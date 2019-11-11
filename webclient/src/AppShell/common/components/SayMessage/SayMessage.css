@@ -1,15 +1,15 @@
 .sayMessage {
-	display: flex;
-	width: 100%;
-	height: 30px;
+  display: flex;
+  width: 100%;
+  height: 30px;
 }
 
 .sayMessage-item,
 .sayMessage-item__field {
-	width: 100%;
-	height: 100%;	
+  width: 100%;
+  height: 100%; 
 }
 
 .sayMessage-submit {
-	width: 30px;
+  width: 30px;
 }

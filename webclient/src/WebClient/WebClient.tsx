@@ -9,6 +9,8 @@ import * as sessionEvents from './events/SessionEvents';
 import { RoomService, SessionService } from './services';
 import { RoomCommands, SessionCommands } from './commands';
 
+import ProtoFiles from './ProtoFiles';
+
 const roomEventKeys = Object.keys(roomEvents);
 const sessionEventKeys = Object.keys(sessionEvents);
 
@@ -19,7 +21,7 @@ interface ApplicationCommands {
 
 interface ApplicationServices {
   rooms: RoomService;
-  server: SessionService;
+  session: SessionService;
 }
 
 export class WebClient {
@@ -47,8 +49,10 @@ export class WebClient {
   };
 
   constructor() {
+    const files = ProtoFiles.map(file => `${WebClient.PB_FILE_DIR}/${file}`);
+    
     this.pb = new protobuf.Root();
-    this.pb.load(WebClient.PB_FILES, { keepCase: false }, (err, root) => {
+    this.pb.load(files, { keepCase: false }, (err, root) => {
       if (err) {
         throw err;
       }
@@ -63,21 +67,27 @@ export class WebClient {
 
     this.services = {
       rooms: new RoomService(this),
-      server: new SessionService(this),
+      session: new SessionService(this),
     };
 
     console.log(this);
   }
 
   public updateStatus(status, description) {
-    this.status = status;
-    this.services.server.updateStatus(status, description);
     console.log(`Status: [${status}]: ${description}`);
+
+    this.status = status;
+    this.services.session.updateStatus(status, description);
+
+    if (status === StatusEnum.DISCONNECTED) {
+      // @TODO clear store
+    }
   }
 
   public resetConnectionvars() {
     this.cmdId = 0;
-    this.pendingCommands = {};    
+    this.pendingCommands = {};
+    this.lastPingPending = false;    
   }
 
   public sendCommand(cmd, callback) {
@@ -87,8 +97,8 @@ export class WebClient {
     this.pendingCommands[this.cmdId] = callback;
 
     if (this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(this.pb.CommandContainer.encode(cmd).finish());
-        this.debug(() => console.log("Sent: " + cmd.toString()));
+      this.socket.send(this.pb.CommandContainer.encode(cmd).finish());
+      this.debug(() => console.log("Sent: " + cmd.toString()));
     } else {
       this.debug(() => console.log("Send: Not connected"));
     }
@@ -114,11 +124,11 @@ export class WebClient {
       "sessionCommand" : [ sesCmd ]
     });
 
-    this.sendCommand(cmd, raw => {
+    this.sendCommand(cmd, (raw, raw2) => {
       this.debug(() => console.log(raw));
       
       if (callback) {
-        callback(raw);
+        callback(raw, raw2);
       }
     });
   }
@@ -163,13 +173,13 @@ export class WebClient {
 
     this.socket.onclose = () => {
       // @TODO determine if these connectionClosed hooks are desired
-      // this.services.server.connectionClosed('Connection Closed');
+      // this.services.session.connectionClosed('Connection Closed');
       this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
     };
 
     this.socket.onerror = () => {
       // @TODO determine if these connectionClosed hooks are desired
-      // this.services.server.connectionClosed('Connection Failed');
+      // this.services.session.connectionClosed('Connection Failed');
       this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
     };
 
@@ -268,32 +278,6 @@ export class WebClient {
   }
 
   static PB_FILE_DIR = `${process.env.PUBLIC_URL}/pb`;
-
-  static PB_FILES = [
-    // commands
-    `${WebClient.PB_FILE_DIR}/commands.proto`,
-    `${WebClient.PB_FILE_DIR}/session_commands.proto`,
-    `${WebClient.PB_FILE_DIR}/room_commands.proto`,
-    // replies
-    `${WebClient.PB_FILE_DIR}/server_message.proto`,
-    `${WebClient.PB_FILE_DIR}/response.proto`,
-    `${WebClient.PB_FILE_DIR}/response_login.proto`,
-    `${WebClient.PB_FILE_DIR}/session_event.proto`,
-    `${WebClient.PB_FILE_DIR}/event_server_message.proto`,
-    `${WebClient.PB_FILE_DIR}/event_server_identification.proto`,
-    `${WebClient.PB_FILE_DIR}/event_server_shutdown.proto`,
-    `${WebClient.PB_FILE_DIR}/event_notify_user.proto`,
-    `${WebClient.PB_FILE_DIR}/event_connection_closed.proto`,
-    `${WebClient.PB_FILE_DIR}/event_list_rooms.proto`,
-    `${WebClient.PB_FILE_DIR}/response_join_room.proto`,
-    `${WebClient.PB_FILE_DIR}/room_event.proto`,
-    `${WebClient.PB_FILE_DIR}/event_room_say.proto`,
-    `${WebClient.PB_FILE_DIR}/event_join_room.proto`,
-    `${WebClient.PB_FILE_DIR}/event_leave_room.proto`,
-    `${WebClient.PB_FILE_DIR}/event_list_games.proto`,
-    `${WebClient.PB_FILE_DIR}/serverinfo_user.proto`,
-    `${WebClient.PB_FILE_DIR}/serverinfo_game.proto`
-  ];
 }
 
 const webClient = new WebClient();

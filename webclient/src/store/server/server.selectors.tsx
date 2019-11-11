@@ -1,13 +1,14 @@
 import { ServerState } from './server.interfaces';
 
 interface State {
-	server: ServerState
+  server: ServerState
 }
 
 export const Selectors = {
-	getMessage: ({ server }: State) => server.info.message,
-	getName: ({ server }: State) => server.info.name,
-	getDescription: ({ server }: State) => server.status.description,
-	getState: ({ server }: State) => server.status.state,
-	getUser: ({ server }: State) => server.user
+  getMessage: ({ server }: State) => server.info.message,
+  getName: ({ server }: State) => server.info.name,
+  getDescription: ({ server }: State) => server.status.description,
+  getState: ({ server }: State) => server.status.state,
+  getUser: ({ server }: State) => server.user,
+  getUsers: ({ server }: State) => server.users
 }

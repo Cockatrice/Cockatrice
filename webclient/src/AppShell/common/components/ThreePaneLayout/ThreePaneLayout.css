@@ -1,0 +1,26 @@
+.three-pane-layout {
+  height: 100%;
+  display: flex;
+}
+
+.three-pane-layout__main {
+  width: 100%;
+}
+
+.three-pane-layout__main-top {
+  height: 50%;
+  border-bottom: 1px solid;
+}
+
+.three-pane-layout__main-bottom {
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.three-pane-layout__side:not(:empty) {
+  width: 25%;
+  max-width: 300px;
+  flex-shrink: 0;
+  border-left: 1px solid;
+}

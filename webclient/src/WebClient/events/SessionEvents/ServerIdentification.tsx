@@ -23,7 +23,7 @@ const defaultLoginConfig = {
 
 export const ServerIdentification = {
   id: '.Event_ServerIdentification.ext',
-  action: (info, webClient) => {
+  action: (info, webClient, _raw) => {
     const { serverName, serverVersion, protocolVersion } = info;
 
     if (protocolVersion !== webClient.protocolVersion) {
@@ -34,7 +34,7 @@ export const ServerIdentification = {
 
     webClient.resetConnectionvars();
     webClient.updateStatus(StatusEnum.CONNECTED, 'Logging in...');
-    webClient.services.server.updateInfo(serverName, serverVersion);
+    webClient.services.session.updateInfo(serverName, serverVersion);
 
     const loginConfig = {
       ...defaultLoginConfig,
@@ -59,10 +59,11 @@ export const ServerIdentification = {
       switch(raw.responseCode) {
         case webClient.pb.Response.ResponseCode.RespOk:
           const { userInfo } = resp;
-          webClient.services.server.updateUser(userInfo);
+          webClient.services.session.updateUser(userInfo);
+          webClient.commands.session.listUsers();
+          webClient.commands.session.listRooms();
           webClient.updateStatus(StatusEnum.LOGGEDIN, 'Logged in.');
           webClient.startPingLoop();
-          webClient.services.server.fetchRooms();
           break;
 
         case webClient.pb.Response.ResponseCode.RespClientUpdateRequired:

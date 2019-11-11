@@ -1,44 +1,45 @@
 export interface ServerConnectParams {
-	host: string;
-	port: string;
-	user: string;
-	pass: string;
+  host: string;
+  port: string;
+  user: string;
+  pass: string;
 }
 
 export interface ServerState {
-	info: ServerStateInfo;
-	status: ServerStateStatus;
-	user: ServerStateUser;
+  info: ServerStateInfo;
+  status: ServerStateStatus;
+  user: ServerStateUser;
+  users: ServerStateUser[];
 }
 
 export interface ServerStateStatus {
-	description: string;
-	state: number;
+  description: string;
+  state: number;
 }
 
 export interface ServerStateInfo {
-	message: string;
-	name: string;
-	version: string;
+  message: string;
+  name: string;
+  version: string;
 }
 
 export interface ServerStateUser {
-	accountageSecs: number;
-	avatarBmp: Uint8Array;
-	country: string;
-	gender: number;
-	name: string;
-	privlevel: ServerStateUserAccessLevel;
-	userLevel: ServerStateUserPrivLevel;
+  accountageSecs: number;
+  avatarBmp: Uint8Array;
+  country: string;
+  gender: number;
+  name: string;
+  privlevel: ServerStateUserAccessLevel;
+  userLevel: ServerStateUserPrivLevel;
 }
 
 export enum ServerStateUserAccessLevel {
-	"NONE"
+  "NONE"
 }
 
 export enum ServerStateUserPrivLevel {
-	"unknown 1",
-	"unknown 2",
-	"unknown 3",
-	"unknown 4"
+  "unknown 1",
+  "unknown 2",
+  "unknown 3",
+  "unknown 4"
 }

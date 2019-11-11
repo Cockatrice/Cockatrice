@@ -11,7 +11,7 @@ import Server from './Server/Server';
 
 const Routes = () => (
   <div className="AppShell-routes overflow-scroll">
-  	<Switch>
+    <Switch>
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
       {<Route path={`${RouteEnum.ROOM}/:roomId`} render={() => <Room />} />}
       <Route path={RouteEnum.GAME} render={() => <Game />} />

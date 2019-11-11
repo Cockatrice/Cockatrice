@@ -1,38 +1,17 @@
-.room-view {
-	height: 100%;
-  display: flex;
+.room-view,
+.room-view__games,
+.room-view__messages,
+.room-view__messages-content {
+  height: 100%;
 }
 
-.room-view__main {
-	width: 100%;
-}
-
-.room-view__main-games {
-	height: 50%;
-	border-bottom: 1px solid;
-}
-
-.room-view__main-messages {
-	height: 50%;
+.room-view__messages {
   display: flex;
   flex-direction: column;
 }
 
-
-.room-view__main-games__content,
-.room-view__main-messages__content {
-	height: 100%;
-}
-
-.room-view__main-messages__sayMessage {
-	width: 100%;
-	max-width: 600px;
-	margin: 10px auto;
-}
-
-.room-view__sidebar {
-	width: 25%;
-	max-width: 300px;
-	flex-shrink: 0;
-	border-left: 1px solid;
+.room-view__sayMessage {
+  width: 100%;
+  max-width: 600px;
+  margin: 10px auto;
 }

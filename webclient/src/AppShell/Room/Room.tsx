@@ -9,6 +9,7 @@ import { RoomsService } from 'AppShell/common/services';
 import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
 
 import ScrollToBottomOnChanges from '../common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges';
+import ThreePaneLayout from '../common/components/ThreePaneLayout/ThreePaneLayout';
 
 import Games from './Games/Games';
 import Messages from './Messages/Messages';
@@ -18,88 +19,92 @@ import './Room.css';
 // @TODO figure out how to properly type this component
 // Component<RouteComponentProps<???, ???, ???>>
 class Room extends Component<any> {
-	gametypeMap = {};
+  gametypeMap = {};
 
-	constructor(props) {
-		super(props);
+  constructor(props) {
+    super(props);
 
-		const { roomId } = this.props.match.params;
+    const { roomId } = this.props.match.params;
 
-		this.gametypeMap = this.props.rooms[roomId].gametypeList.reduce((map, type) => {
-			map[type.gameTypeId] = type.description;
-			return map;
-		})
+    this.gametypeMap = this.props.rooms[roomId].gametypeList.reduce((map, type) => {
+      map[type.gameTypeId] = type.description;
+      return map;
+    })
 
-		this.handleSubmit = this.handleSubmit.bind(this);
-	}
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
-	handleSubmit({ message }) {
-		if (message) {
-			const { roomId } = this.props.match.params;
-			RoomsService.roomSay(roomId, message);
-		}
-	}
+  handleSubmit({ message }) {
+    if (message) {
+      const { roomId } = this.props.match.params;
+      RoomsService.roomSay(roomId, message);
+    }
+  }
 
-	hideUnavailableGame({ started, maxPlayers, playerCount }) {
-		return !started && playerCount < maxPlayers;
-	}
+  hideUnavailableGame({ started, maxPlayers, playerCount }) {
+    return !started && playerCount < maxPlayers;
+  }
 
-	hidePasswordProtectedGame({ withPassword }) {
-		return !withPassword;
-	}
+  hidePasswordProtectedGame({ withPassword }) {
+    return !withPassword;
+  }
 
-	hideBuddiesOnlyGame({ onlyBuddies }) {
-		return !onlyBuddies;
-	}
+  hideBuddiesOnlyGame({ onlyBuddies }) {
+    return !onlyBuddies;
+  }
 
-	render() {
-		const { roomId } = this.props.match.params;
-		const room = this.props.rooms[roomId];
+  render() {
+    const { roomId } = this.props.match.params;
+    const room = this.props.rooms[roomId];
 
-		const messages = this.props.messages[roomId];
-		const games = room.gameList.filter(game => (
-			this.hideUnavailableGame(game) &&
-			this.hidePasswordProtectedGame(game) &&
-			this.hideBuddiesOnlyGame(game)
-		));
+    const messages = this.props.messages[roomId];
+    const games = room.gameList.filter(game => (
+      this.hideUnavailableGame(game) &&
+      this.hidePasswordProtectedGame(game) &&
+      this.hideBuddiesOnlyGame(game)
+    ));
 
-		return (
-			<div className="room-view">
-				<div className="room-view__main">
-					<div className="room-view__main-games">
-						<div className="room-view__main-games__content overflow-scroll">
-							<Games games={games} gameTypesMap={this.gametypeMap} />
-						</div>						
-					</div>
-					<div className="room-view__main-messages">
-						<div className="room-view__main-messages__content overflow-scroll">
-							<ScrollToBottomOnChanges changes={messages.length} content={(
-								<Messages messages={messages} />
-							)} />
-						</div>
-						<div className="room-view__main-messages__sayMessage">
-							<SayMessage onSubmit={this.handleSubmit} />
-						</div>
-					</div>
-				</div>
-				<div className="room-view__sidebar">
-					USERS PANEL
-				</div>
+    return (
+      <div className="room-view">
+        <ThreePaneLayout
+          top={(
+            <div className="room-view__games overflow-scroll">
+              <Games games={games} gameTypesMap={this.gametypeMap} />
+            </div>    
+          )}
 
+          bottom={(
+            <div className="room-view__messages">
+              <div className="room-view__messages-content overflow-scroll">
+                <ScrollToBottomOnChanges changes={messages} content={(
+                  <Messages messages={messages} />
+                )} />
+              </div>
+              <div className="room-view__messages-sayMessage">
+                <SayMessage onSubmit={this.handleSubmit} />
+              </div>
+            </div>
+          )}
 
-			</div>
-		);
-	}
+          side={(
+            <div className="room-view__side">
+              USERS PANEL
+            </div>
+          )}
+        />
+      </div>
+    );
+  }
 }
 
 interface RoomProps {
-	messages: RoomsStateMessages;
-	rooms: RoomsStateRooms;
+  messages: RoomsStateMessages;
+  rooms: RoomsStateRooms;
 }
 
 const mapStateToProps = state => ({
-	messages: Selectors.getMessages(state),
-	rooms: Selectors.getRooms(state),
+  messages: Selectors.getMessages(state),
+  rooms: Selectors.getRooms(state),
 });
 
 export default withRouter(connect(mapStateToProps)(Room));

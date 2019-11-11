@@ -7,7 +7,33 @@ export class SessionCommands {
     this.webClient = webClient;
   }
 
-  fetchRooms() {
+  listUsers() {
+    const CmdListUsers = this.webClient.pb.Command_ListUsers.create();
+
+    const sc = this.webClient.pb.SessionCommand.create({
+      ".Command_ListUsers.ext" : CmdListUsers
+    });
+
+    this.webClient.sendSessionCommand(sc, raw => {
+      const { responseCode } = raw;
+      const response = raw['.Response_ListUsers.ext'];
+
+      console.log('ListUsers', raw);
+
+      if (response) {
+        switch (responseCode) {
+          case this.webClient.pb.Response.ResponseCode.RespOk:
+            this.webClient.services.session.updateUsers(response.userList);
+            break;
+          default:
+            console.log(`Failed to fetch Server Rooms [${responseCode}] : `, raw);
+        }
+      }
+
+    });
+  }
+
+  listRooms() {
     const CmdListRooms = this.webClient.pb.Command_ListRooms.create();
 
     const sc = this.webClient.pb.SessionCommand.create({

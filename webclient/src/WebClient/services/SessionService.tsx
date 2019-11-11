@@ -18,14 +18,6 @@ export class SessionService {
     this.updateStatus(StatusEnum.CONNECTING, 'Connecting');
   }
 
-  fetchRooms() {
-    this.webClient.commands.session.fetchRooms();
-  }
-
-  joinRoom(roomId: string) {
-    this.webClient.commands.session.joinRoom(roomId);
-  }
-
   connectionClosed(reason) {
     Dispatch.connectionClosed(reason);
   }
@@ -47,6 +39,10 @@ export class SessionService {
 
   updateUser(user) {
     Dispatch.updateUser(user);
+  }
+
+  updateUsers(users) {
+    Dispatch.updateUsers(users);
   }
 
   serverMessage(message) {

@@ -1,14 +1,15 @@
-.server {
-
+.server,
+.server-rooms {
+  height: 100%;
 }
 
 .server-connect {
-	margin-top: 50px;
-	display: flex;
-	justify-content: center;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
 }
 
 .serverMessage {
-	padding: 20px;
-	border-top: 2px solid black;
+  padding: 20px;
+  border-top: 2px solid black;
 }

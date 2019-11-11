@@ -3,24 +3,24 @@
 
 .rooms-header,
 .room {
-	display: flex;
-	padding: 10px;
-	border-bottom: 1px solid black;
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid black;
 }
 
 .rooms-header__label,
 .room__detail {
-	width: 10%;
-	flex-grow: 0;
+  width: 10%;
+  flex-grow: 0;
 }
 
 .rooms-header__label.name,
 .room__detail.name {
-	width: 20%;
+  width: 20%;
 }
 
 .rooms-header__label.description,
 .room__detail.description {
-	width: 30%;
-	flex-grow: 1;
+  width: 30%;
+  flex-grow: 1;
 }

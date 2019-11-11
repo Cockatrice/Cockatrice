@@ -34,6 +34,6 @@ export const ConnectionClosed = {
     }
 
     // @TODO: This of a better place for this response data
-    webClient.services.server.updateStatus(StatusEnum.DISCONNECTED, message);
+    webClient.services.session.updateStatus(StatusEnum.DISCONNECTED, message);
   }
 };

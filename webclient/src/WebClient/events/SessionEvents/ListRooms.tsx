@@ -10,11 +10,11 @@ export const ListRooms = {
     webClient.services.rooms.updateRooms(roomList);
 
     if (webClient.options.autojoinrooms) {
-	    _.each(roomList, ({ autoJoin, roomId }) => {
-	    	if (autoJoin) {
-		    	webClient.services.server.joinRoom(roomId);
-	    	}
-	    });
+      _.each(roomList, ({ autoJoin, roomId }) => {
+        if (autoJoin) {
+          webClient.commands.session.joinRoom(roomId);
+        }
+      });
     }
   }
 };
