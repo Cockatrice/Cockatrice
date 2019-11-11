@@ -67,7 +67,7 @@ static void setupParserRules()
 
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
-        return [=](CardData x) {
+    return [=](CardData x) {
             for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
                 if (!sv[i].get<Filter>()(x))
                     return false;
@@ -75,7 +75,8 @@ static void setupParserRules()
             return true;
         };
     };
-    search["ComplexQueryPart"] = [](const peg::SemanticValues &sv) -> Filter {
+    search["ComplexQueryPart"] = [](const peg::SemanticValues &sv) -> Filter
+    {
         return [=](CardData x) {
             for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
                 if (sv[i].get<Filter>()(x))
