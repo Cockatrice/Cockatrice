@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.6.1",
     "@types/jest": "24.0.20",
     "@types/jquery": "^3.3.31",
     "@types/lodash": "^4.14.145",
+    "@types/material-ui": "^0.21.7",
     "@types/node": "12.11.7",
     "@types/prop-types": "^15.7.3",
     "@types/protobufjs": "^6.0.0",
