@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 
 // import { RoomsService } from 'AppShell/common/services';
 
-import User from 'AppShell/common/components/User/User';
+import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
 
 import './Games.css';
 
@@ -25,7 +25,7 @@ const Games = ({ games, gameTypesMap }) => (
         <div className="game" key={gameId}>
           <div className="game__detail age">{gameId}</div>
           <div className="game__detail description">{description}</div>
-          <div className="game__detail creator"><User user={ creatorInfo } /></div>
+          <div className="game__detail creator"><UserDisplay user={ creatorInfo } /></div>
           <div className="game__detail type">{gameTypesMap[gameTypes[0]]}</div>
           <div className="game__detail restrictions">?</div>
           <div className="game__detail players">{`${playerCount}/${maxPlayers}`}</div>

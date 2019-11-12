@@ -17,7 +17,8 @@ export const Selectors = {
     return _.filter(Selectors.getRooms(state), room => joined[room.roomId]);
   },
   getRoomMessages: (state: State, roomId: number) => Selectors.getMessages(state)[roomId],
-  getRoomGames: (state: State, roomId: number) => Selectors.getRooms(state)[roomId].gameList
+  getRoomGames: (state: State, roomId: number) => Selectors.getRooms(state)[roomId].gameList,
+  getRoomUsers: (state: State, roomId: number) => Selectors.getRooms(state)[roomId].userList
 
 }
 

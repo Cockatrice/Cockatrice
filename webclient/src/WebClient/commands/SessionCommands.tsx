@@ -18,8 +18,6 @@ export class SessionCommands {
       const { responseCode } = raw;
       const response = raw['.Response_ListUsers.ext'];
 
-      console.log('ListUsers', raw);
-
       if (response) {
         switch (responseCode) {
           case this.webClient.pb.Response.ResponseCode.RespOk:

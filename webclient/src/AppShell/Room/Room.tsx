@@ -4,12 +4,15 @@ import { connect } from 'react-redux';
 import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
+import { User } from 'types';
 
 import { RoomsService } from 'AppShell/common/services';
-import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
 
-import ScrollToBottomOnChanges from '../common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges';
-import ThreePaneLayout from '../common/components/ThreePaneLayout/ThreePaneLayout';
+import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
+import ScrollToBottomOnChanges from 'AppShell/common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges';
+import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
+import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
+
 
 import Games from './Games/Games';
 import Messages from './Messages/Messages';
@@ -54,8 +57,9 @@ class Room extends Component<any> {
   }
 
   render() {
-    const { roomId } = this.props.match.params;
-    const room = this.props.rooms[roomId];
+    const { match, rooms, users} = this.props;
+    const { roomId } = match.params;
+    const room = rooms[roomId];
 
     const messages = this.props.messages[roomId];
     const games = room.gameList.filter(game => (
@@ -88,7 +92,7 @@ class Room extends Component<any> {
 
           side={(
             <div className="room-view__side">
-              USERS PANEL
+              { users.map(user => <UserDisplay user={user} key={user.name} />) }
             </div>
           )}
         />
@@ -100,11 +104,13 @@ class Room extends Component<any> {
 interface RoomProps {
   messages: RoomsStateMessages;
   rooms: RoomsStateRooms;
+  users: User[];
 }
 
 const mapStateToProps = state => ({
   messages: Selectors.getMessages(state),
   rooms: Selectors.getRooms(state),
+  users: [] // Selectors.getUsers(state),
 });
 
 export default withRouter(connect(mapStateToProps)(Room));

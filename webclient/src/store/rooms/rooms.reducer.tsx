@@ -42,6 +42,8 @@ export const roomsReducer = (state = initialState, action: any) => {
 
       const { joined, rooms } = state;
 
+      console.log('joined', roomInfo);
+
       return {
         ...state,
 

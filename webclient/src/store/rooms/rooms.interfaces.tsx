@@ -1,3 +1,5 @@
+import { Room } from 'types';
+
 export interface RoomsState {
   rooms: RoomsStateRooms;
   joined: JoinedRooms;
@@ -17,27 +19,8 @@ export interface RoomsStateMessages {
   [roomId: number]: Message[];
 }
 
-export interface Room {
-  autoJoin: boolean
-  description: string;
-  gameCount: number;
-  gameList: any[];
-  gametypeList: any[];
-  name: string;
-  permissionlevel: RoomsStateRoomAccessLevel;
-  playerCount: number;
-  privilegelevel: RoomsStateRoomAccessLevel;
-  roomId: number;
-  userList: any[];
-  order: number;
-}
-
 export interface Message {
   message: string;
   messageType: number;
   timeOf?: number;
-}
-
-export enum RoomsStateRoomAccessLevel {
-  "none"
 }

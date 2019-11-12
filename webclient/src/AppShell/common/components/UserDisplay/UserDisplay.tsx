@@ -2,11 +2,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { User as UserType } from '../../types';
+import { User } from 'types';
 
-import './User.css';
+import './UserDisplay.css';
 
-class User extends Component<UserProps> {
+class UserDisplay extends Component<UserDisplayProps> {
 
   render() {
     const { name } = this.props.user;
@@ -17,12 +17,12 @@ class User extends Component<UserProps> {
   }
 }
 
-interface UserProps {
-  user: UserType
+interface UserDisplayProps {
+  user: User
 }
 
 const mapStateToProps = (state) => ({
 
 });
 
-export default connect(mapStateToProps)(User);
+export default connect(mapStateToProps)(UserDisplay);

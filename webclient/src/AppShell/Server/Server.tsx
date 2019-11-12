@@ -4,13 +4,12 @@ import { connect } from 'react-redux';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
+import { User } from 'types';
+
+import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
+import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
 
 import { AuthenticationService } from 'AppShell/common/services';
-import { User as UserType } from 'AppShell/common/types';
-
-import User from 'AppShell/common/components/User/User';
-import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
-
 
 import ConnectForm from './ConnectForm/ConnectForm';
 import Rooms from './Rooms/Rooms';
@@ -42,7 +41,7 @@ class Server extends Component<ServerProps> {
                         Users connected to server: {users.length}
                       </div>
                       <div className="room-view__side-users">
-                        { users.map(user => <User user={user} key={user.name} />) }
+                        { users.map(user => <UserDisplay user={user} key={user.name} />) }
                       </div>
                     </div>
                   )}
@@ -65,7 +64,7 @@ export interface ServerProps {
   message: string;
   state: number;
   rooms: any[];
-  users: UserType[];
+  users: User[];
 }
 
 const mapStateToProps = state => ({

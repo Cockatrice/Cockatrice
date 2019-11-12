@@ -3,15 +3,9 @@ import { connect } from 'react-redux';
 import { NavLink } from "react-router-dom";
 import * as _ from 'lodash';
 
-import {
-  Selectors as RoomsSelectors,
-  Room
-} from 'store/rooms';
-
-import {
-  Selectors as ServerSelectors,
-  ServerStateUser
-} from 'store/server';
+import { Selectors as RoomsSelectors } from 'store/rooms';
+import { Selectors as ServerSelectors } from 'store/server';
+import { Room, User } from 'types';
 
 import { AuthenticationService } from 'AppShell/common/services';
 import { RouteEnum } from 'AppShell/common/types';
@@ -85,7 +79,7 @@ const Rooms = props => (
 interface HeaderProps {
   state: number;
   server: string;
-  user: ServerStateUser;
+  user: User;
   joinedRooms: Room[];
 }
 
