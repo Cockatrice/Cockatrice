@@ -12,6 +12,7 @@ jobs:
   - name: Check code style / Linting
     if: tag IS NOT present
     os: linux
+    dist: bionic
     group: stable
     script: bash ./.ci/travis-lint.sh
 
