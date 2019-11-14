@@ -163,6 +163,38 @@ export const roomsReducer = (state = initialState, action: any) => {
         }
       }
     }
+    case Types.USER_JOINED: {
+      const { roomId, user } = action;
+
+      const room = { ...state.rooms[roomId] };
+
+      room.userList = [
+        ...room.userList,
+        user
+      ];
+
+      return {
+        ...state,
+        rooms: {
+          ...state.rooms,
+          [roomId]: room 
+        }
+      };
+    }
+    case Types.USER_LEFT: {
+      const { roomId, name } = action;
+
+      const room = { ...state.rooms[roomId] };
+      room.userList = room.userList.filter(user =>  user.name !== name);
+
+      return {
+        ...state,
+        rooms: {
+          ...state.rooms,
+          [roomId]: room 
+        }
+      };
+    }
     default:
       return state;
   }

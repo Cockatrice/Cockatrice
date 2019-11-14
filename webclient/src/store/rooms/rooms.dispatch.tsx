@@ -20,5 +20,13 @@ export const Dispatch = {
 
   updateGames: (roomId, games) => {
     store.dispatch(Actions.updateGames(roomId, games));
+  },
+
+  userJoined: (roomId, user) => {
+    store.dispatch(Actions.userJoined(roomId, user));
+  },
+
+  userLeft: (roomId, name) => {
+    store.dispatch(Actions.userLeft(roomId, name));
   }
 }

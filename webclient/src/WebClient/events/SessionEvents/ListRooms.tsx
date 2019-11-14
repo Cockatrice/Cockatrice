@@ -7,7 +7,7 @@ export const ListRooms = {
     // updateRooms
     // updateRoomGameList
     // updateRoomUserList
-    webClient.services.rooms.updateRooms(roomList);
+    webClient.services.room.updateRooms(roomList);
 
     if (webClient.options.autojoinrooms) {
       _.each(roomList, ({ autoJoin, roomId }) => {

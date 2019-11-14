@@ -15,7 +15,7 @@ export class SessionService {
   connectServer(options: ServerConnectParams) {
     Dispatch.connectServer();
     this.webClient.connect(options);
-    this.updateStatus(StatusEnum.CONNECTING, 'Connecting');
+    this.webClient.updateStatus(StatusEnum.CONNECTING, 'Connecting');
   }
 
   connectionClosed(reason) {

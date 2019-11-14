@@ -1,10 +1,101 @@
+import { StatusEnum } from 'types';
+
 import { WebClient } from '../WebClient'; 
+import { guid } from '../util';
+
+const defaultLoginConfig = {
+  "clientver" : "webclient-1.0 (2019-10-31)",
+  "clientfeatures" : [
+    "client_id",
+    "client_ver",
+    "feature_set",
+    "room_chat_history",
+    "client_warnings",
+    /* unimplemented features */
+    "forgot_password",
+    "idle_client",
+    "mod_log_lookup",
+    "user_ban_history",
+    // satisfy server reqs for POC
+    "websocket",
+    "2.6.1_min_version",
+    "2.7.0_min_version",
+  ]
+}
 
 export class SessionCommands {
   private webClient: WebClient;
 
   constructor(webClient) {
     this.webClient = webClient;
+  }
+
+  login() {
+    const loginConfig = {
+      ...this.webClient.clientConfig,
+      "userName" : this.webClient.options.user,
+      "password" : this.webClient.options.pass,
+      "clientid" : guid()
+    };
+
+    const CmdLogin = this.webClient.pb.Command_Login.create(loginConfig);
+
+    const command = this.webClient.pb.SessionCommand.create({
+      ".Command_Login.ext" : CmdLogin
+    });
+
+    this.webClient.sendSessionCommand(command, raw => {
+      const resp = raw[".Response_Login.ext"];
+
+      this.webClient.debug(() =>  console.log('.Response_Login.ext', resp));
+
+      switch(raw.responseCode) {
+        case this.webClient.pb.Response.ResponseCode.RespOk:
+          const { userInfo } = resp;
+          this.webClient.services.session.updateUser(userInfo);
+          this.webClient.commands.session.listUsers();
+          this.webClient.commands.session.listRooms();
+          this.webClient.updateStatus(StatusEnum.LOGGEDIN, 'Logged in.');
+          this.webClient.startPingLoop();
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespClientUpdateRequired:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: missing features');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespWrongPassword:
+        case this.webClient.pb.Response.ResponseCode.RespUsernameInvalid:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: incorrect username or password');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespWouldOverwriteOldSession:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: duplicated user session');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespUserIsBanned:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: banned user');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespRegistrationRequired:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: registration required');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespClientIdRequired:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: missing client ID');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespContextError:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: server error');
+          break;
+
+        case this.webClient.pb.Response.ResponseCode.RespAccountNotActivated:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: account not activated');
+          break;
+
+        default:
+          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: unknown error ' + raw.responseCode);
+      }
+    });
   }
 
   listUsers() {
@@ -59,7 +150,7 @@ export class SessionCommands {
         case this.webClient.pb.Response.ResponseCode.RespOk:
           const { roomInfo } = raw['.Response_JoinRoom.ext'];
 
-          this.webClient.services.rooms.joinRoom(roomInfo);
+          this.webClient.services.room.joinRoom(roomInfo);
           this.webClient.debug(() => console.log('Join Room: ', roomInfo.name));
           return;
         case this.webClient.pb.Response.ResponseCode.RespNameNotFound:

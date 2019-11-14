@@ -34,38 +34,39 @@ class Room extends Component<any> {
       return map;
     })
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleRoomSay = this.handleRoomSay.bind(this);
   }
 
-  handleSubmit({ message }) {
+  handleRoomSay({ message }) {
     if (message) {
       const { roomId } = this.props.match.params;
       RoomsService.roomSay(roomId, message);
     }
   }
 
-  hideUnavailableGame({ started, maxPlayers, playerCount }) {
+  isUnavailableGame({ started, maxPlayers, playerCount }) {
     return !started && playerCount < maxPlayers;
   }
 
-  hidePasswordProtectedGame({ withPassword }) {
+  isPasswordProtectedGame({ withPassword }) {
     return !withPassword;
   }
 
-  hideBuddiesOnlyGame({ onlyBuddies }) {
+  isBuddiesOnlyGame({ onlyBuddies }) {
     return !onlyBuddies;
   }
 
   render() {
-    const { match, rooms, users} = this.props;
+    const { match, rooms} = this.props;
     const { roomId } = match.params;
     const room = rooms[roomId];
 
     const messages = this.props.messages[roomId];
+    const users = room.userList;
     const games = room.gameList.filter(game => (
-      this.hideUnavailableGame(game) &&
-      this.hidePasswordProtectedGame(game) &&
-      this.hideBuddiesOnlyGame(game)
+      this.isUnavailableGame(game) &&
+      this.isPasswordProtectedGame(game) &&
+      this.isBuddiesOnlyGame(game)
     ));
 
     return (
@@ -85,13 +86,14 @@ class Room extends Component<any> {
                 )} />
               </div>
               <div className="room-view__messages-sayMessage">
-                <SayMessage onSubmit={this.handleSubmit} />
+                <SayMessage onSubmit={this.handleRoomSay} />
               </div>
             </div>
           )}
 
           side={(
             <div className="room-view__side">
+              Users in this room: {users.length}
               { users.map(user => <UserDisplay user={user} key={user.name} />) }
             </div>
           )}
@@ -104,13 +106,11 @@ class Room extends Component<any> {
 interface RoomProps {
   messages: RoomsStateMessages;
   rooms: RoomsStateRooms;
-  users: User[];
 }
 
 const mapStateToProps = state => ({
   messages: Selectors.getMessages(state),
-  rooms: Selectors.getRooms(state),
-  users: [] // Selectors.getUsers(state),
+  rooms: Selectors.getRooms(state)
 });
 
 export default withRouter(connect(mapStateToProps)(Room));

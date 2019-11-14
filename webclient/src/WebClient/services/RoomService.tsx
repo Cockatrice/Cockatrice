@@ -30,4 +30,12 @@ export class RoomService {
 
     Dispatch.addMessage(roomId, message);
   }
+
+  userJoined(roomId, user) {
+    Dispatch.userJoined(roomId, user);
+  }
+
+  userLeft(roomId, name) {
+    Dispatch.userLeft(roomId, name);
+  }
 }

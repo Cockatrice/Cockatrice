@@ -20,7 +20,7 @@ interface ApplicationCommands {
 }
 
 interface ApplicationServices {
-  rooms: RoomService;
+  room: RoomService;
   session: SessionService;
 }
 
@@ -37,6 +37,26 @@ export class WebClient {
 
   public protocolVersion = 14;
   public pb;
+
+  public clientConfig = {
+    "clientver" : "webclient-1.0 (2019-10-31)",
+    "clientfeatures" : [
+      "client_id",
+      "client_ver",
+      "feature_set",
+      "room_chat_history",
+      "client_warnings",
+      /* unimplemented features */
+      "forgot_password",
+      "idle_client",
+      "mod_log_lookup",
+      "user_ban_history",
+      // satisfy server reqs for POC
+      "websocket",
+      "2.6.1_min_version",
+      "2.7.0_min_version",
+    ]
+  };
 
   public options: any = {
     host: '',
@@ -66,7 +86,7 @@ export class WebClient {
     };
 
     this.services = {
-      rooms: new RoomService(this),
+      room: new RoomService(this),
       session: new SessionService(this),
     };
 

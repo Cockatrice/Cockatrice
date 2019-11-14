@@ -5,6 +5,7 @@ export const ConnectionClosed = {
   action: ({ reason }, webClient) => {
     let message = '';
 
+    // @TODO figure out how to reflect this change in the ui
     switch(reason) {
       case webClient.pb.Event_ConnectionClosed.CloseReason.USER_LIMIT_REACHED:
         message = 'The server has reached its maximum user capacity';

@@ -26,5 +26,17 @@ export const Actions = {
     type: Types.UPDATE_GAMES,
     roomId,
     games
+  }),
+
+  userJoined: (roomId, user) => ({
+    type: Types.USER_JOINED,
+    roomId,
+    user
+  }),
+
+  userLeft: (roomId, name) => ({
+    type: Types.USER_LEFT,
+    roomId,
+    name
   })
 }

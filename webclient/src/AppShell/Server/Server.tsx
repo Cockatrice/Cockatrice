@@ -41,7 +41,9 @@ class Server extends Component<ServerProps> {
                         Users connected to server: {users.length}
                       </div>
                       <div className="room-view__side-users">
-                        { users.map(user => <UserDisplay user={user} key={user.name} />) }
+                        { users.map(user => {
+                          return (<UserDisplay user={user} key={user.name} />);
+                        } ) }
                       </div>
                     </div>
                   )}
