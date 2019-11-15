@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
-import { FixedSizeList } from 'react-window';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
