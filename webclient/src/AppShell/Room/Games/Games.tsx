@@ -38,7 +38,7 @@ const Games = ({ games, gameTypesMap }) => (
             <TableCell>{gameTypesMap[gameTypes[0]]}</TableCell>
             <TableCell>?</TableCell>
             <TableCell>{`${playerCount}/${maxPlayers}`}</TableCell>
-            <TableCell>spectatorsCount</TableCell>
+            <TableCell>{spectatorsCount}</TableCell>
           </TableRow>
         ))}
       </TableBody>
