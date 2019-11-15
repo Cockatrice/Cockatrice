@@ -2,6 +2,10 @@ import { Actions } from './rooms.actions';
 import { store } from '../store';
 
 export const Dispatch = {
+  clearStore: () => {
+    store.dispatch(Actions.clearStore());
+  },
+  
   updateRooms: rooms => {
     store.dispatch(Actions.updateRooms(rooms));
   },

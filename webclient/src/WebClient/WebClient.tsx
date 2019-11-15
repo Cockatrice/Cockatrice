@@ -100,7 +100,8 @@ export class WebClient {
     this.services.session.updateStatus(status, description);
 
     if (status === StatusEnum.DISCONNECTED) {
-      // @TODO clear store
+      // this.services.room.clearStore();
+      // this.services.session.clearStore();
     }
   }
 

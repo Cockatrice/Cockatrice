@@ -11,6 +11,10 @@ export class SessionService {
     this.webClient = webClient;
   }
 
+  clearStore() {
+    Dispatch.clearStore();
+  }
+
   // @TODO determine proper connect status tracking
   connectServer(options: ServerConnectParams) {
     Dispatch.connectServer();

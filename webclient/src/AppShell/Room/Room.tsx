@@ -2,6 +2,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
+import { FixedSizeList } from 'react-window';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
 import { User } from 'types';
@@ -37,6 +40,7 @@ class Room extends Component<any> {
     this.handleRoomSay = this.handleRoomSay.bind(this);
   }
 
+  // @TODO clear input onSubmit
   handleRoomSay({ message }) {
     if (message) {
       const { roomId } = this.props.match.params;
@@ -94,7 +98,13 @@ class Room extends Component<any> {
           side={(
             <div className="room-view__side">
               Users in this room: {users.length}
-              { users.map(user => <UserDisplay user={user} key={user.name} />) }
+              <List dense={true}>
+                { users.map(user => (
+                  <ListItem button key={user.name}>
+                    <UserDisplay user={user} key={user.name} />
+                  </ListItem>
+                ) ) }
+              </List>
             </div>
           )}
         />

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { NavLink } from "react-router-dom";
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import * as _ from 'lodash';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
@@ -17,33 +19,35 @@ class Header extends Component<HeaderProps> {
   render() {
     return (
       <div>
-        <header className="Header">
-          <NavLink to={RouteEnum.SERVER}>
-            <img src={logo} className="Header__logo" alt="logo" />
-          </NavLink>
-          <div className="Header-content">{
-            AuthenticationService.isConnected(this.props.state) && (
-              <nav className="Header-nav">
-                <ul className="Header-nav__items">
-                  <li className="Header-nav__item">
-                    <NavLink to={RouteEnum.SERVER}>
-                      Server ({this.props.server})
+        {/*<header className="Header">*/}
+        <AppBar position="static">
+          <Toolbar variant="dense">
+            <NavLink to={RouteEnum.SERVER}>
+              <img src={logo} className="Header__logo" alt="logo" />
+            </NavLink>
+            <div className="Header-content">{
+              AuthenticationService.isConnected(this.props.state) && (
+                <nav className="Header-nav">
+                  <ul className="Header-nav__items">
+                    <li className="Header-nav__item">
+                      <NavLink to={RouteEnum.SERVER}>
+                        Server ({this.props.server})
+                      </NavLink>
+                    </li>
+                    <NavLink to={RouteEnum.ACCOUNT}>
+                      <div className="Header-account">
+                        <span className="Header-account__name">
+                          {this.props.user.name}
+                        </span>
+                        <span className="Header-account__indicator"></span>
+                      </div>
                     </NavLink>
-                  </li>
-                  <strong>|</strong>
-                  <NavLink to={RouteEnum.ACCOUNT}>
-                    <div className="Header-account">
-                      <span className="Header-account__name">
-                        {this.props.user.name}
-                      </span>
-                      <span className="Header-account__indicator"></span>
-                    </div>
-                  </NavLink>
-                </ul>
-              </nav>
-            )
-          }</div>
-        </header>
+                  </ul>
+                </nav>
+              )
+            }</div>
+          </Toolbar>
+        </AppBar>
         <div className="temp-subnav">
           {
             this.props.joinedRooms.length > 0 && (

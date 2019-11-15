@@ -9,6 +9,10 @@ export class RoomService {
     this.webClient = webClient;
   }
 
+  clearStore() {
+    Dispatch.clearStore();
+  }
+
   joinRoom(roomInfo) {
     Dispatch.joinRoom(roomInfo);
   }

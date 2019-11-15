@@ -2,6 +2,9 @@ import { Actions } from './server.actions';
 import { store } from '../store';
 
 export const Dispatch = {
+  clearStore: () => {
+    store.dispatch(Actions.clearStore());
+  },
   connectServer: () => {
     store.dispatch(Actions.connectServer());
   },

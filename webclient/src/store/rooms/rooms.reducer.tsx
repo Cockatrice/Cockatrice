@@ -12,6 +12,11 @@ const initialState: RoomsState = {
 
 export const roomsReducer = (state = initialState, action: any) => {
   switch(action.type) {
+    case Types.CLEAR_STORE: {
+      return {
+        ...initialState
+      };
+    }
     case Types.UPDATE_ROOMS: {
       const rooms = {
         ...state.rooms
@@ -41,6 +46,8 @@ export const roomsReducer = (state = initialState, action: any) => {
       const { roomId } = roomInfo;
 
       const { joined, rooms } = state;
+
+      roomInfo.userList.sort((a, b) => a.name.localeCompare(b.name));
 
       console.log('joined', roomInfo);
 
@@ -172,6 +179,8 @@ export const roomsReducer = (state = initialState, action: any) => {
         ...room.userList,
         user
       ];
+
+      room.userList.sort((a, b) => a.name.localeCompare(b.name));
 
       return {
         ...state,

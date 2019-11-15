@@ -1,6 +1,8 @@
 // eslint-disable-next-line
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
@@ -40,11 +42,13 @@ class Server extends Component<ServerProps> {
                       <div className="room-view__side-label">
                         Users connected to server: {users.length}
                       </div>
-                      <div className="room-view__side-users">
-                        { users.map(user => {
-                          return (<UserDisplay user={user} key={user.name} />);
-                        } ) }
-                      </div>
+                      <List dense={true}>
+                        { users.map(user => (
+                          <ListItem button key={user.name}>
+                            <UserDisplay user={user} key={user.name} />
+                          </ListItem>
+                        ) ) }
+                      </List>
                     </div>
                   )}
                 />

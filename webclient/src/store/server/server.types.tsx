@@ -1,4 +1,5 @@
 export const Types = {
+  CLEAR_STORE: "[Server] Clear Store",
   CONNECT_SERVER: "[Server] Connect Server",
   CONNECTION_CLOSED: "[Server] Connection Closed",
   SERVER_MESSAGE: "[Server] Server Message",

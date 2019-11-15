@@ -1,6 +1,11 @@
 // eslint-disable-next-line
 import React from 'react';
 import * as _ from 'lodash';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 import { RoomsService } from 'AppShell/common/services';
 
@@ -8,28 +13,32 @@ import './Rooms.css';
 
 const Rooms = ({ rooms }) => (
   <div className="rooms">
-    <div className="rooms-header">
-      <div className="rooms-header__label name">Name</div>
-      <div className="rooms-header__label description">Description</div>
-      <div className="rooms-header__label permissions">Permissions</div>
-      <div className="rooms-header__label players">Players</div>
-      <div className="rooms-header__label games">Games</div>
-      <div className="rooms-header__label button"></div>
-    </div>
-    {
-      _.map(rooms, ({ description, gameCount, name, permissionlevel, playerCount, roomId }) => (
-        <div className="room" key={roomId}>
-          <div className="room__detail name">{name}</div>
-          <div className="room__detail description">{description}</div>
-          <div className="room__detail permissions">{permissionlevel}</div>
-          <div className="room__detail players">{playerCount}</div>
-          <div className="room__detail games">{gameCount}</div>
-          <div className="room__detail button">
-            <button onClick={() => RoomsService.joinRoom(roomId)}>Join</button>
-          </div>
-        </div>
-      ))
-    }
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell>Name</TableCell>
+          <TableCell>Description</TableCell>
+          <TableCell>Permissions</TableCell>
+          <TableCell>Players</TableCell>
+          <TableCell>Games</TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        { _.map(rooms, ({ description, gameCount, name, permissionlevel, playerCount, roomId }) => (
+          <TableRow key={roomId}>
+            <TableCell>{name}</TableCell>
+            <TableCell>{description}</TableCell>
+            <TableCell>{permissionlevel}</TableCell>
+            <TableCell>{playerCount}</TableCell>
+            <TableCell>{gameCount}</TableCell>
+            <TableCell>
+              <button onClick={() => RoomsService.joinRoom(roomId)}>Join</button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   </div>
 );
 

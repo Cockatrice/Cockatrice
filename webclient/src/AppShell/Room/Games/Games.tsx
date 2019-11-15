@@ -1,6 +1,11 @@
 // eslint-disable-next-line
 import React from 'react';
 import * as _ from 'lodash';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 // import { RoomsService } from 'AppShell/common/services';
 
@@ -10,32 +15,34 @@ import './Games.css';
 
 const Games = ({ games, gameTypesMap }) => (
   <div className="games">
-    <div className="games-header">
-      <div className="games-header__label age">Age</div>
-      <div className="games-header__label description">Description</div>
-      <div className="games-header__label creator">Creator</div>
-      <div className="games-header__label type">Type</div>
-      <div className="games-header__label restrictions">Restrictions</div>
-      <div className="games-header__label players">Players</div>
-      <div className="games-header__label spectators">Spectators</div>
-      {/*<div className="games-header__label button"></div>*/}
-    </div>
-    {
-      _.map(games, ({ description, gameId, gameTypes, creatorInfo, maxPlayers, playerCount, spectatorsCount }) => (
-        <div className="game" key={gameId}>
-          <div className="game__detail age">{gameId}</div>
-          <div className="game__detail description">{description}</div>
-          <div className="game__detail creator"><UserDisplay user={ creatorInfo } /></div>
-          <div className="game__detail type">{gameTypesMap[gameTypes[0]]}</div>
-          <div className="game__detail restrictions">?</div>
-          <div className="game__detail players">{`${playerCount}/${maxPlayers}`}</div>
-          <div className="game__detail spectators">{spectatorsCount}</div>
-          {/*<div className="game__detail button">
-            <button onClick={() => {}}>Join</button>
-          </div>*/}
-        </div>
-      ))
-    }
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell>Age</TableCell>
+          <TableCell>Description</TableCell>
+          <TableCell>Creator</TableCell>
+          <TableCell>Type</TableCell>
+          <TableCell>Restrictions</TableCell>
+          <TableCell>Players</TableCell>
+          <TableCell>Spectators</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        { _.map(games, ({ description, gameId, gameTypes, creatorInfo, maxPlayers, playerCount, spectatorsCount }) => (
+          <TableRow key={gameId}>
+            <TableCell>{gameId}</TableCell>
+            <TableCell>{description}</TableCell>
+            <TableCell>
+              <UserDisplay user={ creatorInfo } />
+            </TableCell>
+            <TableCell>{gameTypesMap[gameTypes[0]]}</TableCell>
+            <TableCell>?</TableCell>
+            <TableCell>{`${playerCount}/${maxPlayers}`}</TableCell>
+            <TableCell>spectatorsCount</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   </div>
 );
 

@@ -19,8 +19,7 @@ const initialState: ServerState = {
 
 export const serverReducer = (state = initialState, action: any) => {
   switch(action.type) {
-    case Types.CONNECT_SERVER:
-    case Types.CONNECTION_CLOSED: {
+    case Types.CLEAR_STORE: {
       return {
         ...initialState,
         status: {
@@ -67,6 +66,7 @@ export const serverReducer = (state = initialState, action: any) => {
     }
     case Types.UPDATE_USERS: {
       const users = [ ...action.users ];
+      users.sort((a, b) => a.name.localeCompare(b.name));
 
       return {
         ...state,
@@ -74,12 +74,16 @@ export const serverReducer = (state = initialState, action: any) => {
       };
     }
     case Types.USER_JOINED: {
+      const users = [
+        ...state.users,
+        { ...action.user }
+      ];
+
+      users.sort((a, b) => a.name.localeCompare(b.name));
+
       return {
         ...state,
-        users: [
-          ...state.users,
-          { ...action.user }
-        ]
+        users 
       };
     }
     case Types.USER_LEFT: {

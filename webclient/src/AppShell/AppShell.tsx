@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from "react-router-dom";
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { store } from 'store';
 
@@ -21,6 +22,7 @@ class AppShell extends Component {
   render() {
     return (
       <Provider store={store}>
+        <CssBaseline />
         <div className="AppShell">
           <Router>
             <Header />
