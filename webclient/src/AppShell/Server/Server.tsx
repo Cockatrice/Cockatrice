@@ -41,7 +41,7 @@ class Server extends Component<ServerProps> {
                   )}
 
                   side={(
-                    <Paper className="server-rooms__side">
+                    <Paper className="server-rooms__side overflow-scroll">
                       <div className="server-rooms__side-label">
                         Users connected to server: {users.length}
                       </div>

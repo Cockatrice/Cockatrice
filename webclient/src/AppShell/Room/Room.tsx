@@ -100,7 +100,7 @@ class Room extends Component<any> {
           )}
 
           side={(
-            <Paper className="room-view__side">
+            <Paper className="room-view__side overflow-scroll">
               <div className="room-view__side-label">
                 Users in this room: {users.length}
               </div>
