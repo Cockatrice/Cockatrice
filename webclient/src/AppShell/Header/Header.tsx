@@ -23,7 +23,7 @@ class Header extends Component<HeaderProps> {
 
     if (currentRooms > previousRooms) {
       const { roomId } = _.difference(currentRooms, previousRooms)[0];
-      this.props.history.push(`${RouteEnum.ROOM}/${roomId}`);
+      this.props.history.push(generatePath(RouteEnum.ROOM, { roomId }));
     }
   }
   render() {
@@ -80,7 +80,7 @@ const Rooms = props => (
     {
       _.reduce(props.rooms, (rooms, { name, roomId}) => {
         rooms.push(
-          <NavLink to={`${RouteEnum.ROOM}/${roomId}`} className="temp-chip" key={roomId}>
+          <NavLink to={generatePath(RouteEnum.ROOM, { roomId })} className="temp-chip" key={roomId}>
             <Chip label={name} color="primary" />
           </NavLink>
         );

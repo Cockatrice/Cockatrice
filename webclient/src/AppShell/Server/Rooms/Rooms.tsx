@@ -1,6 +1,8 @@
 // eslint-disable-next-line
 import React from 'react';
+import { generatePath } from "react-router-dom";
 import * as _ from 'lodash';
+
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -15,7 +17,7 @@ import './Rooms.css';
 const Rooms = ({ rooms, joinedRooms, history }) => {
   function onClick(roomId) {
     if (_.find(joinedRooms, room => room.roomId === roomId)) {
-      history.push(`${RouteEnum.ROOM}/${roomId}`);
+      history.push(generatePath(RouteEnum.ROOM, { roomId }));
     } else {
       RoomsService.joinRoom(roomId);
     }

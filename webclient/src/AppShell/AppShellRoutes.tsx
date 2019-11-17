@@ -13,7 +13,7 @@ const Routes = () => (
   <div className="AppShell-routes overflow-scroll">
     <Switch>
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
-      {<Route path={`${RouteEnum.ROOM}/:roomId`} render={() => <Room />} />}
+      {<Route path={RouteEnum.ROOM} render={() => <Room />} />}
       <Route path={RouteEnum.GAME} render={() => <Game />} />
       <Route path={RouteEnum.DECKS} render={() => <Decks />} />
       {/*<Route path={RouteEnum.DECK} render={() => <Deck />} />*/}
