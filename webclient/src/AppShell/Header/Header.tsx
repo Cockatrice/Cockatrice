@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { NavLink } from "react-router-dom";
+import { NavLink, withRouter, generatePath } from "react-router-dom";
 import AppBar from '@material-ui/core/AppBar';
 import Chip from '@material-ui/core/Chip';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -17,6 +17,15 @@ import './Header.css';
 import logo from './logo.png';
 
 class Header extends Component<HeaderProps> {
+  componentDidUpdate(prevProps) {
+    const currentRooms = this.props.joinedRooms;
+    const previousRooms = prevProps.joinedRooms;
+
+    if (currentRooms > previousRooms) {
+      const { roomId } = _.difference(currentRooms, previousRooms)[0];
+      this.props.history.push(`${RouteEnum.ROOM}/${roomId}`);
+    }
+  }
   render() {
     return (
       <div>
@@ -86,6 +95,7 @@ interface HeaderProps {
   server: string;
   user: User;
   joinedRooms: Room[];
+  history: any;
 }
 
 const mapStateToProps = state => ({
@@ -95,4 +105,4 @@ const mapStateToProps = state => ({
   joinedRooms: RoomsSelectors.getJoinedRooms(state)
 });
 
-export default connect(mapStateToProps)(Header);
+export default withRouter(connect(mapStateToProps)(Header));

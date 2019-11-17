@@ -1,13 +1,14 @@
 // eslint-disable-next-line
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Paper from '@material-ui/core/Paper';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
-import { User } from 'types';
+import { Room, User } from 'types';
 
 import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
 import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
@@ -21,7 +22,7 @@ import './Server.css';
 
 class Server extends Component<ServerProps> {
   render() {
-    const { message, rooms, state, users } = this.props;
+    const { message, rooms, joinedRooms, history, state, users } = this.props;
     const isConnected = AuthenticationService.isConnected(state);
 
     return (
@@ -32,7 +33,7 @@ class Server extends Component<ServerProps> {
                 <ThreePaneLayout
                   top={(
                     <Paper>
-                      <Rooms rooms={rooms} />
+                      <Rooms rooms={rooms} joinedRooms={joinedRooms} history={history} />
                     </Paper>
                   )}
 
@@ -72,15 +73,18 @@ class Server extends Component<ServerProps> {
 export interface ServerProps {
   message: string;
   state: number;
-  rooms: any[];
+  rooms: Room[];
+  joinedRooms: Room[];
   users: User[];
+  history: any;
 }
 
 const mapStateToProps = state => ({
   message: ServerSelectors.getMessage(state),
   state: ServerSelectors.getState(state),
   rooms: RoomsSelectors.getRooms(state),
-  users: ServerSelectors.getUsers(state)
+  joinedRooms: RoomsSelectors.getJoinedRooms(state),
+  users: ServerSelectors.getUsers(state),
 });
 
-export default connect(mapStateToProps)(Server);
+export default withRouter(connect(mapStateToProps)(Server));

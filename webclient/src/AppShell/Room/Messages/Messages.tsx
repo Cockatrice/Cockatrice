@@ -6,7 +6,7 @@ import './Messages.css';
 const Messages = ({ messages }) => (
   <div className="messages">
     {
-      messages.map(({ message, messageType, timeOf }, i) => {
+      messages && messages.map(({ message, messageType, timeOf }, i) => {
         return (
           <div className="message" key={i}>
             <div className="message__detail">{ParsedMessage(message)}</div>

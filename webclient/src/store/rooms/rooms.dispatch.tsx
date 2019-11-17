@@ -1,6 +1,8 @@
 import { Actions } from './rooms.actions';
 import { store } from '../store';
 
+// const history = useHistory();
+
 export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
@@ -12,6 +14,7 @@ export const Dispatch = {
 
   joinRoom: roomInfo => {
     store.dispatch(Actions.joinRoom(roomInfo));
+
   },
 
   leaveRoom: roomId => {

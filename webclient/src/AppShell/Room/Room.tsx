@@ -41,9 +41,7 @@ class Room extends Component<any> {
   }
 
   // @TODO clear input onSubmit
-  handleRoomSay(raw) {
-    const { message } = raw;
-    console.log('raw', raw);
+  handleRoomSay({ message }) {
     if (message) {
       const { roomId } = this.props.match.params;
       RoomsService.roomSay(roomId, message);

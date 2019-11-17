@@ -49,8 +49,6 @@ export const roomsReducer = (state = initialState, action: any) => {
 
       roomInfo.userList.sort((a, b) => a.name.localeCompare(b.name));
 
-      console.log('joined', roomInfo);
-
       return {
         ...state,
 

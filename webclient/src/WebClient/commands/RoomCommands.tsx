@@ -16,8 +16,6 @@ export class RoomCommands {
       ".Command_RoomSay.ext" : CmdRoomSay
     });
 
-    this.webClient.sendRoomCommand(roomId, rc, (raw) => {
-      console.log('RoomSay Response: ', raw);
-    });
+    this.webClient.sendRoomCommand(roomId, rc);
   }
 }

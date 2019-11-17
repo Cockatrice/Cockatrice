@@ -7,7 +7,6 @@ const ScrollToBottomOnChanges = ({ content, changes }) => {
   // when the user has scrolled up
 
   const scrollToBottom = () => {
-    console.log('scrolling');
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
   }
 
