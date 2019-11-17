@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import Paper from '@material-ui/core/Paper';
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
 import { User } from 'types';
@@ -40,7 +41,9 @@ class Room extends Component<any> {
   }
 
   // @TODO clear input onSubmit
-  handleRoomSay({ message }) {
+  handleRoomSay(raw) {
+    const { message } = raw;
+    console.log('raw', raw);
     if (message) {
       const { roomId } = this.props.match.params;
       RoomsService.roomSay(roomId, message);
@@ -75,28 +78,32 @@ class Room extends Component<any> {
     return (
       <div className="room-view">
         <ThreePaneLayout
+          fixedHeight
+
           top={(
-            <div className="room-view__games overflow-scroll">
+            <Paper className="room-view__games overflow-scroll">
               <Games games={games} gameTypesMap={this.gametypeMap} />
-            </div>    
+            </Paper>    
           )}
 
           bottom={(
             <div className="room-view__messages">
-              <div className="room-view__messages-content overflow-scroll">
+              <Paper className="room-view__messages-content overflow-scroll">
                 <ScrollToBottomOnChanges changes={messages} content={(
                   <Messages messages={messages} />
                 )} />
-              </div>
-              <div className="room-view__messages-sayMessage">
+              </Paper>
+              <Paper className="room-view__messages-sayMessage">
                 <SayMessage onSubmit={this.handleRoomSay} />
-              </div>
+              </Paper>
             </div>
           )}
 
           side={(
-            <div className="room-view__side">
-              Users in this room: {users.length}
+            <Paper className="room-view__side">
+              <div className="room-view__side-label">
+                Users in this room: {users.length}
+              </div>
               <List dense={true}>
                 { users.map(user => (
                   <ListItem button key={user.name}>
@@ -104,7 +111,7 @@ class Room extends Component<any> {
                   </ListItem>
                 ) ) }
               </List>
-            </div>
+            </Paper>
           )}
         />
       </div>

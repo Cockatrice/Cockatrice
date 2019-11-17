@@ -1,5 +1,6 @@
 .server,
-.server-rooms {
+.server-rooms,
+.server-rooms__side {
   height: 100%;
 }
 
@@ -11,5 +12,12 @@
 
 .serverMessage {
   padding: 20px;
-  border-top: 2px solid black;
+}
+
+.server-rooms__side-label {
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  background: white;
+  z-index: 1;
 }

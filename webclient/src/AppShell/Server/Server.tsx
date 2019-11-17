@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import Paper from '@material-ui/core/Paper';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
@@ -30,16 +31,18 @@ class Server extends Component<ServerProps> {
               <div className="server-rooms">
                 <ThreePaneLayout
                   top={(
-                    <Rooms rooms={rooms} />
+                    <Paper>
+                      <Rooms rooms={rooms} />
+                    </Paper>
                   )}
 
                   bottom={(
-                    <div className="serverMessage" dangerouslySetInnerHTML={{ __html: message }}></div>
+                    <Paper className="serverMessage" dangerouslySetInnerHTML={{ __html: message }} />
                   )}
 
                   side={(
-                    <div className="room-view__side">
-                      <div className="room-view__side-label">
+                    <Paper className="server-rooms__side">
+                      <div className="server-rooms__side-label">
                         Users connected to server: {users.length}
                       </div>
                       <List dense={true}>
@@ -49,7 +52,7 @@ class Server extends Component<ServerProps> {
                           </ListItem>
                         ) ) }
                       </List>
-                    </div>
+                    </Paper>
                   )}
                 />
                 

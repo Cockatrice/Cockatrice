@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Field, InjectedFormProps, reduxForm } from 'redux-form'
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 import './SayMessage.css';
 
@@ -10,17 +12,39 @@ class SayMessage extends Component<InjectedFormProps> {
     return (
       <form className="sayMessage" onSubmit={this.props.handleSubmit}>
         <div className="sayMessage-item">
-          <Field className="sayMessage-item__field"
+          <Field
+            className="sayMessage-item__field"
+            label="Chat"
             name="message"
-            component="input"
-            type="text"
+            component={InputField}
           />
         </div>
-        <button className="sayMessage-submit" type="submit">>></button>
+        <div className="sayMessage-submit">
+          <Button color="primary" variant="contained" type="submit">
+            Say
+          </Button>
+        </div>
       </form>
     );
   }
 }
+
+const InputField = ({
+  input,
+  label,
+  name,
+  meta: { touched, error },
+  className
+}) => (
+  <TextField
+    className={className}
+    label={label}
+    name={name}
+    margin="normal"
+    variant="outlined"
+    { ...input }
+  />
+);
 
 const propsMap = {
   form: 'sayMessage'

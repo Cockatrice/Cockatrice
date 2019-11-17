@@ -1,7 +1,8 @@
 .room-view,
 .room-view__games,
 .room-view__messages,
-.room-view__messages-content {
+.room-view__messages-content,
+.room-view__side {
   height: 100%;
 }
 
@@ -10,8 +11,15 @@
   flex-direction: column;
 }
 
-.room-view__sayMessage {
+.room-view__messages-sayMessage {
   width: 100%;
-  max-width: 600px;
   margin: 10px auto;
+}
+
+.room-view__side-label {
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  background: white;
+  z-index: 1;
 }

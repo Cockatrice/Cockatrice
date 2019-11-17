@@ -7,5 +7,9 @@
 
 .message {
   padding: 5px 0 2px;
-  border-bottom: 1px dashed;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
+}
+
+.message:last-of-type {
+  border: 0;
 }

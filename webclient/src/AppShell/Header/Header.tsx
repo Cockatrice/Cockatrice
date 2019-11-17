@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { NavLink } from "react-router-dom";
 import AppBar from '@material-ui/core/AppBar';
+import Chip from '@material-ui/core/Chip';
 import Toolbar from '@material-ui/core/Toolbar';
 import * as _ from 'lodash';
 
@@ -71,7 +72,7 @@ const Rooms = props => (
       _.reduce(props.rooms, (rooms, { name, roomId}) => {
         rooms.push(
           <NavLink to={`${RouteEnum.ROOM}/${roomId}`} className="temp-chip" key={roomId}>
-            {name}
+            <Chip label={name} color="primary" />
           </NavLink>
         );
         return rooms;
