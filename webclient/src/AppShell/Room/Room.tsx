@@ -7,8 +7,8 @@ import ListItem from '@material-ui/core/ListItem';
 import Paper from '@material-ui/core/Paper';
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
-import { User } from 'types';
 
+import { AuthGuard } from 'AppShell/common/guards';
 import { RoomsService } from 'AppShell/common/services';
 
 import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
@@ -75,6 +75,7 @@ class Room extends Component<any> {
 
     return (
       <div className="room-view">
+        <AuthGuard />
         <ThreePaneLayout
           fixedHeight
 

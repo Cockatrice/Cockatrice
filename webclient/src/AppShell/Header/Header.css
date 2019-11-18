@@ -2,8 +2,11 @@
 }
 
 .Header__logo {
-  height: 34px;
-  margin: 3px;
+  display: flex;
+}
+
+.Header__logo img {
+  height: 40px;
 }
 
 .Header-content {

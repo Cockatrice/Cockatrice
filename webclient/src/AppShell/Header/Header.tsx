@@ -32,8 +32,8 @@ class Header extends Component<HeaderProps> {
         {/*<header className="Header">*/}
         <AppBar position="static">
           <Toolbar variant="dense">
-            <NavLink to={RouteEnum.SERVER}>
-              <img src={logo} className="Header__logo" alt="logo" />
+            <NavLink to={RouteEnum.SERVER} className="Header__logo">
+              <img src={logo} alt="logo" />
             </NavLink>
             <div className="Header-content">{
               AuthenticationService.isConnected(this.props.state) && (
@@ -60,7 +60,7 @@ class Header extends Component<HeaderProps> {
         </AppBar>
         <div className="temp-subnav">
           {
-            this.props.joinedRooms.length > 0 && (
+            !!this.props.joinedRooms.length && (
               <Rooms rooms={this.props.joinedRooms} />
             )
           }
