@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper';
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
 
-import { AuthGuard } from 'AppShell/common/guards';
+import AuthGuard from 'AppShell/common/guards/AuthGuard';
 import { RoomsService } from 'AppShell/common/services';
 
 import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
