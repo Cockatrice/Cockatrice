@@ -12,7 +12,7 @@ export const ServerIdentification = {
     }
 
     webClient.resetConnectionvars();
-    webClient.updateStatus(StatusEnum.CONNECTED, 'Logging in...');
+    webClient.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
     webClient.services.session.updateInfo(serverName, serverVersion);
     webClient.commands.session.login();
   }

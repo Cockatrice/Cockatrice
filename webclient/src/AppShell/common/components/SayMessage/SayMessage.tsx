@@ -13,11 +13,7 @@ class SayMessage extends Component<InjectedFormProps> {
       // @TODO (4)
       <form className="sayMessage" onSubmit={this.props.handleSubmit}>
         <div className="sayMessage-item">
-          <Field
-            label="Chat"
-            name="message"
-            component={InputField}
-          />
+          <Field label="Chat" name="message" component={InputField} />
         </div>
         <div className="sayMessage-submit">
           <Button color="primary" variant="contained" type="submit">
@@ -29,13 +25,7 @@ class SayMessage extends Component<InjectedFormProps> {
   }
 }
 
-const InputField = ({
-  input,
-  label,
-  name,
-  meta: { touched, error },
-  className
-}) => (
+const InputField = ({ input, label, name }) => (
   <TextField
     label={label}
     name={name}

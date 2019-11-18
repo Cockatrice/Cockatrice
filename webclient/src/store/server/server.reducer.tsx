@@ -6,7 +6,7 @@ import { Types } from './server.types';
 const initialState: ServerState = {
   status: {
     state: StatusEnum.DISCONNECTED,
-    description: getStatusEnumLabel(StatusEnum.DISCONNECTED)
+    description: null
   },
   info: {
     message: null,

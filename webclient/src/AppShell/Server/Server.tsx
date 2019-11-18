@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
-import { Room, User } from 'types';
+import { Room, StatusEnum, User } from 'types';
 
 import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
 import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
@@ -21,8 +21,15 @@ import Rooms from './Rooms/Rooms';
 import './Server.css';
 
 class Server extends Component<ServerProps> {
+  showDescription(state, description) {
+    const isDisconnected = state === StatusEnum.DISCONNECTED;
+    const hasDescription = description && !!description.length;
+
+    return isDisconnected && hasDescription;
+  }
+
   render() {
-    const { message, rooms, joinedRooms, history, state, users } = this.props;
+    const { message, rooms, joinedRooms, history, state, description, users } = this.props;
     const isConnected = AuthenticationService.isConnected(state);
 
     return (
@@ -62,7 +69,16 @@ class Server extends Component<ServerProps> {
             )
           : (
             <div className="server-connect">
-              <ConnectForm onSubmit={AuthenticationService.connect} />
+              <div className="server-connect__form">
+                <ConnectForm onSubmit={AuthenticationService.connect} />
+              </div>
+              {
+                this.showDescription(state, description) && (
+                  <Paper className="server-connect__description">
+                    {description}
+                  </Paper>
+                )
+              }
             </div>
           )
       }</div>
@@ -73,6 +89,7 @@ class Server extends Component<ServerProps> {
 export interface ServerProps {
   message: string;
   state: number;
+  description: string;
   rooms: Room[];
   joinedRooms: Room[];
   users: User[];
@@ -82,6 +99,7 @@ export interface ServerProps {
 const mapStateToProps = state => ({
   message: ServerSelectors.getMessage(state),
   state: ServerSelectors.getState(state),
+  description: ServerSelectors.getDescription(state),
   rooms: RoomsSelectors.getRooms(state),
   joinedRooms: RoomsSelectors.getJoinedRooms(state),
   users: ServerSelectors.getUsers(state),

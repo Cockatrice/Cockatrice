@@ -6,8 +6,20 @@
 
 .server-connect {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   padding-top: 50px;
+}
+
+.server-connect__form {
+  width: 300px;
+}
+
+.server-connect__description {
+  width: 300px;
+  text-align: center;
+  margin-top: 20px;
+  padding: 20px;
 }
 
 .serverMessage {

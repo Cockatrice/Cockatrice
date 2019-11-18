@@ -1,7 +1,6 @@
 .connectForm {
-  width: 300px;
+  width: 100%;
   padding: 20px;
-  border: 1px solid;
 }
 
 .connectForm-item {
@@ -10,19 +9,7 @@
   margin-bottom: 20px;
 }
 
-.connectForm-item__label {
-  margin-bottom: 5px;
-}
-
-.connectForm-item__field {
-  height: 40px;
-}
-
-.connectForm-submit {
+.connectForm-submit.MuiButton-root {
   display: block;
   margin: 0 auto;
-  padding: 10px 20px;
-  border: 1px solid;
-  border-radius: 10px;
-  font-size: 20px;
 }
