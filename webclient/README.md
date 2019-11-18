@@ -42,3 +42,21 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## To-Do List
+
+1) RefreshGuard modal
+  - there is no browser support for displaying custom output to window.onbeforeunload
+  - we should also display a custom modal explaining why they shouldnt refresh or navigate from the site
+  - ideally, the custom popup can be synced with the alert, so when the alert is closed, the modal closes too
+
+2) Disable AutoScrollToBottom when the user has scrolled up
+  - when the user scrolls back to bottom, it should renable
+  - renable after a period of inactivity (3 minutes?)
+
+3) Figure out how to type components w/ RouteComponentProps
+  - Component<RouteComponentProps<???, ???, ???>>
+
+4) clear input onSubmit
+
+5) figure out how to reflect server status changes in the ui

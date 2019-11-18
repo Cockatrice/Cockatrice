@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { RoomsState } from './rooms.interfaces'
-import { Types } from './rooms.types';
+import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
 
 const initialState: RoomsState = {
   rooms: {},
@@ -95,8 +95,7 @@ export const roomsReducer = (state = initialState, action: any) => {
 
       let roomMessages = [ ...(messages[roomId] || []) ];
 
-      // @TODO add this value to a const somewhere higher up
-      if (roomMessages.length === 1000) {
+      if (roomMessages.length === MAX_ROOM_MESSAGES) {
         roomMessages.shift();
       }
 

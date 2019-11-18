@@ -22,8 +22,7 @@ import Messages from './Messages/Messages';
 
 import './Room.css';
 
-// @TODO figure out how to properly type this component
-// Component<RouteComponentProps<???, ???, ???>>
+// @TODO (3)
 class Room extends Component<any> {
   gametypeMap = {};
 
@@ -40,7 +39,6 @@ class Room extends Component<any> {
     this.handleRoomSay = this.handleRoomSay.bind(this);
   }
 
-  // @TODO clear input onSubmit
   handleRoomSay({ message }) {
     if (message) {
       const { roomId } = this.props.match.params;

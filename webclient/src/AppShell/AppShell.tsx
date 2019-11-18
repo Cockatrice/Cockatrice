@@ -13,9 +13,7 @@ import Header from './Header/Header';
 
 class AppShell extends Component {
   componentDidMount() {
-    // @TODO there is no browser support for displaying custom output to this navigation guard,
-    // so we should also display a custom modal explaining why they shouldnt navigate from the site.
-    // Ideally, the custom popup can be synced with the alert, so if either are closed, they both close
+    // @TODO (1)
     window.onbeforeunload = () => true;
   }
 

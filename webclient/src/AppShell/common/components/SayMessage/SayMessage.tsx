@@ -10,6 +10,7 @@ import './SayMessage.css';
 class SayMessage extends Component<InjectedFormProps> {
   render() {
     return (
+      // @TODO (4)
       <form className="sayMessage" onSubmit={this.props.handleSubmit}>
         <div className="sayMessage-item">
           <Field

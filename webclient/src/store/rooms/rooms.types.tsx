@@ -8,3 +8,5 @@ export const Types = {
   USER_JOINED: "[Rooms] User Joined",
   USER_LEFT: "[Rooms] User Left"
 };
+
+export const MAX_ROOM_MESSAGES = 1000;

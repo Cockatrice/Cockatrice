@@ -3,9 +3,7 @@ import React, { useEffect, useRef } from 'react';
 const ScrollToBottomOnChanges = ({ content, changes }) => {
   const messagesEndRef = useRef(null);
 
-  // @TODO improve this to not scroll down
-  // when the user has scrolled up
-
+  // @TODO (2)
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
   }

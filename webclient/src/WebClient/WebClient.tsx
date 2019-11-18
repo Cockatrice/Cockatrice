@@ -202,14 +202,10 @@ export class WebClient {
     };
 
     this.socket.onclose = () => {
-      // @TODO determine if these connectionClosed hooks are desired
-      // this.services.session.connectionClosed('Connection Closed');
       this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
     };
 
     this.socket.onerror = () => {
-      // @TODO determine if these connectionClosed hooks are desired
-      // this.services.session.connectionClosed('Connection Failed');
       this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
     };
 
@@ -229,7 +225,7 @@ export class WebClient {
             this.processSessionEvent(msg.sessionEvent, msg);
             break;
           case this.pb.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
-            // TODO
+            // @TODO
             break;
         }
       }

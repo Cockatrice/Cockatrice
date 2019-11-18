@@ -15,7 +15,6 @@ export class SessionService {
     Dispatch.clearStore();
   }
 
-  // @TODO determine proper connect status tracking
   connectServer(options: ServerConnectParams) {
     Dispatch.connectServer();
     this.webClient.connect(options);
@@ -38,12 +37,9 @@ export class SessionService {
   updateStatus(state, description) {
     Dispatch.updateStatus(state, description);
 
-    // @TODO determine if this is desired
-    // if (state === StatusEnum.DISCONNECTED) {
-    //   Dispatch.connectionClosed({
-    //     reason: description
-    //   });
-    // }
+    if (state === StatusEnum.DISCONNECTED) {
+      this.connectionClosed({ reason: description });
+    }
   }
 
   updateUser(user) {
