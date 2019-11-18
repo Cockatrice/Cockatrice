@@ -117,6 +117,10 @@ export const roomsReducer = (state = initialState, action: any) => {
       const { roomId, games } = action;
       const room = state.rooms[roomId];
 
+      if (!room) {
+        return { ...state };
+      }
+
       // Create map of games with update objects
       const toUpdate = games.reduce((map, game) => {
         map[game.gameId] = game;

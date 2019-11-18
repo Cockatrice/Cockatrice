@@ -10,8 +10,7 @@
   padding: 5px;
 }
 
-.sayMessage-item,
-.sayMessage-item__field {
+.sayMessage-item {
   width: 100%;
   height: 100%; 
 }

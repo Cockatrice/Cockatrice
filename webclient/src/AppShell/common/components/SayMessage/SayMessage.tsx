@@ -13,7 +13,6 @@ class SayMessage extends Component<InjectedFormProps> {
       <form className="sayMessage" onSubmit={this.props.handleSubmit}>
         <div className="sayMessage-item">
           <Field
-            className="sayMessage-item__field"
             label="Chat"
             name="message"
             component={InputField}
@@ -37,10 +36,10 @@ const InputField = ({
   className
 }) => (
   <TextField
-    className={className}
     label={label}
     name={name}
-    margin="normal"
+    fullWidth={true}
+    margin="dense"
     variant="outlined"
     { ...input }
   />

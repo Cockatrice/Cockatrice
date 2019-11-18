@@ -19,19 +19,15 @@
   max-height: 50%;
   width: 100%;
   padding-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .three-pane-layout .grid-main__top.fixedHeight {
   height: 50%;
-  flex-shrink: 0;
 }
 
 .three-pane-layout .grid-main__bottom {
   height: 100%;
   width: 100%;
-}
-
-.three-pane-layout .grid-content {
-  height: 100%;
-  width: 100%;
+  flex-shrink: 1;
 }
