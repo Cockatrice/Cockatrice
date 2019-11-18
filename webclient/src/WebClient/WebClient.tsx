@@ -93,15 +93,18 @@ export class WebClient {
     console.log(this);
   }
 
+  private clearStores() {
+    this.services.room.clearStore();
+    this.services.session.clearStore();
+  }
+
   public updateStatus(status, description) {
     console.log(`Status: [${status}]: ${description}`);
-
     this.status = status;
     this.services.session.updateStatus(status, description);
 
     if (status === StatusEnum.DISCONNECTED) {
-      // this.services.room.clearStore();
-      // this.services.session.clearStore();
+      this.clearStores();
     }
   }
 
