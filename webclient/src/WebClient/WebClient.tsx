@@ -105,6 +105,8 @@ export class WebClient {
 
     if (status === StatusEnum.DISCONNECTED) {
       this.clearStores();
+      this.endPingLoop();
+      this.resetConnectionvars();
     }
   }
 
@@ -168,8 +170,7 @@ export class WebClient {
 
       // stop the ping loop if we're disconnected
       if (this.status !== StatusEnum.LOGGEDIN) {
-        clearInterval(this.keepalivecb);
-        this.keepalivecb = null;
+        this.endPingLoop();
         return;
       }
 
@@ -183,6 +184,11 @@ export class WebClient {
 
       this.sendSessionCommand(command, () => this.lastPingPending = false);
     }, this.options.keepalive);
+  }
+
+  private endPingLoop() {
+    clearInterval(this.keepalivecb);
+    this.keepalivecb = null;
   }
 
   public connect(options) {
