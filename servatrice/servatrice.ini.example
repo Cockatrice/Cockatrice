@@ -135,6 +135,10 @@ disallowedwords="admin"
 ;          http://www.regular-expressions.info/catastrophic.html
 disallowedregexp=""
 
+; Define minimum password length
+; Default 6.
+minpasswordlength = 6
+
 [registration]
 
 ; Servatrice can process registration requests to add new users on the fly.

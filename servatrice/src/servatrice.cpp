@@ -1065,3 +1065,8 @@ bool Servatrice::getEnableForgotPasswordAudit() const
 {
     return settingsCache->value("audit/enable_forgotpassword_audit", true).toBool();
 }
+
+int Servatrice::getMinPasswordLength() const
+{
+    return settingsCache->value("users/minpasswordlength", 6).toInt();
+}
