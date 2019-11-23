@@ -10,7 +10,7 @@ import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
 import { Room, User } from 'types';
 
-import { AuthenticationService } from 'AppShell/common/services';
+import { AuthenticationService, ModeratorService } from 'AppShell/common/services';
 import { RouteEnum } from 'AppShell/common/types';
 
 import './Header.css';
@@ -27,6 +27,8 @@ class Header extends Component<HeaderProps> {
     }
   }
   render() {
+    const { joinedRooms, server, state, user } = this.props;
+
     return (
       <div>
         {/*<header className="Header">*/}
@@ -35,33 +37,40 @@ class Header extends Component<HeaderProps> {
             <NavLink to={RouteEnum.SERVER} className="Header__logo">
               <img src={logo} alt="logo" />
             </NavLink>
-            <div className="Header-content">{
-              AuthenticationService.isConnected(this.props.state) && (
+            { AuthenticationService.isConnected(state) && (
+              <div className="Header-content">
                 <nav className="Header-nav">
                   <ul className="Header-nav__items">
+                    {
+                      AuthenticationService.isModerator(user) && (
+                        <li className="Header-nav__item">
+                          <button onClick={() => ModeratorService.viewLogHistory()}>Logs</button>
+                        </li>
+                      )
+                    }
                     <li className="Header-nav__item">
                       <NavLink to={RouteEnum.SERVER}>
-                        Server ({this.props.server})
+                        Server ({server})
                       </NavLink>
                     </li>
                     <NavLink to={RouteEnum.ACCOUNT}>
                       <div className="Header-account">
                         <span className="Header-account__name">
-                          {this.props.user.name}
+                          {user.name}
                         </span>
                         <span className="Header-account__indicator"></span>
                       </div>
                     </NavLink>
                   </ul>
                 </nav>
-              )
-            }</div>
+              </div>
+            ) }
           </Toolbar>
         </AppBar>
         <div className="temp-subnav">
           {
-            !!this.props.joinedRooms.length && (
-              <Rooms rooms={this.props.joinedRooms} />
+            joinedRooms.length && (
+              <Rooms rooms={joinedRooms} />
             )
           }
           <div className="temp-subnav__games">

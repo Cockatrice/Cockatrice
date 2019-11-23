@@ -42,5 +42,12 @@ export const Actions = {
     type: Types.USER_LEFT,
     roomId,
     name
+  }),
+
+  sortGames: (roomId, field, order) => ({
+    type: Types.SORT_GAMES,
+    roomId,
+    field,
+    order
   })
 }

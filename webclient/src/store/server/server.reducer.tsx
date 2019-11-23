@@ -1,4 +1,6 @@
-import { StatusEnum, getStatusEnumLabel } from 'types';
+import { SortDirection, StatusEnum, UserSortField } from 'types';
+
+import { SortUtil } from '../common';
 
 import { ServerState } from './server.interfaces'
 import { Types } from './server.types';
@@ -14,7 +16,11 @@ const initialState: ServerState = {
     version: null
   },
   user: null,
-  users: []
+  users: [],
+  sortUsersBy: {
+    field: UserSortField.NAME,
+    order: SortDirection.ASC
+  }
 };
 
 export const serverReducer = (state = initialState, action: any) => {
@@ -66,7 +72,10 @@ export const serverReducer = (state = initialState, action: any) => {
     }
     case Types.UPDATE_USERS: {
       const users = [ ...action.users ];
-      users.sort((a, b) => a.name.localeCompare(b.name));
+      const { sortUsersBy } = state;
+
+
+      SortUtil.sortUsersByField(users, sortUsersBy);
 
       return {
         ...state,
@@ -74,12 +83,14 @@ export const serverReducer = (state = initialState, action: any) => {
       };
     }
     case Types.USER_JOINED: {
+      const { sortUsersBy } = state;
+
       const users = [
         ...state.users,
         { ...action.user }
       ];
 
-      users.sort((a, b) => a.name.localeCompare(b.name));
+      SortUtil.sortUsersByField(users, sortUsersBy);
 
       return {
         ...state,

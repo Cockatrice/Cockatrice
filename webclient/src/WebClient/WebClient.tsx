@@ -150,11 +150,25 @@ export class WebClient {
       "sessionCommand" : [ sesCmd ]
     });
 
-    this.sendCommand(cmd, (raw, raw2) => {
+    this.sendCommand(cmd, (raw) => {
       this.debug(() => console.log(raw));
       
       if (callback) {
-        callback(raw, raw2);
+        callback(raw);
+      }
+    });
+  }
+
+  public sendModeratorCommand(modCmd, callback?) {
+    const cmd = this.pb.CommandContainer.create({
+      "moderatorCommand" : [ modCmd ]
+    });
+
+    this.sendCommand(cmd, (raw) => {
+      this.debug(() => console.log(raw));
+      
+      if (callback) {
+        callback(raw);
       }
     });
   }

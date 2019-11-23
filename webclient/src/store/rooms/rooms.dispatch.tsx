@@ -35,5 +35,9 @@ export const Dispatch = {
 
   userLeft: (roomId, name) => {
     store.dispatch(Actions.userLeft(roomId, name));
+  },
+
+  sortGames: (roomId, field, order) => {
+    store.dispatch(Actions.sortGames(roomId, field, order));
   }
 }

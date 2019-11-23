@@ -11,6 +11,8 @@ export const Selectors = {
     _.find(rooms.rooms, ({roomId}) => roomId === id),
   getJoined: ({ rooms }: State) => rooms.joined,
   getMessages: ({ rooms }: State) => rooms.messages,
+  getSortGamesBy: ({ rooms: { sortGamesBy } }: State) => sortGamesBy,
+  getSortUsersBy: ({ rooms: { sortUsersBy } }: State) => sortUsersBy,
 
   getJoinedRooms: (state: State) => {
     const joined = Selectors.getJoined(state);

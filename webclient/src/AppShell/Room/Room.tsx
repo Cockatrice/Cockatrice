@@ -24,18 +24,8 @@ import './Room.css';
 
 // @TODO (3)
 class Room extends Component<any> {
-  gametypeMap = {};
-
   constructor(props) {
     super(props);
-
-    const { roomId } = this.props.match.params;
-
-    this.gametypeMap = this.props.rooms[roomId].gametypeList.reduce((map, type) => {
-      map[type.gameTypeId] = type.description;
-      return map;
-    })
-
     this.handleRoomSay = this.handleRoomSay.bind(this);
   }
 
@@ -46,18 +36,6 @@ class Room extends Component<any> {
     }
   }
 
-  isUnavailableGame({ started, maxPlayers, playerCount }) {
-    return !started && playerCount < maxPlayers;
-  }
-
-  isPasswordProtectedGame({ withPassword }) {
-    return !withPassword;
-  }
-
-  isBuddiesOnlyGame({ onlyBuddies }) {
-    return !onlyBuddies;
-  }
-
   render() {
     const { match, rooms} = this.props;
     const { roomId } = match.params;
@@ -65,11 +43,6 @@ class Room extends Component<any> {
 
     const messages = this.props.messages[roomId];
     const users = room.userList;
-    const games = room.gameList.filter(game => (
-      this.isUnavailableGame(game) &&
-      this.isPasswordProtectedGame(game) &&
-      this.isBuddiesOnlyGame(game)
-    ));
 
     return (
       <div className="room-view">
@@ -79,7 +52,7 @@ class Room extends Component<any> {
 
           top={(
             <Paper className="room-view__games overflow-scroll">
-              <Games games={games} gameTypesMap={this.gametypeMap} />
+              <Games room={room} />
             </Paper>    
           )}
 

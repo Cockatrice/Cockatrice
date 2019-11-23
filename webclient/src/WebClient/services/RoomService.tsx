@@ -1,6 +1,10 @@
-import { Dispatch } from 'store/rooms';
+import { Dispatch, Selectors } from 'store/rooms';
+import { store } from 'store';
+
 
 import { WebClient } from '../WebClient';
+
+import { NormalizeService } from './NormalizeService'
 
 export class RoomService {
   webClient: WebClient;
@@ -14,6 +18,7 @@ export class RoomService {
   }
 
   joinRoom(roomInfo) {
+    NormalizeService.normalizeRoomInfo(roomInfo);
     Dispatch.joinRoom(roomInfo);
   }
 
@@ -22,15 +27,18 @@ export class RoomService {
   }
 
   updateGames(roomId, gameList) {
+    const game = gameList[0];
+
+    if (!game.gameType) {
+      const { gametypeMap } = Selectors.getRoom(store.getState(), roomId);
+      NormalizeService.normalizeGameObject(game, gametypeMap);
+    }
+
     Dispatch.updateGames(roomId, gameList);
   }
 
   addMessage(roomId, message) {
-    const { name } = message;
-
-    if (name) {
-      message.message = `${name}: ${message.message}`;
-    }
+    NormalizeService.normalizeUserMessage(message);
 
     Dispatch.addMessage(roomId, message);
   }

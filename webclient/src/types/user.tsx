@@ -18,3 +18,7 @@ export enum UserPrivLevel {
   "unknown 3",
   "unknown 4"
 }
+
+export enum UserSortField {
+  NAME = 'name'
+}

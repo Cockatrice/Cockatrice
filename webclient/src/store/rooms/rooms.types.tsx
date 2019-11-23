@@ -6,7 +6,8 @@ export const Types = {
   ADD_MESSAGE: "[Rooms] Add Message",
   UPDATE_GAMES: "[Rooms] Update Games",
   USER_JOINED: "[Rooms] User Joined",
-  USER_LEFT: "[Rooms] User Left"
+  USER_LEFT: "[Rooms] User Left",
+  SORT_GAMES: "[Rooms] Sort Games"
 };
 
 export const MAX_ROOM_MESSAGES = 1000;

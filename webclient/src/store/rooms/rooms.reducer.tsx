@@ -1,5 +1,9 @@
 import * as _ from 'lodash';
 
+import { GameSortField, UserSortField, SortDirection } from 'types';
+
+import { SortUtil } from '../common';
+
 import { RoomsState } from './rooms.interfaces'
 import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
 
@@ -7,7 +11,14 @@ const initialState: RoomsState = {
   rooms: {},
   joined: {},
   messages: {},
-  active: null,
+  sortGamesBy: {
+    field: GameSortField.START_TIME,
+    order: SortDirection.DESC
+  },
+  sortUsersBy: {
+    field: UserSortField.NAME,
+    order: SortDirection.ASC
+  }
 };
 
 export const roomsReducer = (state = initialState, action: any) => {
@@ -22,7 +33,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         ...state.rooms
       };
 
-      // Server does not send everything everytime
+      // Server does not send everything on updates
       _.each(action.rooms, (room, order) => {
         const { roomId } = room;
         const existing = rooms[roomId] || {};
@@ -43,31 +54,42 @@ export const roomsReducer = (state = initialState, action: any) => {
     }
     case Types.JOIN_ROOM: {
       const { roomInfo } = action;
+      const { joined, rooms, sortGamesBy, sortUsersBy } = state;
+
       const { roomId } = roomInfo;
 
-      const { joined, rooms } = state;
+      const gameList = [
+        ...roomInfo.gameList
+      ];
 
-      roomInfo.userList.sort((a, b) => a.name.localeCompare(b.name));
+      const userList = [
+        ...roomInfo.userList
+      ];
+
+      SortUtil.sortByField(gameList, sortGamesBy);
+      SortUtil.sortUsersByField(userList, sortUsersBy);
 
       return {
         ...state,
 
         rooms: {
           ...rooms,
-          [roomId]: roomInfo
+          [roomId]: {
+            ...roomInfo,
+            gameList,
+            userList
+          }
         },
 
         joined: {
           ...joined,
           [roomId]: true
         },
-
-        active: roomId
       }
     }
     case Types.LEAVE_ROOM: {
       const { roomId } = action;
-      const { joined, messages, active } = state;
+      const { joined, messages } = state;
 
       const _joined = {
         ...joined
@@ -85,8 +107,6 @@ export const roomsReducer = (state = initialState, action: any) => {
 
         joined: _joined,
         messages: _messages,
-
-        active: active === roomId ? null : active
       }
     }
     case Types.ADD_MESSAGE: {
@@ -99,6 +119,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         roomMessages.shift();
       }
 
+      message.timeReceived = new Date().getTime();
       roomMessages.push(message);
 
       return {
@@ -112,9 +133,11 @@ export const roomsReducer = (state = initialState, action: any) => {
         }
       }
     }
+    // @TODO improve this reducer, likely by improving the store model
     case Types.UPDATE_GAMES: {
       const { roomId, games } = action;
-      const room = state.rooms[roomId];
+      const { rooms, sortGamesBy } = state;
+      const room = rooms[roomId];
 
       if (!room) {
         return { ...state };
@@ -158,52 +181,88 @@ export const roomsReducer = (state = initialState, action: any) => {
         _.each(toUpdate, game => gameUpdates.push(game));
       }
 
+      const gameList = [ ...gameUpdates ];
+
+      SortUtil.sortByField(gameList, sortGamesBy);
+
       return {
         ...state,
         rooms: {
-          ...state.rooms,
+          ...rooms,
           [roomId]: {
             ...room,
-            gameList: [
-              ...gameUpdates
-            ]
+            gameList
           }
         }
       }
     }
     case Types.USER_JOINED: {
       const { roomId, user } = action;
+      const { rooms, sortUsersBy } = state;
 
-      const room = { ...state.rooms[roomId] };
+      const room = { ...rooms[roomId] };
 
-      room.userList = [
+      const userList = [
         ...room.userList,
         user
       ];
 
-      room.userList.sort((a, b) => a.name.localeCompare(b.name));
+      SortUtil.sortUsersByField(userList, sortUsersBy);
 
       return {
         ...state,
         rooms: {
-          ...state.rooms,
-          [roomId]: room 
+          ...rooms,
+          [roomId]: {
+            ...room,
+            userList
+          } 
         }
       };
     }
     case Types.USER_LEFT: {
       const { roomId, name } = action;
+      const { rooms } = state;
 
-      const room = { ...state.rooms[roomId] };
-      room.userList = room.userList.filter(user =>  user.name !== name);
+      const room = { ...rooms[roomId] };
+      const userList = room.userList.filter(user =>  user.name !== name);
 
       return {
         ...state,
         rooms: {
-          ...state.rooms,
-          [roomId]: room 
+          ...rooms,
+          [roomId]: {
+            ...room,
+            userList
+          } 
         }
       };
+    }
+    case Types.SORT_GAMES: {
+      const { field, order, roomId } = action;
+      const { rooms } = state;
+
+      const gameList = [ ...rooms[roomId].gameList ];
+
+      const sortGamesBy = {
+        field, order
+      };
+
+      SortUtil.sortByField(gameList, sortGamesBy);
+
+      return {
+        ...state,
+
+        rooms: {
+          ...rooms,
+          [roomId]: {
+            ...rooms[roomId],
+            gameList
+          }
+        },
+
+        sortGamesBy
+      }
     }
     default:
       return state;

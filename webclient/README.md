@@ -60,3 +60,11 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 4) clear input onSubmit
 
 5) figure out how to reflect server status changes in the ui
+
+6) Account page
+
+7) Register/Forgot Passoword forms
+
+8) Message User
+
+9) Main Nav scheme

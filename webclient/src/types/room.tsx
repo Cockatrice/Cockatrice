@@ -6,6 +6,7 @@ export interface Room {
   gameCount: number;
   gameList: any[];
   gametypeList: any[];
+  gametypeMap: { [index: number]: string; };
   name: string;
   permissionlevel: RoomAccessLevel;
   playerCount: number;

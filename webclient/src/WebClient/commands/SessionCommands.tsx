@@ -3,26 +3,6 @@ import { StatusEnum } from 'types';
 import { WebClient } from '../WebClient'; 
 import { guid } from '../util';
 
-const defaultLoginConfig = {
-  "clientver" : "webclient-1.0 (2019-10-31)",
-  "clientfeatures" : [
-    "client_id",
-    "client_ver",
-    "feature_set",
-    "room_chat_history",
-    "client_warnings",
-    /* unimplemented features */
-    "forgot_password",
-    "idle_client",
-    "mod_log_lookup",
-    "user_ban_history",
-    // satisfy server reqs for POC
-    "websocket",
-    "2.6.1_min_version",
-    "2.7.0_min_version",
-  ]
-}
-
 export class SessionCommands {
   private webClient: WebClient;
 
@@ -60,40 +40,40 @@ export class SessionCommands {
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespClientUpdateRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: missing features');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing features');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespWrongPassword:
         case this.webClient.pb.Response.ResponseCode.RespUsernameInvalid:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: incorrect username or password');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespWouldOverwriteOldSession:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: duplicated user session');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: duplicated user session');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespUserIsBanned:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: banned user');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: banned user');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespRegistrationRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: registration required');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespClientIdRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: missing client ID');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing client ID');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespContextError:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: server error');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: server error');
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespAccountNotActivated:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: account not activated');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
           break;
 
         default:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: unknown error ' + raw.responseCode);
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: unknown error ' + raw.responseCode);
       }
     });
   }
@@ -164,6 +144,37 @@ export class SessionCommands {
           break;
         default:
           error = "Failed to join the room due to an unknown error.";
+          break;
+      }
+      
+      if (error) {
+        console.error(responseCode, error);
+      }
+    });
+  }
+
+  viewLogHistory() {
+    const CmdViewLogHistory = this.webClient.pb.Command_ViewLogHistory.create();
+
+    const sc = this.webClient.pb.ModeratorCommand.create({
+      ".Command_ViewLogHistory.ext" : CmdViewLogHistory
+    });
+
+    this.webClient.sendModeratorCommand(sc, (raw) => {
+      const { responseCode } = raw;
+
+      let error;
+
+      switch(responseCode) {
+        case this.webClient.pb.Response.ResponseCode.RespOk:
+          const resp= raw['.Response_ViewLogHistory.ext'];
+
+          console.log('Response_ViewLogHistory: ', resp)
+
+          this.webClient.debug(() => console.log('View Log History: ', resp));
+          return;
+        default:
+          error = "Failed to retrieve log history.";
           break;
       }
       

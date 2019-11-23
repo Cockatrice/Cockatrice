@@ -13,7 +13,7 @@
 
 .room-view__messages-sayMessage {
   width: 100%;
-  margin: 10px auto;
+  margin: 10px auto 2px;
 }
 
 .room-view__side-label {

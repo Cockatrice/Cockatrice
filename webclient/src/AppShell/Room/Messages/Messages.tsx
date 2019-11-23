@@ -6,9 +6,9 @@ import './Messages.css';
 const Messages = ({ messages }) => (
   <div className="messages">
     {
-      messages && messages.map(({ message, messageType, timeOf }, i) => {
+      messages && messages.map(({ message, messageType, timeOf, timeReceived }) => {
         return (
-          <div className="message" key={i}>
+          <div className="message" key={timeReceived}>
             <div className="message__detail">{ParsedMessage(message)}</div>
           </div>
         );

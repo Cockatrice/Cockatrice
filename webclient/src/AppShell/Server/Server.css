@@ -25,6 +25,7 @@
 
 .serverMessage {
   padding: 20px;
+  margin-bottom: 2px;
 }
 
 .server-rooms__side-label {
