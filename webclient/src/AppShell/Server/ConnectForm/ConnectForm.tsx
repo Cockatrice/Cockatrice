@@ -2,9 +2,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Field, InjectedFormProps, reduxForm } from 'redux-form'
+
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
+
+import InputField from 'AppShell/common/components/InputField/InputField';
 
 import './ConnectForm.css';
 
@@ -34,27 +36,14 @@ class ConnectForm extends Component<InjectedFormProps> {
   }
 }
 
-const InputField = ({ input, label, name, autoComplete, type }) => (
-  <TextField
-    variant="outlined"
-    margin="dense"
-    fullWidth={true}
-    label={label}
-    name={name}
-    type={type}
-    autoComplete={autoComplete}
-    { ...input }
-  />
-);
-
 const propsMap = {
   form: 'connect'
 };
 
 const mapStateToProps = () => ({
   initialValues: {
-    host: 'server.cockatrice.us',
-    port: '4748'
+    host: 'mtg.tetrarch.co/servatrice',
+    port: '443'
   }
 });
 

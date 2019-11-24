@@ -38,5 +38,12 @@ export const Actions = {
   userLeft: name => ({
     type: Types.USER_LEFT,
     name
+  }),
+  viewLogs: logs => ({
+    type: Types.VIEW_LOGS,
+    logs
+  }),
+  clearLogs: () => ({
+    type: Types.CLEAR_LOGS
   })
 }

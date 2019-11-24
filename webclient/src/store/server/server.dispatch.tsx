@@ -35,6 +35,12 @@ export const Dispatch = {
   userLeft: name => {
     store.dispatch(Actions.userLeft(name));
   },
+  viewLogs: name => {
+    store.dispatch(Actions.viewLogs(name));
+  },
+  clearLogs: () => {
+    store.dispatch(Actions.clearLogs());
+  },
   serverMessage: message => {
     store.dispatch(Actions.serverMessage(message));
   }

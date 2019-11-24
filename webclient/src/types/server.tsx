@@ -23,3 +23,14 @@ export const getStatusEnumLabel = (statusEnum: number) => {
 
   return 'Unknown';
 }
+
+export interface Log {
+  message: string;
+  senderId: string;
+  senderIp: string;
+  senderName: string;
+  targetId: string;
+  targetName: string;
+  targetType: string;
+  time: string;
+}

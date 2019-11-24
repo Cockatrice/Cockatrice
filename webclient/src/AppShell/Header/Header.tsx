@@ -10,7 +10,7 @@ import { Selectors as RoomsSelectors } from 'store/rooms';
 import { Selectors as ServerSelectors } from 'store/server';
 import { Room, User } from 'types';
 
-import { AuthenticationService, ModeratorService } from 'AppShell/common/services';
+import { AuthenticationService } from 'AppShell/common/services';
 import { RouteEnum } from 'AppShell/common/types';
 
 import './Header.css';
@@ -44,7 +44,9 @@ class Header extends Component<HeaderProps> {
                     {
                       AuthenticationService.isModerator(user) && (
                         <li className="Header-nav__item">
-                          <button onClick={() => ModeratorService.viewLogHistory()}>Logs</button>
+                          <NavLink to={RouteEnum.LOGS}>
+                            <button>Logs</button>
+                          </NavLink>
                         </li>
                       )
                     }
@@ -69,7 +71,7 @@ class Header extends Component<HeaderProps> {
         </AppBar>
         <div className="temp-subnav">
           {
-            joinedRooms.length && (
+            !!joinedRooms.length && (
               <Rooms rooms={joinedRooms} />
             )
           }

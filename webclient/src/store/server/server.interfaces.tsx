@@ -1,4 +1,4 @@
-import { SortBy, User, UserSortField } from 'types';
+import { Log, SortBy, User, UserSortField } from 'types';
 
 export interface ServerConnectParams {
   host: string;
@@ -10,6 +10,7 @@ export interface ServerConnectParams {
 export interface ServerState {
   info: ServerStateInfo;
   status: ServerStateStatus;
+  logs: ServerStateLogs;
   user: User;
   users: User[];
   sortUsersBy: ServerStateSortUsersBy;
@@ -24,6 +25,12 @@ export interface ServerStateInfo {
   message: string;
   name: string;
   version: string;
+}
+
+export interface ServerStateLogs {
+  room: Log[];
+  game: Log[];
+  chat: Log[];
 }
 
 export interface ServerStateSortUsersBy extends SortBy {

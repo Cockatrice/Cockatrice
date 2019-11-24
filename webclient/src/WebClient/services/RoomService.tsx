@@ -4,7 +4,7 @@ import { store } from 'store';
 
 import { WebClient } from '../WebClient';
 
-import { NormalizeService } from './NormalizeService'
+import { NormalizeService } from './NormalizeService';
 
 export class RoomService {
   webClient: WebClient;

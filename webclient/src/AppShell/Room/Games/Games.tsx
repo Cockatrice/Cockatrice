@@ -43,7 +43,7 @@ class Games extends Component<GamesProps> {
     },
     {
       label: 'Players',
-      // field: ['playerCount', 'maxPlayers']
+      // field: ['maxPlayers', 'playerCount']
     },
     {
       label: 'Spectators',

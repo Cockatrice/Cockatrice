@@ -10,5 +10,6 @@ export const Selectors = {
   getDescription: ({ server }: State) => server.status.description,
   getState: ({ server }: State) => server.status.state,
   getUser: ({ server }: State) => server.user,
-  getUsers: ({ server }: State) => server.users
+  getUsers: ({ server }: State) => server.users,
+  getLogs: ({ server }: State) => server.logs
 }

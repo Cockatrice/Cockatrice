@@ -8,5 +8,7 @@ export const Types = {
   UPDATE_USER: "[Server] Update User",
   UPDATE_USERS: "[Server] Update Users",
   USER_JOINED: "[Server] User Joined",
-  USER_LEFT: "[Server] User Left"
+  USER_LEFT: "[Server] User Left",
+  VIEW_LOGS: "[Server] View Logs",
+  CLEAR_LOGS: "[Server] Clear Logs"
 };

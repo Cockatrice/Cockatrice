@@ -153,8 +153,8 @@ export class SessionCommands {
     });
   }
 
-  viewLogHistory() {
-    const CmdViewLogHistory = this.webClient.pb.Command_ViewLogHistory.create();
+  viewLogHistory(filters) {
+    const CmdViewLogHistory = this.webClient.pb.Command_ViewLogHistory.create(filters);
 
     const sc = this.webClient.pb.ModeratorCommand.create({
       ".Command_ViewLogHistory.ext" : CmdViewLogHistory
@@ -167,11 +167,12 @@ export class SessionCommands {
 
       switch(responseCode) {
         case this.webClient.pb.Response.ResponseCode.RespOk:
-          const resp= raw['.Response_ViewLogHistory.ext'];
+          const { logMessage } = raw['.Response_ViewLogHistory.ext'];
 
-          console.log('Response_ViewLogHistory: ', resp)
+          console.log('Response_ViewLogHistory: ', logMessage)
+          this.webClient.services.session.viewLogs(logMessage)
 
-          this.webClient.debug(() => console.log('View Log History: ', resp));
+          this.webClient.debug(() => console.log('View Log History: ', logMessage));
           return;
         default:
           error = "Failed to retrieve log history.";

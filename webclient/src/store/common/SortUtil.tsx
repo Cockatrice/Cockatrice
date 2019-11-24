@@ -20,6 +20,39 @@ export class SortUtil {
     }
   }
 
+  static sortByFields(arr: any[], sorts: SortBy[]) {
+    if (arr.length) {
+      arr.sort((a, b) => {
+        for (let i = 0; i < sorts.length; i++) {
+          const sortBy = sorts[i];
+          const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
+          
+          const fieldType = typeof field;
+
+          if (fieldType === 'string') {
+            const result = SortUtil.stringComparator(a, b, sortBy);
+
+            if (result) {
+              return result;
+            }
+          }
+
+          if (fieldType === 'number') {
+            const result = SortUtil.numberComparator(a, b, sortBy);
+
+            if (result) {
+              return result;
+            }
+          }
+
+          throw new Error('SortField must resolve to either a string or number');
+        }
+
+        return 0;
+      })
+    }
+  }
+
   static sortUsersByField(users: User[], sortBy: SortBy) {
     if (users.length) {
       users.sort((a, b) => SortUtil.userComparator(a, b, sortBy))

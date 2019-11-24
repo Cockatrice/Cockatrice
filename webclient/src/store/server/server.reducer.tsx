@@ -15,6 +15,11 @@ const initialState: ServerState = {
     name: null,
     version: null
   },
+  logs: {
+    room: [],
+    game: [],
+    chat: []
+  },
   user: null,
   users: [],
   sortUsersBy: {
@@ -105,6 +110,24 @@ export const serverReducer = (state = initialState, action: any) => {
         ...state,
         users
       };
+    }
+    case Types.VIEW_LOGS: {
+      const { logs } = action;
+
+      return {
+        ...state,
+        logs: {
+          ...logs
+        }
+      };
+    }
+    case Types.CLEAR_LOGS: {
+      return {
+        ...state,
+        logs: {
+          ...initialState.logs
+        }
+      }
     }
     default:
       return state;

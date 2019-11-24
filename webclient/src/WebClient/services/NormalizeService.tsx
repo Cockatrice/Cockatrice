@@ -23,6 +23,16 @@ export class NormalizeService {
     game.description = description || '';
   }
   
+  // Flatten logs[] into object mapped by targetType (room, game, chat)
+  static normalizeLogs(logs) {
+    return logs.reduce((obj, log) => {
+      const { targetType } = log;
+      obj[targetType] = obj[targetType] || [];
+      obj[targetType].push(log);
+      return obj;
+    }, {});
+  }
+
   // messages sent by current user dont have their username prepended
   static normalizeUserMessage(message) {
     const { name } = message;

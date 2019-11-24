@@ -4,6 +4,8 @@ import { StatusEnum } from 'types';
 import { sanitizeHtml } from '../util';
 import { WebClient } from '../WebClient';
 
+import { NormalizeService } from './NormalizeService';
+
 export class SessionService {
   webClient: WebClient;
 
@@ -56,6 +58,10 @@ export class SessionService {
 
   userLeft(userId) {
     Dispatch.userLeft(userId);
+  }
+
+  viewLogs(logs) {
+    Dispatch.viewLogs(NormalizeService.normalizeLogs(logs));
   }
 
   serverMessage(message) {
