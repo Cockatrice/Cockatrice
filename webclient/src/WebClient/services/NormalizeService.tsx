@@ -10,7 +10,7 @@ export class NormalizeService {
       return map;
     }, gametypeMap);
 
-    gameList.forEach(game => NormalizeService.normalizeGameObject(game, gametypeMap));
+    gameList.forEach((game) => NormalizeService.normalizeGameObject(game, gametypeMap));
   }
 
   // Flatten gameTypes[] into gameType field
