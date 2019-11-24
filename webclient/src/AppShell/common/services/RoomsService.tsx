@@ -1,4 +1,4 @@
-import webClient from 'WebClient/WebClient';
+import webClient from "WebClient/WebClient";
 
 export class RoomsService {
   static joinRoom(roomId) {

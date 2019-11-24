@@ -1,10 +1,10 @@
-import { Dispatch, ServerConnectParams } from 'store/server';
-import { StatusEnum } from 'types';
+import { Dispatch, ServerConnectParams } from "store/server";
+import { StatusEnum } from "types";
 
-import { sanitizeHtml } from '../util';
-import { WebClient } from '../WebClient';
+import { sanitizeHtml } from "../util";
+import { WebClient } from "../WebClient";
 
-import { NormalizeService } from './NormalizeService';
+import { NormalizeService } from "./NormalizeService";
 
 export class SessionService {
   webClient: WebClient;
@@ -20,11 +20,11 @@ export class SessionService {
   connectServer(options: ServerConnectParams) {
     Dispatch.connectServer();
     this.webClient.connect(options);
-    this.webClient.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
+    this.webClient.updateStatus(StatusEnum.CONNECTING, "Connecting...");
   }
 
   disconnectServer() {
-    this.webClient.updateStatus(StatusEnum.DISCONNECTING, 'Disconnecting...');
+    this.webClient.updateStatus(StatusEnum.DISCONNECTING, "Disconnecting...");
     this.webClient.disconnect();
   }
 

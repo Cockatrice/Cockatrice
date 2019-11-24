@@ -1,7 +1,7 @@
-import { StatusEnum } from 'types';
+import { StatusEnum } from "types";
 
-import { WebClient } from '../WebClient'; 
-import { guid } from '../util';
+import { WebClient } from "../WebClient"; 
+import { guid } from "../util";
 
 export class SessionCommands {
   private webClient: WebClient;
@@ -27,7 +27,7 @@ export class SessionCommands {
     this.webClient.sendSessionCommand(command, raw => {
       const resp = raw[".Response_Login.ext"];
 
-      this.webClient.debug(() =>  console.log('.Response_Login.ext', resp));
+      this.webClient.debug(() =>  console.log(".Response_Login.ext", resp));
 
       switch(raw.responseCode) {
         case this.webClient.pb.Response.ResponseCode.RespOk:
@@ -35,45 +35,45 @@ export class SessionCommands {
           this.webClient.services.session.updateUser(userInfo);
           this.webClient.commands.session.listUsers();
           this.webClient.commands.session.listRooms();
-          this.webClient.updateStatus(StatusEnum.LOGGEDIN, 'Logged in.');
+          this.webClient.updateStatus(StatusEnum.LOGGEDIN, "Logged in.");
           this.webClient.startPingLoop();
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespClientUpdateRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing features');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing features");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespWrongPassword:
         case this.webClient.pb.Response.ResponseCode.RespUsernameInvalid:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespWouldOverwriteOldSession:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: duplicated user session');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: duplicated user session");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespUserIsBanned:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: banned user');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: banned user");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespRegistrationRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: registration required");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespClientIdRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing client ID');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing client ID");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespContextError:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: server error');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: server error");
           break;
 
         case this.webClient.pb.Response.ResponseCode.RespAccountNotActivated:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: account not activated");
           break;
 
         default:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: unknown error ' + raw.responseCode);
+          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: unknown error " + raw.responseCode);
       }
     });
   }
@@ -87,7 +87,7 @@ export class SessionCommands {
 
     this.webClient.sendSessionCommand(sc, raw => {
       const { responseCode } = raw;
-      const response = raw['.Response_ListUsers.ext'];
+      const response = raw[".Response_ListUsers.ext"];
 
       if (response) {
         switch (responseCode) {
@@ -128,13 +128,13 @@ export class SessionCommands {
 
       switch(responseCode) {
         case this.webClient.pb.Response.ResponseCode.RespOk:
-          const { roomInfo } = raw['.Response_JoinRoom.ext'];
+          const { roomInfo } = raw[".Response_JoinRoom.ext"];
 
           this.webClient.services.room.joinRoom(roomInfo);
-          this.webClient.debug(() => console.log('Join Room: ', roomInfo.name));
+          this.webClient.debug(() => console.log("Join Room: ", roomInfo.name));
           return;
         case this.webClient.pb.Response.ResponseCode.RespNameNotFound:
-          error = "Failed to join the room: it doesn't exist on the server.";
+          error = "Failed to join the room: it doesn"t exist on the server.";
           break;
         case this.webClient.pb.Response.ResponseCode.RespContextError:
           error = "The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.";
@@ -167,12 +167,12 @@ export class SessionCommands {
 
       switch(responseCode) {
         case this.webClient.pb.Response.ResponseCode.RespOk:
-          const { logMessage } = raw['.Response_ViewLogHistory.ext'];
+          const { logMessage } = raw[".Response_ViewLogHistory.ext"];
 
-          console.log('Response_ViewLogHistory: ', logMessage)
+          console.log("Response_ViewLogHistory: ", logMessage)
           this.webClient.services.session.viewLogs(logMessage)
 
-          this.webClient.debug(() => console.log('View Log History: ', logMessage));
+          this.webClient.debug(() => console.log("View Log History: ", logMessage));
           return;
         default:
           error = "Failed to retrieve log history.";

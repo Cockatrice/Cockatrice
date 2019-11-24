@@ -1,3 +1,3 @@
 export enum GameSortField {
-  START_TIME = 'startTime'
+  START_TIME = "startTime"
 }

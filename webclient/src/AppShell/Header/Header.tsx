@@ -1,20 +1,20 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { connect } from "react-redux";
 import { NavLink, withRouter, generatePath } from "react-router-dom";
-import AppBar from '@material-ui/core/AppBar';
-import Chip from '@material-ui/core/Chip';
-import Toolbar from '@material-ui/core/Toolbar';
-import * as _ from 'lodash';
+import AppBar from "@material-ui/core/AppBar";
+import Chip from "@material-ui/core/Chip";
+import Toolbar from "@material-ui/core/Toolbar";
+import * as _ from "lodash";
 
-import { Selectors as RoomsSelectors } from 'store/rooms';
-import { Selectors as ServerSelectors } from 'store/server';
-import { Room, User } from 'types';
+import { Selectors as RoomsSelectors } from "store/rooms";
+import { Selectors as ServerSelectors } from "store/server";
+import { Room, User } from "types";
 
-import { AuthenticationService } from 'AppShell/common/services';
-import { RouteEnum } from 'AppShell/common/types';
+import { AuthenticationService } from "AppShell/common/services";
+import { RouteEnum } from "AppShell/common/types";
 
-import './Header.css';
-import logo from './logo.png';
+import "./Header.css";
+import logo from "./logo.png";
 
 class Header extends Component<HeaderProps> {
   componentDidUpdate(prevProps) {

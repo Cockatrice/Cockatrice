@@ -1,10 +1,10 @@
-import { Dispatch, Selectors } from 'store/rooms';
-import { store } from 'store';
+import { Dispatch, Selectors } from "store/rooms";
+import { store } from "store";
 
 
-import { WebClient } from '../WebClient';
+import { WebClient } from "../WebClient";
 
-import { NormalizeService } from './NormalizeService';
+import { NormalizeService } from "./NormalizeService";
 
 export class RoomService {
   webClient: WebClient;

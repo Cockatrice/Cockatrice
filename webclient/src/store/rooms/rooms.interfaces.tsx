@@ -1,4 +1,4 @@
-import { GameSortField, Room, SortBy, UserSortField } from 'types';
+import { GameSortField, Room, SortBy, UserSortField } from "types";
 
 export interface RoomsState {
   rooms: RoomsStateRooms;

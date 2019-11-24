@@ -1,4 +1,4 @@
-import { WebClient } from '../WebClient'; 
+import { WebClient } from "../WebClient"; 
 
 export class RoomCommands {
   private webClient: WebClient;

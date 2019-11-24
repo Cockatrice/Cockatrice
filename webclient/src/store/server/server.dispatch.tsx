@@ -1,5 +1,5 @@
-import { Actions } from './server.actions';
-import { store } from '../store';
+import { Actions } from "./server.actions";
+import { store } from "../store";
 
 export const Dispatch = {
   clearStore: () => {

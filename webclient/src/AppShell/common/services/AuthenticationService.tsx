@@ -1,5 +1,5 @@
-import { StatusEnum } from 'types';
-import webClient from 'WebClient/WebClient';
+import { StatusEnum } from "types";
+import webClient from "WebClient/WebClient";
 
 export class AuthenticationService {
   static connect(options) {

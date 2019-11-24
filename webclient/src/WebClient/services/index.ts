@@ -1,3 +1,3 @@
-export * from './NormalizeService';
-export * from './RoomService';
-export * from './SessionService';
+export * from "./NormalizeService";
+export * from "./RoomService";
+export * from "./SessionService";

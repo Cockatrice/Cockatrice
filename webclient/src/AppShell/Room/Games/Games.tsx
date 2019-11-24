@@ -1,53 +1,53 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import * as _ from 'lodash';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import * as _ from "lodash";
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 
-// import { RoomsService } from 'AppShell/common/services';
+// import { RoomsService } from "AppShell/common/services";
 
-import { SortUtil } from 'store/common';
-import { Dispatch, Selectors } from 'store/rooms';
-import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
+import { SortUtil } from "store/common";
+import { Dispatch, Selectors } from "store/rooms";
+import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
 
-import './Games.css';
+import "./Games.css";
 
 // @TODO run interval to update timeSinceCreated
 class Games extends Component<GamesProps> {
   private headerCells = [
     {
-      label: 'Age',
-      field: 'startTime'
+      label: "Age",
+      field: "startTime"
     },
     {
-      label: 'Description',
-      field: 'description'
+      label: "Description",
+      field: "description"
     },
     {
-      label: 'Creator',
-      field: 'creatorInfo.name'
+      label: "Creator",
+      field: "creatorInfo.name"
     },
     {
-      label: 'Type',
-      field: 'gameType'
+      label: "Type",
+      field: "gameType"
     },
     {
-      label: 'Restrictions',
-      // field: '?'
+      label: "Restrictions",
+      // field: "?"
     },
     {
-      label: 'Players',
-      // field: ['maxPlayers', 'playerCount']
+      label: "Players",
+      // field: ["maxPlayers", "playerCount"]
     },
     {
-      label: 'Spectators',
-      field: 'spectatorsCount'
+      label: "Spectators",
+      field: "spectatorsCount"
     },
   ];
 

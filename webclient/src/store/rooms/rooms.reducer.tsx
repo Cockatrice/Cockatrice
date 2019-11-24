@@ -1,11 +1,11 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
-import { GameSortField, UserSortField, SortDirection } from 'types';
+import { GameSortField, UserSortField, SortDirection } from "types";
 
-import { SortUtil } from '../common';
+import { SortUtil } from "../common";
 
-import { RoomsState } from './rooms.interfaces'
-import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
+import { RoomsState } from "./rooms.interfaces"
+import { MAX_ROOM_MESSAGES, Types } from "./rooms.types";
 
 const initialState: RoomsState = {
   rooms: {},

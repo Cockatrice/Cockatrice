@@ -1,22 +1,22 @@
-import React from 'react';
-import * as _ from 'lodash';
+import React from "react";
+import * as _ from "lodash";
 
-import AppBar from '@material-ui/core/AppBar';
-import Box from '@material-ui/core/Box';
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
-import Typography from '@material-ui/core/Typography';
+import AppBar from "@material-ui/core/AppBar";
+import Box from "@material-ui/core/Box";
+import Paper from "@material-ui/core/Paper";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Tab from "@material-ui/core/Tab";
+import Tabs from "@material-ui/core/Tabs";
+import Typography from "@material-ui/core/Typography";
 
-import './LogResults.css';
+import "./LogResults.css";
 
 const LogResults = (props) => {
-  console.log('LogResults->props', props)
+  console.log("LogResults->props", props)
   const { logs } = props;
 
   const hasRoomLogs = logs.room && logs.room.length;
@@ -31,22 +31,22 @@ const LogResults = (props) => {
 
   const headerCells = [
     {
-      label: 'Time'
+      label: "Time"
     },
     {
-      label: 'Sender Name'
+      label: "Sender Name"
     },
     {
-      label: 'Sender IP'
+      label: "Sender IP"
     },
     {
-      label: 'Message'
+      label: "Message"
     },
     {
-      label: 'Target ID'
+      label: "Target ID"
     },
     {
-      label: 'Target Name'
+      label: "Target Name"
     }
   ];
   
@@ -54,9 +54,9 @@ const LogResults = (props) => {
     <div>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label={'Rooms' + (hasRoomLogs ? ` [${logs.room.length}]` : '')} {...a11yProps(0)} />
-          <Tab label={'Games' + (hasGameLogs ? ` [${logs.game.length}]` : '')} {...a11yProps(1)} />
-          <Tab label={'Chats' + (hasChatLogs ? ` [${logs.chat.length}]` : '')} {...a11yProps(2)} />
+          <Tab label={"Rooms" + (hasRoomLogs ? ` [${logs.room.length}]` : "")} {...a11yProps(0)} />
+          <Tab label={"Games" + (hasGameLogs ? ` [${logs.game.length}]` : "")} {...a11yProps(1)} />
+          <Tab label={"Chats" + (hasChatLogs ? ` [${logs.chat.length}]` : "")} {...a11yProps(2)} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
@@ -75,7 +75,7 @@ const LogResults = (props) => {
 const a11yProps = index => {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 };
 

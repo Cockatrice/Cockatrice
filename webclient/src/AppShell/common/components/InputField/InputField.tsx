@@ -1,5 +1,5 @@
-import React from 'react';
-import TextField from '@material-ui/core/TextField';
+import React from "react";
+import TextField from "@material-ui/core/TextField";
 
 const InputField = ({ input, label, name, autoComplete, type }) => (
   <TextField

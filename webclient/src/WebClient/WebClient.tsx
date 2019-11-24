@@ -1,15 +1,15 @@
-import protobuf from 'protobufjs';
-import $ from 'jquery';
+import protobuf from "protobufjs";
+import $ from "jquery";
 
-import { StatusEnum } from 'types';
+import { StatusEnum } from "types";
 
-import * as roomEvents from './events/RoomEvents';
-import * as sessionEvents from './events/SessionEvents';
+import * as roomEvents from "./events/RoomEvents";
+import * as sessionEvents from "./events/SessionEvents";
   
-import { RoomService, SessionService } from './services';
-import { RoomCommands, SessionCommands } from './commands';
+import { RoomService, SessionService } from "./services";
+import { RoomCommands, SessionCommands } from "./commands";
 
-import ProtoFiles from './ProtoFiles';
+import ProtoFiles from "./ProtoFiles";
 
 const roomEventKeys = Object.keys(roomEvents);
 const sessionEventKeys = Object.keys(sessionEvents);
@@ -59,10 +59,10 @@ export class WebClient {
   };
 
   public options: any = {
-    host: '',
-    port: '',
-    user: '',
-    pass: '',
+    host: ",
+    port: ",
+    user: ",
+    pass: ",
     debug: false,
     autojoinrooms: true,
     keepalive: 5000
@@ -78,7 +78,7 @@ export class WebClient {
       }
     });
 
-    // This sucks. I can't seem to get out of this
+    // This sucks. I can"t seem to get out of this
     // circular dependency trap, so this is my current best.
     this.commands = {
       room: new RoomCommands(this),
@@ -179,10 +179,10 @@ export class WebClient {
       if (this.lastPingPending) {
         this.disconnect();
 
-        this.updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
+        this.updateStatus(StatusEnum.DISCONNECTED, "Connection timeout");
       }
 
-      // stop the ping loop if we're disconnected
+      // stop the ping loop if we"re disconnected
       if (this.status !== StatusEnum.LOGGEDIN) {
         this.endPingLoop();
         return;
@@ -208,19 +208,19 @@ export class WebClient {
   public connect(options) {
     $.extend(this.options, options || {});
 
-    this.socket = new WebSocket('ws://' + this.options.host + ':' + this.options.port);
+    this.socket = new WebSocket("ws://" + this.options.host + ":" + this.options.port);
     this.socket.binaryType = "arraybuffer"; // We are talking binary
 
     this.socket.onopen = () => {
-      this.updateStatus(StatusEnum.CONNECTED, 'Connected');
+      this.updateStatus(StatusEnum.CONNECTED, "Connected");
     };
 
     this.socket.onclose = () => {
-      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
+      this.updateStatus(StatusEnum.DISCONNECTED, "Connection Closed");
     };
 
     this.socket.onerror = () => {
-      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
+      this.updateStatus(StatusEnum.DISCONNECTED, "Connection Failed");
     };
 
 

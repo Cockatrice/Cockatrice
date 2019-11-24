@@ -1,7 +1,7 @@
 // eslint-disable-next-line
-import React from 'react';
+import React from "react";
 
-import './Messages.css';
+import "./Messages.css";
 
 const Messages = ({ messages }) => (
   <div className="messages">
@@ -18,7 +18,7 @@ const Messages = ({ messages }) => (
 );
 
 const ParsedMessage = (message) => {
-  const name = message.match('^[^:]+:');
+  const name = message.match("^[^:]+:");
 
   if (name && name.length) {
     message = message.slice(name[0].length, message.length);

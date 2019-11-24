@@ -1,6 +1,6 @@
 export const ServerShutdown = {
-  id: '.Event_ServerShutdown.ext',
+  id: ".Event_ServerShutdown.ext",
   action: (payload, webClient) => {
-    console.info('Event_ServerShutdown', payload);
+    // console.info("Event_ServerShutdown", payload);
   }
 };

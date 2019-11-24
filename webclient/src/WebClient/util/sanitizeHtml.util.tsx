@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import $ from "jquery";
 
 export function sanitizeHtml(msg) {
   const $div = $("<div>").html(msg);
@@ -37,15 +37,15 @@ function enforceAttrWhitelist($el, attrs) {
 function enforceHrefWhitelist($el, hrefs) {
   $el.find("[href]").each(function() {
     const $_el = $(this);
-    const  attributeValue = $_el.attr('href');
+    const  attributeValue = $_el.attr("href");
 
     for (let protocol in hrefs) {
         if (attributeValue.indexOf(hrefs[protocol]) === 0) {
-            $_el.attr('target', '_blank');
+            $_el.attr("target", "_blank");
             return;
         }
     }
 
-    $_el.removeAttr('href');        
+    $_el.removeAttr("href");        
   });
 }

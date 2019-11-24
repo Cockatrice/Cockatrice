@@ -1,9 +1,9 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import AuthGuard from 'AppShell/common/guards/AuthGuard';
+import AuthGuard from "AppShell/common/guards/AuthGuard";
 
-import './Game.css';
+import "./Game.css";
 
 class Game extends Component {
   render() {

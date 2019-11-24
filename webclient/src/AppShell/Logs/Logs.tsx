@@ -1,19 +1,19 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import * as _ from 'lodash';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import * as _ from "lodash";
 
-import { Dispatch, Selectors, ServerStateLogs } from 'store/server'
+import { Dispatch, Selectors, ServerStateLogs } from "store/server"
 
-import { ModeratorService } from 'AppShell/common/services';
-import AuthGuard from 'AppShell/common/guards/AuthGuard';
-import ModGuard from 'AppShell/common/guards/ModGuard';
+import { ModeratorService } from "AppShell/common/services";
+import AuthGuard from "AppShell/common/guards/AuthGuard";
+import ModGuard from "AppShell/common/guards/ModGuard";
 
-import LogResults from './LogResults/LogResults';
-import SearchForm from './SearchForm/SearchForm';
+import LogResults from "./LogResults/LogResults";
+import SearchForm from "./SearchForm/SearchForm";
 
-import './Logs.css';
+import "./Logs.css";
 
 class Logs extends Component<LogsTypes> {
   MAXIMUM_RESULTS = 1000;
@@ -52,7 +52,7 @@ class Logs extends Component<LogsTypes> {
 
   private trimFields(fields) {
     return _.reduce(fields, (obj, field, key) => {
-      if (typeof field === 'string') {
+      if (typeof field === "string") {
         const trimmed = _.trim(field);
 
         if (!!trimmed) {

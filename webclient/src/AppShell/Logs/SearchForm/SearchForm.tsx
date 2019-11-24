@@ -1,16 +1,16 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Field, InjectedFormProps, reduxForm } from 'redux-form'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Field, InjectedFormProps, reduxForm } from "redux-form"
 
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
+import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import Paper from "@material-ui/core/Paper";
 
-import InputField from 'AppShell/common/components/InputField/InputField';
-import CheckboxField from 'AppShell/common/components/CheckboxField/CheckboxField';
+import InputField from "AppShell/common/components/InputField/InputField";
+import CheckboxField from "AppShell/common/components/CheckboxField/CheckboxField";
 
-import './SearchForm.css';
+import "./SearchForm.css";
 
 class SearchForm extends Component<InjectedFormProps> {
   render() {
@@ -57,7 +57,7 @@ class SearchForm extends Component<InjectedFormProps> {
 }
 
 const propsMap = {
-  form: 'logs'
+  form: "logs"
 };
 
 const mapStateToProps = () => ({

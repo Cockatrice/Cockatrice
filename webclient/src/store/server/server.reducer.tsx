@@ -1,9 +1,9 @@
-import { SortDirection, StatusEnum, UserSortField } from 'types';
+import { SortDirection, StatusEnum, UserSortField } from "types";
 
-import { SortUtil } from '../common';
+import { SortUtil } from "../common";
 
-import { ServerState } from './server.interfaces'
-import { Types } from './server.types';
+import { ServerState } from "./server.interfaces"
+import { Types } from "./server.types";
 
 const initialState: ServerState = {
   status: {

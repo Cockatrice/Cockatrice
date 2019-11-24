@@ -1,4 +1,4 @@
-import { ServerState } from './server.interfaces';
+import { ServerState } from "./server.interfaces";
 
 interface State {
   server: ServerState

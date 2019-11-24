@@ -1,26 +1,26 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { connect } from "react-redux";
 import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import Paper from "@material-ui/core/Paper";
 
-import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
+import { RoomsStateMessages, RoomsStateRooms, Selectors } from "store/rooms";
 
-import AuthGuard from 'AppShell/common/guards/AuthGuard';
-import { RoomsService } from 'AppShell/common/services';
+import AuthGuard from "AppShell/common/guards/AuthGuard";
+import { RoomsService } from "AppShell/common/services";
 
-import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
-import ScrollToBottomOnChanges from 'AppShell/common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges';
-import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
-import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
+import SayMessage from "AppShell/common/components/SayMessage/SayMessage";
+import ScrollToBottomOnChanges from "AppShell/common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges";
+import ThreePaneLayout from "AppShell/common/components/ThreePaneLayout/ThreePaneLayout";
+import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
 
 
-import Games from './Games/Games';
-import Messages from './Messages/Messages';
+import Games from "./Games/Games";
+import Messages from "./Messages/Messages";
 
-import './Room.css';
+import "./Room.css";
 
 // @TODO (3)
 class Room extends Component<any> {

@@ -1,24 +1,24 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import Paper from "@material-ui/core/Paper";
 
-import { Selectors as RoomsSelectors } from 'store/rooms';
-import { Selectors as ServerSelectors } from 'store/server';
-import { Room, StatusEnum, User } from 'types';
+import { Selectors as RoomsSelectors } from "store/rooms";
+import { Selectors as ServerSelectors } from "store/server";
+import { Room, StatusEnum, User } from "types";
 
-import ThreePaneLayout from 'AppShell/common/components/ThreePaneLayout/ThreePaneLayout';
-import UserDisplay from 'AppShell/common/components/UserDisplay/UserDisplay';
+import ThreePaneLayout from "AppShell/common/components/ThreePaneLayout/ThreePaneLayout";
+import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
 
-import { AuthenticationService } from 'AppShell/common/services';
+import { AuthenticationService } from "AppShell/common/services";
 
-import ConnectForm from './ConnectForm/ConnectForm';
-import Rooms from './Rooms/Rooms';
+import ConnectForm from "./ConnectForm/ConnectForm";
+import Rooms from "./Rooms/Rooms";
 
-import './Server.css';
+import "./Server.css";
 
 class Server extends Component<ServerProps> {
   showDescription(state, description) {

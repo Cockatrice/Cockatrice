@@ -1,10 +1,10 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { connect } from "react-redux";
 
-import { User } from 'types';
+import { User } from "types";
 
-import './UserDisplay.css';
+import "./UserDisplay.css";
 
 class UserDisplay extends Component<UserDisplayProps> {
 

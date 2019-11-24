@@ -1,11 +1,11 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Field, InjectedFormProps, reduxForm } from 'redux-form'
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Field, InjectedFormProps, reduxForm } from "redux-form"
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
 
-import './SayMessage.css';
+import "./SayMessage.css";
 
 class SayMessage extends Component<InjectedFormProps> {
   render() {
@@ -37,7 +37,7 @@ const InputField = ({ input, label, name }) => (
 );
 
 const propsMap = {
-  form: 'sayMessage'
+  form: "sayMessage"
 };
 
 export default connect()(reduxForm(propsMap)(SayMessage));

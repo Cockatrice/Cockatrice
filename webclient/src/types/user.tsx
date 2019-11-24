@@ -20,5 +20,5 @@ export enum UserPrivLevel {
 }
 
 export enum UserSortField {
-  NAME = 'name'
+  NAME = "name"
 }

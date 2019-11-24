@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import { RoomsState } from './rooms.interfaces';
+import * as _ from "lodash";
+import { RoomsState } from "./rooms.interfaces";
 
 interface State {
   rooms: RoomsState

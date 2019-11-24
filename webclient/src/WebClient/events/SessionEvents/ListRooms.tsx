@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
 export const ListRooms = {
-  id: '.Event_ListRooms.ext',
+  id: ".Event_ListRooms.ext",
   action: ({ roomList }, webClient) => {
     webClient.services.room.updateRooms(roomList);
 

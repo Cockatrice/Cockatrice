@@ -1,4 +1,4 @@
-import { Log, SortBy, User, UserSortField } from 'types';
+import { Log, SortBy, User, UserSortField } from "types";
 
 export interface ServerConnectParams {
   host: string;

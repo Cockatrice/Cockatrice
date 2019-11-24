@@ -14,13 +14,13 @@ export class NormalizeService {
   }
 
   // Flatten gameTypes[] into gameType field
-  // Default sortable values ('' || 0 || -1)
+  // Default sortable values ("" || 0 || -1)
   static normalizeGameObject(game, gametypeMap) {
     const { gameTypes, description } = game;
     const hasType = gameTypes && gameTypes.length;
-    game.gameType = hasType ? gametypeMap[gameTypes[0]] : '';
+    game.gameType = hasType ? gametypeMap[gameTypes[0]] : "";
 
-    game.description = description || '';
+    game.description = description || "";
   }
   
   // Flatten logs[] into object mapped by targetType (room, game, chat)

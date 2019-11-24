@@ -1,4 +1,4 @@
-import { SortBy, SortDirection, User } from 'types';
+import { SortBy, SortDirection, User } from "types";
 
 export class SortUtil {
   static sortByField(arr:  any[], sortBy: SortBy): void {
@@ -6,17 +6,17 @@ export class SortUtil {
       const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
       const fieldType = typeof field;
 
-      if (fieldType === 'string') {
+      if (fieldType === "string") {
         SortUtil.sortByString(arr, sortBy);
         return;
       }
 
-      if (fieldType === 'number') {
+      if (fieldType === "number") {
         SortUtil.sortByNumber(arr, sortBy);
         return;
       }
 
-      throw new Error('SortField must resolve to either a string or number');
+      throw new Error("SortField must resolve to either a string or number");
     }
   }
 
@@ -29,7 +29,7 @@ export class SortUtil {
           
           const fieldType = typeof field;
 
-          if (fieldType === 'string') {
+          if (fieldType === "string") {
             const result = SortUtil.stringComparator(a, b, sortBy);
 
             if (result) {
@@ -37,7 +37,7 @@ export class SortUtil {
             }
           }
 
-          if (fieldType === 'number') {
+          if (fieldType === "number") {
             const result = SortUtil.numberComparator(a, b, sortBy);
 
             if (result) {
@@ -45,7 +45,7 @@ export class SortUtil {
             }
           }
 
-          throw new Error('SortField must resolve to either a string or number');
+          throw new Error("SortField must resolve to either a string or number");
         }
 
         return 0;
@@ -80,7 +80,7 @@ export class SortUtil {
   private static userComparator(a, b, sortBy, sortByUserLevel = true) {
     if (sortByUserLevel) {
       const adminSortBy = {
-        field: 'userLevel',
+        field: "userLevel",
         order: SortDirection.DESC
       };
 
@@ -128,13 +128,13 @@ export class SortUtil {
   }
 
   private static resolveFieldChain(obj: object, field: string) {
-    const links = field.split('.');
+    const links = field.split(".");
 
     if (links.length > 1) {
       return links.reduce((obj, link) => {
         const parsed = parseInt(link, 10);
 
-        if (parsed.toLocaleString() === 'NaN') {
+        if (parsed.toLocaleString() === "NaN") {
           return obj[link];
         } else {
           return obj[parsed];

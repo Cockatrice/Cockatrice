@@ -1,14 +1,14 @@
 // eslint-disable-next-line
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Field, InjectedFormProps, reduxForm } from 'redux-form'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Field, InjectedFormProps, reduxForm } from "redux-form"
 
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
+import Button from "@material-ui/core/Button";
+import Paper from "@material-ui/core/Paper";
 
-import InputField from 'AppShell/common/components/InputField/InputField';
+import InputField from "AppShell/common/components/InputField/InputField";
 
-import './ConnectForm.css';
+import "./ConnectForm.css";
 
 class ConnectForm extends Component<InjectedFormProps> {
   render() {
@@ -37,13 +37,13 @@ class ConnectForm extends Component<InjectedFormProps> {
 }
 
 const propsMap = {
-  form: 'connect'
+  form: "connect"
 };
 
 const mapStateToProps = () => ({
   initialValues: {
-    host: 'mtg.tetrarch.co/servatrice',
-    port: '443'
+    host: "mtg.tetrarch.co/servatrice",
+    port: "443"
   }
 });
 

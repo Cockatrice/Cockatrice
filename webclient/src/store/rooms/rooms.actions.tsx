@@ -1,4 +1,4 @@
-import { Types } from './rooms.types';
+import { Types } from "./rooms.types";
 
 export const Actions = {
   clearStore: () => ({

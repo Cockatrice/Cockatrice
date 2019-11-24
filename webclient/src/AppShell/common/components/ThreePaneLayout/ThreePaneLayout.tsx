@@ -1,10 +1,10 @@
 // eslint-disable-next-line
-import React, { Component, CElement } from 'react';
-import { connect } from 'react-redux';
-import Grid from '@material-ui/core/Grid';
-import Hidden from '@material-ui/core/Hidden';
+import React, { Component, CElement } from "react";
+import { connect } from "react-redux";
+import Grid from "@material-ui/core/Grid";
+import Hidden from "@material-ui/core/Hidden";
 
-import './ThreePaneLayout.css';
+import "./ThreePaneLayout.css";
 
 class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
   render() {
@@ -14,7 +14,7 @@ class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
           <Grid item xs={12} md={9} lg={10} className="grid-main">
             <Grid item className={
               "grid-main__top overflow-scroll"
-              + (this.props.fixedHeight ? ' fixedHeight' : '')
+              + (this.props.fixedHeight ? " fixedHeight" : "")
             }>
               {this.props.top}
             </Grid>
