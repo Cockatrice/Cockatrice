@@ -22,7 +22,7 @@ export const getStatusEnumLabel = (statusEnum: number) => {
   }
 
   return "Unknown";
-}
+};
 
 export interface Log {
   message: string;
