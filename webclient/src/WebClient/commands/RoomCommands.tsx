@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import { WebClient } from "../WebClient"; 
 
 export class RoomCommands {
@@ -8,8 +10,12 @@ export class RoomCommands {
   }
 
   roomSay(roomId, message) {
+    const trimmed = _.trim(message);
+    
+    if (!trimmed) return;
+
     var CmdRoomSay = this.webClient.pb.Command_RoomSay.create({
-      "message" : message
+      "message" : trimmed
     });
 
     var rc = this.webClient.pb.RoomCommand.create({

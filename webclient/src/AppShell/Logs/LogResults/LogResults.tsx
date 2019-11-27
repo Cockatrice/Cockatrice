@@ -16,7 +16,6 @@ import Typography from "@material-ui/core/Typography";
 import "./LogResults.css";
 
 const LogResults = (props) => {
-  console.log("LogResults->props", props)
   const { logs } = props;
 
   const hasRoomLogs = logs.room && logs.room.length;

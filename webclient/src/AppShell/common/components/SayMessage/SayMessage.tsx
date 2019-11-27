@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Field, InjectedFormProps, reduxForm } from "redux-form"
+import { Form, Field, InjectedFormProps, reduxForm } from "redux-form"
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 
@@ -11,7 +11,7 @@ class SayMessage extends Component<InjectedFormProps> {
   render() {
     return (
       // @TODO (4)
-      <form className="sayMessage" onSubmit={this.props.handleSubmit}>
+      <Form className="sayMessage" onSubmit={this.props.handleSubmit}>
         <div className="sayMessage-item">
           <Field label="Chat" name="message" component={InputField} />
         </div>
@@ -20,7 +20,7 @@ class SayMessage extends Component<InjectedFormProps> {
             Say
           </Button>
         </div>
-      </form>
+      </Form>
     );
   }
 }

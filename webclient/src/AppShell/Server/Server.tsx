@@ -2,6 +2,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
+
+import Button from "@material-ui/core/Button";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
@@ -16,11 +18,25 @@ import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
 import { AuthenticationService } from "AppShell/common/services";
 
 import ConnectForm from "./ConnectForm/ConnectForm";
+import RegisterForm from "./RegisterForm/RegisterForm";
 import Rooms from "./Rooms/Rooms";
 
 import "./Server.css";
 
-class Server extends Component<ServerProps> {
+class Server extends Component<ServerProps, ServerState> {
+  constructor(props) {
+    super(props);
+
+    this.showDescription = this.showDescription.bind(this);
+    this.showRegisterForm = this.showRegisterForm.bind(this);
+    this.hideRegisterForm = this.hideRegisterForm.bind(this);
+    this.onRegister = this.onRegister.bind(this);
+
+    this.state = {
+      register: false
+    };
+  }
+
   showDescription(state, description) {
     const isDisconnected = state === StatusEnum.DISCONNECTED;
     const hasDescription = description && !!description.length;
@@ -28,65 +44,98 @@ class Server extends Component<ServerProps> {
     return isDisconnected && hasDescription;
   }
 
+  showRegisterForm() {
+    this.setState({register: true});
+  }
+
+  hideRegisterForm() {
+    this.setState({register: false});
+  }
+
+  onRegister(fields) {
+    console.log("register", fields);
+  }
+
   render() {
     const { message, rooms, joinedRooms, history, state, description, users } = this.props;
+    const { register } = this.state;
     const isConnected = AuthenticationService.isConnected(state);
 
     return (
-      <div className="server">{
-        isConnected
-          ? (
-              <div className="server-rooms">
-                <ThreePaneLayout
-                  top={(
-                    <Paper>
-                      <Rooms rooms={rooms} joinedRooms={joinedRooms} history={history} />
+      <div className="server">
+            {
+              isConnected
+                ? ( <ServerRooms rooms={rooms} joinedRooms={joinedRooms} history={history} message={message} users={users} /> )
+                : (
+                  <div className="server-connect">
+                    <Paper className="server-connect__form">
+                      {
+                        register
+                          ? ( <Register connect={this.hideRegisterForm} onRegister={this.onRegister} /> )
+                          : ( <Connect register={this.showRegisterForm} /> )
+                      }
                     </Paper>
-                  )}
-
-                  bottom={(
-                    <Paper className="serverMessage" dangerouslySetInnerHTML={{ __html: message }} />
-                  )}
-
-                  side={(
-                    <Paper className="server-rooms__side overflow-scroll">
-                      <div className="server-rooms__side-label">
-                        Users connected to server: {users.length}
-                      </div>
-                      <List dense={true}>
-                        { users.map(user => (
-                          <ListItem button key={user.name}>
-                            <UserDisplay user={user} key={user.name} />
-                          </ListItem>
-                        ) ) }
-                      </List>
-                    </Paper>
-                  )}
-                />
-                
-                
-              </div>
-            )
-          : (
-            <div className="server-connect">
-              <div className="server-connect__form">
-                <ConnectForm onSubmit={AuthenticationService.connect} />
-              </div>
-              {
-                this.showDescription(state, description) && (
-                  <Paper className="server-connect__description">
-                    {description}
-                  </Paper>
+                  </div>
                 )
-              }
-            </div>
-          )
-      }</div>
+            }
+          {
+            !isConnected && this.showDescription(state, description) && (
+              <Paper className="server-connect__description">
+                {description}
+              </Paper>
+            )
+          }
+      </div>
     );
   }
 }
 
-export interface ServerProps {
+const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
+  <div className="server-rooms">
+    <ThreePaneLayout
+      top={(
+        <Paper>
+          <Rooms rooms={rooms} joinedRooms={joinedRooms} history={history} />
+        </Paper>
+      )}
+
+      bottom={(
+        <Paper className="serverMessage" dangerouslySetInnerHTML={{ __html: message }} />
+      )}
+
+      side={(
+        <Paper className="server-rooms__side overflow-scroll">
+          <div className="server-rooms__side-label">
+            Users connected to server: {users.length}
+          </div>
+          <List dense={true}>
+            { users.map(user => (
+              <ListItem button key={user.name}>
+                <UserDisplay user={user} key={user.name} />
+              </ListItem>
+            ) ) }
+          </List>
+        </Paper>
+      )}
+    />
+  </div>
+);
+
+const Connect = ({register}) => (
+  <div className="form-wrapper">
+    <ConnectForm onSubmit={AuthenticationService.connect} />
+    {/*{<Button variant="outlined" onClick={register}>Register</Button>}*/}
+  </div>
+);
+
+const Register = ({ onRegister, connect }) => (
+  <div className="form-wrapper">
+    <RegisterForm onSubmit={event => onRegister(event)} />
+    <Button variant="outlined" onClick={connect}>Connect</Button>
+  </div>
+);
+
+interface ServerProps {
   message: string;
   state: number;
   description: string;
@@ -96,13 +145,17 @@ export interface ServerProps {
   history: any;
 }
 
+interface ServerState {
+  register: boolean;
+}
+
 const mapStateToProps = state => ({
   message: ServerSelectors.getMessage(state),
   state: ServerSelectors.getState(state),
   description: ServerSelectors.getDescription(state),
   rooms: RoomsSelectors.getRooms(state),
   joinedRooms: RoomsSelectors.getJoinedRooms(state),
-  users: ServerSelectors.getUsers(state),
+  users: ServerSelectors.getUsers(state)
 });
 
 export default withRouter(connect(mapStateToProps)(Server));

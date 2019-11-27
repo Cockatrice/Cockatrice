@@ -3,7 +3,7 @@ import { StatusEnum } from "types";
 export const ConnectionClosed = {
   id: ".Event_ConnectionClosed.ext",
   action: ({ reason }, webClient) => {
-    let message = ";
+    let message = "";
 
     // @TODO (5)
     switch(reason) {

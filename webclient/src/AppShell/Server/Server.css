@@ -4,11 +4,23 @@
   height: 100%;
 }
 
-.server-connect {
+.server {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 50px 10px;
+}
+
+.server .form-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.server-connect {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .server-connect__form,
@@ -19,13 +31,17 @@
 
 .server-connect__description {
   text-align: center;
-  margin-top: 20px;
+  margin: 20px 0;
   padding: 20px;
 }
 
 .serverMessage {
   padding: 20px;
   margin-bottom: 2px;
+}
+
+.server-rooms {
+  width: 100%;
 }
 
 .server-rooms__side-label {

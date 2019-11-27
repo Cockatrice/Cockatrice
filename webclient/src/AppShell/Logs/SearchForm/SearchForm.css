@@ -3,7 +3,7 @@
 }
 
 hr.MuiDivider-root {
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 .log-search__form {
@@ -13,7 +13,6 @@ hr.MuiDivider-root {
 
 .log-search__form-item {
   display: flex;
-  margin-bottom: 20px;
 }
 
 .log-search__form-item.log-location {

@@ -59,10 +59,10 @@ export class WebClient {
   };
 
   public options: any = {
-    host: ",
-    port: ",
-    user: ",
-    pass: ",
+    host: "",
+    port: "",
+    user: "",
+    pass: "",
     debug: false,
     autojoinrooms: true,
     keepalive: 5000
@@ -216,7 +216,10 @@ export class WebClient {
     };
 
     this.socket.onclose = () => {
-      this.updateStatus(StatusEnum.DISCONNECTED, "Connection Closed");
+      // dont overwrite failure messages
+      if (this.status !== StatusEnum.DISCONNECTED) {
+        this.updateStatus(StatusEnum.DISCONNECTED, "Connection Closed");
+      }
     };
 
     this.socket.onerror = () => {

@@ -134,7 +134,7 @@ export class SessionCommands {
           this.webClient.debug(() => console.log("Join Room: ", roomInfo.name));
           return;
         case this.webClient.pb.Response.ResponseCode.RespNameNotFound:
-          error = "Failed to join the room: it doesn"t exist on the server.";
+          error = "Failed to join the room: it doesn\"t exist on the server.";
           break;
         case this.webClient.pb.Response.ResponseCode.RespContextError:
           error = "The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.";

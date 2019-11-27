@@ -5,6 +5,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 const CheckboxField = ({ input, label }) => {
   const { value, onChange } = input;
 
+  // @TODO this isnt unchecking properly
   return (
     <FormControlLabel
       className="checkbox-field"
