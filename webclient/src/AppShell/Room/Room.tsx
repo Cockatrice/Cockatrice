@@ -2,7 +2,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
-import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 
@@ -15,7 +14,7 @@ import SayMessage from "AppShell/common/components/SayMessage/SayMessage";
 import ScrollToBottomOnChanges from "AppShell/common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges";
 import ThreePaneLayout from "AppShell/common/components/ThreePaneLayout/ThreePaneLayout";
 import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
-
+import VirtualList from "AppShell/common/components/VirtualList/VirtualList";
 
 import Games from "./Games/Games";
 import Messages from "./Messages/Messages";
@@ -74,13 +73,14 @@ class Room extends Component<any> {
               <div className="room-view__side-label">
                 Users in this room: {users.length}
               </div>
-              <List dense={true}>
-                { users.map(user => (
-                  <ListItem button key={user.name}>
-                    <UserDisplay user={user} key={user.name} />
+              <VirtualList
+                itemKey={(index, data) => users[index].name }
+                items={ users.map(user => (
+                  <ListItem button dense>
+                    <UserDisplay user={user} />
                   </ListItem>
                 ) ) }
-              </List>
+              />
             </Paper>
           )}
         />

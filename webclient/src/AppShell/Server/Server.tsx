@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import Button from "@material-ui/core/Button";
-import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 
@@ -14,6 +13,7 @@ import { Room, StatusEnum, User } from "types";
 
 import ThreePaneLayout from "AppShell/common/components/ThreePaneLayout/ThreePaneLayout";
 import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
+import VirtualList from "AppShell/common/components/VirtualList/VirtualList";
 
 import { AuthenticationService } from "AppShell/common/services";
 
@@ -108,13 +108,14 @@ const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
           <div className="server-rooms__side-label">
             Users connected to server: {users.length}
           </div>
-          <List dense={true}>
-            { users.map(user => (
-              <ListItem button key={user.name}>
-                <UserDisplay user={user} key={user.name} />
+          <VirtualList
+            itemKey={(index, data) => users[index].name }
+            items={ users.map(user => (
+              <ListItem button dense>
+                <UserDisplay user={user} />
               </ListItem>
             ) ) }
-          </List>
+          />
         </Paper>
       )}
     />

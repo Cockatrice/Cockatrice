@@ -1,5 +1,4 @@
 import protobuf from "protobufjs";
-import $ from "jquery";
 
 import { StatusEnum } from "types";
 

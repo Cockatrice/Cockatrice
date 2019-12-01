@@ -1,28 +1,64 @@
 // eslint-disable-next-line
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React from "react";
 
-import { User } from "types";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import "./UserDisplay.css";
 
-class UserDisplay extends Component<UserDisplayProps> {
 
-  render() {
-    const { name } = this.props.user;
-    
-    return (
-      <div>{name}</div>
-    );
+const UserDisplay = ({ user }) => {
+  const [state, setState] = React.useState(null);
+
+  function handleClick(event) {
+    event.preventDefault();
+
+    setState({
+      x: event.clientX + 2,
+      y: event.clientY + 4,
+    });
   }
+
+  function handleClose() {
+    setState(null);
+  }
+
+  function navigateToUserProfile() {
+    handleClose();
+  }
+
+  function addToBuddyList() {
+    handleClose();
+  }
+
+  function addToIgnoreList() {
+    handleClose();
+  }
+
+  return (
+    <div className="user-display">
+      <div className="user-display__details" onContextMenu={handleClick}>
+        <div className="user-display__country"></div>
+        <div className="user-display__name">{user.name}</div>
+      </div>
+      <div className="user-display__menu">
+        <Menu
+          open={Boolean(state)}
+          onClose={handleClose}
+          anchorReference='anchorPosition'
+          anchorPosition={
+            state !== null
+              ? { top: state.y, left: state.x }
+              : undefined
+          }
+        >
+          <MenuItem onClick={navigateToUserProfile}>Profile</MenuItem>
+          <MenuItem onClick={addToBuddyList}>Add to Buddy List</MenuItem>
+          <MenuItem onClick={addToIgnoreList}>Add to Ignore List</MenuItem>
+        </Menu>
+      </div>
+    </div>
+  );
 }
 
-interface UserDisplayProps {
-  user: User
-}
-
-const mapStateToProps = (state) => ({
-
-});
-
-export default connect(mapStateToProps)(UserDisplay);
+export default UserDisplay;

@@ -39,8 +39,10 @@ const propsMap = {
 
 const mapStateToProps = () => ({
   initialValues: {
-    host: "mtg.tetrarch.co/servatrice",
-    port: "443"
+    // host: "mtg.tetrarch.co/servatrice",
+    // port: "443"
+    host: "server.cockatrice.us",
+    port: "4748"
   }
 });
 

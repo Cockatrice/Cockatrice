@@ -10,8 +10,12 @@ const ScrollToBottomOnChanges = ({ content, changes }) => {
 
   useEffect(scrollToBottom, [changes]);
 
+  const styling = {
+    height: '100%'
+  };
+
   return (
-    <div>
+    <div style={styling}>
       {content}
       <div ref={messagesEndRef} />
     </div>
