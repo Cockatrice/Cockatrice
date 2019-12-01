@@ -24,3 +24,16 @@
   background: white;
   z-index: 1;
 }
+
+.room-view__side-list,
+.room-view__side-list .room-view__side-list__item  {
+  height: 100%;
+}
+
+.room-view__side-list .room-view__side-list__item {
+  padding: 0;
+}
+
+.room-view__side-list .room-view__side-list__item  .user-display__details {
+  padding: 0 10px;
+}

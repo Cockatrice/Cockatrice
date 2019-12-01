@@ -6,12 +6,12 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 
 import './VirtualList.css';
 
-const VirtualList = ({ items, itemKey, size = 30 }) => (
+const VirtualList = ({ items, itemKey, className = {}, size = 30 }) => (
   <div className="virtual-list">
     <AutoSizer>
       {({ height, width }) => (
         <List
-          className="virtual-list__list"
+          className={`virtual-list__list ${className}`}
           height={height}
           width={width}
           itemData={items}

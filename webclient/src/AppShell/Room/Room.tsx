@@ -74,9 +74,10 @@ class Room extends Component<any> {
                 Users in this room: {users.length}
               </div>
               <VirtualList
+                className="room-view__side-list"
                 itemKey={(index, data) => users[index].name }
                 items={ users.map(user => (
-                  <ListItem button dense>
+                  <ListItem button className="room-view__side-list__item">
                     <UserDisplay user={user} />
                   </ListItem>
                 ) ) }

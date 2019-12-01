@@ -9,6 +9,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
+import Tooltip from "@material-ui/core/Tooltip";
 
 // import { RoomsService } from "AppShell/common/services";
 
@@ -107,15 +108,21 @@ class Games extends Component<GamesProps> {
           <TableBody>
             { _.map(games, ({ description, gameId, gameType, creatorInfo, maxPlayers, playerCount, spectatorsCount, startTime }) => (
               <TableRow key={gameId}>
-                <TableCell>{startTime}</TableCell>
-                <TableCell>{description}</TableCell>
-                <TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{startTime}</TableCell>
+                <TableCell className="games-header__cell">
+                  <Tooltip title={description} placement="bottom-start">
+                    <div className="single-line-ellipsis">
+                      {description}
+                    </div>
+                  </Tooltip>
+                </TableCell>
+                <TableCell className="games-header__cell">
                   <UserDisplay user={ creatorInfo } />
                 </TableCell>
-                <TableCell>{gameType}</TableCell>
-                <TableCell>?</TableCell>
-                <TableCell>{`${playerCount}/${maxPlayers}`}</TableCell>
-                <TableCell>{spectatorsCount}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{gameType}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">?</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{`${playerCount}/${maxPlayers}`}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{spectatorsCount}</TableCell>
               </TableRow>
             ))}
           </TableBody>

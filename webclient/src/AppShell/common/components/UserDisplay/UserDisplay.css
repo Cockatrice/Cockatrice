@@ -1,3 +1,11 @@
 .user-display {
+  height: 100%;
   width: 100%;
+}
+
+.user-display__details {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: context-menu;
 }

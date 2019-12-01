@@ -8,6 +8,10 @@
   border-bottom: 1px solid black;
 }
 
+.games-header__cell {
+  max-width: 200px;
+}
+
 .games-header__label,
 .game__detail {
   width: 10%;
