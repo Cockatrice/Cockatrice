@@ -205,9 +205,11 @@ export class WebClient {
     this.keepalivecb = null;
   }
 
-  public connect(options, protocol = "wss") {
-    const opts = $.extend(this.options, options || {});
-    const { host, port } = opts;
+  public connect(options) {
+    this.options = { ...this.options, ...options };
+
+    const { host, port } = this.options;
+    const protocol = port === '443' ? 'wss' : 'ws';
 
     this.socket = new WebSocket(protocol + "://" + host + ":" + port);
     this.socket.binaryType = "arraybuffer"; // We are talking binary
@@ -224,12 +226,7 @@ export class WebClient {
     };
 
     this.socket.onerror = () => {
-      if (this.status === StatusEnum.CONNECTING && protocol === "wss") {
-        // failed to connect to the server over wss, try again with ws
-        this.connect(opts, "ws");
-      } else {
-        this.updateStatus(StatusEnum.DISCONNECTED, "Connection Failed");
-      }
+      this.updateStatus(StatusEnum.DISCONNECTED, "Connection Failed");
     };
 
 
