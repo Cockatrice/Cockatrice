@@ -39,7 +39,7 @@ const UserDisplay = ({ user }) => {
     <div className="user-display">
       <div className="user-display__details" onContextMenu={handleClick}>
         <div className="user-display__country"></div>
-        <div className="user-display__name">{user.name}</div>
+        <div className="user-display__name single-line-ellipsis">{user.name}</div>
       </div>
       <div className="user-display__menu">
         <Menu

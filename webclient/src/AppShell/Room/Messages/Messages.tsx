@@ -8,17 +8,11 @@ import "./Messages.css";
 const Messages = ({ messages }) => (
   <div className="messages">
     {
-      messages && (
-        <VirtualList
-          size={25}
-          itemKey={(index, data) => `${index} - ${messages[index].message}` }
-          items={ messages.map(({ message, messageType, timeOf, timeReceived }) => (
-            <div className="message" key={timeReceived}>
-              <div className="message__detail">{ParsedMessage(message)}</div>
-            </div>
-          ) ) }
-        />
-      )
+      messages && messages.map(({ message, messageType, timeOf, timeReceived }) => (
+        <div className="message" key={timeReceived}>
+          <div className="message__detail">{ParsedMessage(message)}</div>
+        </div>
+      ) )
     }
   </div>
 );
