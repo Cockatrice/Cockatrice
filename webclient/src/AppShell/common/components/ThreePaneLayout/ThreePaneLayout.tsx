@@ -13,17 +13,17 @@ class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
         <Grid container spacing={2} className="grid">
           <Grid item xs={12} md={9} lg={10} className="grid-main">
             <Grid item className={
-              "grid-main__top overflow-scroll"
+              "grid-main__top"
               + (this.props.fixedHeight ? " fixedHeight" : "")
             }>
               {this.props.top}
             </Grid>
-            <Grid item className="grid-main__bottom overflow-scroll">
+            <Grid item className="grid-main__bottom">
               {this.props.bottom}
             </Grid>
           </Grid>
           <Hidden smDown>
-            <Grid item md={3} lg={2} className="grid-side overflow-scroll">
+            <Grid item md={3} lg={2} className="grid-side">
               {this.props.side}
             </Grid>
           </Hidden>

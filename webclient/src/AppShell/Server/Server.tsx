@@ -94,13 +94,13 @@ const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
   <div className="server-rooms">
     <ThreePaneLayout
       top={(
-        <Paper>
+        <Paper className="serverRoomWrapper overflow-scroll">
           <Rooms rooms={rooms} joinedRooms={joinedRooms} history={history} />
         </Paper>
       )}
 
       bottom={(
-        <Paper className="serverMessage" dangerouslySetInnerHTML={{ __html: message }} />
+        <Paper className="serverMessage overflow-scroll" dangerouslySetInnerHTML={{ __html: message }} />
       )}
 
       side={(
