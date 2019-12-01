@@ -110,7 +110,7 @@ class Games extends Component<GamesProps> {
               <TableRow key={gameId}>
                 <TableCell className="games-header__cell single-line-ellipsis">{startTime}</TableCell>
                 <TableCell className="games-header__cell">
-                  <Tooltip title={description} placement="bottom-start">
+                  <Tooltip title={description} placement="bottom-start" enterDelay={150}>
                     <div className="single-line-ellipsis">
                       {description}
                     </div>

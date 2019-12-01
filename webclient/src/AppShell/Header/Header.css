@@ -17,11 +17,6 @@
   color: white;
 }
 
-.Header-content a {
-  color: inherit;
-  text-decoration: none;
-}
-
 .Header-serverDetails {
   font-size: 12px;
 }
