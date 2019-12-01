@@ -207,9 +207,10 @@ export class WebClient {
   }
 
   public connect(options) {
-    var opts = $.extend({}, this.options, options || {});
+    const opts = $.extend(this.options, options || {});
+    const { host, port, protocol } = opts;
 
-    this.socket = new WebSocket(opts.protocol + "://" + opts.host + ":" + opts.port);
+    this.socket = new WebSocket(protocol + "://" + host + ":" + port);
     this.socket.binaryType = "arraybuffer"; // We are talking binary
 
     this.socket.onopen = () => {
@@ -224,7 +225,7 @@ export class WebClient {
     };
 
     this.socket.onerror = () => {
-      if (this.status === StatusEnum.CONNECTING && opts.protocol === "wss") {
+      if (this.status === StatusEnum.CONNECTING && protocol === "wss") {
         // failed to connect to the server over wss, try again with ws
         opts.protocol = "ws";
         this.connect(opts);
