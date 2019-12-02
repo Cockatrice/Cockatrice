@@ -17,11 +17,15 @@ class AppShell extends Component {
     window.onbeforeunload = () => true;
   }
 
+  handleContextMenu(event) {
+    event.preventDefault();
+  }
+
   render() {
     return (
       <Provider store={store}>
         <CssBaseline />
-        <div className="AppShell">
+        <div className="AppShell" onContextMenu={this.handleContextMenu}>
           <Router>
             <Header />
             <Routes />

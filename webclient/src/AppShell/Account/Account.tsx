@@ -69,7 +69,7 @@ class Account extends Component<AccountProps> {
           </Paper>
         </div>
         <div className="account-column overflow-scroll">
-          <Paper className="account-details" style={{margin: "0 0 20px 0"}}>
+          <Paper className="account-details" style={{margin: "0 0 5px 0"}}>
             <img src={url} />
             <p>Real Name: {realName}</p>
             <p>Location: ({country.toUpperCase()})</p>
