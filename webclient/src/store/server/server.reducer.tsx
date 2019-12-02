@@ -52,6 +52,9 @@ export const serverReducer = (state = initialState, action: any) => {
     }
     case Types.UPDATE_BUDDY_LIST: {
       const { buddyList } = action;
+      const { sortUsersBy } = state;
+
+      SortUtil.sortUsersByField(buddyList, sortUsersBy);
 
       return {
         ...state,
@@ -60,14 +63,63 @@ export const serverReducer = (state = initialState, action: any) => {
         ]
       };
     }
+    case Types.ADD_TO_BUDDY_LIST: {
+      const { user } = action;
+      const { sortUsersBy } = state;
+
+      const buddyList = [ ...state.buddyList ];
+
+      buddyList.push(user);
+      SortUtil.sortUsersByField(buddyList, sortUsersBy);
+
+      return {
+        ...state,
+        buddyList
+      };
+    }
+    case Types.REMOVE_FROM_BUDDY_LIST: {
+      const { userName } = action;
+      const buddyList = state.buddyList.filter(user => user.name !== userName);
+
+      return {
+        ...state,
+        buddyList
+      };
+    }
     case Types.UPDATE_IGNORE_LIST: {
       const { ignoreList } = action;
+      const { sortUsersBy } = state;
+
+      SortUtil.sortUsersByField(ignoreList, sortUsersBy);
 
       return {
         ...state,
         ignoreList: [
           ...ignoreList
         ]
+      };
+    }
+    case Types.ADD_TO_IGNORE_LIST: {
+      const { user } = action;
+      const { sortUsersBy } = state;
+
+      const ignoreList = [ ...state.ignoreList ];
+
+      ignoreList.push(user);
+      SortUtil.sortUsersByField(ignoreList, sortUsersBy);
+
+      return {
+        ...state,
+        ignoreList
+      };
+    }
+    case Types.REMOVE_FROM_IGNORE_LIST: {
+      const { userName } = action;
+      const ignoreList = state.ignoreList.filter(user => user.name !== userName);
+      
+      return {
+        ...state,
+        ignoreList
       };
     }
     case Types.UPDATE_INFO: {

@@ -10,7 +10,6 @@ import { RoomsStateMessages, RoomsStateRooms, Selectors } from "store/rooms";
 import AuthGuard from "AppShell/common/guards/AuthGuard";
 import { RoomsService } from "AppShell/common/services";
 
-import SayMessage from "AppShell/common/components/SayMessage/SayMessage";
 import ScrollToBottomOnChanges from "AppShell/common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges";
 import ThreePaneLayout from "AppShell/common/components/ThreePaneLayout/ThreePaneLayout";
 import UserDisplay from "AppShell/common/components/UserDisplay/UserDisplay";
@@ -18,6 +17,7 @@ import VirtualList from "AppShell/common/components/VirtualList/VirtualList";
 
 import Games from "./Games/Games";
 import Messages from "./Messages/Messages";
+import SayMessage from "./SayMessage/SayMessage";
 
 import "./Room.css";
 

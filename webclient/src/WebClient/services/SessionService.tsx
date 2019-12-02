@@ -36,8 +36,24 @@ export class SessionService {
     Dispatch.updateBuddyList(buddyList);
   }
 
+  addToBuddyList(user) {
+    Dispatch.addToBuddyList(user);
+  }
+
+  removeFromBuddyList(userName) {
+    Dispatch.removeFromBuddyList(userName);
+  }
+
   updateIgnoreList(ignoreList) {
     Dispatch.updateIgnoreList(ignoreList);
+  }
+
+  addToIgnoreList(user) {
+    Dispatch.addToIgnoreList(user);
+  }
+
+  removeFromIgnoreList(userName) {
+    Dispatch.removeFromIgnoreList(userName);
   }
 
   updateInfo(name, version) {

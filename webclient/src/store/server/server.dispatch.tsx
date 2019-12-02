@@ -1,3 +1,4 @@
+import { reset } from 'redux-form';
 import { Actions } from "./server.actions";
 import { store } from "../store";
 
@@ -14,8 +15,22 @@ export const Dispatch = {
   updateBuddyList: buddyList => {
     store.dispatch(Actions.updateBuddyList(buddyList));
   },
+  addToBuddyList: user => {
+    store.dispatch(reset('addToBuddies'));
+    store.dispatch(Actions.addToBuddyList(user));
+  },
+  removeFromBuddyList: userName => {
+    store.dispatch(Actions.removeFromBuddyList(userName));
+  },
   updateIgnoreList: ignoreList => {
     store.dispatch(Actions.updateIgnoreList(ignoreList));
+  },
+  addToIgnoreList: user => {
+    store.dispatch(reset('addToIgnore'));
+    store.dispatch(Actions.addToIgnoreList(user));
+  },
+  removeFromIgnoreList: userName => {
+    store.dispatch(Actions.removeFromIgnoreList(userName));
   },
   updateInfo: (name, version) => {
     store.dispatch(Actions.updateInfo({

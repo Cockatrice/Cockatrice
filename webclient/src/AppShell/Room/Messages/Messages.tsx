@@ -1,8 +1,6 @@
 // eslint-disable-next-line
 import React from "react";
 
-import VirtualList from "AppShell/common/components/VirtualList/VirtualList";
-
 import "./Messages.css";
 
 const Messages = ({ messages }) => (

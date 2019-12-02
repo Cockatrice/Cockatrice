@@ -19,9 +19,25 @@ export const Actions = {
     type: Types.UPDATE_BUDDY_LIST,
     buddyList
   }),
+  addToBuddyList: user => ({
+    type: Types.ADD_TO_BUDDY_LIST,
+    user
+  }),
+  removeFromBuddyList: userName => ({
+    type: Types.REMOVE_FROM_BUDDY_LIST,
+    userName
+  }),
   updateIgnoreList: ignoreList => ({
     type: Types.UPDATE_IGNORE_LIST,
     ignoreList
+  }),
+  addToIgnoreList: user => ({
+    type: Types.ADD_TO_IGNORE_LIST,
+    user
+  }),
+  removeFromIgnoreList: userName => ({
+    type: Types.REMOVE_FROM_IGNORE_LIST,
+    userName
   }),
   updateInfo: info => ({
     type: Types.UPDATE_INFO,

@@ -32,7 +32,7 @@ export class SessionCommands {
       switch(raw.responseCode) {
         case this.webClient.pb.Response.ResponseCode.RespOk:
           const { buddyList, ignoreList, userInfo } = resp;
-          
+
           this.webClient.services.session.updateBuddyList(buddyList);
           this.webClient.services.session.updateIgnoreList(ignoreList);
           this.webClient.services.session.updateUser(userInfo);
@@ -155,6 +155,48 @@ export class SessionCommands {
       if (error) {
         console.error(responseCode, error);
       }
+    });
+  }
+
+  addToBuddyList(userName) {
+    this.addToList('buddy', userName);
+  }
+
+  removeFromBuddyList(userName) {
+    this.removeFromList('buddy', userName);
+  }
+
+  addToIgnoreList(userName) {
+    this.addToList('ignore', userName);
+  }
+
+  removeFromIgnoreList(userName) {
+    this.removeFromList('ignore', userName);
+  }
+
+  addToList(list: string, userName: string) {
+    const CmdAddToList = this.webClient.pb.Command_AddToList.create({ list, userName });
+
+    const sc = this.webClient.pb.SessionCommand.create({
+      ".Command_AddToList.ext" : CmdAddToList
+    });
+
+    this.webClient.sendSessionCommand(sc, ({ responseCode }) => {
+      // @TODO: filter responseCode, pop snackbar for error
+      this.webClient.debug(() => console.log('Added to List Response: ', responseCode));
+    });
+  }
+
+  removeFromList(list: string, userName: string) {
+    const CmdRemoveFromList = this.webClient.pb.Command_RemoveFromList.create({ list, userName });
+
+    const sc = this.webClient.pb.SessionCommand.create({
+      ".Command_RemoveFromList.ext" : CmdRemoveFromList
+    });
+
+    this.webClient.sendSessionCommand(sc, ({ responseCode }) => {
+      // @TODO: filter responseCode, pop snackbar for error
+      this.webClient.debug(() => console.log('Removed from List Response: ', responseCode));
     });
   }
 

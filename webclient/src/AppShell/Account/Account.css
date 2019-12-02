@@ -30,7 +30,7 @@
 .account-details__actions {
   display: flex;
   align-items: stretch;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 100%;
 }
 
