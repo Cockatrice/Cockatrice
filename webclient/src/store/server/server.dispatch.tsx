@@ -11,6 +11,12 @@ export const Dispatch = {
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
   },
+  updateBuddyList: buddyList => {
+    store.dispatch(Actions.updateBuddyList(buddyList));
+  },
+  updateIgnoreList: ignoreList => {
+    store.dispatch(Actions.updateIgnoreList(ignoreList));
+  },
   updateInfo: (name, version) => {
     store.dispatch(Actions.updateInfo({
       name,

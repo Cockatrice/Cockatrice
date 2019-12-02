@@ -31,10 +31,15 @@ export class SessionCommands {
 
       switch(raw.responseCode) {
         case this.webClient.pb.Response.ResponseCode.RespOk:
-          const { userInfo } = resp;
+          const { buddyList, ignoreList, userInfo } = resp;
+          
+          this.webClient.services.session.updateBuddyList(buddyList);
+          this.webClient.services.session.updateIgnoreList(ignoreList);
           this.webClient.services.session.updateUser(userInfo);
+
           this.webClient.commands.session.listUsers();
           this.webClient.commands.session.listRooms();
+
           this.webClient.updateStatus(StatusEnum.LOGGEDIN, "Logged in.");
           this.webClient.startPingLoop();
           break;

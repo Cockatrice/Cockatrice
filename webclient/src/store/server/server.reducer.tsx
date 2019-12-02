@@ -6,6 +6,9 @@ import { ServerState } from "./server.interfaces"
 import { Types } from "./server.types";
 
 const initialState: ServerState = {
+  buddyList: [],
+  ignoreList: [],
+
   status: {
     state: StatusEnum.DISCONNECTED,
     description: null
@@ -46,6 +49,26 @@ export const serverReducer = (state = initialState, action: any) => {
         ...state,
         info: { ...info, message }
       }
+    }
+    case Types.UPDATE_BUDDY_LIST: {
+      const { buddyList } = action;
+
+      return {
+        ...state,
+        buddyList: [
+          ...buddyList
+        ]
+      };
+    }
+    case Types.UPDATE_IGNORE_LIST: {
+      const { ignoreList } = action;
+
+      return {
+        ...state,
+        ignoreList: [
+          ...ignoreList
+        ]
+      };
     }
     case Types.UPDATE_INFO: {
       const { name, version } = action.info;

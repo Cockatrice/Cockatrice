@@ -8,6 +8,8 @@ export interface ServerConnectParams {
 }
 
 export interface ServerState {
+  buddyList: User[];
+  ignoreList: User[];
   info: ServerStateInfo;
   status: ServerStateStatus;
   logs: ServerStateLogs;

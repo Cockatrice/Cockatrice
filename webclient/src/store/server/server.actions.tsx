@@ -15,6 +15,14 @@ export const Actions = {
     type: Types.SERVER_MESSAGE,
     message
   }),
+  updateBuddyList: buddyList => ({
+    type: Types.UPDATE_BUDDY_LIST,
+    buddyList
+  }),
+  updateIgnoreList: ignoreList => ({
+    type: Types.UPDATE_IGNORE_LIST,
+    ignoreList
+  }),
   updateInfo: info => ({
     type: Types.UPDATE_INFO,
     info

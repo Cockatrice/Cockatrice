@@ -32,6 +32,14 @@ export class SessionService {
     Dispatch.connectionClosed(reason);
   }
 
+  updateBuddyList(buddyList) {
+    Dispatch.updateBuddyList(buddyList);
+  }
+
+  updateIgnoreList(ignoreList) {
+    Dispatch.updateIgnoreList(ignoreList);
+  }
+
   updateInfo(name, version) {
     Dispatch.updateInfo(name, version);
   }

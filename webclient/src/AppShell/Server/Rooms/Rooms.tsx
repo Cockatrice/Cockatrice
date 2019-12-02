@@ -3,6 +3,7 @@ import React from "react";
 import { generatePath } from "react-router-dom";
 import * as _ from "lodash";
 
+import Button from "@material-ui/core/Button";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -45,7 +46,9 @@ const Rooms = ({ rooms, joinedRooms, history }) => {
               <TableCell>{playerCount}</TableCell>
               <TableCell>{gameCount}</TableCell>
               <TableCell>
-                <button onClick={() => onClick(roomId)}>Join</button>
+                <Button size="small" color="primary" variant="contained" onClick={() => onClick(roomId)}>
+                  Join
+                </Button>
               </TableCell>
             </TableRow>
           ))}

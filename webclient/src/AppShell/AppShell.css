@@ -6,4 +6,5 @@
 .AppShell {
   display: flex;
   flex-direction: column;
+   min-width: 768px;
 }

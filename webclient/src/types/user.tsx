@@ -5,6 +5,7 @@ export interface User {
   gender: number;
   name: string;
   privlevel: UserAccessLevel;
+  realName: string;
   userLevel: UserPrivLevel;
 }
 
