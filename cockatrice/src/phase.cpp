@@ -1,6 +1,5 @@
 #include "phase.h"
 
-
 Phase Phases::getPhase(int phase)
 {
     return phases[phase];
