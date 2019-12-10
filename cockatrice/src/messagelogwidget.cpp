@@ -9,43 +9,43 @@
 #include "phase.h"
 #include "player.h"
 #include "soundengine.h"
-const QString& MessageLogWidget::tableConstant() const
+const QString &MessageLogWidget::tableConstant() const
 {
     static const QString constant("table");
     return constant;
 }
 
-const QString& MessageLogWidget::graveyardConstant() const
+const QString &MessageLogWidget::graveyardConstant() const
 {
     static const QString constant("grave");
     return constant;
 }
 
-const QString& MessageLogWidget::exileConstant() const
+const QString &MessageLogWidget::exileConstant() const
 {
     static const QString constant("rfg");
     return constant;
 }
 
-const QString& MessageLogWidget::handConstant() const
+const QString &MessageLogWidget::handConstant() const
 {
     static const QString constant("hand");
     return constant;
 }
 
-const QString& MessageLogWidget::deckConstant() const
+const QString &MessageLogWidget::deckConstant() const
 {
     static const QString constant("deck");
     return constant;
 }
 
-const QString& MessageLogWidget::sideboardConstant() const
+const QString &MessageLogWidget::sideboardConstant() const
 {
     static const QString constant("sb");
     return constant;
 }
 
-const QString& MessageLogWidget::stackConstant() const
+const QString &MessageLogWidget::stackConstant() const
 {
     static const QString constant("stack");
     return constant;
@@ -563,7 +563,7 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 {
     Phase phase = Phases::getPhase(phaseNumber);
 
-    if( phase.name != "Unknown Phase" ){
+    if (phase.name != "Unknown Phase") {
         soundEngine->playSound(phase.soundFileName);
     }
 
