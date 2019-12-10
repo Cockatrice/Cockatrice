@@ -9,44 +9,43 @@
 #include "phase.h"
 #include "player.h"
 #include "soundengine.h"
-
-QString MessageLogWidget::tableConstant() const
+const QString& MessageLogWidget::tableConstant() const
 {
     static const QString constant("table");
     return constant;
 }
 
-QString MessageLogWidget::graveyardConstant() const
+const QString& MessageLogWidget::graveyardConstant() const
 {
     static const QString constant("grave");
     return constant;
 }
 
-QString MessageLogWidget::exileConstant() const
+const QString& MessageLogWidget::exileConstant() const
 {
     static const QString constant("rfg");
     return constant;
 }
 
-QString MessageLogWidget::handConstant() const
+const QString& MessageLogWidget::handConstant() const
 {
     static const QString constant("hand");
     return constant;
 }
 
-QString MessageLogWidget::deckConstant() const
+const QString& MessageLogWidget::deckConstant() const
 {
     static const QString constant("deck");
     return constant;
 }
 
-QString MessageLogWidget::sideboardConstant() const
+const QString& MessageLogWidget::sideboardConstant() const
 {
     static const QString constant("sb");
     return constant;
 }
 
-QString MessageLogWidget::stackConstant() const
+const QString& MessageLogWidget::stackConstant() const
 {
     static const QString constant("stack");
     return constant;
