@@ -6,46 +6,47 @@
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "phase.h"
 #include "player.h"
 #include "soundengine.h"
 
-const QString MessageLogWidget::tableConstant() const
+QString MessageLogWidget::tableConstant() const
 {
     static const QString constant("table");
     return constant;
 }
 
-const QString MessageLogWidget::graveyardConstant() const
+QString MessageLogWidget::graveyardConstant() const
 {
     static const QString constant("grave");
     return constant;
 }
 
-const QString MessageLogWidget::exileConstant() const
+QString MessageLogWidget::exileConstant() const
 {
     static const QString constant("rfg");
     return constant;
 }
 
-const QString MessageLogWidget::handConstant() const
+QString MessageLogWidget::handConstant() const
 {
     static const QString constant("hand");
     return constant;
 }
 
-const QString MessageLogWidget::deckConstant() const
+QString MessageLogWidget::deckConstant() const
 {
     static const QString constant("deck");
     return constant;
 }
 
-const QString MessageLogWidget::sideboardConstant() const
+QString MessageLogWidget::sideboardConstant() const
 {
     static const QString constant("sb");
     return constant;
 }
 
-const QString MessageLogWidget::stackConstant() const
+QString MessageLogWidget::stackConstant() const
 {
     static const QString constant("stack");
     return constant;
@@ -559,73 +560,16 @@ void MessageLogWidget::logSay(Player *player, QString message)
                   QString::fromStdString(player->getUserInfo()->privlevel()), true);
 }
 
-void MessageLogWidget::logSetActivePhase(int phase)
+void MessageLogWidget::logSetActivePhase(int phaseNumber)
 {
-    QString phaseName;
-    QString color;
-    switch (phase) { // TODO: define phases
-        case 0:
-            phaseName = tr("Untap");
-            soundEngine->playSound("untap_step");
-            color = "green";
-            break;
-        case 1:
-            phaseName = tr("Upkeep");
-            soundEngine->playSound("upkeep_step");
-            color = "green";
-            break;
-        case 2:
-            phaseName = tr("Draw");
-            soundEngine->playSound("draw_step");
-            color = "green";
-            break;
-        case 3:
-            phaseName = tr("First Main");
-            soundEngine->playSound("main_1");
-            color = "blue";
-            break;
-        case 4:
-            phaseName = tr("Beginning of Combat");
-            soundEngine->playSound("start_combat");
-            color = "red";
-            break;
-        case 5:
-            phaseName = tr("Declare Attackers");
-            soundEngine->playSound("attack_step");
-            color = "red";
-            break;
-        case 6:
-            phaseName = tr("Declare Blockers");
-            soundEngine->playSound("block_step");
-            color = "red";
-            break;
-        case 7:
-            phaseName = tr("Combat Damage");
-            soundEngine->playSound("damage_step");
-            color = "red";
-            break;
-        case 8:
-            phaseName = tr("End of Combat");
-            soundEngine->playSound("end_combat");
-            color = "red";
-            break;
-        case 9:
-            phaseName = tr("Second Main");
-            soundEngine->playSound("main_2");
-            color = "blue";
-            break;
-        case 10:
-            phaseName = tr("End/Cleanup");
-            soundEngine->playSound("end_step");
-            color = "green";
-            break;
-        default:
-            phaseName = tr("Unknown Phase");
-            color = "black";
-            break;
+    Phase phase = Phases::getPhase(phaseNumber);
+
+    if( phase.name != "Unknown Phase" ){
+        soundEngine->playSound(phase.soundFileName);
     }
-    appendHtml("<font color=\"" + color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               QString("%1").arg(phaseName) + "</b></font>");
+
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
+               QString("%1").arg(tr(phase.name.toStdString().c_str())) + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)

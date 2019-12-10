@@ -123,6 +123,7 @@ SET(cockatrice_SOURCES
     src/carddbparser/cockatricexml3.cpp
     src/carddbparser/cockatricexml4.cpp
     src/filter_string.cpp
+    src/phase.cpp
     ${VERSION_STRING_CPP}
     )
 
