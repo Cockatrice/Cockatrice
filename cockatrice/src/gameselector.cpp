@@ -1,3 +1,4 @@
+#include "abstractclient.h"
 #include "gameselector.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
@@ -8,6 +9,7 @@
 #include "pending_command.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
+#include "tab_userlists.h"
 #include <QApplication>
 #include <QCheckBox>
 #include <QDebug>
@@ -32,7 +34,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
     if (showfilters) {
-        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->isOwnUserRegistered());
+        gameListProxyModel = new GamesProxyModel(this, tabSupervisor);
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
@@ -107,6 +109,29 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(gameListView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(actSelectedGameChanged(const QModelIndex &, const QModelIndex &)));
     connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
+
+    connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this,
+            SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
+    connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this,
+            SLOT(processAddToListEvent(const Event_AddToList &)));
+    connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this,
+            SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
+}
+
+void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &) {
+    gameListProxyModel->refresh();
+}
+
+void GameSelector::processAddToListEvent(const Event_AddToList &event) {
+    if (event.list_name() == "ignore") {
+        gameListProxyModel->refresh();
+    }
+}
+
+void GameSelector::processRemoveFromListEvent(const Event_RemoveFromList &event) {
+    if (event.list_name() == "ignore") {
+        gameListProxyModel->refresh();
+    }
 }
 
 void GameSelector::actSetFilter()
@@ -121,6 +146,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setShowBuddiesOnlyGames(dlg.getShowBuddiesOnlyGames());
     gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
     gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
+    gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());

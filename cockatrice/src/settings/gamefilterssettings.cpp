@@ -48,6 +48,17 @@ bool GameFiltersSettings::isShowPasswordProtectedGames()
     return previous == QVariant() ? true : previous.toBool();
 }
 
+void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
+{
+    setValue(hide, "hide_ignored_user_games", "filter_games");
+}
+
+bool GameFiltersSettings::isHideIgnoredUserGames()
+{
+    QVariant previous = getValue("hide_ignored_user_games", "filter_games");
+    return previous == QVariant() ? false : previous.toBool();
+}
+
 void GameFiltersSettings::setGameNameFilter(QString gameName)
 {
     setValue(gameName, "game_name_filter", "filter_games");

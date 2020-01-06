@@ -2,6 +2,8 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
+#include "tab_userlists.h"
+#include "userlist.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -253,8 +255,8 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
     endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent, bool _ownUserIsRegistered)
-    : QSortFilterProxyModel(parent), ownUserIsRegistered(_ownUserIsRegistered), showBuddiesOnlyGames(false),
+GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
+    : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()), tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(false), hideIgnoredUserGames(false),
       unavailableGamesVisible(false), showPasswordProtectedGames(true), maxPlayersFilterMin(-1), maxPlayersFilterMax(-1)
 {
     setSortRole(GamesModel::SORT_ROLE);
@@ -264,6 +266,12 @@ GamesProxyModel::GamesProxyModel(QObject *parent, bool _ownUserIsRegistered)
 void GamesProxyModel::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
 {
     showBuddiesOnlyGames = _showBuddiesOnlyGames;
+    invalidateFilter();
+}
+
+void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
+{
+    hideIgnoredUserGames = _hideIgnoredUserGames;
     invalidateFilter();
 }
 
@@ -323,6 +331,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
 
     unavailableGamesVisible = settingsCache->gameFilters().isUnavailableGamesVisible();
     showPasswordProtectedGames = settingsCache->gameFilters().isShowPasswordProtectedGames();
+    hideIgnoredUserGames = settingsCache->gameFilters().isHideIgnoredUserGames();
     gameNameFilter = settingsCache->gameFilters().getGameNameFilter();
     maxPlayersFilterMin = settingsCache->gameFilters().getMinPlayers();
     maxPlayersFilterMax = settingsCache->gameFilters().getMaxPlayers();
@@ -343,6 +352,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     settingsCache->gameFilters().setShowBuddiesOnlyGames(showBuddiesOnlyGames);
     settingsCache->gameFilters().setUnavailableGamesVisible(unavailableGamesVisible);
     settingsCache->gameFilters().setShowPasswordProtectedGames(showPasswordProtectedGames);
+    settingsCache->gameFilters().setHideIgnoredUserGames(hideIgnoredUserGames);
     settingsCache->gameFilters().setGameNameFilter(gameNameFilter);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
@@ -365,6 +375,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
     const ServerInfo_Game &game = model->getGame(sourceRow);
 
     if (!showBuddiesOnlyGames && game.only_buddies()) {
+        return false;
+    }
+    if (hideIgnoredUserGames && tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
     if (!unavailableGamesVisible) {
@@ -397,4 +410,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
         return false;
 
     return true;
+}
+
+void GamesProxyModel::refresh() {
+    invalidateFilter();
 }
