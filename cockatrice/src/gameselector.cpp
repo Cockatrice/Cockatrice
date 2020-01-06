@@ -1,5 +1,5 @@
-#include "abstractclient.h"
 #include "gameselector.h"
+#include "abstractclient.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
 #include "gamesmodel.h"
@@ -118,17 +118,20 @@ GameSelector::GameSelector(AbstractClient *_client,
             SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
 }
 
-void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &) {
+void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &)
+{
     gameListProxyModel->refresh();
 }
 
-void GameSelector::processAddToListEvent(const Event_AddToList &event) {
+void GameSelector::processAddToListEvent(const Event_AddToList &event)
+{
     if (event.list_name() == "ignore") {
         gameListProxyModel->refresh();
     }
 }
 
-void GameSelector::processRemoveFromListEvent(const Event_RemoveFromList &event) {
+void GameSelector::processRemoveFromListEvent(const Event_RemoveFromList &event)
+{
     if (event.list_name() == "ignore") {
         gameListProxyModel->refresh();
     }

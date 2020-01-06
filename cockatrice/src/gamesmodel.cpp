@@ -256,7 +256,8 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 }
 
 GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
-    : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()), tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(false), hideIgnoredUserGames(false),
+    : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()),
+      tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(false), hideIgnoredUserGames(false),
       unavailableGamesVisible(false), showPasswordProtectedGames(true), maxPlayersFilterMin(-1), maxPlayersFilterMax(-1)
 {
     setSortRole(GamesModel::SORT_ROLE);
@@ -377,7 +378,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
     if (!showBuddiesOnlyGames && game.only_buddies()) {
         return false;
     }
-    if (hideIgnoredUserGames && tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(QString::fromStdString(game.creator_info().name()))) {
+    if (hideIgnoredUserGames && tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(
+                                    QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
     if (!unavailableGamesVisible) {
@@ -412,6 +414,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
     return true;
 }
 
-void GamesProxyModel::refresh() {
+void GamesProxyModel::refresh()
+{
     invalidateFilter();
 }
