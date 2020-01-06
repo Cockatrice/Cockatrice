@@ -278,11 +278,25 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                                       bool online,
                                       int playerId)
 {
+    showContextMenu(pos, userName, userLevel, online, playerId, QString());
+}
+void UserContextMenu::showContextMenu(const QPoint &pos,
+                                      const QString &userName,
+                                      UserLevelFlags userLevel,
+                                      bool online,
+                                      int playerId,
+                                      const QString &deckHash)
+{
+    QAction *aCopyToClipBoard;
     aUserName->setText(userName);
 
     QMenu *menu = new QMenu(static_cast<QWidget *>(parent()));
     menu->addAction(aUserName);
     menu->addSeparator();
+    if (!deckHash.isEmpty()) {
+        aCopyToClipBoard = new QAction(tr("Copy hash to clipboard"), this);
+        menu->addAction(aCopyToClipBoard);
+    }
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
     menu->addAction(aChat);
@@ -351,9 +365,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                             Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
         infoWidget->setAttribute(Qt::WA_DeleteOnClose);
         infoWidget->updateInfo(userName);
-    } else if (actionClicked == aChat)
+    } else if (actionClicked == aChat) {
         emit openMessageDialog(userName, true);
-    else if (actionClicked == aShowGames) {
+    } else if (actionClicked == aShowGames) {
         Command_GetGamesOfUser cmd;
         cmd.set_user_name(userName.toStdString());
 
@@ -438,6 +452,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(warnUserHistory_processResponse(Response)));
         client->sendCommand(pend);
+    } else if (actionClicked == aCopyToClipBoard) {
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        clipboard->setText(deckHash);
     }
 
     delete menu;

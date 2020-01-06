@@ -53,6 +53,12 @@ public:
                          UserLevelFlags userLevel,
                          bool online = true,
                          int playerId = -1);
+    void showContextMenu(const QPoint &pos,
+                         const QString &userName,
+                         UserLevelFlags userLevel,
+                         bool online,
+                         int playerId,
+                         const QString &deckHash);
 };
 
 #endif
