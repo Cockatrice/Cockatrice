@@ -1795,5 +1795,5 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
 
 bool AbstractServerSocketInterface::isPasswordLongEnough(const int passwordLength)
 {
-    return passwordLength < servatrice->getMinPasswordLength();
+    return passwordLength >= servatrice->getMinPasswordLength();
 }
