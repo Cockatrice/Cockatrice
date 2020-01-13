@@ -577,8 +577,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfo)
         if (tab != currentWidget()) {
             tab->setContentsChanged(true);
             QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(
-                    13, (UserLevelFlags)userInfo.user_level(), true,
-                    QString::fromStdString(userInfo.privlevel()));
+                13, (UserLevelFlags)userInfo.user_level(), true, QString::fromStdString(userInfo.privlevel()));
             setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
         }
 
