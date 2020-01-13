@@ -570,7 +570,24 @@ void TabSupervisor::processUserLeft(const QString &userName)
 
 void TabSupervisor::processUserJoined(const ServerInfo_User &userInfo)
 {
-    TabMessage *tab = messageTabs.value(QString::fromStdString(userInfo.name()));
+    QString userName = QString::fromStdString(userInfo.name());
+    if (isUserBuddy(userName)) {
+        Tab *tab = static_cast<Tab *>(getUserListsTab());
+
+        if (tab != currentWidget()) {
+            tab->setContentsChanged(true);
+            QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(
+                    13, (UserLevelFlags)userInfo.user_level(), true,
+                    QString::fromStdString(userInfo.privlevel()));
+            setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+        }
+
+        if (settingsCache->getBuddyConnectNotificationsEnabled()) {
+            QApplication::alert(this);
+        }
+    }
+
+    TabMessage *tab = messageTabs.value(userName);
     if (tab)
         tab->processUserJoined(userInfo);
 }
