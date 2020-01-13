@@ -121,8 +121,10 @@ void TabDeckEditor::createDeckDock()
     auto *hashSizePolicy = new QSizePolicy();
     hashSizePolicy->setHorizontalPolicy(QSizePolicy::Fixed);
     hashLabel1->setSizePolicy(*hashSizePolicy);
-    hashLabel = new QLabel;
+    hashLabel = new QLineEdit;
     hashLabel->setObjectName("hashLabel");
+    hashLabel->setReadOnly(true);
+    hashLabel->setFrame(false);
 
     auto *lowerLayout = new QGridLayout;
     lowerLayout->setObjectName("lowerLayout");

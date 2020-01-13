@@ -216,6 +216,7 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
     const QString &userName = index.sibling(index.row(), 4).data(Qt::UserRole).toString();
     int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
     UserLevelFlags userLevel(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
+    QString deckHash = index.sibling(index.row(), 5).data().toString();
 
-    userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId);
+    userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId, deckHash);
 }
