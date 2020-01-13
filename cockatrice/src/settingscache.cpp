@@ -226,6 +226,7 @@ SettingsCache::SettingsCache()
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
+    buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
@@ -435,6 +436,12 @@ void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotifications
 {
     spectatorNotificationsEnabled = static_cast<bool>(_spectatorNotificationsEnabled);
     settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
+}
+
+void SettingsCache::setBuddyConnectNotificationsEnabled(int _buddyConnectNotificationsEnabled)
+{
+    buddyConnectNotificationsEnabled = static_cast<bool>(_buddyConnectNotificationsEnabled);
+    settings->setValue("interface/buddyconnectnotificationsenabled", buddyConnectNotificationsEnabled);
 }
 
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
