@@ -280,6 +280,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 {
     showContextMenu(pos, userName, userLevel, online, playerId, QString());
 }
+
 void UserContextMenu::showContextMenu(const QPoint &pos,
                                       const QString &userName,
                                       UserLevelFlags userLevel,
