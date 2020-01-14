@@ -9,7 +9,7 @@ services:
       - MYSQL_USER=servatrice
       - MYSQL_PASSWORD=password
     volumes:
-      - $PWD/servatrice/docker/servatrice.sql.docker:/docker-entrypoint-initdb.d/servatrice.sql
+      - $PWD/servatrice/servatrice.sql:/docker-entrypoint-initdb.d/servatrice.sql
 
   servatrice:
     build:
@@ -24,4 +24,4 @@ services:
     entrypoint: "/bin/bash -c 'sleep 10; servatrice --config /tmp/servatrice.ini --log-to-console'"
     restart: always
     volumes:
-      - $PWD/servatrice/docker/servatrice.ini.docker.example:/tmp/servatrice.ini
+      - $PWD/servatrice/docker/servatrice-docker.ini:/tmp/servatrice.ini
