@@ -62,7 +62,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="278"/>
         <source>Sets JSON file (%1)</source>
-        <translation type="unfinished"/>
+        <translation>カードセット JSON ファイル (%1)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="302"/>
@@ -112,7 +112,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="414"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Xz展開に失敗。</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="422"/>
@@ -208,12 +208,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="635"/>
         <source>Tokens import</source>
-        <translation type="unfinished"/>
+        <translation>トークンのインポート</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="636"/>
         <source>Please specify a compatible source for token data.</source>
-        <translation type="unfinished"/>
+        <translation>トークンデータのソースを選択してください。</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="638"/>
@@ -257,22 +257,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="200"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>完了しました！</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="201"/>
         <source>The wizard has finished.</source>
-        <translation type="unfinished"/>
+        <translation>ウィザードが完了しました。</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="202"/>
         <source>You can now start using Cockatrice with the newly updated cards.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatriceで新しく更新されたカードを使うことが出来ます。</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="203"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
-        <translation type="unfinished"/>
+        <translation>カードデータベースが自動的に再読込されない場合は、Cockatriceを再起動して下さい。</translation>
     </message>
 </context>
 <context>
@@ -301,17 +301,17 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="553"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
-        <translation type="unfinished"/>
+        <translation>”保存”をクリックするとインポートしたカードをCockatriceデータベースに保存します。</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="554"/>
         <source>The card database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>カードデータベースは以下の場所に保存されます:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="556"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>別のパスに保存（非推奨）</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="558"/>

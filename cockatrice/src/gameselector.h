@@ -3,6 +3,8 @@
 
 #include "gametypemap.h"
 #include <QGroupBox>
+#include <common/pb/event_add_to_list.pb.h>
+#include <common/pb/event_remove_from_list.pb.h>
 
 class QTreeView;
 class GamesModel;
@@ -25,6 +27,10 @@ private slots:
     void actJoin();
     void actSelectedGameChanged(const QModelIndex &current, const QModelIndex &previous);
     void checkResponse(const Response &response);
+
+    void ignoreListReceived(const QList<ServerInfo_User> &_ignoreList);
+    void processAddToListEvent(const Event_AddToList &event);
+    void processRemoveFromListEvent(const Event_RemoveFromList &event);
 signals:
     void gameJoined(int gameId);
 

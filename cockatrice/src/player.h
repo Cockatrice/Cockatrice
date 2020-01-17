@@ -5,6 +5,7 @@
 #include "carddatabase.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
+#include "tearoffmenu.h"
 #include <QInputDialog>
 #include <QMap>
 #include <QPoint>
@@ -148,6 +149,7 @@ public slots:
     void actDrawCards();
     void actUndoDraw();
     void actMulligan();
+    void actMoveTopCardToPlay();
     void actMoveTopCardToPlayFaceDown();
     void actMoveTopCardToGrave();
     void actMoveTopCardToExile();
@@ -203,9 +205,9 @@ private slots:
 
 private:
     TabGame *game;
-    QMenu *playerMenu, *handMenu, *moveHandMenu, *graveMenu, *moveGraveMenu, *rfgMenu, *moveRfgMenu, *libraryMenu,
-        *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
+    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
         *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
+    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -213,8 +215,9 @@ private:
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
         *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard, *aMoveTopCardToExile,
         *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg,
-        *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
-        *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu, *aMoveBottomCardToGrave;
+        *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlay,
+        *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu,
+        *aMoveBottomCardToGrave;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,

@@ -953,7 +953,8 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
 
     QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
 
-    passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password where name = :name");
+    passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password, "
+                                 "passwordLastChangedDate = NOW() where name = :name");
     passwordQuery->bindValue(":password", passwordSha512);
     passwordQuery->bindValue(":name", user);
     if (execSqlQuery(passwordQuery))

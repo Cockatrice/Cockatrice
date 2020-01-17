@@ -412,7 +412,7 @@ void RemoteClient::doActivateToServer(const QString &_token)
 {
     doDisconnectFromServer();
 
-    token = _token;
+    token = _token.trimmed();
 
     connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusActivating);
@@ -488,7 +488,7 @@ void RemoteClient::registerToServer(const QString &hostname,
 
 void RemoteClient::activateToServer(const QString &_token)
 {
-    emit sigActivateToServer(_token);
+    emit sigActivateToServer(_token.trimmed());
 }
 
 void RemoteClient::disconnectFromServer()
@@ -550,7 +550,7 @@ void RemoteClient::submitForgotPasswordResetToServer(const QString &hostname,
                                                      const QString &_token,
                                                      const QString &_newpassword)
 {
-    emit sigSubmitForgotPasswordResetToServer(hostname, port, _userName, _token, _newpassword);
+    emit sigSubmitForgotPasswordResetToServer(hostname, port, _userName, _token.trimmed(), _newpassword);
 }
 
 void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
@@ -590,7 +590,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
     userName = _userName;
     lastHostname = hostname;
     lastPort = port;
-    token = _token;
+    token = _token.trimmed();
     password = _newpassword;
 
     connectToHost(lastHostname, static_cast<unsigned int>(lastPort));

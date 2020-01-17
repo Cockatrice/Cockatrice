@@ -12,12 +12,14 @@ public:
     bool isShowBuddiesOnlyGames();
     bool isUnavailableGamesVisible();
     bool isShowPasswordProtectedGames();
+    bool isHideIgnoredUserGames();
     QString getGameNameFilter();
     int getMinPlayers();
     int getMaxPlayers();
     bool isGameTypeEnabled(QString gametype);
 
     void setShowBuddiesOnlyGames(bool show);
+    void setHideIgnoredUserGames(bool hide);
     void setUnavailableGamesVisible(bool enabled);
     void setShowPasswordProtectedGames(bool show);
     void setGameNameFilter(QString gameName);
