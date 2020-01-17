@@ -227,6 +227,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
         aMulligan = new QAction(this);
         connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
+        aMoveTopToPlay = new QAction(this);
+        connect(aMoveTopToPlay, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlay()));
         aMoveTopToPlayFaceDown = new QAction(this);
         connect(aMoveTopToPlayFaceDown, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlayFaceDown()));
         aMoveTopCardToGraveyard = new QAction(this);
@@ -243,21 +245,18 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveBottomCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToGrave()));
     }
 
-    playerMenu = new QMenu(QString());
+    playerMenu = new TearOffMenu();
     table->setMenu(playerMenu);
-    playerMenu->setTearOffEnabled(true);
 
     if (local || judge) {
-        handMenu = playerMenu->addMenu(QString());
-        handMenu->setTearOffEnabled(true);
+        handMenu = playerMenu->addTearOffMenu(QString());
         handMenu->addAction(aViewHand);
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
         handMenu->addSeparator();
         handMenu->addAction(aMulligan);
         handMenu->addSeparator();
-        moveHandMenu = handMenu->addMenu(QString());
-        moveHandMenu->setTearOffEnabled(true);
+        moveHandMenu = handMenu->addTearOffMenu(QString());
         moveHandMenu->addAction(aMoveHandToTopLibrary);
         moveHandMenu->addAction(aMoveHandToBottomLibrary);
         moveHandMenu->addSeparator();
@@ -266,8 +265,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         moveHandMenu->addAction(aMoveHandToRfg);
         hand->setMenu(handMenu);
 
-        libraryMenu = playerMenu->addMenu(QString());
-        libraryMenu->setTearOffEnabled(true);
+        libraryMenu = playerMenu->addTearOffMenu(QString());
         libraryMenu->addAction(aDrawCard);
         libraryMenu->addAction(aDrawCards);
         libraryMenu->addAction(aUndoDraw);
@@ -282,6 +280,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addAction(aAlwaysViewTopCard);
         libraryMenu->addAction(aAlwaysRevealTopCard);
         libraryMenu->addSeparator();
+        libraryMenu->addAction(aMoveTopToPlay);
         libraryMenu->addAction(aMoveTopToPlayFaceDown);
         libraryMenu->addAction(aMoveTopCardToBottom);
         libraryMenu->addAction(aMoveBottomCardToGrave);
@@ -298,8 +297,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu = nullptr;
     }
 
-    graveMenu = playerMenu->addMenu(QString());
-    graveMenu->setTearOffEnabled(true);
+    graveMenu = playerMenu->addTearOffMenu(QString());
     graveMenu->addAction(aViewGraveyard);
 
     if (local || judge) {
@@ -312,15 +310,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     }
     grave->setMenu(graveMenu, aViewGraveyard);
 
-    rfgMenu = playerMenu->addMenu(QString());
-    rfgMenu->setTearOffEnabled(true);
+    rfgMenu = playerMenu->addTearOffMenu(QString());
     rfgMenu->addAction(aViewRfg);
     rfg->setMenu(rfgMenu, aViewRfg);
 
     if (local || judge) {
         graveMenu->addSeparator();
-        moveGraveMenu = graveMenu->addMenu(QString());
-        moveGraveMenu->setTearOffEnabled(true);
+        moveGraveMenu = graveMenu->addTearOffMenu(QString());
         moveGraveMenu->addAction(aMoveGraveToTopLibrary);
         moveGraveMenu->addAction(aMoveGraveToBottomLibrary);
         moveGraveMenu->addSeparator();
@@ -329,8 +325,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         moveGraveMenu->addAction(aMoveGraveToRfg);
 
         rfgMenu->addSeparator();
-        moveRfgMenu = rfgMenu->addMenu(QString());
-        moveRfgMenu->setTearOffEnabled(true);
+        moveRfgMenu = rfgMenu->addTearOffMenu(QString());
         moveRfgMenu->addAction(aMoveRfgToTopLibrary);
         moveRfgMenu->addAction(aMoveRfgToBottomLibrary);
         moveRfgMenu->addSeparator();
@@ -700,6 +695,7 @@ void Player::retranslateUi()
         aUndoDraw->setText(tr("&Undo last draw"));
         aMulligan->setText(tr("Take &mulligan"));
         aShuffle->setText(tr("&Shuffle"));
+        aMoveTopToPlay->setText(tr("Play top card"));
         aMoveTopToPlayFaceDown->setText(tr("Play top card &face down"));
         aMoveTopCardToGraveyard->setText(tr("Move top card to grave&yard"));
         aMoveTopCardToExile->setText(tr("Move top card to e&xile"));
@@ -870,6 +866,7 @@ void Player::setShortcutsActive()
     aCreateAnotherToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateAnotherToken"));
     aAlwaysViewTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysViewTopCard"));
     aAlwaysRevealTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysRevealTopCard"));
+    aMoveTopToPlay->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlay"));
     aMoveTopToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
     aMoveTopCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToGraveyard"));
     aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
@@ -897,6 +894,7 @@ void Player::setShortcutsInactive()
     aCreateAnotherToken->setShortcut(QKeySequence());
     aAlwaysViewTopCard->setShortcut(QKeySequence());
     aAlwaysRevealTopCard->setShortcut(QKeySequence());
+    aMoveTopToPlay->setShortcut(QKeySequence());
     aMoveTopToPlayFaceDown->setShortcut(QKeySequence());
     aMoveTopCardToGraveyard->setShortcut(QKeySequence());
     aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
@@ -1164,6 +1162,20 @@ void Player::actMoveTopCardToBottom()
     cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
     cmd.set_target_player_id(getId());
     cmd.set_target_zone("deck");
+    cmd.set_x(-1);
+    cmd.set_y(0);
+
+    sendGameCommand(cmd);
+}
+
+void Player::actMoveTopCardToPlay()
+{
+    Command_MoveCard cmd;
+    cmd.set_start_zone("deck");
+    CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
+    cardToMove->set_card_id(0);
+    cmd.set_target_player_id(getId());
+    cmd.set_target_zone("stack");
     cmd.set_x(-1);
     cmd.set_y(0);
 

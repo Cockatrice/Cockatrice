@@ -62,7 +62,7 @@ double Expression::eval(const peg::Ast &ast)
         return value;
     } else if (ast.name[0] == 'P') {
         double result = eval(*nodes[0]);
-        for (int i = 1; i < nodes.size(); i += 2) {
+        for (unsigned int i = 1; i < nodes.size(); i += 2) {
             double arg = eval(*nodes[i + 1]);
             char operation = nodes[i]->token[0];
             switch (operation) {

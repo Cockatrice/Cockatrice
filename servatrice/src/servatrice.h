@@ -255,6 +255,7 @@ public:
     bool getEnableAudit() const;
     bool getEnableRegistrationAudit() const;
     bool getEnableForgotPasswordAudit() const;
+    int getMinPasswordLength() const;
     int getIdleClientTimeout() const override;
     int getServerID() const override;
     int getMaxGameInactivityTime() const override;

@@ -121,7 +121,7 @@ private:
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
     QLabel *hashLabel1;
-    QLabel *hashLabel;
+    QLineEdit *hashLabel;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
     KeySignals filterViewKeySignals;

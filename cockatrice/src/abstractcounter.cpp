@@ -30,13 +30,12 @@ AbstractCounter::AbstractCounter(Player *_player,
     shortcutActive = false;
 
     if (player->getLocalOrJudge()) {
-        menu = new QMenu(name);
-        menu->setTearOffEnabled(true);
+        menu = new TearOffMenu(name);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
         menu->addAction(aSet);
         menu->addSeparator();
-        for (int i = 10; i >= -10; --i)
+        for (int i = 10; i >= -10; --i) {
             if (i == 0) {
                 menu->addSeparator();
             } else {
@@ -49,8 +48,10 @@ AbstractCounter::AbstractCounter(Player *_player,
                 connect(aIncrement, SIGNAL(triggered()), this, SLOT(incrementCounter()));
                 menu->addAction(aIncrement);
             }
-    } else
+        }
+    } else {
         menu = nullptr;
+    }
 
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
@@ -107,8 +108,9 @@ void AbstractCounter::setShortcutsInactive()
 
 void AbstractCounter::refreshShortcuts()
 {
-    if (shortcutActive)
+    if (shortcutActive) {
         setShortcutsActive();
+    }
 }
 
 void AbstractCounter::setValue(int _value)

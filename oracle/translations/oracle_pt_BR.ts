@@ -32,7 +32,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="251"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por  favor especifique uma fonte compatível de expansões e cartas. Você pode especificar um endereço URL que será baixado ou usar um arquivo existente no seu computador.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="255"/>
@@ -296,7 +296,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="551"/>
         <source>The following sets have been found:</source>
-        <translation type="unfinished"/>
+        <translation>As seguintes expansões foram encontradas:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="553"/>

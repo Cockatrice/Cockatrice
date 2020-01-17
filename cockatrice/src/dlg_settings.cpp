@@ -382,12 +382,17 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     annotateTokensCheckBox.setChecked(settingsCache->getAnnotateTokens());
     connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setAnnotateTokens(int)));
 
+    useTearOffMenusCheckBox.setChecked(settingsCache->getUseTearOffMenus());
+    connect(&useTearOffMenusCheckBox, &QCheckBox::stateChanged, settingsCache,
+            [](int state) { settingsCache->setUseTearOffMenus(state == Qt::Checked); });
+
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
     generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
     generalGrid->addWidget(&playToStackCheckBox, 3, 0);
     generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 5, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -421,6 +426,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
+    useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }
