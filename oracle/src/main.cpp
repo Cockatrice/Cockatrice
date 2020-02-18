@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
 #else // linux
-    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+    translationPath = qApp->applicationDirPath() + "/../share/oracle/translations";
 #endif
 
     settingsCache = new SettingsCache;
