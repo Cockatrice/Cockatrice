@@ -191,7 +191,7 @@ void IntroPage::retranslateUi()
     setTitle(tr("Introduction"));
     label->setText(tr("This wizard will import the list of sets, cards, and tokens "
                       "that will be used by Cockatrice."));
-    languageLabel->setText(tr("Language:"));
+    languageLabel->setText(tr("Interface language:"));
     versionLabel->setText(tr("Version:") + QString(" %1").arg(VERSION_STRING));
 }
 
