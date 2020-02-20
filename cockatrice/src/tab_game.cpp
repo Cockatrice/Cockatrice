@@ -977,8 +977,6 @@ void TabGame::startGame(bool resuming)
     playerListWidget->setGameStarted(true, resuming);
     gameInfo.set_started(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
-    //if (sayEdit && players.size() > 1)
-        //sayEdit->setFocus();
 }
 
 void TabGame::stopGame()
@@ -1834,7 +1832,7 @@ void TabGame::keyPressEvent(QKeyEvent *event)
         if (sayEdit->hasFocus()) {
             sayEdit->clearFocus();
 
-            return ;
+            return;
         }
     }
 
