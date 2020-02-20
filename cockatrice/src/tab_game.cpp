@@ -248,6 +248,9 @@ void TabGame::refreshShortcuts()
     if (aResetLayout) {
         aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aResetLayout"));
     }
+    if (aFocusChat) {
+        aFocusChat->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aFocusChat"));
+    }
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -530,6 +533,9 @@ void TabGame::retranslateUi()
     }
     if (aCloseReplay) {
         aCloseReplay->setText(tr("C&lose replay"));
+    }
+    if (aFocusChat) {
+        aFocusChat->setText(tr("&Focus Chat"));
     }
     if (sayLabel) {
         sayLabel->setText(tr("&Say:"));
@@ -971,8 +977,8 @@ void TabGame::startGame(bool resuming)
     playerListWidget->setGameStarted(true, resuming);
     gameInfo.set_started(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
-    if (sayEdit && players.size() > 1)
-        sayEdit->setFocus();
+    //if (sayEdit && players.size() > 1)
+        //sayEdit->setFocus();
 }
 
 void TabGame::stopGame()
@@ -1413,6 +1419,8 @@ void TabGame::createMenuItems()
     connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
     aLeaveGame = new QAction(this);
     connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+    aFocusChat = new QAction(this);
+    connect(aFocusChat, SIGNAL(triggered()), sayEdit, SLOT(setFocus()));
     aCloseReplay = nullptr;
 
     phasesMenu = new TearOffMenu(this);
@@ -1440,6 +1448,7 @@ void TabGame::createMenuItems()
     gameMenu->addSeparator();
     gameMenu->addAction(aGameInfo);
     gameMenu->addAction(aConcede);
+    gameMenu->addAction(aFocusChat);
     gameMenu->addAction(aLeaveGame);
     addTabMenu(gameMenu);
 }
@@ -1456,6 +1465,7 @@ void TabGame::createReplayMenuItems()
     aResetLayout = nullptr;
     aGameInfo = nullptr;
     aConcede = nullptr;
+    aFocusChat = nullptr;
     aLeaveGame = nullptr;
     aCloseReplay = new QAction(this);
     connect(aCloseReplay, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
@@ -1816,6 +1826,19 @@ void TabGame::createMessageDock(bool bReplay)
 
     messageLayoutDock->installEventFilter(this);
     connect(messageLayoutDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
+}
+
+void TabGame::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        if (sayEdit->hasFocus()) {
+            sayEdit->clearFocus();
+
+            return ;
+        }
+    }
+
+    QMainWindow::keyPressEvent(event);
 }
 
 // Method uses to sync docks state with menu items state
