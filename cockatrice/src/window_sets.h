@@ -4,11 +4,11 @@
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMainWindow>
 #include <QSet>
 
 class CardDatabase;
+class CustomLineEdit;
 class QGroupBox;
 class QItemSelection;
 class QPushButton;
@@ -35,7 +35,7 @@ private:
     QGroupBox *sortWarning;
     QLabel *sortWarningText;
     QPushButton *sortWarningButton;
-    QLineEdit *searchField;
+    CustomLineEdit *searchField;
     QGridLayout *mainLayout;
     QHBoxLayout *filterBox;
     int sortIndex;

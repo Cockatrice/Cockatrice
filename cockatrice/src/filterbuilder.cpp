@@ -2,10 +2,10 @@
 
 #include <QComboBox>
 #include <QGridLayout>
-#include <QLineEdit>
 #include <QPushButton>
 
 #include "cardfilter.h"
+#include "customlineedit.h"
 
 FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 {
@@ -23,7 +23,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     ok->setObjectName("ok");
     ok->setMaximumSize(20, 20);
 
-    edit = new QLineEdit;
+    edit = new CustomLineEdit;
     edit->setObjectName("edit");
     edit->setPlaceholderText(tr("Type your filter here"));
     edit->setClearButtonEnabled(true);

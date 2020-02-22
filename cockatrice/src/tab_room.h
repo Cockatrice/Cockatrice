@@ -6,7 +6,6 @@
 #include <QFocusEvent>
 #include <QGroupBox>
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QMap>
 
 namespace google
@@ -20,7 +19,6 @@ class AbstractClient;
 class UserList;
 class QLabel;
 class ChatView;
-class QLineEdit;
 class QPushButton;
 class QTextTable;
 class QCompleter;

@@ -5,7 +5,7 @@
 
 class QCheckBox;
 class QComboBox;
-class QLineEdit;
+class CustomLineEdit;
 class CardFilter;
 
 class FilterBuilder : public QWidget
@@ -15,7 +15,7 @@ class FilterBuilder : public QWidget
 private:
     QComboBox *typeCombo;
     QComboBox *filterCombo;
-    QLineEdit *edit;
+    CustomLineEdit *edit;
     CardFilter *fltr;
 
     void destroyFilter();

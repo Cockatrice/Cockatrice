@@ -5,11 +5,11 @@
 #include <QDialog>
 
 class AbstractClient;
+class CustomLineEdit;
 
 class QGroupBox;
 class QPushButton;
 class QSpinBox;
-class QLineEdit;
 class QCheckBox;
 class QRadioButton;
 class QLabel;
@@ -29,7 +29,7 @@ private:
     AbstractClient *client;
     QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum,
         *labelDescription;
-    QLineEdit *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
+    CustomLineEdit *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
     QCheckBox *mainRoom, *gameRoom, *privateChat;
     QRadioButton *pastDays, *today, *lastHour;
     QSpinBox *maximumResults, *pastXDays;

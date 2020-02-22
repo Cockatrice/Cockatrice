@@ -8,7 +8,6 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTextEdit>

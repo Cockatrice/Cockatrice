@@ -1,15 +1,10 @@
 #include "tab_logs.h"
-#include "abstractclient.h"
-#include "pb/moderator_commands.pb.h"
-#include "pb/response_viewlog_history.pb.h"
-#include "pending_command.h"
-#include "window_sets.h"
+
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
@@ -18,6 +13,13 @@
 
 #include <QtGui>
 #include <QtWidgets>
+
+#include "abstractclient.h"
+#include "customlineedit.h"
+#include "pb/moderator_commands.pb.h"
+#include "pb/response_viewlog_history.pb.h"
+#include "pending_command.h"
+#include "window_sets.h"
 
 TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
     : Tab(_tabSupervisor, parent), client(_client)
@@ -147,19 +149,19 @@ void TabLog::createDock()
 {
 
     labelFindUserName = new QLabel(tr("Username: "));
-    findUsername = new QLineEdit("");
+    findUsername = new CustomLineEdit("");
     findUsername->setAlignment(Qt::AlignCenter);
     labelFindIPAddress = new QLabel(tr("IP Address: "));
-    findIPAddress = new QLineEdit("");
+    findIPAddress = new CustomLineEdit("");
     findIPAddress->setAlignment(Qt::AlignCenter);
     labelFindGameName = new QLabel(tr("Game Name: "));
-    findGameName = new QLineEdit("");
+    findGameName = new CustomLineEdit("");
     findGameName->setAlignment(Qt::AlignCenter);
     labelFindGameID = new QLabel(tr("GameID: "));
-    findGameID = new QLineEdit("");
+    findGameID = new CustomLineEdit("");
     findGameID->setAlignment(Qt::AlignCenter);
     labelMessage = new QLabel(tr("Message: "));
-    findMessage = new QLineEdit("");
+    findMessage = new CustomLineEdit("");
     findMessage->setAlignment(Qt::AlignCenter);
 
     mainRoom = new QCheckBox(tr("Main Room"));

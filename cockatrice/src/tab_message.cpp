@@ -6,11 +6,11 @@
 #include "soundengine.h"
 #include <QApplication>
 #include <QDebug>
-#include <QLineEdit>
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
 
+#include "customlineedit.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/session_commands.pb.h"
@@ -27,7 +27,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
-    sayEdit = new QLineEdit;
+    sayEdit = new CustomLineEdit;
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
     QVBoxLayout *vbox = new QVBoxLayout;

@@ -19,7 +19,6 @@ class MessageLogWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
-class QLineEdit;
 class QPushButton;
 class QToolButton;
 class QMenu;
@@ -314,9 +313,6 @@ public slots:
     void sendGameCommand(PendingCommand *pend, int playerId = -1);
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
     void viewCardInfo(const QString &cardName);
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif

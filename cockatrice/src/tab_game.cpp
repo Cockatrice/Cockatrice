@@ -249,7 +249,7 @@ void TabGame::refreshShortcuts()
         aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aResetLayout"));
     }
     if (aFocusChat) {
-        aFocusChat->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aFocusChat"));
+        aFocusChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_game/aFocusChat"));
     }
 }
 
@@ -1824,19 +1824,6 @@ void TabGame::createMessageDock(bool bReplay)
 
     messageLayoutDock->installEventFilter(this);
     connect(messageLayoutDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
-}
-
-void TabGame::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape) {
-        if (sayEdit->hasFocus()) {
-            sayEdit->clearFocus();
-
-            return;
-        }
-    }
-
-    QMainWindow::keyPressEvent(event);
 }
 
 // Method uses to sync docks state with menu items state

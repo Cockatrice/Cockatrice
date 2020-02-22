@@ -86,7 +86,6 @@ SET(cockatrice_SOURCES
     src/deckstats_interface.cpp
     src/tappedout_interface.cpp
     src/chatview/chatview.cpp
-    src/chatview/userlistProxy.h
     src/userlist.cpp
     src/userinfobox.cpp
     src/user_context_menu.cpp
@@ -123,6 +122,7 @@ SET(cockatrice_SOURCES
     src/carddbparser/cockatricexml3.cpp
     src/carddbparser/cockatricexml4.cpp
     src/filter_string.cpp
+    src/customlineedit.cpp
     ${VERSION_STRING_CPP}
     )
 

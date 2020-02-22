@@ -3,11 +3,11 @@
 
 #include "pb/serverinfo_user.pb.h"
 #include "tab.h"
-#include <QLineEdit>
 
 class AbstractClient;
 class UserList;
 class UserInfoBox;
+class CustomLineEdit;
 
 class Event_ListRooms;
 class Event_UserJoined;
@@ -41,8 +41,8 @@ private:
     UserList *buddyList;
     UserList *ignoreList;
     UserInfoBox *userInfoBox;
-    QLineEdit *addBuddyEdit;
-    QLineEdit *addIgnoreEdit;
+    CustomLineEdit *addBuddyEdit;
+    CustomLineEdit *addIgnoreEdit;
     void addToList(const std::string &listName, const QString &userName);
 
 public:

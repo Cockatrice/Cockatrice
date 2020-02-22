@@ -3,10 +3,11 @@
 
 #include <QFocusEvent>
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QStringList>
 
-class LineEditCompleter : public QLineEdit
+#include "customlineedit.h"
+
+class LineEditCompleter : public CustomLineEdit
 {
     Q_OBJECT
 private:

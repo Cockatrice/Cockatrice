@@ -5,9 +5,9 @@
 #include "tab.h"
 #include <QAbstractItemModel>
 #include <QDir>
-#include <QLineEdit>
 
 #include "carddatabase.h"
+#include "customlineedit.h"
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
@@ -27,7 +27,7 @@ class QVBoxLayout;
 class QPushButton;
 class QDockWidget;
 
-class SearchLineEdit : public QLineEdit
+class SearchLineEdit : public CustomLineEdit
 {
 private:
     QTreeView *treeView;
@@ -36,7 +36,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 public:
-    SearchLineEdit() : QLineEdit(), treeView(nullptr)
+    SearchLineEdit() : CustomLineEdit(), treeView(nullptr)
     {
     }
     void setTreeView(QTreeView *_treeView)
@@ -117,11 +117,11 @@ private:
     KeySignals searchKeySignals;
 
     QLabel *nameLabel;
-    QLineEdit *nameEdit;
+    CustomLineEdit *nameEdit;
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
     QLabel *hashLabel1;
-    QLineEdit *hashLabel;
+    CustomLineEdit *hashLabel;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
     KeySignals filterViewKeySignals;

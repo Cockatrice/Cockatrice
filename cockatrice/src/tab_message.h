@@ -5,7 +5,7 @@
 
 class AbstractClient;
 class ChatView;
-class QLineEdit;
+class CustomLineEdit;
 class Event_UserMessage;
 class Response;
 class ServerInfo_User;
@@ -21,7 +21,7 @@ private:
     bool userOnline;
 
     ChatView *chatView;
-    QLineEdit *sayEdit;
+    CustomLineEdit *sayEdit;
 
     QAction *aLeave;
 signals:

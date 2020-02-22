@@ -19,7 +19,6 @@
 #include <QApplication>
 #include <QCompleter>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>

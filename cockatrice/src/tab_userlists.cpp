@@ -4,10 +4,10 @@
 #include "userinfobox.h"
 #include "userlist.h"
 #include <QHBoxLayout>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "customlineedit.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
 #include "pb/event_user_joined.pb.h"
@@ -58,7 +58,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     vbox->addWidget(allUsersList);
 
     QHBoxLayout *addToBuddyList = new QHBoxLayout;
-    addBuddyEdit = new QLineEdit;
+    addBuddyEdit = new CustomLineEdit;
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
     connect(addBuddyEdit, SIGNAL(returnPressed()), this, SLOT(addToBuddyList()));
     QPushButton *addBuddyButton = new QPushButton("Add");
@@ -67,7 +67,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     addToBuddyList->addWidget(addBuddyButton);
 
     QHBoxLayout *addToIgnoreList = new QHBoxLayout;
-    addIgnoreEdit = new QLineEdit;
+    addIgnoreEdit = new CustomLineEdit;
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
     connect(addIgnoreEdit, SIGNAL(returnPressed()), this, SLOT(addToIgnoreList()));
     QPushButton *addIgnoreButton = new QPushButton("Add");
