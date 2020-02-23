@@ -31,7 +31,7 @@ bool CustomLineEdit::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::ShortcutOverride) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Escape) {
-            event->ignore();
+            event->accept();
             return true;
         }
     }
