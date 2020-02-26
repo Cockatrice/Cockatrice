@@ -28,7 +28,7 @@ ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
 RarityQuery <- [rR] ':' RegexString
 
 FormatQuery <- 'f' ':' Format / Legality ':' Format
-Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'? / [Pp] 'ioneer'?
+Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'? / [Pp] 'ioneer'? / [Pp] 'auper'?
 Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
