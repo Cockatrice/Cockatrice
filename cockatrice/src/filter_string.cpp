@@ -28,7 +28,7 @@ ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
 RarityQuery <- [rR] ':' RegexString
 
 FormatQuery <- 'f' ':' Format / Legality ':' Format
-Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'? / [Pp] 'ioneer'? / [Pp] 'auper'?
+Format <- [a-zA-Z] [a-z]*
 Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
@@ -138,21 +138,25 @@ static void setupParserRules()
     };
 
     search["Format"] = [](const peg::SemanticValues &sv) -> QString {
-        switch (tolower(sv.str()[0])) {
-            case 'm':
-                return "modern";
-            case 's':
-                return "standard";
-            case 'v':
-                return "vintage";
-            case 'l':
-                return "legacy";
-            case 'c':
-                return "commander";
-            case 'p':
-                return "pioneer";
-            default:
-                return "";
+        if (sv.length() == 1) {
+            switch (tolower(sv.str()[0])) {
+                case 'm':
+                    return "modern";
+                case 's':
+                    return "standard";
+                case 'v':
+                    return "vintage";
+                case 'l':
+                    return "legacy";
+                case 'c':
+                    return "commander";
+                case 'p':
+                    return "pioneer";
+                default:
+                    return "";
+            }
+        } else {
+            return QString::fromStdString(sv.str()).toLower();
         }
     };
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
