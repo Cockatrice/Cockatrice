@@ -408,15 +408,11 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             if (!allNumProps.contains(cardIter.key())) {
                 extraStarCards.append(cardIter.value());
             }
-            // else qDebug() << "skipped the card" << cardIter.key() << "with star in the set" <<
-            // CardInfoPerSet(currentSet).getPtr()->getShortName();
         }
         if (!extraStarCards.isEmpty()) {
             numCards += importCardsFromSet(currentSet, extraStarCards, false);
         }
     }
-    // else if (numCards) qDebug() << "added" << numCards << "cards with stars to the set" <<
-    // CardInfoPerSet(currentSet).getPtr()->getShortName();
     return numCards;
 }
 
