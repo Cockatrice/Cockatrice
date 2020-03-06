@@ -335,7 +335,7 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
 
-    auto size = static_cast<unsigned int>(cont.ByteSize());
+    unsigned int size = cont.ByteSizeLong();
 #ifdef QT_DEBUG
     qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
 #endif

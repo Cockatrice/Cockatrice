@@ -153,7 +153,7 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
 
 void TableZone::reorganizeCards()
 {
-    QList<ArrowItem *> arrowsToUpdate;
+    QSet<ArrowItem *> arrowsToUpdate;
 
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
@@ -185,18 +185,24 @@ void TableZone::reorganizeCards()
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
-
-            arrowsToUpdate.append(attachedCard->getArrowsFrom());
-            arrowsToUpdate.append(attachedCard->getArrowsTo());
+            for (ArrowItem *item : attachedCard->getArrowsFrom()) {
+                arrowsToUpdate.insert(item);
+            }
+            for (ArrowItem *item : attachedCard->getArrowsTo()) {
+                arrowsToUpdate.insert(item);
+            }
         }
 
-        arrowsToUpdate.append(cards[i]->getArrowsFrom());
-        arrowsToUpdate.append(cards[i]->getArrowsTo());
+        for (ArrowItem *item : cards[i]->getArrowsFrom()) {
+            arrowsToUpdate.insert(item);
+        }
+        for (ArrowItem *item : cards[i]->getArrowsTo()) {
+            arrowsToUpdate.insert(item);
+        }
     }
-
-    QSetIterator<ArrowItem *> arrowIterator(QSet<ArrowItem *>::fromList(arrowsToUpdate));
-    while (arrowIterator.hasNext())
-        arrowIterator.next()->updatePath();
+    for (ArrowItem *item : arrowsToUpdate) {
+        item->updatePath();
+    }
 
     resizeToContents();
     update();

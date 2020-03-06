@@ -73,7 +73,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 void StackZone::reorganizeCards()
 {
     if (!cards.isEmpty()) {
-        QList<ArrowItem *> arrowsToUpdate;
+        QSet<ArrowItem *> arrowsToUpdate;
 
         const int cardCount = cards.size();
         qreal totalWidth = boundingRect().width();
@@ -95,12 +95,16 @@ void StackZone::reorganizeCards()
                 c->setPos(x, ((qreal)i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
             c->setRealZValue(i);
 
-            arrowsToUpdate.append(c->getArrowsFrom());
-            arrowsToUpdate.append(c->getArrowsTo());
+            for (ArrowItem *item : c->getArrowsFrom()) {
+                arrowsToUpdate.insert(item);
+            }
+            for (ArrowItem *item : c->getArrowsTo()) {
+                arrowsToUpdate.insert(item);
+            }
         }
-        QSetIterator<ArrowItem *> arrowIterator(QSet<ArrowItem *>::fromList(arrowsToUpdate));
-        while (arrowIterator.hasNext())
-            arrowIterator.next()->updatePath();
+        for (ArrowItem *item : arrowsToUpdate) {
+            item->updatePath();
+        }
     }
     update();
 }

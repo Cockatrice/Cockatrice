@@ -1553,7 +1553,7 @@ void TcpServerSocketInterface::flushOutputQueue()
         locker.unlock();
 
         QByteArray buf;
-        unsigned int size = item.ByteSize();
+        unsigned int size = item.ByteSizeLong();
         buf.resize(size + 4);
         item.SerializeToArray(buf.data() + 4, size);
         buf.data()[3] = (unsigned char)size;
@@ -1747,7 +1747,7 @@ void WebsocketServerSocketInterface::flushOutputQueue()
         locker.unlock();
 
         QByteArray buf;
-        unsigned int size = item.ByteSize();
+        unsigned int size = item.ByteSizeLong();
         buf.resize(size);
         item.SerializeToArray(buf.data(), size);
         // In case socket->write() calls catchSocketError(), the mutex must not be locked during this call.
