@@ -804,7 +804,11 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
     QVariantList replayIds, replayGameIds, replayDurations, replayBlobs;
     for (int i = 0; i < replayList.size(); ++i) {
         QByteArray blob;
+#if GOOGLE_PROTOBUF_VERSION > 3001000
         const unsigned int size = replayList[i]->ByteSizeLong();
+#else
+        const unsigned int size = replayList[i]->ByteSize();
+#endif
         blob.resize(size);
         replayList[i]->SerializeToArray(blob.data(), size);
 

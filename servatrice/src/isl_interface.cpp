@@ -261,7 +261,11 @@ void IslInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 void IslInterface::transmitMessage(const IslMessage &item)
 {
     QByteArray buf;
+#if GOOGLE_PROTOBUF_VERSION > 3001000
     unsigned int size = item.ByteSizeLong();
+#else
+    unsigned int size = item.ByteSize();
+#endif
     buf.resize(size + 4);
     item.SerializeToArray(buf.data() + 4, size);
     buf.data()[3] = (unsigned char)size;

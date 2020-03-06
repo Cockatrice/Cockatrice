@@ -334,8 +334,11 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
 
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
-
+#if GOOGLE_PROTOBUF_VERSION > 3001000
     unsigned int size = cont.ByteSizeLong();
+#else
+    unsigned int size = cont.ByteSize();
+#endif
 #ifdef QT_DEBUG
     qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
 #endif
