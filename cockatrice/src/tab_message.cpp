@@ -1,20 +1,21 @@
 #include "tab_message.h"
+
 #include "abstractclient.h"
 #include "chatview/chatview.h"
+#include "customlineedit.h"
 #include "main.h"
+#include "pb/event_user_message.pb.h"
+#include "pb/serverinfo_user.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
 #include "settingscache.h"
 #include "soundengine.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
-
-#include "customlineedit.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/serverinfo_user.pb.h"
-#include "pb/session_commands.pb.h"
-#include "pending_command.h"
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
                        AbstractClient *_client,
@@ -27,7 +28,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
-    sayEdit = new CustomLineEdit;
+    sayEdit = new LineEditUnfocusable;
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
     QVBoxLayout *vbox = new QVBoxLayout;

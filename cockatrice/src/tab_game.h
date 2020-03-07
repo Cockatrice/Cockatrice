@@ -5,6 +5,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
 #include "tearoffmenu.h"
+
 #include <QCompleter>
 #include <QMap>
 #include <QPushButton>

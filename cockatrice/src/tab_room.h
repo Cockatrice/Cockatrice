@@ -3,6 +3,7 @@
 
 #include "lineeditcompleter.h"
 #include "tab.h"
+
 #include <QFocusEvent>
 #include <QGroupBox>
 #include <QKeyEvent>

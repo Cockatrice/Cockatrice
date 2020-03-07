@@ -23,3 +23,5 @@ BinPackParameters: false
 AllowAllParametersOfDeclarationOnNextLine: false
 IndentCaseLabels: true
 PointerAlignment: Right
+SortIncludes: true
+IncludeBlocks: Regroup

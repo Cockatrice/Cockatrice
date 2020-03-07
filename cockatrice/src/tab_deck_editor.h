@@ -1,13 +1,13 @@
 #ifndef WINDOW_DECKEDITOR_H
 #define WINDOW_DECKEDITOR_H
 
-#include "keysignals.h"
-#include "tab.h"
-#include <QAbstractItemModel>
-#include <QDir>
-
 #include "carddatabase.h"
 #include "customlineedit.h"
+#include "keysignals.h"
+#include "tab.h"
+
+#include <QAbstractItemModel>
+#include <QDir>
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
@@ -27,7 +27,7 @@ class QVBoxLayout;
 class QPushButton;
 class QDockWidget;
 
-class SearchLineEdit : public CustomLineEdit
+class SearchLineEdit : public LineEditUnfocusable
 {
 private:
     QTreeView *treeView;
@@ -36,7 +36,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 public:
-    SearchLineEdit() : CustomLineEdit(), treeView(nullptr)
+    SearchLineEdit() : LineEditUnfocusable(), treeView(nullptr)
     {
     }
     void setTreeView(QTreeView *_treeView)
@@ -117,11 +117,11 @@ private:
     KeySignals searchKeySignals;
 
     QLabel *nameLabel;
-    CustomLineEdit *nameEdit;
+    LineEditUnfocusable *nameEdit;
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
     QLabel *hashLabel1;
-    CustomLineEdit *hashLabel;
+    LineEditUnfocusable *hashLabel;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
     KeySignals filterViewKeySignals;

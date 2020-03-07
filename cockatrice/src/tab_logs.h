@@ -2,10 +2,11 @@
 #define TAB_LOG_H
 
 #include "tab.h"
+
 #include <QDialog>
 
 class AbstractClient;
-class CustomLineEdit;
+class LineEditUnfocusable;
 
 class QGroupBox;
 class QPushButton;
@@ -29,7 +30,7 @@ private:
     AbstractClient *client;
     QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum,
         *labelDescription;
-    CustomLineEdit *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
+    LineEditUnfocusable *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
     QCheckBox *mainRoom, *gameRoom, *privateChat;
     QRadioButton *pastDays, *today, *lastHour;
     QSpinBox *maximumResults, *pastXDays;

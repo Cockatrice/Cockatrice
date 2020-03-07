@@ -9,13 +9,13 @@
 #include <QTextCursor>
 #include <QWidget>
 
-LineEditCompleter::LineEditCompleter(QWidget *parent) : CustomLineEdit(parent), c(nullptr)
+LineEditCompleter::LineEditCompleter(QWidget *parent) : LineEditUnfocusable(parent), c(nullptr)
 {
 }
 
 void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
-    CustomLineEdit::focusOutEvent(e);
+    LineEditUnfocusable::focusOutEvent(e);
     if (c->popup()->isVisible()) {
         // Remove Popup
         c->popup()->hide();
@@ -73,7 +73,7 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
             break;
     }
 
-    CustomLineEdit::keyPressEvent(event);
+    LineEditUnfocusable::keyPressEvent(event);
     // return if the completer is null or if the most recently typed char was '@'.
     // Only want the popup AFTER typing the first char of the mention.
     if (!c || text().right(1).contains("@")) {

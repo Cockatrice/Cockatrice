@@ -8,7 +8,7 @@
 #include <QSet>
 
 class CardDatabase;
-class CustomLineEdit;
+class LineEditUnfocusable;
 class QGroupBox;
 class QItemSelection;
 class QPushButton;
@@ -35,7 +35,7 @@ private:
     QGroupBox *sortWarning;
     QLabel *sortWarningText;
     QPushButton *sortWarningButton;
-    CustomLineEdit *searchField;
+    LineEditUnfocusable *searchField;
     QGridLayout *mainLayout;
     QHBoxLayout *filterBox;
     int sortIndex;

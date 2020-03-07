@@ -1,17 +1,4 @@
-#include <QAction>
-#include <QCompleter>
-#include <QDebug>
-#include <QDockWidget>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QMenu>
-#include <QMessageBox>
-#include <QSplitter>
-#include <QStackedWidget>
-#include <QTimer>
-#include <QToolButton>
-#include <QWidget>
+#include "tab_game.h"
 
 #include "abstractclient.h"
 #include "arrowitem.h"
@@ -24,22 +11,10 @@
 #include "dlg_load_remote_deck.h"
 #include "gamescene.h"
 #include "gameview.h"
+#include "get_pb_extension.h"
 #include "lineeditcompleter.h"
 #include "main.h"
 #include "messagelogwidget.h"
-#include "phasestoolbar.h"
-#include "pictureloader.h"
-#include "player.h"
-#include "playerlistwidget.h"
-#include "replay_timeline_widget.h"
-#include "settingscache.h"
-#include "tab_game.h"
-#include "tab_supervisor.h"
-#include "window_sets.h"
-#include "zoneviewwidget.h"
-#include "zoneviewzone.h"
-
-#include "get_pb_extension.h"
 #include "pb/command_concede.pb.h"
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_delete_arrow.pb.h"
@@ -70,6 +45,31 @@
 #include "pb/game_replay.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pending_command.h"
+#include "phasestoolbar.h"
+#include "pictureloader.h"
+#include "player.h"
+#include "playerlistwidget.h"
+#include "replay_timeline_widget.h"
+#include "settingscache.h"
+#include "tab_supervisor.h"
+#include "window_sets.h"
+#include "zoneviewwidget.h"
+#include "zoneviewzone.h"
+
+#include <QAction>
+#include <QCompleter>
+#include <QDebug>
+#include <QDockWidget>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QTimer>
+#include <QToolButton>
+#include <QWidget>
 #include <google/protobuf/descriptor.h>
 
 ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)

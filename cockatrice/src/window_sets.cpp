@@ -1,5 +1,10 @@
 #include "window_sets.h"
 
+#include "customlineedit.h"
+#include "main.h"
+#include "pictureloader.h"
+#include "setsmodel.h"
+
 #include <QAction>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -13,13 +18,7 @@
 #include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>
-
 #include <algorithm>
-
-#include "customlineedit.h"
-#include "main.h"
-#include "pictureloader.h"
-#include "setsmodel.h"
 
 #define SORT_RESET -1
 
@@ -62,10 +61,10 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setsEditToolBar->addAction(aBottom);
 
     // search field
-    searchField = new CustomLineEdit;
+    searchField = new LineEditUnfocusable;
     searchField->setObjectName("searchEdit");
     searchField->setPlaceholderText(tr("Search by set name, code, or type"));
-    searchField->addAction(QPixmap("theme:icons/search"), CustomLineEdit::LeadingPosition);
+    searchField->addAction(QPixmap("theme:icons/search"), LineEditUnfocusable::LeadingPosition);
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
 

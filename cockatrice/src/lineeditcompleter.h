@@ -1,13 +1,13 @@
 #ifndef LINEEDITCOMPLETER_H
 #define LINEEDITCOMPLETER_H
 
+#include "customlineedit.h"
+
 #include <QFocusEvent>
 #include <QKeyEvent>
 #include <QStringList>
 
-#include "customlineedit.h"
-
-class LineEditCompleter : public CustomLineEdit
+class LineEditCompleter : public LineEditUnfocusable
 {
     Q_OBJECT
 private:
