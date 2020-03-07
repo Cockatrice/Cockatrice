@@ -38,7 +38,7 @@ bool LineEditUnfocusable::isUnfocusShortcut(QKeyEvent *event)
     QKeySequence key(modifier + keyNoMod);
     QList<QKeySequence> unfocusShortcut = settingsCache->shortcuts().getShortcut("Textbox/unfocusTextBox");
 
-    for (QList<QKeySequence>::iterator i = unfocusShortcut.begin(); i != unfocusShortcut.end(); i++) {
+    for (QList<QKeySequence>::iterator i = unfocusShortcut.begin(); i != unfocusShortcut.end(); ++i) {
         if (key.matches(*i) == QKeySequence::ExactMatch)
             return true;
     }
