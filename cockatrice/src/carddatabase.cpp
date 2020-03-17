@@ -573,7 +573,7 @@ QStringList CardDatabase::getAllMainCardTypes() const
     while (cardIterator.hasNext()) {
         types.insert(cardIterator.next().value()->getMainCardType());
     }
-    return types.toList();
+    return types.values();
 }
 
 void CardDatabase::checkUnknownSets()

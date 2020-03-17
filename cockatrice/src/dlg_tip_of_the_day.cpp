@@ -41,17 +41,15 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipNumber = new QLabel();
     tipNumber->setAlignment(Qt::AlignCenter);
 
-    if (settingsCache->getSeenTips().size() != tipDatabase->rowCount()) {
-        newTipsAvailable = true;
-        QList<int> rangeToMaxTips;
-        for (int i = 0; i < tipDatabase->rowCount(); i++) {
-            rangeToMaxTips.append(i);
+    QList<int> seenTips = settingsCache->getSeenTips();
+    newTipsAvailable = false;
+    currentTip = 0;
+    for (int i = 0; i < tipDatabase->rowCount(); i++) {
+        if (!seenTips.contains(i)) {
+            newTipsAvailable = true;
+            currentTip = i;
+            break;
         }
-        QSet<int> unseenTips = rangeToMaxTips.toSet() - settingsCache->getSeenTips().toSet();
-        currentTip = *std::min_element(unseenTips.begin(), unseenTips.end());
-    } else {
-        newTipsAvailable = false;
-        currentTip = 0;
     }
 
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));

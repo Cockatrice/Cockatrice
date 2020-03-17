@@ -704,7 +704,7 @@ QStringList DeckList::getCardList() const
 {
     QSet<QString> result;
     getCardListHelper(root, result);
-    return result.toList();
+    return result.values();
 }
 
 int DeckList::getSideboardSize() const
