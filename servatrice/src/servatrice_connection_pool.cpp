@@ -1,4 +1,5 @@
 #include "servatrice_connection_pool.h"
+
 #include "servatrice_database_interface.h"
 
 #include <QThread>
