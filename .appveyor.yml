@@ -30,7 +30,7 @@ environment:
     matrix:
         - target_arch: win64
           qt_ver: 5.12\msvc2019_64
-          cmake_generator: Visual Studio 16 2019 Win64
+          cmake_generator: Visual Studio 16 2019
           cmake_toolset: v141,host=x64
           vcpkg_arch: x64
 
