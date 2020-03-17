@@ -226,7 +226,7 @@ SettingsCache::SettingsCache()
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
-    buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", false).toBool();
+    buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
