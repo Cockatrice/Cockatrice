@@ -29,14 +29,14 @@ cache:
 environment:
     matrix:
         - target_arch: win64
-          qt_ver: 5.14.0\msvc2019_64
+          qt_ver: 5.14.0\msvc2017_64
           cmake_generator: Visual Studio 16 2019
           architecture: x64
           cmake_toolset: v141,host=x64
           vcpkg_arch: x64
 
         - target_arch: win32
-          qt_ver: 5.14.0\msvc2019
+          qt_ver: 5.14.0\msvc2017
           cmake_generator: Visual Studio 16 2019
           architecture: Win32
           cmake_toolset: v141
