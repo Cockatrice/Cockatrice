@@ -1,5 +1,6 @@
 #include "tab_supervisor.h"
 #include "abstractclient.h"
+#include "main.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "tab_admin.h"
@@ -17,6 +18,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QPainter>
+#include <QSystemTrayIcon>
 
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_notify_user.pb.h"
@@ -441,7 +443,7 @@ void TabSupervisor::replayLeft(TabGame *tab)
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
 {
     if (receiverName == QString::fromStdString(userInfo->name()))
-        return 0;
+        return nullptr;
 
     ServerInfo_User otherUser;
     UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
@@ -561,6 +563,17 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     tab->processUserMessageEvent(event);
 }
 
+void TabSupervisor::actShowPopup(const QString &message)
+{
+    qDebug() << "ACT SHOW POPUP";
+    if (trayIcon && (QApplication::activeWindow() == nullptr || QApplication::focusWidget() == nullptr)) {
+        qDebug() << "LAUNCHING POPUP";
+        // disconnect(trayIcon, SIGNAL(messageClicked()), nullptr, nullptr);
+        trayIcon->showMessage(message, tr("Click to view"));
+        // connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
+    }
+}
+
 void TabSupervisor::processUserLeft(const QString &userName)
 {
     TabMessage *tab = messageTabs.value(userName);
@@ -568,11 +581,29 @@ void TabSupervisor::processUserLeft(const QString &userName)
         tab->processUserLeft();
 }
 
-void TabSupervisor::processUserJoined(const ServerInfo_User &userInfo)
+void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
 {
-    TabMessage *tab = messageTabs.value(QString::fromStdString(userInfo.name()));
+    QString userName = QString::fromStdString(userInfoJoined.name());
+    if (isUserBuddy(userName)) {
+        Tab *tab = static_cast<Tab *>(getUserListsTab());
+
+        if (tab != currentWidget()) {
+            tab->setContentsChanged(true);
+            QPixmap avatarPixmap =
+                UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)userInfoJoined.user_level(), true,
+                                                         QString::fromStdString(userInfoJoined.privlevel()));
+            setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+        }
+
+        if (settingsCache->getBuddyConnectNotificationsEnabled()) {
+            QApplication::alert(this);
+            this->actShowPopup(tr("Your buddy %1 has signed on!").arg(userName));
+        }
+    }
+
+    TabMessage *tab = messageTabs.value(userName);
     if (tab)
-        tab->processUserJoined(userInfo);
+        tab->processUserJoined(userInfoJoined);
 }
 
 void TabSupervisor::updateCurrent(int index)

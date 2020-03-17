@@ -108,12 +108,14 @@ private slots:
 private:
     QCheckBox notificationsEnabledCheckBox;
     QCheckBox specNotificationsEnabledCheckBox;
+    QCheckBox buddyConnectNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
+    QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
 
 public:

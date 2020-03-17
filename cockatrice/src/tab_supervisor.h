@@ -115,11 +115,13 @@ public:
     bool isUserBuddy(const QString &userName) const;
     bool isUserIgnored(const QString &userName) const;
     const ServerInfo_User *getOnlineUser(const QString &userName) const;
+    void actShowPopup(const QString &message);
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();
     void adminLockChanged(bool lock);
     void showWindowIfHidden();
+
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     void openReplay(GameReplay *replay);
