@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "servatrice.h"
+
 #include "decklist.h"
 #include "featureset.h"
 #include "isl_interface.h"
@@ -32,6 +33,7 @@
 #include "serversocketinterface.h"
 #include "settingscache.h"
 #include "smtpclient.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>

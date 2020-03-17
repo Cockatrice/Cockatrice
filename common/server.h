@@ -7,6 +7,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_warning.pb.h"
 #include "server_player_reference.h"
+
 #include <QMap>
 #include <QMultiMap>
 #include <QMutex>

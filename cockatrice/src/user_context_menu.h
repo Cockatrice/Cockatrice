@@ -2,6 +2,7 @@
 #define USER_CONTEXT_MENU_H
 
 #include "user_level.h"
+
 #include <QObject>
 
 class QAction;

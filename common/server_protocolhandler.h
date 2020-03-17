@@ -5,6 +5,7 @@
 #include "pb/server_message.pb.h"
 #include "server.h"
 #include "server_abstractuserinterface.h"
+
 #include <QObject>
 #include <QPair>
 

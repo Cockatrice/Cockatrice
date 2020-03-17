@@ -1,10 +1,10 @@
 #ifndef CARDDATABASE_PARSER_H
 #define CARDDATABASE_PARSER_H
 
+#include "../carddatabase.h"
+
 #include <QIODevice>
 #include <QString>
-
-#include "../carddatabase.h"
 
 class ICardDatabaseParser : public QObject
 {

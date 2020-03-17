@@ -1,14 +1,15 @@
+#include "main.h"
+
+#include "oraclewizard.h"
+#include "settingscache.h"
+#include "thememanager.h"
+
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QTextCodec>
 #include <QTranslator>
-
-#include "main.h"
-#include "oraclewizard.h"
-#include "settingscache.h"
-#include "thememanager.h"
 
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;

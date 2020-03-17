@@ -1,4 +1,5 @@
 #include "cardinfotext.h"
+
 #include "carditem.h"
 #include "game_specific_terms.h"
 #include "main.h"

@@ -2,6 +2,7 @@
 #define GAMESELECTOR_H
 
 #include "gametypemap.h"
+
 #include <QGroupBox>
 #include <common/pb/event_add_to_list.pb.h>
 #include <common/pb/event_remove_from_list.pb.h>

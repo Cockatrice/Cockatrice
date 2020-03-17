@@ -5,6 +5,7 @@
 #include "pb/serverinfo_room.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "servatrice.h"
+
 #include <QSslCertificate>
 #include <QWaitCondition>
 

@@ -1,8 +1,6 @@
 #ifndef SERVER_METATYPES_H
 #define SERVER_METATYPES_H
 
-#include <QMetaType>
-
 #include "pb/commands.pb.h"
 #include "pb/game_event_container.pb.h"
 #include "pb/isl_message.pb.h"
@@ -12,6 +10,8 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pb/serverinfo_room.pb.h"
 #include "pb/serverinfo_user.pb.h"
+
+#include <QMetaType>
 
 Q_DECLARE_METATYPE(ServerInfo_Ban)
 Q_DECLARE_METATYPE(ServerInfo_User)

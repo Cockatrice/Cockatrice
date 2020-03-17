@@ -1,13 +1,14 @@
 #include "remotereplaylist_treewidget.h"
-#include "abstractclient.h"
-#include <QFileIconProvider>
-#include <QHeaderView>
-#include <QSortFilterProxyModel>
 
+#include "abstractclient.h"
 #include "pb/command_replay_list.pb.h"
 #include "pb/response_replay_list.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pending_command.h"
+
+#include <QFileIconProvider>
+#include <QHeaderView>
+#include <QSortFilterProxyModel>
 
 const int RemoteReplayList_TreeModel::numberOfColumns = 6;
 

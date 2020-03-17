@@ -2,6 +2,7 @@
 #define DLG_EDIT_TOKENS_H
 
 #include "carddatabase.h"
+
 #include <QDialog>
 
 class QModelIndex;

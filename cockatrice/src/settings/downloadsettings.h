@@ -2,6 +2,7 @@
 #define COCKATRICE_DOWNLOADSETTINGS_H
 
 #include "settingsmanager.h"
+
 #include <QObject>
 
 class DownloadSettings : public SettingsManager

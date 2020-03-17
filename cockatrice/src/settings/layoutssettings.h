@@ -2,6 +2,7 @@
 #define LAYOUTSSETTINGS_H
 
 #include "settingsmanager.h"
+
 #include <QSize>
 
 class LayoutsSettings : public SettingsManager

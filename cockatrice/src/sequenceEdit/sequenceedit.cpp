@@ -1,5 +1,7 @@
 #include "sequenceedit.h"
+
 #include "../settingscache.h"
+
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QToolTip>

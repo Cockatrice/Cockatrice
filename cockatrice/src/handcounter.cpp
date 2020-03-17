@@ -1,5 +1,7 @@
 #include "handcounter.h"
+
 #include "cardzone.h"
+
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPixmapCache>

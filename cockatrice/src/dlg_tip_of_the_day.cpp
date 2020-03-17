@@ -1,3 +1,8 @@
+#include "dlg_tip_of_the_day.h"
+
+#include "settingscache.h"
+#include "tip_of_the_day.h"
+
 #include <QCheckBox>
 #include <QDate>
 #include <QDebug>
@@ -5,10 +10,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-
-#include "dlg_tip_of_the_day.h"
-#include "settingscache.h"
-#include "tip_of_the_day.h"
 
 #define MIN_TIP_IMAGE_HEIGHT 200
 #define MIN_TIP_IMAGE_WIDTH 200

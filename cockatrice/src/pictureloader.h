@@ -1,12 +1,12 @@
 #ifndef PICTURELOADER_H
 #define PICTURELOADER_H
 
+#include "carddatabase.h"
+
 #include <QList>
 #include <QMap>
 #include <QMutex>
 #include <QNetworkRequest>
-
-#include "carddatabase.h"
 class QNetworkAccessManager;
 class QNetworkReply;
 class QThread;

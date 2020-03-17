@@ -3,6 +3,7 @@
 
 #include "chatview/userlistProxy.h"
 #include "deck_loader.h"
+
 #include <QAbstractButton>
 #include <QCommonStyle>
 #include <QMap>

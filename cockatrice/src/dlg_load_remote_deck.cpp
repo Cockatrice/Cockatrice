@@ -1,6 +1,8 @@
 #include "dlg_load_remote_deck.h"
+
 #include "main.h"
 #include "remotedecklist_treewidget.h"
+
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QPushButton>

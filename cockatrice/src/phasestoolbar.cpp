@@ -7,13 +7,12 @@
 #ifdef _WIN32
 #include "round.h"
 #endif /* _WIN32 */
-#include "phasestoolbar.h"
-#include "pixmapgenerator.h"
-
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_next_turn.pb.h"
 #include "pb/command_set_active_phase.pb.h"
 #include "pb/command_set_card_attr.pb.h"
+#include "phasestoolbar.h"
+#include "pixmapgenerator.h"
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
     : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),

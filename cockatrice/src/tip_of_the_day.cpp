@@ -1,11 +1,11 @@
+#include "tip_of_the_day.h"
+
 #include <QDate>
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
 #include <QXmlStreamReader>
 #include <utility>
-
-#include "tip_of_the_day.h"
 
 #define TIPDDBMODEL_COLUMNS 3
 

@@ -5,6 +5,7 @@
 
 #include "carddatabase.h"
 #include "cardfilter.h"
+
 #include <QList>
 #include <QMap>
 #include <QObject>

@@ -1,4 +1,5 @@
 #include "gameselector.h"
+
 #include "abstractclient.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
@@ -10,6 +11,7 @@
 #include "tab_room.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QDebug>

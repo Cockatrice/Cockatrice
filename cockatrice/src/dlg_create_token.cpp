@@ -1,3 +1,11 @@
+#include "dlg_create_token.h"
+
+#include "carddatabasemodel.h"
+#include "cardinfopicture.h"
+#include "decklist.h"
+#include "main.h"
+#include "settingscache.h"
+
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -11,13 +19,6 @@
 #include <QRadioButton>
 #include <QTreeView>
 #include <QVBoxLayout>
-
-#include "carddatabasemodel.h"
-#include "cardinfopicture.h"
-#include "decklist.h"
-#include "dlg_create_token.h"
-#include "main.h"
-#include "settingscache.h"
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)

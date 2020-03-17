@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "main.h"
+
 #include "QtNetwork/QNetworkInterface"
 #include "carddatabase.h"
 #include "dlg_settings.h"
@@ -32,6 +33,7 @@
 #include "thememanager.h"
 #include "version_string.h"
 #include "window_main.h"
+
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDateTime>

@@ -1,9 +1,9 @@
 #ifndef COCKATRICE_XML4_H
 #define COCKATRICE_XML4_H
 
-#include <QXmlStreamReader>
-
 #include "carddatabaseparser.h"
+
+#include <QXmlStreamReader>
 
 class CockatriceXml4Parser : public ICardDatabaseParser
 {

@@ -2,6 +2,7 @@
 #define DECKLISTMODEL_H
 
 #include "decklist.h"
+
 #include <QAbstractItemModel>
 #include <QList>
 

@@ -1,7 +1,7 @@
+#include "update_downloader.h"
+
 #include <QDebug>
 #include <QUrl>
-
-#include "update_downloader.h"
 
 UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent), response(nullptr)
 {

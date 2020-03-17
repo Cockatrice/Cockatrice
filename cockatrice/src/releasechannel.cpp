@@ -1,4 +1,5 @@
 #include "releasechannel.h"
+
 #include "version_string.h"
 
 #include <QJsonArray>

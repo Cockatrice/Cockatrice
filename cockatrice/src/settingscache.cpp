@@ -1,4 +1,5 @@
 #include "settingscache.h"
+
 #include "releasechannel.h"
 
 #include <QApplication>

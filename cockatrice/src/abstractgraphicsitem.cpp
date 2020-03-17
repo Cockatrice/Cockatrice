@@ -1,4 +1,5 @@
 #include "abstractgraphicsitem.h"
+
 #include <QPainter>
 
 void AbstractGraphicsItem::paintNumberEllipse(int number,

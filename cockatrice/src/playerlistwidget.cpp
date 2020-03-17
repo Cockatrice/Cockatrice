@@ -1,19 +1,20 @@
 #include "playerlistwidget.h"
+
 #include "abstractclient.h"
+#include "pb/command_kick_from_game.pb.h"
+#include "pb/serverinfo_playerproperties.pb.h"
+#include "pb/session_commands.pb.h"
 #include "pixmapgenerator.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
 #include "user_context_menu.h"
 #include "userlist.h"
+
 #include <QAction>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMouseEvent>
-
-#include "pb/command_kick_from_game.pb.h"
-#include "pb/serverinfo_playerproperties.pb.h"
-#include "pb/session_commands.pb.h"
 
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {
