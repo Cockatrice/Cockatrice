@@ -111,7 +111,7 @@ public:
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName);
-    int importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cards);
+    int importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cards, bool skipSpecialNums = true);
     QList<SetToDownload> &getSets()
     {
         return allSets;
