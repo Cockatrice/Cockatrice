@@ -24,7 +24,7 @@ clone_depth: 15
 image: Visual Studio 2019
 
 cache:
-    - c:\Tools\vcpkg\installed
+    - c:\tools\vcpkg\installed\ -> restore.ps1, build.ps1
 
 environment:
     matrix:
