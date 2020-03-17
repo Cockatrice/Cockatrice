@@ -29,14 +29,16 @@ cache:
 environment:
     matrix:
         - target_arch: win64
-          qt_ver: 5.12\msvc2019_64
+          qt_ver: 5.14.0\msvc2019_64
           cmake_generator: Visual Studio 16 2019
+          architecture: x64
           cmake_toolset: v141,host=x64
           vcpkg_arch: x64
 
         - target_arch: win32
-          qt_ver: 5.12\msvc2019
+          qt_ver: 5.14.0\msvc2019
           cmake_generator: Visual Studio 16 2019
+          architecture: Win32
           cmake_toolset: v141
           vcpkg_arch: x86
 
@@ -54,7 +56,7 @@ build_script:
         $vcpkgbindir = "C:\Tools\vcpkg\installed\$env:vcpkg_arch-windows\bin"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$vcpkgbindir" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -A "$env:architecture" -T "$env:cmake_toolset" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$vcpkgbindir" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
