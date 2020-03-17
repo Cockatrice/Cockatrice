@@ -76,6 +76,7 @@ private slots:
     void addMentionTag(QString mentionTag);
     void focusTab();
     void actShowMentionPopup(QString &sender);
+    void actShowPopup(const QString &message);
     void actCompleterChanged();
 
     void processListGamesEvent(const Event_ListGames &event);
