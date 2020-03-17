@@ -1,4 +1,5 @@
 #include "tab_room.h"
+
 #include "abstractclient.h"
 #include "chatview/chatview.h"
 #include "dlg_settings.h"
@@ -16,10 +17,10 @@
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
 #include "userlist.h"
+
 #include <QApplication>
 #include <QCompleter>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>

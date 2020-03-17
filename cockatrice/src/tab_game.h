@@ -5,6 +5,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
 #include "tearoffmenu.h"
+
 #include <QCompleter>
 #include <QMap>
 #include <QPushButton>
@@ -19,7 +20,6 @@ class MessageLogWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
-class QLineEdit;
 class QPushButton;
 class QToolButton;
 class QMenu;
@@ -170,6 +170,7 @@ private:
         *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
         *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
+    QAction *aFocusChat;
     QList<QAction *> phaseActions;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);

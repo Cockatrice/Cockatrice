@@ -1,21 +1,22 @@
 #include "tab_logs.h"
+
 #include "abstractclient.h"
+#include "customlineedit.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
 #include "pending_command.h"
 #include "window_sets.h"
+
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QTabWidget>
-
 #include <QtGui>
 #include <QtWidgets>
 
@@ -147,19 +148,19 @@ void TabLog::createDock()
 {
 
     labelFindUserName = new QLabel(tr("Username: "));
-    findUsername = new QLineEdit("");
+    findUsername = new LineEditUnfocusable("");
     findUsername->setAlignment(Qt::AlignCenter);
     labelFindIPAddress = new QLabel(tr("IP Address: "));
-    findIPAddress = new QLineEdit("");
+    findIPAddress = new LineEditUnfocusable("");
     findIPAddress->setAlignment(Qt::AlignCenter);
     labelFindGameName = new QLabel(tr("Game Name: "));
-    findGameName = new QLineEdit("");
+    findGameName = new LineEditUnfocusable("");
     findGameName->setAlignment(Qt::AlignCenter);
     labelFindGameID = new QLabel(tr("GameID: "));
-    findGameID = new QLineEdit("");
+    findGameID = new LineEditUnfocusable("");
     findGameID->setAlignment(Qt::AlignCenter);
     labelMessage = new QLabel(tr("Message: "));
-    findMessage = new QLineEdit("");
+    findMessage = new LineEditUnfocusable("");
     findMessage->setAlignment(Qt::AlignCenter);
 
     mainRoom = new QCheckBox(tr("Main Room"));
