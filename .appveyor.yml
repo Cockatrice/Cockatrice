@@ -21,7 +21,7 @@ skip_branch_with_pr: true
 
 clone_depth: 15
 
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 cache:
     - c:\Tools\vcpkg\installed
@@ -29,14 +29,14 @@ cache:
 environment:
     matrix:
         - target_arch: win64
-          qt_ver: 5.12\msvc2017_64
-          cmake_generator: Visual Studio 15 2017 Win64
+          qt_ver: 5.12\msvc2019_64
+          cmake_generator: Visual Studio 16 2019 Win64
           cmake_toolset: v141,host=x64
           vcpkg_arch: x64
 
         - target_arch: win32
-          qt_ver: 5.12\msvc2017
-          cmake_generator: Visual Studio 15 2017
+          qt_ver: 5.12\msvc2019
+          cmake_generator: Visual Studio 16 2019
           cmake_toolset: v141
           vcpkg_arch: x86
 
