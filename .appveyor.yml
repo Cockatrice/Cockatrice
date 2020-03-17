@@ -44,7 +44,7 @@ environment:
 
 install:
     - vcpkg remove --outdated --recurse
-    - vcpkg install openssl protobuf liblzma zlib --triplet %vcpkg_arch%-windows
+    - vcpkg install protobuf liblzma zlib --triplet %vcpkg_arch%-windows
 
 services:
     - mysql
