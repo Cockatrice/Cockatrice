@@ -23,8 +23,8 @@ clone_depth: 15
 
 image: Visual Studio 2017
 
-# cache:
-#    - c:\Tools\vcpkg\installed
+cache:
+    - c:\Tools\vcpkg\installed
 
 environment:
     matrix:
@@ -41,6 +41,7 @@ environment:
           vcpkg_arch: x86
 
 install:
+    - cd C:\Tools\vcpkg && git pull -q
     - vcpkg remove --outdated --recurse
     - vcpkg install openssl protobuf liblzma zlib --triplet %vcpkg_arch%-windows
 
