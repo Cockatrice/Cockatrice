@@ -42,7 +42,7 @@ environment:
 
 install:
     - cd C:\Tools\vcpkg
-    - git pull
+    - git pull -q
     - .\bootstrap-vcpkg.bat
     - cd %APPVEYOR_BUILD_FOLDER%
     - vcpkg remove --outdated --recurse
