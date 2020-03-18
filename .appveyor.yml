@@ -41,6 +41,7 @@ environment:
           vcpkg_arch: x86
 
 install:
+    - cd C:\Tools\vcpkg && .\bootstrap-vcpkg.bat
     - cd C:\Tools\vcpkg && git pull -q
     - vcpkg remove --outdated --recurse
     - vcpkg install openssl protobuf liblzma zlib --triplet %vcpkg_arch%-windows
