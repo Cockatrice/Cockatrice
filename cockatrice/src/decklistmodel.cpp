@@ -1,8 +1,10 @@
 #include "decklistmodel.h"
+
 #include "carddatabase.h"
 #include "deck_loader.h"
 #include "main.h"
 #include "settingscache.h"
+
 #include <QBrush>
 #include <QFile>
 #include <QFont>

@@ -1,13 +1,14 @@
 #include "pilezone.h"
+
 #include "carddragitem.h"
 #include "carditem.h"
+#include "pb/command_move_card.pb.h"
 #include "player.h"
 #include "zoneviewzone.h"
+
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-
-#include "pb/command_move_card.pb.h"
 
 PileZone::PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent)
     : CardZone(_p, _name, false, _isShufflable, _contentsKnown, parent)

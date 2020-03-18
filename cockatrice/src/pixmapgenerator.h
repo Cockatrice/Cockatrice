@@ -1,10 +1,10 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
+#include "user_level.h"
+
 #include <QMap>
 #include <QPixmap>
-
-#include "user_level.h"
 
 class PhasePixmapGenerator
 {

@@ -1,6 +1,8 @@
 #include "counter_general.h"
+
 #include "abstractgraphicsitem.h"
 #include "pixmapgenerator.h"
+
 #include <QPainter>
 
 GeneralCounter::GeneralCounter(Player *_player,

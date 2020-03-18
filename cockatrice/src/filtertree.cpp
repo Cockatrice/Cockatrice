@@ -1,4 +1,5 @@
 #include "filtertree.h"
+
 #include "cardfilter.h"
 
 #include <QList>

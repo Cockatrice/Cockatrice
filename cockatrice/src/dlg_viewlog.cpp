@@ -1,4 +1,5 @@
 #include "dlg_viewlog.h"
+
 #include "logger.h"
 #include "settingscache.h"
 

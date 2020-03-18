@@ -1,4 +1,5 @@
 #include "decklist.h"
+
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>

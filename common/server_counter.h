@@ -21,6 +21,7 @@
 #define SERVER_COUNTER_H
 
 #include "pb/color.pb.h"
+
 #include <QString>
 
 class ServerInfo_Counter;

@@ -1,4 +1,5 @@
 #include "carddatabase.h"
+
 #include "carddbparser/cockatricexml3.h"
 #include "carddbparser/cockatricexml4.h"
 #include "game_specific_terms.h"

@@ -2,6 +2,7 @@
 #define TAB_SERVER_H
 
 #include "tab.h"
+
 #include <QGroupBox>
 #include <QTextBrowser>
 #include <QTreeWidget>

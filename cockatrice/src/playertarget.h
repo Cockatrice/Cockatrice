@@ -3,6 +3,7 @@
 
 #include "abstractcounter.h"
 #include "arrowtarget.h"
+
 #include <QFont>
 #include <QPixmap>
 

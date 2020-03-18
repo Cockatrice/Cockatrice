@@ -1,12 +1,12 @@
 #include "oracleimporter.h"
+
 #include "carddbparser/cockatricexml4.h"
+#include "qt-json/json.h"
 
 #include <QDebug>
 #include <QtWidgets>
 #include <algorithm>
 #include <climits>
-
-#include "qt-json/json.h"
 
 SplitCardPart::SplitCardPart(const int _index,
                              const QString &_text,

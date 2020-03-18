@@ -1,4 +1,5 @@
 #include "server_abstractuserinterface.h"
+
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_game_state_changed.pb.h"
 #include "server.h"
@@ -7,6 +8,7 @@
 #include "server_player_reference.h"
 #include "server_response_containers.h"
 #include "server_room.h"
+
 #include <QDebug>
 #include <QList>
 #include <QPair>

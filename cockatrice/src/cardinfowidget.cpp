@@ -1,11 +1,12 @@
-#include <utility>
+#include "cardinfowidget.h"
 
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
-#include "cardinfowidget.h"
 #include "carditem.h"
 #include "main.h"
+
 #include <QApplication>
+#include <utility>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
 #include <QScreen>
 #else

@@ -1,14 +1,15 @@
 #include "stackzone.h"
+
 #include "arrowitem.h"
 #include "carddragitem.h"
 #include "carditem.h"
+#include "pb/command_move_card.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include "thememanager.h"
+
 #include <QPainter>
 #include <QSet>
-
-#include "pb/command_move_card.pb.h"
 
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)

@@ -9,13 +9,12 @@
 #include "carddatabase.h"
 #include "carddragitem.h"
 #include "carditem.h"
+#include "pb/command_move_card.pb.h"
+#include "pb/command_set_card_attr.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include "tablezone.h"
 #include "thememanager.h"
-
-#include "pb/command_move_card.pb.h"
-#include "pb/command_set_card_attr.pb.h"
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);

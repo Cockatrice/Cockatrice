@@ -21,6 +21,7 @@
 #define SERVER_CARDZONE_H
 
 #include "pb/serverinfo_zone.pb.h"
+
 #include <QList>
 #include <QMap>
 #include <QSet>

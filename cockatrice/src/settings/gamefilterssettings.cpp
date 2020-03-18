@@ -1,4 +1,5 @@
 #include "gamefilterssettings.h"
+
 #include <QCryptographicHash>
 
 GameFiltersSettings::GameFiltersSettings(QString settingPath, QObject *parent)

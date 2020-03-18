@@ -1,7 +1,9 @@
 #include "dlg_edit_tokens.h"
+
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "main.h"
+
 #include <QAction>
 #include <QComboBox>
 #include <QDialogButtonBox>

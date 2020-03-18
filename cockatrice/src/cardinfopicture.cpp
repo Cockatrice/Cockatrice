@@ -1,12 +1,12 @@
 #include "cardinfopicture.h"
 
-#include <QPainter>
-#include <QStyle>
-#include <QWidget>
-
 #include "carditem.h"
 #include "main.h"
 #include "pictureloader.h"
+
+#include <QPainter>
+#include <QStyle>
+#include <QWidget>
 
 CardInfoPicture::CardInfoPicture(QWidget *parent) : QWidget(parent), info(nullptr), pixmapDirty(true)
 {

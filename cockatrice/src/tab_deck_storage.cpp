@@ -1,9 +1,20 @@
 #include "tab_deck_storage.h"
+
 #include "abstractclient.h"
 #include "deck_loader.h"
 #include "decklist.h"
+#include "pb/command_deck_del.pb.h"
+#include "pb/command_deck_del_dir.pb.h"
+#include "pb/command_deck_download.pb.h"
+#include "pb/command_deck_new_dir.pb.h"
+#include "pb/command_deck_upload.pb.h"
+#include "pb/response.pb.h"
+#include "pb/response_deck_download.pb.h"
+#include "pb/response_deck_upload.pb.h"
+#include "pending_command.h"
 #include "remotedecklist_treewidget.h"
 #include "settingscache.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QFileSystemModel>
@@ -15,16 +26,6 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
-
-#include "pb/command_deck_del.pb.h"
-#include "pb/command_deck_del_dir.pb.h"
-#include "pb/command_deck_download.pb.h"
-#include "pb/command_deck_new_dir.pb.h"
-#include "pb/command_deck_upload.pb.h"
-#include "pb/response.pb.h"
-#include "pb/response_deck_download.pb.h"
-#include "pb/response_deck_upload.pb.h"
-#include "pending_command.h"
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     : Tab(_tabSupervisor), client(_client)

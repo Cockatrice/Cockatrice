@@ -1,8 +1,18 @@
 #include "tab_replays.h"
+
 #include "abstractclient.h"
+#include "pb/command_replay_delete_match.pb.h"
+#include "pb/command_replay_download.pb.h"
+#include "pb/command_replay_modify_match.pb.h"
+#include "pb/event_replay_added.pb.h"
+#include "pb/game_replay.pb.h"
+#include "pb/response.pb.h"
+#include "pb/response_replay_download.pb.h"
+#include "pending_command.h"
 #include "remotereplaylist_treewidget.h"
 #include "settingscache.h"
 #include "tab_game.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QFileSystemModel>
@@ -14,15 +24,6 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
-
-#include "pb/command_replay_delete_match.pb.h"
-#include "pb/command_replay_download.pb.h"
-#include "pb/command_replay_modify_match.pb.h"
-#include "pb/event_replay_added.pb.h"
-#include "pb/game_replay.pb.h"
-#include "pb/response.pb.h"
-#include "pb/response_replay_download.pb.h"
-#include "pending_command.h"
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
 {

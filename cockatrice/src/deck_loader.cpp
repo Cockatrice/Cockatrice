@@ -1,7 +1,9 @@
 #include "deck_loader.h"
+
 #include "carddatabase.h"
 #include "decklist.h"
 #include "main.h"
+
 #include <QDebug>
 #include <QFile>
 #include <QStringList>

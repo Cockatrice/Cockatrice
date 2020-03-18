@@ -4,6 +4,7 @@
 #include "abstractgraphicsitem.h"
 #include "cardlist.h"
 #include "translation.h"
+
 #include <QString>
 
 class Player;

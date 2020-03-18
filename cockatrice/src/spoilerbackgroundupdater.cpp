@@ -1,3 +1,10 @@
+#include "spoilerbackgroundupdater.h"
+
+#include "carddatabase.h"
+#include "main.h"
+#include "settingscache.h"
+#include "window_main.h"
+
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDateTime>
@@ -8,12 +15,6 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QtConcurrent>
-
-#include "carddatabase.h"
-#include "main.h"
-#include "settingscache.h"
-#include "spoilerbackgroundupdater.h"
-#include "window_main.h"
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
 #define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"

@@ -1,6 +1,16 @@
 #include "tab_supervisor.h"
+
 #include "abstractclient.h"
 #include "main.h"
+#include "pb/event_game_joined.pb.h"
+#include "pb/event_notify_user.pb.h"
+#include "pb/event_user_message.pb.h"
+#include "pb/game_event_container.pb.h"
+#include "pb/moderator_commands.pb.h"
+#include "pb/room_commands.pb.h"
+#include "pb/room_event.pb.h"
+#include "pb/serverinfo_room.pb.h"
+#include "pb/serverinfo_user.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "tab_admin.h"
@@ -14,21 +24,12 @@
 #include "tab_server.h"
 #include "tab_userlists.h"
 #include "userlist.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QMessageBox>
 #include <QPainter>
 #include <QSystemTrayIcon>
-
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_notify_user.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/game_event_container.pb.h"
-#include "pb/moderator_commands.pb.h"
-#include "pb/room_commands.pb.h"
-#include "pb/room_event.pb.h"
-#include "pb/serverinfo_room.pb.h"
-#include "pb/serverinfo_user.pb.h"
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {

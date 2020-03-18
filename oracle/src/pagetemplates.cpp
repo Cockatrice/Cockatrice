@@ -1,3 +1,7 @@
+#include "pagetemplates.h"
+
+#include "oraclewizard.h"
+
 #include <QCheckBox>
 #include <QDir>
 #include <QFileDialog>
@@ -9,9 +13,6 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QtGui>
-
-#include "oraclewizard.h"
-#include "pagetemplates.h"
 
 SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPage(parent)
 {

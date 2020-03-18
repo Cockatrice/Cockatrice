@@ -1,11 +1,7 @@
 #include "isl_interface.h"
-#include "main.h"
-#include "server_logger.h"
-#include "server_protocolhandler.h"
-#include "server_room.h"
-#include <QSslSocket>
 
 #include "get_pb_extension.h"
+#include "main.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
@@ -16,6 +12,11 @@
 #include "pb/event_user_left.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/isl_message.pb.h"
+#include "server_logger.h"
+#include "server_protocolhandler.h"
+#include "server_room.h"
+
+#include <QSslSocket>
 #include <google/protobuf/descriptor.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)

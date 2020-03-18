@@ -1,5 +1,7 @@
 #include "deckstats_interface.h"
+
 #include "decklist.h"
+
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QNetworkAccessManager>

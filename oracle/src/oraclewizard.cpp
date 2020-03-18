@@ -1,3 +1,10 @@
+#include "oraclewizard.h"
+
+#include "main.h"
+#include "oracleimporter.h"
+#include "settingscache.h"
+#include "version_string.h"
+
 #include <QAbstractButton>
 #include <QBuffer>
 #include <QCheckBox>
@@ -19,12 +26,6 @@
 #include <QTextEdit>
 #include <QtConcurrent>
 #include <QtGui>
-
-#include "main.h"
-#include "oracleimporter.h"
-#include "oraclewizard.h"
-#include "settingscache.h"
-#include "version_string.h"
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"

@@ -1,4 +1,5 @@
 #include "dlg_settings.h"
+
 #include "carddatabase.h"
 #include "main.h"
 #include "releasechannel.h"
@@ -7,6 +8,7 @@
 #include "soundengine.h"
 #include "spoilerbackgroundupdater.h"
 #include "thememanager.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>

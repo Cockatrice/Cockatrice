@@ -1,4 +1,5 @@
 #include "filter_string.h"
+
 #include "../../common/lib/peglib.h"
 
 #include <QByteArray>

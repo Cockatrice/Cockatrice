@@ -1,4 +1,5 @@
 #include "zoneviewzone.h"
+
 #include "carddatabase.h"
 #include "carddragitem.h"
 #include "carditem.h"
@@ -8,6 +9,7 @@
 #include "pb/serverinfo_card.pb.h"
 #include "pending_command.h"
 #include "player.h"
+
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsSceneWheelEvent>

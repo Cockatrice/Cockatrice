@@ -4,6 +4,7 @@
 #include "gametypemap.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab_supervisor.h"
+
 #include <QAbstractTableModel>
 #include <QList>
 #include <QSet>

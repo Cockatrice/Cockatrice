@@ -1,13 +1,14 @@
-#include <utility>
+#include "messagelogwidget.h"
 
 #include "carditem.h"
 #include "cardzone.h"
-#include "messagelogwidget.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "soundengine.h"
+
+#include <utility>
 
 const QString MessageLogWidget::tableConstant() const
 {

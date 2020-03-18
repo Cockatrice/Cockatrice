@@ -1,5 +1,7 @@
 #include "abstractcarddragitem.h"
+
 #include "carddatabase.h"
+
 #include <QCursor>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>

@@ -1,4 +1,5 @@
 #include "gamesmodel.h"
+
 #include "pb/serverinfo_game.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"

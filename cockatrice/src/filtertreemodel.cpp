@@ -1,6 +1,8 @@
 #include "filtertreemodel.h"
+
 #include "cardfilter.h"
 #include "filtertree.h"
+
 #include <QFont>
 
 FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)

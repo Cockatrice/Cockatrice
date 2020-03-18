@@ -8,6 +8,7 @@
 #include "settings/messagesettings.h"
 #include "settings/serverssettings.h"
 #include "shortcutssettings.h"
+
 #include <QObject>
 #include <QSize>
 #include <QStringList>

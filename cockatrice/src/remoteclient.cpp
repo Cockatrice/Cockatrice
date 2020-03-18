@@ -1,4 +1,5 @@
 #include "remoteclient.h"
+
 #include "main.h"
 #include "pb/commands.pb.h"
 #include "pb/event_server_identification.pb.h"
@@ -11,6 +12,7 @@
 #include "pending_command.h"
 #include "settingscache.h"
 #include "version_string.h"
+
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QHostAddress>

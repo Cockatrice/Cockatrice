@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "serversocketinterface.h"
+
 #include "decklist.h"
 #include "main.h"
 #include "pb/command_deck_del.pb.h"
@@ -61,15 +62,14 @@
 #include "server_player.h"
 #include "server_response_containers.h"
 #include "settingscache.h"
+#include "version_string.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
-#include <iostream>
-
-#include "version_string.h"
 #include <iostream>
 #include <string>
 

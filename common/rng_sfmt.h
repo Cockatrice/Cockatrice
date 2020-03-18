@@ -3,6 +3,7 @@
 
 #include "rng_abstract.h"
 #include "sfmt/SFMT.h"
+
 #include <QMutex>
 #include <climits>
 
