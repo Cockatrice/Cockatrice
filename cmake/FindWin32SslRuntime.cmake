@@ -52,8 +52,8 @@ set(_OPENSSL_ROOT_HINTS_AND_PATHS
 
 # For OpenSSL < 1.1, they are named libeay32 and ssleay32 and even if the dll is 64bit, it's still suffixed as *32.dll
 # For OpenSSL >= 1.1, they are named libcrypto and libssl with no suffix
-FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libeay32.dll libcrypto.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES ssleay32.dll libssl.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
+FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
+FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1.dll libssl.dll ssleay32.dll${_OPENSSL_ROOT_HINTS_AND_PATHS})
 
 
 IF(WIN32SSLRUNTIME_LIBEAY AND WIN32SSLRUNTIME_SSLEAY)
