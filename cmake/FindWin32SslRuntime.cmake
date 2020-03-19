@@ -52,9 +52,15 @@ set(_OPENSSL_ROOT_HINTS_AND_PATHS
 
 # For OpenSSL < 1.1, they are named libeay32 and ssleay32 and even if the dll is 64bit, it's still suffixed as *32.dll
 # For OpenSSL >= 1.1, they are named libcrypto and libssl with no suffix
-FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+  # target win64
+  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1-x64.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
+  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1-x64.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
+else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+  # target win32
+  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
+  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
+endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 IF(WIN32SSLRUNTIME_LIBEAY AND WIN32SSLRUNTIME_SSLEAY)
   SET(WIN32SSLRUNTIME_LIBRARIES "${WIN32SSLRUNTIME_LIBEAY}" "${WIN32SSLRUNTIME_SSLEAY}")
