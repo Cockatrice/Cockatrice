@@ -39,14 +39,11 @@ function(get_commit_date)
 endfunction()
 
 function(clean_release_name name)
-	# "name": "Cockatrice: Thopter Pie Network, Revision 2"
-
-	# Remove all double quotes
-	STRING(REPLACE "\"" "" name "${name}")
-	# Remove json prefix "name: "
-	STRING(REPLACE "  name: " "" name "${name}")
-	# Remove "cockatrice" name
-	STRING(REPLACE "Cockatrice" "" name "${name}")
+	#  <title>Release Cockatrice 2.7.3: Dawn of Hope · Cockatrice/Cockatrice · GitHub</title>
+	# Remove prefix
+	STRING(REGEX REPLACE "<title>Release Cockatrice [0-9\.]+: " "" name "${name}")
+	# Remove suffix
+	STRING(REPLACE " · Cockatrice/Cockatrice · GitHub</title>" "" name "${name}")
 	# Remove all unwanted chars
 	STRING(REGEX REPLACE "[^A-Za-z0-9_ ]" "" name "${name}")
 	# Strip (trim) whitespaces
@@ -54,6 +51,7 @@ function(clean_release_name name)
 	# Replace all spaces with underscores
 	STRING(REPLACE " " "_" name "${name}")
 
+	MESSAGE(STATUS "Friendly tag name: ${name}")
 	set(GIT_TAG_RELEASENAME "${name}" PARENT_SCOPE)
 endfunction()
 
@@ -168,7 +166,7 @@ function(get_tag_name commit)
 
 		# get version name from github
 		set(GIT_TAG_TEMP_FILE "${PROJECT_BINARY_DIR}/tag_informations.txt")
-		set(GIT_TAG_TEMP_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/tags/${GIT_TAG}")
+		set(GIT_TAG_TEMP_URL "https://github.com/Cockatrice/Cockatrice/releases/tag/${GIT_TAG}")
 		message(STATUS "Fetching tag informations from ${GIT_TAG_TEMP_URL}")
 		file(REMOVE "${GIT_TAG_TEMP_FILE}")
 		file(DOWNLOAD "${GIT_TAG_TEMP_URL}" "${GIT_TAG_TEMP_FILE}" STATUS status LOG log INACTIVITY_TIMEOUT 30 TIMEOUT 300 SHOW_PROGRESS)
@@ -178,7 +176,7 @@ function(get_tag_name commit)
 	    	message(WARNING "Download failed with error ${msg}: ${log}")
 	    	return()
     	endif()
-    	file(STRINGS "${GIT_TAG_TEMP_FILE}" GIT_TAG_RAW_RELEASENAME REGEX "\"name\": \"" LIMIT_COUNT 1)
+    	file(STRINGS "${GIT_TAG_TEMP_FILE}" GIT_TAG_RAW_RELEASENAME REGEX "<title>Release Cockatrice .*</title>" LIMIT_COUNT 1 ENCODING UTF-8)
 
     	clean_release_name("${GIT_TAG_RAW_RELEASENAME}")
     	set(PROJECT_VERSION_RELEASENAME "${GIT_TAG_RELEASENAME}" PARENT_SCOPE)
