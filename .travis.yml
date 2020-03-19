@@ -42,6 +42,31 @@ jobs:
     script: RUN --server --package $NAME --release
 
 
+  #Debian Buster (on Docker)
+  - name: Debian Buster (Compile)
+    if: tag IS NOT present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=DebianBuster CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server
+
+  - name: Debian Buster (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=DebianBuster CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --package $NAME --release
+
   #macOS High Sierra
   - name: macOS High Sierra (Debug)
     if: tag IS NOT present
