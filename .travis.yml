@@ -21,29 +21,25 @@ jobs:
     if: tag IS NOT present
     os: linux
     services: docker
-    env: NAME=UbuntuBionic
+    language: minimal
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
     cache:
       directories:
-      - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --test --debug
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --test --debug
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: linux
     services: docker
-    env: NAME=UbuntuBionic
+    language: minimal
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
     cache:
       directories:
-      - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --package "$NAME" --release
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --package $NAME --release
 
 
   #macOS High Sierra
