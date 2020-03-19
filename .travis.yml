@@ -177,6 +177,24 @@ jobs:
     - brew cleanup
 
 
+  #Arch Linux (on Docker)
+  - name: Arch Linux (Debug, Optional)
+    if: tag IS NOT present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=ArchLinux CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --debug
+
+  allow_failures:
+  - name: Arch Linux (Debug, Optional)
+  fast_finish: true
+
+
 # Builds for pull requests skip the deployment step altogether
 deploy:
 # Deploy configuration for "beta" releases
