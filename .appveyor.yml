@@ -84,7 +84,6 @@ deploy:
     release: "Cockatrice $(APPVEYOR_REPO_TAG_NAME)"
     description: "Beta release of Cockatrice"
     artifact: /.*\.exe/
-    force_update: true
     draft: false
     prerelease: true
     on:
@@ -98,7 +97,6 @@ deploy:
     tag: "$(APPVEYOR_REPO_TAG_NAME)"
     release: "Cockatrice $(APPVEYOR_REPO_TAG_NAME)"
     artifact: /.*\.exe/
-    force_update: true
     draft: false
     prerelease: false
     on:
