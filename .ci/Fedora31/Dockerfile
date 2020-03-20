@@ -7,6 +7,7 @@ RUN dnf install -y \
         desktop-file-utils \
         file \
         gcc-c++ \
+        git \
         hicolor-icon-theme \
         libappstream-glib \
         protobuf-devel \
@@ -14,6 +15,6 @@ RUN dnf install -y \
         rpm-build \
         sqlite-devel \
         wget \
-        zlib-devel \
         xz-devel \
+        zlib-devel \
     && dnf clean all

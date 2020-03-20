@@ -4,6 +4,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         base-devel \
         ccache \
         cmake \
+        git \
         protobuf \
         qt5-base \
         qt5-multimedia \
