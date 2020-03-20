@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         clang-format \
         file \
         g++ \
-        git \
         ccache \
         cmake \
         liblzma-dev \

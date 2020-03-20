@@ -68,11 +68,13 @@ if ! [[ -d $CACHE ]]; then
   echo "could not find cache dir: $CACHE" >&2
   unset CACHE
 else
-  img_dir="$CACHE/$image_cache"
-  img_save="$img_dir/$IMAGE_NAME$save_extension"
-  if ! [[ -d $img_dir ]]; then
-    echo "could not find image dir: $img_dir" >&2
-    mkdir -p "$img_dir"
+  if [[ $GET || $SAVE ]]; then
+    img_dir="$CACHE/$image_cache"
+    img_save="$img_dir/$IMAGE_NAME$save_extension"
+    if ! [[ -d $img_dir ]]; then
+      echo "could not find image dir: $img_dir" >&2
+      mkdir -p "$img_dir"
+    fi
   fi
   export CCACHE_DIR="$CACHE/$ccache_cache"
   if ! [[ -d $CCACHE_DIR ]]; then

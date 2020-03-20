@@ -177,8 +177,8 @@ jobs:
     - brew cleanup
 
 
-  #Arch Linux (on Docker)
-  - name: Arch Linux (Debug, Optional)
+  #Arch Linux (on Docker) (allow failures)
+  - name: Arch Linux (Debug)
     if: tag IS NOT present
     os: linux
     services: docker
@@ -191,7 +191,9 @@ jobs:
     script: RUN --server --debug
 
   allow_failures:
-  - name: Arch Linux (Debug, Optional)
+  # Arch linux is always the latest version and by definition not stable
+  - name: Arch Linux (Debug)
+  # Report build completion even if optional builds are not completed
   fast_finish: true
 
 
