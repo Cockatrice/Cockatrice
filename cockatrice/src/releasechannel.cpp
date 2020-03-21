@@ -45,14 +45,24 @@ void ReleaseChannel::checkForUpdates()
 #if defined(Q_OS_OSX)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-    const auto mac_os_version = QSysInfo::productVersion();
+    const int mac_os_version = QSysInfo::productVersion().split(".")[1].toInt();
 
-    if (mac_os_version == QString("10.12") or mac_os_version == QString("10.13")) {
+    // TODO: If we change macOS builds, this must be updated
+    if (12 > mac_os_version) {
+        // We no longer compile files for macOS 10.12 or older
+        return false;
+    } else if (12 <= mac_os_version && mac_os_version <= 13) {
+        // We support Sierra & High Sierra
         return fileName.contains("macos10.13");
+    } else if (14 <= mac_os_version && mac_os_version <= 15) {
+        // We support Mojave, and Catalina
+        return fileName.contains("macos10.14");
+    } else {
+        // Future Mac releases we haven't heard of or accounted for yet
+        return (!fileName.contains("macos10.13") && !fileName.contains("macos10.14") && fileName.contains("macos"));
     }
-
-    return fileName.contains("macos10.14");
 }
+
 #elif defined(Q_OS_WIN)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
