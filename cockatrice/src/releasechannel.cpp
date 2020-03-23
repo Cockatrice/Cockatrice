@@ -49,13 +49,13 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 
     // TODO: If we change macOS builds, this must be updated
     if (mac_os_version <= 12) {
-        // We no longer compile files for macOS 10.12 or older
+        // We no longer compile files for macOS 10.12 Sierra or older
         return false;
     } else if (mac_os_version == 13) {
-        // We support Sierra & High Sierra
+        // We support 10.13 High Sierra
         return fileName.contains("macos10.13");
     } else if (14 <= mac_os_version && mac_os_version <= 15) {
-        // We support Mojave, and Catalina
+        // We support 10.14 Mojave, and 10.15 Catalina
         return fileName.contains("macos10.14");
     } else {
         // Future Mac releases we haven't heard of or accounted for yet
