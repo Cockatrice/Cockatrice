@@ -48,10 +48,10 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     const int mac_os_version = QSysInfo::productVersion().split(".")[1].toInt();
 
     // TODO: If we change macOS builds, this must be updated
-    if (12 > mac_os_version) {
+    if (mac_os_version <= 12) {
         // We no longer compile files for macOS 10.12 or older
         return false;
-    } else if (12 <= mac_os_version && mac_os_version <= 13) {
+    } else if (mac_os_version == 13) {
         // We support Sierra & High Sierra
         return fileName.contains("macos10.13");
     } else if (14 <= mac_os_version && mac_os_version <= 15) {
