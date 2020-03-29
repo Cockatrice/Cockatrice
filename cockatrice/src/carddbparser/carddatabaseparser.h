@@ -15,7 +15,11 @@ public:
 
     virtual bool getCanParseFile(const QString &name, QIODevice &device) = 0;
     virtual void parseFile(QIODevice &device) = 0;
-    virtual bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName) = 0;
+    virtual bool saveToFile(SetNameMap sets,
+                            CardNameMap cards,
+                            const QString &fileName,
+                            const QString &sourceUrl = "unknown",
+                            const QString &sourceVersion = "unknown") = 0;
     static void clearSetlist();
 
 protected:

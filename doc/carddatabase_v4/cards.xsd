@@ -57,6 +57,16 @@
     <xs:element name="cockatrice_carddatabase">
         <xs:complexType>
             <xs:sequence>
+                <xs:element name="info" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element type="xs:string" name="author" minOccurs="0" maxOccurs="1" />
+                            <xs:element type="xs:string" name="createdAt" minOccurs="0" maxOccurs="1" />
+                            <xs:element type="xs:string" name="sourceUrl" minOccurs="0" maxOccurs="1" />
+                            <xs:element type="xs:string" name="sourceVersion" minOccurs="0" maxOccurs="1" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element name="sets" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>

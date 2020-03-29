@@ -1,12 +1,15 @@
 #include "cockatricexml4.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
+#include <version_string.h>
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML4_TAGVER 4
-#define COCKATRICE_XML4_SCHEMALOCATION "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
+#define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
+    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
 
 bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
@@ -330,7 +333,11 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     return xml;
 }
 
-bool CockatriceXml4Parser::saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName)
+bool CockatriceXml4Parser::saveToFile(SetNameMap sets,
+                                      CardNameMap cards,
+                                      const QString &fileName,
+                                      const QString &sourceUrl,
+                                      const QString &sourceVersion)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -345,6 +352,13 @@ bool CockatriceXml4Parser::saveToFile(SetNameMap sets, CardNameMap cards, const 
     xml.writeAttribute("version", QString::number(COCKATRICE_XML4_TAGVER));
     xml.writeAttribute("xmlns:xsi", COCKATRICE_XML_XSI_NAMESPACE);
     xml.writeAttribute("xsi:schemaLocation", COCKATRICE_XML4_SCHEMALOCATION);
+
+    xml.writeStartElement("info");
+    xml.writeTextElement("author", QCoreApplication::applicationName() + QString(" %1").arg(VERSION_STRING));
+    xml.writeTextElement("createdAt", QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    xml.writeTextElement("sourceUrl", sourceUrl);
+    xml.writeTextElement("sourceVersion", sourceVersion);
+    xml.writeEndElement();
 
     if (sets.count() > 0) {
         xml.writeStartElement("sets");

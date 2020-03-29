@@ -459,10 +459,10 @@ int OracleImporter::startImport()
     return setIndex;
 }
 
-bool OracleImporter::saveToFile(const QString &fileName)
+bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
     CockatriceXml4Parser parser;
-    return parser.saveToFile(sets, cards, fileName);
+    return parser.saveToFile(sets, cards, fileName, sourceUrl, sourceVersion);
 }
 
 void OracleImporter::clear()

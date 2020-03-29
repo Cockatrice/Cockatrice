@@ -38,6 +38,22 @@ public:
     {
         return !tokensData.isEmpty();
     }
+    void setCardSourceUrl(const QString &sourceUrl)
+    {
+        cardSourceUrl = sourceUrl;
+    }
+    void setCardSourceVersion(const QString &sourceVersion)
+    {
+        cardSourceVersion = sourceVersion;
+    }
+    const QString &getCardSourceUrl() const
+    {
+        return cardSourceUrl;
+    }
+    const QString &getCardSourceVersion() const
+    {
+        return cardSourceVersion;
+    }
     bool saveTokensToFile(const QString &fileName);
 
 public:
@@ -50,6 +66,8 @@ private slots:
 
 private:
     QByteArray tokensData;
+    QString cardSourceUrl;
+    QString cardSourceVersion;
 
 protected:
     void changeEvent(QEvent *event) override;
