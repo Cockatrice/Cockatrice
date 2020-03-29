@@ -6,6 +6,7 @@
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML4_TAGVER 4
+#define COCKATRICE_XML4_SCHEMALOCATION "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
 
 bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
@@ -342,6 +343,8 @@ bool CockatriceXml4Parser::saveToFile(SetNameMap sets, CardNameMap cards, const 
     xml.writeStartDocument();
     xml.writeStartElement(COCKATRICE_XML4_TAGNAME);
     xml.writeAttribute("version", QString::number(COCKATRICE_XML4_TAGVER));
+    xml.writeAttribute("xmlns:xsi", COCKATRICE_XML_XSI_NAMESPACE);
+    xml.writeAttribute("xsi:schemaLocation", COCKATRICE_XML4_SCHEMALOCATION);
 
     if (sets.count() > 0) {
         xml.writeStartElement("sets");
