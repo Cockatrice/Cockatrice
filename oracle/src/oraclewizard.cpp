@@ -316,8 +316,6 @@ bool LoadSetsPage::validatePage()
         wizard()->disableButtons();
         setEnabled(false);
 
-        wizard()->setCardSourceVersion("meh");
-
         downloadSetsFile(url);
     } else if (fileRadioButton->isChecked()) {
         QFile setsFile(fileLineEdit->text());
