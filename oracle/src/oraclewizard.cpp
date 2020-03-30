@@ -39,6 +39,7 @@
 // Xz stream header: 0xFD + "7zXZ"
 #define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
 #define ALLSETS_URL_FALLBACK "https://www.mtgjson.com/files/AllPrintings.json"
+#define MTGJSON_VERSION_URL "https://www.mtgjson.com/files/version.json"
 
 #ifdef HAS_LZMA
 #define ALLSETS_URL "https://www.mtgjson.com/files/AllPrintings.json.xz"
@@ -331,14 +332,46 @@ bool LoadSetsPage::validatePage()
         wizard()->disableButtons();
         setEnabled(false);
 
+        wizard()->setCardSourceUrl(setsFile.fileName());
+        wizard()->setCardSourceVersion("unknown");
+
         readSetsFromByteArray(setsFile.readAll());
     }
 
     return false;
 }
 
+#include <iostream>
 void LoadSetsPage::downloadSetsFile(QUrl url)
 {
+    wizard()->setCardSourceVersion("unknown");
+
+    QString urlString = url.toString();
+    if (urlString == ALLSETS_URL || urlString == ALLSETS_URL_FALLBACK) {
+        QUrl versionUrl = QUrl::fromUserInput(MTGJSON_VERSION_URL);
+        QNetworkReply *versionReply = wizard()->nam->get(QNetworkRequest(versionUrl));
+        connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
+            if (versionReply->error() == QNetworkReply::NoError) {
+                QByteArray jsonData = versionReply->readAll();
+                QJsonParseError jsonError;
+                QJsonDocument jsonResponse = QJsonDocument::fromJson(jsonData, &jsonError);
+
+                if (jsonError.error == QJsonParseError::NoError) {
+                    QVariantMap jsonMap = jsonResponse.toVariant().toMap();
+                    QString versionString = jsonMap["version"].toString();
+                    if (versionString.isEmpty()) {
+                        versionString = "unknown";
+                    }
+                    wizard()->setCardSourceVersion(versionString);
+                }
+            }
+
+            versionReply->deleteLater();
+        });
+    }
+
+    wizard()->setCardSourceUrl(url.toString());
+
     QNetworkReply *reply = wizard()->nam->get(QNetworkRequest(url));
 
     connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSetsFile()));
@@ -597,7 +630,7 @@ bool SaveSetsPage::validatePage()
             return false;
         }
 
-        if (wizard()->importer->saveToFile(fileName)) {
+        if (wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(), wizard()->getCardSourceVersion())) {
             ok = true;
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));

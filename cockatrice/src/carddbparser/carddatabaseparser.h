@@ -6,6 +6,8 @@
 #include <QIODevice>
 #include <QString>
 
+#define COCKATRICE_XML_XSI_NAMESPACE "http://www.w3.org/2001/XMLSchema-instance"
+
 class ICardDatabaseParser : public QObject
 {
 public:
@@ -13,7 +15,11 @@ public:
 
     virtual bool getCanParseFile(const QString &name, QIODevice &device) = 0;
     virtual void parseFile(QIODevice &device) = 0;
-    virtual bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName) = 0;
+    virtual bool saveToFile(SetNameMap sets,
+                            CardNameMap cards,
+                            const QString &fileName,
+                            const QString &sourceUrl = "unknown",
+                            const QString &sourceVersion = "unknown") = 0;
     static void clearSetlist();
 
 protected:
