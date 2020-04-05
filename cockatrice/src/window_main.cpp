@@ -1087,12 +1087,21 @@ void MainWindow::actCheckCardUpdates()
     QDir dir = QDir(QApplication::applicationDirPath());
 
 #if defined(Q_OS_MAC)
+    /*
+     * bypass app translocation: quarantined application will be started from a temporary directory eg.
+     * /private/var/folders/tk/qx76cyb50jn5dvj7rrgfscz40000gn/T/AppTranslocation/A0CBBD5A-9264-4106-8547-36B84DB161E2/d/oracle/
+     */
+    if(dir.absolutePath().startsWith("/private/var/folders")) {
+        dir.setPath("/Applications/");
+    } else {
+        // exit from the Cockatrice application bundle
+        dir.cdUp();
+        dir.cdUp();
+        dir.cdUp();        
+    }
+
     binaryName = getCardUpdaterBinaryName();
 
-    // exit from the application bundle
-    dir.cdUp();
-    dir.cdUp();
-    dir.cdUp();
     dir.cd(binaryName + ".app");
     dir.cd("Contents");
     dir.cd("MacOS");
