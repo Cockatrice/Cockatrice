@@ -11,6 +11,7 @@ class QTreeView;
 class GamesModel;
 class GamesProxyModel;
 class QPushButton;
+class QLabel;
 class QCheckBox;
 class AbstractClient;
 class TabSupervisor;
@@ -44,7 +45,10 @@ private:
     GamesModel *gameListModel;
     GamesProxyModel *gameListProxyModel;
     QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
+    QLabel *alteredFiltersLabel;
     GameTypeMap gameTypeMap;
+
+    void setAlteredFiltersText(int numAlteredFilters);
 
 public:
     GameSelector(AbstractClient *_client,

@@ -77,6 +77,9 @@ private:
     int maxPlayersFilterMin, maxPlayersFilterMax;
 
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
+    static const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
+    static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
+    static const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
 
 public:
     GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
@@ -128,6 +131,7 @@ public:
     void resetFilterParameters();
     void loadFilterParameters(const QMap<int, QString> &allGameTypes);
     void saveFilterParameters(const QMap<int, QString> &allGameTypes);
+    int getNumberOfAlteredFilters() const;
     void refresh();
 
 protected:
