@@ -368,17 +368,36 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     settingsCache->gameFilters().setMaxPlayers(maxPlayersFilterMax);
 }
 
-int GamesProxyModel::getNumberOfAlteredFilters() const {
+int GamesProxyModel::getNumberOfAlteredFilters() const
+{
     int numFiltersAltered = 0;
-    if (showBuddiesOnlyGames != DEFAULT_SHOW_BUDDIES_ONLY_GAMES) { numFiltersAltered++; }
-    if (hideIgnoredUserGames) { numFiltersAltered++; }
-    if (unavailableGamesVisible != DEFAULT_UNAVAILABLE_GAMES_VISIBLE) { numFiltersAltered++; }
-    if (showPasswordProtectedGames != DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES) { numFiltersAltered++; }
-    if (!gameNameFilter.isEmpty()) { numFiltersAltered++; }
-    if (!creatorNameFilter.isEmpty()) { numFiltersAltered++; }
-    if (!gameTypeFilter.isEmpty()) { numFiltersAltered++; }
-    if (maxPlayersFilterMin != -1 && maxPlayersFilterMin != 1) { numFiltersAltered++; }
-    if (maxPlayersFilterMax != -1 && maxPlayersFilterMax != DEFAULT_MAX_PLAYERS_MAX) { numFiltersAltered++; }
+    if (showBuddiesOnlyGames != DEFAULT_SHOW_BUDDIES_ONLY_GAMES) {
+        numFiltersAltered++;
+    }
+    if (hideIgnoredUserGames) {
+        numFiltersAltered++;
+    }
+    if (unavailableGamesVisible != DEFAULT_UNAVAILABLE_GAMES_VISIBLE) {
+        numFiltersAltered++;
+    }
+    if (showPasswordProtectedGames != DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES) {
+        numFiltersAltered++;
+    }
+    if (!gameNameFilter.isEmpty()) {
+        numFiltersAltered++;
+    }
+    if (!creatorNameFilter.isEmpty()) {
+        numFiltersAltered++;
+    }
+    if (!gameTypeFilter.isEmpty()) {
+        numFiltersAltered++;
+    }
+    if (maxPlayersFilterMin != -1 && maxPlayersFilterMin != 1) {
+        numFiltersAltered++;
+    }
+    if (maxPlayersFilterMax != -1 && maxPlayersFilterMax != DEFAULT_MAX_PLAYERS_MAX) {
+        numFiltersAltered++;
+    }
     return numFiltersAltered;
 }
 
