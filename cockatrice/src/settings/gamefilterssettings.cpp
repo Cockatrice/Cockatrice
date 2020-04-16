@@ -60,6 +60,17 @@ bool GameFiltersSettings::isHideIgnoredUserGames()
     return previous == QVariant() ? false : previous.toBool();
 }
 
+void GameFiltersSettings::setHideOldGames(bool hide)
+{
+    setValue(hide, "hide_old_games", "filter_games");
+}
+
+bool GameFiltersSettings::isHideOldGames()
+{
+    QVariant previous = getValue("hide_old_games", "filter_games");
+    return previous == QVariant() ? false : previous.toBool();
+}
+
 void GameFiltersSettings::setGameNameFilter(QString gameName)
 {
     setValue(gameName, "game_name_filter", "filter_games");

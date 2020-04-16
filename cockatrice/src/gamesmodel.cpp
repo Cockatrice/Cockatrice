@@ -259,7 +259,8 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
     : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()),
       tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(false), hideIgnoredUserGames(false),
-      unavailableGamesVisible(false), showPasswordProtectedGames(true), maxPlayersFilterMin(-1), maxPlayersFilterMax(-1)
+      unavailableGamesVisible(false), showPasswordProtectedGames(true), hideOldGames(false),
+      maxPlayersFilterMin(-1), maxPlayersFilterMax(-1)
 {
     setSortRole(GamesModel::SORT_ROLE);
     setDynamicSortFilter(true);
@@ -274,6 +275,11 @@ void GamesProxyModel::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
 void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
 {
     hideIgnoredUserGames = _hideIgnoredUserGames;
+    invalidateFilter();
+}
+
+void GamesProxyModel::setHideOldGames(bool _hideOldGames) {
+    hideOldGames = _hideOldGames;
     invalidateFilter();
 }
 
@@ -319,6 +325,7 @@ void GamesProxyModel::resetFilterParameters()
     unavailableGamesVisible = DEFAULT_UNAVAILABLE_GAMES_VISIBLE;
     showPasswordProtectedGames = DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES;
     showBuddiesOnlyGames = DEFAULT_SHOW_BUDDIES_ONLY_GAMES;
+    hideOldGames = DEFAULT_HIDE_OLD_GAMES;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
@@ -334,6 +341,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     unavailableGamesVisible = settingsCache->gameFilters().isUnavailableGamesVisible();
     showPasswordProtectedGames = settingsCache->gameFilters().isShowPasswordProtectedGames();
     hideIgnoredUserGames = settingsCache->gameFilters().isHideIgnoredUserGames();
+    hideOldGames = settingsCache->gameFilters().isHideOldGames();
     gameNameFilter = settingsCache->gameFilters().getGameNameFilter();
     maxPlayersFilterMin = settingsCache->gameFilters().getMinPlayers();
     maxPlayersFilterMax = settingsCache->gameFilters().getMaxPlayers();
@@ -355,6 +363,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     settingsCache->gameFilters().setUnavailableGamesVisible(unavailableGamesVisible);
     settingsCache->gameFilters().setShowPasswordProtectedGames(showPasswordProtectedGames);
     settingsCache->gameFilters().setHideIgnoredUserGames(hideIgnoredUserGames);
+    settingsCache->gameFilters().setHideIgnoredUserGames(hideOldGames);
     settingsCache->gameFilters().setGameNameFilter(gameNameFilter);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
@@ -375,6 +384,9 @@ int GamesProxyModel::getNumberOfAlteredFilters() const
         numFiltersAltered++;
     }
     if (hideIgnoredUserGames) {
+        numFiltersAltered++;
+    }
+    if (hideOldGames != DEFAULT_HIDE_OLD_GAMES) {
         numFiltersAltered++;
     }
     if (unavailableGamesVisible != DEFAULT_UNAVAILABLE_GAMES_VISIBLE) {
@@ -415,6 +427,12 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
     if (hideIgnoredUserGames && tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(
                                     QString::fromStdString(game.creator_info().name()))) {
         return false;
+    }
+    if (hideOldGames) {
+        QDateTime then;
+        then.setTime_t(game.start_time());
+        if (then.secsTo(QDateTime::currentDateTime()) > OLD_GAME_CUTOFF_SECONDS)
+            return false;
     }
     if (!unavailableGamesVisible) {
         if (game.player_count() == game.max_players())

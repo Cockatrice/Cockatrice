@@ -29,6 +29,9 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideIgnoredUserGames = new QCheckBox(tr("Hide '&ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
+    hideOldGames = new QCheckBox(tr("Hide games &older than 2 hours"));
+    hideOldGames->setChecked(gamesProxyModel->getHideOldGames());
+
     gameNameFilterEdit = new QLineEdit;
     gameNameFilterEdit->setText(gamesProxyModel->getGameNameFilter());
     QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
@@ -92,6 +95,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     restrictionsLayout->addWidget(showPasswordProtectedGames, 1, 0);
     restrictionsLayout->addWidget(showBuddiesOnlyGames, 2, 0);
     restrictionsLayout->addWidget(hideIgnoredUserGames, 3, 0);
+    restrictionsLayout->addWidget(hideOldGames, 4, 0);
 
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
@@ -167,6 +171,16 @@ bool DlgFilterGames::getHideIgnoredUserGames() const
 void DlgFilterGames::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
 {
     hideIgnoredUserGames->setChecked(_hideIgnoredUserGames);
+}
+
+bool DlgFilterGames::getHideOldGames() const
+{
+    return hideOldGames->isChecked();
+}
+
+void DlgFilterGames::setHideOldGames(bool _hideOldGames)
+{
+    hideOldGames->setChecked(_hideOldGames);
 }
 
 QString DlgFilterGames::getGameNameFilter() const

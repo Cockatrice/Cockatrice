@@ -72,14 +72,18 @@ private:
     bool hideIgnoredUserGames;
     bool unavailableGamesVisible;
     bool showPasswordProtectedGames;
+    bool hideOldGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
+
+    static const int OLD_GAME_CUTOFF_SECONDS = 2 * 60 * 60;  // 2 hours
 
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
     static const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
     static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
     static const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
+    static const bool DEFAULT_HIDE_OLD_GAMES = false;
 
 public:
     GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
@@ -104,6 +108,10 @@ public:
         return showPasswordProtectedGames;
     }
     void setShowPasswordProtectedGames(bool _showPasswordProtectedGames);
+    bool getHideOldGames() const {
+        return hideOldGames;
+    }
+    void setHideOldGames(bool _hideOldGames);
     QString getGameNameFilter() const
     {
         return gameNameFilter;
