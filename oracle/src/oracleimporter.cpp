@@ -201,7 +201,7 @@ QString OracleImporter::getStringPropertyFromMap(QVariantMap card, QString prope
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
 
-int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cardsList, bool skipSpecialNums)
+int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cardsList, bool skipSpecialCards)
 {
     static const QMap<QString, QString> cardProperties{
         // mtgjson name => xml name
@@ -226,8 +226,8 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
     static const QList<QString> specialNumChars = {"★", "s"};
-    QMap<QString, QVariant> specialNumCards;
-    QList<QString> allNumProps;
+    QMap<QString, QVariant> specialPromoCards;
+    QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
@@ -276,21 +276,26 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             continue;
         }
 
-        // skip cards containing special stuff in the collectors number if it's not the only print
-        if (skipSpecialNums) {
+        if (skipSpecialCards) {
+            // skip promo cards if it's not the only print
+            if (getStringPropertyFromMap(card, "isPromo") == "true") {
+                specialPromoCards.insert(name, cardVar);
+                continue;
+            }
             QString numProperty = setInfo.getProperty("num");
             bool skip = false;
+            // skip cards containing special stuff in the collectors number like promo cards
             for (const QString &specialChar : specialNumChars) {
                 if (numProperty.contains(specialChar)) {
-                    specialNumCards.insert(numProperty.remove(specialChar), cardVar);
                     skip = true;
                     break;
                 }
             }
             if (skip) {
+                specialPromoCards.insert(name, cardVar);
                 continue;
             } else {
-                allNumProps.append(numProperty);
+                allNameProps.append(name);
             }
         }
 
@@ -401,16 +406,16 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         numCards++;
     }
 
-    // add the unique cards with special chars in num
-    if (skipSpecialNums) {
-        QList<QVariant> extraStarCards;
-        for (auto cardIter = specialNumCards.constBegin(); cardIter != specialNumCards.constEnd(); ++cardIter) {
-            if (!allNumProps.contains(cardIter.key())) {
-                extraStarCards.append(cardIter.value());
+    // only add the unique promo cards that didn't already exist in the set
+    if (skipSpecialCards) {
+        QList<QVariant> nonDuplicatePromos;
+        for (auto cardIter = specialPromoCards.constBegin(); cardIter != specialPromoCards.constEnd(); ++cardIter) {
+            if (!allNameProps.contains(cardIter.key())) {
+                nonDuplicatePromos.append(cardIter.value());
             }
         }
-        if (!extraStarCards.isEmpty()) {
-            numCards += importCardsFromSet(currentSet, extraStarCards, false);
+        if (!nonDuplicatePromos.isEmpty()) {
+            numCards += importCardsFromSet(currentSet, nonDuplicatePromos, false);
         }
     }
     return numCards;
