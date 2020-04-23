@@ -254,7 +254,7 @@ public:
     }
     inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
     {
-        return (order == Qt::AscendingOrder) ^ (a.second->compare(b.second));
+        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
     }
 };
 
