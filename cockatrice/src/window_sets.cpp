@@ -364,7 +364,7 @@ void WndSets::actDown()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
     // QModelIndex only implements operator<, so we can't use std::greater
-    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return !(b < a); });
+    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
     QSet<int> newRows;
 
     if (rows.empty())
@@ -412,7 +412,7 @@ void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
     // QModelIndex only implements operator<, so we can't use std::greater
-    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return !(b < a); });
+    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
     QSet<int> newRows;
     int newRow = model->rowCount() - 1;
 
