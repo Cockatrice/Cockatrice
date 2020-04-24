@@ -29,7 +29,7 @@ port=4747
 ; Set to 0 to disable the tcp server.
 number_pools=1
 
-; Servatrice can listen for clients on websockets, too. Multiple connexction pools are available but
+; Servatrice can listen for clients on websockets, too. Multiple connection pools are available but
 ; unfortunately, due to a Qt limitation, they must run in the same execution thread.
 ; Set to 0 to disable the websocket server.
 websocket_number_pools=1
