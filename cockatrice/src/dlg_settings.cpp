@@ -87,9 +87,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
     personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
-    personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0);
-    personalGrid->addWidget(&showTipsOnStartup, 5, 0);
+    personalGrid->addWidget(&updateNotificationCheckBox, 3, 0, 1, 2);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0, 1, 2);
+    personalGrid->addWidget(&showTipsOnStartup, 5, 0, 1, 2);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
