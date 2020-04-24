@@ -122,6 +122,11 @@ void AbstractServerSocketInterface::catchSocketError(QAbstractSocket::SocketErro
     prepareDestroy();
 }
 
+void AbstractServerSocketInterface::catchSocketDisconnected()
+{
+    prepareDestroy();
+}
+
 void AbstractServerSocketInterface::transmitProtocolItem(const ServerMessage &item)
 {
     outputQueueMutex.lock();
@@ -1511,6 +1516,7 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
     connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -1594,7 +1600,7 @@ void TcpServerSocketInterface::readClient()
             } else
                 return;
         }
-        if (inputBuffer.size() < messageLength)
+        if (inputBuffer.size() < messageLength || messageLength < 0)
             return;
 
         CommandContainer newCommandContainer;
@@ -1679,6 +1685,7 @@ WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
 void WebsocketServerSocketInterface::initConnection(void *_socket)
 {
     socket = (QWebSocket *)_socket;
+    socket->setParent(this);
     address = socket->peerAddress();
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
@@ -1699,6 +1706,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
             SLOT(binaryMessageReceived(const QByteArray &)));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 
     // Add this object to the server's list of connections before it can receive socket events.
     // Otherwise, in case a of a socket error, it could be removed from the list before it is added.

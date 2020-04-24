@@ -111,21 +111,30 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
 #define WEBSOCKET_POOL_NUMBER 999
 
 Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server,
-                                                               int /* _numberPools */,
+                                                               int _numberPools,
                                                                const QSqlDatabase &_sqlDatabase,
                                                                QObject *parent)
     : QWebSocketServer("Servatrice", QWebSocketServer::NonSecureMode, parent), server(_server)
 {
-    // Qt limitation: websockets can't be moved to another thread
-    auto newDatabaseInterface = new Servatrice_DatabaseInterface(WEBSOCKET_POOL_NUMBER, server);
-    auto newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
+    for (int i = 0; i < _numberPools; ++i) {
+        int poolNumber = WEBSOCKET_POOL_NUMBER + i;
+        auto newDatabaseInterface = new Servatrice_DatabaseInterface(poolNumber, server);
+        auto newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 
-    server->addDatabaseInterface(thread(), newDatabaseInterface);
-    newDatabaseInterface->initDatabase(_sqlDatabase);
+        auto newThread = new QThread;
+        newThread->setObjectName("pool_" + QString::number(poolNumber));
+        newPool->moveToThread(newThread);
+        newDatabaseInterface->moveToThread(newThread);
+        server->addDatabaseInterface(newThread, newDatabaseInterface);
 
-    connectionPools.append(newPool);
+        newThread->start();
+        QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
+                                  Q_ARG(QSqlDatabase, _sqlDatabase));
 
-    connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+        connectionPools.append(newPool);
+
+        connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+    }
 }
 
 Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
@@ -143,7 +152,11 @@ void Servatrice_WebsocketGameServer::onNewConnection()
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
-    //    ssi->moveToThread(pool->thread());
+    /*
+     * Due to a Qt limitation, websockets can't be moved to another thread.
+     * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
+     */
+    // ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
 

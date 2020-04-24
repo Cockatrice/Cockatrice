@@ -59,6 +59,7 @@ class AbstractServerSocketInterface : public Server_ProtocolHandler
     Q_OBJECT
 protected slots:
     void catchSocketError(QAbstractSocket::SocketError socketError);
+    void catchSocketDisconnected();
     virtual void flushOutputQueue() = 0;
 signals:
     void outputQueueChanged();
