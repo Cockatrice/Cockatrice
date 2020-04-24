@@ -156,7 +156,7 @@ void Servatrice_WebsocketGameServer::onNewConnection()
      * Due to a Qt limitation, websockets can't be moved to another thread.
      * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
      */
-    //ssi->moveToThread(pool->thread());
+    // ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
 
