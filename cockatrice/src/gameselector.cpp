@@ -290,13 +290,12 @@ void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QMod
     joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
 }
 
-void GameSelector::setAlteredFiltersText(const int numAlteredFilters)
-{
+void GameSelector::setAlteredFiltersText(const int numAlteredFilters) {
     if (alteredFiltersLabel != nullptr) {
         if (numAlteredFilters == 0) {
             alteredFiltersLabel->setText(tr("Default filters applied"));
         } else {
-            alteredFiltersLabel->setText(tr("%1 filter(s) applied").arg(numAlteredFilters));
+            alteredFiltersLabel->setText(tr("%1 filter(s) altered").arg(numAlteredFilters));
         }
     }
 }
