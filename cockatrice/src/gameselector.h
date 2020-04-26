@@ -12,6 +12,7 @@ class GamesModel;
 class GamesProxyModel;
 class QPushButton;
 class QCheckBox;
+class QLabel;
 class AbstractClient;
 class TabSupervisor;
 class TabRoom;
@@ -44,7 +45,11 @@ private:
     GamesModel *gameListModel;
     GamesProxyModel *gameListProxyModel;
     QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
+    QLabel *filteredGamesLabel;
+    const bool showFilters;
     GameTypeMap gameTypeMap;
+
+    void setFilteredGamesLabel();
 
 public:
     GameSelector(AbstractClient *_client,
@@ -53,7 +58,7 @@ public:
                  const QMap<int, QString> &_rooms,
                  const QMap<int, GameTypeMap> &_gameTypes,
                  const bool restoresettings,
-                 const bool showfilters,
+                 const bool _showfilters,
                  QWidget *parent = nullptr);
     void retranslateUi();
     void processGameInfo(const ServerInfo_Game &info);

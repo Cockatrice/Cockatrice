@@ -125,6 +125,7 @@ public:
         return maxPlayersFilterMax;
     }
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
+    int getNumFilteredGames() const;
     void resetFilterParameters();
     void loadFilterParameters(const QMap<int, QString> &allGameTypes);
     void saveFilterParameters(const QMap<int, QString> &allGameTypes);
@@ -132,6 +133,7 @@ public:
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow) const;
 };
 
 #endif

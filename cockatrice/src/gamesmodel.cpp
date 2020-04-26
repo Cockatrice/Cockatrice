@@ -314,6 +314,21 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
     invalidateFilter();
 }
 
+int GamesProxyModel::getNumFilteredGames() const
+{
+    GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
+    if (!model)
+        return 0;
+
+    int numFilteredGames = 0;
+    for (int row = 0; row < model->rowCount(); row++)
+    {
+        if (!filterAcceptsRow(row))
+            numFilteredGames++;
+    }
+    return numFilteredGames;
+}
+
 void GamesProxyModel::resetFilterParameters()
 {
     unavailableGamesVisible = false;
@@ -369,6 +384,11 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+{
+    return filterAcceptsRow(sourceRow);
+}
+
+bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 {
     GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)
