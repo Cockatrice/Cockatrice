@@ -316,9 +316,9 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
 
 void GamesProxyModel::resetFilterParameters()
 {
-    unavailableGamesVisible = DEFAULT_UNAVAILABLE_GAMES_VISIBLE;
-    showPasswordProtectedGames = DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES;
-    showBuddiesOnlyGames = DEFAULT_SHOW_BUDDIES_ONLY_GAMES;
+    unavailableGamesVisible = false;
+    showPasswordProtectedGames = true;
+    showBuddiesOnlyGames = true;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
@@ -366,20 +366,6 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 
     settingsCache->gameFilters().setMinPlayers(maxPlayersFilterMin);
     settingsCache->gameFilters().setMaxPlayers(maxPlayersFilterMax);
-}
-
-int GamesProxyModel::getNumberOfAlteredFilters() const {
-    int numFiltersAltered = 0;
-    if (showBuddiesOnlyGames != DEFAULT_SHOW_BUDDIES_ONLY_GAMES) { numFiltersAltered++; }
-    if (hideIgnoredUserGames) { numFiltersAltered++; }
-    if (unavailableGamesVisible != DEFAULT_UNAVAILABLE_GAMES_VISIBLE) { numFiltersAltered++; }
-    if (showPasswordProtectedGames != DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES) { numFiltersAltered++; }
-    if (!gameNameFilter.isEmpty()) { numFiltersAltered++; }
-    if (!creatorNameFilter.isEmpty()) { numFiltersAltered++; }
-    if (!gameTypeFilter.isEmpty()) { numFiltersAltered++; }
-    if (maxPlayersFilterMin != -1 && maxPlayersFilterMin != 1) { numFiltersAltered++; }
-    if (maxPlayersFilterMax != -1 && maxPlayersFilterMax != DEFAULT_MAX_PLAYERS_MAX) { numFiltersAltered++; }
-    return numFiltersAltered;
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const

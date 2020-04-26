@@ -18,7 +18,6 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
-#include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
@@ -76,7 +75,6 @@ GameSelector::GameSelector(AbstractClient *_client,
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
     clearFilterButton->setEnabled(true);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
-    alteredFiltersLabel = new QLabel;
 
     if (room) {
         createButton = new QPushButton;
@@ -90,7 +88,6 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (showfilters) {
         buttonLayout->addWidget(filterButton);
         buttonLayout->addWidget(clearFilterButton);
-        buttonLayout->addWidget(alteredFiltersLabel);
     }
     buttonLayout->addStretch();
     if (room)
@@ -160,8 +157,6 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
-
-    setAlteredFiltersText(gameListProxyModel->getNumberOfAlteredFilters());
 }
 
 void GameSelector::actClearFilter()
@@ -170,7 +165,6 @@ void GameSelector::actClearFilter()
 
     gameListProxyModel->resetFilterParameters();
     gameListProxyModel->saveFilterParameters(gameTypeMap);
-    alteredFiltersLabel->setText(tr("Filters reset to default"));
 }
 
 void GameSelector::actCreate()
@@ -265,8 +259,7 @@ void GameSelector::retranslateUi()
 {
     setTitle(tr("Games"));
     filterButton->setText(tr("&Filter games"));
-    clearFilterButton->setText(tr("Reset fi&lters"));
-    setAlteredFiltersText(gameListProxyModel->getNumberOfAlteredFilters());
+    clearFilterButton->setText(tr("C&lear filter"));
     if (createButton)
         createButton->setText(tr("C&reate"));
     joinButton->setText(tr("&Join"));
@@ -288,14 +281,4 @@ void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QMod
 
     spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
     joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
-}
-
-void GameSelector::setAlteredFiltersText(const int numAlteredFilters) {
-    if (alteredFiltersLabel != nullptr) {
-        if (numAlteredFilters == 0) {
-            alteredFiltersLabel->setText(tr("Default filters applied"));
-        } else {
-            alteredFiltersLabel->setText(tr("%1 filter(s) altered").arg(numAlteredFilters));
-        }
-    }
 }
