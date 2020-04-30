@@ -867,6 +867,7 @@ void Player::setShortcutsActive()
     aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
     aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
     aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
+    aMoveBottomCardToGrave->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToGrave"));
 }
 
 void Player::setShortcutsInactive()

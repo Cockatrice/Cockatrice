@@ -23,6 +23,7 @@ public:
         Move_selected,
         View,
         Move_top,
+        Move_bottom,
         Gameplay,
         Drawing,
         Chat_room,
@@ -55,6 +56,8 @@ public:
                 return QApplication::translate("shortcutsTab", "View");
             case Move_top:
                 return QApplication::translate("shortcutsTab", "Move top card to");
+            case Move_bottom:
+                return QApplication::translate("shortcutsTab", "Move bottom card to");
             case Gameplay:
                 return QApplication::translate("shortcutsTab", "Gameplay");
             case Drawing:
@@ -491,6 +494,9 @@ private:
         {"Player/aMoveTopCardsToExile", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move multiple to exile"),
                                                     parseSequenceString(""),
                                                     ShortcutGroup::Move_top)},
+        {"Player/aMoveBottomCardToGrave", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move to graveyard once"),
+                                                      parseSequenceString(""),
+                                                      ShortcutGroup::Move_bottom)},
         {"Player/aDrawArrow", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Draw arrow"),
                                           parseSequenceString(""),
                                           ShortcutGroup::Gameplay)},
