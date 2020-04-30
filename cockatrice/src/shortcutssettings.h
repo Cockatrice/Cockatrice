@@ -51,23 +51,23 @@ public:
             case Playing_Area:
                 return QApplication::translate("shortcutsTab", "Playing Area");
             case Move_selected:
-                return QApplication::translate("shortcutsTab", "Move selected card to");
+                return QApplication::translate("shortcutsTab", "Move Selected Card");
             case View:
                 return QApplication::translate("shortcutsTab", "View");
             case Move_top:
-                return QApplication::translate("shortcutsTab", "Move top card to");
+                return QApplication::translate("shortcutsTab", "Move Top Card");
             case Move_bottom:
-                return QApplication::translate("shortcutsTab", "Move bottom card to");
+                return QApplication::translate("shortcutsTab", "Move Bottom Card");
             case Gameplay:
                 return QApplication::translate("shortcutsTab", "Gameplay");
             case Drawing:
                 return QApplication::translate("shortcutsTab", "Drawing");
             case Chat_room:
-                return QApplication::translate("shortcutsTab", "Chat room");
+                return QApplication::translate("shortcutsTab", "Chat Room");
             case Game_window:
-                return QApplication::translate("shortcutsTab", "Game window");
+                return QApplication::translate("shortcutsTab", "Game Window");
             case Load_deck:
-                return QApplication::translate("shortcutsTab", "Load deck from clipboard");
+                return QApplication::translate("shortcutsTab", "Load Deck from Clipboard");
         }
 
         return {};
@@ -445,7 +445,7 @@ private:
         {"Player/aSetAnnotation", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Set annotation"),
                                               parseSequenceString(""),
                                               ShortcutGroup::Playing_Area)},
-        {"Player/aMoveToBottomLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom library"),
+        {"Player/aMoveToBottomLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),
                                                     parseSequenceString(""),
                                                     ShortcutGroup::Move_selected)},
         {"Player/aMoveToExile", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Exile"),
@@ -456,15 +456,15 @@ private:
                                                 ShortcutGroup::Move_selected)},
         {"Player/aMoveToHand",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::Move_selected)},
-        {"Player/aMoveToTopLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top of library"),
+        {"Player/aMoveToTopLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top of Library"),
                                                  parseSequenceString(""),
                                                  ShortcutGroup::Move_selected)},
-        {"Player/aMoveTopToPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play on stack"),
-                                              parseSequenceString("Ctrl+Y"),
-                                              ShortcutGroup::Move_selected)},
-        {"Player/aMoveTopToPlayFaceDown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play face down"),
-                                                      parseSequenceString("Ctrl+Shift+E"),
-                                                      ShortcutGroup::Move_selected)},
+        {"Player/aPlayFacedown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield, Face Down"),
+                                             parseSequenceString(""),
+                                             ShortcutGroup::Move_selected)},
+        {"Player/aPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield"),
+                                     parseSequenceString(""),
+                                     ShortcutGroup::Move_selected)},
         {"Player/aViewHand",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::View)},
         {"Player/aViewGraveyard",
@@ -476,25 +476,32 @@ private:
         {"Player/aViewSideboard", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sideboard"),
                                               parseSequenceString("Ctrl+F3"),
                                               ShortcutGroup::View)},
-        {"Player/aViewTopCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top cards of library"),
+        {"Player/aViewTopCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top Card(s) of Library"),
                                              parseSequenceString("Ctrl+W"),
                                              ShortcutGroup::View)},
         {"Player/aCloseMostRecentZoneView", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Close recent view"),
                                                         parseSequenceString("Esc"),
                                                         ShortcutGroup::View)},
-        {"Player/aMoveTopCardToGraveyard", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move to graveyard once"),
-                                                       parseSequenceString(""),
-                                                       ShortcutGroup::Move_top)},
-        {"Player/aMoveTopCardsToGraveyard", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move multiple to graveyard"),
+        {"Player/aMoveTopToPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Stack"),
+                                              parseSequenceString("Ctrl+Y"),
+                                              ShortcutGroup::Move_top)},
+        {"Player/aMoveTopToPlayFaceDown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield, Face Down"),
+                                                      parseSequenceString("Ctrl+Shift+E"),
+                                                      ShortcutGroup::Move_top)},
+        {"Player/aMoveTopCardToGraveyard",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard"), parseSequenceString(""), ShortcutGroup::Move_top)},
+        {"Player/aMoveTopCardsToGraveyard", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard (Multiple)"),
                                                         parseSequenceString("Ctrl+Shift+M"),
                                                         ShortcutGroup::Move_top)},
-        {"Player/aMoveTopCardToExile", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move to exile once"),
-                                                   parseSequenceString(""),
-                                                   ShortcutGroup::Move_top)},
-        {"Player/aMoveTopCardsToExile", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move multiple to exile"),
+        {"Player/aMoveTopCardToExile",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Exile"), parseSequenceString(""), ShortcutGroup::Move_top)},
+        {"Player/aMoveTopCardsToExile", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Exile (Multiple)"),
                                                     parseSequenceString(""),
                                                     ShortcutGroup::Move_top)},
-        {"Player/aMoveBottomCardToGrave", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Move to graveyard once"),
+        {"Player/aMoveTopCardToBottom", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),
+                                                    parseSequenceString(""),
+                                                    ShortcutGroup::Move_top)},
+        {"Player/aMoveBottomCardToGrave", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard"),
                                                       parseSequenceString(""),
                                                       ShortcutGroup::Move_bottom)},
         {"Player/aDrawArrow", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Draw arrow"),
