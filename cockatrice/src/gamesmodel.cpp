@@ -322,8 +322,9 @@ int GamesProxyModel::getNumFilteredGames() const
 
     int numFilteredGames = 0;
     for (int row = 0; row < model->rowCount(); ++row) {
-        if (!filterAcceptsRow(row))
+        if (!filterAcceptsRow(row)) {
             ++numFilteredGames;
+        }
     }
     return numFilteredGames;
 }
