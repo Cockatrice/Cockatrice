@@ -38,7 +38,7 @@ const QString GamesModel::getGameCreatedString(const int secs) const
     } else { // from 1 hr onward we show hrs
         int hours = secs / SECS_PER_HOUR;
         if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
-            hours++;
+            ++hours;
         ret = QString("%1+ h").arg(QString::number(hours));
     }
     return ret;
@@ -321,10 +321,10 @@ int GamesProxyModel::getNumFilteredGames() const
         return 0;
 
     int numFilteredGames = 0;
-    for (int row = 0; row < model->rowCount(); row++)
+    for (int row = 0; row < model->rowCount(); ++row)
     {
         if (!filterAcceptsRow(row))
-            numFilteredGames++;
+            ++numFilteredGames;
     }
     return numFilteredGames;
 }
