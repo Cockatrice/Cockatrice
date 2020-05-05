@@ -32,8 +32,7 @@ GameSelector::GameSelector(AbstractClient *_client,
                            const bool restoresettings,
                            const bool _showfilters,
                            QWidget *parent)
-    : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room),
-      showFilters(_showfilters)
+    : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room), showFilters(_showfilters)
 {
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
