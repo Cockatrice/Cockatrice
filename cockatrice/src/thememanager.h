@@ -20,6 +20,7 @@ public:
 
 private:
     QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;
+    QBrush table2BgBrush;
     QStringMap availableThemes;
 
 protected:
@@ -38,6 +39,10 @@ public:
     QBrush &getTableBgBrush()
     {
         return tableBgBrush;
+    }
+    QBrush &getTable2BgBrush()
+    {
+        return table2BgBrush;
     }
     QBrush &getPlayerBgBrush()
     {

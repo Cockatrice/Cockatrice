@@ -15,6 +15,7 @@
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
+#define TABLEZONE2_BG_NAME "tablezone2"
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
@@ -100,6 +101,7 @@ void ThemeManager::themeChangedSlot()
     dir.cd("zones");
     handBgBrush = loadBrush(HANDZONE_BG_NAME, QColor(80, 100, 50));
     tableBgBrush = loadBrush(TABLEZONE_BG_NAME, QColor(70, 50, 100));
+    table2BgBrush = loadBrush(TABLEZONE2_BG_NAME, QColor(70, 50, 100));
     playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
     stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
 

@@ -55,7 +55,13 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
+    QBrush brush;
+
+    brush = themeManager->getTableBgBrush();
+    if (player->getId() == 1) {
+        brush = themeManager->getTable2BgBrush();
+    }
+    painter->fillRect(boundingRect(), brush);
 
     if (active) {
         paintZoneOutline(painter);
