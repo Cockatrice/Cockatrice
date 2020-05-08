@@ -867,6 +867,10 @@ void Player::setShortcutsActive()
     aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
     aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
     aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
+    aMoveTopCardToBottom->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToBottom"));
+    aMoveBottomCardToGrave->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToGrave"));
+    aPlayFacedown->setShortcut(shortcuts.getSingleShortcut("Player/aPlayFacedown"));
+    aPlay->setShortcut(shortcuts.getSingleShortcut("Player/aPlay"));
 }
 
 void Player::setShortcutsInactive()
@@ -908,7 +912,7 @@ void Player::initSayMenu()
     int count = settingsCache->messages().getCount();
 
     for (int i = 0; i < count; ++i) {
-        QAction *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
+        auto *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
         if (i <= 10) {
             newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }
