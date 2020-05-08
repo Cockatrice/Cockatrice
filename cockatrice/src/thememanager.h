@@ -20,7 +20,6 @@ public:
 
 private:
     QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;
-    QBrush table2BgBrush;
     QStringMap availableThemes;
 
 protected:
@@ -40,15 +39,12 @@ public:
     {
         return tableBgBrush;
     }
-    QBrush &getTable2BgBrush()
-    {
-        return table2BgBrush;
-    }
     QBrush &getPlayerBgBrush()
     {
         return playerBgBrush;
     }
     QStringMap &getAvailableThemes();
+    QBrush getExtraTableBgBrush(QString extraNumber);
 protected slots:
     void themeChangedSlot();
 signals:
