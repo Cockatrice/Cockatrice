@@ -55,9 +55,8 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush;
+    QBrush brush = themeManager->getTableBgBrush();
 
-    brush = themeManager->getTableBgBrush();
     // If the player is other than Player 1
     if (player->getId() > 0) {
         // The palyer's id starts with 0 so in order to get the correct image we need to add 1

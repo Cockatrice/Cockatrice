@@ -15,7 +15,6 @@
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
-#define TABLEZONE2_BG_NAME "tablezone2"
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
