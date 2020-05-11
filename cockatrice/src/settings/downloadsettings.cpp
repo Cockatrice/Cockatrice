@@ -1,4 +1,5 @@
 #include "downloadsettings.h"
+
 #include "settingsmanager.h"
 
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)

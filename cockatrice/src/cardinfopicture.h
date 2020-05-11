@@ -1,9 +1,9 @@
 #ifndef CARDINFOPICTURE_H
 #define CARDINFOPICTURE_H
 
-#include <QWidget>
-
 #include "carddatabase.h"
+
+#include <QWidget>
 
 class AbstractCardItem;
 

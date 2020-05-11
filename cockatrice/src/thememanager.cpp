@@ -1,5 +1,7 @@
 #include "thememanager.h"
+
 #include "settingscache.h"
+
 #include <QApplication>
 #include <QColor>
 #include <QDebug>

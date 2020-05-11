@@ -1,19 +1,19 @@
-#include <QDesktopServices>
-#include <QMessageBox>
-#include <QProgressDialog>
-#include <QVBoxLayout>
-#include <QtNetwork>
-
-#include <QApplication>
-#include <QLabel>
-#include <QProgressBar>
-#include <QPushButton>
-#include <version_string.h>
-
 #include "dlg_update.h"
+
 #include "releasechannel.h"
 #include "settingscache.h"
 #include "window_main.h"
+
+#include <QApplication>
+#include <QDesktopServices>
+#include <QLabel>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QProgressDialog>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QtNetwork>
+#include <version_string.h>
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
 {

@@ -1,4 +1,5 @@
 #include "dlg_filter_games.h"
+
 #include <QCheckBox>
 #include <QCryptographicHash>
 #include <QDialogButtonBox>
@@ -24,6 +25,9 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     showPasswordProtectedGames = new QCheckBox(tr("Show &password protected games"));
     showPasswordProtectedGames->setChecked(gamesProxyModel->getShowPasswordProtectedGames());
+
+    hideIgnoredUserGames = new QCheckBox(tr("Hide '&ignored user' games"));
+    hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
     gameNameFilterEdit = new QLineEdit;
     gameNameFilterEdit->setText(gamesProxyModel->getGameNameFilter());
@@ -87,6 +91,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     restrictionsLayout->addWidget(unavailableGamesVisibleCheckBox, 0, 0);
     restrictionsLayout->addWidget(showPasswordProtectedGames, 1, 0);
     restrictionsLayout->addWidget(showBuddiesOnlyGames, 2, 0);
+    restrictionsLayout->addWidget(hideIgnoredUserGames, 3, 0);
 
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
@@ -152,6 +157,16 @@ bool DlgFilterGames::getShowPasswordProtectedGames() const
 void DlgFilterGames::setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden)
 {
     showPasswordProtectedGames->setChecked(_passwordProtectedGamesHidden);
+}
+
+bool DlgFilterGames::getHideIgnoredUserGames() const
+{
+    return hideIgnoredUserGames->isChecked();
+}
+
+void DlgFilterGames::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
+{
+    hideIgnoredUserGames->setChecked(_hideIgnoredUserGames);
 }
 
 QString DlgFilterGames::getGameNameFilter() const

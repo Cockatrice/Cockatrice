@@ -1,19 +1,20 @@
 #include "playerlistwidget.h"
+
 #include "abstractclient.h"
+#include "pb/command_kick_from_game.pb.h"
+#include "pb/serverinfo_playerproperties.pb.h"
+#include "pb/session_commands.pb.h"
 #include "pixmapgenerator.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
 #include "user_context_menu.h"
 #include "userlist.h"
+
 #include <QAction>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMouseEvent>
-
-#include "pb/command_kick_from_game.pb.h"
-#include "pb/serverinfo_playerproperties.pb.h"
-#include "pb/session_commands.pb.h"
 
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {
@@ -216,6 +217,7 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
     const QString &userName = index.sibling(index.row(), 4).data(Qt::UserRole).toString();
     int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
     UserLevelFlags userLevel(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
+    QString deckHash = index.sibling(index.row(), 5).data().toString();
 
-    userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId);
+    userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId, deckHash);
 }

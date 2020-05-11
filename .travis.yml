@@ -1,4 +1,5 @@
 os: linux
+dist: bionic
 language: cpp
 compiler: gcc
 
@@ -21,29 +22,75 @@ jobs:
     if: tag IS NOT present
     os: linux
     services: docker
-    env: NAME=UbuntuBionic
+    language: minimal
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
     cache:
       directories:
-      - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --test --debug
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --test --debug
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: linux
     services: docker
-    env: NAME=UbuntuBionic
+    language: minimal
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
     cache:
       directories:
-      - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --package "$NAME" --release
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --package $NAME --release
+
+
+  #Debian Buster (on Docker)
+  - name: Debian Buster (Compile)
+    if: tag IS NOT present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=DebianBuster CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server
+
+  - name: Debian Buster (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=DebianBuster CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --package $NAME --release
+
+
+  #Fedora 31 (on docker)
+  - name: Fedora 31 (Compile)
+    if: tag IS NOT present
+    services: docker
+    language: minimal
+    env: NAME=Fedora31 CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server
+
+  - name: Fedora 31 (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    services: docker
+    language: minimal
+    env: NAME=Fedora31 CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --package $NAME RPM --release
 
 
   #macOS High Sierra
@@ -131,6 +178,26 @@ jobs:
     - brew cleanup
 
 
+  #Arch Linux (on Docker) (allow failures)
+  - name: Arch Linux (Debug)
+    if: tag IS NOT present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=ArchLinux CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --debug
+
+  allow_failures:
+  # Arch linux is always the latest version and by definition not stable
+  - name: Arch Linux (Debug)
+  # Report build completion even if optional builds are not completed
+  fast_finish: true
+
+
 # Builds for pull requests skip the deployment step altogether
 deploy:
 # Deploy configuration for "beta" releases
@@ -139,6 +206,7 @@ deploy:
       secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
     name: "Cockatrice $TRAVIS_TAG"
     release_notes: "Beta release of Cockatrice"
+    skip_cleanup: true
     file_glob: true
     file: "build/Cockatrice-*"
     overwrite: true
@@ -153,6 +221,7 @@ deploy:
   - provider: releases
     token:
       secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
+    skip_cleanup: true
     file_glob: true
     file: "build/Cockatrice-*"
     overwrite: true

@@ -1,12 +1,12 @@
 #include "oracleimporter.h"
+
 #include "carddbparser/cockatricexml4.h"
+#include "qt-json/json.h"
 
 #include <QDebug>
 #include <QtWidgets>
 #include <algorithm>
 #include <climits>
-
-#include "qt-json/json.h"
 
 SplitCardPart::SplitCardPart(const int _index,
                              const QString &_text,
@@ -201,7 +201,7 @@ QString OracleImporter::getStringPropertyFromMap(QVariantMap card, QString prope
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
 
-int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cardsList)
+int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cardsList, bool skipSpecialCards)
 {
     static const QMap<QString, QString> cardProperties{
         // mtgjson name => xml name
@@ -220,11 +220,14 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     QString ptSeparator("/");
     QVariantMap card;
     QString layout, name, text, colors, colorIdentity, maintype, power, toughness;
-    bool isToken;
+    static const bool isToken = false;
     QStringList additionalNames;
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
+    static const QList<QString> specialNumChars = {"★", "s"};
+    QMap<QString, QVariant> specialPromoCards;
+    QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
@@ -236,9 +239,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         layout = getStringPropertyFromMap(card, "layout");
 
         // don't import tokens from the json file
-        isToken = false;
-        if (layout == "token")
+        if (layout == "token") {
             continue;
+        }
 
         // normal cards handling
         name = getStringPropertyFromMap(card, "name");
@@ -273,14 +276,27 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             continue;
         }
 
-        // skip cards containing a star char in the collectors number
-        if (setInfo.getProperty("num").contains("★")) {
-            continue;
-        }
-
-        // skip prerelease foils
-        if (setInfo.getProperty("num").contains("s")) {
-            continue;
+        if (skipSpecialCards) {
+            // skip promo cards if it's not the only print
+            if (getStringPropertyFromMap(card, "isPromo") == "true") {
+                specialPromoCards.insert(name, cardVar);
+                continue;
+            }
+            QString numProperty = setInfo.getProperty("num");
+            bool skip = false;
+            // skip cards containing special stuff in the collectors number like promo cards
+            for (const QString &specialChar : specialNumChars) {
+                if (numProperty.contains(specialChar)) {
+                    skip = true;
+                    break;
+                }
+            }
+            if (skip) {
+                specialPromoCards.insert(name, cardVar);
+                continue;
+            } else {
+                allNameProps.append(name);
+            }
         }
 
         // special handling properties
@@ -349,7 +365,6 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                   [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getIndex() < b.getIndex(); });
 
         text = QString("");
-        isToken = false;
         properties.clear();
         relatedCards.clear();
 
@@ -391,6 +406,18 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         numCards++;
     }
 
+    // only add the unique promo cards that didn't already exist in the set
+    if (skipSpecialCards) {
+        QList<QVariant> nonDuplicatePromos;
+        for (auto cardIter = specialPromoCards.constBegin(); cardIter != specialPromoCards.constEnd(); ++cardIter) {
+            if (!allNameProps.contains(cardIter.key())) {
+                nonDuplicatePromos.append(cardIter.value());
+            }
+        }
+        if (!nonDuplicatePromos.isEmpty()) {
+            numCards += importCardsFromSet(currentSet, nonDuplicatePromos, false);
+        }
+    }
     return numCards;
 }
 
@@ -437,10 +464,10 @@ int OracleImporter::startImport()
     return setIndex;
 }
 
-bool OracleImporter::saveToFile(const QString &fileName)
+bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
     CockatriceXml4Parser parser;
-    return parser.saveToFile(sets, cards, fileName);
+    return parser.saveToFile(sets, cards, fileName, sourceUrl, sourceVersion);
 }
 
 void OracleImporter::clear()

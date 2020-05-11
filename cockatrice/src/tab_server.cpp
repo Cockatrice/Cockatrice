@@ -1,25 +1,25 @@
 #include "tab_server.h"
+
 #include "abstractclient.h"
+#include "pb/event_list_rooms.pb.h"
+#include "pb/event_server_message.pb.h"
+#include "pb/response_join_room.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
 #include "tab_supervisor.h"
 #include "userlist.h"
+
 #include <QCheckBox>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
 #include <QVBoxLayout>
-
-#include "pb/event_list_rooms.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/response_join_room.pb.h"
-#include "pb/session_commands.pb.h"
-#include "pending_command.h"
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox(parent), client(_client)
 {

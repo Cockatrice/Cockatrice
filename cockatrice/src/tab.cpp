@@ -1,5 +1,7 @@
 #include "tab.h"
+
 #include "cardinfowidget.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QDesktopWidget>

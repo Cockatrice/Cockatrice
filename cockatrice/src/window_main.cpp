@@ -17,22 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include <QAction>
-#include <QApplication>
-#include <QCloseEvent>
-#include <QDateTime>
-#include <QFile>
-#include <QFileDialog>
-#include <QInputDialog>
-#include <QMenu>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QPixmapCache>
-#include <QSystemTrayIcon>
-#include <QThread>
-#include <QTimer>
-#include <QtConcurrent>
-#include <QtNetwork>
+#include "window_main.h"
 
 #include "carddatabase.h"
 #include "dlg_connect.h"
@@ -50,18 +35,33 @@
 #include "localserverinterface.h"
 #include "logger.h"
 #include "main.h"
+#include "pb/event_connection_closed.pb.h"
+#include "pb/event_server_shutdown.pb.h"
+#include "pb/game_replay.pb.h"
+#include "pb/room_commands.pb.h"
 #include "remoteclient.h"
 #include "settingscache.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "version_string.h"
-#include "window_main.h"
 #include "window_sets.h"
 
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_server_shutdown.pb.h"
-#include "pb/game_replay.pb.h"
-#include "pb/room_commands.pb.h"
+#include <QAction>
+#include <QApplication>
+#include <QCloseEvent>
+#include <QDateTime>
+#include <QFile>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPixmapCache>
+#include <QSystemTrayIcon>
+#include <QThread>
+#include <QTimer>
+#include <QtConcurrent>
+#include <QtNetwork>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
@@ -1087,12 +1087,21 @@ void MainWindow::actCheckCardUpdates()
     QDir dir = QDir(QApplication::applicationDirPath());
 
 #if defined(Q_OS_MAC)
+    /*
+     * bypass app translocation: quarantined application will be started from a temporary directory eg.
+     * /private/var/folders/tk/qx76cyb50jn5dvj7rrgfscz40000gn/T/AppTranslocation/A0CBBD5A-9264-4106-8547-36B84DB161E2/d/oracle/
+     */
+    if(dir.absolutePath().startsWith("/private/var/folders")) {
+        dir.setPath("/Applications/");
+    } else {
+        // exit from the Cockatrice application bundle
+        dir.cdUp();
+        dir.cdUp();
+        dir.cdUp();        
+    }
+
     binaryName = getCardUpdaterBinaryName();
 
-    // exit from the application bundle
-    dir.cdUp();
-    dir.cdUp();
-    dir.cdUp();
     dir.cd(binaryName + ".app");
     dir.cd("Contents");
     dir.cd("MacOS");

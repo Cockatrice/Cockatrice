@@ -1,4 +1,5 @@
 #include "gamefilterssettings.h"
+
 #include <QCryptographicHash>
 
 GameFiltersSettings::GameFiltersSettings(QString settingPath, QObject *parent)
@@ -46,6 +47,17 @@ bool GameFiltersSettings::isShowPasswordProtectedGames()
 {
     QVariant previous = getValue("show_password_protected_games", "filter_games");
     return previous == QVariant() ? true : previous.toBool();
+}
+
+void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
+{
+    setValue(hide, "hide_ignored_user_games", "filter_games");
+}
+
+bool GameFiltersSettings::isHideIgnoredUserGames()
+{
+    QVariant previous = getValue("hide_ignored_user_games", "filter_games");
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setGameNameFilter(QString gameName)

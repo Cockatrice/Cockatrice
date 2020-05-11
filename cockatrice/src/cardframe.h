@@ -1,9 +1,9 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include <QTabWidget>
-
 #include "carddatabase.h"
+
+#include <QTabWidget>
 
 class AbstractCardItem;
 class CardInfoPicture;

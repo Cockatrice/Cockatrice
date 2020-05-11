@@ -1,5 +1,7 @@
 #include "pixmapgenerator.h"
+
 #include "pb/serverinfo_user.pb.h"
+
 #include <QApplication>
 #include <QPainter>
 #include <QPalette>

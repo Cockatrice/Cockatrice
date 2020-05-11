@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server_card.h"
+
 #include "pb/serverinfo_card.pb.h"
 #include "server_cardzone.h"
 #include "server_player.h"

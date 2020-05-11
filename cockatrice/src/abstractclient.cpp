@@ -19,6 +19,7 @@
 #include "pb/event_user_message.pb.h"
 #include "pb/server_message.pb.h"
 #include "pending_command.h"
+
 #include <google/protobuf/descriptor.h>
 
 AbstractClient::AbstractClient(QObject *parent) : QObject(parent), nextCmdId(0), status(StatusDisconnected)

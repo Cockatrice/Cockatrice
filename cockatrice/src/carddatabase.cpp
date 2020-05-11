@@ -1,4 +1,5 @@
 #include "carddatabase.h"
+
 #include "carddbparser/cockatricexml3.h"
 #include "carddbparser/cockatricexml4.h"
 #include "game_specific_terms.h"
@@ -573,7 +574,7 @@ QStringList CardDatabase::getAllMainCardTypes() const
     while (cardIterator.hasNext()) {
         types.insert(cardIterator.next().value()->getMainCardType());
     }
-    return types.toList();
+    return types.values();
 }
 
 void CardDatabase::checkUnknownSets()

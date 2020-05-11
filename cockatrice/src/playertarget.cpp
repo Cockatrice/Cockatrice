@@ -1,7 +1,9 @@
 #include "playertarget.h"
+
 #include "pb/serverinfo_user.pb.h"
 #include "pixmapgenerator.h"
 #include "player.h"
+
 #include <QDebug>
 #include <QPainter>
 #include <QPixmapCache>

@@ -1,4 +1,5 @@
 #include "tab_deck_editor.h"
+
 #include "abstractclient.h"
 #include "carddatabasemodel.h"
 #include "cardframe.h"
@@ -16,6 +17,7 @@
 #include "settingscache.h"
 #include "tab_supervisor.h"
 #include "tappedout_interface.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
@@ -28,6 +30,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -50,7 +53,7 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
     if (treeView && ((event->key() == Qt::Key_Up) || (event->key() == Qt::Key_Down)))
         QCoreApplication::sendEvent(treeView, event);
-    QLineEdit::keyPressEvent(event);
+    LineEditUnfocusable::keyPressEvent(event);
 }
 
 void TabDeckEditor::createDeckDock()
@@ -79,7 +82,7 @@ void TabDeckEditor::createDeckDock()
 
     nameLabel = new QLabel();
     nameLabel->setObjectName("nameLabel");
-    nameEdit = new QLineEdit;
+    nameEdit = new LineEditUnfocusable;
     nameEdit->setObjectName("nameEdit");
     nameLabel->setBuddy(nameEdit);
     connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateName(const QString &)));
@@ -121,8 +124,10 @@ void TabDeckEditor::createDeckDock()
     auto *hashSizePolicy = new QSizePolicy();
     hashSizePolicy->setHorizontalPolicy(QSizePolicy::Fixed);
     hashLabel1->setSizePolicy(*hashSizePolicy);
-    hashLabel = new QLabel;
+    hashLabel = new LineEditUnfocusable;
     hashLabel->setObjectName("hashLabel");
+    hashLabel->setReadOnly(true);
+    hashLabel->setFrame(false);
 
     auto *lowerLayout = new QGridLayout;
     lowerLayout->setObjectName("lowerLayout");

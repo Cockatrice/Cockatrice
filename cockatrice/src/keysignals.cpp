@@ -1,4 +1,5 @@
 #include "keysignals.h"
+
 #include <QKeyEvent>
 
 bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)

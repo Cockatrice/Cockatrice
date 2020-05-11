@@ -1,7 +1,10 @@
 #include "gamesmodel.h"
+
 #include "pb/serverinfo_game.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
+#include "tab_userlists.h"
+#include "userlist.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -35,7 +38,7 @@ const QString GamesModel::getGameCreatedString(const int secs) const
     } else { // from 1 hr onward we show hrs
         int hours = secs / SECS_PER_HOUR;
         if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
-            hours++;
+            ++hours;
         ret = QString("%1+ h").arg(QString::number(hours));
     }
     return ret;
@@ -253,8 +256,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
     endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent, bool _ownUserIsRegistered)
-    : QSortFilterProxyModel(parent), ownUserIsRegistered(_ownUserIsRegistered), showBuddiesOnlyGames(false),
+GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
+    : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()),
+      tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(false), hideIgnoredUserGames(false),
       unavailableGamesVisible(false), showPasswordProtectedGames(true), maxPlayersFilterMin(-1), maxPlayersFilterMax(-1)
 {
     setSortRole(GamesModel::SORT_ROLE);
@@ -264,6 +268,12 @@ GamesProxyModel::GamesProxyModel(QObject *parent, bool _ownUserIsRegistered)
 void GamesProxyModel::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
 {
     showBuddiesOnlyGames = _showBuddiesOnlyGames;
+    invalidateFilter();
+}
+
+void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
+{
+    hideIgnoredUserGames = _hideIgnoredUserGames;
     invalidateFilter();
 }
 
@@ -304,6 +314,21 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
     invalidateFilter();
 }
 
+int GamesProxyModel::getNumFilteredGames() const
+{
+    GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
+    if (!model)
+        return 0;
+
+    int numFilteredGames = 0;
+    for (int row = 0; row < model->rowCount(); ++row) {
+        if (!filterAcceptsRow(row)) {
+            ++numFilteredGames;
+        }
+    }
+    return numFilteredGames;
+}
+
 void GamesProxyModel::resetFilterParameters()
 {
     unavailableGamesVisible = false;
@@ -323,6 +348,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
 
     unavailableGamesVisible = settingsCache->gameFilters().isUnavailableGamesVisible();
     showPasswordProtectedGames = settingsCache->gameFilters().isShowPasswordProtectedGames();
+    hideIgnoredUserGames = settingsCache->gameFilters().isHideIgnoredUserGames();
     gameNameFilter = settingsCache->gameFilters().getGameNameFilter();
     maxPlayersFilterMin = settingsCache->gameFilters().getMinPlayers();
     maxPlayersFilterMax = settingsCache->gameFilters().getMaxPlayers();
@@ -343,6 +369,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     settingsCache->gameFilters().setShowBuddiesOnlyGames(showBuddiesOnlyGames);
     settingsCache->gameFilters().setUnavailableGamesVisible(unavailableGamesVisible);
     settingsCache->gameFilters().setShowPasswordProtectedGames(showPasswordProtectedGames);
+    settingsCache->gameFilters().setHideIgnoredUserGames(hideIgnoredUserGames);
     settingsCache->gameFilters().setGameNameFilter(gameNameFilter);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
@@ -358,6 +385,11 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
+    return filterAcceptsRow(sourceRow);
+}
+
+bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
+{
     GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)
         return false;
@@ -365,6 +397,10 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
     const ServerInfo_Game &game = model->getGame(sourceRow);
 
     if (!showBuddiesOnlyGames && game.only_buddies()) {
+        return false;
+    }
+    if (hideIgnoredUserGames && tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(
+                                    QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
     if (!unavailableGamesVisible) {
@@ -397,4 +433,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
         return false;
 
     return true;
+}
+
+void GamesProxyModel::refresh()
+{
+    invalidateFilter();
 }

@@ -1,10 +1,12 @@
 #include "chatview.h"
+
 #include "../pixmapgenerator.h"
 #include "../settingscache.h"
 #include "../soundengine.h"
 #include "../tab_userlists.h"
 #include "../user_context_menu.h"
 #include "user_level.h"
+
 #include <QApplication>
 #include <QDateTime>
 #include <QDesktopServices>

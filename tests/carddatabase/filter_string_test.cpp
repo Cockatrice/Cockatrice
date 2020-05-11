@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../cockatrice/src/filter_string.h"
+#include "../../cockatrice/src/filter_string.h"
 #include "mocks.h"
 
 #include <cmath>

@@ -2,6 +2,7 @@
 #define ARROWTARGET_H
 
 #include "abstractgraphicsitem.h"
+
 #include <QList>
 
 class Player;

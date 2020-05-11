@@ -1,9 +1,9 @@
 #ifndef COCKATRICE_XML3_H
 #define COCKATRICE_XML3_H
 
-#include <QXmlStreamReader>
-
 #include "carddatabaseparser.h"
+
+#include <QXmlStreamReader>
 
 class CockatriceXml3Parser : public ICardDatabaseParser
 {
@@ -14,7 +14,11 @@ public:
     ~CockatriceXml3Parser() override = default;
     bool getCanParseFile(const QString &name, QIODevice &device) override;
     void parseFile(QIODevice &device) override;
-    bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName) override;
+    bool saveToFile(SetNameMap sets,
+                    CardNameMap cards,
+                    const QString &fileName,
+                    const QString &sourceUrl = "unknown",
+                    const QString &sourceVersion = "unknown") override;
 
 private:
     void loadCardsFromXml(QXmlStreamReader &xml);

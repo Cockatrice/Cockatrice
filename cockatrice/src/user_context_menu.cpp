@@ -1,20 +1,7 @@
 #include "user_context_menu.h"
+
 #include "abstractclient.h"
 #include "gameselector.h"
-#include "pending_command.h"
-#include "tab_game.h"
-#include "tab_supervisor.h"
-#include "tab_userlists.h"
-#include "userinfobox.h"
-#include "userlist.h"
-#include <QAction>
-#include <QMenu>
-#include <QMessageBox>
-
-#include <QSignalMapper>
-#include <QtGui>
-#include <QtWidgets>
-
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/commands.pb.h"
 #include "pb/moderator_commands.pb.h"
@@ -24,6 +11,19 @@
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
 #include "pb/session_commands.pb.h"
+#include "pending_command.h"
+#include "tab_game.h"
+#include "tab_supervisor.h"
+#include "tab_userlists.h"
+#include "userinfobox.h"
+#include "userlist.h"
+
+#include <QAction>
+#include <QMenu>
+#include <QMessageBox>
+#include <QSignalMapper>
+#include <QtGui>
+#include <QtWidgets>
 
 UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
@@ -278,11 +278,26 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                                       bool online,
                                       int playerId)
 {
+    showContextMenu(pos, userName, userLevel, online, playerId, QString());
+}
+
+void UserContextMenu::showContextMenu(const QPoint &pos,
+                                      const QString &userName,
+                                      UserLevelFlags userLevel,
+                                      bool online,
+                                      int playerId,
+                                      const QString &deckHash)
+{
+    QAction *aCopyToClipBoard;
     aUserName->setText(userName);
 
     QMenu *menu = new QMenu(static_cast<QWidget *>(parent()));
     menu->addAction(aUserName);
     menu->addSeparator();
+    if (!deckHash.isEmpty()) {
+        aCopyToClipBoard = new QAction(tr("Copy hash to clipboard"), this);
+        menu->addAction(aCopyToClipBoard);
+    }
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
     menu->addAction(aChat);
@@ -351,9 +366,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                             Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
         infoWidget->setAttribute(Qt::WA_DeleteOnClose);
         infoWidget->updateInfo(userName);
-    } else if (actionClicked == aChat)
+    } else if (actionClicked == aChat) {
         emit openMessageDialog(userName, true);
-    else if (actionClicked == aShowGames) {
+    } else if (actionClicked == aShowGames) {
         Command_GetGamesOfUser cmd;
         cmd.set_user_name(userName.toStdString());
 
@@ -438,6 +453,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(warnUserHistory_processResponse(Response)));
         client->sendCommand(pend);
+    } else if (actionClicked == aCopyToClipBoard) {
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        clipboard->setText(deckHash);
     }
 
     delete menu;

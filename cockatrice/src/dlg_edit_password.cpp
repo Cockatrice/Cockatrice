@@ -1,11 +1,12 @@
+#include "dlg_edit_password.h"
+
+#include "settingscache.h"
+
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-
-#include "dlg_edit_password.h"
-#include "settingscache.h"
 
 DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 {

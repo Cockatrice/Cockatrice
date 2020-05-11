@@ -1,9 +1,11 @@
 #include "cardzone.h"
+
 #include "carditem.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "zoneviewzone.h"
+
 #include <QAction>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>

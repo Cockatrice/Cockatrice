@@ -2,6 +2,7 @@
 #define TIP_OF_DAY_H
 
 #include <QAbstractListModel>
+#include <QDate>
 
 class TipOfTheDay
 {

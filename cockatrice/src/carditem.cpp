@@ -1,4 +1,5 @@
 #include "carditem.h"
+
 #include "arrowitem.h"
 #include "carddatabase.h"
 #include "carddragitem.h"
@@ -11,6 +12,7 @@
 #include "tab_game.h"
 #include "tablezone.h"
 #include "zoneviewzone.h"
+
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>

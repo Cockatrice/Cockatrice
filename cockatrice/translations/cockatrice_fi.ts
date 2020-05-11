@@ -2367,7 +2367,7 @@ Kirjautuu.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="380"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
-        <translation type="unfinished"/>
+        <translation>Väärä käyttäjänimi tai salasana. Tarkista todennustietosi ja yritä uudelleen.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="384"/>
@@ -2573,19 +2573,21 @@ You need to provide the activation token received in the activation email.</sour
     <message>
         <location filename="../src/window_main.cpp" line="559"/>
         <source>Socket error: %1</source>
-        <translation type="unfinished"/>
+        <translation>Pistokevirhe: %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="567"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
-        <translation type="unfinished"/>
+        <translation>Yritit yhdistää vanhentuneeseen palvelimeen. Käytä vanhempaa versiota Cockatricesta tai yhdistä sopivaan palvelimeen.
+Paikallinen versio on %1, etäversio on %2.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="573"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice-ohjelmasi on vanhentunut. Päivitä Cockatrice-versiosi.
+Paikallinen versio on %1, etäversio on %2.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="583"/>
@@ -2605,7 +2607,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="593"/>
         <source>Connected, logging in at %1</source>
-        <translation type="unfinished"/>
+        <translation>Yhteys luotu, kirjaudutaan %1:n</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="622"/>
@@ -3548,13 +3550,13 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="850"/>
         <source>Add message</source>
-        <translation type="unfinished"/>
+        <translation>Lisää viesti</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="850"/>
         <location filename="../src/dlg_settings.cpp" line="862"/>
         <source>Message:</source>
-        <translation type="unfinished"/>
+        <translation>Viesti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="862"/>
@@ -3564,7 +3566,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="880"/>
         <source>Chat settings</source>
-        <translation type="unfinished"/>
+        <translation>Keskusteluasetukset</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="881"/>
@@ -3574,7 +3576,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="882"/>
         <source>Enable chat mentions</source>
-        <translation type="unfinished"/>
+        <translation>Salli keskustelumaininnat</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="883"/>
@@ -3584,7 +3586,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="884"/>
         <source>In-game message macros</source>
-        <translation type="unfinished"/>
+        <translation>Pelinsisäiset viestimakrot</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="885"/>
@@ -3600,7 +3602,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/dlg_settings.cpp" line="887"/>
         <location filename="../src/dlg_settings.cpp" line="888"/>
         <source>Invert text color</source>
-        <translation type="unfinished"/>
+        <translation>Käänteinen tekstin väri</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="889"/>
@@ -3621,7 +3623,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/dlg_settings.cpp" line="892"/>
         <location filename="../src/dlg_settings.cpp" line="893"/>
         <source>(Color is hexadecimal)</source>
-        <translation type="unfinished"/>
+        <translation>(Väri on heksadesimaaliluku)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="894"/>

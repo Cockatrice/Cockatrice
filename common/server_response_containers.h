@@ -2,6 +2,7 @@
 #define SERVER_RESPONSE_CONTAINERS_H
 
 #include "pb/server_message.pb.h"
+
 #include <QList>
 #include <QPair>
 

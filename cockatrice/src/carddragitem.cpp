@@ -1,9 +1,11 @@
 #include "carddragitem.h"
+
 #include "carditem.h"
 #include "cardzone.h"
 #include "gamescene.h"
 #include "tablezone.h"
 #include "zoneviewzone.h"
+
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>

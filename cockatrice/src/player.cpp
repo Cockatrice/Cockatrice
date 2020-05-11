@@ -1,4 +1,5 @@
 #include "player.h"
+
 #include "arrowitem.h"
 #include "carddatabase.h"
 #include "carditem.h"
@@ -12,21 +13,6 @@
 #include "handcounter.h"
 #include "handzone.h"
 #include "main.h"
-#include "pilezone.h"
-#include "playertarget.h"
-#include "settingscache.h"
-#include "stackzone.h"
-#include "tab_game.h"
-#include "tablezone.h"
-#include "thememanager.h"
-#include "zoneviewwidget.h"
-#include "zoneviewzone.h"
-#include <QDebug>
-#include <QMenu>
-#include <QPainter>
-#include <QRegularExpression>
-#include <QRegularExpressionMatch>
-
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_concede.pb.h"
@@ -67,6 +53,21 @@
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_zone.pb.h"
+#include "pilezone.h"
+#include "playertarget.h"
+#include "settingscache.h"
+#include "stackzone.h"
+#include "tab_game.h"
+#include "tablezone.h"
+#include "thememanager.h"
+#include "zoneviewwidget.h"
+#include "zoneviewzone.h"
+
+#include <QDebug>
+#include <QMenu>
+#include <QPainter>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QObject(), QGraphicsItem(parentItem)
 {
@@ -866,6 +867,10 @@ void Player::setShortcutsActive()
     aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
     aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
     aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
+    aMoveTopCardToBottom->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToBottom"));
+    aMoveBottomCardToGrave->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToGrave"));
+    aPlayFacedown->setShortcut(shortcuts.getSingleShortcut("Player/aPlayFacedown"));
+    aPlay->setShortcut(shortcuts.getSingleShortcut("Player/aPlay"));
 }
 
 void Player::setShortcutsInactive()
@@ -907,7 +912,7 @@ void Player::initSayMenu()
     int count = settingsCache->messages().getCount();
 
     for (int i = 0; i < count; ++i) {
-        QAction *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
+        auto *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
         if (i <= 10) {
             newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }

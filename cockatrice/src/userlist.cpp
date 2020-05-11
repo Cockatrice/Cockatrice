@@ -1,4 +1,5 @@
 #include "userlist.h"
+
 #include "abstractclient.h"
 #include "gameselector.h"
 #include "pb/moderator_commands.pb.h"
@@ -10,12 +11,14 @@
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
 #include "user_context_menu.h"
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>

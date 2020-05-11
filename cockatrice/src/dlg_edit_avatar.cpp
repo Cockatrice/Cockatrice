@@ -1,3 +1,5 @@
+#include "dlg_edit_avatar.h"
+
 #include <QBuffer>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -7,8 +9,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-
-#include "dlg_edit_avatar.h"
 
 DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent)
 {

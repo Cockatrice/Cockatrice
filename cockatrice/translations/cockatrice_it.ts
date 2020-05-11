@@ -3094,12 +3094,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="438"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carta.</numerusform><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carte.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="443"/>
         <source>%1 shuffles their deck and draws a new hand.</source>
-        <translation type="unfinished"/>
+        <translation>%1 mischia il proprio mazzo e pesca una nuova mano.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="479"/>
@@ -5256,7 +5256,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="505"/>
         <source>Reverse turn order</source>
-        <translation type="unfinished"/>
+        <translation>Inverti l&apos;ordine dei turni</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="508"/>

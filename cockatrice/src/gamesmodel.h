@@ -3,6 +3,8 @@
 
 #include "gametypemap.h"
 #include "pb/serverinfo_game.pb.h"
+#include "tab_supervisor.h"
+
 #include <QAbstractTableModel>
 #include <QList>
 #include <QSet>
@@ -65,7 +67,9 @@ class GamesProxyModel : public QSortFilterProxyModel
     Q_OBJECT
 private:
     bool ownUserIsRegistered;
+    const TabSupervisor *tabSupervisor;
     bool showBuddiesOnlyGames;
+    bool hideIgnoredUserGames;
     bool unavailableGamesVisible;
     bool showPasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
@@ -75,13 +79,18 @@ private:
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
 
 public:
-    GamesProxyModel(QObject *parent = nullptr, bool _ownUserIsRegistered = false);
+    GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
 
     bool getShowBuddiesOnlyGames() const
     {
         return showBuddiesOnlyGames;
     }
     void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
+    bool getHideIgnoredUserGames() const
+    {
+        return hideIgnoredUserGames;
+    }
+    void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
     bool getUnavailableGamesVisible() const
     {
         return unavailableGamesVisible;
@@ -116,12 +125,15 @@ public:
         return maxPlayersFilterMax;
     }
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
+    int getNumFilteredGames() const;
     void resetFilterParameters();
     void loadFilterParameters(const QMap<int, QString> &allGameTypes);
     void saveFilterParameters(const QMap<int, QString> &allGameTypes);
+    void refresh();
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow) const;
 };
 
 #endif

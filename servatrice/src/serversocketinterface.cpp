@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "serversocketinterface.h"
+
 #include "decklist.h"
 #include "main.h"
 #include "pb/command_deck_del.pb.h"
@@ -61,15 +62,14 @@
 #include "server_player.h"
 #include "server_response_containers.h"
 #include "settingscache.h"
+#include "version_string.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
-#include <iostream>
-
-#include "version_string.h"
 #include <iostream>
 #include <string>
 
@@ -119,6 +119,11 @@ void AbstractServerSocketInterface::catchSocketError(QAbstractSocket::SocketErro
 {
     qDebug() << "Socket error:" << socketError;
 
+    prepareDestroy();
+}
+
+void AbstractServerSocketInterface::catchSocketDisconnected()
+{
     prepareDestroy();
 }
 
@@ -1511,6 +1516,7 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
     connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -1553,7 +1559,11 @@ void TcpServerSocketInterface::flushOutputQueue()
         locker.unlock();
 
         QByteArray buf;
+#if GOOGLE_PROTOBUF_VERSION > 3001000
+        unsigned int size = item.ByteSizeLong();
+#else
         unsigned int size = item.ByteSize();
+#endif
         buf.resize(size + 4);
         item.SerializeToArray(buf.data() + 4, size);
         buf.data()[3] = (unsigned char)size;
@@ -1590,7 +1600,7 @@ void TcpServerSocketInterface::readClient()
             } else
                 return;
         }
-        if (inputBuffer.size() < messageLength)
+        if (inputBuffer.size() < messageLength || messageLength < 0)
             return;
 
         CommandContainer newCommandContainer;
@@ -1675,6 +1685,7 @@ WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
 void WebsocketServerSocketInterface::initConnection(void *_socket)
 {
     socket = (QWebSocket *)_socket;
+    socket->setParent(this);
     address = socket->peerAddress();
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
@@ -1695,6 +1706,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
             SLOT(binaryMessageReceived(const QByteArray &)));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 
     // Add this object to the server's list of connections before it can receive socket events.
     // Otherwise, in case a of a socket error, it could be removed from the list before it is added.
@@ -1747,7 +1759,11 @@ void WebsocketServerSocketInterface::flushOutputQueue()
         locker.unlock();
 
         QByteArray buf;
+#if GOOGLE_PROTOBUF_VERSION > 3001000
+        unsigned int size = item.ByteSizeLong();
+#else
         unsigned int size = item.ByteSize();
+#endif
         buf.resize(size);
         item.SerializeToArray(buf.data(), size);
         // In case socket->write() calls catchSocketError(), the mutex must not be locked during this call.
@@ -1795,5 +1811,5 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
 
 bool AbstractServerSocketInterface::isPasswordLongEnough(const int passwordLength)
 {
-    return passwordLength < servatrice->getMinPasswordLength();
+    return passwordLength >= servatrice->getMinPasswordLength();
 }

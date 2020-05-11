@@ -141,6 +141,25 @@ to permit connections to the server.
 
 Find more information on how to use Servatrice with Docker in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
 
+**Docker compose**
+
+There is also a docker-compose file available which will configure and run both a MySQL server and Servatrice. The docker-compose setup scripts can be found in the `servatrice/docker` folder and vary only slightly from the default sql and server .ini files. The setup scripts can either be modified in place, or docker-compose can mount alternative files into the images, as you prefer.
+
+To run Servatrice via docker-compose, first install docker-compose following the [install instructions](https://docs.docker.com/compose/install/). Once installed, run the following from the root of the repository:
+```bash
+docker-compose build    # Build the Servatrice image using the same Dockerfile as above.
+docker-compose up       # Setup and run both the MySQL server and Servatrice.
+```
+
+>Note: Similar to the above Docker setup, this will expose TCP ports 4747 and 4748.
+
+>Note: The first time running the docker-compose setup, the MySQL server will take a little time to run the initial setup scripts. Due to this, the Servatrice instance may fail the first few attempts to connect to the database. Servatrice is set to `restart: always` in the docker-compose.yml, which will allow it to continue attempting to start up. Once the MySQL scripts have completed, Servatrice should then connect automatically on the next attempt.
+
+**Docker compose in Windows**
+A out of box working docker-compose file has been added to help setup in Windows.
+
+Docker in Windows requires additional steps in form of using Docker Desktop to allow resource sharing from the drive the volumes are mapped from, as well as potential workarounds needed to get file sharing working in Windows. This [StackOverflow discussion sheds some light on it](https://stackoverflow.com/questions/42203488/settings-to-windows-firewall-to-allow-docker-for-windows-to-share-drive)
+
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
 
 Cockatrice is free software, licensed under the [GPLv2](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE).

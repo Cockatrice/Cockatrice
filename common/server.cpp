@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server.h"
+
 #include "featureset.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -33,6 +34,7 @@
 #include "server_protocolhandler.h"
 #include "server_remoteuserinterface.h"
 #include "server_room.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QThread>

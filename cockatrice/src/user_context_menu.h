@@ -2,6 +2,7 @@
 #define USER_CONTEXT_MENU_H
 
 #include "user_level.h"
+
 #include <QObject>
 
 class QAction;
@@ -53,6 +54,12 @@ public:
                          UserLevelFlags userLevel,
                          bool online = true,
                          int playerId = -1);
+    void showContextMenu(const QPoint &pos,
+                         const QString &userName,
+                         UserLevelFlags userLevel,
+                         bool online,
+                         int playerId,
+                         const QString &deckHash);
 };
 
 #endif
