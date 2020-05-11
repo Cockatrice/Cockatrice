@@ -18,7 +18,7 @@ jobs:
 
 
   #Ubuntu Bionic (on Docker)
-  - name: Ubuntu Bionic (Compile)
+  - name: Ubuntu Bionic (Debug + Tests)
     if: tag IS NOT present
     os: linux
     services: docker
@@ -28,7 +28,7 @@ jobs:
       directories:
       - $CACHE
     before_install: source .ci/travis-docker.sh --build
-    script: RUN --server
+    script: RUN --server --debug --test
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -43,7 +43,7 @@ jobs:
     script: RUN --server --package $NAME --release
 
   #Ubuntu Focal (on Docker)
-  - name: Ubuntu Focal (Debug + Tests)
+  - name: Ubuntu Focal (Compile)
     if: tag IS NOT present
     os: linux
     services: docker
@@ -53,7 +53,7 @@ jobs:
       directories:
       - $CACHE
     before_install: source .ci/travis-docker.sh --build
-    script: RUN --server --test --debug
+    script: RUN --server
 
   - name: Ubuntu Focal (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
