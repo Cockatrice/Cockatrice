@@ -7,12 +7,11 @@ Phase::Phase(const char *_name, QString _color, QString _soundFileName) : color(
 
 Phase Phases::getPhase(int phase)
 {
-  if (0 <= phase && phase < Phases::phaseTypesCount){
-    return phases[phase];
-  }
-  else {
-    return unknownPhase;
-  }
+    if (0 <= phase && phase < Phases::phaseTypesCount) {
+        return phases[phase];
+    } else {
+        return unknownPhase;
+    }
 }
 
 const Phase Phases::unknownPhase(QT_TRANSLATE_NOOP("Phase", "Unknown Phase"), "black", "unknown_phase");
