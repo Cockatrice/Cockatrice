@@ -8,11 +8,10 @@
 #include "phase.h"
 #include "player.h"
 #include "soundengine.h"
+
 #include <utility>
 
 const QString &MessageLogWidget::tableConstant() const
-
-
 {
     static const QString constant("table");
     return constant;
@@ -566,12 +565,10 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 {
     Phase phase = Phases::getPhase(phaseNumber);
 
-    if (phase.name != "Unknown Phase") {
-        soundEngine->playSound(phase.soundFileName);
-    }
+    soundEngine->playSound(phase.soundFileName);
 
     appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               QString("%1").arg(tr(phase.name.toStdString().c_str())) + "</b></font>");
+               phase.name + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
