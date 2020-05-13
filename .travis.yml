@@ -28,7 +28,7 @@ jobs:
       directories:
       - $CACHE
     before_install: source .ci/travis-docker.sh --build
-    script: RUN --server --test --debug
+    script: RUN --server --debug --test
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -42,6 +42,30 @@ jobs:
     before_install: source .ci/travis-docker.sh --build
     script: RUN --server --package $NAME --release
 
+  #Ubuntu Focal (on Docker)
+  - name: Ubuntu Focal (Compile)
+    if: tag IS NOT present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=UbuntuFocal CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server
+
+  - name: Ubuntu Focal (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=UbuntuFocal CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --package $NAME --release
 
   #Debian Buster (on Docker)
   - name: Debian Buster (Compile)
