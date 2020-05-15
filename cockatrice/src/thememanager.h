@@ -44,6 +44,7 @@ public:
         return playerBgBrush;
     }
     QStringMap &getAvailableThemes();
+    QBrush getExtraTableBgBrush(QString extraNumber);
 protected slots:
     void themeChangedSlot();
 signals:

@@ -107,3 +107,8 @@ void ThemeManager::themeChangedSlot()
 
     emit themeChanged();
 }
+
+QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber)
+{
+    return loadBrush(TABLEZONE_BG_NAME + extraNumber, QColor(70, 50, 100));
+}
