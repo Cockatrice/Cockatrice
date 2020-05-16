@@ -28,12 +28,12 @@ AbstractCounter::AbstractCounter(Player *_player,
       useNameForShortcut(_useNameForShortcut), hovered(false), aDec(nullptr), aInc(nullptr), dialogSemaphore(false),
       deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea), game(_game)
 {
-    QString displayName = CapitalizeCounterName::getDisplayName(_name);
     setAcceptHoverEvents(true);
 
     shortcutActive = false;
 
     if (player->getLocalOrJudge()) {
+        QString displayName = CapitalizeCounterName::getDisplayName(_name);
         menu = new TearOffMenu(displayName);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
