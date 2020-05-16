@@ -677,13 +677,15 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
-    if (counterName == "life") {
+    QString counterDisplayName = QString(counterName);
+    counterDisplayName[0] = counterDisplayName[0].toTitleCase();
+    if (counterDisplayName == "Life") {
         soundEngine->playSound("life_change");
     }
 
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
                                 .arg(sanitizeHtml(player->getName()))
-                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterName)))
+                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(value))
                                 .arg(value > oldValue ? "+" : "")
                                 .arg(value - oldValue));
