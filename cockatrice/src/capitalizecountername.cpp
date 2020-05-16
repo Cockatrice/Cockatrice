@@ -8,5 +8,4 @@ const QMap<QString, QString> CapitalizeCounterName::translated = {
     {"r", QT_TRANSLATE_NOOP("CapitalizeCounterName", "Red")},
     {"g", QT_TRANSLATE_NOOP("CapitalizeCounterName", "Green")},
     {"x", QT_TRANSLATE_NOOP("CapitalizeCounterName", "Colorless")},
-    {"storm", QT_TRANSLATE_NOOP("CapitalizeCounterName", "Storm")}
-};
+    {"storm", QT_TRANSLATE_NOOP("CapitalizeCounterName", "Storm")}};
