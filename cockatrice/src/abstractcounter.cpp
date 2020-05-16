@@ -5,6 +5,7 @@
 #include "pb/command_set_counter.pb.h"
 #include "player.h"
 #include "settingscache.h"
+#include "capitalizecountername.h"
 
 #include <QAction>
 #include <QApplication>
@@ -27,8 +28,7 @@ AbstractCounter::AbstractCounter(Player *_player,
       useNameForShortcut(_useNameForShortcut), hovered(false), aDec(nullptr), aInc(nullptr), dialogSemaphore(false),
       deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea), game(_game)
 {
-    QString displayName = QString(_name);
-    displayName[0] = displayName[0].toTitleCase();
+    QString displayName = CapitalizeCounterName::getDisplayName(_name);
     setAcceptHoverEvents(true);
 
     shortcutActive = false;

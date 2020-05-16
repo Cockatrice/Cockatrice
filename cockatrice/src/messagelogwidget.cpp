@@ -7,6 +7,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "soundengine.h"
+#include "capitalizecountername.h"
 
 #include <utility>
 
@@ -677,8 +678,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
-    QString counterDisplayName = QString(counterName);
-    counterDisplayName[0] = counterDisplayName[0].toTitleCase();
+    QString counterDisplayName = CapitalizeCounterName::getDisplayName(counterName);
     if (counterDisplayName == "Life") {
         soundEngine->playSound("life_change");
     }
