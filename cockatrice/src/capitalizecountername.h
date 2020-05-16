@@ -6,7 +6,6 @@
 
 class CapitalizeCounterName
 {
-    Q_DECLARE_TR_FUNCTIONS(CapitalizedCounterName)
 
 public:
     static QString getDisplayName(QString _name)
