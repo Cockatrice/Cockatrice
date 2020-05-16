@@ -1,5 +1,6 @@
 #include "messagelogwidget.h"
 
+#include "capitalizecountername.h"
 #include "carditem.h"
 #include "cardzone.h"
 #include "pb/context_move_card.pb.h"
@@ -7,7 +8,6 @@
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "soundengine.h"
-#include "capitalizecountername.h"
 
 #include <utility>
 
@@ -678,7 +678,6 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
-    
     if (counterName == "life") {
         soundEngine->playSound("life_change");
     }

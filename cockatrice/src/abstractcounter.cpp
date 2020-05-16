@@ -1,11 +1,11 @@
 #include "abstractcounter.h"
 
+#include "capitalizecountername.h"
 #include "expression.h"
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
 #include "player.h"
 #include "settingscache.h"
-#include "capitalizecountername.h"
 
 #include <QAction>
 #include <QApplication>
