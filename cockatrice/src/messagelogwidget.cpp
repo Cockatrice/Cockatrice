@@ -7,6 +7,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "soundengine.h"
+#include "translatecountername.h"
 
 #include <utility>
 
@@ -681,9 +682,10 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
         soundEngine->playSound("life_change");
     }
 
+    QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
                                 .arg(sanitizeHtml(player->getName()))
-                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterName)))
+                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(value))
                                 .arg(value > oldValue ? "+" : "")
                                 .arg(value - oldValue));
