@@ -1,12 +1,12 @@
-#ifndef CAPITALIZECOUNTERNAME_H
-#define CAPITALIZECOUNTERNAME_H
+#ifndef TRANSLATECOUNTERNAME_H
+#define TRANSLATECOUNTERNAME_H
 
 #include <QString>
 #include <QtCore>
 
-class CapitalizeCounterName
+class TranslateCounterName
 {
-    Q_DECLARE_TR_FUNCTIONS(CapitalizeCounterName)
+    Q_DECLARE_TR_FUNCTIONS(TranslateCounterName)
 
     static const QMap<QString, QString> translated;
 
@@ -21,4 +21,4 @@ public:
     }
 };
 
-#endif // CAPITALIZECOUNTERNAME_H
+#endif // TRANSLATECOUNTERNAME_H

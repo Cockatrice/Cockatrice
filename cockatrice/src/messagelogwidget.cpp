@@ -1,6 +1,5 @@
 #include "messagelogwidget.h"
 
-#include "capitalizecountername.h"
 #include "carditem.h"
 #include "cardzone.h"
 #include "pb/context_move_card.pb.h"
@@ -8,6 +7,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "soundengine.h"
+#include "translatecountername.h"
 
 #include <utility>
 
@@ -682,7 +682,7 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
         soundEngine->playSound("life_change");
     }
 
-    QString counterDisplayName = CapitalizeCounterName::getDisplayName(counterName);
+    QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))

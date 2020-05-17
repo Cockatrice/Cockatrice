@@ -1,11 +1,11 @@
 #include "abstractcounter.h"
 
-#include "capitalizecountername.h"
 #include "expression.h"
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
 #include "player.h"
 #include "settingscache.h"
+#include "translatecountername.h"
 
 #include <QAction>
 #include <QApplication>
@@ -33,7 +33,7 @@ AbstractCounter::AbstractCounter(Player *_player,
     shortcutActive = false;
 
     if (player->getLocalOrJudge()) {
-        QString displayName = CapitalizeCounterName::getDisplayName(_name);
+        QString displayName = TranslateCounterName::getDisplayName(_name);
         menu = new TearOffMenu(displayName);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
