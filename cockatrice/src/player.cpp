@@ -104,6 +104,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
     connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
 
+    zoneId = 0;
+
     playerArea = new PlayerArea(this);
 
     playerTarget = new PlayerTarget(this, playerArea, game);
@@ -3257,6 +3259,11 @@ void Player::setConceded(bool _conceded)
         clear();
     }
     emit playerCountChanged();
+}
+
+void Player::setZoneId(int _zoneId)
+{
+    zoneId = _zoneId;
 }
 
 void Player::setMirrored(bool _mirrored)

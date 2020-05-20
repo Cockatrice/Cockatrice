@@ -25,6 +25,7 @@ private:
 protected:
     void ensureThemeDirectoryExists();
     QBrush loadBrush(QString fileName, QColor fallbackColor);
+    QBrush loadExtraBrush(QString fileName, QBrush fallbackBrush);
 
 public:
     QBrush &getHandBgBrush()
@@ -44,7 +45,7 @@ public:
         return playerBgBrush;
     }
     QStringMap &getAvailableThemes();
-    QBrush getExtraTableBgBrush(QString extraNumber);
+    QBrush getExtraTableBgBrush(QString extraNumber, QBrush fallbackBrush);
 protected slots:
     void themeChangedSlot();
 signals:

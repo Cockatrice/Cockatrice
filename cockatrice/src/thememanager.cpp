@@ -77,6 +77,20 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
     return brush;
 }
 
+QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush fallbackBrush)
+{
+    QBrush brush;
+    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+
+    if (tmp.isNull()) {
+        brush = fallbackBrush;
+    } else {
+        brush.setTexture(tmp);
+    }
+
+    return brush;
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = settingsCache->getThemeName();
@@ -108,7 +122,7 @@ void ThemeManager::themeChangedSlot()
     emit themeChanged();
 }
 
-QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber)
+QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber, QBrush fallbackBrush)
 {
-    return loadBrush(TABLEZONE_BG_NAME + extraNumber, QColor(70, 50, 100));
+    return loadExtraBrush(TABLEZONE_BG_NAME + extraNumber, fallbackBrush);
 }

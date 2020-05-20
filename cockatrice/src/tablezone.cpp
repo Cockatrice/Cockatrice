@@ -57,10 +57,9 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 {
     QBrush brush = themeManager->getTableBgBrush();
 
-    // If the player is other than Player 1
-    if (player->getId() > 0) {
-        // The player's id starts with 0 so in order to get the correct image we need to add 1
-        brush = themeManager->getExtraTableBgBrush(QString::number(player->getId() + 1));
+    if (player->getZoneId() > 0) {
+        // If the extra image is not found, load the default one
+        brush = themeManager->getExtraTableBgBrush(QString::number(player->getZoneId()), brush);
     }
     painter->fillRect(boundingRect(), brush);
 
