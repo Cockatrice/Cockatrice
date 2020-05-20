@@ -92,23 +92,34 @@ void PlayerArea::setSize(qreal width, qreal height)
     bRect = QRectF(0, 0, width, height);
 }
 
+void Player::initializeUserInfo(const ServerInfo_User &info) {
+    userInfo = new ServerInfo_User;
+    userInfo->CopyFrom(info);
+}
+
+void Player::connectSettingsCache() {
+    connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
+    connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
+}
+
+void Player::initializePlayerAreaAndTarget() {
+    playerArea = new PlayerArea(this);
+
+    playerTarget = new PlayerTarget(this, playerArea, game);
+    qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
+    playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
+}
+
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
     : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
       defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
       local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
       deck(nullptr)
 {
-    userInfo = new ServerInfo_User;
-    userInfo->CopyFrom(info);
+    initializeUserInfo(info);
+    connectSettingsCache();
+    initializePlayerAreaAndTarget();
 
-    connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
-    connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
-
-    playerArea = new PlayerArea(this);
-
-    playerTarget = new PlayerTarget(this, playerArea, game);
-    qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
-    playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
     PileZone *deck = new PileZone(this, "deck", true, false, playerArea);
     QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,

@@ -432,6 +432,12 @@ public:
     void sendGameCommand(const google::protobuf::Message &command);
 
     void setLastToken(CardInfoPtr cardInfo);
+
+
+    // Helper functions to increase code legibility
+    void initializeUserInfo(const ServerInfo_User &info);
+    void connectSettingsCache();
+    void initializePlayerAreaAndTarget();
 };
 
 #endif
