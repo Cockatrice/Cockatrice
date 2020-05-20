@@ -110,35 +110,25 @@ void Player::initializePlayerAreaAndTarget() {
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 }
 
-Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
-      defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
-      local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
-      deck(nullptr)
-{
-    initializeUserInfo(info);
-    connectSettingsCache();
-    initializePlayerAreaAndTarget();
-
-
-    PileZone *deck = new PileZone(this, "deck", true, false, playerArea);
+void Player::initializePileZones(bool _local, TabGame *_parent) {
     QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
                            10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
-    deck->setPos(base);
+    deckZone = new PileZone(this, "deck", true, false, playerArea);
+    deckZone->setPos(base);
 
-    qreal h = deck->boundingRect().width() + 5;
+    qreal deckPos = deckZone->boundingRect().width() + 5;
 
     auto *handCounter = new HandCounter(playerArea);
-    handCounter->setPos(base + QPointF(0, h + 10));
-    qreal h2 = handCounter->boundingRect().height();
+    handCounter->setPos(base + QPointF(0, deckPos + 10));
+    qreal handPos = handCounter->boundingRect().height();
 
-    PileZone *grave = new PileZone(this, "grave", false, true, playerArea);
-    grave->setPos(base + QPointF(0, h + h2 + 10));
+    grave = new PileZone(this, "grave", false, true, playerArea);
+    grave->setPos(base + QPointF(0, deckPos + handPos + 10));
 
-    PileZone *rfg = new PileZone(this, "rfg", false, true, playerArea);
-    rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
+    rfg = new PileZone(this, "rfg", false, true, playerArea);
+    rfg->setPos(base + QPointF(0, 2 * deckPos + handPos + 10));
 
-    PileZone *sb = new PileZone(this, "sb", false, false, playerArea);
+    sb = new PileZone(this, "sb", false, false, playerArea);
     sb->setVisible(false);
 
     table = new TableZone(this, this);
@@ -150,6 +140,20 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
                         (int)table->boundingRect().height(), this);
     connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
     connect(handCounter, SIGNAL(showContextMenu(const QPoint &)), hand, SLOT(showContextMenu(const QPoint &)));
+}
+
+Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
+    : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
+      defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
+      local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
+      deck(nullptr)
+{
+    initializeUserInfo(info);
+    connectSettingsCache();
+    initializePlayerAreaAndTarget();
+    initializePileZones(_local, _parent);
+
+
 
     updateBoundingRect();
 
@@ -299,7 +303,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addAction(aMoveTopCardsToExile);
         libraryMenu->addSeparator();
         libraryMenu->addAction(aOpenDeckInDeckEditor);
-        deck->setMenu(libraryMenu, aDrawCard);
+        deckZone->setMenu(libraryMenu, aDrawCard);
     } else {
         handMenu = nullptr;
         libraryMenu = nullptr;

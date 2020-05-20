@@ -6,6 +6,7 @@
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 #include "tearoffmenu.h"
+#include "pilezone.h"
 
 #include <QInputDialog>
 #include <QMap>
@@ -241,6 +242,11 @@ private:
     bool handVisible;
     bool conceded;
 
+    PileZone *deckZone;
+    PileZone *grave;
+    PileZone *rfg;
+    PileZone *sb;
+
     bool dialogSemaphore;
     bool clearCardsToDelete();
     QList<CardItem *> cardsToDelete;
@@ -438,6 +444,7 @@ public:
     void initializeUserInfo(const ServerInfo_User &info);
     void connectSettingsCache();
     void initializePlayerAreaAndTarget();
+    void initializePileZones(bool _local, TabGame *_parent);
 };
 
 #endif
