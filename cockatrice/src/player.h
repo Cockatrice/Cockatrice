@@ -444,7 +444,13 @@ public:
     void initializeUserInfo(const ServerInfo_User &info);
     void connectSettingsCache();
     void initializePlayerAreaAndTarget();
-    void initializePileZones(bool _local, TabGame *_parent);
+    void initializeZones(bool _local, TabGame *_parent);
+    void initializeLocalOrJudgeActions();
+    void initializeHandMenu();
+    void initializeLibraryMenu();
+    void initializeRevealRandomGraveyardCard();
+    void initializeMoveGraveMenu();
+    void initializeMoveRfgMenu();
 };
 
 #endif

@@ -110,59 +110,7 @@ void Player::initializePlayerAreaAndTarget() {
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 }
 
-void Player::initializePileZones(bool _local, TabGame *_parent) {
-    QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
-                           10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
-    deckZone = new PileZone(this, "deck", true, false, playerArea);
-    deckZone->setPos(base);
-
-    qreal deckPos = deckZone->boundingRect().width() + 5;
-
-    auto *handCounter = new HandCounter(playerArea);
-    handCounter->setPos(base + QPointF(0, deckPos + 10));
-    qreal handPos = handCounter->boundingRect().height();
-
-    grave = new PileZone(this, "grave", false, true, playerArea);
-    grave->setPos(base + QPointF(0, deckPos + handPos + 10));
-
-    rfg = new PileZone(this, "rfg", false, true, playerArea);
-    rfg->setPos(base + QPointF(0, 2 * deckPos + handPos + 10));
-
-    sb = new PileZone(this, "sb", false, false, playerArea);
-    sb->setVisible(false);
-
-    table = new TableZone(this, this);
-    connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
-
-    stack = new StackZone(this, (int)table->boundingRect().height(), this);
-
-    hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
-                        (int)table->boundingRect().height(), this);
-    connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
-    connect(handCounter, SIGNAL(showContextMenu(const QPoint &)), hand, SLOT(showContextMenu(const QPoint &)));
-}
-
-Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
-      defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
-      local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
-      deck(nullptr)
-{
-    initializeUserInfo(info);
-    connectSettingsCache();
-    initializePlayerAreaAndTarget();
-    initializePileZones(_local, _parent);
-
-
-
-    updateBoundingRect();
-
-    if (local || judge) {
-        connect(_parent, SIGNAL(playerAdded(Player *)), this, SLOT(addPlayer(Player *)));
-        connect(_parent, SIGNAL(playerRemoved(Player *)), this, SLOT(removePlayer(Player *)));
-    }
-
-    if (local || judge) {
+void Player::initializeLocalOrJudgeActions() {
         aMoveHandToTopLibrary = new QAction(this);
         aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
         aMoveHandToBottomLibrary = new QAction(this);
@@ -209,6 +157,12 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
         aViewHand = new QAction(this);
         connect(aViewHand, SIGNAL(triggered()), this, SLOT(actViewHand()));
+        aViewGraveyard = new QAction(this);
+        connect(aViewGraveyard, SIGNAL(triggered()), this, SLOT(actViewGraveyard()));
+        aViewRfg = new QAction(this);
+        connect(aViewRfg, SIGNAL(triggered()), this, SLOT(actViewRfg()));
+        aViewSideboard = new QAction(this);
+        connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
 
         aViewTopCards = new QAction(this);
         connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
@@ -218,17 +172,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aOpenDeckInDeckEditor = new QAction(this);
         aOpenDeckInDeckEditor->setEnabled(false);
         connect(aOpenDeckInDeckEditor, SIGNAL(triggered()), this, SLOT(actOpenDeckInDeckEditor()));
-    }
-
-    aViewGraveyard = new QAction(this);
-    connect(aViewGraveyard, SIGNAL(triggered()), this, SLOT(actViewGraveyard()));
-
-    aViewRfg = new QAction(this);
-    connect(aViewRfg, SIGNAL(triggered()), this, SLOT(actViewRfg()));
-
-    if (local || judge) {
-        aViewSideboard = new QAction(this);
-        connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
 
         aDrawCard = new QAction(this);
         connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
@@ -256,12 +199,43 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
         aMoveBottomCardToGrave = new QAction(this);
         connect(aMoveBottomCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToGrave()));
-    }
 
-    playerMenu = new TearOffMenu();
-    table->setMenu(playerMenu);
 
-    if (local || judge) {
+}
+
+void Player::initializeZones(bool _local, TabGame *_parent) {
+    QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
+                           10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
+    deckZone = new PileZone(this, "deck", true, false, playerArea);
+    deckZone->setPos(base);
+
+    qreal deckPos = deckZone->boundingRect().width() + 5;
+
+    auto *handCounter = new HandCounter(playerArea);
+    handCounter->setPos(base + QPointF(0, deckPos + 10));
+    qreal handPos = handCounter->boundingRect().height();
+
+    grave = new PileZone(this, "grave", false, true, playerArea);
+    grave->setPos(base + QPointF(0, deckPos + handPos + 10));
+
+    rfg = new PileZone(this, "rfg", false, true, playerArea);
+    rfg->setPos(base + QPointF(0, 2 * deckPos + handPos + 10));
+
+    sb = new PileZone(this, "sb", false, false, playerArea);
+    sb->setVisible(false);
+
+    table = new TableZone(this, this);
+    connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
+
+    stack = new StackZone(this, (int)table->boundingRect().height(), this);
+
+    hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
+                        (int)table->boundingRect().height(), this);
+    connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
+    connect(handCounter, SIGNAL(showContextMenu(const QPoint &)), hand, SLOT(showContextMenu(const QPoint &)));
+}
+
+void Player::initializeHandMenu() {
         handMenu = playerMenu->addTearOffMenu(QString());
         handMenu->addAction(aViewHand);
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
@@ -277,7 +251,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         moveHandMenu->addSeparator();
         moveHandMenu->addAction(aMoveHandToRfg);
         hand->setMenu(handMenu);
+}
 
+void Player::initializeLibraryMenu() {
         libraryMenu = playerMenu->addTearOffMenu(QString());
         libraryMenu->addAction(aDrawCard);
         libraryMenu->addAction(aDrawCards);
@@ -304,29 +280,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addSeparator();
         libraryMenu->addAction(aOpenDeckInDeckEditor);
         deckZone->setMenu(libraryMenu, aDrawCard);
-    } else {
-        handMenu = nullptr;
-        libraryMenu = nullptr;
-    }
+}
 
-    graveMenu = playerMenu->addTearOffMenu(QString());
-    graveMenu->addAction(aViewGraveyard);
-
-    if (local || judge) {
-        mRevealRandomGraveyardCard = graveMenu->addMenu(QString());
-        QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
-        newAction->setData(-1);
-        connect(newAction, SIGNAL(triggered()), this, SLOT(actRevealRandomGraveyardCard()));
-        allPlayersActions.append(newAction);
-        mRevealRandomGraveyardCard->addSeparator();
-    }
-    grave->setMenu(graveMenu, aViewGraveyard);
-
-    rfgMenu = playerMenu->addTearOffMenu(QString());
-    rfgMenu->addAction(aViewRfg);
-    rfg->setMenu(rfgMenu, aViewRfg);
-
-    if (local || judge) {
+void Player::initializeMoveGraveMenu() {
         graveMenu->addSeparator();
         moveGraveMenu = graveMenu->addTearOffMenu(QString());
         moveGraveMenu->addAction(aMoveGraveToTopLibrary);
@@ -335,7 +291,18 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         moveGraveMenu->addAction(aMoveGraveToHand);
         moveGraveMenu->addSeparator();
         moveGraveMenu->addAction(aMoveGraveToRfg);
+}
 
+void Player::initializeRevealRandomGraveyardCard() {
+        mRevealRandomGraveyardCard = graveMenu->addMenu(QString());
+        QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
+        newAction->setData(-1);
+        connect(newAction, SIGNAL(triggered()), this, SLOT(actRevealRandomGraveyardCard()));
+        allPlayersActions.append(newAction);
+        mRevealRandomGraveyardCard->addSeparator();
+}
+
+void Player::initializeMoveRfgMenu() {
         rfgMenu->addSeparator();
         moveRfgMenu = rfgMenu->addTearOffMenu(QString());
         moveRfgMenu->addAction(aMoveRfgToTopLibrary);
@@ -344,6 +311,53 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         moveRfgMenu->addAction(aMoveRfgToHand);
         moveRfgMenu->addSeparator();
         moveRfgMenu->addAction(aMoveRfgToGrave);
+}
+
+Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
+    : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
+      defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
+      local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
+      deck(nullptr)
+{
+    initializeUserInfo(info);
+    connectSettingsCache();
+    initializePlayerAreaAndTarget();
+    initializeZones(_local, _parent);
+
+    updateBoundingRect();
+
+    if (local || judge) {
+        connect(_parent, SIGNAL(playerAdded(Player *)), this, SLOT(addPlayer(Player *)));
+        connect(_parent, SIGNAL(playerRemoved(Player *)), this, SLOT(removePlayer(Player *)));
+    }
+
+    if (local || judge) {
+        initializeLocalOrJudgeActions();
+    }
+
+    playerMenu = new TearOffMenu();
+    table->setMenu(playerMenu);
+
+    graveMenu = playerMenu->addTearOffMenu(QString());
+    graveMenu->addAction(aViewGraveyard);
+    grave->setMenu(graveMenu, aViewGraveyard);
+
+    rfgMenu = playerMenu->addTearOffMenu(QString());
+    rfgMenu->addAction(aViewRfg);
+    rfg->setMenu(rfgMenu, aViewRfg);
+
+    if (local || judge) {
+        initializeHandMenu();
+        initializeLibraryMenu();
+        initializeRevealRandomGraveyardCard();
+    } else {
+        handMenu = nullptr;
+        libraryMenu = nullptr;
+    }
+
+    if (local || judge) {
+        initializeMoveGraveMenu();
+        initializeMoveRfgMenu();
 
         sbMenu = playerMenu->addMenu(QString());
         sbMenu->addAction(aViewSideboard);
