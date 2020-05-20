@@ -326,8 +326,8 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else if (targetZoneName == deckConstant()) {
         if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
-        } else if (newX == targetZone->getCards().size() - 1) {
-            finalStr = tr("%1 puts %2%3 on bottom of their library.");
+        } else if (newX == targetZone->getCards().size()) {
+            finalStr = tr("%1 puts %2%3 onto the bottom of their library.");
         } else if (newX == 0) {
             finalStr = tr("%1 puts %2%3 on top of their library.");
         } else {
