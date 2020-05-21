@@ -1,4 +1,5 @@
 #include "dlg_settings.h"
+
 #include "carddatabase.h"
 #include "main.h"
 #include "releasechannel.h"
@@ -7,6 +8,7 @@
 #include "soundengine.h"
 #include "spoilerbackgroundupdater.h"
 #include "thememanager.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
@@ -85,9 +87,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
     personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
-    personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0);
-    personalGrid->addWidget(&showTipsOnStartup, 5, 0);
+    personalGrid->addWidget(&updateNotificationCheckBox, 3, 0, 1, 2);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0, 1, 2);
+    personalGrid->addWidget(&showTipsOnStartup, 5, 0, 1, 2);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -373,6 +375,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
             SLOT(setSpectatorNotificationsEnabled(int)));
 
+    buddyConnectNotificationsEnabledCheckBox.setChecked(settingsCache->getBuddyConnectNotificationsEnabled());
+    buddyConnectNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
+    connect(&buddyConnectNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+            SLOT(setBuddyConnectNotificationsEnabled(int)));
+
     doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
     connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
 
@@ -387,15 +394,21 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
             [](int state) { settingsCache->setUseTearOffMenus(state == Qt::Checked); });
 
     auto *generalGrid = new QGridLayout;
-    generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
-    generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
-    generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
-    generalGrid->addWidget(&playToStackCheckBox, 3, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 5, 0);
+    generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
+    generalGrid->addWidget(&playToStackCheckBox, 1, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 2, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 3, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
+
+    auto *notificationsGrid = new QGridLayout;
+    notificationsGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
+    notificationsGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
+    notificationsGrid->addWidget(&buddyConnectNotificationsEnabledCheckBox, 2, 0);
+
+    notificationsGroupBox = new QGroupBox;
+    notificationsGroupBox->setLayout(notificationsGrid);
 
     tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
@@ -408,6 +421,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
+    mainLayout->addWidget(notificationsGroupBox);
     mainLayout->addWidget(animationGroupBox);
 
     setLayout(mainLayout);
@@ -421,12 +435,14 @@ void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i)
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
-    notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
-    specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
+    notificationsGroupBox->setTitle(tr("Notifications settings"));
+    notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
+    specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
+    buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }

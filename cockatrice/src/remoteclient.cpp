@@ -1,4 +1,5 @@
 #include "remoteclient.h"
+
 #include "main.h"
 #include "pb/commands.pb.h"
 #include "pb/event_server_identification.pb.h"
@@ -11,6 +12,7 @@
 #include "pending_command.h"
 #include "settingscache.h"
 #include "version_string.h"
+
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QHostAddress>
@@ -334,8 +336,11 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
 
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
-
-    auto size = static_cast<unsigned int>(cont.ByteSize());
+#if GOOGLE_PROTOBUF_VERSION > 3001000
+    unsigned int size = cont.ByteSizeLong();
+#else
+    unsigned int size = cont.ByteSize();
+#endif
 #ifdef QT_DEBUG
     qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
 #endif

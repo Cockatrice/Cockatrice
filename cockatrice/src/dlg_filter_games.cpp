@@ -1,4 +1,5 @@
 #include "dlg_filter_games.h"
+
 #include <QCheckBox>
 #include <QCryptographicHash>
 #include <QDialogButtonBox>

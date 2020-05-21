@@ -1,14 +1,15 @@
+#include "main.h"
+
+#include "oraclewizard.h"
+#include "settingscache.h"
+#include "thememanager.h"
+
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QTextCodec>
 #include <QTranslator>
-
-#include "main.h"
-#include "oraclewizard.h"
-#include "settingscache.h"
-#include "thememanager.h"
 
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
 #else // linux
-    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+    translationPath = qApp->applicationDirPath() + "/../share/oracle/translations";
 #endif
 
     settingsCache = new SettingsCache;

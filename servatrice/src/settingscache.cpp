@@ -1,4 +1,5 @@
 #include "settingscache.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>

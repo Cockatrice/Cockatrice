@@ -2,6 +2,7 @@
 #define DLG_FILTER_GAMES_H
 
 #include "gamesmodel.h"
+
 #include <QCheckBox>
 #include <QDialog>
 #include <QMap>

@@ -1,6 +1,8 @@
 #include "selectzone.h"
+
 #include "carditem.h"
 #include "gamescene.h"
+
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 

@@ -1,9 +1,13 @@
 #include "zoneviewwidget.h"
+
 #include "carditem.h"
 #include "gamescene.h"
+#include "pb/command_shuffle.pb.h"
+#include "pb/command_stop_dump_zone.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include "zoneviewzone.h"
+
 #include <QCheckBox>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
@@ -13,9 +17,6 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
-
-#include "pb/command_shuffle.pb.h"
-#include "pb/command_stop_dump_zone.pb.h"
 
 ZoneViewWidget::ZoneViewWidget(Player *_player,
                                CardZone *_origZone,

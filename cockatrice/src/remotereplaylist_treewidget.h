@@ -3,6 +3,7 @@
 
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_replay_match.pb.h"
+
 #include <QAbstractItemModel>
 #include <QDateTime>
 #include <QTreeView>

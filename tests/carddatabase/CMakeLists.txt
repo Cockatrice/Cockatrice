@@ -6,6 +6,7 @@ add_executable(carddatabase_test
     ../../cockatrice/src/carddbparser/carddatabaseparser.cpp
     ../../cockatrice/src/carddbparser/cockatricexml3.cpp
     ../../cockatrice/src/carddbparser/cockatricexml4.cpp
+    ${VERSION_STRING_CPP}
 )
 add_executable(filter_string_test
     filter_string_test.cpp
@@ -17,6 +18,7 @@ add_executable(filter_string_test
     ../../cockatrice/src/carddbparser/carddatabaseparser.cpp
     ../../cockatrice/src/carddbparser/cockatricexml3.cpp
     ../../cockatrice/src/carddbparser/cockatricexml4.cpp
+    ${VERSION_STRING_CPP}
 )
 if(NOT GTEST_FOUND)
     add_dependencies(carddatabase_test gtest)

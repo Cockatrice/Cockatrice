@@ -1,13 +1,7 @@
 #include "tab_userlists.h"
-#include "abstractclient.h"
-#include "soundengine.h"
-#include "userinfobox.h"
-#include "userlist.h"
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
 
+#include "abstractclient.h"
+#include "customlineedit.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
 #include "pb/event_user_joined.pb.h"
@@ -15,6 +9,13 @@
 #include "pb/response_list_users.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
+#include "soundengine.h"
+#include "userinfobox.h"
+#include "userlist.h"
+
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
                            AbstractClient *_client,
@@ -58,7 +59,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     vbox->addWidget(allUsersList);
 
     QHBoxLayout *addToBuddyList = new QHBoxLayout;
-    addBuddyEdit = new QLineEdit;
+    addBuddyEdit = new LineEditUnfocusable;
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
     connect(addBuddyEdit, SIGNAL(returnPressed()), this, SLOT(addToBuddyList()));
     QPushButton *addBuddyButton = new QPushButton("Add");
@@ -67,7 +68,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     addToBuddyList->addWidget(addBuddyButton);
 
     QHBoxLayout *addToIgnoreList = new QHBoxLayout;
-    addIgnoreEdit = new QLineEdit;
+    addIgnoreEdit = new LineEditUnfocusable;
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
     connect(addIgnoreEdit, SIGNAL(returnPressed()), this, SLOT(addToIgnoreList()));
     QPushButton *addIgnoreButton = new QPushButton("Add");

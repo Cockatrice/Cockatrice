@@ -1,5 +1,16 @@
 #include "tab_supervisor.h"
+
 #include "abstractclient.h"
+#include "main.h"
+#include "pb/event_game_joined.pb.h"
+#include "pb/event_notify_user.pb.h"
+#include "pb/event_user_message.pb.h"
+#include "pb/game_event_container.pb.h"
+#include "pb/moderator_commands.pb.h"
+#include "pb/room_commands.pb.h"
+#include "pb/room_event.pb.h"
+#include "pb/serverinfo_room.pb.h"
+#include "pb/serverinfo_user.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "tab_admin.h"
@@ -13,20 +24,12 @@
 #include "tab_server.h"
 #include "tab_userlists.h"
 #include "userlist.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QMessageBox>
 #include <QPainter>
-
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_notify_user.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/game_event_container.pb.h"
-#include "pb/moderator_commands.pb.h"
-#include "pb/room_commands.pb.h"
-#include "pb/room_event.pb.h"
-#include "pb/serverinfo_room.pb.h"
-#include "pb/serverinfo_user.pb.h"
+#include <QSystemTrayIcon>
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
@@ -344,7 +347,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
         (QTabBar::ButtonPosition)tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar());
     CloseButton *closeButton = new CloseButton;
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeButtonPressed()));
-    closeButton->setProperty("tab", qVariantFromValue((QObject *)tab));
+    closeButton->setProperty("tab", QVariant::fromValue((QObject *)tab));
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
 
@@ -441,7 +444,7 @@ void TabSupervisor::replayLeft(TabGame *tab)
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
 {
     if (receiverName == QString::fromStdString(userInfo->name()))
-        return 0;
+        return nullptr;
 
     ServerInfo_User otherUser;
     UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
@@ -561,6 +564,17 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     tab->processUserMessageEvent(event);
 }
 
+void TabSupervisor::actShowPopup(const QString &message)
+{
+    qDebug() << "ACT SHOW POPUP";
+    if (trayIcon && (QApplication::activeWindow() == nullptr || QApplication::focusWidget() == nullptr)) {
+        qDebug() << "LAUNCHING POPUP";
+        // disconnect(trayIcon, SIGNAL(messageClicked()), nullptr, nullptr);
+        trayIcon->showMessage(message, tr("Click to view"));
+        // connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
+    }
+}
+
 void TabSupervisor::processUserLeft(const QString &userName)
 {
     TabMessage *tab = messageTabs.value(userName);
@@ -568,11 +582,29 @@ void TabSupervisor::processUserLeft(const QString &userName)
         tab->processUserLeft();
 }
 
-void TabSupervisor::processUserJoined(const ServerInfo_User &userInfo)
+void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
 {
-    TabMessage *tab = messageTabs.value(QString::fromStdString(userInfo.name()));
+    QString userName = QString::fromStdString(userInfoJoined.name());
+    if (isUserBuddy(userName)) {
+        Tab *tab = static_cast<Tab *>(getUserListsTab());
+
+        if (tab != currentWidget()) {
+            tab->setContentsChanged(true);
+            QPixmap avatarPixmap =
+                UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)userInfoJoined.user_level(), true,
+                                                         QString::fromStdString(userInfoJoined.privlevel()));
+            setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+        }
+
+        if (settingsCache->getBuddyConnectNotificationsEnabled()) {
+            QApplication::alert(this);
+            this->actShowPopup(tr("Your buddy %1 has signed on!").arg(userName));
+        }
+    }
+
+    TabMessage *tab = messageTabs.value(userName);
     if (tab)
-        tab->processUserJoined(userInfo);
+        tab->processUserJoined(userInfoJoined);
 }
 
 void TabSupervisor::updateCurrent(int index)

@@ -3,6 +3,7 @@
 
 #include "pb/commands.pb.h"
 #include "pb/response.pb.h"
+
 #include <QVariant>
 
 class PendingCommand : public QObject

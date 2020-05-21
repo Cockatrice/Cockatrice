@@ -1,4 +1,5 @@
 #include "rng_abstract.h"
+
 #include <QDebug>
 
 QVector<int> RNG_Abstract::makeNumbersVector(int n, int min, int max)

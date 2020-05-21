@@ -1,4 +1,6 @@
 #include "window_sets.h"
+
+#include "customlineedit.h"
 #include "main.h"
 #include "pictureloader.h"
 #include "setsmodel.h"
@@ -16,7 +18,6 @@
 #include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>
-
 #include <algorithm>
 
 #define SORT_RESET -1
@@ -60,10 +61,10 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setsEditToolBar->addAction(aBottom);
 
     // search field
-    searchField = new QLineEdit;
+    searchField = new LineEditUnfocusable;
     searchField->setObjectName("searchEdit");
     searchField->setPlaceholderText(tr("Search by set name, code, or type"));
-    searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchField->addAction(QPixmap("theme:icons/search"), LineEditUnfocusable::LeadingPosition);
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
 
@@ -363,7 +364,7 @@ void WndSets::actDown()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
     // QModelIndex only implements operator<, so we can't use std::greater
-    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return !(b < a); });
+    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
     QSet<int> newRows;
 
     if (rows.empty())
@@ -411,7 +412,7 @@ void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
     // QModelIndex only implements operator<, so we can't use std::greater
-    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return !(b < a); });
+    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
     QSet<int> newRows;
     int newRow = model->rowCount() - 1;
 

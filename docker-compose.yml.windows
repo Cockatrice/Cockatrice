@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root-password
+      - MYSQL_DATABASE=servatrice
+      - MYSQL_USER=servatrice
+      - MYSQL_PASSWORD=password
+    volumes:
+      - ./servatrice/servatrice.sql:/docker-entrypoint-initdb.d/servatrice.sql
+      - ./servatrice/mysql-storage:/var/lib/mysql
+
+  servatrice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: servatrice
+    depends_on:
+      - mysql
+    ports:
+      - "4747:4747"
+      - "4748:4748"
+    entrypoint: "/bin/bash -c 'sleep 10; servatrice --config /tmp/servatrice.ini --log-to-console'"
+    restart: always
+    volumes:
+      - ./servatrice/docker/servatrice-docker.ini:/tmp/servatrice.ini

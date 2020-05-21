@@ -1,6 +1,8 @@
 #include "dlg_connect.h"
+
 #include "settingscache.h"
 #include "userconnection_information.h"
+
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>

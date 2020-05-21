@@ -1,4 +1,5 @@
 #include "serverinfo_user_container.h"
+
 #include "pb/serverinfo_user.pb.h"
 
 ServerInfo_User_Container::ServerInfo_User_Container(ServerInfo_User *_userInfo) : userInfo(_userInfo)

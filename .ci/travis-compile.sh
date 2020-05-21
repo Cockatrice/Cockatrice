@@ -68,6 +68,10 @@ set -e
 mkdir -p build
 cd build
 
+if ! [[ $CORE_AMOUNT ]]; then
+  CORE_AMOUNT="2" # travis machines have 2 cores
+fi
+
 # Add cmake flags
 if [[ $MAKE_SERVER ]]; then
   flags+=" -DWITH_SERVER=1"
@@ -92,7 +96,7 @@ fi
 # Compile
 cmake --version
 cmake .. $flags
-make -j2
+make -j"$CORE_AMOUNT"
 
 if [[ $MAKE_TEST ]]; then
   make test
@@ -105,9 +109,9 @@ fi
 if [[ $MAKE_PACKAGE ]]; then
   make package
   if [[ $PACKAGE_NAME ]]; then
-    found=$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)
-    path=${found%/*}
-    file=${found##*/}
+    found="$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)"
+    path="${found%/*}"
+    file="${found##*/}"
     if [[ ! $file ]]; then
       echo "could not find package" >&2
       exit 1

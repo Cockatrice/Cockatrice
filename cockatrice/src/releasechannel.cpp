@@ -1,4 +1,5 @@
 #include "releasechannel.h"
+
 #include "version_string.h"
 
 #include <QJsonArray>
@@ -6,6 +7,8 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QNetworkReply>
+#include <QSysInfo>
+#include <QtGlobal>
 
 #define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
 #define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
@@ -38,41 +41,45 @@ void ReleaseChannel::checkForUpdates()
     connect(response, SIGNAL(finished()), this, SLOT(releaseListFinished()));
 }
 
+// Different release channel checking functions for different operating systems
 #if defined(Q_OS_OSX)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-    return fileName.endsWith(".dmg");
+    const int mac_os_version = QSysInfo::productVersion().split(".")[1].toInt();
+
+    // TODO: If we change macOS builds, this must be updated
+    if (mac_os_version <= 12) {
+        // We no longer compile files for macOS 10.12 Sierra or older
+        return false;
+    } else if (mac_os_version == 13) {
+        // We support 10.13 High Sierra
+        return fileName.contains("macos10.13");
+    } else if (14 <= mac_os_version && mac_os_version <= 15) {
+        // We support 10.14 Mojave, and 10.15 Catalina
+        return fileName.contains("macos10.14");
+    } else {
+        // Future Mac releases we haven't heard of or accounted for yet
+        return (!fileName.contains("macos10.13") && !fileName.contains("macos10.14") && fileName.contains("macos"));
+    }
 }
 
 #elif defined(Q_OS_WIN)
-
-#include <QSysInfo>
-
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-    QString wordSize = QSysInfo::buildAbi().split('-')[2];
-    QString arch;
-
-    if (wordSize == "llp64") {
-        arch = "win64";
-    } else if (wordSize == "ilp32") {
-        arch = "win32";
-    } else {
-        qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
-        return false;
-    }
-
-    auto exeName = arch + ".exe";
-    return (fileName.endsWith(exeName));
+#if Q_PROCESSOR_WORDSIZE == 4
+    return fileName.contains("win32");
+#elif Q_PROCESSOR_WORDSIZE == 8
+    return fileName.contains("win64");
+#else
+    return false;
+#endif
 }
 #else
-
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &)
 {
     // If the OS doesn't fit one of the above #defines, then it will never match
     return false;
 }
-
 #endif
 
 QString StableReleaseChannel::getManualDownloadUrl() const

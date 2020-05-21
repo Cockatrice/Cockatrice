@@ -1,10 +1,12 @@
 #include "servatrice_database_interface.h"
+
 #include "decklist.h"
 #include "passwordhasher.h"
 #include "pb/game_replay.pb.h"
 #include "servatrice.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
+
 #include <QChar>
 #include <QDateTime>
 #include <QDebug>
@@ -804,7 +806,11 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
     QVariantList replayIds, replayGameIds, replayDurations, replayBlobs;
     for (int i = 0; i < replayList.size(); ++i) {
         QByteArray blob;
+#if GOOGLE_PROTOBUF_VERSION > 3001000
+        const unsigned int size = replayList[i]->ByteSizeLong();
+#else
         const unsigned int size = replayList[i]->ByteSize();
+#endif
         blob.resize(size);
         replayList[i]->SerializeToArray(blob.data(), size);
 

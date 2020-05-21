@@ -1,4 +1,5 @@
 #include "logger.h"
+
 #include "version_string.h"
 
 #include <QApplication>

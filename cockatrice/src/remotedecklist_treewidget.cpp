@@ -1,13 +1,14 @@
 #include "remotedecklist_treewidget.h"
-#include "abstractclient.h"
-#include <QFileIconProvider>
-#include <QHeaderView>
-#include <QSortFilterProxyModel>
 
+#include "abstractclient.h"
 #include "pb/command_deck_list.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
 #include "pending_command.h"
+
+#include <QFileIconProvider>
+#include <QHeaderView>
+#include <QSortFilterProxyModel>
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name,
                                                        RemoteDeckList_TreeModel::DirectoryNode *_parent)

@@ -1,12 +1,13 @@
 #include "handzone.h"
+
 #include "carddragitem.h"
 #include "carditem.h"
+#include "pb/command_move_card.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include "thememanager.h"
-#include <QPainter>
 
-#include "pb/command_move_card.pb.h"
+#include <QPainter>
 
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)

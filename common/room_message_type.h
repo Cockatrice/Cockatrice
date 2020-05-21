@@ -7,6 +7,7 @@
 #undef TYPE_BOOL
 #endif
 #include "pb/event_room_say.pb.h"
+
 #include <QFlags>
 
 Q_DECLARE_FLAGS(RoomMessageTypeFlags, Event_RoomSay::RoomMessageType)

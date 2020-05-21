@@ -4,6 +4,7 @@
 #include "pb/response.pb.h"
 #include "pb/serverinfo_chat_message.pb.h"
 #include "serverinfo_user_container.h"
+
 #include <QList>
 #include <QMap>
 #include <QMutex>

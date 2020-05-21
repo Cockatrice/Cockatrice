@@ -1,8 +1,4 @@
 #include "server_room.h"
-#include "server_game.h"
-#include "server_protocolhandler.h"
-#include <QDateTime>
-#include <QDebug>
 
 #include "pb/commands.pb.h"
 #include "pb/event_join_room.pb.h"
@@ -12,6 +8,11 @@
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_chat_message.pb.h"
 #include "pb/serverinfo_room.pb.h"
+#include "server_game.h"
+#include "server_protocolhandler.h"
+
+#include <QDateTime>
+#include <QDebug>
 #include <google/protobuf/descriptor.h>
 
 Server_Room::Server_Room(int _id,

@@ -2,6 +2,7 @@
 #define ZONEVIEWERZONE_H
 
 #include "selectzone.h"
+
 #include <QGraphicsLayoutItem>
 
 class ZoneViewWidget;

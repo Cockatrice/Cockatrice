@@ -6,6 +6,7 @@
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 #include "tearoffmenu.h"
+
 #include <QInputDialog>
 #include <QMap>
 #include <QPoint>

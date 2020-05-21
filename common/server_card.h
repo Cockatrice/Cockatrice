@@ -22,6 +22,7 @@
 
 #include "pb/card_attributes.pb.h"
 #include "server_arrowtarget.h"
+
 #include <QMap>
 #include <QString>
 

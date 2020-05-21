@@ -1,6 +1,7 @@
 #include "passwordhasher.h"
 
 #include "rng_sfmt.h"
+
 #include <QCryptographicHash>
 
 void PasswordHasher::initialize()

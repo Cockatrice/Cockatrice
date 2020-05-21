@@ -1,4 +1,5 @@
 #include "gameselector.h"
+
 #include "abstractclient.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
@@ -10,12 +11,14 @@
 #include "tab_room.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
@@ -27,13 +30,14 @@ GameSelector::GameSelector(AbstractClient *_client,
                            const QMap<int, QString> &_rooms,
                            const QMap<int, GameTypeMap> &_gameTypes,
                            const bool restoresettings,
-                           const bool showfilters,
+                           const bool _showfilters,
                            QWidget *parent)
-    : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
+    : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room), showFilters(_showfilters)
 {
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
-    if (showfilters) {
+    filteredGamesLabel = new QLabel;
+    if (showFilters) {
         gameListProxyModel = new GamesProxyModel(this, tabSupervisor);
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -61,7 +65,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (room)
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
-    if (showfilters && restoresettings)
+    if (showFilters && restoresettings)
         gameListProxyModel->loadFilterParameters(gameTypeMap);
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -83,9 +87,10 @@ GameSelector::GameSelector(AbstractClient *_client,
     spectateButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    if (showfilters) {
+    if (showFilters) {
         buttonLayout->addWidget(filterButton);
         buttonLayout->addWidget(clearFilterButton);
+        buttonLayout->addWidget(filteredGamesLabel);
     }
     buttonLayout->addStretch();
     if (room)
@@ -128,6 +133,7 @@ void GameSelector::processAddToListEvent(const Event_AddToList &event)
     if (event.list_name() == "ignore") {
         gameListProxyModel->refresh();
     }
+    setFilteredGamesLabel();
 }
 
 void GameSelector::processRemoveFromListEvent(const Event_RemoveFromList &event)
@@ -135,6 +141,7 @@ void GameSelector::processRemoveFromListEvent(const Event_RemoveFromList &event)
     if (event.list_name() == "ignore") {
         gameListProxyModel->refresh();
     }
+    setFilteredGamesLabel();
 }
 
 void GameSelector::actSetFilter()
@@ -155,6 +162,8 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
+
+    setFilteredGamesLabel();
 }
 
 void GameSelector::actClearFilter()
@@ -163,6 +172,8 @@ void GameSelector::actClearFilter()
 
     gameListProxyModel->resetFilterParameters();
     gameListProxyModel->saveFilterParameters(gameTypeMap);
+
+    setFilteredGamesLabel();
 }
 
 void GameSelector::actCreate()
@@ -174,6 +185,7 @@ void GameSelector::actCreate()
 
     DlgCreateGame dlg(room, room->getGameTypes(), this);
     dlg.exec();
+    setFilteredGamesLabel();
 }
 
 void GameSelector::checkResponse(const Response &response)
@@ -262,11 +274,14 @@ void GameSelector::retranslateUi()
         createButton->setText(tr("C&reate"));
     joinButton->setText(tr("&Join"));
     spectateButton->setText(tr("J&oin as spectator"));
+
+    setFilteredGamesLabel();
 }
 
 void GameSelector::processGameInfo(const ServerInfo_Game &info)
 {
     gameListModel->updateGameList(info);
+    setFilteredGamesLabel();
 }
 
 void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QModelIndex & /* previous */)
@@ -279,4 +294,13 @@ void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QMod
 
     spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
     joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
+}
+
+void GameSelector::setFilteredGamesLabel()
+{
+    if (showFilters) {
+        const int totalGames = gameListModel->rowCount();
+        const int shownGames = totalGames - gameListProxyModel->getNumFilteredGames();
+        filteredGamesLabel->setText(tr("Games shown: %1 / %2").arg(shownGames).arg(totalGames));
+    }
 }

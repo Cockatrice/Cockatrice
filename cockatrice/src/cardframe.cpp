@@ -1,5 +1,3 @@
-#include <utility>
-
 #include "cardframe.h"
 
 #include "cardinfopicture.h"
@@ -10,6 +8,7 @@
 
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <utility>
 
 CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(parent), info(nullptr), cardTextOnly(false)
 {

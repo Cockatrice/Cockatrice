@@ -1,5 +1,8 @@
 #include "tab_admin.h"
+
 #include "abstractclient.h"
+#include "pb/admin_commands.pb.h"
+
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -10,8 +13,6 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
-
-#include "pb/admin_commands.pb.h"
 
 ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 {

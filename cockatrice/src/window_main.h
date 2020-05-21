@@ -20,15 +20,15 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "abstractclient.h"
+#include "pb/response.pb.h"
+
 #include <QList>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QProcess>
 #include <QSystemTrayIcon>
 #include <QtNetwork>
-
-#include "abstractclient.h"
-#include "pb/response.pb.h"
 
 class DlgConnect;
 class DlgViewLog;
