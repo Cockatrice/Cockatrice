@@ -803,24 +803,21 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 
     players.insert(playerId, newPlayer);
 
-    int i = 1;
-    // Loop for each player, the idea is to have one assigned zone for each non-spectator player
-    for (i = 1; i <= players.count(); ++i) {
-        bool aPlayerHasThisZone = false;
-        QMapIterator<int, Player *> playerIterator(players);
-        while (playerIterator.hasNext()) {
-            if (playerIterator.next().value()->getZoneId() == i) {
-                aPlayerHasThisZone = true;
+    if (!spectators.contains(playerId)) {
+
+        // Loop for each player, the idea is to have one assigned zone for each non-spectator player
+        for (int i = 1; i <= players.count(); ++i) {
+            bool aPlayerHasThisZone = false;
+            for (auto &player : players) {
+                if (player->getZoneId() == i) {
+                    aPlayerHasThisZone = true;
+                }
+            }
+            if (!aPlayerHasThisZone) {
+                newPlayer->setZoneId(i);
+                break;
             }
         }
-        // If no player has this zone number break the loop and assign it
-        if (!aPlayerHasThisZone) {
-            break;
-        }
-    }
-
-    if (!spectators.contains(playerId)) {
-        newPlayer->setZoneId(i);
     }
 
     emit playerAdded(newPlayer);

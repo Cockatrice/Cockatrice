@@ -96,15 +96,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
       defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
       local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
-      deck(nullptr)
+      deck(nullptr), zoneId(0)
 {
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
 
     connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
     connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
-
-    zoneId = 0;
 
     playerArea = new PlayerArea(this);
 
