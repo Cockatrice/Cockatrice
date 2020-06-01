@@ -1,13 +1,16 @@
 #include "deck_loader.h"
+
 #include "carddatabase.h"
 #include "decklist.h"
 #include "main.h"
+
 #include <QDebug>
 #include <QFile>
 #include <QStringList>
 
-const QStringList DeckLoader::fileNameFilters =
-    QStringList() << QObject::tr("Common deck formats (*.cod *.dec *.txt *.mwDeck)") << QObject::tr("All files (*.*)");
+const QStringList DeckLoader::fileNameFilters = QStringList()
+                                                << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
+                                                << QObject::tr("All files (*.*)");
 
 DeckLoader::DeckLoader() : DeckList(), lastFileName(QString()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
 {

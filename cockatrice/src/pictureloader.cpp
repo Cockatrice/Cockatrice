@@ -1,4 +1,5 @@
 #include "pictureloader.h"
+
 #include "carddatabase.h"
 #include "main.h"
 #include "settingscache.h"

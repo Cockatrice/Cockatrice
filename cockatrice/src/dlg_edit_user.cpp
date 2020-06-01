@@ -1,11 +1,12 @@
+#include "dlg_edit_user.h"
+
+#include "settingscache.h"
+
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-
-#include "dlg_edit_user.h"
-#include "settingscache.h"
 
 DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName) : QDialog(parent)
 {

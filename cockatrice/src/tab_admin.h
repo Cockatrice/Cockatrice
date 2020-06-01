@@ -2,6 +2,7 @@
 #define TAB_ADMIN_H
 
 #include "tab.h"
+
 #include <QDialog>
 
 class AbstractClient;

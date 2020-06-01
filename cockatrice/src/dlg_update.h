@@ -1,11 +1,11 @@
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 
+#include "update_downloader.h"
+
 #include <QDialogButtonBox>
 #include <QProgressDialog>
 #include <QtNetwork>
-
-#include "update_downloader.h"
 class Release;
 
 class DlgUpdate : public QDialog

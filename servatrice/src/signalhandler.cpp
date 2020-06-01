@@ -1,9 +1,10 @@
-#include <QSocketNotifier>
+#include "signalhandler.h"
 
 #include "main.h"
 #include "server_logger.h"
 #include "settingscache.h"
-#include "signalhandler.h"
+
+#include <QSocketNotifier>
 
 #ifdef Q_OS_UNIX
 #include <cstdio>

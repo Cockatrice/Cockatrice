@@ -6,6 +6,7 @@
 #include "room_message_type.h"
 #include "user_level.h"
 #include "userlistProxy.h"
+
 #include <QAction>
 #include <QColor>
 #include <QTextBrowser>

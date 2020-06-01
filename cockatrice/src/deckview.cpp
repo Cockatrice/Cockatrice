@@ -1,9 +1,11 @@
 #include "deckview.h"
+
 #include "carddatabase.h"
 #include "decklist.h"
 #include "main.h"
 #include "settingscache.h"
 #include "thememanager.h"
+
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>

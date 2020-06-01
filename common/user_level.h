@@ -7,6 +7,7 @@
 #undef TYPE_BOOL
 #endif
 #include "pb/serverinfo_user.pb.h"
+
 #include <QFlags>
 
 Q_DECLARE_FLAGS(UserLevelFlags, ServerInfo_User::UserLevelFlag)

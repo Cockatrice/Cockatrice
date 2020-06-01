@@ -1,4 +1,5 @@
 #include "decklist.h"
+
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
@@ -253,7 +254,7 @@ public:
     }
     inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
     {
-        return (order == Qt::AscendingOrder) ^ (a.second->compare(b.second));
+        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
     }
 };
 
@@ -704,7 +705,7 @@ QStringList DeckList::getCardList() const
 {
     QSet<QString> result;
     getCardListHelper(root, result);
-    return result.toList();
+    return result.values();
 }
 
 int DeckList::getSideboardSize() const

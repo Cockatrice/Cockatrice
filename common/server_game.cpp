@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server_game.h"
+
 #include "decklist.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
@@ -43,6 +44,7 @@
 #include "server_player.h"
 #include "server_protocolhandler.h"
 #include "server_room.h"
+
 #include <QDebug>
 #include <QTimer>
 #include <google/protobuf/descriptor.h>

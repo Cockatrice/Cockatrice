@@ -1,4 +1,5 @@
 #include "server_protocolhandler.h"
+
 #include "featureset.h"
 #include "get_pb_extension.h"
 #include "pb/commands.pb.h"
@@ -19,6 +20,7 @@
 #include "server_game.h"
 #include "server_player.h"
 #include "server_room.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <google/protobuf/descriptor.h>

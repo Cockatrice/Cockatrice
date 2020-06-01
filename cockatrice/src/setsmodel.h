@@ -2,6 +2,7 @@
 #define SETSMODEL_H
 
 #include "carddatabase.h"
+
 #include <QAbstractTableModel>
 #include <QMimeData>
 #include <QSet>

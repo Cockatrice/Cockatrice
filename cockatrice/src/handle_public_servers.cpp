@@ -1,5 +1,7 @@
 #include "handle_public_servers.h"
+
 #include "settingscache.h"
+
 #include <QJsonDocument>
 #include <QMessageBox>
 #include <QNetworkAccessManager>

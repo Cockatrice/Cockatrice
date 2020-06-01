@@ -1,9 +1,9 @@
 #ifndef CARDINFOTEXT_H
 #define CARDINFOTEXT_H
 
-#include <QFrame>
-
 #include "carddatabase.h"
+
+#include <QFrame>
 class QLabel;
 class QTextEdit;
 

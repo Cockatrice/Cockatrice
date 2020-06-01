@@ -8,6 +8,7 @@
 #include "settings/messagesettings.h"
 #include "settings/serverssettings.h"
 #include "shortcutssettings.h"
+
 #include <QObject>
 #include <QSize>
 #include <QStringList>
@@ -77,6 +78,7 @@ private:
     bool picDownload;
     bool notificationsEnabled;
     bool spectatorNotificationsEnabled;
+    bool buddyConnectNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
     int startingHandSize;
@@ -201,6 +203,10 @@ public:
     bool getSpectatorNotificationsEnabled() const
     {
         return spectatorNotificationsEnabled;
+    }
+    bool getBuddyConnectNotificationsEnabled() const
+    {
+        return buddyConnectNotificationsEnabled;
     }
     bool getNotifyAboutUpdates() const
     {
@@ -476,6 +482,7 @@ public slots:
     void setPicDownload(int _picDownload);
     void setNotificationsEnabled(int _notificationsEnabled);
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
+    void setBuddyConnectNotificationsEnabled(int _buddyConnectNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setStartingHandSize(int _startingHandSize);

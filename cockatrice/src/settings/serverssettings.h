@@ -2,6 +2,7 @@
 #define SERVERSSETTINGS_H
 
 #include "settingsmanager.h"
+
 #include <QObject>
 
 class ServersSettings : public SettingsManager

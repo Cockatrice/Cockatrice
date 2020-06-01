@@ -1,5 +1,7 @@
 #include "carddatabasemodel.h"
+
 #include "filtertree.h"
+
 #include <QMap>
 
 #define CARDDBMODEL_COLUMNS 6

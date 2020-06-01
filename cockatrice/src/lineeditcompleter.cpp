@@ -1,21 +1,21 @@
 #include "lineeditcompleter.h"
+
 #include <QAbstractItemView>
 #include <QCompleter>
 #include <QFocusEvent>
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QScrollBar>
 #include <QStringListModel>
 #include <QTextCursor>
 #include <QWidget>
 
-LineEditCompleter::LineEditCompleter(QWidget *parent) : QLineEdit(parent), c(nullptr)
+LineEditCompleter::LineEditCompleter(QWidget *parent) : LineEditUnfocusable(parent), c(nullptr)
 {
 }
 
 void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
-    QLineEdit::focusOutEvent(e);
+    LineEditUnfocusable::focusOutEvent(e);
     if (c->popup()->isVisible()) {
         // Remove Popup
         c->popup()->hide();
@@ -73,7 +73,7 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
             break;
     }
 
-    QLineEdit::keyPressEvent(event);
+    LineEditUnfocusable::keyPressEvent(event);
     // return if the completer is null or if the most recently typed char was '@'.
     // Only want the popup AFTER typing the first char of the mention.
     if (!c || text().right(1).contains("@")) {

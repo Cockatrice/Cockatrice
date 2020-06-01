@@ -41,6 +41,10 @@ environment:
           vcpkg_arch: x86
 
 install:
+    - cd C:\Tools\vcpkg
+    - git pull -q
+    - .\bootstrap-vcpkg.bat
+    - cd %APPVEYOR_BUILD_FOLDER%
     - vcpkg remove --outdated --recurse
     - vcpkg install openssl protobuf liblzma zlib --triplet %vcpkg_arch%-windows
 
@@ -80,7 +84,6 @@ deploy:
     release: "Cockatrice $(APPVEYOR_REPO_TAG_NAME)"
     description: "Beta release of Cockatrice"
     artifact: /.*\.exe/
-    force_update: true
     draft: false
     prerelease: true
     on:
@@ -94,7 +97,6 @@ deploy:
     tag: "$(APPVEYOR_REPO_TAG_NAME)"
     release: "Cockatrice $(APPVEYOR_REPO_TAG_NAME)"
     artifact: /.*\.exe/
-    force_update: true
     draft: false
     prerelease: false
     on:

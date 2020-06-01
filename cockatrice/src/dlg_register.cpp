@@ -1,3 +1,8 @@
+#include "dlg_register.h"
+
+#include "pb/serverinfo_user.pb.h"
+#include "settingscache.h"
+
 #include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -5,10 +10,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-
-#include "dlg_register.h"
-#include "pb/serverinfo_user.pb.h"
-#include "settingscache.h"
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {

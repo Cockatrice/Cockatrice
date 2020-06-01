@@ -21,6 +21,7 @@
 #define SERVATRICE_H
 
 #include "server.h"
+
 #include <QHostAddress>
 #include <QMetaType>
 #include <QMutex>

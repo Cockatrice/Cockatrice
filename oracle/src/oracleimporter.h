@@ -110,8 +110,8 @@ public:
     explicit OracleImporter(const QString &_dataDir, QObject *parent = nullptr);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
-    bool saveToFile(const QString &fileName);
-    int importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cards);
+    bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
+    int importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cards, bool skipSpecialNums = true);
     QList<SetToDownload> &getSets()
     {
         return allSets;

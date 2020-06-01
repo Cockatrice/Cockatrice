@@ -9,13 +9,12 @@
 #include "carddatabase.h"
 #include "carddragitem.h"
 #include "carditem.h"
+#include "pb/command_move_card.pb.h"
+#include "pb/command_set_card_attr.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include "tablezone.h"
 #include "thememanager.h"
-
-#include "pb/command_move_card.pb.h"
-#include "pb/command_set_card_attr.pb.h"
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
@@ -56,7 +55,14 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
+    QBrush brush = themeManager->getTableBgBrush();
+
+    // If the player is other than Player 1
+    if (player->getId() > 0) {
+        // The player's id starts with 0 so in order to get the correct image we need to add 1
+        brush = themeManager->getExtraTableBgBrush(QString::number(player->getId() + 1));
+    }
+    painter->fillRect(boundingRect(), brush);
 
     if (active) {
         paintZoneOutline(painter);
@@ -153,7 +159,7 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
 
 void TableZone::reorganizeCards()
 {
-    QList<ArrowItem *> arrowsToUpdate;
+    QSet<ArrowItem *> arrowsToUpdate;
 
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
@@ -185,18 +191,24 @@ void TableZone::reorganizeCards()
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
-
-            arrowsToUpdate.append(attachedCard->getArrowsFrom());
-            arrowsToUpdate.append(attachedCard->getArrowsTo());
+            for (ArrowItem *item : attachedCard->getArrowsFrom()) {
+                arrowsToUpdate.insert(item);
+            }
+            for (ArrowItem *item : attachedCard->getArrowsTo()) {
+                arrowsToUpdate.insert(item);
+            }
         }
 
-        arrowsToUpdate.append(cards[i]->getArrowsFrom());
-        arrowsToUpdate.append(cards[i]->getArrowsTo());
+        for (ArrowItem *item : cards[i]->getArrowsFrom()) {
+            arrowsToUpdate.insert(item);
+        }
+        for (ArrowItem *item : cards[i]->getArrowsTo()) {
+            arrowsToUpdate.insert(item);
+        }
     }
-
-    QSetIterator<ArrowItem *> arrowIterator(QSet<ArrowItem *>::fromList(arrowsToUpdate));
-    while (arrowIterator.hasNext())
-        arrowIterator.next()->updatePath();
+    for (ArrowItem *item : arrowsToUpdate) {
+        item->updatePath();
+    }
 
     resizeToContents();
     update();

@@ -1,5 +1,7 @@
 #include "thememanager.h"
+
 #include "settingscache.h"
+
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
@@ -104,4 +106,9 @@ void ThemeManager::themeChangedSlot()
     QPixmapCache::clear();
 
     emit themeChanged();
+}
+
+QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber)
+{
+    return loadBrush(TABLEZONE_BG_NAME + extraNumber, QColor(70, 50, 100));
 }

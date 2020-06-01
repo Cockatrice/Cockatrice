@@ -1,11 +1,11 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
+#include "carddatabase.h"
+
 #include <QComboBox>
 #include <QFrame>
 #include <QStringList>
-
-#include "carddatabase.h"
 
 class CardInfoPicture;
 class CardInfoText;

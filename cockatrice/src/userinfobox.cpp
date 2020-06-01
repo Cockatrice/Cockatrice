@@ -1,8 +1,12 @@
 #include "userinfobox.h"
+
 #include "abstractclient.h"
 #include "dlg_edit_avatar.h"
 #include "dlg_edit_password.h"
 #include "dlg_edit_user.h"
+#include "pb/response_get_user_info.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
 #include "pixmapgenerator.h"
 
 #include <QDateTime>
@@ -10,10 +14,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-
-#include "pb/response_get_user_info.pb.h"
-#include "pb/session_commands.pb.h"
-#include "pending_command.h"
 
 const qint64 SIXTY = 60;
 const qint64 HOURS_IN_A_DAY = 24;

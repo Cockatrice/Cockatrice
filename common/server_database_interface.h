@@ -2,6 +2,7 @@
 #define SERVER_DATABASE_INTERFACE_H
 
 #include "server.h"
+
 #include <QObject>
 
 class Server_DatabaseInterface : public QObject

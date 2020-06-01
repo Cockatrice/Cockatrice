@@ -18,10 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server_cardzone.h"
+
 #include "pb/command_move_card.pb.h"
 #include "rng_abstract.h"
 #include "server_card.h"
 #include "server_player.h"
+
 #include <QDebug>
 #include <QSet>
 

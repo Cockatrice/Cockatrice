@@ -1,22 +1,22 @@
 #define _USE_MATH_DEFINES
-#include <cmath>
-
 #include "arrowitem.h"
+
 #include "carddatabase.h"
 #include "carditem.h"
 #include "cardzone.h"
-#include "player.h"
-#include "playertarget.h"
-#include "settingscache.h"
-#include <QDebug>
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-
 #include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"
 #include "pb/command_delete_arrow.pb.h"
+#include "player.h"
+#include "playertarget.h"
+#include "settingscache.h"
+
+#include <QDebug>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <cmath>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
     : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color),

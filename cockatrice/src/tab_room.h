@@ -3,10 +3,10 @@
 
 #include "lineeditcompleter.h"
 #include "tab.h"
+
 #include <QFocusEvent>
 #include <QGroupBox>
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QMap>
 
 namespace google
@@ -20,7 +20,6 @@ class AbstractClient;
 class UserList;
 class QLabel;
 class ChatView;
-class QLineEdit;
 class QPushButton;
 class QTextTable;
 class QCompleter;
@@ -76,6 +75,7 @@ private slots:
     void addMentionTag(QString mentionTag);
     void focusTab();
     void actShowMentionPopup(QString &sender);
+    void actShowPopup(const QString &message);
     void actCompleterChanged();
 
     void processListGamesEvent(const Event_ListGames &event);

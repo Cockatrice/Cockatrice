@@ -3,6 +3,7 @@
 
 #include "carddatabase.h"
 #include "filter_string.h"
+
 #include <QAbstractListModel>
 #include <QList>
 #include <QSet>

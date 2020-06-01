@@ -3,6 +3,7 @@
 
 #include "pb/moderator_commands.pb.h"
 #include "user_level.h"
+
 #include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>

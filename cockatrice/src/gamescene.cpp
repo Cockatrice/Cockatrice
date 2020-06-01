@@ -1,10 +1,12 @@
 #include "gamescene.h"
+
 #include "carditem.h"
 #include "phasestoolbar.h"
 #include "player.h"
 #include "settingscache.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
+
 #include <QAction>
 #include <QBasicTimer>
 #include <QDebug>

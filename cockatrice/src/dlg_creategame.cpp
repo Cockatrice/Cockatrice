@@ -1,6 +1,10 @@
 #include "dlg_creategame.h"
+
+#include "pb/serverinfo_game.pb.h"
+#include "pending_command.h"
 #include "settingscache.h"
 #include "tab_room.h"
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -14,9 +18,6 @@
 #include <QSet>
 #include <QSpinBox>
 #include <QWizard>
-
-#include "pb/serverinfo_game.pb.h"
-#include "pending_command.h"
 
 void DlgCreateGame::sharedCtor()
 {

@@ -1,5 +1,7 @@
 #include "localserverinterface.h"
+
 #include "localserver.h"
+
 #include <QDebug>
 
 LocalServerInterface::LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface)

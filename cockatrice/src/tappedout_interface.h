@@ -3,6 +3,7 @@
 
 #include "carddatabase.h"
 #include "decklist.h"
+
 #include <QObject>
 
 class QByteArray;

@@ -1,6 +1,8 @@
 #include "gameview.h"
+
 #include "gamescene.h"
 #include "settingscache.h"
+
 #include <QAction>
 #include <QResizeEvent>
 #include <QRubberBand>

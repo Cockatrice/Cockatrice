@@ -1,4 +1,5 @@
 #include "gamesmodel.h"
+
 #include "pb/serverinfo_game.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
@@ -37,7 +38,7 @@ const QString GamesModel::getGameCreatedString(const int secs) const
     } else { // from 1 hr onward we show hrs
         int hours = secs / SECS_PER_HOUR;
         if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
-            hours++;
+            ++hours;
         ret = QString("%1+ h").arg(QString::number(hours));
     }
     return ret;
@@ -313,6 +314,21 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
     invalidateFilter();
 }
 
+int GamesProxyModel::getNumFilteredGames() const
+{
+    GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
+    if (!model)
+        return 0;
+
+    int numFilteredGames = 0;
+    for (int row = 0; row < model->rowCount(); ++row) {
+        if (!filterAcceptsRow(row)) {
+            ++numFilteredGames;
+        }
+    }
+    return numFilteredGames;
+}
+
 void GamesProxyModel::resetFilterParameters()
 {
     unavailableGamesVisible = false;
@@ -368,6 +384,11 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+{
+    return filterAcceptsRow(sourceRow);
+}
+
+bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 {
     GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)
