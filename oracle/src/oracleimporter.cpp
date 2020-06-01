@@ -392,7 +392,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                     if (originalPropertyValue != thisCardPropertyValue) {
                         if (prop == "colors") {
                             properties.insert(prop, originalPropertyValue + thisCardPropertyValue);
-                        } else if (prop == "maintype") {  // don't create maintypes with //es in them
+                        } else if (prop == "maintype") { // don't create maintypes with //es in them
                             properties.insert(prop, originalPropertyValue);
                         } else {
                             properties.insert(prop,
