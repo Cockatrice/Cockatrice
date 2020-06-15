@@ -53,10 +53,10 @@ void Logger::openLogfileSession()
     fileHandle.setFileName(LOGGER_FILENAME);
     fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
     fileStream.setDevice(&fileHandle);
-    fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
-    fileStream << getClientVersion() << endl;
-    fileStream << getSystemArchitecture() << endl;
-    fileStream << getClientInstallInfo() << endl;
+    fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << Qt::endl;
+    fileStream << getClientVersion() << Qt::endl;
+    fileStream << getSystemArchitecture() << Qt::endl;
+    fileStream << getClientInstallInfo() << Qt::endl;
     logToFileEnabled = true;
 }
 
@@ -66,7 +66,7 @@ void Logger::closeLogfileSession()
         return;
 
     logToFileEnabled = false;
-    fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << endl;
+    fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << Qt::endl;
     fileHandle.close();
 }
 
@@ -87,8 +87,9 @@ void Logger::internalLog(QString message)
     emit logEntryAdded(message);
     std::cerr << message.toStdString() << std::endl; // Print to stdout
 
-    if (logToFileEnabled)
-        fileStream << message << endl; // Print to fileStream
+    if (logToFileEnabled) {
+        fileStream << message << Qt::endl; // Print to fileStream
+    }
 }
 
 QString Logger::getSystemArchitecture()

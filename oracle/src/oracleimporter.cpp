@@ -216,7 +216,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                                                           {"rarity", "rarity"}};
 
     int numCards = 0;
-    QMap<QString, SplitCardPart> splitCards;
+    QMultiMap<QString, SplitCardPart> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
     QString layout, name, text, colors, colorIdentity, maintype, power, toughness;
@@ -338,7 +338,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             // construct full card name
             name = additionalNames.join(QString(" // "));
             SplitCardPart split(index, text, properties, setInfo);
-            splitCards.insertMulti(name, split);
+            splitCards.insert(name, split);
         } else {
             // relations
             relatedCards.clear();
