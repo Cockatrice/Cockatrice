@@ -4,6 +4,7 @@
 #include "filtertree.h"
 
 #include <QFont>
+#include <qnamespace.h>
 
 FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
 {
@@ -174,11 +175,11 @@ Qt::ItemFlags FilterTreeModel::flags(const QModelIndex &index) const
     Qt::ItemFlags result;
 
     if (!index.isValid())
-        return 0;
+        return Qt::NoItemFlags;
 
     node = indexToNode(index);
     if (node == NULL)
-        return 0;
+        return Qt::NoItemFlags;
 
     result = Qt::ItemIsEnabled;
     if (node == fTree)

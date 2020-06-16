@@ -9,6 +9,7 @@
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
+#include <qnamespace.h>
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name,
                                                        RemoteDeckList_TreeModel::DirectoryNode *_parent)
@@ -203,8 +204,9 @@ QModelIndex RemoteDeckList_TreeModel::parent(const QModelIndex &ind) const
 
 Qt::ItemFlags RemoteDeckList_TreeModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid())
-        return 0;
+    if (!index.isValid()) {
+        return Qt::NoItemFlags;
+    }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }

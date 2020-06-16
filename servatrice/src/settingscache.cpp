@@ -12,7 +12,11 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
 
     QStringList disallowedRegExpStr =
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        value("users/disallowedregexp", "").toString().split(",", Qt::SkipEmptyParts);
+#else
         value("users/disallowedregexp", "").toString().split(",", QString::SkipEmptyParts);
+#endif
     disallowedRegExpStr.removeDuplicates();
     for (const QString &regExpStr : disallowedRegExpStr) {
         disallowedRegExp.append(QRegExp(regExpStr));

@@ -81,7 +81,7 @@ public:
                                          bool optionalIsBold = false,
                                          QString optionalFontColor = QString());
     void appendMessage(QString message,
-                       RoomMessageTypeFlags messageType = 0,
+                       RoomMessageTypeFlags messageType = {},
                        QString sender = QString(),
                        UserLevelFlags userLevel = UserLevelFlags(),
                        QString UserPrivLevel = "NONE",
