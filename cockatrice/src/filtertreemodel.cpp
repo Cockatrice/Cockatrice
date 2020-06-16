@@ -4,7 +4,6 @@
 #include "filtertree.h"
 
 #include <QFont>
-#include <qnamespace.h>
 
 FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
 {

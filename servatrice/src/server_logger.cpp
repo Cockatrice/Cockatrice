@@ -60,7 +60,7 @@ void ServerLogger::logMessage(QString message, void *caller)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList listlogFilters = logFilters.split(",", Qt::SkipEmptyParts);
 #else
-    QStringList listlogFilters = logFilters.split(",", QStringList::SkipEmptyParts);
+    QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts);
 #endif
     bool shouldWeSkipLine = false;
 
