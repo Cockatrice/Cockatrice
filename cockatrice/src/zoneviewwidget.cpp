@@ -84,15 +84,15 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     scrollBar->setSingleStep(20);
     scrollBar->setPageStep(200);
     connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(handleScrollBarChange(int)));
-    QGraphicsProxyWidget *scrollBarProxy = new QGraphicsProxyWidget;
+    scrollBarProxy = new ScrollableGraphicsProxyWidget;
     scrollBarProxy->setWidget(scrollBar);
     zoneHBox->addItem(scrollBarProxy);
 
     vbox->addItem(zoneHBox);
 
     zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer);
-    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), this,
-            SLOT(handleWheelEvent(QGraphicsSceneWheelEvent *)));
+    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
+            SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
 
     // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
     // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
@@ -190,12 +190,6 @@ void ZoneViewWidget::resizeToZoneContents()
 
     if (layout())
         layout()->invalidate();
-}
-
-void ZoneViewWidget::handleWheelEvent(QGraphicsSceneWheelEvent *event)
-{
-    QWheelEvent wheelEvent(QPoint(), event->delta(), event->buttons(), event->modifiers(), event->orientation());
-    scrollBar->event(&wheelEvent);
 }
 
 void ZoneViewWidget::handleScrollBarChange(int value)

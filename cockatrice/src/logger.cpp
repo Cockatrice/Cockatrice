@@ -53,10 +53,17 @@ void Logger::openLogfileSession()
     fileHandle.setFileName(LOGGER_FILENAME);
     fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
     fileStream.setDevice(&fileHandle);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << Qt::endl;
     fileStream << getClientVersion() << Qt::endl;
     fileStream << getSystemArchitecture() << Qt::endl;
     fileStream << getClientInstallInfo() << Qt::endl;
+#else
+    fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
+    fileStream << getClientVersion() << endl;
+    fileStream << getSystemArchitecture() << endl;
+    fileStream << getClientInstallInfo() << endl;
+#endif
     logToFileEnabled = true;
 }
 
@@ -66,7 +73,11 @@ void Logger::closeLogfileSession()
         return;
 
     logToFileEnabled = false;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << Qt::endl;
+#else
+    fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << endl;
+#endif
     fileHandle.close();
 }
 

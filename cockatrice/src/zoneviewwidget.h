@@ -2,6 +2,7 @@
 #define ZONEVIEWWIDGET_H
 
 #include <QCheckBox>
+#include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 
 class QLabel;
@@ -18,6 +19,16 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QStyleOption;
 
+class ScrollableGraphicsProxyWidget : public QGraphicsProxyWidget
+{
+    Q_OBJECT
+public slots:
+    void recieveWheelEvent(QGraphicsSceneWheelEvent *event)
+    {
+        wheelEvent(event);
+    }
+};
+
 class ZoneViewWidget : public QGraphicsWidget
 {
     Q_OBJECT
@@ -27,6 +38,7 @@ private:
 
     QPushButton *closeButton;
     QScrollBar *scrollBar;
+    ScrollableGraphicsProxyWidget *scrollBarProxy;
     QCheckBox sortByNameCheckBox;
     QCheckBox sortByTypeCheckBox;
     QCheckBox shuffleCheckBox;
@@ -42,7 +54,6 @@ private slots:
     void processSortByName(int value);
     void processSetPileView(int value);
     void resizeToZoneContents();
-    void handleWheelEvent(QGraphicsSceneWheelEvent *event);
     void handleScrollBarChange(int value);
     void zoneDeleted();
     void moveEvent(QGraphicsSceneMoveEvent * /* event */);

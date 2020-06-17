@@ -10,7 +10,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent)
+DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
 {
     imageLabel = new QLabel(tr("No image chosen."));
     imageLabel->setFixedSize(400, 200);
@@ -55,7 +55,6 @@ void DlgEditAvatar::actBrowse()
         return;
     }
 
-    QImage image;
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setFileName(fileName);
@@ -69,13 +68,9 @@ void DlgEditAvatar::actBrowse()
 
 QByteArray DlgEditAvatar::getImage()
 {
-    const QPixmap *pix = imageLabel->pixmap();
-    if (!pix || pix->isNull())
+    if (image.isNull()) {
         return QByteArray();
-
-    QImage image = pix->toImage();
-    if (image.isNull())
-        return QByteArray();
+    }
 
     QByteArray ba;
     QBuffer buffer(&ba);
