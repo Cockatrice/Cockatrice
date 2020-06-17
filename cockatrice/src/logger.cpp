@@ -99,7 +99,11 @@ void Logger::internalLog(QString message)
     std::cerr << message.toStdString() << std::endl; // Print to stdout
 
     if (logToFileEnabled) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         fileStream << message << Qt::endl; // Print to fileStream
+#else
+        fileStream << message << endl; // Print to fileStream
+#endif
     }
 }
 
