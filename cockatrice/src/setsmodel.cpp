@@ -1,7 +1,5 @@
 #include "setsmodel.h"
 
-#include <qnamespace.h>
-
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent) : QAbstractTableModel(parent), sets(_db->getSetList())
 {
     sets.sortByKey();

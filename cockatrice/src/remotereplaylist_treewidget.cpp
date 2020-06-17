@@ -9,7 +9,6 @@
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
-#include <qnamespace.h>
 
 const int RemoteReplayList_TreeModel::numberOfColumns = 6;
 

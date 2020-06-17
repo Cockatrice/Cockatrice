@@ -9,7 +9,6 @@
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
-#include <qnamespace.h>
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name,
                                                        RemoteDeckList_TreeModel::DirectoryNode *_parent)
