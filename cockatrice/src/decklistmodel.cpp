@@ -195,7 +195,7 @@ QModelIndex DeckListModel::parent(const QModelIndex &ind) const
 Qt::ItemFlags DeckListModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) {
-        return nullptr;
+        return Qt::NoItemFlags;
     }
 
     Qt::ItemFlags result = Qt::ItemIsEnabled;

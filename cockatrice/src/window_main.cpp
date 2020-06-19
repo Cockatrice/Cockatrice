@@ -1120,7 +1120,7 @@ void MainWindow::actCheckCardUpdates()
         return;
     }
 
-    cardUpdateProcess->start("\"" + updaterCmd + "\"");
+    cardUpdateProcess->start("\"" + updaterCmd + "\"", QStringList());
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)

@@ -808,7 +808,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
     Response_WarnList *re = new Response_WarnList;
 
     QString officialWarnings = settingsCache->value("server/officialwarnings").toString();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QStringList warningsList = officialWarnings.split(",", Qt::SkipEmptyParts);
+#else
     QStringList warningsList = officialWarnings.split(",", QString::SkipEmptyParts);
+#endif
     foreach (QString warning, warningsList) {
         re->add_warning(warning.toStdString());
     }
@@ -986,7 +990,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     QString emailBlackList = servatrice->getEmailBlackList();
     QString emailAddress = QString::fromStdString(cmd.email());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
+#else
     QStringList emailBlackListFilters = emailBlackList.split(",", QString::SkipEmptyParts);
+#endif
 
     // verify that users email/provider is not blacklisted
     if (!emailBlackList.trimmed().isEmpty()) {

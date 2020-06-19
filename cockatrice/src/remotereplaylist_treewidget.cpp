@@ -199,7 +199,7 @@ QModelIndex RemoteReplayList_TreeModel::parent(const QModelIndex &ind) const
 Qt::ItemFlags RemoteReplayList_TreeModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return 0;
+        return Qt::NoItemFlags;
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }

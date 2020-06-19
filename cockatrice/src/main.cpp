@@ -144,7 +144,6 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
-    qsrand(QDateTime::currentDateTime().toTime_t());
     qDebug("main(): starting main program");
 
     MainWindow ui;

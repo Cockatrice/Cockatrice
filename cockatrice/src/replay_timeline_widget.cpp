@@ -1,6 +1,7 @@
 #include "replay_timeline_widget.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QPalette>
 #include <QTimer>
 #include <cmath>

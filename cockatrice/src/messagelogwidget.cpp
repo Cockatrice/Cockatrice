@@ -558,7 +558,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(std::move(message), nullptr, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
+    appendMessage(std::move(message), {}, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
                   QString::fromStdString(player->getUserInfo()->privlevel()), true);
 }
 
@@ -740,7 +740,7 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName,
                                        QString userPrivLevel,
                                        QString message)
 {
-    appendMessage(std::move(message), nullptr, spectatorName, spectatorUserLevel, userPrivLevel, false);
+    appendMessage(std::move(message), {}, spectatorName, spectatorUserLevel, userPrivLevel, false);
 }
 
 void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
