@@ -9,6 +9,7 @@
 #include "deckview.h"
 #include "dlg_creategame.h"
 #include "dlg_load_remote_deck.h"
+#include "dlg_load_url_deck.h"
 #include "gamescene.h"
 #include "gameview.h"
 #include "get_pb_extension.h"
@@ -101,12 +102,14 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
+    loadURLButton = new QPushButton;
     readyStartButton = new ToggleButton;
     readyStartButton->setEnabled(false);
     sideboardLockButton = new ToggleButton;
     sideboardLockButton->setEnabled(false);
 
     connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
+    connect(loadURLButton, SIGNAL(clicked()), this, SLOT(loadURLDeck()));
     connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
     connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
     connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
@@ -120,6 +123,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
     buttonHBox->addWidget(loadRemoteButton);
+    buttonHBox->addWidget(loadURLButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
     buttonHBox->setContentsMargins(0, 0, 0, 0);
@@ -143,6 +147,7 @@ void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
+    loadURLButton->setText(tr("Load deck from URL..."));
     readyStartButton->setText(tr("Ready to start"));
     updateSideboardLockButtonText();
 }
@@ -151,6 +156,7 @@ void DeckViewContainer::setButtonsVisible(bool _visible)
 {
     loadLocalButton->setVisible(_visible);
     loadRemoteButton->setVisible(_visible);
+    loadURLButton->setVisible(_visible);
     readyStartButton->setVisible(_visible);
     sideboardLockButton->setVisible(_visible);
 }
@@ -168,6 +174,7 @@ void DeckViewContainer::refreshShortcuts()
 {
     loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+    loadURLButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadURLButton"));
     readyStartButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(
         settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/sideboardLockButton"));
@@ -283,6 +290,20 @@ void DeckViewContainer::loadRemoteDeck()
     if (dlg.exec()) {
         Command_DeckSelect cmd;
         cmd.set_deck_id(dlg.getDeckId());
+        PendingCommand *pend = parentGame->prepareGameCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(deckSelectFinished(const Response &)));
+        parentGame->sendGameCommand(pend, playerId);
+    }
+}
+
+void DeckViewContainer::loadURLDeck()
+{
+    DlgLoadURLDeck dlg(this);
+    if (dlg.exec()) {
+        Command_DeckSelect cmd;
+        DeckLoader *deck = dlg.getDeckList();
+        cmd.set_deck(deck->writeToString_Native().toStdString());
         PendingCommand *pend = parentGame->prepareGameCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(deckSelectFinished(const Response &)));

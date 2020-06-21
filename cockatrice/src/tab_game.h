@@ -86,7 +86,7 @@ class DeckViewContainer : public QWidget
 {
     Q_OBJECT
 private:
-    QPushButton *loadLocalButton, *loadRemoteButton;
+    QPushButton *loadLocalButton, *loadRemoteButton, *loadURLButton;
     ToggleButton *readyStartButton, *sideboardLockButton;
     DeckView *deckView;
     TabGame *parentGame;
@@ -94,6 +94,7 @@ private:
 private slots:
     void loadLocalDeck();
     void loadRemoteDeck();
+    void loadURLDeck();
     void readyStart();
     void deckSelectFinished(const Response &r);
     void sideboardPlanChanged();
