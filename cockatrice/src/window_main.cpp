@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Max-Wilhelm Bruker   *
- *   brukie@gmx.net   *
+ *   Copyright (C) 2008 by Max-Wilhelm Bruker                              *
+ *   brukie@gmx.net                                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -637,18 +637,18 @@ void MainWindow::retranslateUi()
 #endif
 
     dbMenu->setTitle(tr("C&ard Database"));
+    aManageSets->setText(tr("&Manage sets..."));
+    aEditTokens->setText(tr("Edit custom &tokens..."));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
-    aManageSets->setText(tr("&Manage sets..."));
-    aEditTokens->setText(tr("Edit custom &tokens..."));
 
+    helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
-    aViewLog->setText(tr("View &debug log"));
-    helpMenu->setTitle(tr("&Help"));
-    aCheckCardUpdates->setText(tr("Check for card updates..."));
+    aCheckCardUpdates->setText(tr("Check for Card Updates..."));
+    aViewLog->setText(tr("View &Debug Log"));
     tabSupervisor->retranslateUi();
 }
 
@@ -675,32 +675,27 @@ void MainWindow::createActions()
     aExit = new QAction(this);
     connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 
+    aManageSets = new QAction(QString(), this);
+    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
+    aEditTokens = new QAction(QString(), this);
+    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    aOpenCustomFolder = new QAction(QString(), this);
+    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+    aOpenCustomsetsFolder = new QAction(QString(), this);
+    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+    aAddCustomSet = new QAction(QString(), this);
+    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
     aTips = new QAction(this);
     connect(aTips, SIGNAL(triggered()), this, SLOT(actTips()));
     aUpdate = new QAction(this);
     connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
-    aViewLog = new QAction(this);
-    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
-
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
-
-    aOpenCustomsetsFolder = new QAction(QString(), this);
-    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
-
-    aOpenCustomFolder = new QAction(QString(), this);
-    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
-
-    aAddCustomSet = new QAction(QString(), this);
-    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
-
-    aManageSets = new QAction(QString(), this);
-    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
-
-    aEditTokens = new QAction(QString(), this);
-    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    aViewLog = new QAction(this);
+    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
 
 #if defined(__APPLE__) /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
@@ -751,8 +746,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSettings);
-    cockatriceMenu->addAction(aCheckCardUpdates);
-    cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
 
     dbMenu = menuBar()->addMenu(QString());
@@ -768,7 +761,10 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
     helpMenu->addAction(aTips);
+    helpMenu->addSeparator();
     helpMenu->addAction(aUpdate);
+    helpMenu->addAction(aCheckCardUpdates);
+    helpMenu->addSeparator();
     helpMenu->addAction(aViewLog);
 }
 
@@ -1180,10 +1176,10 @@ void MainWindow::refreshShortcuts()
     aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
     aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
     aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
-    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
-    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aOpenCustomFolder"));
     aManageSets->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aManageSets"));
     aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditTokens"));
+    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aOpenCustomFolder"));
+    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
 }
 
 void MainWindow::notifyUserAboutUpdate()
