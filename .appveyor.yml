@@ -11,7 +11,6 @@ skip_commits:
     - .clang-format
     - .*ignore
     - .codacy.yml
-    - .gitlab-ci.yml
     - .travis.yml
     - '**/*.md'
     - Dockerfile
