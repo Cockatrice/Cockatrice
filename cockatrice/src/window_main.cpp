@@ -46,6 +46,7 @@
 #include "version_string.h"
 #include "window_sets.h"
 
+#include <QDesktopServices>
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
@@ -752,10 +753,8 @@ void MainWindow::createMenus()
     dbMenu->addAction(aManageSets);
     dbMenu->addAction(aEditTokens);
     dbMenu->addSeparator();
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
-#endif
     dbMenu->addAction(aAddCustomSet);
 
     helpMenu = menuBar()->addMenu(QString());
@@ -1206,6 +1205,8 @@ void MainWindow::actOpenCustomFolder()
     QStringList args;
     args << QDir::toNativeSeparators(dir);
     QProcess::startDetached("explorer", args);
+#else // LINUX
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 #endif
 }
 
@@ -1225,6 +1226,8 @@ void MainWindow::actOpenCustomsetsFolder()
     QStringList args;
     args << QDir::toNativeSeparators(dir);
     QProcess::startDetached("explorer", args);
+#else // LINUX
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 #endif
 }
 
