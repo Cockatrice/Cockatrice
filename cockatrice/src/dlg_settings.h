@@ -42,6 +42,7 @@ private slots:
     void replaysPathButtonClicked();
     void picsPathButtonClicked();
     void cardDatabasePathButtonClicked();
+    void customCardDatabaseButtonClicked();
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
 
@@ -52,6 +53,7 @@ private:
     QLineEdit *replaysPathEdit;
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
+    QLineEdit *customCardDatabasePathEdit;
     QLineEdit *tokenDatabasePathEdit;
     QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox;
@@ -66,6 +68,7 @@ private:
     QLabel replaysPathLabel;
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
+    QLabel customCardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
     QLabel updateReleaseChannelLabel;
     QCheckBox showTipsOnStartup;
