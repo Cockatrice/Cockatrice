@@ -46,11 +46,11 @@
 #include "version_string.h"
 #include "window_sets.h"
 
-#include <QDesktopServices>
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
 #include <QInputDialog>
