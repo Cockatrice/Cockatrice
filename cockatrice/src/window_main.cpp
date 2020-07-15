@@ -1193,42 +1193,13 @@ void MainWindow::notifyUserAboutUpdate()
 void MainWindow::actOpenCustomFolder()
 {
     QString dir = settingsCache->getCustomPicsPath();
-#if defined(Q_OS_MAC)
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1(R"(tell application "Finder" to open POSIX file "%1")").arg(dir);
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
-
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
-#elif defined(Q_OS_WIN)
-    QStringList args;
-    args << QDir::toNativeSeparators(dir);
-    QProcess::startDetached("explorer", args);
-#else // LINUX
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
-#endif
 }
 
 void MainWindow::actOpenCustomsetsFolder()
 {
     QString dir = settingsCache->getCustomCardDatabasePath();
-
-#if defined(Q_OS_MAC)
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1(R"(tell application "Finder" to open POSIX file "%1")").arg(dir);
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
-
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
-#elif defined(Q_OS_WIN)
-    QStringList args;
-    args << QDir::toNativeSeparators(dir);
-    QProcess::startDetached("explorer", args);
-#else // LINUX
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
-#endif
 }
 
 void MainWindow::actAddCustomSet()
