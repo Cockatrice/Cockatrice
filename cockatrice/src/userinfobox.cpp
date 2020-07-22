@@ -27,11 +27,11 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     nameFont.setPointSize(nameFont.pointSize() * 1.5);
     nameLabel.setFont(nameFont);
 
-    avatarLabel.setScaledContents(true);
+    avatarLabel.setMinimumSize(200, 200);
     avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->addWidget(&avatarLabel, 0, 0, 1, 3);
+    mainLayout->addWidget(&avatarLabel, 0, 1, 1, 1);
     mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
@@ -43,7 +43,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
     mainLayout->addWidget(&accountAgeLebel1, 6, 0, 1, 1);
     mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
-    mainLayout->setColumnStretch(2, 10);
+    mainLayout->setColumnStretch(1, 10);
 
     if (editable) {
         QHBoxLayout *buttonsLayout = new QHBoxLayout;
@@ -78,7 +78,6 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
     const UserLevelFlags userLevel(user.user_level());
 
-    QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), bmp.size()))
         avatarPixmap =
@@ -293,4 +292,10 @@ void UserInfoBox::processAvatarResponse(const Response &r)
             QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to updater your avatar."));
             break;
     }
+}
+
+void UserInfoBox::resizeEvent(QResizeEvent *)
+{
+    QPixmap resizedPixmap = avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    avatarLabel.setPixmap(resizedPixmap);
 }
