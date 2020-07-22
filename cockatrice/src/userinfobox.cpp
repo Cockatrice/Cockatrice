@@ -294,8 +294,9 @@ void UserInfoBox::processAvatarResponse(const Response &r)
     }
 }
 
-void UserInfoBox::resizeEvent(QResizeEvent *)
+void UserInfoBox::resizeEvent(QResizeEvent *event)
 {
     QPixmap resizedPixmap = avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     avatarLabel.setPixmap(resizedPixmap);
+    QWidget::resizeEvent(event);
 }
