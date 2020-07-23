@@ -18,6 +18,7 @@ private:
     QLabel avatarLabel, nameLabel, realNameLabel1, realNameLabel2, countryLabel1, countryLabel2, countryLabel3,
         userLevelLabel1, userLevelLabel2, userLevelLabel3, accountAgeLebel1, accountAgeLabel2;
     QPushButton editButton, passwordButton, avatarButton;
+    QPixmap avatarPixmap;
 
 public:
     UserInfoBox(AbstractClient *_client, bool editable, QWidget *parent = nullptr, Qt::WindowFlags flags = {});
@@ -35,6 +36,9 @@ private slots:
 public slots:
     void updateInfo(const ServerInfo_User &user);
     void updateInfo(const QString &userName);
+
+private:
+    void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif
