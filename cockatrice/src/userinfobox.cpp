@@ -29,6 +29,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     avatarLabel.setMinimumSize(200, 200);
     avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    avatarLabel.setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *avatarLayout = new QHBoxLayout;
     avatarLayout->setContentsMargins(0, 0, 0, 0);
