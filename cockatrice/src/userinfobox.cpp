@@ -29,9 +29,16 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     avatarLabel.setMinimumSize(200, 200);
     avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    avatarLabel.setAlignment(Qt::AlignCenter);
+
+    QHBoxLayout *avatarLayout = new QHBoxLayout;
+    avatarLayout->setContentsMargins(0, 0, 0, 0);
+    avatarLayout->addStretch(1);
+    avatarLayout->addWidget(&avatarLabel, 3);
+    avatarLayout->addStretch(1);
 
     QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->addWidget(&avatarLabel, 0, 1, 1, 1);
+    mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
     mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
@@ -41,9 +48,9 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
     mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1);
     mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
-    mainLayout->addWidget(&accountAgeLebel1, 6, 0, 1, 1);
+    mainLayout->addWidget(&accountAgeLabel1, 6, 0, 1, 1);
     mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
-    mainLayout->setColumnStretch(1, 10);
+    mainLayout->setColumnStretch(2, 10);
 
     if (editable) {
         QHBoxLayout *buttonsLayout = new QHBoxLayout;
@@ -67,7 +74,7 @@ void UserInfoBox::retranslateUi()
     realNameLabel1.setText(tr("Real name:"));
     countryLabel1.setText(tr("Location:"));
     userLevelLabel1.setText(tr("User level:"));
-    accountAgeLebel1.setText(tr("Account Age:"));
+    accountAgeLabel1.setText(tr("Account Age:"));
 
     editButton.setText(tr("Edit"));
     passwordButton.setText(tr("Change password"));
