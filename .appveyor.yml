@@ -58,7 +58,7 @@ build_script:
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
         cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_C_FLAGS=/MP" "-DCMAKE_CXX_FLAGS=/MP" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$vcpkgbindir" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll" "-DTEST=1"
-    - msbuild PACKAGE.vcxproj /p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /m 
+    - msbuild PACKAGE.vcxproj /p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /m
     - ps: |
         $exe = dir -name *.exe
         $new_name = $exe.Replace(".exe", "-${env:target_arch}.exe")
