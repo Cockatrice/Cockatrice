@@ -72,6 +72,7 @@ build_script:
 
 test_script:
     - ps: |
+        $env:Path += ";c:/Qt/$env:qt_ver/bin"
         ctest -T Test -C Release
         $XSLInputElement = New-Object System.Xml.Xsl.XslCompiledTransform
         $XSLInputElement.Load("https://raw.githubusercontent.com/rpavlik/jenkins-ctest-plugin/master/ctest-to-junit.xsl")
