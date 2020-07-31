@@ -45,7 +45,5 @@ include_directories(${GTEST_INCLUDE_DIRS})
 target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(expression_test cockatrice_common Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 
-if(NOT MSVC)
-    add_subdirectory(carddatabase)
-endif()
+add_subdirectory(carddatabase)
 add_subdirectory(loading_from_clipboard)
