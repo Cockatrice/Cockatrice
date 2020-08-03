@@ -163,7 +163,7 @@ jobs:
   - name: macOS Mojave (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode11.1
+    osx_image: xcode11.3
     cache:
     - ccache
     - directories:
@@ -183,7 +183,7 @@ jobs:
   - name: macOS Mojave (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode11.1
+    osx_image: xcode11.3
     env: OSX_VERSION=10.14
     cache:
     - ccache
