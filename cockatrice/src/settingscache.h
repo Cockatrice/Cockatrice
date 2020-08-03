@@ -462,6 +462,8 @@ public:
     {
         return mbDownloadSpoilers;
     }
+
+    static SettingsCache &instance();
 public slots:
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
@@ -528,7 +530,5 @@ public slots:
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
 };
-
-extern SettingsCache *settingsCache;
 
 #endif

@@ -22,7 +22,7 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
-    connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
+    connect(&SettingsCache::instance(), SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
     cardInfoUpdated();
 }
 
@@ -74,7 +74,7 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    const int MAX_FONT_SIZE = settingsCache->getMaxFontSize();
+    const int MAX_FONT_SIZE = SettingsCache::instance().getMaxFontSize();
     const int fontSize = std::max(9, MAX_FONT_SIZE);
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
@@ -133,7 +133,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     else
         painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 1.5));
 
-    if (translatedPixmap.isNull() || settingsCache->getDisplayCardNames() || facedown) {
+    if (translatedPixmap.isNull() || SettingsCache::instance().getDisplayCardNames() || facedown) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);
@@ -203,7 +203,7 @@ void AbstractCardItem::setHovered(bool _hovered)
         processHoverEvent();
     isHovered = _hovered;
     setZValue(_hovered ? 2000000004 : realZValue);
-    setScale(_hovered && settingsCache->getScaleCards() ? 1.1 : 1);
+    setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
     setTransformOriginPoint(_hovered ? CARD_WIDTH / 2 : 0, _hovered ? CARD_HEIGHT / 2 : 0);
     update();
 }
@@ -256,7 +256,7 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
         return;
 
     tapped = _tapped;
-    if (settingsCache->getTapAnimation() && canAnimate)
+    if (SettingsCache::instance().getTapAnimation() && canAnimate)
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     else {
         tapAngle = tapped ? 90 : 0;

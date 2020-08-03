@@ -51,3 +51,8 @@ void PictureLoader::clearPixmapCache(CardInfoPtr /* card */)
 }
 
 SettingsCache *settingsCache;
+
+SettingsCache& SettingsCache::instance()
+{
+    return *settingsCache;
+}

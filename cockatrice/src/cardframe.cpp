@@ -55,7 +55,7 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
     tab3Layout->addWidget(splitter);
     tab3->setLayout(tab3Layout);
 
-    setViewMode(settingsCache->getCardInfoViewMode());
+    setViewMode(SettingsCache::instance().getCardInfoViewMode());
 
     setCard(db->getCard(cardName));
 }
@@ -86,7 +86,7 @@ void CardFrame::setViewMode(int mode)
             break;
     }
 
-    settingsCache->setCardInfoViewMode(mode);
+    SettingsCache::instance().setCardInfoViewMode(mode);
 }
 
 void CardFrame::setCard(CardInfoPtr card)

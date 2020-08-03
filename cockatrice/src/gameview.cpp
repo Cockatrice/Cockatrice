@@ -24,7 +24,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene
 
     connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
     addAction(aCloseMostRecentZoneView);
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
@@ -65,5 +65,6 @@ void GameView::stopRubberBand()
 
 void GameView::refreshShortcuts()
 {
-    aCloseMostRecentZoneView->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
+    aCloseMostRecentZoneView->setShortcuts(
+        SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
 }

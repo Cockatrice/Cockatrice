@@ -49,7 +49,7 @@ void DlgCreateGame::sharedCtor()
         QRadioButton *gameTypeRadioButton = new QRadioButton(gameTypeIterator.value(), this);
         gameTypeLayout->addWidget(gameTypeRadioButton);
         gameTypeCheckBoxes.insert(gameTypeIterator.key(), gameTypeRadioButton);
-        bool isChecked = settingsCache->getGameTypes().contains(gameTypeIterator.value() + ", ");
+        bool isChecked = SettingsCache::instance().getGameTypes().contains(gameTypeIterator.value() + ", ");
         gameTypeCheckBoxes[gameTypeIterator.key()]->setChecked(isChecked);
     }
     QGroupBox *gameTypeGroupBox = new QGroupBox(tr("Game type"));
@@ -115,20 +115,20 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
 {
     sharedCtor();
 
-    rememberGameSettings->setChecked(settingsCache->getRememberGameSettings());
-    descriptionEdit->setText(settingsCache->getGameDescription());
-    maxPlayersEdit->setValue(settingsCache->getMaxPlayers());
+    rememberGameSettings->setChecked(SettingsCache::instance().getRememberGameSettings());
+    descriptionEdit->setText(SettingsCache::instance().getGameDescription());
+    maxPlayersEdit->setValue(SettingsCache::instance().getMaxPlayers());
     if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) {
-        onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
-        onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
+        onlyBuddiesCheckBox->setChecked(SettingsCache::instance().getOnlyBuddies());
+        onlyRegisteredCheckBox->setChecked(SettingsCache::instance().getOnlyRegistered());
     } else {
         onlyBuddiesCheckBox->setEnabled(false);
         onlyRegisteredCheckBox->setEnabled(false);
     }
-    spectatorsAllowedCheckBox->setChecked(settingsCache->getSpectatorsAllowed());
-    spectatorsNeedPasswordCheckBox->setChecked(settingsCache->getSpectatorsNeedPassword());
-    spectatorsCanTalkCheckBox->setChecked(settingsCache->getSpectatorsCanTalk());
-    spectatorsSeeEverythingCheckBox->setChecked(settingsCache->getSpectatorsCanSeeEverything());
+    spectatorsAllowedCheckBox->setChecked(SettingsCache::instance().getSpectatorsAllowed());
+    spectatorsNeedPasswordCheckBox->setChecked(SettingsCache::instance().getSpectatorsNeedPassword());
+    spectatorsCanTalkCheckBox->setChecked(SettingsCache::instance().getSpectatorsCanTalk());
+    spectatorsSeeEverythingCheckBox->setChecked(SettingsCache::instance().getSpectatorsCanSeeEverything());
 
     if (!rememberGameSettings->isChecked()) {
         actReset();
@@ -237,17 +237,17 @@ void DlgCreateGame::actOK()
         }
     }
 
-    settingsCache->setRememberGameSettings(rememberGameSettings->isChecked());
+    SettingsCache::instance().setRememberGameSettings(rememberGameSettings->isChecked());
     if (rememberGameSettings->isChecked()) {
-        settingsCache->setGameDescription(descriptionEdit->text());
-        settingsCache->setMaxPlayers(maxPlayersEdit->value());
-        settingsCache->setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
-        settingsCache->setOnlyRegistered(onlyRegisteredCheckBox->isChecked());
-        settingsCache->setSpectatorsAllowed(spectatorsAllowedCheckBox->isChecked());
-        settingsCache->setSpectatorsNeedPassword(spectatorsNeedPasswordCheckBox->isChecked());
-        settingsCache->setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
-        settingsCache->setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
-        settingsCache->setGameTypes(gameTypes);
+        SettingsCache::instance().setGameDescription(descriptionEdit->text());
+        SettingsCache::instance().setMaxPlayers(maxPlayersEdit->value());
+        SettingsCache::instance().setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
+        SettingsCache::instance().setOnlyRegistered(onlyRegisteredCheckBox->isChecked());
+        SettingsCache::instance().setSpectatorsAllowed(spectatorsAllowedCheckBox->isChecked());
+        SettingsCache::instance().setSpectatorsNeedPassword(spectatorsNeedPasswordCheckBox->isChecked());
+        SettingsCache::instance().setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
+        SettingsCache::instance().setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
+        SettingsCache::instance().setGameTypes(gameTypes);
     }
     PendingCommand *pend = room->prepareRoomCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));

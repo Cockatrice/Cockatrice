@@ -6,10 +6,10 @@
 #include <QObject>
 #include <QString>
 
-#include "../../cockatrice/src/carddatabase.h"
-
 #define SETTINGSCACHE_H
+#define PICTURELOADER_H
 
+#include "../../cockatrice/src/carddatabase.h"
 
 class CardDatabaseSettings
 {
@@ -37,15 +37,16 @@ public:
     QString getTokenDatabasePath() const;
     QString getSpoilerCardDatabasePath() const;
     CardDatabaseSettings &cardDatabase() const;
+
+    static SettingsCache& instance();
 signals:
     void cardDatabasePathChanged();
 };
 
 extern SettingsCache *settingsCache;
 
-#define PICTURELOADER_H
-
 class PictureLoader
 {
-    void clearPixmapCache(CardInfoPtr card);
+public:
+    static void clearPixmapCache(CardInfoPtr card);
 };

@@ -27,10 +27,9 @@
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
 
-PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
+PictureToLoad::PictureToLoad(CardInfoPtr _card)
+    : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
-    urlTemplates = settingsCache->downloads().getAllURLs();
-
     if (card) {
         for (const auto &set : card->getSets()) {
             sortedSets << set.getPtr();
@@ -105,15 +104,14 @@ QString PictureToLoad::getSetName() const
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
-PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), downloadRunning(false), loadQueueRunning(false)
+PictureLoaderWorker::PictureLoaderWorker()
+    : QObject(nullptr), picsPath(SettingsCache::instance().getPicsPath()),
+      customPicsPath(SettingsCache::instance().getCustomPicsPath()),
+      picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false)
 {
-    picsPath = settingsCache->getPicsPath();
-    customPicsPath = settingsCache->getCustomPicsPath();
-    picDownload = settingsCache->getPicDownload();
-
     connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
-    connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
+    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
@@ -475,21 +473,21 @@ void PictureLoaderWorker::enqueueImageLoad(CardInfoPtr card)
 void PictureLoaderWorker::picDownloadChanged()
 {
     QMutexLocker locker(&mutex);
-    picDownload = settingsCache->getPicDownload();
+    picDownload = SettingsCache::instance().getPicDownload();
 }
 
 void PictureLoaderWorker::picsPathChanged()
 {
     QMutexLocker locker(&mutex);
-    picsPath = settingsCache->getPicsPath();
-    customPicsPath = settingsCache->getCustomPicsPath();
+    picsPath = SettingsCache::instance().getPicsPath();
+    customPicsPath = SettingsCache::instance().getCustomPicsPath();
 }
 
 PictureLoader::PictureLoader() : QObject(nullptr)
 {
     worker = new PictureLoaderWorker;
-    connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
+    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
     connect(worker, SIGNAL(imageLoaded(CardInfoPtr, const QImage &)), this,
             SLOT(imageLoaded(CardInfoPtr, const QImage &)));

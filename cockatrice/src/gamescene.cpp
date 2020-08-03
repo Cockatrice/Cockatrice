@@ -20,7 +20,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(settingsCache, SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
+    connect(&SettingsCache::instance(), SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
 
     rearrange();
 }
@@ -96,7 +96,7 @@ void GameScene::rearrange()
     }
 
     const int playersCount = playersPlaying.size();
-    const int columns = playersCount < settingsCache->getMinPlayersForMultiColumnLayout() ? 1 : 2;
+    const int columns = playersCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
     const int rows = ceil((qreal)playersCount / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;

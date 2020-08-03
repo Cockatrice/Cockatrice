@@ -6,9 +6,12 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QGlobalStatic>
 #include <QSettings>
 #include <QStandardPaths>
 #include <utility>
+
+Q_GLOBAL_STATIC(SettingsCache, settingsCache);
 
 QString SettingsCache::getDataPath()
 {
@@ -966,4 +969,9 @@ void SettingsCache::setMaxFontSize(int _max)
 {
     maxFontSize = _max;
     settings->setValue("game/maxfontsize", maxFontSize);
+}
+
+SettingsCache &SettingsCache::instance()
+{
+    return *settingsCache;
 }

@@ -100,10 +100,10 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         connect(&sortByNameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByName(int)));
         connect(&sortByTypeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByType(int)));
         connect(&pileViewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSetPileView(int)));
-        sortByNameCheckBox.setChecked(settingsCache->getZoneViewSortByName());
-        sortByTypeCheckBox.setChecked(settingsCache->getZoneViewSortByType());
-        pileViewCheckBox.setChecked(settingsCache->getZoneViewPileView());
-        if (!settingsCache->getZoneViewSortByType())
+        sortByNameCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByName());
+        sortByTypeCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByType());
+        pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
+        if (!SettingsCache::instance().getZoneViewSortByType())
             pileViewCheckBox.setEnabled(false);
     }
 
@@ -118,20 +118,20 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 void ZoneViewWidget::processSortByType(int value)
 {
     pileViewCheckBox.setEnabled(value);
-    settingsCache->setZoneViewSortByType(value);
+    SettingsCache::instance().setZoneViewSortByType(value);
     zone->setPileView(pileViewCheckBox.isChecked());
     zone->setSortByType(value);
 }
 
 void ZoneViewWidget::processSortByName(int value)
 {
-    settingsCache->setZoneViewSortByName(value);
+    SettingsCache::instance().setZoneViewSortByName(value);
     zone->setSortByName(value);
 }
 
 void ZoneViewWidget::processSetPileView(int value)
 {
-    settingsCache->setZoneViewPileView(value);
+    SettingsCache::instance().setZoneViewPileView(value);
     zone->setPileView(value);
 }
 

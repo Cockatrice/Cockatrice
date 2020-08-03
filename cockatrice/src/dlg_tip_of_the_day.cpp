@@ -42,7 +42,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipNumber = new QLabel();
     tipNumber->setAlignment(Qt::AlignCenter);
 
-    QList<int> seenTips = settingsCache->getSeenTips();
+    QList<int> seenTips = SettingsCache::instance().getSeenTips();
     newTipsAvailable = false;
     currentTip = 0;
     for (int i = 0; i < tipDatabase->rowCount(); i++) {
@@ -74,8 +74,9 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(previousButton, SIGNAL(clicked()), this, SLOT(previousClicked()));
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
-    showTipsOnStartupCheck->setChecked(settingsCache->getShowTipsOnStartup());
-    connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
+    showTipsOnStartupCheck->setChecked(SettingsCache::instance().getShowTipsOnStartup());
+    connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), &SettingsCache::instance(),
+            SLOT(setShowTipsOnStartup(bool)));
     buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
     buttonBar->addWidget(tipNumber);
@@ -130,10 +131,10 @@ void DlgTipOfTheDay::updateTip(int tipId)
     }
 
     // Store tip id as seen
-    QList<int> seenTips = settingsCache->getSeenTips();
+    QList<int> seenTips = SettingsCache::instance().getSeenTips();
     if (!seenTips.contains(tipId)) {
         seenTips.append(tipId);
-        settingsCache->setSeenTips(seenTips);
+        SettingsCache::instance().setSeenTips(seenTips);
     }
 
     TipOfTheDay tip = tipDatabase->getTip(tipId);

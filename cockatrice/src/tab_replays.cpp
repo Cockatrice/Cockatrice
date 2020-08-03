@@ -28,7 +28,7 @@
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
 {
     localDirModel = new QFileSystemModel(this);
-    localDirModel->setRootPath(settingsCache->getReplaysPath());
+    localDirModel->setRootPath(SettingsCache::instance().getReplaysPath());
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;

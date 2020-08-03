@@ -31,7 +31,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     : Tab(_tabSupervisor), client(_client)
 {
     localDirModel = new QFileSystemModel(this);
-    localDirModel->setRootPath(settingsCache->getDeckPath());
+    localDirModel->setRootPath(SettingsCache::instance().getDeckPath());
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;

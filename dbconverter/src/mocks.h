@@ -37,6 +37,8 @@ public:
     QString getTokenDatabasePath() const;
     QString getSpoilerCardDatabasePath() const;
     CardDatabaseSettings &cardDatabase() const;
+
+    static SettingsCache& instance();
 signals:
     void cardDatabasePathChanged();
 };
