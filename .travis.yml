@@ -93,7 +93,7 @@ jobs:
     script: RUN --server --package $NAME --release
 
 
-  #Fedora 32 (on docker)
+  #Fedora 32 (on Docker)
   - name: Fedora 32 (Compile)
     if: tag IS NOT present
     services: docker
