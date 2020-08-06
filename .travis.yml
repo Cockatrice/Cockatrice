@@ -93,7 +93,7 @@ jobs:
     script: RUN --server --package $NAME --release
 
 
-  #Fedora 32 (on docker)
+  #Fedora 32 (on Docker)
   - name: Fedora 32 (Compile)
     if: tag IS NOT present
     services: docker
@@ -159,11 +159,11 @@ jobs:
     before_cache:
     - brew cleanup
 
-  #macOS Mojave
-  - name: macOS Mojave (Debug)
+  #macOS Catalina
+  - name: macOS Catalina (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode11.1
+    osx_image: xcode11.6
     cache:
     - ccache
     - directories:
@@ -180,11 +180,11 @@ jobs:
     before_cache:
     - brew cleanup
 
-  - name: macOS Mojave (Release)
+  - name: macOS Catalina (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode11.1
-    env: OSX_VERSION=10.14
+    osx_image: xcode11.6
+    env: OSX_VERSION=10.15
     cache:
     - ccache
     - directories:
