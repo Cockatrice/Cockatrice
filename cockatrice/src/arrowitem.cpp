@@ -240,12 +240,12 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         if (startZone->getName().compare("hand") == 0) {
             startCard->playCard(false);
             CardInfoPtr ci = startCard->getInfo();
-            if (ci && (((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
-                        ((settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
+            if (ci && (((!SettingsCache::instance().getPlayToStack() && ci->getTableRow() == 3) ||
+                        ((SettingsCache::instance().getPlayToStack() && ci->getTableRow() != 0) &&
                          startCard->getZone()->getName().toStdString() != "stack"))))
                 cmd.set_start_zone("stack");
             else
-                cmd.set_start_zone(settingsCache->getPlayToStack() ? "stack" : "table");
+                cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? "stack" : "table");
         }
         player->sendGameCommand(cmd);
     }

@@ -54,10 +54,10 @@
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
-    settings = new QSettings(settingsCache->getSettingsPath() + "global.ini", QSettings::IniFormat, this);
-    connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
+    settings = new QSettings(SettingsCache::instance().getSettingsPath() + "global.ini", QSettings::IniFormat, this);
+    connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
-    importer = new OracleImporter(settingsCache->getDataPath(), this);
+    importer = new OracleImporter(SettingsCache::instance().getDataPath(), this);
 
     nam = new QNetworkAccessManager(this);
 
@@ -140,7 +140,7 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     languageLabel = new QLabel(this);
     versionLabel = new QLabel(this);
     languageBox = new QComboBox(this);
-    QString setLanguage = settingsCache->getLang();
+    QString setLanguage = SettingsCache::instance().getLang();
 
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
@@ -185,7 +185,7 @@ QString IntroPage::languageName(const QString &qmFile)
 
 void IntroPage::languageBoxChanged(int index)
 {
-    settingsCache->setLang(languageBox->itemData(index).toString());
+    SettingsCache::instance().setLang(languageBox->itemData(index).toString());
 }
 
 void IntroPage::retranslateUi()
@@ -587,7 +587,7 @@ void SaveSetsPage::retranslateUi()
 
     saveLabel->setText(tr("Press \"Save\" to store the imported cards in the Cockatrice database."));
     pathLabel->setText(tr("The card database will be saved at the following location:") + "<br>" +
-                       settingsCache->getCardDatabasePath());
+                       SettingsCache::instance().getCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 
     setButtonText(QWizard::NextButton, tr("&Save"));
@@ -608,7 +608,7 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, co
 bool SaveSetsPage::validatePage()
 {
     bool ok = false;
-    QString defaultPath = settingsCache->getCardDatabasePath();
+    QString defaultPath = SettingsCache::instance().getCardDatabasePath();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
 
@@ -652,7 +652,7 @@ QString LoadTokensPage::getCustomUrlSettingsKey()
 
 QString LoadTokensPage::getDefaultSavePath()
 {
-    return settingsCache->getTokenDatabasePath();
+    return SettingsCache::instance().getTokenDatabasePath();
 }
 
 QString LoadTokensPage::getWindowTitle()
@@ -673,7 +673,7 @@ void LoadTokensPage::retranslateUi()
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
     pathLabel->setText(tr("The token database will be saved at the following location:") + "<br>" +
-                       settingsCache->getTokenDatabasePath());
+                       SettingsCache::instance().getTokenDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
@@ -689,7 +689,7 @@ QString LoadSpoilersPage::getCustomUrlSettingsKey()
 
 QString LoadSpoilersPage::getDefaultSavePath()
 {
-    return settingsCache->getTokenDatabasePath();
+    return SettingsCache::instance().getTokenDatabasePath();
 }
 
 QString LoadSpoilersPage::getWindowTitle()
@@ -710,6 +710,6 @@ void LoadSpoilersPage::retranslateUi()
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
     pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" +
-                       settingsCache->getSpoilerCardDatabasePath());
+                       SettingsCache::instance().getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }

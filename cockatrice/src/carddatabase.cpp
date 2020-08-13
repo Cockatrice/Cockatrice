@@ -68,27 +68,27 @@ QString CardSet::getCorrectedShortName() const
 
 void CardSet::loadSetOptions()
 {
-    sortKey = settingsCache->cardDatabase().getSortKey(shortName);
-    enabled = settingsCache->cardDatabase().isEnabled(shortName);
-    isknown = settingsCache->cardDatabase().isKnown(shortName);
+    sortKey = SettingsCache::instance().cardDatabase().getSortKey(shortName);
+    enabled = SettingsCache::instance().cardDatabase().isEnabled(shortName);
+    isknown = SettingsCache::instance().cardDatabase().isKnown(shortName);
 }
 
 void CardSet::setSortKey(unsigned int _sortKey)
 {
     sortKey = _sortKey;
-    settingsCache->cardDatabase().setSortKey(shortName, _sortKey);
+    SettingsCache::instance().cardDatabase().setSortKey(shortName, _sortKey);
 }
 
 void CardSet::setEnabled(bool _enabled)
 {
     enabled = _enabled;
-    settingsCache->cardDatabase().setEnabled(shortName, _enabled);
+    SettingsCache::instance().cardDatabase().setEnabled(shortName, _enabled);
 }
 
 void CardSet::setIsKnown(bool _isknown)
 {
     isknown = _isknown;
-    settingsCache->cardDatabase().setIsKnown(shortName, _isknown);
+    SettingsCache::instance().cardDatabase().setIsKnown(shortName, _isknown);
 }
 
 class SetList::KeyCompareFunctor
@@ -337,7 +337,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
         connect(parser, SIGNAL(addSet(CardSetPtr)), this, SLOT(addSet(CardSetPtr)), Qt::DirectConnection);
     }
 
-    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
+    connect(&SettingsCache::instance(), SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
 }
 
 CardDatabase::~CardDatabase()
@@ -515,12 +515,12 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     clear(); // remove old db
 
-    loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath()); // load main card database
-    loadCardDatabase(settingsCache->getTokenDatabasePath());             // load tokens database
-    loadCardDatabase(settingsCache->getSpoilerCardDatabasePath());       // load spoilers database
+    loadStatus = loadCardDatabase(SettingsCache::instance().getCardDatabasePath()); // load main card database
+    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
+    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
 
     // load custom card databases
-    QDir dir(settingsCache->getCustomCardDatabasePath());
+    QDir dir(SettingsCache::instance().getCustomCardDatabasePath());
     for (const QString &fileName :
          dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
         loadCardDatabase(dir.absoluteFilePath(fileName));
@@ -625,7 +625,8 @@ void CardDatabase::notifyEnabledSetsChanged()
 
 bool CardDatabase::saveCustomTokensToFile()
 {
-    QString fileName = settingsCache->getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
+    QString fileName =
+        SettingsCache::instance().getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
 
     SetNameMap tmpSets;
     CardSetPtr customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);

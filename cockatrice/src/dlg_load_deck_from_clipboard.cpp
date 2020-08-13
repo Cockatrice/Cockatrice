@@ -34,7 +34,7 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(pa
     resize(500, 500);
 
     actRefresh();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 }
 
@@ -45,7 +45,8 @@ void DlgLoadDeckFromClipboard::actRefresh()
 
 void DlgLoadDeckFromClipboard::refreshShortcuts()
 {
-    refreshButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
+    refreshButton->setShortcut(
+        SettingsCache::instance().shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
 }
 
 void DlgLoadDeckFromClipboard::actOK()

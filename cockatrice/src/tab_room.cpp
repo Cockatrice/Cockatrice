@@ -56,7 +56,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
-    connect(settingsCache, SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
+    connect(&SettingsCache::instance(), SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
     sayLabel = new QLabel;
     sayEdit = new LineEditCompleter;
     sayLabel->setBuddy(sayEdit);
@@ -122,7 +122,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     sayEdit->setCompleter(completer);
     actCompleterChanged();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     retranslateUi();
@@ -233,7 +233,8 @@ void TabRoom::actOpenChatSettings()
 
 void TabRoom::actCompleterChanged()
 {
-    settingsCache->getChatMentionCompleter() ? completer->setCompletionRole(2) : completer->setCompletionRole(1);
+    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
+                                                        : completer->setCompletionRole(1);
 }
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
@@ -293,11 +294,12 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     if (twi) {
         userLevel = UserLevelFlags(twi->getUserInfo().user_level());
         userPrivLevel = QString::fromStdString(twi->getUserInfo().privlevel());
-        if (settingsCache->getIgnoreUnregisteredUsers() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
+        if (SettingsCache::instance().getIgnoreUnregisteredUsers() &&
+            !userLevel.testFlag(ServerInfo_User::IsRegistered))
             return;
     }
 
-    if (event.message_type() == Event_RoomSay::ChatHistory && !settingsCache->getRoomHistory())
+    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().getRoomHistory())
         return;
 
     if (event.message_type() == Event_RoomSay::ChatHistory)
@@ -312,7 +314,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 
 void TabRoom::refreshShortcuts()
 {
-    aClearChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_room/aClearChat"));
+    aClearChat->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("tab_room/aClearChat"));
 }
 
 void TabRoom::addMentionTag(QString mentionTag)

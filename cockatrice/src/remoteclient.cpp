@@ -30,7 +30,7 @@ RemoteClient::RemoteClient(QObject *parent)
 {
 
     clearNewClientFeatures();
-    int keepalive = settingsCache->getKeepAlive();
+    int keepalive = SettingsCache::instance().getKeepAlive();
     timer = new QTimer(this);
     timer->setInterval(keepalive * 1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
@@ -227,8 +227,8 @@ void RemoteClient::loginResponse(const Response &response)
         emit ignoreListReceived(ignoreList);
 
         if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 &&
-            settingsCache->getNotifyAboutUpdates()) {
-            settingsCache->setKnownMissingFeatures(possibleMissingFeatures);
+            SettingsCache::instance().getNotifyAboutUpdates()) {
+            SettingsCache::instance().setKnownMissingFeatures(possibleMissingFeatures);
             emit notifyUserAboutUpdate();
         }
 
@@ -459,7 +459,7 @@ void RemoteClient::ping()
         }
     }
 
-    int keepalive = settingsCache->getKeepAlive();
+    int keepalive = SettingsCache::instance().getKeepAlive();
     int maxTime = timeRunning - lastDataReceived;
     emit maxPingTime(maxTime, maxTimeout);
     if (maxTime >= (keepalive * maxTimeout)) {
@@ -498,13 +498,13 @@ void RemoteClient::activateToServer(const QString &_token)
 
 void RemoteClient::disconnectFromServer()
 {
-    settingsCache->servers().setAutoConnect(false);
+    SettingsCache::instance().servers().setAutoConnect(false);
     emit sigDisconnectFromServer();
 }
 
 QString RemoteClient::getSrvClientID(const QString _hostname)
 {
-    QString srvClientID = settingsCache->getClientID();
+    QString srvClientID = SettingsCache::instance().getClientID();
     QHostInfo hostInfo = QHostInfo::fromName(_hostname);
     if (!hostInfo.error()) {
         QHostAddress hostAddress = hostInfo.addresses().first();
@@ -524,7 +524,7 @@ bool RemoteClient::newMissingFeatureFound(QString _serversMissingFeatures)
     QStringList serversMissingFeaturesList = _serversMissingFeatures.split(",");
     foreach (const QString &feature, serversMissingFeaturesList) {
         if (!feature.isEmpty()) {
-            if (!settingsCache->getKnownMissingFeatures().contains(feature))
+            if (!SettingsCache::instance().getKnownMissingFeatures().contains(feature))
                 return true;
         }
     }
@@ -534,14 +534,14 @@ bool RemoteClient::newMissingFeatureFound(QString _serversMissingFeatures)
 void RemoteClient::clearNewClientFeatures()
 {
     QString newKnownMissingFeatures;
-    QStringList existingKnownMissingFeatures = settingsCache->getKnownMissingFeatures().split(",");
+    QStringList existingKnownMissingFeatures = SettingsCache::instance().getKnownMissingFeatures().split(",");
     foreach (const QString &existingKnownFeature, existingKnownMissingFeatures) {
         if (!existingKnownFeature.isEmpty()) {
             if (!clientFeatures.contains(existingKnownFeature))
                 newKnownMissingFeatures.append("," + existingKnownFeature);
         }
     }
-    settingsCache->setKnownMissingFeatures(newKnownMissingFeatures);
+    SettingsCache::instance().setKnownMissingFeatures(newKnownMissingFeatures);
 }
 
 void RemoteClient::requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)

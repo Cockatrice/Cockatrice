@@ -223,14 +223,15 @@ void MainWindow::actSinglePlayer()
 
     localServer = new LocalServer(this);
     LocalServerInterface *mainLsi = localServer->newConnection();
-    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), settingsCache->getClientID(), this);
+    LocalClient *mainClient =
+        new LocalClient(mainLsi, tr("Player %1").arg(1), SettingsCache::instance().getClientID(), this);
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
 
     for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
         LocalClient *slaveClient =
-            new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), settingsCache->getClientID(), this);
+            new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), SettingsCache::instance().getClientID(), this);
         localClients.append(slaveClient);
     }
     tabSupervisor->startLocal(localClients);
@@ -243,7 +244,7 @@ void MainWindow::actSinglePlayer()
 void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
-    dlg.setDirectory(settingsCache->getReplaysPath());
+    dlg.setDirectory(SettingsCache::instance().getReplaysPath());
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec())
         return;
@@ -771,8 +772,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), cardUpdateProcess(nullptr),
       logviewDialog(nullptr)
 {
-    connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
-    pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
+    connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
+    pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
 
     client = new RemoteClient;
     connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this,
@@ -816,7 +817,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     retranslateUi();
 
-    if (!restoreGeometry(settingsCache->getMainWindowGeometry())) {
+    if (!restoreGeometry(SettingsCache::instance().getMainWindowGeometry())) {
         setWindowState(Qt::WindowMaximized);
     }
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
@@ -826,7 +827,7 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayIcon();
     }
 
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     connect(db, SIGNAL(cardDatabaseLoadingFailed()), this, SLOT(cardDatabaseLoadingFailed()));
@@ -842,21 +843,21 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
-    if (settingsCache->getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
-        settingsCache->setClientVersion(VERSION_STRING);
-    } else if (settingsCache->getClientVersion() != VERSION_STRING) {
+        SettingsCache::instance().setClientVersion(VERSION_STRING);
+    } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
-        qDebug() << "Startup: old client version" << settingsCache->getClientVersion()
+        qDebug() << "Startup: old client version" << SettingsCache::instance().getClientVersion()
                  << "differs, assuming first start after update";
-        if (settingsCache->getNotifyAboutNewVersion()) {
+        if (SettingsCache::instance().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         } else {
             QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         }
-        settingsCache->setClientVersion(VERSION_STRING);
+        SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qDebug() << "Startup: found config with current version";
@@ -864,7 +865,7 @@ void MainWindow::startupConfigCheck()
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
-        if (tip->successfulInit && settingsCache->getShowTipsOnStartup() && tip->newTipsAvailable) {
+        if (tip->successfulInit && SettingsCache::instance().getShowTipsOnStartup() && tip->newTipsAvailable) {
             tip->raise();
             tip->show();
         }
@@ -960,7 +961,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     tip->close();
 
     event->accept();
-    settingsCache->setMainWindowGeometry(saveGeometry());
+    SettingsCache::instance().setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();
 }
 
@@ -974,7 +975,7 @@ void MainWindow::changeEvent(QEvent *event)
             if (!connectTo.isEmpty()) {
                 qDebug() << "Command line connect to " << connectTo;
                 client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
-            } else if (settingsCache->servers().getAutoConnect()) {
+            } else if (SettingsCache::instance().servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
@@ -1166,19 +1167,20 @@ void MainWindow::actCheckServerUpdates()
 
 void MainWindow::refreshShortcuts()
 {
-    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aConnect"));
-    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDisconnect"));
-    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSinglePlayer"));
-    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aWatchReplay"));
-    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDeckEditor"));
-    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen"));
-    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
-    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
-    aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
-    aManageSets->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aManageSets"));
-    aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditTokens"));
-    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aOpenCustomFolder"));
-    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    aConnect->setShortcuts(shortcuts.getShortcut("MainWindow/aConnect"));
+    aDisconnect->setShortcuts(shortcuts.getShortcut("MainWindow/aDisconnect"));
+    aSinglePlayer->setShortcuts(shortcuts.getShortcut("MainWindow/aSinglePlayer"));
+    aWatchReplay->setShortcuts(shortcuts.getShortcut("MainWindow/aWatchReplay"));
+    aDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
+    aFullScreen->setShortcuts(shortcuts.getShortcut("MainWindow/aFullScreen"));
+    aRegister->setShortcuts(shortcuts.getShortcut("MainWindow/aRegister"));
+    aSettings->setShortcuts(shortcuts.getShortcut("MainWindow/aSettings"));
+    aExit->setShortcuts(shortcuts.getShortcut("MainWindow/aExit"));
+    aManageSets->setShortcuts(shortcuts.getShortcut("MainWindow/aManageSets"));
+    aEditTokens->setShortcuts(shortcuts.getShortcut("MainWindow/aEditTokens"));
+    aOpenCustomFolder->setShortcuts(shortcuts.getShortcut("MainWindow/aOpenCustomFolder"));
+    aCheckCardUpdates->setShortcuts(shortcuts.getShortcut("MainWindow/aCheckCardUpdates"));
 }
 
 void MainWindow::notifyUserAboutUpdate()
@@ -1192,13 +1194,13 @@ void MainWindow::notifyUserAboutUpdate()
 
 void MainWindow::actOpenCustomFolder()
 {
-    QString dir = settingsCache->getCustomPicsPath();
+    QString dir = SettingsCache::instance().getCustomPicsPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void MainWindow::actOpenCustomsetsFolder()
 {
-    QString dir = settingsCache->getCustomCardDatabasePath();
+    QString dir = SettingsCache::instance().getCustomCardDatabasePath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
@@ -1223,7 +1225,7 @@ void MainWindow::actAddCustomSet()
         return;
     }
 
-    QDir dir = settingsCache->getCustomCardDatabasePath();
+    QDir dir = SettingsCache::instance().getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
     bool res;
@@ -1296,9 +1298,9 @@ void MainWindow::forgotPasswordSuccess()
     QMessageBox::information(
         this, tr("Forgot Password"),
         tr("Your password has been reset successfully, you can now log in using the new credentials."));
-    settingsCache->servers().setFPHostName("");
-    settingsCache->servers().setFPPort("");
-    settingsCache->servers().setFPPlayerName("");
+    SettingsCache::instance().servers().setFPHostName("");
+    SettingsCache::instance().servers().setFPPort("");
+    SettingsCache::instance().servers().setFPPlayerName("");
 }
 
 void MainWindow::forgotPasswordError()
@@ -1306,9 +1308,9 @@ void MainWindow::forgotPasswordError()
     QMessageBox::warning(
         this, tr("Forgot Password"),
         tr("Failed to reset user account password, please contact the server operator to reset your password."));
-    settingsCache->servers().setFPHostName("");
-    settingsCache->servers().setFPPort("");
-    settingsCache->servers().setFPPlayerName("");
+    SettingsCache::instance().servers().setFPHostName("");
+    SettingsCache::instance().servers().setFPPort("");
+    SettingsCache::instance().servers().setFPPlayerName("");
 }
 
 void MainWindow::promptForgotPasswordReset()

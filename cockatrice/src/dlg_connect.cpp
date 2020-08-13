@@ -63,11 +63,11 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    if (settingsCache->servers().getSavePassword()) {
-        autoConnectCheckBox->setChecked(static_cast<bool>(settingsCache->servers().getAutoConnect()));
+    if (SettingsCache::instance().servers().getSavePassword()) {
+        autoConnectCheckBox->setChecked(static_cast<bool>(SettingsCache::instance().servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
     } else {
-        settingsCache->servers().setAutoConnect(0);
+        SettingsCache::instance().servers().setAutoConnect(0);
         autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
     }
@@ -192,8 +192,8 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    bool autoConnectEnabled = static_cast<bool>(settingsCache->servers().getAutoConnect());
-    QString autoConnectSaveName = settingsCache->servers().getSaveName();
+    bool autoConnectEnabled = static_cast<bool>(SettingsCache::instance().servers().getAutoConnect());
+    QString autoConnectSaveName = SettingsCache::instance().servers().getSaveName();
 
     int index = 0;
 
@@ -297,23 +297,24 @@ void DlgConnect::passwordSaved(int state)
 
 void DlgConnect::actOk()
 {
+    ServersSettings &servers = SettingsCache::instance().servers();
+
     if (newHostButton->isChecked()) {
         if (saveEdit->text().isEmpty()) {
             QMessageBox::critical(this, tr("Connection Warning"), tr("You need to name your new connection profile."));
             return;
         }
 
-        settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
-                                              portEdit->text().trimmed(), playernameEdit->text().trimmed(),
-                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
+        servers.addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
+                             playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
     } else {
-        settingsCache->servers().updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
-                                                      portEdit->text().trimmed(), playernameEdit->text().trimmed(),
-                                                      passwordEdit->text(), savePasswordCheckBox->isChecked());
+        servers.updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
+                                     playernameEdit->text().trimmed(), passwordEdit->text(),
+                                     savePasswordCheckBox->isChecked());
     }
 
-    settingsCache->servers().setPrevioushostName(saveEdit->text());
-    settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked());
+    servers.setPrevioushostName(saveEdit->text());
+    servers.setAutoConnect(autoConnectCheckBox->isChecked());
 
     if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));

@@ -50,7 +50,6 @@
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
-SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
 QSystemTrayIcon *trayIcon;
@@ -66,7 +65,7 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
 
 void installNewTranslator()
 {
-    QString lang = settingsCache->getLang();
+    QString lang = SettingsCache::instance().getLang();
 
     qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     qApp->installTranslator(qtTranslator);
@@ -133,7 +132,6 @@ int main(int argc, char *argv[])
     }
 
     rng = new RNG_SFMT;
-    settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
     db = new CardDatabase;
@@ -154,7 +152,7 @@ int main(int argc, char *argv[])
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
 
-    settingsCache->setClientID(generateClientID());
+    SettingsCache::instance().setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -168,7 +166,6 @@ int main(int argc, char *argv[])
 
     qDebug("Event loop finished, terminating...");
     delete db;
-    delete settingsCache;
     delete rng;
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();
