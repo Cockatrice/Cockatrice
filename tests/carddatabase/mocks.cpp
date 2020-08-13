@@ -41,20 +41,19 @@ QString SettingsCache::getSafeConfigFilePath(QString /* configEntry */, QString 
     return defaultPath;
 }
 SettingsCache::SettingsCache()
+    : settings{new QSettings("global.ini", QSettings::IniFormat, this)},
+      shortcutsSettings{nullptr},
+      cardDatabaseSettings{new CardDatabaseSettings("", this)},
+      serversSettings{nullptr},
+      messageSettings{nullptr},
+      gameFiltersSettings{nullptr},
+      layoutsSettings{nullptr},
+      downloadSettings{nullptr},
+      cardDatabasePath{QString("%1/cards.xml").arg(CARDDB_DATADIR)},
+      customCardDatabasePath{QString("%1/customsets/").arg(CARDDB_DATADIR)},
+      spoilerDatabasePath{QString("%1/spoiler.xml").arg(CARDDB_DATADIR)},
+      tokenDatabasePath{QString("%1/tokens.xml").arg(CARDDB_DATADIR)}
 {
-    settings = new QSettings("global.ini", QSettings::IniFormat, this);
-    shortcutsSettings = nullptr;
-    cardDatabaseSettings = new CardDatabaseSettings("", this);
-    serversSettings = nullptr;
-    messageSettings = nullptr;
-    gameFiltersSettings = nullptr;
-    layoutsSettings = nullptr;
-    downloadSettings = nullptr;
-
-    customCardDatabasePath = QString("%1/customsets/").arg(CARDDB_DATADIR);
-    cardDatabasePath = QString("%1/cards.xml").arg(CARDDB_DATADIR);
-    tokenDatabasePath = QString("%1/tokens.xml").arg(CARDDB_DATADIR);
-    spoilerDatabasePath = QString("%1/spoiler.xml").arg(CARDDB_DATADIR);
 }
 void SettingsCache::setUseTearOffMenus(bool /* _useTearOffMenus */)
 {
