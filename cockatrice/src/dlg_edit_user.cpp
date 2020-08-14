@@ -21,7 +21,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
     countryEdit->insertItem(0, tr("Undefined"));
     countryEdit->setCurrentIndex(0);
 
-    QStringList countries = settingsCache->getCountries();
+    QStringList countries = SettingsCache::instance().getCountries();
     int i = 1;
     foreach (QString c, countries) {
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);

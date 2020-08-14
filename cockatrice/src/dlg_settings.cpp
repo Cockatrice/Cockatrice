@@ -42,7 +42,7 @@
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-    QString setLanguage = settingsCache->getLang();
+    QString setLanguage = SettingsCache::instance().getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
@@ -53,32 +53,34 @@ GeneralSettingsPage::GeneralSettingsPage()
     }
 
     // updates
-    QList<ReleaseChannel *> channels = settingsCache->getUpdateReleaseChannels();
+    QList<ReleaseChannel *> channels = SettingsCache::instance().getUpdateReleaseChannels();
     foreach (ReleaseChannel *chan, channels) {
         updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
     }
-    updateReleaseChannelBox.setCurrentIndex(settingsCache->getUpdateReleaseChannel()->getIndex());
+    updateReleaseChannelBox.setCurrentIndex(SettingsCache::instance().getUpdateReleaseChannel()->getIndex());
 
-    updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
-    newVersionOracleCheckBox.setChecked(settingsCache->getNotifyAboutNewVersion());
+    updateNotificationCheckBox.setChecked(SettingsCache::instance().getNotifyAboutUpdates());
+    newVersionOracleCheckBox.setChecked(SettingsCache::instance().getNotifyAboutNewVersion());
 
     // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
     // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
     pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
     pixmapCacheEdit.setSingleStep(64);
-    pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
+    pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
 
-    showTipsOnStartup.setChecked(settingsCache->getShowTipsOnStartup());
+    showTipsOnStartup.setChecked(SettingsCache::instance().getShowTipsOnStartup());
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache,
+    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &SettingsCache::instance(),
             SLOT(setUpdateReleaseChannel(int)));
-    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
-    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutNewVersion(int)));
-    connect(&showTipsOnStartup, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
+    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setNotifyAboutUpdate(int)));
+    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setNotifyAboutNewVersion(int)));
+    connect(&showTipsOnStartup, SIGNAL(clicked(bool)), &SettingsCache::instance(), SLOT(setShowTipsOnStartup(bool)));
 
     auto *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -94,37 +96,37 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
 
-    deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
+    deckPathEdit = new QLineEdit(SettingsCache::instance().getDeckPath());
     deckPathEdit->setReadOnly(true);
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 
-    replaysPathEdit = new QLineEdit(settingsCache->getReplaysPath());
+    replaysPathEdit = new QLineEdit(SettingsCache::instance().getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     QPushButton *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, SIGNAL(clicked()), this, SLOT(replaysPathButtonClicked()));
 
-    picsPathEdit = new QLineEdit(settingsCache->getPicsPath());
+    picsPathEdit = new QLineEdit(SettingsCache::instance().getPicsPath());
     picsPathEdit->setReadOnly(true);
     QPushButton *picsPathButton = new QPushButton("...");
     connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
 
-    cardDatabasePathEdit = new QLineEdit(settingsCache->getCardDatabasePath());
+    cardDatabasePathEdit = new QLineEdit(SettingsCache::instance().getCardDatabasePath());
     cardDatabasePathEdit->setReadOnly(true);
     QPushButton *cardDatabasePathButton = new QPushButton("...");
     connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 
-    customCardDatabasePathEdit = new QLineEdit(settingsCache->getCustomCardDatabasePath());
+    customCardDatabasePathEdit = new QLineEdit(SettingsCache::instance().getCustomCardDatabasePath());
     customCardDatabasePathEdit->setReadOnly(true);
     QPushButton *customCardDatabasePathButton = new QPushButton("...");
     connect(customCardDatabasePathButton, SIGNAL(clicked()), this, SLOT(customCardDatabaseButtonClicked()));
 
-    tokenDatabasePathEdit = new QLineEdit(settingsCache->getTokenDatabasePath());
+    tokenDatabasePathEdit = new QLineEdit(SettingsCache::instance().getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
 
-    if (settingsCache->getIsPortableBuild()) {
+    if (SettingsCache::instance().getIsPortableBuild()) {
         deckPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
         picsPathEdit->setEnabled(false);
@@ -195,7 +197,7 @@ void GeneralSettingsPage::deckPathButtonClicked()
         return;
 
     deckPathEdit->setText(path);
-    settingsCache->setDeckPath(path);
+    SettingsCache::instance().setDeckPath(path);
 }
 
 void GeneralSettingsPage::replaysPathButtonClicked()
@@ -205,7 +207,7 @@ void GeneralSettingsPage::replaysPathButtonClicked()
         return;
 
     replaysPathEdit->setText(path);
-    settingsCache->setReplaysPath(path);
+    SettingsCache::instance().setReplaysPath(path);
 }
 
 void GeneralSettingsPage::picsPathButtonClicked()
@@ -215,7 +217,7 @@ void GeneralSettingsPage::picsPathButtonClicked()
         return;
 
     picsPathEdit->setText(path);
-    settingsCache->setPicsPath(path);
+    SettingsCache::instance().setPicsPath(path);
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
@@ -225,7 +227,7 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
         return;
 
     cardDatabasePathEdit->setText(path);
-    settingsCache->setCardDatabasePath(path);
+    SettingsCache::instance().setCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::customCardDatabaseButtonClicked()
@@ -245,12 +247,12 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
         return;
 
     tokenDatabasePathEdit->setText(path);
-    settingsCache->setTokenDatabasePath(path);
+    SettingsCache::instance().setTokenDatabasePath(path);
 }
 
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
-    settingsCache->setLang(languageBox.itemData(index).toString());
+    SettingsCache::instance().setLang(languageBox.itemData(index).toString());
 }
 
 void GeneralSettingsPage::retranslateUi()
@@ -258,7 +260,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
 
-    if (settingsCache->getIsPortableBuild()) {
+    if (SettingsCache::instance().getIsPortableBuild()) {
         pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
     } else {
         pathsGroupBox->setTitle(tr("Paths"));
@@ -279,7 +281,7 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
-    QString themeName = settingsCache->getThemeName();
+    QString themeName = SettingsCache::instance().getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
@@ -297,11 +299,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
 
-    displayCardNamesCheckBox.setChecked(settingsCache->getDisplayCardNames());
-    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDisplayCardNames(int)));
+    displayCardNamesCheckBox.setChecked(SettingsCache::instance().getDisplayCardNames());
+    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setDisplayCardNames(int)));
 
-    cardScalingCheckBox.setChecked(settingsCache->getScaleCards());
-    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setCardScaling(int)));
+    cardScalingCheckBox.setChecked(SettingsCache::instance().getScaleCards());
+    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setCardScaling(int)));
 
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
@@ -310,11 +313,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
 
-    horizontalHandCheckBox.setChecked(settingsCache->getHorizontalHand());
-    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setHorizontalHand(int)));
+    horizontalHandCheckBox.setChecked(SettingsCache::instance().getHorizontalHand());
+    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setHorizontalHand(int)));
 
-    leftJustifiedHandCheckBox.setChecked(settingsCache->getLeftJustified());
-    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setLeftJustified(int)));
+    leftJustifiedHandCheckBox.setChecked(SettingsCache::instance().getLeftJustified());
+    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setLeftJustified(int)));
 
     auto *handGrid = new QGridLayout;
     handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
@@ -323,18 +328,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
 
-    invertVerticalCoordinateCheckBox.setChecked(settingsCache->getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+    invertVerticalCoordinateCheckBox.setChecked(SettingsCache::instance().getInvertVerticalCoordinate());
+    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setInvertVerticalCoordinate(int)));
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
-    minPlayersForMultiColumnLayoutEdit.setValue(settingsCache->getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache,
+    minPlayersForMultiColumnLayoutEdit.setValue(SettingsCache::instance().getMinPlayersForMultiColumnLayout());
+    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
             SLOT(setMinPlayersForMultiColumnLayout(int)));
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
-    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMaxFontSize(int)));
-    maxFontSizeForCardsEdit.setValue(settingsCache->getMaxFontSize());
+    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setMaxFontSize(int)));
+    maxFontSizeForCardsEdit.setValue(SettingsCache::instance().getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
@@ -362,7 +367,7 @@ void AppearanceSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
     if (index >= 0 && index < themeDirs.count())
-        settingsCache->setThemeName(themeDirs.at(index));
+        SettingsCache::instance().setThemeName(themeDirs.at(index));
 }
 
 void AppearanceSettingsPage::retranslateUi()
@@ -386,33 +391,36 @@ void AppearanceSettingsPage::retranslateUi()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
-    notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().getNotificationsEnabled());
+    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setNotificationsEnabled(int)));
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
 
-    specNotificationsEnabledCheckBox.setChecked(settingsCache->getSpectatorNotificationsEnabled());
-    specNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+    specNotificationsEnabledCheckBox.setChecked(SettingsCache::instance().getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
+    connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setSpectatorNotificationsEnabled(int)));
 
-    buddyConnectNotificationsEnabledCheckBox.setChecked(settingsCache->getBuddyConnectNotificationsEnabled());
-    buddyConnectNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
-    connect(&buddyConnectNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+    buddyConnectNotificationsEnabledCheckBox.setChecked(
+        SettingsCache::instance().getBuddyConnectNotificationsEnabled());
+    buddyConnectNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
+    connect(&buddyConnectNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setBuddyConnectNotificationsEnabled(int)));
 
-    doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
-    connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
+    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().getDoubleClickToPlay());
+    connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setDoubleClickToPlay(int)));
 
-    playToStackCheckBox.setChecked(settingsCache->getPlayToStack());
-    connect(&playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
+    playToStackCheckBox.setChecked(SettingsCache::instance().getPlayToStack());
+    connect(&playToStackCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setPlayToStack(int)));
 
-    annotateTokensCheckBox.setChecked(settingsCache->getAnnotateTokens());
-    connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setAnnotateTokens(int)));
+    annotateTokensCheckBox.setChecked(SettingsCache::instance().getAnnotateTokens());
+    connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setAnnotateTokens(int)));
 
-    useTearOffMenusCheckBox.setChecked(settingsCache->getUseTearOffMenus());
-    connect(&useTearOffMenusCheckBox, &QCheckBox::stateChanged, settingsCache,
-            [](int state) { settingsCache->setUseTearOffMenus(state == Qt::Checked); });
+    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
+    connect(&useTearOffMenusCheckBox, &QCheckBox::stateChanged, &SettingsCache::instance(),
+            [](int state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
@@ -431,8 +439,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     notificationsGroupBox = new QGroupBox;
     notificationsGroupBox->setLayout(notificationsGrid);
 
-    tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
-    connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
+    tapAnimationCheckBox.setChecked(SettingsCache::instance().getTapAnimation());
+    connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setTapAnimation(int)));
 
     auto *animationGrid = new QGridLayout;
     animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
@@ -470,8 +478,8 @@ void UserInterfaceSettingsPage::retranslateUi()
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
-    connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
+    picDownloadCheckBox.setChecked(SettingsCache::instance().getPicDownload());
+    connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setPicDownload(int)));
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -482,9 +490,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
 
-    mcDownloadSpoilersCheckBox.setChecked(settingsCache->getDownloadSpoilersStatus());
+    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().getDownloadSpoilersStatus());
 
-    mpSpoilerSavePathLineEdit = new QLineEdit(settingsCache->getSpoilerCardDatabasePath());
+    mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().getSpoilerCardDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
     mpSpoilerPathButton = new QPushButton("...");
     connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
@@ -504,8 +512,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(urlList->model(), SIGNAL(rowsMoved(const QModelIndex, int, int, const QModelIndex, int)), this,
             SLOT(urlListChanged(const QModelIndex, int, int, const QModelIndex, int)));
 
-    for (int i = 0; i < settingsCache->downloads().getCount(); i++)
-        urlList->addItem(settingsCache->downloads().getDownloadUrlAt(i));
+    for (int i = 0; i < SettingsCache::instance().downloads().getCount(); i++)
+        urlList->addItem(SettingsCache::instance().downloads().getDownloadUrlAt(i));
 
     auto aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
@@ -545,7 +553,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the check box, hide/unhide the other fields
-    connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), settingsCache, SLOT(setDownloadSpoilerStatus(bool)));
+    connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
+            SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
 
     mpGeneralGroupBox = new QGroupBox;
@@ -563,15 +572,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 {
-    settingsCache->downloads().clear();
+    SettingsCache::instance().downloads().clear();
     urlList->clear();
-    urlList->addItems(settingsCache->downloads().getAllURLs());
+    urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
     QMessageBox::information(this, tr("Success"), tr("Download URLs have been reset."));
 }
 
 void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
-    QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
+    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
     for (const auto &dir : dirs) {
@@ -637,10 +646,10 @@ void DeckEditorSettingsPage::actEditURL()
 void DeckEditorSettingsPage::storeSettings()
 {
     qInfo() << "URL Priority Reset";
-    settingsCache->downloads().clear();
+    SettingsCache::instance().downloads().clear();
     for (int i = 0; i < urlList->count(); i++) {
         qInfo() << "Priority" << i << ":" << urlList->item(i)->text();
-        settingsCache->downloads().setDownloadUrlAt(i, urlList->item(i)->text());
+        SettingsCache::instance().downloads().setDownloadUrlAt(i, urlList->item(i)->text());
     }
 }
 
@@ -669,7 +678,7 @@ void DeckEditorSettingsPage::unlockSettings()
 
 QString DeckEditorSettingsPage::getLastUpdateTime()
 {
-    QString fileName = settingsCache->getSpoilerCardDatabasePath();
+    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     QFile file(fileName);
@@ -689,7 +698,7 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
     }
 
     mpSpoilerSavePathLineEdit->setText(lsPath + "/spoiler.xml");
-    settingsCache->setSpoilerDatabasePath(lsPath + "/spoiler.xml");
+    SettingsCache::instance().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
 }
 
 void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
@@ -725,43 +734,45 @@ void DeckEditorSettingsPage::retranslateUi()
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
-    chatMentionCheckBox.setChecked(settingsCache->getChatMention());
-    connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
+    chatMentionCheckBox.setChecked(SettingsCache::instance().getChatMention());
+    connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setChatMention(int)));
 
-    chatMentionCompleterCheckbox.setChecked(settingsCache->getChatMentionCompleter());
-    connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), settingsCache,
+    chatMentionCompleterCheckbox.setChecked(SettingsCache::instance().getChatMentionCompleter());
+    connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setChatMentionCompleter(int)));
 
-    ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
-    ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
-    connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
-    connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), settingsCache,
+    ignoreUnregUsersMainChat.setChecked(SettingsCache::instance().getIgnoreUnregisteredUsers());
+    ignoreUnregUserMessages.setChecked(SettingsCache::instance().getIgnoreUnregisteredUserMessages());
+    connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+            SLOT(setIgnoreUnregisteredUsers(int)));
+    connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setIgnoreUnregisteredUserMessages(int)));
 
-    invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
+    invertMentionForeground.setChecked(SettingsCache::instance().getChatMentionForeground());
     connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
 
-    invertHighlightForeground.setChecked(settingsCache->getChatHighlightForeground());
+    invertHighlightForeground.setChecked(SettingsCache::instance().getChatHighlightForeground());
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
-    mentionColor->setText(settingsCache->getChatMentionColor());
+    mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
 
-    messagePopups.setChecked(settingsCache->getShowMessagePopup());
-    connect(&messagePopups, SIGNAL(stateChanged(int)), settingsCache, SLOT(setShowMessagePopups(int)));
+    messagePopups.setChecked(SettingsCache::instance().getShowMessagePopup());
+    connect(&messagePopups, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setShowMessagePopups(int)));
 
-    mentionPopups.setChecked(settingsCache->getShowMentionPopup());
-    connect(&mentionPopups, SIGNAL(stateChanged(int)), settingsCache, SLOT(setShowMentionPopups(int)));
+    mentionPopups.setChecked(SettingsCache::instance().getShowMentionPopup());
+    connect(&mentionPopups, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setShowMentionPopups(int)));
 
-    roomHistory.setChecked(settingsCache->getRoomHistory());
-    connect(&roomHistory, SIGNAL(stateChanged(int)), settingsCache, SLOT(setRoomHistory(int)));
+    roomHistory.setChecked(SettingsCache::instance().getRoomHistory());
+    connect(&roomHistory, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setRoomHistory(int)));
 
     customAlertString = new QLineEdit();
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
-    customAlertString->setText(settingsCache->getHighlightWords());
-    connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
+    customAlertString->setText(SettingsCache::instance().getHighlightWords());
+    connect(customAlertString, SIGNAL(textChanged(QString)), &SettingsCache::instance(),
+            SLOT(setHighlightWords(QString)));
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
@@ -778,7 +789,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
-    highlightColor->setText(settingsCache->getChatHighlightColor());
+    highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
     connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
 
@@ -793,9 +804,9 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     messageList = new QListWidget;
 
-    int count = settingsCache->messages().getCount();
+    int count = SettingsCache::instance().messages().getCount();
     for (int i = 0; i < count; i++)
-        messageList->addItem(settingsCache->messages().getMessageAt(i));
+        messageList->addItem(SettingsCache::instance().messages().getMessageAt(i));
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
@@ -841,7 +852,7 @@ void MessagesSettingsPage::updateColor(const QString &value)
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
     if (colorToSet.isValid()) {
-        settingsCache->setChatMentionColor(value);
+        SettingsCache::instance().setChatMentionColor(value);
         updateMentionPreview();
     }
 }
@@ -851,40 +862,42 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value)
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
     if (colorToSet.isValid()) {
-        settingsCache->setChatHighlightColor(value);
+        SettingsCache::instance().setChatHighlightColor(value);
         updateHighlightPreview();
     }
 }
 
 void MessagesSettingsPage::updateTextColor(int value)
 {
-    settingsCache->setChatMentionForeground(value);
+    SettingsCache::instance().setChatMentionForeground(value);
     updateMentionPreview();
 }
 
 void MessagesSettingsPage::updateTextHighlightColor(int value)
 {
-    settingsCache->setChatHighlightForeground(value);
+    SettingsCache::instance().setChatHighlightForeground(value);
     updateHighlightPreview();
 }
 
 void MessagesSettingsPage::updateMentionPreview()
 {
-    mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() +
-                                ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
+    mentionColor->setStyleSheet(
+        "QLineEdit{background:#" + SettingsCache::instance().getChatMentionColor() +
+        ";color: " + (SettingsCache::instance().getChatMentionForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::updateHighlightPreview()
 {
-    highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() + ";color: " +
-                                  (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
+    highlightColor->setStyleSheet(
+        "QLineEdit{background:#" + SettingsCache::instance().getChatHighlightColor() +
+        ";color: " + (SettingsCache::instance().getChatHighlightForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()
 {
-    settingsCache->messages().setCount(messageList->count());
+    SettingsCache::instance().messages().setCount(messageList->count());
     for (int i = 0; i < messageList->count(); i++)
-        settingsCache->messages().setMessageAt(i, messageList->item(i)->text());
+        SettingsCache::instance().messages().setMessageAt(i, messageList->item(i)->text());
 }
 
 void MessagesSettingsPage::actAdd()
@@ -939,10 +952,10 @@ void MessagesSettingsPage::retranslateUi()
 
 SoundSettingsPage::SoundSettingsPage()
 {
-    soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
-    connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
+    soundEnabledCheckBox.setChecked(SettingsCache::instance().getSoundEnabled());
+    connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setSoundEnabled(int)));
 
-    QString themeName = settingsCache->getSoundThemeName();
+    QString themeName = SettingsCache::instance().getSoundThemeName();
 
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
@@ -957,16 +970,16 @@ SoundSettingsPage::SoundSettingsPage()
     masterVolumeSlider = new QSlider(Qt::Horizontal);
     masterVolumeSlider->setMinimum(0);
     masterVolumeSlider->setMaximum(100);
-    masterVolumeSlider->setValue(settingsCache->getMasterVolume());
-    masterVolumeSlider->setToolTip(QString::number(settingsCache->getMasterVolume()));
-    connect(settingsCache, SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
+    masterVolumeSlider->setValue(SettingsCache::instance().getMasterVolume());
+    masterVolumeSlider->setToolTip(QString::number(SettingsCache::instance().getMasterVolume()));
+    connect(&SettingsCache::instance(), SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
     connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(testSound()));
-    connect(masterVolumeSlider, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMasterVolume(int)));
+    connect(masterVolumeSlider, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setMasterVolume(int)));
 
     masterVolumeSpinBox = new QSpinBox();
     masterVolumeSpinBox->setMinimum(0);
     masterVolumeSpinBox->setMaximum(100);
-    masterVolumeSpinBox->setValue(settingsCache->getMasterVolume());
+    masterVolumeSpinBox->setValue(SettingsCache::instance().getMasterVolume());
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), masterVolumeSpinBox, SLOT(setValue(int)));
     connect(masterVolumeSpinBox, SIGNAL(valueChanged(int)), masterVolumeSlider, SLOT(setValue(int)));
 
@@ -992,7 +1005,7 @@ void SoundSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     if (index >= 0 && index < themeDirs.count())
-        settingsCache->setSoundThemeName(themeDirs.at(index));
+        SettingsCache::instance().setSoundThemeName(themeDirs.at(index));
 }
 
 void SoundSettingsPage::masterVolumeChanged(int value)
@@ -1067,7 +1080,7 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
     connect(shortcutsTable, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
             SLOT(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
 
     createShortcuts();
 }
@@ -1080,8 +1093,8 @@ void ShortcutSettingsPage::currentItemChanged(QTreeWidgetItem *current, QTreeWid
         editTextBox->setShortcutName("");
     } else {
         QString key = current->data(2, Qt::DisplayRole).toString();
-        QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
-        QString action = settingsCache->shortcuts().getShortcut(key).getName();
+        QString group = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
+        QString action = SettingsCache::instance().shortcuts().getShortcut(key).getName();
         currentActionGroupName->setText(group);
         currentActionName->setText(action);
         editTextBox->setShortcutName(key);
@@ -1092,7 +1105,7 @@ void ShortcutSettingsPage::resetShortcuts()
 {
     if (QMessageBox::question(this, tr("Restore all default shortcuts"),
                               tr("Do you really want to restore all default shortcuts?")) == QMessageBox::Yes) {
-        settingsCache->shortcuts().resetAllShortcuts();
+        SettingsCache::instance().shortcuts().resetAllShortcuts();
     }
 }
 
@@ -1100,10 +1113,10 @@ void ShortcutSettingsPage::createShortcuts()
 {
     QHash<QString, QTreeWidgetItem *> parentItems;
     QTreeWidgetItem *curParent = nullptr;
-    for (const auto &key : settingsCache->shortcuts().getAllShortcutKeys()) {
-        QString name = settingsCache->shortcuts().getShortcut(key).getName();
-        QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
-        QString shortcut = settingsCache->shortcuts().getShortcutString(key);
+    for (const auto &key : SettingsCache::instance().shortcuts().getAllShortcutKeys()) {
+        QString name = SettingsCache::instance().shortcuts().getShortcut(key).getName();
+        QString group = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
+        QString shortcut = SettingsCache::instance().shortcuts().getShortcutString(key);
 
         if (parentItems.contains(group)) {
             curParent = parentItems.value(group);
@@ -1133,14 +1146,14 @@ void ShortcutSettingsPage::refreshShortcuts()
         for (int j = 0; j < curParent->childCount(); ++j) {
             curChild = curParent->child(j);
             QString key = curChild->data(2, Qt::DisplayRole).toString();
-            QString name = settingsCache->shortcuts().getShortcut(key).getName();
-            QString shortcut = settingsCache->shortcuts().getShortcutString(key);
+            QString name = SettingsCache::instance().shortcuts().getShortcut(key).getName();
+            QString shortcut = SettingsCache::instance().shortcuts().getShortcutString(key);
             curChild->setText(0, name);
             curChild->setText(1, shortcut);
 
             if (j == 0) {
                 // the first child also updates the parent's group name
-                QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
+                QString group = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
                 curParent->setText(0, group);
             }
         }
@@ -1153,7 +1166,7 @@ void ShortcutSettingsPage::clearShortcuts()
 {
     if (QMessageBox::question(this, tr("Clear all default shortcuts"),
                               tr("Do you really want to clear all shortcuts?")) == QMessageBox::Yes) {
-        settingsCache->shortcuts().clearAllShortcuts();
+        SettingsCache::instance().shortcuts().clearAllShortcuts();
     }
 }
 
@@ -1181,7 +1194,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     this->setMinimumSize(rec.width() / 2, rec.height() - 100);
     this->setBaseSize(rec.width(), rec.height());
 
-    connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
+    connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);
@@ -1343,7 +1356,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
+    if (!QDir(SettingsCache::instance().getDeckPath()).exists() || SettingsCache::instance().getDeckPath().isEmpty()) {
         // TODO: Prompt to create it
         if (QMessageBox::critical(
                 this, tr("Error"),
@@ -1354,7 +1367,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty()) {
+    if (!QDir(SettingsCache::instance().getPicsPath()).exists() || SettingsCache::instance().getPicsPath().isEmpty()) {
         // TODO: Prompt to create it
         if (QMessageBox::critical(this, tr("Error"),
                                   tr("The path to your card pictures directory is invalid. Would you like to go back "

@@ -45,7 +45,7 @@ void SequenceEdit::setShortcutName(const QString &_shortcutName)
         clearButton->setEnabled(true);
         defaultButton->setEnabled(true);
         lineEdit->setEnabled(true);
-        lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+        lineEdit->setText(SettingsCache::instance().shortcuts().getShortcutString(shortcutName));
         lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
     }
 }
@@ -72,13 +72,13 @@ void SequenceEdit::removeLastShortcut()
 
 void SequenceEdit::restoreDefault()
 {
-    lineEdit->setText(settingsCache->shortcuts().getDefaultShortcutString(shortcutName));
+    lineEdit->setText(SettingsCache::instance().shortcuts().getDefaultShortcutString(shortcutName));
     updateSettings();
 }
 
 void SequenceEdit::refreshShortcut()
 {
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+    lineEdit->setText(SettingsCache::instance().shortcuts().getShortcutString(shortcutName));
 }
 
 void SequenceEdit::clear()
@@ -159,8 +159,8 @@ void SequenceEdit::finishShortcut()
     QKeySequence sequence(keys);
     if (!sequence.isEmpty() && valid) {
         QString sequenceString = sequence.toString();
-        if (settingsCache->shortcuts().isKeyAllowed(shortcutName, sequenceString)) {
-            if (settingsCache->shortcuts().isValid(shortcutName, sequenceString)) {
+        if (SettingsCache::instance().shortcuts().isKeyAllowed(shortcutName, sequenceString)) {
+            if (SettingsCache::instance().shortcuts().isValid(shortcutName, sequenceString)) {
                 if (!lineEdit->text().isEmpty()) {
                     if (lineEdit->text().contains(sequenceString)) {
                         return;
@@ -184,7 +184,7 @@ void SequenceEdit::finishShortcut()
 
 void SequenceEdit::updateSettings()
 {
-    settingsCache->shortcuts().setShortcuts(shortcutName, lineEdit->text());
+    SettingsCache::instance().shortcuts().setShortcuts(shortcutName, lineEdit->text());
 }
 
 void SequenceEdit::retranslateUi()

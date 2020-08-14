@@ -21,7 +21,7 @@
 
 SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
 {
-    isSpoilerDownloadEnabled = settingsCache->getDownloadSpoilersStatus();
+    isSpoilerDownloadEnabled = SettingsCache::instance().getDownloadSpoilersStatus();
     if (isSpoilerDownloadEnabled) {
         // Start the process of checking if we're in spoiler season
         // File exists means we're in spoiler season
@@ -73,7 +73,7 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 
 bool SpoilerBackgroundUpdater::deleteSpoilerFile()
 {
-    QString fileName = settingsCache->getSpoilerCardDatabasePath();
+    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     QFile file(fileName);
@@ -124,7 +124,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 
 bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 {
-    QString fileName = settingsCache->getSpoilerCardDatabasePath();
+    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
 

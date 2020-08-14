@@ -367,7 +367,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             cardMenu->exec(event->screenPos());
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
-               (!settingsCache->getDoubleClickToPlay())) {
+               (!SettingsCache::instance().getDoubleClickToPlay())) {
         bool hideCard = false;
         if (zone && zone->getIsView()) {
             ZoneViewZone *view = static_cast<ZoneViewZone *>(zone);
@@ -387,7 +387,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if ((event->modifiers() != Qt::AltModifier) && (settingsCache->getDoubleClickToPlay()) &&
+    if ((event->modifiers() != Qt::AltModifier) && (SettingsCache::instance().getDoubleClickToPlay()) &&
         (event->buttons() == Qt::LeftButton)) {
         if (revealedCard)
             zone->removeCard(this);

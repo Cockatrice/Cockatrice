@@ -345,18 +345,18 @@ void GamesProxyModel::resetFilterParameters()
 
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
 {
-
-    unavailableGamesVisible = settingsCache->gameFilters().isUnavailableGamesVisible();
-    showPasswordProtectedGames = settingsCache->gameFilters().isShowPasswordProtectedGames();
-    hideIgnoredUserGames = settingsCache->gameFilters().isHideIgnoredUserGames();
-    gameNameFilter = settingsCache->gameFilters().getGameNameFilter();
-    maxPlayersFilterMin = settingsCache->gameFilters().getMinPlayers();
-    maxPlayersFilterMax = settingsCache->gameFilters().getMaxPlayers();
+    GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
+    unavailableGamesVisible = gameFilters.isUnavailableGamesVisible();
+    showPasswordProtectedGames = gameFilters.isShowPasswordProtectedGames();
+    hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
+    gameNameFilter = gameFilters.getGameNameFilter();
+    maxPlayersFilterMin = gameFilters.getMinPlayers();
+    maxPlayersFilterMax = gameFilters.getMaxPlayers();
 
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
     while (gameTypesIterator.hasNext()) {
         gameTypesIterator.next();
-        if (settingsCache->gameFilters().isGameTypeEnabled(gameTypesIterator.value())) {
+        if (gameFilters.isGameTypeEnabled(gameTypesIterator.value())) {
             gameTypeFilter.insert(gameTypesIterator.key());
         }
     }
@@ -366,21 +366,22 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
 
 void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
 {
-    settingsCache->gameFilters().setShowBuddiesOnlyGames(showBuddiesOnlyGames);
-    settingsCache->gameFilters().setUnavailableGamesVisible(unavailableGamesVisible);
-    settingsCache->gameFilters().setShowPasswordProtectedGames(showPasswordProtectedGames);
-    settingsCache->gameFilters().setHideIgnoredUserGames(hideIgnoredUserGames);
-    settingsCache->gameFilters().setGameNameFilter(gameNameFilter);
+    GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
+    gameFilters.setShowBuddiesOnlyGames(showBuddiesOnlyGames);
+    gameFilters.setUnavailableGamesVisible(unavailableGamesVisible);
+    gameFilters.setShowPasswordProtectedGames(showPasswordProtectedGames);
+    gameFilters.setHideIgnoredUserGames(hideIgnoredUserGames);
+    gameFilters.setGameNameFilter(gameNameFilter);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
     while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
         bool enabled = gameTypeFilter.contains(gameTypeIterator.key());
-        settingsCache->gameFilters().setGameTypeEnabled(gameTypeIterator.value(), enabled);
+        gameFilters.setGameTypeEnabled(gameTypeIterator.value(), enabled);
     }
 
-    settingsCache->gameFilters().setMinPlayers(maxPlayersFilterMin);
-    settingsCache->gameFilters().setMaxPlayers(maxPlayersFilterMax);
+    gameFilters.setMinPlayers(maxPlayersFilterMin);
+    gameFilters.setMaxPlayers(maxPlayersFilterMax);
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const

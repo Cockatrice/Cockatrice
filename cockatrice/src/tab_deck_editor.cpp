@@ -415,7 +415,7 @@ void TabDeckEditor::createCentralFrame()
             SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 
-    QByteArray dbHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
+    QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     if (dbHeaderState.isNull()) {
         // first run
         databaseView->setColumnWidth(0, 200);
@@ -532,35 +532,35 @@ void TabDeckEditor::freeDocksSize()
 
 void TabDeckEditor::refreshShortcuts()
 {
-    aNewDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aNewDeck"));
-    aLoadDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeck"));
-    aSaveDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeck"));
-    aExportDeckDecklist->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aExportDeckDecklist"));
-    aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckAs"));
-    aLoadDeckFromClipboard->setShortcuts(
-        settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
-    aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aPrintDeck"));
-    aAnalyzeDeckDeckstats->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aAnalyzeDeck"));
-    aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
-    aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aResetLayout"));
-    aClearFilterAll->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterAll"));
-    aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    aNewDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aNewDeck"));
+    aLoadDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeck"));
+    aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));
+    aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
+    aSaveDeckAs->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckAs"));
+    aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
+    aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
+    aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));
+    aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
+    aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aResetLayout"));
+    aClearFilterAll->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClearFilterAll"));
+    aClearFilterOne->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClearFilterOne"));
 
-    aSaveDeckToClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
-    aSaveDeckToClipboardRaw->setShortcuts(
-        settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckToClipboardRaw"));
+    aSaveDeckToClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
+    aSaveDeckToClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRaw"));
 
-    aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
-    aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
-    aRemoveCard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aRemoveCard"));
-    aIncrement->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aIncrement"));
-    aDecrement->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aDecrement"));
+    aClearFilterOne->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClearFilterOne"));
+    aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
+    aRemoveCard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aRemoveCard"));
+    aIncrement->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aIncrement"));
+    aDecrement->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aDecrement"));
 }
 
 void TabDeckEditor::loadLayout()
 {
-    restoreState(settingsCache->layouts().getDeckEditorLayoutState());
-    restoreGeometry(settingsCache->layouts().getDeckEditorGeometry());
+    LayoutsSettings &layouts = SettingsCache::instance().layouts();
+    restoreState(layouts.getDeckEditorLayoutState());
+    restoreGeometry(layouts.getDeckEditorGeometry());
 
     aCardInfoDockVisible->setChecked(cardInfoDock->isVisible());
     aFilterDockVisible->setChecked(filterDock->isVisible());
@@ -574,14 +574,14 @@ void TabDeckEditor::loadLayout()
     aFilterDockFloating->setChecked(filterDock->isFloating());
     aDeckDockFloating->setChecked(deckDock->isFloating());
 
-    cardInfoDock->setMinimumSize(settingsCache->layouts().getDeckEditorCardSize());
-    cardInfoDock->setMaximumSize(settingsCache->layouts().getDeckEditorCardSize());
+    cardInfoDock->setMinimumSize(layouts.getDeckEditorCardSize());
+    cardInfoDock->setMaximumSize(layouts.getDeckEditorCardSize());
 
-    filterDock->setMinimumSize(settingsCache->layouts().getDeckEditorFilterSize());
-    filterDock->setMaximumSize(settingsCache->layouts().getDeckEditorFilterSize());
+    filterDock->setMinimumSize(layouts.getDeckEditorFilterSize());
+    filterDock->setMaximumSize(layouts.getDeckEditorFilterSize());
 
-    deckDock->setMinimumSize(settingsCache->layouts().getDeckEditorDeckSize());
-    deckDock->setMaximumSize(settingsCache->layouts().getDeckEditorDeckSize());
+    deckDock->setMinimumSize(layouts.getDeckEditorDeckSize());
+    deckDock->setMaximumSize(layouts.getDeckEditorDeckSize());
 
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
@@ -604,7 +604,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     this->installEventFilter(this);
 
     retranslateUi();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     QTimer::singleShot(0, this, SLOT(loadLayout()));
@@ -766,7 +766,7 @@ void TabDeckEditor::actLoadDeck()
         return;
 
     QFileDialog dialog(this, tr("Load deck"));
-    dialog.setDirectory(settingsCache->getDeckPath());
+    dialog.setDirectory(SettingsCache::instance().getDeckPath());
     dialog.setNameFilters(DeckLoader::fileNameFilters);
     if (!dialog.exec())
         return;
@@ -820,7 +820,7 @@ bool TabDeckEditor::actSaveDeck()
 bool TabDeckEditor::actSaveDeckAs()
 {
     QFileDialog dialog(this, tr("Save deck"));
-    dialog.setDirectory(settingsCache->getDeckPath());
+    dialog.setDirectory(SettingsCache::instance().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
@@ -1144,11 +1144,12 @@ bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
         }
     }
     if (o == this && e->type() == QEvent::Hide) {
-        settingsCache->layouts().setDeckEditorLayoutState(saveState());
-        settingsCache->layouts().setDeckEditorGeometry(saveGeometry());
-        settingsCache->layouts().setDeckEditorCardSize(cardInfoDock->size());
-        settingsCache->layouts().setDeckEditorFilterSize(filterDock->size());
-        settingsCache->layouts().setDeckEditorDeckSize(deckDock->size());
+        LayoutsSettings &layouts = SettingsCache::instance().layouts();
+        layouts.setDeckEditorLayoutState(saveState());
+        layouts.setDeckEditorGeometry(saveGeometry());
+        layouts.setDeckEditorCardSize(cardInfoDock->size());
+        layouts.setDeckEditorFilterSize(filterDock->size());
+        layouts.setDeckEditorDeckSize(deckDock->size());
     }
     return false;
 }
@@ -1215,7 +1216,7 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 
 void TabDeckEditor::saveDbHeaderState()
 {
-    settingsCache->layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
+    SettingsCache::instance().layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
 }
 
 void TabDeckEditor::setSaveStatus(bool newStatus)

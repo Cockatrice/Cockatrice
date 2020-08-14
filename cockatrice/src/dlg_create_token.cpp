@@ -77,7 +77,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
     connect(chooseTokenFromDeckRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromDeck(bool)));
 
-    QByteArray deckHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
+    QByteArray deckHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     chooseTokenView = new QTreeView;
     chooseTokenView->setModel(cardDatabaseDisplayModel);
     chooseTokenView->setUniformRowHeights(true);
@@ -137,13 +137,13 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     setWindowTitle(tr("Create token"));
 
     resize(600, 500);
-    restoreGeometry(settingsCache->getTokenDialogGeometry());
+    restoreGeometry(SettingsCache::instance().getTokenDialogGeometry());
 }
 
 void DlgCreateToken::closeEvent(QCloseEvent *event)
 {
     event->accept();
-    settingsCache->setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
 }
 
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
@@ -161,7 +161,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
-        if (settingsCache->getAnnotateTokens())
+        if (SettingsCache::instance().getAnnotateTokens())
             annotationEdit->setText(cardInfo->getText());
     } else {
         nameEdit->setText("");
@@ -205,13 +205,13 @@ void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 
 void DlgCreateToken::actOk()
 {
-    settingsCache->setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
     accept();
 }
 
 void DlgCreateToken::actReject()
 {
-    settingsCache->setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
     reject();
 }
 

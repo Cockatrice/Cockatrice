@@ -42,8 +42,8 @@ set(TEST_QT_MODULES Qt5::Widgets)
 
 
 include_directories(${GTEST_INCLUDE_DIRS})
-target_link_libraries(dummy_test ${GTEST_BOTH_LIBRARIES})
-target_link_libraries(expression_test cockatrice_common ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(expression_test cockatrice_common Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 
 add_subdirectory(carddatabase)
 add_subdirectory(loading_from_clipboard)
