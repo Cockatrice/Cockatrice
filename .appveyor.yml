@@ -74,11 +74,13 @@ test_script:
     - ps: |
         $env:Path += ";c:/Qt/$env:qt_ver/bin"
         ctest -T Test -C Release
+        $ctest_success = $?
         $XSLInputElement = New-Object System.Xml.Xsl.XslCompiledTransform
         $XSLInputElement.Load("https://raw.githubusercontent.com/rpavlik/jenkins-ctest-plugin/master/ctest-to-junit.xsl")
         $XSLInputElement.Transform((Resolve-Path .\Testing\*\Test.xml), (Join-Path (Resolve-Path .) "ctest-to-junit-results.xml"))
         $wc = New-Object 'System.Net.WebClient'
         $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\ctest-to-junit-results.xml))
+        if (-not $ctest_success) { throw "Tests failed" }
 
 
 # Builds for pull requests skip the deployment step altogether
