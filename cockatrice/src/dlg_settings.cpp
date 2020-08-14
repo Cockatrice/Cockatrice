@@ -237,7 +237,7 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
         return;
 
     customCardDatabasePathEdit->setText(path);
-    settingsCache->setCustomCardDatabasePath(path);
+    SettingsCache::instance().setCustomCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()

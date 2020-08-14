@@ -106,6 +106,9 @@ void SettingsCache::setPicsPath(const QString &/* _picsPath */)
 void SettingsCache::setCardDatabasePath(const QString &/* _cardDatabasePath */)
 {
 }
+void SettingsCache::setCustomCardDatabasePath(const QString &/* _customCardDatabasePath */)
+{
+}
 void SettingsCache::setSpoilerDatabasePath(const QString &/* _spoilerDatabasePath */)
 {
 }
