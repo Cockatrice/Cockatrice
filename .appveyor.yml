@@ -45,7 +45,7 @@ install:
     - .\bootstrap-vcpkg.bat
     - cd %APPVEYOR_BUILD_FOLDER%
     - vcpkg remove --outdated --recurse
-    - vcpkg install openssl protobuf liblzma zlib --triplet %vcpkg_arch%-windows
+    - vcpkg install openssl protobuf liblzma zlib gtest --triplet %vcpkg_arch%-windows
 
 services:
     - mysql
@@ -57,8 +57,8 @@ build_script:
         $vcpkgbindir = "C:\Tools\vcpkg\installed\$env:vcpkg_arch-windows\bin"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_C_FLAGS=/MP" "-DCMAKE_CXX_FLAGS=/MP" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$vcpkgbindir" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
-    - msbuild PACKAGE.vcxproj /p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /m 
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_C_FLAGS=/MP" "-DCMAKE_CXX_FLAGS=/MP" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$vcpkgbindir" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll" "-DTEST=1"
+    - msbuild PACKAGE.vcxproj /p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /m
     - ps: |
         $exe = dir -name *.exe
         $new_name = $exe.Replace(".exe", "-${env:target_arch}.exe")
@@ -70,7 +70,17 @@ build_script:
         Push-AppveyorArtifact "latest-$env:target_arch"
         $version = $matches['content']
 
-test: off
+test_script:
+    - ps: |
+        $env:Path += ";c:/Qt/$env:qt_ver/bin"
+        ctest -T Test -C Release
+        $ctest_success = $?
+        $XSLInputElement = New-Object System.Xml.Xsl.XslCompiledTransform
+        $XSLInputElement.Load("https://raw.githubusercontent.com/rpavlik/jenkins-ctest-plugin/master/ctest-to-junit.xsl")
+        $XSLInputElement.Transform((Resolve-Path .\Testing\*\Test.xml), (Join-Path (Resolve-Path .) "ctest-to-junit-results.xml"))
+        $wc = New-Object 'System.Net.WebClient'
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\ctest-to-junit-results.xml))
+        if (-not $ctest_success) { throw "Tests failed" }
 
 
 # Builds for pull requests skip the deployment step altogether
