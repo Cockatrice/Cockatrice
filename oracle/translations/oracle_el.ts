@@ -2,22 +2,22 @@
 <context>
     <name>IntroPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="191"/>
+        <location filename="../src/oraclewizard.cpp" line="193"/>
         <source>Introduction</source>
         <translation>Εισαγωγή</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="192"/>
+        <location filename="../src/oraclewizard.cpp" line="194"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
         <translation>Αυτός ο αυτόματος οδηγός θα εισάγει τη λίστα των σετ, καρτών και δειγμάτων (tokens) που θα χρησιμοποιηθούν από το Cockatrice.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="194"/>
-        <source>Language:</source>
-        <translation>Γλώσσα:</translation>
+        <location filename="../src/oraclewizard.cpp" line="196"/>
+        <source>Interface language:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="195"/>
+        <location filename="../src/oraclewizard.cpp" line="197"/>
         <source>Version:</source>
         <translation>Έκδοση:</translation>
     </message>
@@ -25,127 +25,127 @@
 <context>
     <name>LoadSetsPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="250"/>
+        <location filename="../src/oraclewizard.cpp" line="252"/>
         <source>Source selection</source>
         <translation>Επιλογή πηγής</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="251"/>
+        <location filename="../src/oraclewizard.cpp" line="253"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="255"/>
+        <location filename="../src/oraclewizard.cpp" line="257"/>
         <source>Download URL:</source>
         <translation>URL λήψης:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="256"/>
+        <location filename="../src/oraclewizard.cpp" line="258"/>
         <source>Local file:</source>
         <translation>Τοπικό αρχείο:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="257"/>
+        <location filename="../src/oraclewizard.cpp" line="259"/>
         <source>Restore default URL</source>
         <translation>Επαναφορά προκαθορισμένης διεύθυνσης URL</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="258"/>
+        <location filename="../src/oraclewizard.cpp" line="260"/>
         <source>Choose file...</source>
         <translation>Επιλέξτε αρχείο...</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="268"/>
+        <location filename="../src/oraclewizard.cpp" line="270"/>
         <source>Load sets file</source>
         <translation>Φόρτωση αρχείων</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="278"/>
+        <location filename="../src/oraclewizard.cpp" line="280"/>
         <source>Sets JSON file (%1)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="302"/>
-        <location filename="../src/oraclewizard.cpp" line="321"/>
-        <location filename="../src/oraclewizard.cpp" line="326"/>
-        <location filename="../src/oraclewizard.cpp" line="362"/>
-        <location filename="../src/oraclewizard.cpp" line="486"/>
-        <location filename="../src/oraclewizard.cpp" line="507"/>
+        <location filename="../src/oraclewizard.cpp" line="304"/>
+        <location filename="../src/oraclewizard.cpp" line="323"/>
+        <location filename="../src/oraclewizard.cpp" line="328"/>
+        <location filename="../src/oraclewizard.cpp" line="396"/>
+        <location filename="../src/oraclewizard.cpp" line="520"/>
+        <location filename="../src/oraclewizard.cpp" line="541"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="302"/>
+        <location filename="../src/oraclewizard.cpp" line="304"/>
         <source>The provided URL is not valid.</source>
         <translation>Η παρεχόμενη διεύθυνση URL δεν είναι έγκυρη.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="306"/>
+        <location filename="../src/oraclewizard.cpp" line="308"/>
         <source>Downloading (0MB)</source>
         <translation>Λήψη (0MB)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="321"/>
+        <location filename="../src/oraclewizard.cpp" line="323"/>
         <source>Please choose a file.</source>
         <translation>Παρακαλώ διαλέξτε έναν αρχείο.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="326"/>
+        <location filename="../src/oraclewizard.cpp" line="328"/>
         <source>Cannot open file &apos;%1&apos;.</source>
         <translation>Δεν είναι δυνατό να ανοίξει το αρχείο &apos;% 1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="353"/>
+        <location filename="../src/oraclewizard.cpp" line="387"/>
         <source>Downloading (%1MB)</source>
         <translation>Λήψη (% 1MB)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="362"/>
+        <location filename="../src/oraclewizard.cpp" line="396"/>
         <source>Network error: %1.</source>
         <translation>Σφάλμα δικτύου: % 1.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="400"/>
+        <location filename="../src/oraclewizard.cpp" line="434"/>
         <source>Parsing file</source>
         <translation>Ανάλυση αρχείου</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="414"/>
+        <location filename="../src/oraclewizard.cpp" line="448"/>
         <source>Xz extraction failed.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="422"/>
+        <location filename="../src/oraclewizard.cpp" line="456"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="441"/>
+        <location filename="../src/oraclewizard.cpp" line="475"/>
         <source>Failed to open Zip archive: %1.</source>
         <translation>Αποτυχία ανοίγματος αρχείου Zip:% 1.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="446"/>
+        <location filename="../src/oraclewizard.cpp" line="480"/>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
         <translation>Η εξαγωγή zip απέτυχε: το αρχείο Zip δεν περιέχει ακριβώς ένα αρχείο.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="454"/>
+        <location filename="../src/oraclewizard.cpp" line="488"/>
         <source>Zip extraction failed: %1.</source>
         <translation>Η εξαγωγή zip απέτυχε: % 1.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="463"/>
+        <location filename="../src/oraclewizard.cpp" line="497"/>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
         <translation>Λυπούμαστε, αυτή η έκδοση του Oracle δεν υποστηρίζει αρχεία τύπου zipped.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="486"/>
+        <location filename="../src/oraclewizard.cpp" line="520"/>
         <source>Do you want to download the uncompressed file instead?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="508"/>
+        <location filename="../src/oraclewizard.cpp" line="542"/>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>Το αρχείο ανακτήθηκε με επιτυχία, αλλά δεν περιέχει σύνολα δεδομένων.</translation>
     </message>
@@ -153,42 +153,42 @@
 <context>
     <name>LoadSpoilersPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="662"/>
+        <location filename="../src/oraclewizard.cpp" line="697"/>
         <source>Save spoiler database</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="667"/>
+        <location filename="../src/oraclewizard.cpp" line="702"/>
         <source>XML; spoiler database (*.xml)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="672"/>
+        <location filename="../src/oraclewizard.cpp" line="707"/>
         <source>Spoilers import</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="673"/>
+        <location filename="../src/oraclewizard.cpp" line="708"/>
         <source>Please specify a compatible source for spoiler data.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="675"/>
+        <location filename="../src/oraclewizard.cpp" line="710"/>
         <source>Download URL:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="676"/>
+        <location filename="../src/oraclewizard.cpp" line="711"/>
         <source>Restore default URL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="677"/>
+        <location filename="../src/oraclewizard.cpp" line="712"/>
         <source>The spoiler database will be saved at the following location:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="679"/>
+        <location filename="../src/oraclewizard.cpp" line="714"/>
         <source>Save to a custom path (not recommended)</source>
         <translation type="unfinished"/>
     </message>
@@ -196,42 +196,42 @@
 <context>
     <name>LoadTokensPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="625"/>
+        <location filename="../src/oraclewizard.cpp" line="660"/>
         <source>Save token database</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="630"/>
+        <location filename="../src/oraclewizard.cpp" line="665"/>
         <source>XML; token database (*.xml)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="635"/>
+        <location filename="../src/oraclewizard.cpp" line="670"/>
         <source>Tokens import</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="636"/>
+        <location filename="../src/oraclewizard.cpp" line="671"/>
         <source>Please specify a compatible source for token data.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="638"/>
+        <location filename="../src/oraclewizard.cpp" line="673"/>
         <source>Download URL:</source>
         <translation>URL λήψης:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="639"/>
+        <location filename="../src/oraclewizard.cpp" line="674"/>
         <source>Restore default URL</source>
         <translation>Επαναφορά προκαθορισμένης διεύθυνσης URL</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="640"/>
+        <location filename="../src/oraclewizard.cpp" line="675"/>
         <source>The token database will be saved at the following location:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="642"/>
+        <location filename="../src/oraclewizard.cpp" line="677"/>
         <source>Save to a custom path (not recommended)</source>
         <translation type="unfinished"/>
     </message>
@@ -239,7 +239,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="396"/>
+        <location filename="../src/oracleimporter.cpp" line="445"/>
         <source>Dummy set containing tokens</source>
         <translation>Εικονικό σετ που περιέχει tokens</translation>
     </message>
@@ -247,7 +247,7 @@
 <context>
     <name>OracleWizard</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="93"/>
+        <location filename="../src/oraclewizard.cpp" line="95"/>
         <source>Oracle Importer</source>
         <translation>Εισαγωγέας Oracle</translation>
     </message>
@@ -255,22 +255,22 @@
 <context>
     <name>OutroPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="200"/>
+        <location filename="../src/oraclewizard.cpp" line="202"/>
         <source>Finished</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="201"/>
+        <location filename="../src/oraclewizard.cpp" line="203"/>
         <source>The wizard has finished.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="202"/>
+        <location filename="../src/oraclewizard.cpp" line="204"/>
         <source>You can now start using Cockatrice with the newly updated cards.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="203"/>
+        <location filename="../src/oraclewizard.cpp" line="205"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
         <translation type="unfinished"/>
     </message>
@@ -278,68 +278,68 @@
 <context>
     <name>SaveSetsPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="544"/>
-        <location filename="../src/oraclewizard.cpp" line="601"/>
+        <location filename="../src/oraclewizard.cpp" line="579"/>
+        <location filename="../src/oraclewizard.cpp" line="636"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="544"/>
+        <location filename="../src/oraclewizard.cpp" line="579"/>
         <source>No set has been imported.</source>
         <translation>Δεν έχει εισαχθεί κανένα σετ.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="550"/>
+        <location filename="../src/oraclewizard.cpp" line="585"/>
         <source>Sets imported</source>
         <translation>Εισαγόμενα σετς</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="551"/>
+        <location filename="../src/oraclewizard.cpp" line="586"/>
         <source>The following sets have been found:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="553"/>
+        <location filename="../src/oraclewizard.cpp" line="588"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="554"/>
+        <location filename="../src/oraclewizard.cpp" line="589"/>
         <source>The card database will be saved at the following location:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="556"/>
+        <location filename="../src/oraclewizard.cpp" line="591"/>
         <source>Save to a custom path (not recommended)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="558"/>
+        <location filename="../src/oraclewizard.cpp" line="593"/>
         <source>&amp;Save</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="564"/>
+        <location filename="../src/oraclewizard.cpp" line="599"/>
         <source>Import finished: %1 cards.</source>
         <translation>Η εισαγωγή ολοκληρώθηκε: % 1 κάρτες.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="567"/>
+        <location filename="../src/oraclewizard.cpp" line="602"/>
         <source>%1: %2 cards imported</source>
         <translation>%1: %2 κάρτες εισήχθησαν</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="577"/>
+        <location filename="../src/oraclewizard.cpp" line="612"/>
         <source>Save card database</source>
         <translation>Αποθήκευση κάρτας βάσης δεδομένων</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="578"/>
+        <location filename="../src/oraclewizard.cpp" line="613"/>
         <source>XML; card database (*.xml)</source>
         <translation>XML; κάρτα βάσης δεδομένων (* .xml)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="601"/>
+        <location filename="../src/oraclewizard.cpp" line="636"/>
         <source>The file could not be saved to %1</source>
         <translation>Δεν ήταν δυνατή η αποθήκευση του αρχείου στο %1</translation>
     </message>
@@ -347,34 +347,34 @@
 <context>
     <name>SimpleDownloadFilePage</name>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="72"/>
-        <location filename="../src/pagetemplates.cpp" line="112"/>
-        <location filename="../src/pagetemplates.cpp" line="172"/>
+        <location filename="../src/pagetemplates.cpp" line="73"/>
+        <location filename="../src/pagetemplates.cpp" line="113"/>
+        <location filename="../src/pagetemplates.cpp" line="173"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="72"/>
+        <location filename="../src/pagetemplates.cpp" line="73"/>
         <source>The provided URL is not valid.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="76"/>
+        <location filename="../src/pagetemplates.cpp" line="77"/>
         <source>Downloading (0MB)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="103"/>
+        <location filename="../src/pagetemplates.cpp" line="104"/>
         <source>Downloading (%1MB)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="112"/>
+        <location filename="../src/pagetemplates.cpp" line="113"/>
         <source>Network error: %1.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="172"/>
+        <location filename="../src/pagetemplates.cpp" line="173"/>
         <source>The file could not be saved to %1</source>
         <translation type="unfinished"/>
     </message>
@@ -523,7 +523,7 @@
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="156"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="158"/>
         <source>English</source>
         <translation>Ελληνικά (Greek)</translation>
     </message>
@@ -531,7 +531,7 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/main.cpp" line="42"/>
+        <location filename="../src/main.cpp" line="43"/>
         <source>Only run in spoiler mode</source>
         <translation type="unfinished"/>
     </message>
