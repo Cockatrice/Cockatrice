@@ -813,6 +813,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
             for (auto &player : players) {
                 if (player->getZoneId() == i) {
                     aPlayerHasThisZone = true;
+                    break;
                 }
             }
             if (!aPlayerHasThisZone) {
