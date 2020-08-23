@@ -116,6 +116,11 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *cardDatabasePathButton = new QPushButton("...");
     connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 
+    customCardDatabasePathEdit = new QLineEdit(SettingsCache::instance().getCustomCardDatabasePath());
+    customCardDatabasePathEdit->setReadOnly(true);
+    QPushButton *customCardDatabasePathButton = new QPushButton("...");
+    connect(customCardDatabasePathButton, SIGNAL(clicked()), this, SLOT(customCardDatabaseButtonClicked()));
+
     tokenDatabasePathEdit = new QLineEdit(SettingsCache::instance().getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
@@ -126,12 +131,14 @@ GeneralSettingsPage::GeneralSettingsPage()
         replaysPathEdit->setEnabled(false);
         picsPathEdit->setEnabled(false);
         cardDatabasePathEdit->setEnabled(false);
+        customCardDatabasePathEdit->setEnabled(false);
         tokenDatabasePathEdit->setEnabled(false);
 
         deckPathButton->setVisible(false);
         replaysPathButton->setVisible(false);
         picsPathButton->setVisible(false);
         cardDatabasePathButton->setVisible(false);
+        customCardDatabasePathEdit->setVisible(false);
         tokenDatabasePathButton->setVisible(false);
     }
 
@@ -148,9 +155,12 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(&cardDatabasePathLabel, 3, 0);
     pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
     pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
-    pathsGrid->addWidget(&tokenDatabasePathLabel, 4, 0);
-    pathsGrid->addWidget(tokenDatabasePathEdit, 4, 1);
-    pathsGrid->addWidget(tokenDatabasePathButton, 4, 2);
+    pathsGrid->addWidget(&customCardDatabasePathLabel, 4, 0);
+    pathsGrid->addWidget(customCardDatabasePathEdit, 4, 1);
+    pathsGrid->addWidget(customCardDatabasePathButton, 4, 2);
+    pathsGrid->addWidget(&tokenDatabasePathLabel, 5, 0);
+    pathsGrid->addWidget(tokenDatabasePathEdit, 5, 1);
+    pathsGrid->addWidget(tokenDatabasePathButton, 5, 2);
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
 
@@ -220,6 +230,16 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
     SettingsCache::instance().setCardDatabasePath(path);
 }
 
+void GeneralSettingsPage::customCardDatabaseButtonClicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), customCardDatabasePathEdit->text());
+    if (path.isEmpty())
+        return;
+
+    customCardDatabasePathEdit->setText(path);
+    SettingsCache::instance().setCustomCardDatabasePath(path);
+}
+
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), tokenDatabasePathEdit->text());
@@ -250,6 +270,7 @@ void GeneralSettingsPage::retranslateUi()
     replaysPathLabel.setText(tr("Replays directory:"));
     picsPathLabel.setText(tr("Pictures directory:"));
     cardDatabasePathLabel.setText(tr("Card database:"));
+    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));

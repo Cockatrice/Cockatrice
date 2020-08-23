@@ -203,7 +203,6 @@ SettingsCache::SettingsCache()
     } else {
         customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
     }
-    // this has never been exposed as an user-configurable setting
     customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
@@ -385,6 +384,12 @@ void SettingsCache::setReplaysPath(const QString &_replaysPath)
 {
     replaysPath = _replaysPath;
     settings->setValue("paths/replays", replaysPath);
+}
+
+void SettingsCache::setCustomCardDatabasePath(const QString &_customCardDatabasePath)
+{
+    customCardDatabasePath = _customCardDatabasePath;
+    settings->setValue("paths/customsets", customCardDatabasePath);
 }
 
 void SettingsCache::setPicsPath(const QString &_picsPath)
