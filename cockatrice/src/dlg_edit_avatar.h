@@ -20,6 +20,7 @@ private slots:
     void actBrowse();
 
 private:
+    QImage image;
     QLabel *textLabel, *imageLabel;
     QPushButton *browseButton;
 };

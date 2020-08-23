@@ -110,7 +110,11 @@ void IslInterface::initServer()
 
     socket->startServerEncryption();
     if (!socket->waitForEncrypted(5000)) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+        QList<QSslError> sslErrors(socket->sslHandshakeErrors());
+#else
         QList<QSslError> sslErrors(socket->sslErrors());
+#endif
         if (sslErrors.isEmpty())
             qDebug() << "[ISL] SSL handshake timeout, terminating connection";
         else
@@ -187,7 +191,11 @@ void IslInterface::initClient()
         return;
     }
     if (!socket->waitForEncrypted(5000)) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+        QList<QSslError> sslErrors(socket->sslHandshakeErrors());
+#else
         QList<QSslError> sslErrors(socket->sslErrors());
+#endif
         if (sslErrors.isEmpty())
             qDebug() << "[ISL] SSL handshake timeout, terminating connection";
         else

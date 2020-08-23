@@ -5,48 +5,50 @@
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "phase.h"
 #include "player.h"
 #include "soundengine.h"
+#include "translatecountername.h"
 
 #include <utility>
 
-const QString MessageLogWidget::tableConstant() const
+const QString &MessageLogWidget::tableConstant() const
 {
     static const QString constant("table");
     return constant;
 }
 
-const QString MessageLogWidget::graveyardConstant() const
+const QString &MessageLogWidget::graveyardConstant() const
 {
     static const QString constant("grave");
     return constant;
 }
 
-const QString MessageLogWidget::exileConstant() const
+const QString &MessageLogWidget::exileConstant() const
 {
     static const QString constant("rfg");
     return constant;
 }
 
-const QString MessageLogWidget::handConstant() const
+const QString &MessageLogWidget::handConstant() const
 {
     static const QString constant("hand");
     return constant;
 }
 
-const QString MessageLogWidget::deckConstant() const
+const QString &MessageLogWidget::deckConstant() const
 {
     static const QString constant("deck");
     return constant;
 }
 
-const QString MessageLogWidget::sideboardConstant() const
+const QString &MessageLogWidget::sideboardConstant() const
 {
     static const QString constant("sb");
     return constant;
 }
 
-const QString MessageLogWidget::stackConstant() const
+const QString &MessageLogWidget::stackConstant() const
 {
     static const QString constant("stack");
     return constant;
@@ -324,8 +326,8 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else if (targetZoneName == deckConstant()) {
         if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
-        } else if (newX == targetZone->getCards().size() - 1) {
-            finalStr = tr("%1 puts %2%3 on bottom of their library.");
+        } else if (newX >= targetZone->getCards().size()) {
+            finalStr = tr("%1 puts %2%3 onto the bottom of their library.");
         } else if (newX == 0) {
             finalStr = tr("%1 puts %2%3 on top of their library.");
         } else {
@@ -556,77 +558,18 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(std::move(message), nullptr, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
+    appendMessage(std::move(message), {}, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
                   QString::fromStdString(player->getUserInfo()->privlevel()), true);
 }
 
-void MessageLogWidget::logSetActivePhase(int phase)
+void MessageLogWidget::logSetActivePhase(int phaseNumber)
 {
-    QString phaseName;
-    QString color;
-    switch (phase) { // TODO: define phases
-        case 0:
-            phaseName = tr("Untap");
-            soundEngine->playSound("untap_step");
-            color = "green";
-            break;
-        case 1:
-            phaseName = tr("Upkeep");
-            soundEngine->playSound("upkeep_step");
-            color = "green";
-            break;
-        case 2:
-            phaseName = tr("Draw");
-            soundEngine->playSound("draw_step");
-            color = "green";
-            break;
-        case 3:
-            phaseName = tr("First Main");
-            soundEngine->playSound("main_1");
-            color = "blue";
-            break;
-        case 4:
-            phaseName = tr("Beginning of Combat");
-            soundEngine->playSound("start_combat");
-            color = "red";
-            break;
-        case 5:
-            phaseName = tr("Declare Attackers");
-            soundEngine->playSound("attack_step");
-            color = "red";
-            break;
-        case 6:
-            phaseName = tr("Declare Blockers");
-            soundEngine->playSound("block_step");
-            color = "red";
-            break;
-        case 7:
-            phaseName = tr("Combat Damage");
-            soundEngine->playSound("damage_step");
-            color = "red";
-            break;
-        case 8:
-            phaseName = tr("End of Combat");
-            soundEngine->playSound("end_combat");
-            color = "red";
-            break;
-        case 9:
-            phaseName = tr("Second Main");
-            soundEngine->playSound("main_2");
-            color = "blue";
-            break;
-        case 10:
-            phaseName = tr("End/Cleanup");
-            soundEngine->playSound("end_step");
-            color = "green";
-            break;
-        default:
-            phaseName = tr("Unknown Phase");
-            color = "black";
-            break;
-    }
-    appendHtml("<font color=\"" + color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               QString("%1").arg(phaseName) + "</b></font>");
+    Phase phase = Phases::getPhase(phaseNumber);
+
+    soundEngine->playSound(phase.soundFileName);
+
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
+               phase.name + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
@@ -681,9 +624,10 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
         soundEngine->playSound("life_change");
     }
 
+    QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
                                 .arg(sanitizeHtml(player->getName()))
-                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterName)))
+                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(value))
                                 .arg(value > oldValue ? "+" : "")
                                 .arg(value - oldValue));
@@ -796,7 +740,7 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName,
                                        QString userPrivLevel,
                                        QString message)
 {
-    appendMessage(std::move(message), nullptr, spectatorName, spectatorUserLevel, userPrivLevel, false);
+    appendMessage(std::move(message), {}, spectatorName, spectatorUserLevel, userPrivLevel, false);
 }
 
 void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)

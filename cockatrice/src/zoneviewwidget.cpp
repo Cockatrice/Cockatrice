@@ -84,15 +84,15 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     scrollBar->setSingleStep(20);
     scrollBar->setPageStep(200);
     connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(handleScrollBarChange(int)));
-    QGraphicsProxyWidget *scrollBarProxy = new QGraphicsProxyWidget;
+    scrollBarProxy = new ScrollableGraphicsProxyWidget;
     scrollBarProxy->setWidget(scrollBar);
     zoneHBox->addItem(scrollBarProxy);
 
     vbox->addItem(zoneHBox);
 
     zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer);
-    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), this,
-            SLOT(handleWheelEvent(QGraphicsSceneWheelEvent *)));
+    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
+            SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
 
     // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
     // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
@@ -100,10 +100,10 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         connect(&sortByNameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByName(int)));
         connect(&sortByTypeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByType(int)));
         connect(&pileViewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSetPileView(int)));
-        sortByNameCheckBox.setChecked(settingsCache->getZoneViewSortByName());
-        sortByTypeCheckBox.setChecked(settingsCache->getZoneViewSortByType());
-        pileViewCheckBox.setChecked(settingsCache->getZoneViewPileView());
-        if (!settingsCache->getZoneViewSortByType())
+        sortByNameCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByName());
+        sortByTypeCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByType());
+        pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
+        if (!SettingsCache::instance().getZoneViewSortByType())
             pileViewCheckBox.setEnabled(false);
     }
 
@@ -118,20 +118,20 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 void ZoneViewWidget::processSortByType(int value)
 {
     pileViewCheckBox.setEnabled(value);
-    settingsCache->setZoneViewSortByType(value);
+    SettingsCache::instance().setZoneViewSortByType(value);
     zone->setPileView(pileViewCheckBox.isChecked());
     zone->setSortByType(value);
 }
 
 void ZoneViewWidget::processSortByName(int value)
 {
-    settingsCache->setZoneViewSortByName(value);
+    SettingsCache::instance().setZoneViewSortByName(value);
     zone->setSortByName(value);
 }
 
 void ZoneViewWidget::processSetPileView(int value)
 {
-    settingsCache->setZoneViewPileView(value);
+    SettingsCache::instance().setZoneViewPileView(value);
     zone->setPileView(value);
 }
 
@@ -190,12 +190,6 @@ void ZoneViewWidget::resizeToZoneContents()
 
     if (layout())
         layout()->invalidate();
-}
-
-void ZoneViewWidget::handleWheelEvent(QGraphicsSceneWheelEvent *event)
-{
-    QWheelEvent wheelEvent(QPoint(), event->delta(), event->buttons(), event->modifiers(), event->orientation());
-    scrollBar->event(&wheelEvent);
 }
 
 void ZoneViewWidget::handleScrollBarChange(int value)

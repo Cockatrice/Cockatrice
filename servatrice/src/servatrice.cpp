@@ -265,7 +265,11 @@ bool Servatrice::initServer()
     qDebug() << "Accept registered users only: " << getRegOnlyServerEnabled();
     qDebug() << "Registration enabled: " << getRegistrationEnabled();
     if (getRegistrationEnabled()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        QStringList emailBlackListFilters = getEmailBlackList().split(",", Qt::SkipEmptyParts);
+#else
         QStringList emailBlackListFilters = getEmailBlackList().split(",", QString::SkipEmptyParts);
+#endif
         qDebug() << "Email blacklist: " << emailBlackListFilters;
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
@@ -568,7 +572,11 @@ void Servatrice::setRequiredFeatures(const QString featureList)
     FeatureSet features;
     serverRequiredFeatureList.clear();
     features.initalizeFeatureList(serverRequiredFeatureList);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QStringList listReqFeatures = featureList.split(",", Qt::SkipEmptyParts);
+#else
     QStringList listReqFeatures = featureList.split(",", QString::SkipEmptyParts);
+#endif
     if (!listReqFeatures.isEmpty())
         foreach (QString reqFeature, listReqFeatures)
             features.enableRequiredFeature(serverRequiredFeatureList, reqFeature);

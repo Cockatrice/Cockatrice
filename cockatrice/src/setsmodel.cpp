@@ -96,7 +96,7 @@ QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int rol
 Qt::ItemFlags SetsModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return 0;
+        return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = QAbstractTableModel::flags(index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 
@@ -195,12 +195,12 @@ void SetsModel::swapRows(int oldRow, int newRow)
 
 void SetsModel::sort(int column, Qt::SortOrder order)
 {
-    QMap<QString, CardSetPtr> setMap;
+    QMultiMap<QString, CardSetPtr> setMap;
     int numRows = rowCount();
     int row;
 
     for (row = 0; row < numRows; ++row)
-        setMap.insertMulti(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
+        setMap.insert(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
 
     QList<CardSetPtr> tmp = setMap.values();
     sets.clear();

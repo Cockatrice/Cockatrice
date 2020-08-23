@@ -16,19 +16,18 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     QString lastfphost;
     QString lastfpport;
     QString lastfpplayername;
-    lastfphost = settingsCache->servers().getHostname("server.cockatrice.us");
-    lastfpport = settingsCache->servers().getPort("4747");
-    lastfpplayername = settingsCache->servers().getPlayerName("Player");
+    ServersSettings &servers = SettingsCache::instance().servers();
+    lastfphost = servers.getHostname("server.cockatrice.us");
+    lastfpport = servers.getPort("4747");
+    lastfpplayername = servers.getPlayerName("Player");
 
-    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() &&
-        !settingsCache->servers().getFPPlayerName().isEmpty()) {
-        lastfphost = settingsCache->servers().getFPHostname();
-        lastfpport = settingsCache->servers().getFPPort();
-        lastfpplayername = settingsCache->servers().getFPPlayerName();
+    if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {
+        lastfphost = servers.getFPHostname();
+        lastfpport = servers.getFPPort();
+        lastfpplayername = servers.getFPPlayerName();
     }
 
-    if (settingsCache->servers().getFPHostname().isEmpty() && settingsCache->servers().getFPPort().isEmpty() &&
-        settingsCache->servers().getFPPlayerName().isEmpty()) {
+    if (servers.getFPHostname().isEmpty() && servers.getFPPort().isEmpty() && servers.getFPPlayerName().isEmpty()) {
         QMessageBox::warning(this, tr("Forgot Password Reset Warning"),
                              tr("Oops, looks like something has gone wrong. Please re-start the forgot password "
                                 "process by using the forgot password button on the connection screen."));
@@ -61,8 +60,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     newpasswordverifyLabel->setBuddy(newpasswordEdit);
     newpasswordverifyEdit->setEchoMode(QLineEdit::Password);
 
-    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() &&
-        !settingsCache->servers().getFPPlayerName().isEmpty()) {
+    if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {
         hostLabel->hide();
         hostEdit->hide();
         portLabel->hide();
@@ -121,9 +119,10 @@ void DlgForgotPasswordReset::actOk()
         return;
     }
 
-    settingsCache->servers().setFPHostName(hostEdit->text());
-    settingsCache->servers().setFPPort(portEdit->text());
-    settingsCache->servers().setFPPlayerName(playernameEdit->text());
+    ServersSettings &servers = SettingsCache::instance().servers();
+    servers.setFPHostName(hostEdit->text());
+    servers.setFPPort(portEdit->text());
+    servers.setFPPlayerName(playernameEdit->text());
 
     accept();
 }

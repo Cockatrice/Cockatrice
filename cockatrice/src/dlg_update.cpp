@@ -24,7 +24,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     statusLabel->setWordWrap(true);
     descriptionLabel =
         new QLabel(tr("Current release channel") +
-                       QString(": %1").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())),
+                       QString(": %1").arg(tr(SettingsCache::instance().getUpdateReleaseChannel()->getName().toUtf8())),
                    this);
     progress = new QProgressBar(this);
 
@@ -67,7 +67,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     connect(uDownloader, SIGNAL(progressMade(qint64, qint64)), this, SLOT(downloadProgressMade(qint64, qint64)));
     connect(uDownloader, SIGNAL(error(QString)), this, SLOT(downloadError(QString)));
 
-    ReleaseChannel *channel = settingsCache->getUpdateReleaseChannel();
+    ReleaseChannel *channel = SettingsCache::instance().getUpdateReleaseChannel();
     connect(channel, SIGNAL(finishedCheck(bool, bool, Release *)), this,
             SLOT(finishedUpdateCheck(bool, bool, Release *)));
     connect(channel, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
@@ -83,7 +83,7 @@ void DlgUpdate::closeDialog()
 
 void DlgUpdate::gotoDownloadPage()
 {
-    QDesktopServices::openUrl(settingsCache->getUpdateReleaseChannel()->getManualDownloadUrl());
+    QDesktopServices::openUrl(SettingsCache::instance().getUpdateReleaseChannel()->getManualDownloadUrl());
 }
 
 void DlgUpdate::downloadUpdate()
@@ -106,7 +106,7 @@ void DlgUpdate::beginUpdateCheck()
     progress->setMinimum(0);
     progress->setMaximum(0);
     setLabel(tr("Checking for updates..."));
-    settingsCache->getUpdateReleaseChannel()->checkForUpdates();
+    SettingsCache::instance().getUpdateReleaseChannel()->checkForUpdates();
 }
 
 void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release)
@@ -136,7 +136,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
                 tr("You are already running the latest version available in the chosen release channel.") + "<br>" +
                 "<b>" + tr("Current version") + QString(":</b> %1<br>").arg(VERSION_STRING) + "<b>" +
                 tr("Selected release channel") +
-                QString(":</b> %1").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())));
+                QString(":</b> %1").arg(tr(SettingsCache::instance().getUpdateReleaseChannel()->getName().toUtf8())));
         return;
     }
 

@@ -5,6 +5,7 @@
 #include "pb/command_set_counter.pb.h"
 #include "player.h"
 #include "settingscache.h"
+#include "translatecountername.h"
 
 #include <QAction>
 #include <QApplication>
@@ -32,7 +33,8 @@ AbstractCounter::AbstractCounter(Player *_player,
     shortcutActive = false;
 
     if (player->getLocalOrJudge()) {
-        menu = new TearOffMenu(name);
+        QString displayName = TranslateCounterName::getDisplayName(_name);
+        menu = new TearOffMenu(displayName);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
         menu->addAction(aSet);
@@ -55,7 +57,7 @@ AbstractCounter::AbstractCounter(Player *_player,
         menu = nullptr;
     }
 
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     retranslateUi();
 }
@@ -85,16 +87,17 @@ void AbstractCounter::setShortcutsActive()
     if (!player->getLocal()) {
         return;
     }
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     if (name == "life") {
         shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
+        aSet->setShortcuts(shortcuts.getShortcut("Player/aSet"));
+        aDec->setShortcuts(shortcuts.getShortcut("Player/aDec"));
+        aInc->setShortcuts(shortcuts.getShortcut("Player/aInc"));
     } else if (useNameForShortcut) {
         shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounter_" + name));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounter_" + name));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounter_" + name));
+        aSet->setShortcuts(shortcuts.getShortcut("Player/aSetCounter_" + name));
+        aDec->setShortcuts(shortcuts.getShortcut("Player/aDecCounter_" + name));
+        aInc->setShortcuts(shortcuts.getShortcut("Player/aIncCounter_" + name));
     }
 }
 

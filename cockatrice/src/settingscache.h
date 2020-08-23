@@ -462,6 +462,8 @@ public:
     {
         return mbDownloadSpoilers;
     }
+
+    static SettingsCache &instance();
 public slots:
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
@@ -472,6 +474,7 @@ public slots:
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
+    void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
     void setPicsPath(const QString &_picsPath);
     void setCardDatabasePath(const QString &_cardDatabasePath);
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
@@ -528,7 +531,5 @@ public slots:
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
 };
-
-extern SettingsCache *settingsCache;
 
 #endif

@@ -19,15 +19,16 @@
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     ensureThemeDirectoryExists();
-    connect(settingsCache, SIGNAL(themeChanged()), this, SLOT(themeChangedSlot()));
+    connect(&SettingsCache::instance(), SIGNAL(themeChanged()), this, SLOT(themeChangedSlot()));
     themeChangedSlot();
 }
 
 void ThemeManager::ensureThemeDirectoryExists()
 {
-    if (settingsCache->getThemeName().isEmpty() || !getAvailableThemes().contains(settingsCache->getThemeName())) {
+    if (SettingsCache::instance().getThemeName().isEmpty() ||
+        !getAvailableThemes().contains(SettingsCache::instance().getThemeName())) {
         qDebug() << "Theme name not set, setting default value";
-        settingsCache->setThemeName(DEFAULT_THEME_NAME);
+        SettingsCache::instance().setThemeName(DEFAULT_THEME_NAME);
     }
 }
 
@@ -37,7 +38,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     availableThemes.clear();
 
     // load themes from user profile dir
-    dir.setPath(settingsCache->getDataPath() + "/themes");
+    dir.setPath(SettingsCache::instance().getDataPath() + "/themes");
 
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
@@ -93,7 +94,7 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 
 void ThemeManager::themeChangedSlot()
 {
-    QString themeName = settingsCache->getThemeName();
+    QString themeName = SettingsCache::instance().getThemeName();
     qDebug() << "Theme changed:" << themeName;
 
     QDir dir = getAvailableThemes().value(themeName);

@@ -22,7 +22,7 @@ private:
     CardInfoText *text;
 
 public:
-    explicit CardInfoWidget(const QString &cardName, QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+    explicit CardInfoWidget(const QString &cardName, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
 public slots:
     void setCard(CardInfoPtr card);

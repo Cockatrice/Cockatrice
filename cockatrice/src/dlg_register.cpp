@@ -13,20 +13,21 @@
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
+    ServersSettings &servers = SettingsCache::instance().servers();
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname("server.cockatrice.us"));
+    hostEdit = new QLineEdit(servers.getHostname("server.cockatrice.us"));
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
+    portEdit = new QLineEdit(servers.getPort("4747"));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
+    playernameEdit = new QLineEdit(servers.getPlayerName("Player"));
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
+    passwordEdit = new QLineEdit(servers.getPassword());
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
@@ -297,7 +298,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     countryEdit->addItem(QPixmap("theme:countries/zm"), "zm");
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
     countryEdit->setCurrentIndex(0);
-    QStringList countries = settingsCache->getCountries();
+    QStringList countries = SettingsCache::instance().getCountries();
     foreach (QString c, countries)
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
 
@@ -354,11 +355,12 @@ void DlgRegister::actOk()
         return;
     }
 
-    settingsCache->servers().setHostName(hostEdit->text());
-    settingsCache->servers().setPort(portEdit->text());
-    settingsCache->servers().setPlayerName(playernameEdit->text());
+    ServersSettings &servers = SettingsCache::instance().servers();
+    servers.setHostName(hostEdit->text());
+    servers.setPort(portEdit->text());
+    servers.setPlayerName(playernameEdit->text());
     // always save the password so it will be picked up by the connect dialog
-    settingsCache->servers().setPassword(passwordEdit->text());
+    servers.setPassword(passwordEdit->text());
 
     accept();
 }

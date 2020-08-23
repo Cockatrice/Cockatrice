@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Max-Wilhelm Bruker   *
- *   brukie@gmx.net   *
+ *   Copyright (C) 2008 by Max-Wilhelm Bruker                              *
+ *   brukie@gmx.net                                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -50,6 +50,7 @@
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -222,14 +223,15 @@ void MainWindow::actSinglePlayer()
 
     localServer = new LocalServer(this);
     LocalServerInterface *mainLsi = localServer->newConnection();
-    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), settingsCache->getClientID(), this);
+    LocalClient *mainClient =
+        new LocalClient(mainLsi, tr("Player %1").arg(1), SettingsCache::instance().getClientID(), this);
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
 
     for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
         LocalClient *slaveClient =
-            new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), settingsCache->getClientID(), this);
+            new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), SettingsCache::instance().getClientID(), this);
         localClients.append(slaveClient);
     }
     tabSupervisor->startLocal(localClients);
@@ -242,7 +244,7 @@ void MainWindow::actSinglePlayer()
 void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
-    dlg.setDirectory(settingsCache->getReplaysPath());
+    dlg.setDirectory(SettingsCache::instance().getReplaysPath());
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec())
         return;
@@ -637,18 +639,18 @@ void MainWindow::retranslateUi()
 #endif
 
     dbMenu->setTitle(tr("C&ard Database"));
+    aManageSets->setText(tr("&Manage sets..."));
+    aEditTokens->setText(tr("Edit custom &tokens..."));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
-    aManageSets->setText(tr("&Manage sets..."));
-    aEditTokens->setText(tr("Edit custom &tokens..."));
 
+    helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
-    aViewLog->setText(tr("View &debug log"));
-    helpMenu->setTitle(tr("&Help"));
-    aCheckCardUpdates->setText(tr("Check for card updates..."));
+    aCheckCardUpdates->setText(tr("Check for Card Updates..."));
+    aViewLog->setText(tr("View &Debug Log"));
     tabSupervisor->retranslateUi();
 }
 
@@ -675,32 +677,27 @@ void MainWindow::createActions()
     aExit = new QAction(this);
     connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
 
+    aManageSets = new QAction(QString(), this);
+    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
+    aEditTokens = new QAction(QString(), this);
+    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    aOpenCustomFolder = new QAction(QString(), this);
+    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+    aOpenCustomsetsFolder = new QAction(QString(), this);
+    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+    aAddCustomSet = new QAction(QString(), this);
+    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
     aTips = new QAction(this);
     connect(aTips, SIGNAL(triggered()), this, SLOT(actTips()));
     aUpdate = new QAction(this);
     connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
-    aViewLog = new QAction(this);
-    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
-
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
-
-    aOpenCustomsetsFolder = new QAction(QString(), this);
-    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
-
-    aOpenCustomFolder = new QAction(QString(), this);
-    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
-
-    aAddCustomSet = new QAction(QString(), this);
-    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
-
-    aManageSets = new QAction(QString(), this);
-    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
-
-    aEditTokens = new QAction(QString(), this);
-    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    aViewLog = new QAction(this);
+    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
 
 #if defined(__APPLE__) /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
@@ -751,24 +748,23 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSettings);
-    cockatriceMenu->addAction(aCheckCardUpdates);
-    cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
 
     dbMenu = menuBar()->addMenu(QString());
     dbMenu->addAction(aManageSets);
     dbMenu->addAction(aEditTokens);
     dbMenu->addSeparator();
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
-#endif
     dbMenu->addAction(aAddCustomSet);
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
     helpMenu->addAction(aTips);
+    helpMenu->addSeparator();
     helpMenu->addAction(aUpdate);
+    helpMenu->addAction(aCheckCardUpdates);
+    helpMenu->addSeparator();
     helpMenu->addAction(aViewLog);
 }
 
@@ -776,8 +772,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), cardUpdateProcess(nullptr),
       logviewDialog(nullptr)
 {
-    connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
-    pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
+    connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
+    pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
 
     client = new RemoteClient;
     connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this,
@@ -821,7 +817,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     retranslateUi();
 
-    if (!restoreGeometry(settingsCache->getMainWindowGeometry())) {
+    if (!restoreGeometry(SettingsCache::instance().getMainWindowGeometry())) {
         setWindowState(Qt::WindowMaximized);
     }
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
@@ -831,7 +827,7 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayIcon();
     }
 
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     connect(db, SIGNAL(cardDatabaseLoadingFailed()), this, SLOT(cardDatabaseLoadingFailed()));
@@ -847,21 +843,21 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
-    if (settingsCache->getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
-        settingsCache->setClientVersion(VERSION_STRING);
-    } else if (settingsCache->getClientVersion() != VERSION_STRING) {
+        SettingsCache::instance().setClientVersion(VERSION_STRING);
+    } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
-        qDebug() << "Startup: old client version" << settingsCache->getClientVersion()
+        qDebug() << "Startup: old client version" << SettingsCache::instance().getClientVersion()
                  << "differs, assuming first start after update";
-        if (settingsCache->getNotifyAboutNewVersion()) {
+        if (SettingsCache::instance().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         } else {
             QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         }
-        settingsCache->setClientVersion(VERSION_STRING);
+        SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qDebug() << "Startup: found config with current version";
@@ -869,7 +865,7 @@ void MainWindow::startupConfigCheck()
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
-        if (tip->successfulInit && settingsCache->getShowTipsOnStartup() && tip->newTipsAvailable) {
+        if (tip->successfulInit && SettingsCache::instance().getShowTipsOnStartup() && tip->newTipsAvailable) {
             tip->raise();
             tip->show();
         }
@@ -965,7 +961,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     tip->close();
 
     event->accept();
-    settingsCache->setMainWindowGeometry(saveGeometry());
+    SettingsCache::instance().setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();
 }
 
@@ -979,7 +975,7 @@ void MainWindow::changeEvent(QEvent *event)
             if (!connectTo.isEmpty()) {
                 qDebug() << "Command line connect to " << connectTo;
                 client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
-            } else if (settingsCache->servers().getAutoConnect()) {
+            } else if (SettingsCache::instance().servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
@@ -1091,13 +1087,13 @@ void MainWindow::actCheckCardUpdates()
      * bypass app translocation: quarantined application will be started from a temporary directory eg.
      * /private/var/folders/tk/qx76cyb50jn5dvj7rrgfscz40000gn/T/AppTranslocation/A0CBBD5A-9264-4106-8547-36B84DB161E2/d/oracle/
      */
-    if(dir.absolutePath().startsWith("/private/var/folders")) {
+    if (dir.absolutePath().startsWith("/private/var/folders")) {
         dir.setPath("/Applications/");
     } else {
         // exit from the Cockatrice application bundle
         dir.cdUp();
         dir.cdUp();
-        dir.cdUp();        
+        dir.cdUp();
     }
 
     binaryName = getCardUpdaterBinaryName();
@@ -1111,8 +1107,9 @@ void MainWindow::actCheckCardUpdates()
     binaryName = getCardUpdaterBinaryName();
 #endif
 
-    if (dir.exists(binaryName))
+    if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
+    }
 
     if (updaterCmd.isEmpty()) {
         QMessageBox::warning(this, tr("Error"),
@@ -1120,7 +1117,7 @@ void MainWindow::actCheckCardUpdates()
         return;
     }
 
-    cardUpdateProcess->start("\"" + updaterCmd + "\"");
+    cardUpdateProcess->start(updaterCmd, QStringList());
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1171,19 +1168,20 @@ void MainWindow::actCheckServerUpdates()
 
 void MainWindow::refreshShortcuts()
 {
-    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aConnect"));
-    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDisconnect"));
-    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSinglePlayer"));
-    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aWatchReplay"));
-    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDeckEditor"));
-    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen"));
-    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
-    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
-    aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
-    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
-    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aOpenCustomFolder"));
-    aManageSets->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aManageSets"));
-    aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditTokens"));
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    aConnect->setShortcuts(shortcuts.getShortcut("MainWindow/aConnect"));
+    aDisconnect->setShortcuts(shortcuts.getShortcut("MainWindow/aDisconnect"));
+    aSinglePlayer->setShortcuts(shortcuts.getShortcut("MainWindow/aSinglePlayer"));
+    aWatchReplay->setShortcuts(shortcuts.getShortcut("MainWindow/aWatchReplay"));
+    aDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
+    aFullScreen->setShortcuts(shortcuts.getShortcut("MainWindow/aFullScreen"));
+    aRegister->setShortcuts(shortcuts.getShortcut("MainWindow/aRegister"));
+    aSettings->setShortcuts(shortcuts.getShortcut("MainWindow/aSettings"));
+    aExit->setShortcuts(shortcuts.getShortcut("MainWindow/aExit"));
+    aManageSets->setShortcuts(shortcuts.getShortcut("MainWindow/aManageSets"));
+    aEditTokens->setShortcuts(shortcuts.getShortcut("MainWindow/aEditTokens"));
+    aOpenCustomFolder->setShortcuts(shortcuts.getShortcut("MainWindow/aOpenCustomFolder"));
+    aCheckCardUpdates->setShortcuts(shortcuts.getShortcut("MainWindow/aCheckCardUpdates"));
 }
 
 void MainWindow::notifyUserAboutUpdate()
@@ -1197,39 +1195,14 @@ void MainWindow::notifyUserAboutUpdate()
 
 void MainWindow::actOpenCustomFolder()
 {
-    QString dir = settingsCache->getCustomPicsPath();
-#if defined(Q_OS_MAC)
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1(R"(tell application "Finder" to open POSIX file "%1")").arg(dir);
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
-
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
-#elif defined(Q_OS_WIN)
-    QStringList args;
-    args << QDir::toNativeSeparators(dir);
-    QProcess::startDetached("explorer", args);
-#endif
+    QString dir = SettingsCache::instance().getCustomPicsPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void MainWindow::actOpenCustomsetsFolder()
 {
-    QString dir = settingsCache->getCustomCardDatabasePath();
-
-#if defined(Q_OS_MAC)
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1(R"(tell application "Finder" to open POSIX file "%1")").arg(dir);
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
-
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
-#elif defined(Q_OS_WIN)
-    QStringList args;
-    args << QDir::toNativeSeparators(dir);
-    QProcess::startDetached("explorer", args);
-#endif
+    QString dir = SettingsCache::instance().getCustomCardDatabasePath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void MainWindow::actAddCustomSet()
@@ -1253,7 +1226,7 @@ void MainWindow::actAddCustomSet()
         return;
     }
 
-    QDir dir = settingsCache->getCustomCardDatabasePath();
+    QDir dir = SettingsCache::instance().getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
     bool res;
@@ -1326,9 +1299,9 @@ void MainWindow::forgotPasswordSuccess()
     QMessageBox::information(
         this, tr("Forgot Password"),
         tr("Your password has been reset successfully, you can now log in using the new credentials."));
-    settingsCache->servers().setFPHostName("");
-    settingsCache->servers().setFPPort("");
-    settingsCache->servers().setFPPlayerName("");
+    SettingsCache::instance().servers().setFPHostName("");
+    SettingsCache::instance().servers().setFPPort("");
+    SettingsCache::instance().servers().setFPPlayerName("");
 }
 
 void MainWindow::forgotPasswordError()
@@ -1336,9 +1309,9 @@ void MainWindow::forgotPasswordError()
     QMessageBox::warning(
         this, tr("Forgot Password"),
         tr("Failed to reset user account password, please contact the server operator to reset your password."));
-    settingsCache->servers().setFPHostName("");
-    settingsCache->servers().setFPPort("");
-    settingsCache->servers().setFPPlayerName("");
+    SettingsCache::instance().servers().setFPHostName("");
+    SettingsCache::instance().servers().setFPPort("");
+    SettingsCache::instance().servers().setFPPlayerName("");
 }
 
 void MainWindow::promptForgotPasswordReset()

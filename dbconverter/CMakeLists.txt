@@ -9,6 +9,7 @@ SET(dbconverter_SOURCES
     ../cockatrice/src/carddbparser/carddatabaseparser.cpp
     ../cockatrice/src/carddbparser/cockatricexml3.cpp
     ../cockatrice/src/carddbparser/cockatricexml4.cpp
+    ../cockatrice/src/settings/settingsmanager.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -16,6 +17,11 @@ SET(dbconverter_SOURCES
 find_package(Qt5 COMPONENTS Network Widgets REQUIRED)
 set(dbconverter_QT_MODULES Qt5::Core Qt5::Network Qt5::Widgets)
 SET(QT_DONT_USE_QTGUI TRUE)
+
+QT5_WRAP_CPP(dbconverter_SOURCES
+    ../cockatrice/src/settingscache.h
+    ../cockatrice/src/settings/carddatabasesettings.h
+)
 
 # Build servatrice binary and link it
 ADD_EXECUTABLE(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES} ${dbconverter_MOC_SRCS})

@@ -499,6 +499,8 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
     const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
     const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
+    const QRegularExpression reBraceDigit(
+        " ?\\([\\dA-Z]+\\) *\\d+$"); // () are matched if containing setcode then a number
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
                                                          {QRegularExpression("æ"), QString("ae")},
@@ -513,8 +515,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     // start at the first empty line before the first cardline
     int deckStart = inputs.indexOf(reCardLine);
     if (deckStart == -1) { // there are no cards?
-        if (inputs.indexOf(reComment) == -1)
+        if (inputs.indexOf(reComment) == -1) {
             return false; // input is empty
+        }
         deckStart = max_line;
     } else {
         deckStart = inputs.lastIndexOf(reEmpty, deckStart);
@@ -594,7 +597,8 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         // remove stuff inbetween braces
         cardName.remove(reBrace);
         cardName.remove(reRoundBrace); // I'll be entirely honest here, these are split to accommodate just three cards
-        cardName.remove(reDigitBrace); // all cards from un-sets that have a word in between round braces at the end
+        cardName.remove(reDigitBrace); // from un-sets that have a word in between round braces at the end
+        cardName.remove(reBraceDigit); // very specific format with the set code in () and collectors number after
 
         // replace common differences in cardnames
         for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {

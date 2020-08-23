@@ -123,11 +123,11 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
     const UserLevelFlags userLevel(userInfo->user_level());
     const QString userPriv = QString::fromStdString(userInfo->privlevel());
 
-    chatView->appendMessage(QString::fromStdString(event.message()), 0, QString::fromStdString(event.sender_name()),
+    chatView->appendMessage(QString::fromStdString(event.message()), {}, QString::fromStdString(event.sender_name()),
                             userLevel, userPriv, true);
     if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this))
         soundEngine->playSound("private_message");
-    if (settingsCache->getShowMessagePopup() && shouldShowSystemPopup(event))
+    if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event))
         showSystemPopup(event);
     if (QString::fromStdString(event.sender_name()).toLower().simplified() == "servatrice")
         sayEdit->setDisabled(true);
