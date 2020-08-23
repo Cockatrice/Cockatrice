@@ -9,6 +9,7 @@
 #include <QString>
 
 typedef QMap<QString, QString> QStringMap;
+typedef QMap<int, QBrush> QBrushMap;
 
 class QApplication;
 
@@ -21,10 +22,15 @@ public:
 private:
     QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;
     QStringMap availableThemes;
+    /*
+      Internal cache for table backgrounds
+    */
+    QBrushMap tableBgBrushesCache;
 
 protected:
     void ensureThemeDirectoryExists();
     QBrush loadBrush(QString fileName, QColor fallbackColor);
+    QBrush loadExtraBrush(QString fileName, QBrush &fallbackBrush);
 
 public:
     QBrush &getHandBgBrush()
@@ -44,7 +50,7 @@ public:
         return playerBgBrush;
     }
     QStringMap &getAvailableThemes();
-    QBrush getExtraTableBgBrush(QString extraNumber);
+    QBrush getExtraTableBgBrush(QString extraNumber, QBrush &fallbackBrush);
 protected slots:
     void themeChangedSlot();
 signals:

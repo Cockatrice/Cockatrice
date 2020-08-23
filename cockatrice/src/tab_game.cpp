@@ -804,6 +804,25 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     gameMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
 
     players.insert(playerId, newPlayer);
+
+    if (!spectators.contains(playerId)) {
+
+        // Loop for each player, the idea is to have one assigned zone for each non-spectator player
+        for (int i = 1; i <= players.count(); ++i) {
+            bool aPlayerHasThisZone = false;
+            for (auto &player : players) {
+                if (player->getZoneId() == i) {
+                    aPlayerHasThisZone = true;
+                    break;
+                }
+            }
+            if (!aPlayerHasThisZone) {
+                newPlayer->setZoneId(i);
+                break;
+            }
+        }
+    }
+
     emit playerAdded(newPlayer);
     return newPlayer;
 }

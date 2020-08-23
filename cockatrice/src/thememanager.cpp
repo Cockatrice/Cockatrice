@@ -78,6 +78,20 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
     return brush;
 }
 
+QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
+{
+    QBrush brush;
+    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+
+    if (tmp.isNull()) {
+        brush = fallbackBrush;
+    } else {
+        brush.setTexture(tmp);
+    }
+
+    return brush;
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
@@ -103,13 +117,23 @@ void ThemeManager::themeChangedSlot()
     tableBgBrush = loadBrush(TABLEZONE_BG_NAME, QColor(70, 50, 100));
     playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
     stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
+    tableBgBrushesCache.clear();
 
     QPixmapCache::clear();
 
     emit themeChanged();
 }
 
-QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber)
+QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber, QBrush &fallbackBrush)
 {
-    return loadBrush(TABLEZONE_BG_NAME + extraNumber, QColor(70, 50, 100));
+    QBrush returnBrush;
+
+    if (!tableBgBrushesCache.contains(extraNumber.toInt())) {
+        returnBrush = loadExtraBrush(TABLEZONE_BG_NAME + extraNumber, fallbackBrush);
+        tableBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
+    } else {
+        returnBrush = tableBgBrushesCache.value(extraNumber.toInt());
+    }
+
+    return returnBrush;
 }
