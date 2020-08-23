@@ -128,7 +128,7 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 {
     if (!url.contains("://"))
-        url.prepend("http://");
+        url.prepend("https://");
 
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;

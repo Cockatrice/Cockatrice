@@ -336,7 +336,7 @@ DeckList::DeckList()
     root = new InnerDecklistNode;
 }
 
-// TODO: http://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
+// TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
     : QObject(), name(other.name), comments(other.comments), deckHash(other.deckHash)
 {
