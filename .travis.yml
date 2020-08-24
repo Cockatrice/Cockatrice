@@ -17,8 +17,22 @@ jobs:
     script: bash ./.ci/travis-lint.sh
 
 
+  #Due to an bug in Qt debug builds do not succeed on 20.04 yet, see https://github.com/Cockatrice/Cockatrice/issues/3993
+  #Ubuntu Bionic (on Docker)
+  - name: Ubuntu Bionic (Debug + Tests)
+    if: tag IS NOT present
+    os: linux
+    services: docker
+    language: minimal
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --server --debug --test
+
   #Ubuntu Focal (on Docker)
-  - name: Ubuntu Focal (Debug + Tests)
+  - name: Ubuntu Focal (Compile)
     if: tag IS NOT present
     os: linux
     services: docker
@@ -28,7 +42,7 @@ jobs:
       directories:
       - $CACHE
     before_install: source .ci/travis-docker.sh --build
-    script: RUN --server --debug --test
+    script: RUN --server
 
   - name: Ubuntu Focal (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
