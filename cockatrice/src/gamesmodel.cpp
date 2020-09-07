@@ -258,8 +258,10 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 
 GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
     : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()),
-      tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(false), hideIgnoredUserGames(false),
-      unavailableGamesVisible(false), showPasswordProtectedGames(true), maxPlayersFilterMin(-1), maxPlayersFilterMax(-1)
+      tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(DEFAULT_SHOW_BUDDIES_ONLY_GAMES),
+      hideIgnoredUserGames(DEFAULT_HIDE_IGNORED_USER_GAMES), unavailableGamesVisible(DEFAULT_UNAVAILABLE_GAMES_VISIBLE),
+      showPasswordProtectedGames(DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES), maxPlayersFilterMin(MAX_PLAYERS_FILTER_OFF),
+      maxPlayersFilterMax(MAX_PLAYERS_FILTER_OFF)
 {
     setSortRole(GamesModel::SORT_ROLE);
     setDynamicSortFilter(true);
@@ -331,16 +333,28 @@ int GamesProxyModel::getNumFilteredGames() const
 
 void GamesProxyModel::resetFilterParameters()
 {
-    unavailableGamesVisible = false;
-    showPasswordProtectedGames = true;
-    showBuddiesOnlyGames = true;
+    unavailableGamesVisible = DEFAULT_UNAVAILABLE_GAMES_VISIBLE;
+    showPasswordProtectedGames = DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES;
+    showBuddiesOnlyGames = DEFAULT_SHOW_BUDDIES_ONLY_GAMES;
+    hideIgnoredUserGames = DEFAULT_HIDE_IGNORED_USER_GAMES;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
-    maxPlayersFilterMin = 1;
+    maxPlayersFilterMin = DEFAULT_MAX_PLAYERS_MIN;
     maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;
 
     invalidateFilter();
+}
+
+bool GamesProxyModel::areFilterParametersSetToDefaults() const
+{
+    return unavailableGamesVisible == DEFAULT_UNAVAILABLE_GAMES_VISIBLE &&
+           showPasswordProtectedGames == DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES &&
+           showBuddiesOnlyGames == DEFAULT_SHOW_BUDDIES_ONLY_GAMES &&
+           hideIgnoredUserGames == DEFAULT_HIDE_IGNORED_USER_GAMES && gameNameFilter.isEmpty() &&
+           creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() &&
+           (maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN || maxPlayersFilterMin == MAX_PLAYERS_FILTER_OFF) &&
+           (maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX || maxPlayersFilterMax == MAX_PLAYERS_FILTER_OFF);
 }
 
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
@@ -428,9 +442,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (!gameTypeFilter.isEmpty() && gameTypes.intersect(gameTypeFilter).isEmpty())
         return false;
 
-    if ((maxPlayersFilterMin != -1) && ((int)game.max_players() < maxPlayersFilterMin))
+    if ((maxPlayersFilterMin != MAX_PLAYERS_FILTER_OFF) && ((int)game.max_players() < maxPlayersFilterMin))
         return false;
-    if ((maxPlayersFilterMax != -1) && ((int)game.max_players() > maxPlayersFilterMax))
+    if ((maxPlayersFilterMax != MAX_PLAYERS_FILTER_OFF) && ((int)game.max_players() > maxPlayersFilterMax))
         return false;
 
     return true;
