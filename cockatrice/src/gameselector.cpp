@@ -161,6 +161,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
+    gameListProxyModel->setMaxGameAge(dlg.getMaxGameAgeAsInt());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());

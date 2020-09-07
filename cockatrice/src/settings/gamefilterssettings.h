@@ -16,6 +16,7 @@ public:
     QString getGameNameFilter();
     int getMinPlayers();
     int getMaxPlayers();
+    int getMaxGameAgeEnum();
     bool isGameTypeEnabled(QString gametype);
 
     void setShowBuddiesOnlyGames(bool show);
@@ -25,6 +26,7 @@ public:
     void setGameNameFilter(QString gameName);
     void setMinPlayers(int min);
     void setMaxPlayers(int max);
+    void setMaxGameAgeAsInt(int maxGameAgeEnum);
     void setGameTypeEnabled(QString gametype, bool enabled);
     void setGameHashedTypeEnabled(QString gametypeHASHED, bool enabled);
 signals:

@@ -9,6 +9,7 @@
 #include <QList>
 #include <QSet>
 #include <QSortFilterProxyModel>
+#include <QStringList>
 
 class GamesModel : public QAbstractTableModel
 {
@@ -37,7 +38,7 @@ public:
     }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    const QString getGameCreatedString(const int secs) const;
+    static const QString getGameCreatedString(const int secs);
     const ServerInfo_Game &getGame(int row);
 
     /**
@@ -62,12 +63,30 @@ public:
 
 class ServerInfo_User;
 
+enum MaxGameAge
+{
+    NO_MAX_AGE = 0,
+    FIVE_MINUTES = 1,
+    TEN_MINUTES = 2,
+    THIRTY_MINUTES = 3,
+    ONE_HOUR = 4,
+    TWO_HOURS = 5
+};
+
 class GamesProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 private:
     bool ownUserIsRegistered;
     const TabSupervisor *tabSupervisor;
+
+    // If adding any additional filters, make sure to update:
+    // - GamesProxyModel()
+    // - resetFilterParameters()
+    // - areFilterParametersSetToDefaults()
+    // - loadFilterParameters()
+    // - saveFilterParameters()
+    // - filterAcceptsRow()
     bool showBuddiesOnlyGames;
     bool hideIgnoredUserGames;
     bool unavailableGamesVisible;
@@ -75,6 +94,7 @@ private:
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
+    MaxGameAge maxGameAge;
 
     static const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
     static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
@@ -82,6 +102,10 @@ private:
     static const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
     static const int DEFAULT_MAX_PLAYERS_MIN = 1;
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
+    static const MaxGameAge DEFAULT_MAX_GAME_AGE = TWO_HOURS;
+
+    static const int SECS_PER_MIN = 60;
+    static const int SECS_PER_HOUR = 3600;
 
 public:
     GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
@@ -130,6 +154,14 @@ public:
         return maxPlayersFilterMax;
     }
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
+    MaxGameAge getMaxGameAge() const
+    {
+        return maxGameAge;
+    }
+    void setMaxGameAge(int _maxGameAge);
+    static int getMaxGameAgeInSeconds(MaxGameAge maxGameAge);
+    static const QStringList getMaxGameAgeOptions();
+
     int getNumFilteredGames() const;
     void resetFilterParameters();
     bool areFilterParametersSetToDefaults() const;

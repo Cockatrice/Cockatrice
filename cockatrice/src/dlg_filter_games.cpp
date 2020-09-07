@@ -1,6 +1,7 @@
 #include "dlg_filter_games.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QCryptographicHash>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -29,6 +30,13 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideIgnoredUserGames = new QCheckBox(tr("Hide '&ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
+    maxGameAgeComboBox = new QComboBox();
+    maxGameAgeComboBox->setEditable(false);
+    maxGameAgeComboBox->addItems(gamesProxyModel->getMaxGameAgeOptions());
+    maxGameAgeComboBox->setCurrentIndex((int)gamesProxyModel->getMaxGameAge());
+    QLabel *maxGameAgeLabel = new QLabel(tr("Hide games &older than:"));
+    maxGameAgeLabel->setBuddy(maxGameAgeComboBox);
+
     gameNameFilterEdit = new QLineEdit;
     gameNameFilterEdit->setText(gamesProxyModel->getGameNameFilter());
     QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
@@ -43,6 +51,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     generalGrid->addWidget(gameNameFilterEdit, 0, 1);
     generalGrid->addWidget(creatorNameFilterLabel, 1, 0);
     generalGrid->addWidget(creatorNameFilterEdit, 1, 1);
+    generalGrid->addWidget(maxGameAgeLabel, 2, 0);
+    generalGrid->addWidget(maxGameAgeComboBox, 2, 1);
     generalGroupBox = new QGroupBox(tr("General"));
     generalGroupBox->setLayout(generalGrid);
 
@@ -218,6 +228,11 @@ int DlgFilterGames::getMaxPlayersFilterMin() const
 int DlgFilterGames::getMaxPlayersFilterMax() const
 {
     return maxPlayersFilterMaxSpinBox->value();
+}
+
+int DlgFilterGames::getMaxGameAgeAsInt() const
+{
+    return maxGameAgeComboBox->currentIndex();
 }
 
 void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
