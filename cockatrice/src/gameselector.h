@@ -45,11 +45,10 @@ private:
     GamesModel *gameListModel;
     GamesProxyModel *gameListProxyModel;
     QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
-    QLabel *filteredGamesLabel;
     const bool showFilters;
     GameTypeMap gameTypeMap;
 
-    void setFilteredGamesLabel();
+    void updateTitle();
 
 public:
     GameSelector(AbstractClient *_client,
