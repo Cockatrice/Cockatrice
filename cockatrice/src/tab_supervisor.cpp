@@ -238,20 +238,22 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         connect(tabReplays, SIGNAL(openReplay(GameReplay *)), this, SLOT(openReplay(GameReplay *)));
         myAddTab(tabReplays);
     } else {
-        tabDeckStorage = 0;
-        tabReplays = 0;
+        tabDeckStorage = nullptr;
+        tabReplays = nullptr;
     }
 
-    if (userInfo->user_level() & ServerInfo_User::IsModerator) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
-        connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
-        myAddTab(tabAdmin);
+    // Preset to empty, fill in when necessary
+    tabAdmin = nullptr;
+    tabLog = nullptr;
 
-        tabLog = new TabLog(this, client);
-        myAddTab(tabLog);
-    } else {
-        tabAdmin = 0;
-        tabLog = 0;
+    // Enable Log tab for Moderators & Admins
+    if (userInfo->user_level() & ServerInfo_User::IsModerator) {
+        addAdminLogTab();
+    }
+
+    // Enable Administration tab for Admins
+    if (userInfo->user_level() & ServerInfo_User::IsAdmin) {
+        addAdminConsoleTab();
     }
 
     retranslateUi();
@@ -366,6 +368,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
+
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     gameTabs.insert(event.game_info().game_id(), tab);
@@ -497,6 +500,25 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     deckEditorTabs.append(tab);
     setCurrentWidget(tab);
     return tab;
+}
+
+TabLog *TabSupervisor::addAdminLogTab()
+{
+    tabLog = new TabLog(this, client);
+    const int tabIndex = myAddTab(tabLog);
+    addCloseButtonToTab(tabLog, tabIndex);
+    return tabLog;
+}
+
+TabAdmin *TabSupervisor::addAdminConsoleTab()
+{
+    bool isFullAdmin = userInfo->user_level() & ServerInfo_User::IsAdmin;
+
+    tabAdmin = new TabAdmin(this, client, isFullAdmin);
+    connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
+    const int tabIndex = myAddTab(tabAdmin);
+    addCloseButtonToTab(tabAdmin, tabIndex);
+    return tabAdmin;
 }
 
 void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)

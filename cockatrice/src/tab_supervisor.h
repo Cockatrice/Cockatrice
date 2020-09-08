@@ -125,6 +125,8 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabLog *addAdminLogTab();
+    TabAdmin *addAdminConsoleTab();
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:

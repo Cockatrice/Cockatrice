@@ -44,6 +44,7 @@ private:
     QTableWidget *roomTable, *gameTable, *chatTable;
 
     void createDock();
+    void closeRequest() override;
 signals:
 
 private slots:
@@ -55,8 +56,8 @@ private slots:
 public:
     TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
     ~TabLog();
-    void retranslateUi();
-    QString getTabText() const
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Logs");
     }

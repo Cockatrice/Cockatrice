@@ -57,6 +57,11 @@ TabLog::~TabLog()
 {
 }
 
+void TabLog::closeRequest()
+{
+    deleteLater();
+}
+
 void TabLog::retranslateUi()
 {
 }

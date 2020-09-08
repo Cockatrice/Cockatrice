@@ -277,6 +277,16 @@ void MainWindow::actDeckEditor()
     tabSupervisor->addDeckEditorTab(nullptr);
 }
 
+void MainWindow::actAdminLogTab()
+{
+    tabSupervisor->addAdminLogTab();
+}
+
+void MainWindow::actAdminConsoleTab()
+{
+    tabSupervisor->addAdminConsoleTab();
+}
+
 void MainWindow::actFullScreen(bool checked)
 {
     if (checked)
@@ -631,6 +641,8 @@ void MainWindow::retranslateUi()
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
+    aAdminLogTab->setText(tr("Admin - Logs"));
+    aAdminConsoleTab->setText(tr("Admin - Console"));
 
 #if defined(__APPLE__) /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
@@ -667,6 +679,10 @@ void MainWindow::createActions()
     connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
     aDeckEditor = new QAction(this);
     connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+    aAdminLogTab = new QAction(this);
+    connect(aAdminLogTab, SIGNAL(triggered()), this, SLOT(actAdminLogTab()));
+    aAdminConsoleTab = new QAction(this);
+    connect(aAdminConsoleTab, SIGNAL(triggered()), this, SLOT(actAdminConsoleTab()));
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
@@ -766,6 +782,27 @@ void MainWindow::createMenus()
     helpMenu->addAction(aCheckCardUpdates);
     helpMenu->addSeparator();
     helpMenu->addAction(aViewLog);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    // Shift + Control in either order = Admin Ops
+    if ((event->key() == Qt::Key_Control && QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)) ||
+        (event->key() == Qt::Key_Shift && QApplication::keyboardModifiers().testFlag(Qt::ControlModifier))) {
+        cockatriceMenu->addAction(aAdminLogTab);
+        cockatriceMenu->addAction(aAdminConsoleTab);
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *)
+{
+    if (cockatriceMenu->actions().contains(aAdminLogTab)) {
+        cockatriceMenu->removeAction(aAdminLogTab);
+    }
+
+    if (cockatriceMenu->actions().contains(aAdminConsoleTab)) {
+        cockatriceMenu->removeAction(aAdminConsoleTab);
+    }
 }
 
 MainWindow::MainWindow(QWidget *parent)

@@ -44,11 +44,12 @@ private slots:
 
     void actUnlock();
     void actLock();
+    void closeRequest() override;
 
 public:
     TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent = nullptr);
-    void retranslateUi();
-    QString getTabText() const
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Administration");
     }

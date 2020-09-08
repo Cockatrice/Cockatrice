@@ -50,6 +50,8 @@ public slots:
     void actCheckCardUpdates();
     void actCheckServerUpdates();
 private slots:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *) override;
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
@@ -72,6 +74,8 @@ private slots:
     void actSinglePlayer();
     void actWatchReplay();
     void actDeckEditor();
+    void actAdminLogTab();
+    void actAdminConsoleTab();
     void actFullScreen(bool checked);
     void actRegister();
     void actSettings();
@@ -124,8 +128,9 @@ private:
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
-    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog, *closeAction;
+    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aAdminLogTab, *aAdminConsoleTab,
+        *aFullScreen, *aSettings, *aExit, *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog,
+        *closeAction;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
