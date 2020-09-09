@@ -80,7 +80,6 @@ private:
     static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
     static const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
     static const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
-    static const int MAX_PLAYERS_FILTER_OFF = -1;
     static const int DEFAULT_MAX_PLAYERS_MIN = 1;
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
 

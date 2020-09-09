@@ -258,11 +258,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 
 GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
     : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()),
-      tabSupervisor(_tabSupervisor), showBuddiesOnlyGames(DEFAULT_SHOW_BUDDIES_ONLY_GAMES),
-      hideIgnoredUserGames(DEFAULT_HIDE_IGNORED_USER_GAMES), unavailableGamesVisible(DEFAULT_UNAVAILABLE_GAMES_VISIBLE),
-      showPasswordProtectedGames(DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES), maxPlayersFilterMin(MAX_PLAYERS_FILTER_OFF),
-      maxPlayersFilterMax(MAX_PLAYERS_FILTER_OFF)
+      tabSupervisor(_tabSupervisor)
 {
+    resetFilterParameters();
     setSortRole(GamesModel::SORT_ROLE);
     setDynamicSortFilter(true);
 }
@@ -352,9 +350,8 @@ bool GamesProxyModel::areFilterParametersSetToDefaults() const
            showPasswordProtectedGames == DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES &&
            showBuddiesOnlyGames == DEFAULT_SHOW_BUDDIES_ONLY_GAMES &&
            hideIgnoredUserGames == DEFAULT_HIDE_IGNORED_USER_GAMES && gameNameFilter.isEmpty() &&
-           creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() &&
-           (maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN || maxPlayersFilterMin == MAX_PLAYERS_FILTER_OFF) &&
-           (maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX || maxPlayersFilterMax == MAX_PLAYERS_FILTER_OFF);
+           creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
+           maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX;
 }
 
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
@@ -442,9 +439,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (!gameTypeFilter.isEmpty() && gameTypes.intersect(gameTypeFilter).isEmpty())
         return false;
 
-    if ((maxPlayersFilterMin != MAX_PLAYERS_FILTER_OFF) && ((int)game.max_players() < maxPlayersFilterMin))
+    if ((int)game.max_players() < maxPlayersFilterMin)
         return false;
-    if ((maxPlayersFilterMax != MAX_PLAYERS_FILTER_OFF) && ((int)game.max_players() > maxPlayersFilterMax))
+    if ((int)game.max_players() > maxPlayersFilterMax)
         return false;
 
     return true;
