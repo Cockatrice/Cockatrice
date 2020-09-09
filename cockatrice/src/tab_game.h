@@ -295,7 +295,6 @@ public:
         return gameInfo.spectators_omniscient();
     }
     bool isSpectator();
-    bool isJudge();
     Player *getActiveLocalPlayer() const;
     AbstractClient *getClientForPlayer(int playerId) const;
 

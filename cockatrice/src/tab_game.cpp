@@ -641,11 +641,6 @@ bool TabGame::isSpectator()
     return spectator;
 }
 
-bool TabGame::isJudge()
-{
-    return judge;
-}
-
 void TabGame::actGameInfo()
 {
     DlgCreateGame dlg(gameInfo, roomGameTypes, this);
@@ -1824,7 +1819,7 @@ void TabGame::createMessageDock(bool bReplay)
          * (b) the spectator is a moderator/administrator
          * (c) the spectator is a judge
          */
-        if (!(isSpectator() && (gameInfo.spectators_can_chat() || !tabSupervisor->getAdminLocked() || isJudge()))) {
+        if (!(spectator && (gameInfo.spectators_can_chat() || !tabSupervisor->getAdminLocked() || judge))) {
             sayLabel->hide();
             sayEdit->hide();
         }
