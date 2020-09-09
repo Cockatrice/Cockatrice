@@ -1814,14 +1814,17 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit->setCompleter(completer);
         actCompleterChanged();
 
-        /* Spectators can only talk if:
-         * (a) the game creator allows it
-         * (b) the spectator is a moderator/administrator
-         * (c) the spectator is a judge
-         */
-        if (spectator && !gameInfo.spectators_can_chat() && tabSupervisor->getAdminLocked() && !judge) {
-            sayLabel->hide();
-            sayEdit->hide();
+        if (spectator) {
+            /* Spectators can only talk if:
+             * (a) the game creator allows it
+             * (b) the spectator is a moderator/administrator
+             * (c) the spectator is a judge
+             */
+            bool isModOrJudge = !tabSupervisor->getAdminLocked() || judge;
+            if (!isModOrJudge && !gameInfo.spectators_can_chat()) {
+                sayLabel->hide();
+                sayEdit->hide();
+            }
         }
 
         connect(tabSupervisor, SIGNAL(adminLockChanged(bool)), this, SLOT(adminLockChanged(bool)));
