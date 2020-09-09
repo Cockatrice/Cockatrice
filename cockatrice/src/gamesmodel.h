@@ -76,6 +76,11 @@ private:
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
 
+    static const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
+    static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
+    static const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
+    static const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
+    static const int DEFAULT_MAX_PLAYERS_MIN = 1;
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
 
 public:
@@ -127,6 +132,7 @@ public:
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
     int getNumFilteredGames() const;
     void resetFilterParameters();
+    bool areFilterParametersSetToDefaults() const;
     void loadFilterParameters(const QMap<int, QString> &allGameTypes);
     void saveFilterParameters(const QMap<int, QString> &allGameTypes);
     void refresh();

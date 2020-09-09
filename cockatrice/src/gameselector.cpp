@@ -74,7 +74,11 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
-    clearFilterButton->setEnabled(true);
+    if (showFilters && gameListProxyModel->areFilterParametersSetToDefaults()) {
+        clearFilterButton->setEnabled(false);
+    } else {
+        clearFilterButton->setEnabled(true);
+    }
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 
     if (room) {
@@ -149,8 +153,6 @@ void GameSelector::actSetFilter()
     if (!dlg.exec())
         return;
 
-    clearFilterButton->setEnabled(true);
-
     gameListProxyModel->setShowBuddiesOnlyGames(dlg.getShowBuddiesOnlyGames());
     gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
     gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
@@ -160,6 +162,8 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
+
+    clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());
 
     updateTitle();
 }
