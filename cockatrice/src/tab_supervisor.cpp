@@ -621,11 +621,17 @@ void TabSupervisor::updateCurrent(int index)
         emit setMenu();
 }
 
+/**
+ * Determine if a user is a moderator/administrator
+ * By seeing if they have the admin or log tabs open
+ * @return if one of the two tabs are open
+ */
 bool TabSupervisor::getAdminLocked() const
 {
-    if (!tabAdmin)
+    if (!tabAdmin && !tabLog)
         return true;
-    return tabAdmin->getLocked();
+
+    return tabAdmin->getLocked() || tabLog;
 }
 
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)

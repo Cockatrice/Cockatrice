@@ -1819,7 +1819,15 @@ void TabGame::createMessageDock(bool bReplay)
          * (b) the spectator is a moderator/administrator
          * (c) the spectator is a judge
          */
-        if (!(spectator && (gameInfo.spectators_can_chat() || !tabSupervisor->getAdminLocked() || judge))) {
+        bool canChat = true;
+        if (spectator) {
+            if (gameInfo.spectators_can_chat() || !tabSupervisor->getAdminLocked() || judge) {
+                canChat = true;
+            } else {
+                canChat = false;
+            }
+        }
+        if (!canChat) {
             sayLabel->hide();
             sayEdit->hide();
         }
