@@ -919,23 +919,13 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    bool canChat = true;
-    if (spectator) {
-        // By default, spectators shouldn't be able to talk
-        canChat = false;
-
-        /* Spectators can only talk if:
-         * (a) the game creator allows it
-         * (b) the spectator is a moderator/administrator
-         * (c) the spectator is a judge
-         */
-        if (game->getSpectatorsCanTalk() || (userInfo->user_level() & ServerInfo_User::IsModerator) ||
-            (userInfo->user_level() & ServerInfo_User::IsJudge)) {
-            canChat = true;
-        }
-    }
-
-    if (!canChat) {
+    /* Spectators can only talk if:
+     * (a) the game creator allows it
+     * (b) the spectator is a moderator/administrator
+     * (c) the spectator is a judge
+     */
+    if (spectator && !game->getSpectatorsCanTalk() && !(userInfo->user_level() & ServerInfo_User::IsModerator) &&
+        !(userInfo->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespFunctionNotAllowed;
     }
 

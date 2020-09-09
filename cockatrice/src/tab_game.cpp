@@ -1814,22 +1814,12 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit->setCompleter(completer);
         actCompleterChanged();
 
-        bool canChat = true;
-        if (spectator) {
-            // By default, spectators shouldn't be able to talk
-            canChat = false;
-
-            /* Spectators can only talk if:
-             * (a) the game creator allows it
-             * (b) the spectator is a moderator/administrator
-             * (c) the spectator is a judge
-             */
-            if (gameInfo.spectators_can_chat() || !tabSupervisor->getAdminLocked() || judge) {
-                canChat = true;
-            }
-        }
-
-        if (!canChat) {
+        /* Spectators can only talk if:
+         * (a) the game creator allows it
+         * (b) the spectator is a moderator/administrator
+         * (c) the spectator is a judge
+         */
+        if (spectator && !gameInfo.spectators_can_chat() && tabSupervisor->getAdminLocked() && !judge) {
             sayLabel->hide();
             sayEdit->hide();
         }
