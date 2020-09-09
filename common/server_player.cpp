@@ -929,8 +929,8 @@ Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/
          * (b) the spectator is a moderator/administrator
          * (c) the spectator is a judge
          */
-        if (game->getSpectatorsCanTalk() || userInfo->user_level() & ServerInfo_User::IsModerator ||
-            userInfo->user_level() & ServerInfo_User::IsJudge) {
+        if (game->getSpectatorsCanTalk() || (userInfo->user_level() & ServerInfo_User::IsModerator) ||
+            (userInfo->user_level() & ServerInfo_User::IsJudge)) {
             canChat = true;
         }
     }
