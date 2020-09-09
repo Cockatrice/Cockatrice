@@ -445,13 +445,13 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
-void TabGame::addMentionTag(QString value)
+void TabGame::addMentionTag(const QString &value)
 {
     sayEdit->insert(value + " ");
     sayEdit->setFocus();
 }
 
-void TabGame::linkCardToChat(QString cardName)
+void TabGame::linkCardToChat(const QString &cardName)
 {
     sayEdit->insert("[[" + cardName + "]] ");
     sayEdit->setFocus();
@@ -1814,10 +1814,19 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit->setCompleter(completer);
         actCompleterChanged();
 
-        if (spectator && !gameInfo.spectators_can_chat() && tabSupervisor->getAdminLocked()) {
-            sayLabel->hide();
-            sayEdit->hide();
+        if (spectator) {
+            /* Spectators can only talk if:
+             * (a) the game creator allows it
+             * (b) the spectator is a moderator/administrator
+             * (c) the spectator is a judge
+             */
+            bool isModOrJudge = !tabSupervisor->getAdminLocked() || judge;
+            if (!isModOrJudge && !gameInfo.spectators_can_chat()) {
+                sayLabel->hide();
+                sayEdit->hide();
+            }
         }
+
         connect(tabSupervisor, SIGNAL(adminLockChanged(bool)), this, SLOT(adminLockChanged(bool)));
         connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
 

@@ -242,8 +242,8 @@ private slots:
     void actNextTurn();
     void actReverseTurn();
 
-    void addMentionTag(QString value);
-    void linkCardToChat(QString cardName);
+    void addMentionTag(const QString &value);
+    void linkCardToChat(const QString &cardName);
     void commandFinished(const Response &response);
 
     void refreshShortcuts();

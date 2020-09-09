@@ -919,8 +919,16 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator && !game->getSpectatorsCanTalk() && !(userInfo->user_level() & ServerInfo_User::IsModerator)) {
-        return Response::RespFunctionNotAllowed;
+    if (spectator) {
+        /* Spectators can only talk if:
+         * (a) the game creator allows it
+         * (b) the spectator is a moderator/administrator
+         * (c) the spectator is a judge
+         */
+        bool isModOrJudge = (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge));
+        if (!isModOrJudge && !game->getSpectatorsCanTalk()) {
+            return Response::RespFunctionNotAllowed;
+        }
     }
 
     Event_GameSay event;
