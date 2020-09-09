@@ -117,7 +117,7 @@ class TabGame : public Tab
 {
     Q_OBJECT
 private:
-    QTimer *gameTimer{};
+    QTimer *gameTimer;
     int secondsElapsed;
     QList<AbstractClient *> clients;
     ServerInfo_Game gameInfo;
@@ -133,11 +133,11 @@ private:
     bool resuming;
     QStringList phasesList;
     int currentPhase;
-    int activePlayer{};
+    int activePlayer;
     CardItem *activeCard;
     bool gameClosed;
     QStringList gameTypes;
-    QCompleter *completer{};
+    QCompleter *completer;
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
 
@@ -145,35 +145,32 @@ private:
     GameReplay *replay;
     int currentReplayStep;
     QList<int> replayTimeline;
-    ReplayTimelineWidget *timelineWidget{};
-    QToolButton *replayStartButton{}, *replayPauseButton{}, *replayFastForwardButton{};
+    ReplayTimelineWidget *timelineWidget;
+    QToolButton *replayStartButton, *replayPauseButton, *replayFastForwardButton;
 
-    CardFrame *cardInfo{};
-    PlayerListWidget *playerListWidget{};
-    QLabel *timeElapsedLabel{};
-    MessageLogWidget *messageLog{};
+    CardFrame *cardInfo;
+    PlayerListWidget *playerListWidget;
+    QLabel *timeElapsedLabel;
+    MessageLogWidget *messageLog;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
-    PhasesToolbar *phasesToolbar{};
-    GameScene *scene{};
-    GameView *gameView{};
+    PhasesToolbar *phasesToolbar;
+    GameScene *scene;
+    GameView *gameView;
     QMap<int, DeckViewContainer *> deckViewContainers;
-    QVBoxLayout *cardVInfoLayout{}, *messageLogLayout{}, *gamePlayAreaVBox{}, *deckViewContainerLayout{};
-    QHBoxLayout *cardHInfoLayout{}, *sayHLayout{}, *mainHLayout{}, *replayControlLayout{};
-    QWidget *cardBoxLayoutWidget{}, *messageLogLayoutWidget{}, *gamePlayAreaWidget{}, *deckViewContainerWidget{},
-        *replayControlWidget{};
-    QDockWidget *cardInfoDock{}, *messageLayoutDock{}, *playerListDock{}, *replayDock{};
-    QAction *playersSeparator{};
-    QMenu *gameMenu{}, *viewMenu{}, *cardInfoDockMenu{}, *messageLayoutDockMenu{}, *playerListDockMenu{},
-        *replayDockMenu{};
-    TearOffMenu *phasesMenu{};
-    QAction *aGameInfo{}, *aConcede{}, *aLeaveGame{}, *aCloseReplay{}, *aNextPhase{}, *aNextPhaseAction{}, *aNextTurn{},
-        *aReverseTurn{}, *aRemoveLocalArrows{}, *aRotateViewCW{}, *aRotateViewCCW{}, *aResetLayout{},
-        *aResetReplayLayout{};
-    QAction *aCardInfoDockVisible{}, *aCardInfoDockFloating{}, *aMessageLayoutDockVisible{},
-        *aMessageLayoutDockFloating{}, *aPlayerListDockVisible{}, *aPlayerListDockFloating{}, *aReplayDockVisible{},
-        *aReplayDockFloating{};
-    QAction *aFocusChat{};
+    QVBoxLayout *cardVInfoLayout, *messageLogLayout, *gamePlayAreaVBox, *deckViewContainerLayout;
+    QHBoxLayout *cardHInfoLayout, *sayHLayout, *mainHLayout, *replayControlLayout;
+    QWidget *cardBoxLayoutWidget, *messageLogLayoutWidget, *gamePlayAreaWidget, *deckViewContainerWidget,
+        *replayControlWidget;
+    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
+    QAction *playersSeparator;
+    QMenu *gameMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu, *replayDockMenu;
+    TearOffMenu *phasesMenu;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextPhaseAction, *aNextTurn,
+        *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
+        *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
+    QAction *aFocusChat;
     QList<QAction *> phaseActions;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
