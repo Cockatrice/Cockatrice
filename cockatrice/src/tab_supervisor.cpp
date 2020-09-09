@@ -628,10 +628,15 @@ void TabSupervisor::updateCurrent(int index)
  */
 bool TabSupervisor::getAdminLocked() const
 {
-    if (!tabAdmin && !tabLog)
-        return true;
+    if (tabLog) {
+        return false;
+    }
 
-    return tabAdmin->getLocked() || tabLog;
+    if (!tabAdmin) {
+        return true;
+    }
+
+    return tabAdmin->getLocked();
 }
 
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
