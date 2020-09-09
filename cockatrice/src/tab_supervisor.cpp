@@ -624,7 +624,7 @@ void TabSupervisor::updateCurrent(int index)
 /**
  * Determine if a user is a moderator/administrator
  * By seeing if they have the admin tab open & unlocked
- * @return if one of the two tabs are open
+ * @return if the admin tab is open & unlocked
  */
 bool TabSupervisor::getAdminLocked() const
 {
