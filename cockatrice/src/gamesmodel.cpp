@@ -24,7 +24,7 @@ enum GameListColumn
     SPECTATORS
 };
 
-const QString GamesModel::getGameCreatedString(const int secs) const
+const QString GamesModel::getGameCreatedString(const int secs)
 {
     static const QTime zeroTime{0, 0};
     static const int wrapSeconds = zeroTime.secsTo(zeroTime.addSecs(-1));
@@ -36,20 +36,31 @@ const QString GamesModel::getGameCreatedString(const int secs) const
     }
 
     QTime total = zeroTime.addSecs(secs);
+    if (total.minute() < 2) { // games are new during their first minute
+        return tr("New");
+    }
+
+    QString unit;
+    int amount;
     if (total.hour()) {
         total = total.addSecs(halfHourSecs); // round up
-        return QString::number(total.hour()) + QLatin1String("+ h");
-    } else if (total.minute() < 2) { // games are new during their first minute
-        return tr("New");
+        amount = total.hour();
+        unit = tr("hr(s)", "short notation age in hours", amount);
     } else {
         total = total.addSecs(halfMinSecs); // round up
-        int tenMinutes = total.minute() / 10;
-        if (tenMinutes) { // aggregate multiples of ten
-            return QString::number(tenMinutes) + QLatin1String("0+ m");
-        } else {
-            return QString::number(total.minute()) + QLatin1String("+ m");
+        amount = total.minute();
+        unit = tr("min(s)", "short notation age in minutes", amount);
+    }
+
+    QString larger{};
+    for (int aggregate : {20, 10, 5}) { // floor to values in this list
+        if (amount >= aggregate) {
+            amount -= amount % aggregate;
+            larger = ">";
+            break;
         }
     }
+    return larger + QString::number(amount) + " " + unit;
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)

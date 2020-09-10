@@ -34,7 +34,7 @@ public:
     }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    const QString getGameCreatedString(const int secs) const;
+    static const QString getGameCreatedString(const int secs);
     const ServerInfo_Game &getGame(int row);
 
     /**
