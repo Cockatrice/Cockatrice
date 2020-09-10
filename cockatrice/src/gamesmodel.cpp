@@ -7,10 +7,10 @@
 #include "userlist.h"
 
 #include <QDateTime>
-#include <QTime>
 #include <QDebug>
 #include <QIcon>
 #include <QStringList>
+#include <QTime>
 
 enum GameListColumn
 {
