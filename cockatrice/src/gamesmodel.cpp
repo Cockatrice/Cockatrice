@@ -51,10 +51,10 @@ const QString GamesModel::getGameCreatedString(const int secs)
 
     for (int aggregate : {40, 20, 10, 5}) { // floor to values in this list
         if (amount >= aggregate) {
-            return form.arg(">", aggregate);
+            return form.arg(">").arg(aggregate);
         }
     }
-    return form.arg("", amount);
+    return form.arg("").arg(amount);
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
