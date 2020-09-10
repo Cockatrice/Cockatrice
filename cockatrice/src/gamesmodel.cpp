@@ -36,17 +36,16 @@ const QString GamesModel::getGameCreatedString(const int secs)
     }
 
     QTime total = zeroTime.addSecs(secs);
-    if (total.minute() < 2) { // games are new during their first minute
-        return tr("New");
-    }
-
     QString unit;
     int amount;
     if (total.hour()) {
         total = total.addSecs(halfHourSecs); // round up
         amount = total.hour();
         unit = tr("hr(s)", "short notation age in hours", amount);
+    } else if (total.minute() < 2) { // games are new during their first minute
+        return tr("New");
     } else {
+
         total = total.addSecs(halfMinSecs); // round up
         amount = total.minute();
         unit = tr("min(s)", "short notation age in minutes", amount);
