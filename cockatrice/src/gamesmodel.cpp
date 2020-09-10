@@ -7,6 +7,7 @@
 #include "userlist.h"
 
 #include <QDateTime>
+#include <QTime>
 #include <QDebug>
 #include <QIcon>
 #include <QStringList>
@@ -25,23 +26,30 @@ enum GameListColumn
 
 const QString GamesModel::getGameCreatedString(const int secs) const
 {
+    static const QTime zeroTime{0, 0};
+    static const int wrapSeconds = zeroTime.secsTo(zeroTime.addSecs(-1));
+    static const int halfHourSecs = zeroTime.secsTo(QTime(1, 0)) / 2;
+    static const int halfMinSecs = zeroTime.secsTo(QTime(0, 1)) / 2;
 
-    QString ret;
-    if (secs < SECS_PER_MIN * 2) // for first min we display "New"
-        ret = tr("New");
-    else if (secs < SECS_PER_MIN * 10) // from 2 - 10 mins we show the mins
-        ret = QString("%1 min").arg(QString::number(secs / SECS_PER_MIN));
-    else if (secs < SECS_PER_MIN * 60) { // from 10 mins to 1h we aggregate every 10 mins
-        int unitOfTen = secs / SECS_PER_TEN_MIN;
-        QString str = "%1%2";
-        ret = str.arg(QString::number(unitOfTen), "0+ min");
-    } else { // from 1 hr onward we show hrs
-        int hours = secs / SECS_PER_HOUR;
-        if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
-            ++hours;
-        ret = QString("%1+ h").arg(QString::number(hours));
+    if (secs > wrapSeconds) { // QTime wraps after a day
+        return tr("Days");
     }
-    return ret;
+
+    QTime total = zeroTime.addSecs(secs);
+    if (total.hour()) {
+        total = total.addSecs(halfHourSecs); // round up
+        return QString::number(total.hour()) + QLatin1String("+ h");
+    } else if (total.minute() < 2) { // games are new during their first minute
+        return tr("New");
+    } else {
+        total = total.addSecs(halfMinSecs); // round up
+        int tenMinutes = total.minute() / 10;
+        if (tenMinutes) { // aggregate multiples of ten
+            return QString::number(tenMinutes) + QLatin1String("0+ m");
+        } else {
+            return QString::number(total.minute()) + QLatin1String("+ m");
+        }
+    }
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
