@@ -33,7 +33,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     maxGameAgeComboBox = new QComboBox();
     maxGameAgeComboBox->setEditable(false);
     maxGameAgeComboBox->addItems(gamesProxyModel->getMaxGameAgeOptions());
-    maxGameAgeComboBox->setCurrentIndex((int)gamesProxyModel->getMaxGameAge());
+    maxGameAgeComboBox->setCurrentIndex(getComboBoxIndexForMaxGameAge(gamesProxyModel->getMaxGameAgeSeconds()));
     QLabel *maxGameAgeLabel = new QLabel(tr("Hide games &older than:"));
     maxGameAgeLabel->setBuddy(maxGameAgeComboBox);
 
@@ -230,7 +230,7 @@ int DlgFilterGames::getMaxPlayersFilterMax() const
     return maxPlayersFilterMaxSpinBox->value();
 }
 
-int DlgFilterGames::getMaxGameAgeAsInt() const
+int DlgFilterGames::getMaxGameAgeComboBoxIndex() const
 {
     return maxGameAgeComboBox->currentIndex();
 }

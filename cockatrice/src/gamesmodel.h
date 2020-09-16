@@ -1,6 +1,7 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
+#include "gametimefilter.h"
 #include "gametypemap.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab_supervisor.h"
@@ -63,16 +64,6 @@ public:
 
 class ServerInfo_User;
 
-enum MaxGameAge
-{
-    NO_MAX_AGE = 0,
-    FIVE_MINUTES = 1,
-    TEN_MINUTES = 2,
-    THIRTY_MINUTES = 3,
-    ONE_HOUR = 4,
-    TWO_HOURS = 5
-};
-
 class GamesProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -94,7 +85,7 @@ private:
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
-    MaxGameAge maxGameAge;
+    int maxGameAgeSeconds;
 
     static const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
     static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
@@ -102,10 +93,7 @@ private:
     static const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
     static const int DEFAULT_MAX_PLAYERS_MIN = 1;
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
-    static const MaxGameAge DEFAULT_MAX_GAME_AGE = TWO_HOURS;
-
-    static const int SECS_PER_MIN = 60;
-    static const int SECS_PER_HOUR = 3600;
+    static const int DEFAULT_MAX_GAME_AGE_SECONDS = -1;
 
 public:
     GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
@@ -154,12 +142,11 @@ public:
         return maxPlayersFilterMax;
     }
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    MaxGameAge getMaxGameAge() const
+    int getMaxGameAgeSeconds() const
     {
-        return maxGameAge;
+        return maxGameAgeSeconds;
     }
-    void setMaxGameAge(int _maxGameAge);
-    static int getMaxGameAgeInSeconds(MaxGameAge maxGameAge);
+    void setMaxGameAgeSeconds(int maxGameAgeComboBoxIndex);
     static const QStringList getMaxGameAgeOptions();
 
     int getNumFilteredGames() const;

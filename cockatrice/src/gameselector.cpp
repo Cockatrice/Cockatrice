@@ -74,11 +74,8 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
-    if (showFilters && gameListProxyModel->areFilterParametersSetToDefaults()) {
-        clearFilterButton->setEnabled(false);
-    } else {
-        clearFilterButton->setEnabled(true);
-    }
+    const bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
+    clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 
     if (room) {
@@ -161,7 +158,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
-    gameListProxyModel->setMaxGameAge(dlg.getMaxGameAgeAsInt());
+    gameListProxyModel->setMaxGameAgeSeconds(dlg.getMaxGameAgeComboBoxIndex());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());

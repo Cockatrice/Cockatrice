@@ -92,15 +92,15 @@ int GameFiltersSettings::getMaxPlayers()
     return previous == QVariant() ? 99 : previous.toInt();
 }
 
-void GameFiltersSettings::setMaxGameAgeAsInt(int maxGameAgeEnum)
+void GameFiltersSettings::setMaxGameAgeSeconds(int maxGameAgeSeconds)
 {
-    setValue(maxGameAgeEnum, "max_game_age_enum", "filter_games");
+    setValue(maxGameAgeSeconds, "max_game_age_seconds", "filter_games");
 }
 
-int GameFiltersSettings::getMaxGameAgeEnum()
+int GameFiltersSettings::getMaxGameAgeSeconds()
 {
-    QVariant previous = getValue("max_game_age_enum", "filter_games");
-    return previous == QVariant() ? 5 : previous.toInt();
+    QVariant previous = getValue("max_game_age_seconds", "filter_games");
+    return previous == QVariant() ? -1 : previous.toInt();
 }
 
 void GameFiltersSettings::setGameTypeEnabled(QString gametype, bool enabled)

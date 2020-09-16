@@ -59,7 +59,7 @@ public:
     int getMaxPlayersFilterMin() const;
     int getMaxPlayersFilterMax() const;
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    int getMaxGameAgeAsInt() const;
+    int getMaxGameAgeComboBoxIndex() const;
 };
 
 #endif
