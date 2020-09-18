@@ -464,7 +464,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (maxGameAge.isValid()) {
         QDateTime now = QDateTime::currentDateTimeUtc();
         QDateTime total = now.addSecs(-(qint64)game.start_time()); // cast to 64 bit value before 2038-1-19 comes around
-        if (total.isValid() && total.date() == epochDate && total.time() > maxGameAge) {
+        // games shouldn't have negative ages but we'll not filter them
+        // because qtime wraps after a day we consider all games older than a day to be too old
+        if (total.isValid() && total.date() >= epochDate && (total.date() > epochDate || total.time() > maxGameAge)) {
             return false;
         }
     }
