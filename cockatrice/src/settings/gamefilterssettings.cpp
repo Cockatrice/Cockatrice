@@ -1,6 +1,7 @@
 #include "gamefilterssettings.h"
 
 #include <QCryptographicHash>
+#include <QTime>
 
 GameFiltersSettings::GameFiltersSettings(QString settingPath, QObject *parent)
     : SettingsManager(settingPath + "gamefilters.ini", parent)
@@ -92,15 +93,15 @@ int GameFiltersSettings::getMaxPlayers()
     return previous == QVariant() ? 99 : previous.toInt();
 }
 
-void GameFiltersSettings::setMaxGameAgeSeconds(int maxGameAgeSeconds)
+void GameFiltersSettings::setMaxGameAge(const QTime &maxGameAge)
 {
-    setValue(maxGameAgeSeconds, "max_game_age_seconds", "filter_games");
+    setValue(maxGameAge, "max_game_age_time", "filter_games");
 }
 
-int GameFiltersSettings::getMaxGameAgeSeconds()
+QTime GameFiltersSettings::getMaxGameAge()
 {
-    QVariant previous = getValue("max_game_age_seconds", "filter_games");
-    return previous == QVariant() ? -1 : previous.toInt();
+    QVariant previous = getValue("max_game_age_time", "filter_games");
+    return previous.toTime();
 }
 
 void GameFiltersSettings::setGameTypeEnabled(QString gametype, bool enabled)

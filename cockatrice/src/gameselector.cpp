@@ -81,8 +81,9 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (room) {
         createButton = new QPushButton;
         connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
-    } else
-        createButton = 0;
+    } else {
+        createButton = nullptr;
+    }
     joinButton = new QPushButton;
     spectateButton = new QPushButton;
 
@@ -158,7 +159,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
-    gameListProxyModel->setMaxGameAgeSeconds(dlg.getMaxGameAgeComboBoxIndex());
+    gameListProxyModel->setMaxGameAge(dlg.getMaxGameAge());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());

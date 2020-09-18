@@ -1,6 +1,5 @@
 #include "gamesmodel.h"
 
-#include "gametimefilter.h"
 #include "pb/serverinfo_game.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
@@ -66,15 +65,18 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case ROOM:
             return rooms.value(g.room_id());
         case CREATED: {
-            QDateTime then;
-            then.setTime_t(g.start_time());
-            int secs = then.secsTo(QDateTime::currentDateTime());
-
             switch (role) {
-                case Qt::DisplayRole:
+                case Qt::DisplayRole: {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+                    QDateTime then = QDateTime::fromSecsSinceEpoch(g.start_time(), Qt::UTC);
+#else
+                    QDateTime then = QDateTime::fromTime_t(g.start_time(), Qt::UTC);
+#endif
+                    int secs = then.secsTo(QDateTime::currentDateTimeUtc());
                     return getGameCreatedString(secs);
+                }
                 case SORT_ROLE:
-                    return QVariant(secs);
+                    return QVariant(-g.start_time());
                 case Qt::TextAlignmentRole:
                     return Qt::AlignCenter;
                 default:
@@ -315,28 +317,10 @@ void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlay
     invalidateFilter();
 }
 
-void GamesProxyModel::setMaxGameAgeSeconds(const int maxGameAgeComboBoxIndex)
+void GamesProxyModel::setMaxGameAge(const QTime &_maxGameAge)
 {
-    maxGameAgeSeconds = getMaxGameAgeInSecondsFromComboBoxIndex(maxGameAgeComboBoxIndex);
+    maxGameAge = _maxGameAge;
     invalidateFilter();
-}
-
-const QStringList GamesProxyModel::getMaxGameAgeOptions()
-{
-    QStringList gameAgeList;
-    gameAgeList.reserve(getMaxGameAgeEnumOptions().size());
-    for (MaxGameAge maxAgeEnum : getMaxGameAgeEnumOptions()) {
-        if (maxAgeEnum == NO_MAX_AGE) {
-            gameAgeList.append(tr("No max age"));
-            continue;
-        }
-        const int maxAgeSeconds = getMaxGameAgeInSecondsFromEnum(maxAgeEnum);
-        if (maxAgeSeconds != -1)
-            gameAgeList.append(GamesModel::getGameCreatedString(maxAgeSeconds));
-        else
-            gameAgeList.append(tr("Error"));
-    }
-    return gameAgeList;
 }
 
 int GamesProxyModel::getNumFilteredGames() const
@@ -365,7 +349,7 @@ void GamesProxyModel::resetFilterParameters()
     gameTypeFilter.clear();
     maxPlayersFilterMin = DEFAULT_MAX_PLAYERS_MIN;
     maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;
-    maxGameAgeSeconds = DEFAULT_MAX_GAME_AGE_SECONDS;
+    maxGameAge = DEFAULT_MAX_GAME_AGE;
 
     invalidateFilter();
 }
@@ -377,7 +361,7 @@ bool GamesProxyModel::areFilterParametersSetToDefaults() const
            showBuddiesOnlyGames == DEFAULT_SHOW_BUDDIES_ONLY_GAMES &&
            hideIgnoredUserGames == DEFAULT_HIDE_IGNORED_USER_GAMES && gameNameFilter.isEmpty() &&
            creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
-           maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX && maxGameAgeSeconds == DEFAULT_MAX_GAME_AGE_SECONDS;
+           maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX && maxGameAge == DEFAULT_MAX_GAME_AGE;
 }
 
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
@@ -389,7 +373,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     gameNameFilter = gameFilters.getGameNameFilter();
     maxPlayersFilterMin = gameFilters.getMinPlayers();
     maxPlayersFilterMax = gameFilters.getMaxPlayers();
-    maxGameAgeSeconds = gameFilters.getMaxGameAgeSeconds();
+    maxGameAge = gameFilters.getMaxGameAge();
 
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
     while (gameTypesIterator.hasNext()) {
@@ -420,7 +404,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 
     gameFilters.setMinPlayers(maxPlayersFilterMin);
     gameFilters.setMaxPlayers(maxPlayersFilterMax);
-    gameFilters.setMaxGameAgeSeconds(maxGameAgeSeconds);
+    gameFilters.setMaxGameAge(maxGameAge);
 }
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
@@ -430,6 +414,11 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+    static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, Qt::UTC).date();
+#else
+    static const QDate epochDate = QDateTime::fromTime_t(0, Qt::UTC).date();
+#endif
     GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)
         return false;
@@ -472,10 +461,10 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if ((int)game.max_players() > maxPlayersFilterMax)
         return false;
 
-    if (maxGameAgeSeconds != DEFAULT_MAX_GAME_AGE_SECONDS) {
-        QDateTime then;
-        then.setTime_t(game.start_time());
-        if (then.secsTo(QDateTime::currentDateTime()) > maxGameAgeSeconds) {
+    if (maxGameAge.isValid()) {
+        QDateTime now = QDateTime::currentDateTimeUtc();
+        QDateTime total = now.addSecs(-(qint64)game.start_time()); // cast to 64 bit value before 2038-1-19 comes around
+        if (total.isValid() && total.date() == epochDate && total.time() > maxGameAge) {
             return false;
         }
     }

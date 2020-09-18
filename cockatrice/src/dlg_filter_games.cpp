@@ -16,7 +16,13 @@
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                                const GamesProxyModel *_gamesProxyModel,
                                QWidget *parent)
-    : QDialog(parent), allGameTypes(_allGameTypes), gamesProxyModel(_gamesProxyModel)
+    : QDialog(parent), allGameTypes(_allGameTypes), gamesProxyModel(_gamesProxyModel),
+      gameAgeMap({{QTime(), tr("no limit")},
+                  {QTime(0, 5), tr("5 minutes")},
+                  {QTime(0, 10), tr("10 minutes")},
+                  {QTime(0, 30), tr("30 minutes")},
+                  {QTime(1, 0), tr("1 hour")},
+                  {QTime(2, 0), tr("2 hours")}})
 {
     showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
     showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
@@ -32,9 +38,10 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     maxGameAgeComboBox = new QComboBox();
     maxGameAgeComboBox->setEditable(false);
-    maxGameAgeComboBox->addItems(gamesProxyModel->getMaxGameAgeOptions());
-    maxGameAgeComboBox->setCurrentIndex(getComboBoxIndexForMaxGameAge(gamesProxyModel->getMaxGameAgeSeconds()));
-    QLabel *maxGameAgeLabel = new QLabel(tr("Hide games &older than:"));
+    maxGameAgeComboBox->addItems(gameAgeMap.values());
+    QTime gameAge = gamesProxyModel->getMaxGameAge();
+    maxGameAgeComboBox->setCurrentIndex(gameAgeMap.keys().indexOf(gameAge)); // index is -1 if unknown
+    QLabel *maxGameAgeLabel = new QLabel(tr("&Newer than:"));
     maxGameAgeLabel->setBuddy(maxGameAgeComboBox);
 
     gameNameFilterEdit = new QLineEdit;
@@ -230,9 +237,13 @@ int DlgFilterGames::getMaxPlayersFilterMax() const
     return maxPlayersFilterMaxSpinBox->value();
 }
 
-int DlgFilterGames::getMaxGameAgeComboBoxIndex() const
+const QTime &DlgFilterGames::getMaxGameAge() const
 {
-    return maxGameAgeComboBox->currentIndex();
+    int index = maxGameAgeComboBox->currentIndex();
+    if (index < 0 || index >= gameAgeMap.size()) { // index is out of bounds
+        return gamesProxyModel->getMaxGameAge();   // leave the setting unchanged
+    }
+    return gameAgeMap.keys().at(index);
 }
 
 void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
