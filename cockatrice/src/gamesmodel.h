@@ -92,7 +92,7 @@ private:
     bool showPasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
-    int maxPlayersFilterMin, maxPlayersFilterMax;
+    quint32 maxPlayersFilterMin, maxPlayersFilterMax;
     QTime maxGameAge;
 
 public:
