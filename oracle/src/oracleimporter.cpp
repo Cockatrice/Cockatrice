@@ -278,6 +278,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
 
         if (skipSpecialCards) {
             // skip promo cards if it's not the only print
+            if (allNameProps.contains(name)) {
+                continue;
+            }
             if (getStringPropertyFromMap(card, "isPromo") == "true") {
                 specialPromoCards.insert(name, cardVar);
                 continue;
