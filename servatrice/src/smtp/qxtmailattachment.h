@@ -57,7 +57,7 @@ public:
     void setContentType(const QString& contentType);
 
     QHash<QString, QString> extraHeaders() const;
-    QString extraHeader(const QString&) const;
+    QByteArray extraHeader(const QString&) const;
     bool hasExtraHeader(const QString&) const;
     void setExtraHeader(const QString& key, const QString& value);
     void setExtraHeaders(const QHash<QString, QString>&);
