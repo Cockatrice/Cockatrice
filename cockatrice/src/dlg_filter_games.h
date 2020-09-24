@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QMap>
 #include <QSet>
+#include <QTime>
 
 class QCheckBox;
 class QComboBox;
@@ -59,7 +60,8 @@ public:
     int getMaxPlayersFilterMin() const;
     int getMaxPlayersFilterMax() const;
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    int getMaxGameAgeComboBoxIndex() const;
+    const QTime &getMaxGameAge() const;
+    const QMap<QTime, QString> gameAgeMap;
 };
 
 #endif

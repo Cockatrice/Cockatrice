@@ -1,7 +1,6 @@
 #ifndef GAMEFILTERSSETTINGS_H
 #define GAMEFILTERSSETTINGS_H
 
-#include "../gametimefilter.h"
 #include "settingsmanager.h"
 
 class GameFiltersSettings : public SettingsManager
@@ -17,7 +16,7 @@ public:
     QString getGameNameFilter();
     int getMinPlayers();
     int getMaxPlayers();
-    int getMaxGameAgeSeconds();
+    QTime getMaxGameAge();
     bool isGameTypeEnabled(QString gametype);
 
     void setShowBuddiesOnlyGames(bool show);
@@ -27,7 +26,7 @@ public:
     void setGameNameFilter(QString gameName);
     void setMinPlayers(int min);
     void setMaxPlayers(int max);
-    void setMaxGameAgeSeconds(int maxGameAgeSeconds);
+    void setMaxGameAge(const QTime &maxGameAge);
     void setGameTypeEnabled(QString gametype, bool enabled);
     void setGameHashedTypeEnabled(QString gametypeHASHED, bool enabled);
 signals:

@@ -1,7 +1,6 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
-#include "gametimefilter.h"
 #include "gametypemap.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab_supervisor.h"
@@ -11,6 +10,15 @@
 #include <QSet>
 #include <QSortFilterProxyModel>
 #include <QStringList>
+#include <QTime>
+
+const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
+const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
+const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
+const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
+const int DEFAULT_MAX_PLAYERS_MIN = 1;
+const int DEFAULT_MAX_PLAYERS_MAX = 99;
+constexpr QTime DEFAULT_MAX_GAME_AGE = QTime();
 
 class GamesModel : public QAbstractTableModel
 {
@@ -84,16 +92,8 @@ private:
     bool showPasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
-    int maxPlayersFilterMin, maxPlayersFilterMax;
-    int maxGameAgeSeconds;
-
-    static const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
-    static const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
-    static const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
-    static const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
-    static const int DEFAULT_MAX_PLAYERS_MIN = 1;
-    static const int DEFAULT_MAX_PLAYERS_MAX = 99;
-    static const int DEFAULT_MAX_GAME_AGE_SECONDS = -1;
+    quint32 maxPlayersFilterMin, maxPlayersFilterMax;
+    QTime maxGameAge;
 
 public:
     GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
@@ -142,12 +142,11 @@ public:
         return maxPlayersFilterMax;
     }
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    int getMaxGameAgeSeconds() const
+    const QTime &getMaxGameAge() const
     {
-        return maxGameAgeSeconds;
+        return maxGameAge;
     }
-    void setMaxGameAgeSeconds(int maxGameAgeComboBoxIndex);
-    static const QStringList getMaxGameAgeOptions();
+    void setMaxGameAge(const QTime &_maxGameAge);
 
     int getNumFilteredGames() const;
     void resetFilterParameters();
