@@ -70,6 +70,16 @@ QString GameFiltersSettings::getGameNameFilter()
     return getValue("game_name_filter", "filter_games").toString();
 }
 
+void GameFiltersSettings::setCreatorNameFilter(QString creatorName)
+{
+    setValue(creatorName, "creator_name_filter", "filter_games");
+}
+
+QString GameFiltersSettings::getCreatorNameFilter()
+{
+    return getValue("creator_name_filter", "filter_games").toString();
+}
+
 void GameFiltersSettings::setMinPlayers(int min)
 {
     setValue(min, "min_players", "filter_games");
