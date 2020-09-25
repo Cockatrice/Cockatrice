@@ -225,7 +225,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
-    static const QList<QString> specialNumChars = {"★", "s"};
+    static const QList<QString> specialNumChars = {"★", "s", "†"};
     QMap<QString, QVariant> specialPromoCards;
     QList<QString> allNameProps;
 
