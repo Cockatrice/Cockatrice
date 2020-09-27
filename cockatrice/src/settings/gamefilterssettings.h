@@ -14,6 +14,7 @@ public:
     bool isShowPasswordProtectedGames();
     bool isHideIgnoredUserGames();
     QString getGameNameFilter();
+    QString getCreatorNameFilter();
     int getMinPlayers();
     int getMaxPlayers();
     bool isGameTypeEnabled(QString gametype);
@@ -23,6 +24,7 @@ public:
     void setUnavailableGamesVisible(bool enabled);
     void setShowPasswordProtectedGames(bool show);
     void setGameNameFilter(QString gameName);
+    void setCreatorNameFilter(QString creatorName);
     void setMinPlayers(int min);
     void setMaxPlayers(int max);
     void setGameTypeEnabled(QString gametype, bool enabled);

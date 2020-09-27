@@ -360,7 +360,9 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     unavailableGamesVisible = gameFilters.isUnavailableGamesVisible();
     showPasswordProtectedGames = gameFilters.isShowPasswordProtectedGames();
     hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
+    showBuddiesOnlyGames = gameFilters.isShowBuddiesOnlyGames();
     gameNameFilter = gameFilters.getGameNameFilter();
+    creatorNameFilter = gameFilters.getCreatorNameFilter();
     maxPlayersFilterMin = gameFilters.getMinPlayers();
     maxPlayersFilterMax = gameFilters.getMaxPlayers();
 
@@ -383,6 +385,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     gameFilters.setShowPasswordProtectedGames(showPasswordProtectedGames);
     gameFilters.setHideIgnoredUserGames(hideIgnoredUserGames);
     gameFilters.setGameNameFilter(gameNameFilter);
+    gameFilters.setCreatorNameFilter(creatorNameFilter);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
     while (gameTypeIterator.hasNext()) {
