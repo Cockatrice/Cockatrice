@@ -74,7 +74,6 @@
 #include <string>
 
 static const int protocolVersion = 14;
-static const int globalDeckOffset = 10000000;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
@@ -576,10 +575,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
 
     DeckList *deck;
     try {
-        if ((servatrice->getGlobalDecksID() != -1) && (cmd.deck_id() > globalDeckOffset))
-            deck = sqlInterface->getDeckFromDatabase(cmd.deck_id() - globalDeckOffset, servatrice->getGlobalDecksID());
-        else
-            deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
+        deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
     } catch (Response::ResponseCode &r) {
         return r;
     }

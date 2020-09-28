@@ -27,6 +27,8 @@
 #include <QTcpSocket>
 #include <QWebSocket>
 
+static const int globalDeckOffset = 10000000;
+
 class Servatrice;
 class Servatrice_DatabaseInterface;
 class DeckList;
