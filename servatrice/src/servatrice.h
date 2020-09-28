@@ -259,6 +259,7 @@ public:
     int getMinPasswordLength() const;
     int getIdleClientTimeout() const override;
     int getServerID() const override;
+    int getGlobalDecksID() const;
     int getMaxGameInactivityTime() const override;
     int getMaxPlayerInactivityTime() const override;
     int getClientKeepAlive() const override;
