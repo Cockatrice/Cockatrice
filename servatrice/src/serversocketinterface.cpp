@@ -345,7 +345,7 @@ int AbstractServerSocketInterface::getDeckPathId(const QString &path)
 
 bool AbstractServerSocketInterface::deckListHelper(int folderId, int userId, ServerInfo_DeckStorage_Folder *folder)
 {
-    int offset = (servatrice->getGlobalDecksID() == userId) ? globalDeckOffset : 0;
+    int offset = (userInfo->id() != userId) ? globalDeckOffset : 0;
 
     QSqlQuery *query = sqlInterface->prepareQuery(
         "select id, name from {prefix}_decklist_folders where id_parent = :id_parent and id_user = :id_user");
