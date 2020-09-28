@@ -360,7 +360,7 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId, int userId, Ser
 
     foreach (int key, results.keys()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(key+offset);
+        newItem->set_id(key + offset);
         newItem->set_name(results.value(key).toStdString());
 
         if (!deckListHelper(key, userId, newItem->mutable_folder()))
@@ -376,7 +376,7 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId, int userId, Ser
 
     while (query->next()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query->value(0).toInt()+offset);
+        newItem->set_id(query->value(0).toInt() + offset);
         newItem->set_name(query->value(1).toString().toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
@@ -401,7 +401,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckList(const Command_
     ServerInfo_DeckStorage_Folder *root = re->mutable_root();
 
     int globalID = servatrice->getGlobalDecksID();
-    if((globalID != -1) && ((globalID != userInfo->id())))
+    if ((globalID != -1) && ((globalID != userInfo->id())))
         if (!deckListHelper(0, globalID, root))
             return Response::RespContextError;
 
@@ -576,8 +576,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
 
     DeckList *deck;
     try {
-        if((servatrice->getGlobalDecksID() != -1) && (cmd.deck_id()>globalDeckOffset))
-            deck = sqlInterface->getDeckFromDatabase(cmd.deck_id()-globalDeckOffset, servatrice->getGlobalDecksID());
+        if ((servatrice->getGlobalDecksID() != -1) && (cmd.deck_id() > globalDeckOffset))
+            deck = sqlInterface->getDeckFromDatabase(cmd.deck_id() - globalDeckOffset, servatrice->getGlobalDecksID());
         else
             deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
     } catch (Response::ResponseCode &r) {
