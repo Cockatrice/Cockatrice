@@ -868,8 +868,7 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
 {
     checkSql();
 
-    if ((server->getGlobalDecksID() != -1) && (deckId > globalDeckOffset))
-    {
+    if ((server->getGlobalDecksID() != -1) && (deckId > globalDeckOffset)) {
         deckId = deckId - globalDeckOffset;
         userId = server->getGlobalDecksID();
     }
