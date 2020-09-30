@@ -74,7 +74,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
-    const bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
+    bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 

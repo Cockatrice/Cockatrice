@@ -23,6 +23,14 @@ enum GameListColumn
     SPECTATORS
 };
 
+const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
+const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
+const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
+const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
+const int DEFAULT_MAX_PLAYERS_MIN = 1;
+const int DEFAULT_MAX_PLAYERS_MAX = 99;
+constexpr QTime DEFAULT_MAX_GAME_AGE = QTime();
+
 const QString GamesModel::getGameCreatedString(const int secs)
 {
 
