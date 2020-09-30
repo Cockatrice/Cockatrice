@@ -52,7 +52,7 @@ void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
     urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
     urlQuery.addQueryItem("decktitle", deck->getName());
     params.setQuery(urlQuery);
-    data->append(params.query(QUrl::EncodeReserved));
+    data->append(params.query(QUrl::EncodeReserved).toUtf8());
 }
 
 void DeckStatsInterface::analyzeDeck(DeckList *deck)

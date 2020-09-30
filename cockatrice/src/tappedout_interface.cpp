@@ -78,7 +78,7 @@ void TappedOutInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
     urlQuery.addQueryItem("mainboard", mainboard.writeToString_Plain(false, true));
     urlQuery.addQueryItem("sideboard", sideboard.writeToString_Plain(false, true));
     params.setQuery(urlQuery);
-    data->append(params.query(QUrl::EncodeReserved));
+    data->append(params.query(QUrl::EncodeReserved).toUtf8());
 }
 
 void TappedOutInterface::analyzeDeck(DeckList *deck)

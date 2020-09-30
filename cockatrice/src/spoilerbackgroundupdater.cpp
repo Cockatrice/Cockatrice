@@ -167,8 +167,8 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
         QList<QByteArray> lines = data.split('\n');
 
         foreach (QByteArray line, lines) {
-            if (line.contains("created:")) {
-                QString timeStamp = QString(line).replace("created:", "").trimmed();
+            if (line.contains("Created At:")) {
+                QString timeStamp = QString(line).replace("Created At:", "").trimmed();
                 timeStamp.chop(6); // Remove " (UTC)"
 
                 auto utcTime = QLocale().toDateTime(timeStamp, "ddd, MMM dd yyyy, hh:mm:ss");
