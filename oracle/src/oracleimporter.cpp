@@ -225,7 +225,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
-    static const QList<QString> specialNumChars = {"★", "s"};
+    static const QList<QString> specialNumChars = {"★", "s", "†"};
     QMap<QString, QVariant> specialPromoCards;
     QList<QString> allNameProps;
 
@@ -278,6 +278,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
 
         if (skipSpecialCards) {
             // skip promo cards if it's not the only print
+            if (allNameProps.contains(name)) {
+                continue;
+            }
             if (getStringPropertyFromMap(card, "isPromo") == "true") {
                 specialPromoCards.insert(name, cardVar);
                 continue;

@@ -143,9 +143,9 @@ QHash<QString, QString> QxtMailAttachment::extraHeaders() const
     return qxt_d->extraHeaders;
 }
 
-QString QxtMailAttachment::extraHeader(const QString& key) const
+QByteArray QxtMailAttachment::extraHeader(const QString& key) const
 {
-    return qxt_d->extraHeaders[key.toLower()];
+    return qxt_d->extraHeaders[key.toLower()].toLatin1();
 }
 
 bool QxtMailAttachment::hasExtraHeader(const QString& key) const
