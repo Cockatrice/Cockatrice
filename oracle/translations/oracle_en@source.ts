@@ -241,7 +241,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="445"/>
+        <location filename="../src/oracleimporter.cpp" line="448"/>
         <source>Dummy set containing tokens</source>
         <translation type="unfinished"></translation>
     </message>
@@ -525,7 +525,7 @@
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="158"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="161"/>
         <source>English</source>
         <translation type="unfinished"></translation>
     </message>
@@ -533,7 +533,7 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/main.cpp" line="43"/>
+        <location filename="../src/main.cpp" line="42"/>
         <source>Only run in spoiler mode</source>
         <translation type="unfinished"></translation>
     </message>

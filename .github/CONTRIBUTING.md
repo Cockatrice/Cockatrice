@@ -202,7 +202,7 @@ You can find more information on how we use Protobuf on [our wiki!](https://gith
 
 Basic workflow for translations:
  1. Developer adds a `tr("foo")` string in the code;
- 2. Every few days, a maintainer updates the `*_en.ts files` with the new strings;
+ 2. Every few days, a maintainer updates the `*_en@source.ts files` with the new strings;
  3. Transifex picks up the new files from github every 24 hours;
  4. Translators translate the new untranslated strings on Transifex;
  5. Before a release, a maintainer fetches the updated translations from Transifex.
@@ -238,14 +238,14 @@ make
 If the parameter has been enabled correctly, when running "make" you should see
 a line similar to this one (the numbers may vary):
 ```sh
-[ 76%] Generating ../../cockatrice/translations/cockatrice_en.ts
-Updating '../../cockatrice/translations/cockatrice_en.ts'...
+[ 76%] Generating ../../cockatrice/translations/cockatrice_en@source.ts
+Updating '../../cockatrice/translations/cockatrice_en@source.ts'...
 Found 857 source text(s) (8 new and 849 already existing)
 ```
 You should then notice that the following files have uncommitted changes:
 
-    cockatrice/translations/cockatrice_en.ts
-    oracle/translations/oracle_en.ts
+    cockatrice/translations/cockatrice_en@source.ts
+    oracle/translations/oracle_en@source.ts
 
 It is recommended to disable the parameter afterwards using:
 ```sh
