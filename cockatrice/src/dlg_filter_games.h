@@ -4,11 +4,14 @@
 #include "gamesmodel.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QMap>
 #include <QSet>
+#include <QTime>
 
 class QCheckBox;
+class QComboBox;
 class QGroupBox;
 class QLineEdit;
 class QSpinBox;
@@ -27,6 +30,7 @@ private:
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
     QSpinBox *maxPlayersFilterMinSpinBox;
     QSpinBox *maxPlayersFilterMaxSpinBox;
+    QComboBox *maxGameAgeComboBox;
 
     const QMap<int, QString> &allGameTypes;
     const GamesProxyModel *gamesProxyModel;
@@ -56,6 +60,8 @@ public:
     int getMaxPlayersFilterMin() const;
     int getMaxPlayersFilterMax() const;
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
+    const QTime &getMaxGameAge() const;
+    const QMap<QTime, QString> gameAgeMap;
 };
 
 #endif

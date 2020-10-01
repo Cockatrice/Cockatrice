@@ -1,6 +1,7 @@
 #include "dlg_filter_games.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QCryptographicHash>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -15,7 +16,13 @@
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                                const GamesProxyModel *_gamesProxyModel,
                                QWidget *parent)
-    : QDialog(parent), allGameTypes(_allGameTypes), gamesProxyModel(_gamesProxyModel)
+    : QDialog(parent), allGameTypes(_allGameTypes), gamesProxyModel(_gamesProxyModel),
+      gameAgeMap({{QTime(), tr("no limit")},
+                  {QTime(0, 5), tr("5 minutes")},
+                  {QTime(0, 10), tr("10 minutes")},
+                  {QTime(0, 30), tr("30 minutes")},
+                  {QTime(1, 0), tr("1 hour")},
+                  {QTime(2, 0), tr("2 hours")}})
 {
     showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
     showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
@@ -28,6 +35,14 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     hideIgnoredUserGames = new QCheckBox(tr("Hide '&ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
+
+    maxGameAgeComboBox = new QComboBox();
+    maxGameAgeComboBox->setEditable(false);
+    maxGameAgeComboBox->addItems(gameAgeMap.values());
+    QTime gameAge = gamesProxyModel->getMaxGameAge();
+    maxGameAgeComboBox->setCurrentIndex(gameAgeMap.keys().indexOf(gameAge)); // index is -1 if unknown
+    QLabel *maxGameAgeLabel = new QLabel(tr("&Newer than:"));
+    maxGameAgeLabel->setBuddy(maxGameAgeComboBox);
 
     gameNameFilterEdit = new QLineEdit;
     gameNameFilterEdit->setText(gamesProxyModel->getGameNameFilter());
@@ -43,6 +58,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     generalGrid->addWidget(gameNameFilterEdit, 0, 1);
     generalGrid->addWidget(creatorNameFilterLabel, 1, 0);
     generalGrid->addWidget(creatorNameFilterEdit, 1, 1);
+    generalGrid->addWidget(maxGameAgeLabel, 2, 0);
+    generalGrid->addWidget(maxGameAgeComboBox, 2, 1);
     generalGroupBox = new QGroupBox(tr("General"));
     generalGroupBox->setLayout(generalGrid);
 
@@ -218,6 +235,15 @@ int DlgFilterGames::getMaxPlayersFilterMin() const
 int DlgFilterGames::getMaxPlayersFilterMax() const
 {
     return maxPlayersFilterMaxSpinBox->value();
+}
+
+const QTime &DlgFilterGames::getMaxGameAge() const
+{
+    int index = maxGameAgeComboBox->currentIndex();
+    if (index < 0 || index >= gameAgeMap.size()) { // index is out of bounds
+        return gamesProxyModel->getMaxGameAge();   // leave the setting unchanged
+    }
+    return gameAgeMap.keys().at(index);
 }
 
 void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
