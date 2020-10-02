@@ -31,8 +31,7 @@ https://www.visualstudio.com/) the best tool for the job.
 If you'd like to ask questions, get advice, or just want to say hi,
 The Cockatrice Development Team uses [Discord](https://discord.gg/ZASRzKu)
 for communications nowadays in #dev. If you're not into Discord, we also
-have a [Gitter](
-https://gitter.im/Cockatrice/Cockatrice) channel available.
+have a [Gitter](https://gitter.im/Cockatrice/Cockatrice) channel available.
 
 
 # Code Style Guide #
