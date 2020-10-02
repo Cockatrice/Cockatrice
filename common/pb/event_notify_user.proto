@@ -4,7 +4,7 @@ import "session_event.proto";
 message Event_NotifyUser {
 
     enum NotificationType {
-        UNKNOWN = 0;  // Default enum value if no "type" is defined when used
+        UNKNOWN = 0; // Default enum value if no "type" is defined when used
         PROMOTED = 1;
         WARNING = 2;
         IDLEWARNING = 3;
@@ -18,5 +18,4 @@ message Event_NotifyUser {
     optional string warning_reason = 2;
     optional string custom_title = 3;
     optional string custom_content = 4;
-
 }

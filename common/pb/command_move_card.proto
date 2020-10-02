@@ -23,4 +23,3 @@ message Command_MoveCard {
     optional sint32 x = 6 [default = -1];
     optional sint32 y = 7 [default = -1];
 }
-

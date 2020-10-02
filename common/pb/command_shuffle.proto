@@ -8,4 +8,3 @@ message Command_Shuffle {
     optional sint32 start = 2 [default = 0];
     optional sint32 end = 3 [default = -1];
 }
-

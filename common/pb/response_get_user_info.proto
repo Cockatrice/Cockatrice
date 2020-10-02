@@ -8,5 +8,3 @@ message Response_GetUserInfo {
     }
     optional ServerInfo_User user_info = 1;
 }
- 
- 

@@ -9,5 +9,3 @@ message Command_FlipCard {
     optional bool face_down = 3;
     optional string pt = 4;
 }
-
-
