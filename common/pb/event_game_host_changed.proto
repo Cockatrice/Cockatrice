@@ -6,4 +6,3 @@ message Event_GameHostChanged {
         optional Event_GameHostChanged ext = 1003;
     }
 }
- 

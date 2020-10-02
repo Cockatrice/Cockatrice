@@ -12,7 +12,7 @@ message ServerMessage {
         ROOM_EVENT = 3;
     }
     optional MessageType message_type = 1;
-    
+
     optional Response response = 2;
     optional SessionEvent session_event = 3;
     optional GameEventContainer game_event_container = 4;

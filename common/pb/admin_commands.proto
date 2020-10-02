@@ -37,4 +37,3 @@ message Command_AdjustMod {
     optional bool should_be_mod = 2;
     optional bool should_be_judge = 3;
 }
-

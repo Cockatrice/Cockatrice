@@ -6,7 +6,6 @@ message Command_Concede {
     }
 }
 
-
 message Command_Unconcede {
     extend GameCommand {
         optional Command_Unconcede ext = 1032;

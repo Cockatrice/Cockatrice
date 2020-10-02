@@ -3,7 +3,6 @@ import "game_commands.proto";
 message Command_KickFromGame {
     extend GameCommand {
         optional Command_KickFromGame ext = 1000;
-}
+    }
     optional sint32 player_id = 1 [default = -1];
 }
-
