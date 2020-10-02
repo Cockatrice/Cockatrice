@@ -18,7 +18,7 @@ exclude=("servatrice/src/smtp" \
 "oracle/src/zip" \
 "oracle/src/lzma" \
 "oracle/src/qt-json")
-exts=("cpp" "h")
+exts=("cpp" "h" "proto")
 cf_cmd="clang-format"
 branch="origin/master"
 
