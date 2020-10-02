@@ -146,23 +146,10 @@ CardInfoPtr OracleImporter::addCard(QString name,
                 (text.contains(name + " enters the battlefield tapped") &&
                  !text.contains(name + " enters the battlefield tapped unless"));
 
-    // detect mana generator artifacts
-    QStringList cardTextRows = text.split("\n");
-    bool mArtifact = false;
-    QString cardType = properties.value("type").toString();
-    if (cardType.endsWith("Artifact")) {
-        for (int i = 0; i < cardTextRows.size(); ++i) {
-            cardTextRows[i].remove(QRegularExpression(R"(\".*?\")"));
-            if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool")) {
-                mArtifact = true;
-            }
-        }
-    }
-
     // table row
     int tableRow = 1;
     QString mainCardType = properties.value("maintype").toString();
-    if ((mainCardType == "Land") || mArtifact)
+    if ((mainCardType == "Land"))
         tableRow = 0;
     else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
         tableRow = 3;
