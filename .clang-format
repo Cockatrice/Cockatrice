@@ -27,6 +27,5 @@ SortIncludes: true
 IncludeBlocks: Regroup
 ---
 Language: Proto
-AllowShortBlocksOnASingleLine: Never
 AllowShortFunctionsOnASingleLine: None
 SpacesInContainerLiterals: false
