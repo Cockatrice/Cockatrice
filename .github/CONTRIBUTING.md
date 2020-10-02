@@ -25,9 +25,14 @@ you most enjoy.
 Developers who like Windows development tend to find [Visual Studio](
 https://www.visualstudio.com/) the best tool for the job.
 
-If you have any questions on IDEs, feel free to chat with us on [Gitter](
-https://gitter.im/Cockatrice/Cockatrice) and we would love to help answer
-your questions!  
+[![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white&color=7289da)](https://discord.gg/ZASRzKu)
+[![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
+
+If you'd like to ask questions, get advice, or just want to say hi,
+The Cockatrice Development Team uses [Discord](https://discord.gg/ZASRzKu)
+for communications in the #dev channel. If you're not into Discord, we also
+have a [Gitter](https://gitter.im/Cockatrice/Cockatrice) channel available,
+albeit slightly less active.
 
 
 # Code Style Guide #
