@@ -113,10 +113,32 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
 
+    spectatorsCanWatch = new QCheckBox(tr("Show games &spectators can watch"));
+    spectatorsCanWatch->setChecked(true);  // DO NOT SUBMIT get from storage
+    connect(spectatorsCanWatch, SIGNAL(toggled(bool)), this, SLOT(toggleSpectatorCheckboxEnabledness(bool)));
+
+    spectatorsNeedPassword = new QCheckBox(tr("Show if spectators need password"));
+    spectatorsNeedPassword->setChecked(true);  // DO NOT SUBMIT get from storage
+    spectatorsCanChat = new QCheckBox(tr("Show if spectators can chat"));
+    spectatorsCanChat->setChecked(true);  // DO NOT SUBMIT get from storage
+    spectatorsCanSeeHands = new QCheckBox(tr("Show if spectators can see hands"));
+    spectatorsCanSeeHands->setChecked(true);  // DO NOT SUBMIT get from storage
+    toggleSpectatorCheckboxEnabledness(getSpectatorsCanWatch());
+
+    QGridLayout *spectatorsLayout = new QGridLayout;
+    spectatorsLayout->addWidget(spectatorsCanWatch, 0, 0);
+    spectatorsLayout->addWidget(spectatorsNeedPassword, 1, 0);
+    spectatorsLayout->addWidget(spectatorsCanChat, 2, 0);
+    spectatorsLayout->addWidget(spectatorsCanSeeHands, 3, 0);
+
+    QGroupBox *spectatorsGroupBox = new QGroupBox(tr("Spectators"));
+    spectatorsGroupBox->setLayout(spectatorsLayout);
+
     QGridLayout *leftGrid = new QGridLayout;
     leftGrid->addWidget(generalGroupBox, 0, 0, 1, 2);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
     leftGrid->addWidget(restrictionsGroupBox, 3, 0, 1, 2);
+    leftGrid->addWidget(spectatorsGroupBox, 4, 0, 1, 2);
 
     QVBoxLayout *leftColumn = new QVBoxLayout;
     leftColumn->addLayout(leftGrid);
@@ -144,6 +166,13 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 void DlgFilterGames::actOk()
 {
     accept();
+}
+
+void DlgFilterGames::toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled)
+{
+    spectatorsNeedPassword->setDisabled(!spectatorsEnabled);
+    spectatorsCanChat->setDisabled(!spectatorsEnabled);
+    spectatorsCanSeeHands->setDisabled(!spectatorsEnabled);
 }
 
 bool DlgFilterGames::getUnavailableGamesVisible() const
@@ -251,4 +280,9 @@ void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlaye
     maxPlayersFilterMinSpinBox->setValue(_maxPlayersFilterMin);
     maxPlayersFilterMaxSpinBox->setValue(_maxPlayersFilterMax == -1 ? maxPlayersFilterMaxSpinBox->maximum()
                                                                     : _maxPlayersFilterMax);
+}
+
+int DlgFilterGames::getSpectatorsCanWatch() const
+{
+    return spectatorsCanWatch->isEnabled() && spectatorsCanWatch->isChecked();
 }

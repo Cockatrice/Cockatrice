@@ -32,11 +32,17 @@ private:
     QSpinBox *maxPlayersFilterMaxSpinBox;
     QComboBox *maxGameAgeComboBox;
 
+    QCheckBox *spectatorsCanWatch;
+    QCheckBox *spectatorsNeedPassword;
+    QCheckBox *spectatorsCanChat;
+    QCheckBox *spectatorsCanSeeHands;
+
     const QMap<int, QString> &allGameTypes;
     const GamesProxyModel *gamesProxyModel;
 
 private slots:
     void actOk();
+    void toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled);
 
 public:
     DlgFilterGames(const QMap<int, QString> &_allGameTypes,
@@ -62,6 +68,7 @@ public:
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
     const QTime &getMaxGameAge() const;
     const QMap<QTime, QString> gameAgeMap;
+    int getSpectatorsCanWatch() const;
 };
 
 #endif
