@@ -113,23 +113,23 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     auto *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
 
-    spectatorsCanWatch = new QCheckBox(tr("Show games &spectators can watch"));
-    spectatorsCanWatch->setChecked(true);  // DO NOT SUBMIT get from storage
-    connect(spectatorsCanWatch, SIGNAL(toggled(bool)), this, SLOT(toggleSpectatorCheckboxEnabledness(bool)));
+    showOnlyIfSpectatorsCanWatch = new QCheckBox(tr("Show games only if &spectators can watch"));
+    showOnlyIfSpectatorsCanWatch->setChecked(gamesProxyModel->getShowOnlyIfSpectatorsCanWatch());
+    connect(showOnlyIfSpectatorsCanWatch, SIGNAL(toggled(bool)), this, SLOT(toggleSpectatorCheckboxEnabledness(bool)));
 
-    spectatorsNeedPassword = new QCheckBox(tr("Show if spectators need password"));
-    spectatorsNeedPassword->setChecked(true);  // DO NOT SUBMIT get from storage
-    spectatorsCanChat = new QCheckBox(tr("Show if spectators can chat"));
-    spectatorsCanChat->setChecked(true);  // DO NOT SUBMIT get from storage
-    spectatorsCanSeeHands = new QCheckBox(tr("Show if spectators can see hands"));
-    spectatorsCanSeeHands->setChecked(true);  // DO NOT SUBMIT get from storage
-    toggleSpectatorCheckboxEnabledness(getSpectatorsCanWatch());
+    showSpectatorPasswordProtected = new QCheckBox(tr("Show spectator password p&rotected games"));
+    showSpectatorPasswordProtected->setChecked(gamesProxyModel->getShowSpectatorPasswordProtected());
+    showOnlyIfSpectatorsCanChat = new QCheckBox(tr("Show only if spectators can ch&at"));
+    showOnlyIfSpectatorsCanChat->setChecked(gamesProxyModel->getShowOnlyIfSpectatorsCanChat());
+    showOnlyIfSpectatorsCanSeeHands = new QCheckBox(tr("Show only if spectators can see &hands"));
+    showOnlyIfSpectatorsCanSeeHands->setChecked(gamesProxyModel->getShowOnlyIfSpectatorsCanSeeHands());
+    toggleSpectatorCheckboxEnabledness(getShowOnlyIfSpectatorsCanWatch());
 
     auto *spectatorsLayout = new QGridLayout;
-    spectatorsLayout->addWidget(spectatorsCanWatch, 0, 0);
-    spectatorsLayout->addWidget(spectatorsNeedPassword, 1, 0);
-    spectatorsLayout->addWidget(spectatorsCanChat, 2, 0);
-    spectatorsLayout->addWidget(spectatorsCanSeeHands, 3, 0);
+    spectatorsLayout->addWidget(showOnlyIfSpectatorsCanWatch, 0, 0);
+    spectatorsLayout->addWidget(showSpectatorPasswordProtected, 1, 0);
+    spectatorsLayout->addWidget(showOnlyIfSpectatorsCanChat, 2, 0);
+    spectatorsLayout->addWidget(showOnlyIfSpectatorsCanSeeHands, 3, 0);
 
     auto *spectatorsGroupBox = new QGroupBox(tr("Spectators"));
     spectatorsGroupBox->setLayout(spectatorsLayout);
@@ -170,9 +170,9 @@ void DlgFilterGames::actOk()
 
 void DlgFilterGames::toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled)
 {
-    spectatorsNeedPassword->setDisabled(!spectatorsEnabled);
-    spectatorsCanChat->setDisabled(!spectatorsEnabled);
-    spectatorsCanSeeHands->setDisabled(!spectatorsEnabled);
+    showSpectatorPasswordProtected->setDisabled(!spectatorsEnabled);
+    showOnlyIfSpectatorsCanChat->setDisabled(!spectatorsEnabled);
+    showOnlyIfSpectatorsCanSeeHands->setDisabled(!spectatorsEnabled);
 }
 
 bool DlgFilterGames::getUnavailableGamesVisible() const
@@ -282,7 +282,22 @@ void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlaye
                                                                     : _maxPlayersFilterMax);
 }
 
-int DlgFilterGames::getSpectatorsCanWatch() const
+bool DlgFilterGames::getShowOnlyIfSpectatorsCanWatch() const
 {
-    return spectatorsCanWatch->isEnabled() && spectatorsCanWatch->isChecked();
+    return showOnlyIfSpectatorsCanWatch->isChecked();
+}
+
+bool DlgFilterGames::getShowSpectatorPasswordProtected() const
+{
+    return showSpectatorPasswordProtected->isEnabled() && showSpectatorPasswordProtected->isChecked();
+}
+
+bool DlgFilterGames::getShowOnlyIfSpectatorsCanChat() const
+{
+    return showOnlyIfSpectatorsCanChat->isEnabled() && showOnlyIfSpectatorsCanChat->isChecked();
+}
+
+bool DlgFilterGames::getShowOnlyIfSpectatorsCanSeeHands() const
+{
+    return showOnlyIfSpectatorsCanSeeHands->isEnabled() && showOnlyIfSpectatorsCanSeeHands->isChecked();
 }

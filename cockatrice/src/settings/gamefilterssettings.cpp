@@ -129,3 +129,47 @@ bool GameFiltersSettings::isGameTypeEnabled(QString gametype)
     QVariant previous = getValue("game_type/" + hashGameType(gametype), "filter_games");
     return previous == QVariant() ? false : previous.toBool();
 }
+
+void GameFiltersSettings::setShowOnlyIfSpectatorsCanWatch(bool show)
+{
+    setValue(show, "show_only_if_spectators_can_watch", "filter_games");
+}
+
+bool GameFiltersSettings::isShowOnlyIfSpectatorsCanWatch()
+{
+    QVariant previous = getValue("show_only_if_spectators_can_watch", "filter_games");
+    return previous == QVariant() ? true : previous.toBool();
+}
+
+void GameFiltersSettings::setShowSpectatorPasswordProtected(bool show)
+{
+    setValue(show, "show_spectator_password_protected", "filter_games");
+}
+
+bool GameFiltersSettings::isShowSpectatorPasswordProtected()
+{
+    QVariant previous = getValue("show_spectator_password_protected", "filter_games");
+    return previous == QVariant() ? true : previous.toBool();
+}
+
+void GameFiltersSettings::setShowOnlyIfSpectatorsCanChat(bool show)
+{
+    setValue(show, "show_only_if_spectators_can_chat", "filter_games");
+}
+
+bool GameFiltersSettings::isShowOnlyIfSpectatorsCanChat()
+{
+    QVariant previous = getValue("show_only_if_spectators_can_chat", "filter_games");
+    return previous == QVariant() ? true : previous.toBool();
+}
+
+void GameFiltersSettings::setShowOnlyIfSpectatorsCanSeeHands(bool show)
+{
+    setValue(show, "show_only_if_spectators_can_see_hands", "filter_games");
+}
+
+bool GameFiltersSettings::isShowOnlyIfSpectatorsCanSeeHands()
+{
+    QVariant previous = getValue("show_only_if_spectators_can_see_hands", "filter_games");
+    return previous == QVariant() ? true : previous.toBool();
+}

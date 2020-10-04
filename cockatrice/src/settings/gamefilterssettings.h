@@ -19,6 +19,10 @@ public:
     int getMaxPlayers();
     QTime getMaxGameAge();
     bool isGameTypeEnabled(QString gametype);
+    bool isShowOnlyIfSpectatorsCanWatch();
+    bool isShowSpectatorPasswordProtected();
+    bool isShowOnlyIfSpectatorsCanChat();
+    bool isShowOnlyIfSpectatorsCanSeeHands();
 
     void setShowBuddiesOnlyGames(bool show);
     void setHideIgnoredUserGames(bool hide);
@@ -31,6 +35,10 @@ public:
     void setMaxGameAge(const QTime &maxGameAge);
     void setGameTypeEnabled(QString gametype, bool enabled);
     void setGameHashedTypeEnabled(QString gametypeHASHED, bool enabled);
+    void setShowOnlyIfSpectatorsCanWatch(bool show);
+    void setShowSpectatorPasswordProtected(bool show);
+    void setShowOnlyIfSpectatorsCanChat(bool show);
+    void setShowOnlyIfSpectatorsCanSeeHands(bool show);
 signals:
 
 public slots:

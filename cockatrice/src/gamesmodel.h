@@ -86,6 +86,8 @@ private:
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
     QTime maxGameAge;
+    bool showOnlyIfSpectatorsCanWatch, showSpectatorPasswordProtected, showOnlyIfSpectatorsCanChat,
+        showOnlyIfSpectatorsCanSeeHands;
 
 public:
     GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
@@ -139,6 +141,26 @@ public:
         return maxGameAge;
     }
     void setMaxGameAge(const QTime &_maxGameAge);
+    bool getShowOnlyIfSpectatorsCanWatch() const
+    {
+        return showOnlyIfSpectatorsCanWatch;
+    }
+    void setShowOnlyIfSpectatorsCanWatch(bool _showOnlyIfSpectatorsCanWatch);
+    bool getShowSpectatorPasswordProtected() const
+    {
+        return showSpectatorPasswordProtected;
+    }
+    void setShowSpectatorPasswordProtected(bool _showSpectatorPasswordProtected);
+    bool getShowOnlyIfSpectatorsCanChat() const
+    {
+        return showOnlyIfSpectatorsCanChat;
+    }
+    void setShowOnlyIfSpectatorsCanChat(bool _showOnlyIfSpectatorsCanChat);
+    bool getShowOnlyIfSpectatorsCanSeeHands() const
+    {
+        return showOnlyIfSpectatorsCanSeeHands;
+    }
+    void setShowOnlyIfSpectatorsCanSeeHands(bool _showOnlyIfSpectatorsCanSeeHands);
 
     int getNumFilteredGames() const;
     void resetFilterParameters();
