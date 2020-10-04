@@ -41,19 +41,19 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     maxGameAgeComboBox->addItems(gameAgeMap.values());
     QTime gameAge = gamesProxyModel->getMaxGameAge();
     maxGameAgeComboBox->setCurrentIndex(gameAgeMap.keys().indexOf(gameAge)); // index is -1 if unknown
-    QLabel *maxGameAgeLabel = new QLabel(tr("&Newer than:"));
+    auto *maxGameAgeLabel = new QLabel(tr("&Newer than:"));
     maxGameAgeLabel->setBuddy(maxGameAgeComboBox);
 
     gameNameFilterEdit = new QLineEdit;
     gameNameFilterEdit->setText(gamesProxyModel->getGameNameFilter());
-    QLabel *gameNameFilterLabel = new QLabel(tr("Game &description:"));
+    auto *gameNameFilterLabel = new QLabel(tr("Game &description:"));
     gameNameFilterLabel->setBuddy(gameNameFilterEdit);
     creatorNameFilterEdit = new QLineEdit;
     creatorNameFilterEdit->setText(gamesProxyModel->getCreatorNameFilter());
-    QLabel *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
+    auto *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
     creatorNameFilterLabel->setBuddy(creatorNameFilterEdit);
 
-    QGridLayout *generalGrid = new QGridLayout;
+    auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(gameNameFilterLabel, 0, 0);
     generalGrid->addWidget(gameNameFilterEdit, 0, 1);
     generalGrid->addWidget(creatorNameFilterLabel, 1, 0);
@@ -63,12 +63,12 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     generalGroupBox = new QGroupBox(tr("General"));
     generalGroupBox->setLayout(generalGrid);
 
-    QVBoxLayout *gameTypeFilterLayout = new QVBoxLayout;
+    auto *gameTypeFilterLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
     while (gameTypesIterator.hasNext()) {
         gameTypesIterator.next();
 
-        QCheckBox *temp = new QCheckBox(gameTypesIterator.value());
+        auto *temp = new QCheckBox(gameTypesIterator.value());
         temp->setChecked(gamesProxyModel->getGameTypeFilter().contains(gameTypesIterator.key()));
 
         gameTypeFilterCheckBoxes.insert(gameTypesIterator.key(), temp);
@@ -79,38 +79,38 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
         gameTypeFilterGroupBox = new QGroupBox(tr("&Game types"));
         gameTypeFilterGroupBox->setLayout(gameTypeFilterLayout);
     } else
-        gameTypeFilterGroupBox = 0;
+        gameTypeFilterGroupBox = nullptr;
 
-    QLabel *maxPlayersFilterMinLabel = new QLabel(tr("at &least:"));
+    auto *maxPlayersFilterMinLabel = new QLabel(tr("at &least:"));
     maxPlayersFilterMinSpinBox = new QSpinBox;
     maxPlayersFilterMinSpinBox->setMinimum(1);
     maxPlayersFilterMinSpinBox->setMaximum(99);
     maxPlayersFilterMinSpinBox->setValue(gamesProxyModel->getMaxPlayersFilterMin());
     maxPlayersFilterMinLabel->setBuddy(maxPlayersFilterMinSpinBox);
 
-    QLabel *maxPlayersFilterMaxLabel = new QLabel(tr("at &most:"));
+    auto *maxPlayersFilterMaxLabel = new QLabel(tr("at &most:"));
     maxPlayersFilterMaxSpinBox = new QSpinBox;
     maxPlayersFilterMaxSpinBox->setMinimum(1);
     maxPlayersFilterMaxSpinBox->setMaximum(99);
     maxPlayersFilterMaxSpinBox->setValue(gamesProxyModel->getMaxPlayersFilterMax());
     maxPlayersFilterMaxLabel->setBuddy(maxPlayersFilterMaxSpinBox);
 
-    QGridLayout *maxPlayersFilterLayout = new QGridLayout;
+    auto *maxPlayersFilterLayout = new QGridLayout;
     maxPlayersFilterLayout->addWidget(maxPlayersFilterMinLabel, 0, 0);
     maxPlayersFilterLayout->addWidget(maxPlayersFilterMinSpinBox, 0, 1);
     maxPlayersFilterLayout->addWidget(maxPlayersFilterMaxLabel, 1, 0);
     maxPlayersFilterLayout->addWidget(maxPlayersFilterMaxSpinBox, 1, 1);
 
-    QGroupBox *maxPlayersGroupBox = new QGroupBox(tr("Maximum player count"));
+    auto *maxPlayersGroupBox = new QGroupBox(tr("Maximum player count"));
     maxPlayersGroupBox->setLayout(maxPlayersFilterLayout);
 
-    QGridLayout *restrictionsLayout = new QGridLayout;
+    auto *restrictionsLayout = new QGridLayout;
     restrictionsLayout->addWidget(unavailableGamesVisibleCheckBox, 0, 0);
     restrictionsLayout->addWidget(showPasswordProtectedGames, 1, 0);
     restrictionsLayout->addWidget(showBuddiesOnlyGames, 2, 0);
     restrictionsLayout->addWidget(hideIgnoredUserGames, 3, 0);
 
-    QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
+    auto *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
 
     spectatorsCanWatch = new QCheckBox(tr("Show games &spectators can watch"));
@@ -125,37 +125,37 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     spectatorsCanSeeHands->setChecked(true);  // DO NOT SUBMIT get from storage
     toggleSpectatorCheckboxEnabledness(getSpectatorsCanWatch());
 
-    QGridLayout *spectatorsLayout = new QGridLayout;
+    auto *spectatorsLayout = new QGridLayout;
     spectatorsLayout->addWidget(spectatorsCanWatch, 0, 0);
     spectatorsLayout->addWidget(spectatorsNeedPassword, 1, 0);
     spectatorsLayout->addWidget(spectatorsCanChat, 2, 0);
     spectatorsLayout->addWidget(spectatorsCanSeeHands, 3, 0);
 
-    QGroupBox *spectatorsGroupBox = new QGroupBox(tr("Spectators"));
+    auto *spectatorsGroupBox = new QGroupBox(tr("Spectators"));
     spectatorsGroupBox->setLayout(spectatorsLayout);
 
-    QGridLayout *leftGrid = new QGridLayout;
+    auto *leftGrid = new QGridLayout;
     leftGrid->addWidget(generalGroupBox, 0, 0, 1, 2);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
     leftGrid->addWidget(restrictionsGroupBox, 3, 0, 1, 2);
     leftGrid->addWidget(spectatorsGroupBox, 4, 0, 1, 2);
 
-    QVBoxLayout *leftColumn = new QVBoxLayout;
+    auto *leftColumn = new QVBoxLayout;
     leftColumn->addLayout(leftGrid);
     leftColumn->addStretch();
 
-    QVBoxLayout *rightColumn = new QVBoxLayout;
+    auto *rightColumn = new QVBoxLayout;
     rightColumn->addWidget(gameTypeFilterGroupBox);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
+    auto *hbox = new QHBoxLayout;
     hbox->addLayout(leftColumn);
     hbox->addLayout(rightColumn);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);
     mainLayout->addWidget(buttonBox);
 
