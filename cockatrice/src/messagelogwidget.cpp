@@ -316,7 +316,11 @@ void MessageLogWidget::logMoveCard(Player *player,
     bool usesNewX = false;
     if (targetZoneName == tableConstant()) {
         soundEngine->playSound("play_card");
-        finalStr = tr("%1 puts %2 into play%3.");
+        if (card->getFaceDown()) {
+            finalStr = tr("%1 puts %2 into play%3 face down.");
+        } else {
+            finalStr = tr("%1 puts %2 into play%3.");
+        }
     } else if (targetZoneName == graveyardConstant()) {
         finalStr = tr("%1 puts %2%3 into their graveyard.");
     } else if (targetZoneName == exileConstant()) {
