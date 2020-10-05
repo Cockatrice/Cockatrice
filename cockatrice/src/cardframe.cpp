@@ -107,7 +107,7 @@ void CardFrame::setCard(CardInfoPtr card)
 
 void CardFrame::setCard(const QString &cardName)
 {
-    setCard(db->getCardBySimpleName(cardName));
+    setCard(db->guessCard(cardName));
 }
 
 void CardFrame::setCard(AbstractCardItem *card)

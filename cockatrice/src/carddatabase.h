@@ -409,6 +409,7 @@ public:
     void removeCard(CardInfoPtr card);
     CardInfoPtr getCard(const QString &cardName) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
+    CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
