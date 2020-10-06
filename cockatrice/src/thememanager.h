@@ -25,7 +25,7 @@ private:
     /*
       Internal cache for multiple backgrounds
     */
-    QBrushMap tableBgBrushesCache, stackBgBrushesCache;
+    QBrushMap tableBgBrushesCache, stackBgBrushesCache, playerBgBrushesCache;
 
 protected:
     void ensureThemeDirectoryExists();
@@ -52,6 +52,7 @@ public:
     QStringMap &getAvailableThemes();
     QBrush getExtraTableBgBrush(QString extraNumber, QBrush &fallbackBrush);
     QBrush getExtraStackBgBrush(QString extraNumber, QBrush &fallbackBrush);
+    QBrush getExtraPlayerBgBrush(QString extraNumber, QBrush &fallbackBrush);
 protected slots:
     void themeChangedSlot();
 signals:

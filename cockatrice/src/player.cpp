@@ -83,13 +83,25 @@ void PlayerArea::updateBg()
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(bRect, themeManager->getPlayerBgBrush());
+    QBrush brush = themeManager->getPlayerBgBrush();
+
+    if (playerZoneId > 0) {
+        // If the extra image is not found, load the default one
+        brush = themeManager->getExtraPlayerBgBrush(QString::number(playerZoneId), brush);
+    }
+    painter->fillRect(boundingRect(), brush);
+    // painter->fillRect(bRect, themeManager->getPlayerBgBrush());
 }
 
 void PlayerArea::setSize(qreal width, qreal height)
 {
     prepareGeometryChange();
     bRect = QRectF(0, 0, width, height);
+}
+
+void PlayerArea::setPlayerZoneId(int _playerZoneId)
+{
+    playerZoneId = _playerZoneId;
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
@@ -3266,6 +3278,7 @@ void Player::setConceded(bool _conceded)
 void Player::setZoneId(int _zoneId)
 {
     zoneId = _zoneId;
+    playerArea->setPlayerZoneId(_zoneId);
 }
 
 void Player::setMirrored(bool _mirrored)
