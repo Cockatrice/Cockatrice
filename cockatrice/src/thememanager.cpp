@@ -118,6 +118,7 @@ void ThemeManager::themeChangedSlot()
     playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
     stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
     tableBgBrushesCache.clear();
+    stackBgBrushesCache.clear();
 
     QPixmapCache::clear();
 
@@ -133,6 +134,20 @@ QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber, QBrush &fallbackB
         tableBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
     } else {
         returnBrush = tableBgBrushesCache.value(extraNumber.toInt());
+    }
+
+    return returnBrush;
+}
+
+QBrush ThemeManager::getExtraStackBgBrush(QString extraNumber, QBrush &fallbackBrush)
+{
+    QBrush returnBrush;
+
+    if (!stackBgBrushesCache.contains(extraNumber.toInt())) {
+        returnBrush = loadExtraBrush(STACKZONE_BG_NAME + extraNumber, fallbackBrush);
+        stackBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
+    } else {
+        returnBrush = stackBgBrushesCache.value(extraNumber.toInt());
     }
 
     return returnBrush;
