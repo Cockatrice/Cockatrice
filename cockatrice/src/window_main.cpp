@@ -1109,15 +1109,32 @@ void MainWindow::actCheckCardUpdates()
 
     if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
+    } else { // try and find the directory oracle is stored in the build directory
+        QDir findLocalDir(dir);
+        findLocalDir.cdUp();
+        findLocalDir.cd(getCardUpdaterBinaryName());
+        if (findLocalDir.exists(binaryName)) {
+            dir = findLocalDir;
+            updaterCmd = dir.absoluteFilePath(binaryName);
+        }
     }
 
     if (updaterCmd.isEmpty()) {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
+        exitCardDatabaseUpdate();
         return;
     }
 
     cardUpdateProcess->start(updaterCmd, QStringList());
+}
+
+void MainWindow::exitCardDatabaseUpdate()
+{
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = nullptr;
+
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1145,18 +1162,13 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-
+    exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 {
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    exitCardDatabaseUpdate();
 }
 
 void MainWindow::actCheckServerUpdates()

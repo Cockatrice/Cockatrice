@@ -116,11 +116,11 @@ private:
     void createTrayIcon();
     void createTrayActions();
     int getNextCustomSetPrefix(QDir dataDir);
-    // TODO: add a preference item to choose updater name for other games
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";
     };
+    void exitCardDatabaseUpdate();
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
