@@ -29,7 +29,7 @@ https://www.visualstudio.com/) the best tool for the job.
 [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
 
 If you'd like to ask questions, get advice, or just want to say hi,
-The Cockatrice Development Team uses [Discord](https://discord.gg/ZASRzKu)
+the Cockatrice Development Team uses [Discord](https://discord.gg/ZASRzKu)
 for communications in the #dev channel. If you're not into Discord, we also
 have a [Gitter](https://gitter.im/Cockatrice/Cockatrice) channel available,
 albeit slightly less active.
@@ -37,12 +37,12 @@ albeit slightly less active.
 
 # Code Style Guide #
 
-### Formatting and continuous integration (ci) ###
+### Formatting and continuous integration (CI) ###
 
-We use a separate job on Travis CI to check your code for formatting issues, if
-your pull request was rejected you can check the output on their website.
-Click on "Details" next to the failed Travis CI build and then click on the
-Linting build (the fastest one) to see the log.
+We use a separate job on Travis CI to check your code for formatting issues. If
+your pull request was rejected, you can check the output on their website.
+Click on <kbd>Details</kbd> next to the failed Travis CI build and then click on the
+"Linting" build (the fastest one on the very top) to see the log.
 
 The message will look like this:
 ```
@@ -54,12 +54,12 @@ The message will look like this:
 ***  Then commit and push those changes to this branch. ***
 ***   Check our CONTRIBUTING.md file for more details.  ***
 ***                                                     ***
-***                    Thank you ❤️                      ***
+***                    Thank you ❤️                     ***
 ***                                                     ***
 ***********************************************************
 ```
-The CONTRIBUTING.md file mentioned is this file. Please read [this section](
-#formatting) for full information on our formatting guidelines.
+The CONTRIBUTING.md file mentioned in that message is the file you are currently
+reading. Please see [this section](#formatting) below for full information on our formatting guidelines.
 
 ### Compatibility ###
 
@@ -70,7 +70,7 @@ to help convert it over!
 For consistency, we use Qt data structures where possible. For example,
 `QString` over `std::string` and `QList` over `std::vector`.
 
-Do not use old c style casts in new code, instead use a [`static_cast<>`](
+Do not use old C style casts in new code, instead use a [`static_cast<>`](
 https://en.cppreference.com/w/cpp/language/static_cast)
 or other appropriate conversion.
 
@@ -85,7 +85,7 @@ format all files in your pr in one go. Use `./clangify.sh --help` to show a
 full help page.
 
 To run clang-format on a single source file simply use the command
-`clang-format -i <filename>` to format it in place. (some systems install
+`clang-format -i <filename>` to format it in place. (Some systems install
 clang-format with a specific version number appended,
 `find /usr/bin -name clang-format*` should find it for you)
 
@@ -102,7 +102,7 @@ Use header guards in the form of `FILE_NAME_H`.
 Simple functions, such as getters, may be written inline in the header file,
 but other functions should be written in the source file.
 
-Group library includes after project includes, and in alphabetic order. Like this:
+Group project includes first, followed by library includes. All in alphabetic order. Like this:
 ```c++
 // Good
 #include "card.h"
