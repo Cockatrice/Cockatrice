@@ -41,8 +41,9 @@ albeit slightly less active.
 
 We use a separate job on Travis CI to check your code for formatting issues. If
 your pull request was rejected, you can check the output on their website.
-Click on <kbd>Details</kbd> next to the failed Travis CI build and then click on the
-"Linting" build (the fastest one on the very top) to see the log.
+Click on <kbd>Details</kbd> next to the failed Travis CI build at the bottom of
+your PR and then click on the "Linting" build (the fastest one on the very top
+of the list) to see the detailed log.
 
 The message will look like this:
 ```
@@ -59,7 +60,8 @@ The message will look like this:
 ***********************************************************
 ```
 The CONTRIBUTING.md file mentioned in that message is the file you are currently
-reading. Please see [this section](#formatting) below for full information on our formatting guidelines.
+reading. Please see [this section](#formatting) below for full information on our
+formatting guidelines.
 
 ### Compatibility ###
 
@@ -102,7 +104,8 @@ Use header guards in the form of `FILE_NAME_H`.
 Simple functions, such as getters, may be written inline in the header file,
 but other functions should be written in the source file.
 
-Group project includes first, followed by library includes. All in alphabetic order. Like this:
+Group project includes first, followed by library includes. All in alphabetic order.
+Like this:
 ```c++
 // Good
 #include "card.h"
