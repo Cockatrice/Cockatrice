@@ -769,8 +769,8 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), cardUpdateProcess(nullptr),
-      logviewDialog(nullptr)
+    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
+      cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
     connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
@@ -1003,6 +1003,10 @@ void MainWindow::showWindowIfHidden()
 
 void MainWindow::cardDatabaseLoadingFailed()
 {
+    if (askedForDbUpdater) {
+        return;
+    }
+    askedForDbUpdater = true;
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Card database"));
     msgBox.setIcon(QMessageBox::Question);

@@ -132,7 +132,7 @@ private:
     RemoteClient *client;
     QThread *clientThread;
     LocalServer *localServer;
-    bool bHasActivated;
+    bool bHasActivated, askedForDbUpdater;
     QMessageBox serverShutdownMessageBox;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;
