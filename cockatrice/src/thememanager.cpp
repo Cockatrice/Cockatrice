@@ -120,6 +120,7 @@ void ThemeManager::themeChangedSlot()
     tableBgBrushesCache.clear();
     stackBgBrushesCache.clear();
     playerBgBrushesCache.clear();
+    handBgBrushesCache.clear();
 
     QPixmapCache::clear();
 
@@ -163,6 +164,20 @@ QBrush ThemeManager::getExtraPlayerBgBrush(QString extraNumber, QBrush &fallback
         playerBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
     } else {
         returnBrush = playerBgBrushesCache.value(extraNumber.toInt());
+    }
+
+    return returnBrush;
+}
+
+QBrush ThemeManager::getExtraHandBgBrush(QString extraNumber, QBrush &fallbackBrush)
+{
+    QBrush returnBrush;
+
+    if (!handBgBrushesCache.contains(extraNumber.toInt())) {
+        returnBrush = loadExtraBrush(HANDZONE_BG_NAME + extraNumber, fallbackBrush);
+        handBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
+    } else {
+        returnBrush = handBgBrushesCache.value(extraNumber.toInt());
     }
 
     return returnBrush;
