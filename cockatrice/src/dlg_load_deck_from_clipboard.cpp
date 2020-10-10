@@ -1,31 +1,30 @@
-#include <QClipboard>
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QKeySequence>
-#include <QApplication>
-#include <QTextStream>
-#include <QDialogButtonBox>
-#include <QMessageBox>
 #include "dlg_load_deck_from_clipboard.h"
+
 #include "deck_loader.h"
 #include "settingscache.h"
 
-DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
-    : QDialog(parent), deckList(0)
+#include <QApplication>
+#include <QClipboard>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QTextStream>
+#include <QVBoxLayout>
+
+DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
 {
     contentsEdit = new QPlainTextEdit;
-    
+
     refreshButton = new QPushButton(tr("&Refresh"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     buttonBox->addButton(refreshButton, QDialogButtonBox::ActionRole);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(contentsEdit);
     mainLayout->addWidget(buttonBox);
 
@@ -33,9 +32,9 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
 
     setWindowTitle(tr("Load deck from clipboard"));
     resize(500, 500);
-    
+
     actRefresh();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 }
 
@@ -46,33 +45,29 @@ void DlgLoadDeckFromClipboard::actRefresh()
 
 void DlgLoadDeckFromClipboard::refreshShortcuts()
 {
-    refreshButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
+    refreshButton->setShortcut(
+        SettingsCache::instance().shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
 }
 
 void DlgLoadDeckFromClipboard::actOK()
 {
     QString buffer = contentsEdit->toPlainText();
     QTextStream stream(&buffer);
-    
-    DeckLoader *l = new DeckLoader;
-    if (buffer.contains("<cockatrice_deck version=\"1\">"))
-    {
-        if (l->loadFromString_Native(buffer))
-        {
-            deckList = l;
+
+    auto *deckLoader = new DeckLoader;
+    if (buffer.contains("<cockatrice_deck version=\"1\">")) {
+        if (deckLoader->loadFromString_Native(buffer)) {
+            deckList = deckLoader;
             accept();
-        }
-        else
-        {
+        } else {
             QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
-            delete l;
+            delete deckLoader;
         }
-    }
-    else if (l->loadFromStream_Plain(stream)) {
-        deckList = l;
+    } else if (deckLoader->loadFromStream_Plain(stream)) {
+        deckList = deckLoader;
         accept();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
-        delete l;
+        delete deckLoader;
     }
 }

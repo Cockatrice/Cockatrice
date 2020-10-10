@@ -1,24 +1,30 @@
-#include <QVBoxLayout>
-#include <QDesktopWidget>
 #include "cardinfowidget.h"
-#include "carditem.h"
-#include "carddatabase.h"
+
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
+#include "carditem.h"
 #include "main.h"
 
+#include <QApplication>
+#include <utility>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+#include <QScreen>
+#else
+#include <QDesktopWidget>
+#endif
+#include <QVBoxLayout>
+
 CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
-    : QFrame(parent, flags)
-    , aspectRatio((qreal) CARD_HEIGHT / (qreal) CARD_WIDTH)
-    , info(nullptr)
+    : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH), info(nullptr)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPicture();
     pic->setObjectName("pic");
     text = new CardInfoText();
     text->setObjectName("text");
+    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
-    QVBoxLayout * layout = new QVBoxLayout();
+    auto *layout = new QVBoxLayout();
     layout->setObjectName("layout");
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -27,26 +33,31 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     setLayout(layout);
 
     setFrameStyle(QFrame::Panel | QFrame::Raised);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+    int pixmapHeight = qApp->primaryScreen()->geometry().height() / 3;
+#else
     QDesktopWidget desktopWidget;
     int pixmapHeight = desktopWidget.screenGeometry().height() / 3;
-    int pixmapWidth = pixmapHeight / aspectRatio;
+#endif
+    int pixmapWidth = static_cast<int>(pixmapHeight / aspectRatio);
     pic->setFixedWidth(pixmapWidth);
     pic->setFixedHeight(pixmapHeight);
     setFixedWidth(pixmapWidth + 150);
-    
+
     setCard(cardName);
 
     // ensure our parent gets a valid size to position us correctly
     resize(width(), sizeHint().height());
 }
 
-void CardInfoWidget::setCard(CardInfo *card)
+void CardInfoWidget::setCard(CardInfoPtr card)
 {
     if (info)
-        disconnect(info, nullptr, this, nullptr);
-    info = card;
-    if(info)
-        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+        disconnect(info.data(), nullptr, this, nullptr);
+    info = std::move(card);
+    if (info)
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
 
     text->setCard(info);
     pic->setCard(info);
@@ -55,6 +66,8 @@ void CardInfoWidget::setCard(CardInfo *card)
 void CardInfoWidget::setCard(const QString &cardName)
 {
     setCard(db->getCardBySimpleName(cardName));
+    if (!info)
+        text->setInvalidCardName(cardName);
 }
 
 void CardInfoWidget::setCard(AbstractCardItem *card)
@@ -64,5 +77,5 @@ void CardInfoWidget::setCard(AbstractCardItem *card)
 
 void CardInfoWidget::clear()
 {
-    setCard((CardInfo *) nullptr);
+    setCard((CardInfoPtr) nullptr);
 }

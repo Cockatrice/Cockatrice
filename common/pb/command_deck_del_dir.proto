@@ -7,4 +7,3 @@ message Command_DeckDelDir {
     }
     optional string path = 1;
 }
- 

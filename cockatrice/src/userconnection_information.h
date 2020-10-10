@@ -1,31 +1,56 @@
 #ifndef USERCONNECTION_INFORMATION_H
 #define USERCONNECTION_INFORMATION_H
 
-#include <QSettings>
-#include <QFile>
-#include <QDir>
 #include <QApplication>
+#include <QDir>
+#include <QFile>
+#include <QSettings>
 #include <QStandardPaths>
 
-class UserConnection_Information {
-    private:
-        QString saveName;
-        QString server;
-        QString port;
-        QString username;
-        QString password;
-        bool savePassword;
-    
-    public:
-        UserConnection_Information();
-        UserConnection_Information(QString, QString, QString, QString, QString, bool);
-        QString getSaveName() { return saveName; }
-        QString getServer() { return server; }
-        QString getPort() { return port; }
-        QString getUsername() { return username; }
-        QString getPassword() { return password; }
-        bool getSavePassword() { return savePassword; }
-        QMap<QString, UserConnection_Information> getServerInfo();
-        QStringList getServerInfo(const QString &find);
+class UserConnection_Information
+{
+private:
+    QString saveName;
+    QString server;
+    QString port;
+    QString username;
+    QString password;
+    bool savePassword;
+    QString site;
+    bool isCustom;
+
+public:
+    UserConnection_Information();
+    UserConnection_Information(QString, QString, QString, QString, QString, bool, QString);
+    QString getSaveName() const
+    {
+        return saveName;
+    }
+    QString getServer() const
+    {
+        return server;
+    }
+    QString getPort() const
+    {
+        return port;
+    }
+    QString getUsername() const
+    {
+        return username;
+    }
+    QString getPassword() const
+    {
+        return password;
+    }
+    bool getSavePassword() const
+    {
+        return savePassword;
+    }
+    QString getSite() const
+    {
+        return site;
+    }
+    QMap<QString, std::pair<QString, UserConnection_Information>> getServerInfo();
+    QStringList getServerInfo(const QString &find);
 };
 #endif

@@ -1,22 +1,26 @@
 #include "tab_userlists.h"
-#include "userlist.h"
-#include "userinfobox.h"
-#include "abstractclient.h"
-#include "soundengine.h"
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QLineEdit>
 
-#include "pending_command.h"
-#include "pb/session_commands.pb.h"
-#include "pb/response_list_users.pb.h"
-#include "pb/event_user_joined.pb.h"
-#include "pb/event_user_left.pb.h"
+#include "abstractclient.h"
+#include "customlineedit.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
+#include "pb/event_user_joined.pb.h"
+#include "pb/event_user_left.pb.h"
+#include "pb/response_list_users.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
+#include "soundengine.h"
+#include "userinfobox.h"
+#include "userlist.h"
 
-TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent)
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
+                           AbstractClient *_client,
+                           const ServerInfo_User &userInfo,
+                           QWidget *parent)
     : Tab(_tabSupervisor, parent), client(_client)
 {
     allUsersList = new UserList(_tabSupervisor, client, UserList::AllUsersList);
@@ -25,19 +29,29 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     userInfoBox = new UserInfoBox(client, true);
     userInfoBox->updateInfo(userInfo);
 
-    connect(allUsersList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
-    connect(buddyList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
-    connect(ignoreList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
+    connect(allUsersList, SIGNAL(openMessageDialog(const QString &, bool)), this,
+            SIGNAL(openMessageDialog(const QString &, bool)));
+    connect(buddyList, SIGNAL(openMessageDialog(const QString &, bool)), this,
+            SIGNAL(openMessageDialog(const QString &, bool)));
+    connect(ignoreList, SIGNAL(openMessageDialog(const QString &, bool)), this,
+            SIGNAL(openMessageDialog(const QString &, bool)));
 
-    connect(client, SIGNAL(userJoinedEventReceived(const Event_UserJoined &)), this, SLOT(processUserJoinedEvent(const Event_UserJoined &)));
-    connect(client, SIGNAL(userLeftEventReceived(const Event_UserLeft &)), this, SLOT(processUserLeftEvent(const Event_UserLeft &)));
-    connect(client, SIGNAL(buddyListReceived(const QList<ServerInfo_User> &)), this, SLOT(buddyListReceived(const QList<ServerInfo_User> &)));
-    connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this, SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
-    connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this, SLOT(processAddToListEvent(const Event_AddToList &)));
-    connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this, SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
+    connect(client, SIGNAL(userJoinedEventReceived(const Event_UserJoined &)), this,
+            SLOT(processUserJoinedEvent(const Event_UserJoined &)));
+    connect(client, SIGNAL(userLeftEventReceived(const Event_UserLeft &)), this,
+            SLOT(processUserLeftEvent(const Event_UserLeft &)));
+    connect(client, SIGNAL(buddyListReceived(const QList<ServerInfo_User> &)), this,
+            SLOT(buddyListReceived(const QList<ServerInfo_User> &)));
+    connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this,
+            SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
+    connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this,
+            SLOT(processAddToListEvent(const Event_AddToList &)));
+    connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this,
+            SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
 
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processListUsersResponse(const Response &)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(processListUsersResponse(const Response &)));
     client->sendCommand(pend);
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -45,7 +59,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     vbox->addWidget(allUsersList);
 
     QHBoxLayout *addToBuddyList = new QHBoxLayout;
-    addBuddyEdit = new QLineEdit;
+    addBuddyEdit = new LineEditUnfocusable;
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
     connect(addBuddyEdit, SIGNAL(returnPressed()), this, SLOT(addToBuddyList()));
     QPushButton *addBuddyButton = new QPushButton("Add");
@@ -54,7 +68,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     addToBuddyList->addWidget(addBuddyButton);
 
     QHBoxLayout *addToIgnoreList = new QHBoxLayout;
-    addIgnoreEdit = new QLineEdit;
+    addIgnoreEdit = new LineEditUnfocusable;
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
     connect(addIgnoreEdit, SIGNAL(returnPressed()), this, SLOT(addToIgnoreList()));
     QPushButton *addIgnoreButton = new QPushButton("Add");
@@ -77,7 +91,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 
     retranslateUi();
 
-    QWidget * mainWidget = new QWidget(this);
+    QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
 }
@@ -85,7 +99,8 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 void TabUserLists::addToBuddyList()
 {
     QString userName = addBuddyEdit->text();
-    if (userName.length() < 1) return;
+    if (userName.length() < 1)
+        return;
 
     std::string listName = "buddy";
     addToList(listName, userName);
@@ -95,7 +110,8 @@ void TabUserLists::addToBuddyList()
 void TabUserLists::addToIgnoreList()
 {
     QString userName = addIgnoreEdit->text();
-    if (userName.length() < 1) return;
+    if (userName.length() < 1)
+        return;
 
     std::string listName = "ignore";
     addToList(listName, userName);
@@ -111,7 +127,6 @@ void TabUserLists::addToList(const std::string &listName, const QString &userNam
     client->sendCommand(client->prepareSessionCommand(cmd));
 }
 
-
 void TabUserLists::retranslateUi()
 {
     allUsersList->retranslateUi();
@@ -123,7 +138,7 @@ void TabUserLists::retranslateUi()
 void TabUserLists::processListUsersResponse(const Response &response)
 {
     const Response_ListUsers &resp = response.GetExtension(Response_ListUsers::ext);
-    
+
     const int userListSize = resp.user_list_size();
     for (int i = 0; i < userListSize; ++i) {
         const ServerInfo_User &info = resp.user_list(i);
@@ -132,7 +147,7 @@ void TabUserLists::processListUsersResponse(const Response &response)
         ignoreList->setUserOnline(userName, true);
         buddyList->setUserOnline(userName, true);
     }
-    
+
     allUsersList->sortItems();
     ignoreList->sortItems();
     buddyList->sortItems();
@@ -142,15 +157,15 @@ void TabUserLists::processUserJoinedEvent(const Event_UserJoined &event)
 {
     const ServerInfo_User &info = event.user_info();
     const QString userName = QString::fromStdString(info.name());
-    
+
     allUsersList->processUserInfo(info, true);
     ignoreList->setUserOnline(userName, true);
     buddyList->setUserOnline(userName, true);
-    
+
     allUsersList->sortItems();
     ignoreList->sortItems();
     buddyList->sortItems();
-    
+
     if (buddyList->getUsers().keys().contains(userName))
         soundEngine->playSound("buddy_join");
 
@@ -169,7 +184,7 @@ void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)
         buddyList->setUserOnline(userName, false);
         ignoreList->sortItems();
         buddyList->sortItems();
-        
+
         emit userLeft(userName);
     }
 }
@@ -200,7 +215,7 @@ void TabUserLists::processAddToListEvent(const Event_AddToList &event)
         userList = ignoreList;
     if (!userList)
         return;
-    
+
     userList->processUserInfo(info, online);
     userList->sortItems();
 }

@@ -1,8 +1,12 @@
 #include "server_response_containers.h"
-#include <google/protobuf/descriptor.h>
+
 #include "server_game.h"
 
-GameEventStorageItem::GameEventStorageItem(const ::google::protobuf::Message &_event, int _playerId, EventRecipients _recipients)
+#include <google/protobuf/descriptor.h>
+
+GameEventStorageItem::GameEventStorageItem(const ::google::protobuf::Message &_event,
+                                           int _playerId,
+                                           EventRecipients _recipients)
     : event(new GameEvent), recipients(_recipients)
 {
     event->GetReflection()->MutableMessage(event, _event.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(_event);
@@ -14,8 +18,7 @@ GameEventStorageItem::~GameEventStorageItem()
     delete event;
 }
 
-GameEventStorage::GameEventStorage()
-    : gameEventContext(0), privatePlayerId(0)
+GameEventStorage::GameEventStorage() : gameEventContext(0), privatePlayerId(0)
 {
 }
 
@@ -30,10 +33,15 @@ void GameEventStorage::setGameEventContext(const ::google::protobuf::Message &_g
 {
     delete gameEventContext;
     gameEventContext = new GameEventContext;
-    gameEventContext->GetReflection()->MutableMessage(gameEventContext, _gameEventContext.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(_gameEventContext);
+    gameEventContext->GetReflection()
+        ->MutableMessage(gameEventContext, _gameEventContext.GetDescriptor()->FindExtensionByName("ext"))
+        ->CopyFrom(_gameEventContext);
 }
 
-void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event, int playerId, GameEventStorageItem::EventRecipients recipients, int _privatePlayerId)
+void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event,
+                                        int playerId,
+                                        GameEventStorageItem::EventRecipients recipients,
+                                        int _privatePlayerId)
 {
     gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
     if (_privatePlayerId != -1)
@@ -44,9 +52,13 @@ void GameEventStorage::sendToGame(Server_Game *game)
 {
     if (gameEventList.isEmpty())
         return;
-    
+
     GameEventContainer *contPrivate = new GameEventContainer;
     GameEventContainer *contOthers = new GameEventContainer;
+    if (forcedByJudge != -1) {
+        contPrivate->set_forced_by_judge(forcedByJudge);
+        contOthers->set_forced_by_judge(forcedByJudge);
+    }
     for (int i = 0; i < gameEventList.size(); ++i) {
         const GameEvent &event = gameEventList[i]->getGameEvent();
         const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
@@ -63,8 +75,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
     game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, privatePlayerId);
 }
 
-ResponseContainer::ResponseContainer(int _cmdId)
-        : cmdId(_cmdId), responseExtension(0)
+ResponseContainer::ResponseContainer(int _cmdId) : cmdId(_cmdId), responseExtension(0)
 {
 }
 

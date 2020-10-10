@@ -8,4 +8,3 @@ message Command_ReplayModifyMatch {
     optional sint32 game_id = 1 [default = -1];
     optional bool do_not_hide = 2;
 }
- 

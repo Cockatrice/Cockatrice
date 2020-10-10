@@ -1,32 +1,33 @@
-#include <QLabel>
+#include "dlg_register.h"
+
+#include "pb/serverinfo_user.pb.h"
+#include "settingscache.h"
+
 #include <QCheckBox>
+#include <QDebug>
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
-#include <QDialogButtonBox>
+#include <QLabel>
 #include <QMessageBox>
-#include <QDebug>
 
-#include "dlg_register.h"
-#include "settingscache.h"
-#include "pb/serverinfo_user.pb.h"
-
-DlgRegister::DlgRegister(QWidget *parent)
-    : QDialog(parent)
+DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
+    ServersSettings &servers = SettingsCache::instance().servers();
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
+    hostEdit = new QLineEdit(servers.getHostname("server.cockatrice.us"));
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
+    portEdit = new QLineEdit(servers.getPort("4747"));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
+    playernameEdit = new QLineEdit(servers.getPlayerName("Player"));
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
+    passwordEdit = new QLineEdit(servers.getPassword());
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
@@ -297,8 +298,8 @@ DlgRegister::DlgRegister(QWidget *parent)
     countryEdit->addItem(QPixmap("theme:countries/zm"), "zm");
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
     countryEdit->setCurrentIndex(0);
-    QStringList countries = settingsCache->getCountries();
-    foreach(QString c, countries)
+    QStringList countries = SettingsCache::instance().getCountries();
+    foreach (QString c, countries)
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
 
     realnameLabel = new QLabel(tr("Real name:"));
@@ -327,7 +328,7 @@ DlgRegister::DlgRegister(QWidget *parent)
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -341,32 +342,25 @@ DlgRegister::DlgRegister(QWidget *parent)
 
 void DlgRegister::actOk()
 {
-    if (passwordEdit->text() != passwordConfirmationEdit->text())
-    {
-         QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
-         return;
-    }
-    else if (emailConfirmationEdit->text() != emailEdit->text())
-    {
-        QMessageBox::critical(this, tr("Registration Warning"), tr("Your email addresses do not match, please try again."));
+    if (passwordEdit->text() != passwordConfirmationEdit->text()) {
+        QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
+        return;
+    } else if (emailConfirmationEdit->text() != emailEdit->text()) {
+        QMessageBox::critical(this, tr("Registration Warning"),
+                              tr("Your email addresses do not match, please try again."));
         return;
     }
-    if(playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
         return;
     }
 
-    settingsCache->servers().setHostName(hostEdit->text());
-    settingsCache->servers().setPort(portEdit->text());
-    settingsCache->servers().setPlayerName(playernameEdit->text());
+    ServersSettings &servers = SettingsCache::instance().servers();
+    servers.setHostName(hostEdit->text());
+    servers.setPort(portEdit->text());
+    servers.setPlayerName(playernameEdit->text());
     // always save the password so it will be picked up by the connect dialog
-    settingsCache->servers().setPassword(passwordEdit->text());
+    servers.setPassword(passwordEdit->text());
 
     accept();
-}
-
-void DlgRegister::actCancel()
-{
-    reject();
 }

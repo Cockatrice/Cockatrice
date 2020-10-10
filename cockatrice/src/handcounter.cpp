@@ -1,11 +1,12 @@
-#include <QPainter>
-#include <QPixmapCache>
-#include <QGraphicsSceneMouseEvent>
 #include "handcounter.h"
+
 #include "cardzone.h"
 
-HandCounter::HandCounter(QGraphicsItem *parent)
-    : AbstractGraphicsItem(parent), number(0)
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <QPixmapCache>
+
+HandCounter::HandCounter(QGraphicsItem *parent) : AbstractGraphicsItem(parent), number(0)
 {
     setCacheMode(DeviceCoordinateCache);
 }
@@ -34,10 +35,10 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
         cachedPixmap = QPixmap("theme:hand").scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert("handCounter" + QString::number(translatedSize.width()), cachedPixmap);
     }
-    painter->resetTransform();
+    resetPainterTransform(painter);
     painter->drawPixmap(cachedPixmap.rect(), cachedPixmap, cachedPixmap.rect());
     painter->restore();
-    
+
     paintNumberEllipse(number, 24, Qt::white, -1, -1, painter);
 }
 

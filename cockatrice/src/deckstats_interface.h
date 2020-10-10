@@ -3,6 +3,7 @@
 
 #include "carddatabase.h"
 #include "decklist.h"
+
 #include <QObject>
 
 class QByteArray;
@@ -10,7 +11,8 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class DeckList;
 
-class DeckStatsInterface : public QObject {
+class DeckStatsInterface : public QObject
+{
     Q_OBJECT
 private:
     QNetworkAccessManager *manager;
@@ -22,13 +24,14 @@ private:
      * closest non-token card instead. So we construct a new deck which has no
      * tokens.
      */
-    void copyDeckWithoutTokens(const DeckList &source, DeckList& destination);
+    void copyDeckWithoutTokens(const DeckList &source, DeckList &destination);
 
 private slots:
     void queryFinished(QNetworkReply *reply);
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
+
 public:
-    DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = 0);
+    DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
     void analyzeDeck(DeckList *deck);
 };
 

@@ -1,10 +1,18 @@
-#include <QGraphicsSceneMouseEvent>
 #include "selectzone.h"
-#include "gamescene.h"
-#include "carditem.h"
-#include <QDebug>
 
-SelectZone::SelectZone(Player *_player, const QString &_name, bool _hasCardAttr, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent, bool isView)
+#include "carditem.h"
+#include "gamescene.h"
+
+#include <QDebug>
+#include <QGraphicsSceneMouseEvent>
+
+SelectZone::SelectZone(Player *_player,
+                       const QString &_name,
+                       bool _hasCardAttr,
+                       bool _isShufflable,
+                       bool _contentsKnown,
+                       QGraphicsItem *parent,
+                       bool isView)
     : CardZone(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent, isView)
 {
 }
@@ -22,7 +30,7 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             pos.setY(0);
         if (pos.y() > br.height())
             pos.setY(br.height());
-        
+
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
         for (int i = 0; i < cards.size(); ++i) {
             if (cards[i]->getAttachedTo())
@@ -30,7 +38,8 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                     continue;
             cards[i]->setSelected(selectionRect.intersects(cards[i]->mapRectToParent(cards[i]->boundingRect())));
         }
-        static_cast<GameScene *>(scene())->resizeRubberBand(deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
+        static_cast<GameScene *>(scene())->resizeRubberBand(
+            deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
         event->accept();
     }
 }
@@ -39,7 +48,7 @@ void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         scene()->clearSelection();
-        
+
         selectionOrigin = event->pos();
         static_cast<GameScene *>(scene())->startRubberBand(event->scenePos());
         event->accept();
@@ -53,4 +62,3 @@ void SelectZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     static_cast<GameScene *>(scene())->stopRubberBand();
     event->accept();
 }
- 

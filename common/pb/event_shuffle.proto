@@ -6,4 +6,6 @@ message Event_Shuffle {
         optional Event_Shuffle ext = 2007;
     }
     optional string zone_name = 1;
+    optional sint32 start = 2 [default = 0];
+    optional sint32 end = 3 [default = -1];
 }

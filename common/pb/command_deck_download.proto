@@ -7,4 +7,3 @@ message Command_DeckDownload {
     }
     optional sint32 deck_id = 1 [default = -1];
 }
- 

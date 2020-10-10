@@ -1,33 +1,37 @@
-#include <QLabel>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QHBoxLayout>
-#include <QDialogButtonBox>
-#include <QMessageBox>
-#include <QDebug>
-
 #include "dlg_forgotpasswordreset.h"
+
 #include "settingscache.h"
 
-DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
-    : QDialog(parent)
+#include <QCheckBox>
+#include <QDebug>
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
+
+DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent)
 {
 
-    QString lastfphost; QString lastfpport; QString lastfpplayername;
-    lastfphost = settingsCache->servers().getHostname("cockatrice.woogerworks.com");
-    lastfpport = settingsCache->servers().getPort("4747");
-    lastfpplayername = settingsCache->servers().getPlayerName("Player");
+    QString lastfphost;
+    QString lastfpport;
+    QString lastfpplayername;
+    ServersSettings &servers = SettingsCache::instance().servers();
+    lastfphost = servers.getHostname("server.cockatrice.us");
+    lastfpport = servers.getPort("4747");
+    lastfpplayername = servers.getPlayerName("Player");
 
-    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
-        lastfphost = settingsCache->servers().getFPHostname();
-        lastfpport = settingsCache->servers().getFPPort();
-        lastfpplayername = settingsCache->servers().getFPPlayerName();
+    if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {
+        lastfphost = servers.getFPHostname();
+        lastfpport = servers.getFPPort();
+        lastfpplayername = servers.getFPPlayerName();
     }
 
-    if (settingsCache->servers().getFPHostname().isEmpty() && settingsCache->servers().getFPPort().isEmpty() && settingsCache->servers().getFPPlayerName().isEmpty())
-    {
-        QMessageBox::warning(this, tr("Forgot Password Reset Warning"), tr("Opps, looks like something has gone wrong.  Please re-start the forgot password process by using the forgot password button on the connection screen."));
-        actCancel();
+    if (servers.getFPHostname().isEmpty() && servers.getFPPort().isEmpty() && servers.getFPPlayerName().isEmpty()) {
+        QMessageBox::warning(this, tr("Forgot Password Reset Warning"),
+                             tr("Oops, looks like something has gone wrong. Please re-start the forgot password "
+                                "process by using the forgot password button on the connection screen."));
+        reject();
     }
 
     hostLabel = new QLabel(tr("&Host:"));
@@ -56,7 +60,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
     newpasswordverifyLabel->setBuddy(newpasswordEdit);
     newpasswordverifyEdit->setEchoMode(QLineEdit::Password);
 
-    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
+    if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {
         hostLabel->hide();
         hostEdit->hide();
         portLabel->hide();
@@ -81,7 +85,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -95,38 +99,30 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
 
 void DlgForgotPasswordReset::actOk()
 {
-    if(playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The player name can't be empty."));
         return;
     }
 
-    if (tokenEdit->text().isEmpty())
-    {
+    if (tokenEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The token can't be empty."));
         return;
     }
 
-    if (newpasswordEdit->text().isEmpty())
-    {
+    if (newpasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The new password can't be empty."));
         return;
     }
 
-    if (newpasswordEdit->text() != newpasswordverifyEdit->text())
-    {
+    if (newpasswordEdit->text() != newpasswordverifyEdit->text()) {
         QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The passwords do not match."));
         return;
     }
 
-    settingsCache->servers().setFPHostName(hostEdit->text());
-    settingsCache->servers().setFPPort(portEdit->text());
-    settingsCache->servers().setFPPlayerName(playernameEdit->text());
+    ServersSettings &servers = SettingsCache::instance().servers();
+    servers.setFPHostName(hostEdit->text());
+    servers.setFPPort(portEdit->text());
+    servers.setFPPlayerName(playernameEdit->text());
 
     accept();
-}
-
-void DlgForgotPasswordReset::actCancel()
-{
-    reject();
 }

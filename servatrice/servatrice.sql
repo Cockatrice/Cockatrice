@@ -18,9 +18,9 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   `version` int(7) unsigned NOT NULL,
   PRIMARY KEY  (`version`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(23);
+INSERT INTO cockatrice_schema_version VALUES(27);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -40,11 +40,12 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `privlevel` enum("NONE","VIP","DONATOR") NOT NULL,
   `privlevelStartDate` datetime NOT NULL,
   `privlevelEndDate` datetime NOT NULL,
+  `passwordLastChangedDate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
   KEY `email` (`email`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -56,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   PRIMARY KEY  (`id`),
   KEY `FolderPlusUser` (`id_folder`,`id_user`),
   FOREIGN KEY(`id_user`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   PRIMARY KEY  (`id`),
   KEY `ParentPlusUser` (`id_parent`,`id_user`),
   FOREIGN KEY(`id_user`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_ignorelist` (
   `id_user1` int(7) unsigned NOT NULL,
@@ -74,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_ignorelist` (
   UNIQUE KEY `key` (`id_user1`, `id_user2`),
   FOREIGN KEY(`id_user1`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY(`id_user2`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_buddylist` (
   `id_user1` int(7) unsigned NOT NULL,
@@ -82,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_buddylist` (
   UNIQUE KEY `key` (`id_user1`, `id_user2`),
   FOREIGN KEY(`id_user1`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY(`id_user2`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- rooms
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
@@ -96,34 +97,34 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `chat_history_size` int(4) NOT NULL,
   `id_server` tinyint(3) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
   `id_room` int(7) unsigned NOT NULL,
   `name` varchar(50) NOT NULL,
   `id_server` tinyint(3) NOT NULL DEFAULT 1,
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- games
 CREATE TABLE IF NOT EXISTS `cockatrice_games` (
   `room_name` varchar(255) NOT NULL,
   `id` int(7) unsigned NOT NULL auto_increment,
   `descr` varchar(50) default NULL,
-  `creator_name` varchar(255) NOT NULL,
+  `creator_name` varchar(35) NOT NULL,
   `password` tinyint(1) NOT NULL,
   `game_types` varchar(255) NOT NULL,
   `player_count` tinyint(3) NOT NULL,
   `time_started` datetime default NULL,
   `time_finished` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_games_players` (
   `id_game` int(7) unsigned zerofill NOT NULL,
-  `player_name` varchar(255) NOT NULL,
+  `player_name` varchar(35) NOT NULL,
   FOREIGN KEY(`id_game`) REFERENCES `cockatrice_games`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- Note: an empty row with id_game = NULL is created when the game is created,
 -- and then updated when the game ends with the full replay data.
@@ -134,66 +135,68 @@ CREATE TABLE IF NOT EXISTS `cockatrice_replays` (
   `replay` mediumblob NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY(`id_game`) REFERENCES `cockatrice_games`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_replays_access` (
   `id_game` int(7) unsigned NOT NULL,
   `id_player` int(7) unsigned NOT NULL,
-  `replay_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `replay_name` varchar(255) NOT NULL,
   `do_not_hide` tinyint(1) NOT NULL,
   KEY `id_player` (`id_player`),
   FOREIGN KEY(`id_game`) REFERENCES `cockatrice_games`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY(`id_player`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- server administration
 
 -- Note: unused table
 CREATE TABLE IF NOT EXISTS `cockatrice_servers` (
   `id` mediumint(8) unsigned NOT NULL,
-  `ssl_cert` text COLLATE utf8_unicode_ci NOT NULL,
-  `hostname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ssl_cert` text NOT NULL,
+  `hostname` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
   `game_port` mediumint(8) unsigned NOT NULL,
   `control_port` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_uptime` (
   `id_server` tinyint(3) NOT NULL,
   `timest` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `uptime` int(11) NOT NULL,
   `users_count` int(11) NOT NULL,
+  `mods_count` int(11) NOT NULL DEFAULT 0,
+  `mods_list` TEXT,
   `games_count` int(11) NOT NULL,
   `rx_bytes` int(11) NOT NULL,
   `tx_bytes` int(11) NOT NULL,
   PRIMARY KEY (`timest`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_servermessages` (
   `id_server` tinyint(3) not null default 1,
   `timest` datetime NOT NULL default '0000-00-00 00:00:00',
   `message` text,
   PRIMARY KEY  (`timest`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `id` int(9) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(35) NOT NULL,
   `id_server` tinyint(3) NOT NULL,
-  `ip_address` varchar(255) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
   `clientid` varchar(15) NOT NULL,
   `connection_type` ENUM('tcp', 'websocket'),
   PRIMARY KEY (`id`),
   KEY `username` (`user_name`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- server moderation
 CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
- `user_name` varchar(255) NOT NULL,
- `ip_address` varchar(255) NOT NULL,
+ `user_name` varchar(35) NOT NULL,
+ `ip_address` varchar(45) NOT NULL,
  `id_admin` int(7) unsigned zerofill NOT NULL,
  `time_from` datetime NOT NULL,
  `minutes` int(6) NOT NULL,
@@ -204,23 +207,23 @@ CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
   KEY `time_from` (`time_from`,`ip_address`),
   KEY `ip_address` (`ip_address`),
   FOREIGN KEY(`id_admin`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_warnings` (
   `user_id` int(7) unsigned NOT NULL,
-  `user_name` varchar(255) NOT NULL,
-  `mod_name` varchar(255) NOT NULL,
+  `user_name` varchar(35) NOT NULL,
+  `mod_name` varchar(35) NOT NULL,
   `reason` text NOT NULL,
   `time_of` datetime NOT NULL,
   `clientid` varchar(15) NOT NULL,
   PRIMARY KEY (`user_id`,`time_of`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   `log_time` datetime NOT NULL,
   `sender_id` int(7) unsigned NULL,
   `sender_name` varchar(35) NOT NULL,
-  `sender_ip` varchar(255) NOT NULL,
+  `sender_ip` varchar(45) NOT NULL,
   `log_message` text NOT NULL,
   `target_type` ENUM('room', 'game', 'chat'),
   `target_id` int(7) NULL,
@@ -232,12 +235,12 @@ CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   KEY `target_name` (`target_name`),
   FOREIGN KEY(`sender_id`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
   -- No FK on target_id, it can be zero
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_activation_emails` (
   `name` varchar(35) NOT NULL,
   FOREIGN KEY(`name`) REFERENCES `cockatrice_users`(`name`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_user_analytics` (
   `id` int(7) unsigned zerofill NOT NULL,
@@ -246,11 +249,11 @@ CREATE TABLE IF NOT EXISTS `cockatrice_user_analytics` (
   `notes` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   FOREIGN KEY(`id`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_donations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) DEFAULT NULL,
+  `username` varchar(35) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `payment_pre_fee` double DEFAULT NULL,
   `payment_post_fee` double DEFAULT NULL,
@@ -258,7 +261,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_donations` (
   `date` varchar(255) DEFAULT NULL,
   `pp_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_forgot_password` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -267,13 +270,13 @@ CREATE TABLE IF NOT EXISTS `cockatrice_forgot_password` (
   `emailed` tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (`id`),
   KEY `user_name` (`name`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_server` tinyint(3) NOT NULL,
   `name` varchar(35) NOT NULL,
-  `ip_address` varchar(255) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
   `clientid` varchar(15) NOT NULL,
   `incidentDate` datetime NOT NULL default '0000-00-00 00:00:00',
   `action` varchar(35) NOT NULL,
@@ -281,4 +284,4 @@ CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   `details` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `user_name` (`name`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;

@@ -1,19 +1,19 @@
 #include "userinfobox.h"
-#include "pixmapgenerator.h"
-#include "abstractclient.h"
-#include "dlg_edit_user.h"
-#include "dlg_edit_password.h"
-#include "dlg_edit_avatar.h"
 
-#include <QLabel>
+#include "abstractclient.h"
+#include "dlg_edit_avatar.h"
+#include "dlg_edit_password.h"
+#include "dlg_edit_user.h"
+#include "pb/response_get_user_info.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
+#include "pixmapgenerator.h"
+
 #include <QDateTime>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QMessageBox>
-
-#include "pending_command.h"
-#include "pb/session_commands.pb.h"
-#include "pb/response_get_user_info.pb.h"
 
 const qint64 SIXTY = 60;
 const qint64 HOURS_IN_A_DAY = 24;
@@ -27,11 +27,18 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     nameFont.setPointSize(nameFont.pointSize() * 1.5);
     nameLabel.setFont(nameFont);
 
-    avatarLabel.setMaximumWidth(400);
-    avatarLabel.setMaximumHeight(200);
+    avatarLabel.setMinimumSize(200, 200);
+    avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    avatarLabel.setAlignment(Qt::AlignCenter);
+
+    QHBoxLayout *avatarLayout = new QHBoxLayout;
+    avatarLayout->setContentsMargins(0, 0, 0, 0);
+    avatarLayout->addStretch(1);
+    avatarLayout->addWidget(&avatarLabel, 3);
+    avatarLayout->addStretch(1);
 
     QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->addWidget(&avatarLabel, 0, 0, 1, 3, Qt::AlignCenter);
+    mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
     mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
@@ -41,13 +48,12 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
     mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1);
     mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
-    mainLayout->addWidget(&accountAgeLebel1, 6, 0, 1, 1);
+    mainLayout->addWidget(&accountAgeLabel1, 6, 0, 1, 1);
     mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
     mainLayout->setColumnStretch(2, 10);
 
-    if(editable)
-    {
-        QHBoxLayout * buttonsLayout = new QHBoxLayout;
+    if (editable) {
+        QHBoxLayout *buttonsLayout = new QHBoxLayout;
         buttonsLayout->addWidget(&editButton);
         buttonsLayout->addWidget(&passwordButton);
         buttonsLayout->addWidget(&avatarButton);
@@ -68,7 +74,7 @@ void UserInfoBox::retranslateUi()
     realNameLabel1.setText(tr("Real name:"));
     countryLabel1.setText(tr("Location:"));
     userLevelLabel1.setText(tr("User level:"));
-    accountAgeLebel1.setText(tr("Account Age:"));
+    accountAgeLabel1.setText(tr("Account Age:"));
 
     editButton.setText(tr("Edit"));
     passwordButton.setText(tr("Change password"));
@@ -79,28 +85,26 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
     const UserLevelFlags userLevel(user.user_level());
 
-    QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
-    if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
-        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
-    avatarLabel.setPixmap(avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), bmp.size()))
+        avatarPixmap =
+            UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
+    avatarLabel.setPixmap(avatarPixmap.scaled(400, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
     QString country = QString::fromStdString(user.country());
 
-    if (country.length() != 0)
-    {
+    if (country.length() != 0) {
         countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
         countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
-    }
-    else
-    {
+    } else {
         countryLabel2.setText("");
         countryLabel3.setText("");
     }
 
-    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
+    userLevelLabel2.setPixmap(
+        UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
@@ -111,6 +115,9 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     else
         userLevelText = tr("Unregistered user");
 
+    if (userLevel.testFlag(ServerInfo_User::IsJudge))
+        userLevelText += " | " + tr("Judge");
+
     if (user.has_privlevel() && user.privlevel() != "NONE") {
         userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
     }
@@ -118,12 +125,13 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     userLevelLabel3.setText(userLevelText);
 
     QString accountAgeString = tr("Unregistered user");
-    if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) || userLevel.testFlag(ServerInfo_User::IsRegistered)) {
+    if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) ||
+        userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         if (user.accountage_secs() == 0)
             accountAgeString = tr("Unknown");
         else {
             qint64 seconds = user.accountage_secs();
-            qint64 minutes =  seconds / SIXTY;
+            qint64 minutes = seconds / SIXTY;
             qint64 hours = minutes / SIXTY;
             qint64 days = hours / HOURS_IN_A_DAY;
             qint64 years = days / DAYS_IN_A_YEAR;
@@ -151,7 +159,8 @@ void UserInfoBox::updateInfo(const QString &userName)
     cmd.set_user_name(userName.toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processResponse(const Response &)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(processResponse(const Response &)));
 
     client->sendCommand(pend);
 }
@@ -160,7 +169,6 @@ void UserInfoBox::processResponse(const Response &r)
 {
     const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
     updateInfo(response.user_info());
-    setFixedSize(sizeHint());
     show();
 }
 
@@ -169,7 +177,8 @@ void UserInfoBox::actEdit()
     Command_GetUserInfo cmd;
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(actEditInternal(const Response &)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(actEditInternal(const Response &)));
 
     client->sendCommand(pend);
 }
@@ -184,17 +193,18 @@ void UserInfoBox::actEditInternal(const Response &r)
     QString realName = QString::fromStdString(user.real_name());
 
     DlgEditUser dlg(this, email, country, realName);
-    if(!dlg.exec())
+    if (!dlg.exec())
         return;
 
     Command_AccountEdit cmd;
     cmd.set_real_name(dlg.getRealName().toStdString());
     cmd.set_email(dlg.getEmail().toStdString());
-    cmd.set_gender((ServerInfo_User_Gender) dlg.getGender());
+    cmd.set_gender((ServerInfo_User_Gender)dlg.getGender());
     cmd.set_country(dlg.getCountry().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processEditResponse(const Response &)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(processEditResponse(const Response &)));
 
     client->sendCommand(pend);
 }
@@ -202,7 +212,7 @@ void UserInfoBox::actEditInternal(const Response &r)
 void UserInfoBox::actPassword()
 {
     DlgEditPassword dlg(this);
-    if(!dlg.exec())
+    if (!dlg.exec())
         return;
 
     Command_AccountPassword cmd;
@@ -210,7 +220,8 @@ void UserInfoBox::actPassword()
     cmd.set_new_password(dlg.getNewPassword().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processPasswordResponse(const Response &)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(processPasswordResponse(const Response &)));
 
     client->sendCommand(pend);
 }
@@ -218,14 +229,15 @@ void UserInfoBox::actPassword()
 void UserInfoBox::actAvatar()
 {
     DlgEditAvatar dlg(this);
-    if(!dlg.exec())
+    if (!dlg.exec())
         return;
 
     Command_AccountImage cmd;
     cmd.set_image(dlg.getImage().data(), dlg.getImage().size());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processAvatarResponse(const Response &)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(processAvatarResponse(const Response &)));
 
     client->sendCommand(pend);
 }
@@ -238,11 +250,13 @@ void UserInfoBox::processEditResponse(const Response &r)
             QMessageBox::information(this, tr("Information"), tr("User information updated."));
             break;
         case Response::RespFunctionNotAllowed:
-            QMessageBox::critical(this, tr("Error"), tr("This server does not permit you to update your user informations."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("This server does not permit you to update your user informations."));
             break;
         case Response::RespInternalError:
         default:
-            QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to update your user informations."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("An error occured while trying to update your user informations."));
             break;
     }
 }
@@ -264,7 +278,8 @@ void UserInfoBox::processPasswordResponse(const Response &r)
             break;
         case Response::RespInternalError:
         default:
-            QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to update your user informations."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("An error occured while trying to update your user informations."));
             break;
     }
 }
@@ -284,4 +299,11 @@ void UserInfoBox::processAvatarResponse(const Response &r)
             QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to updater your avatar."));
             break;
     }
+}
+
+void UserInfoBox::resizeEvent(QResizeEvent *event)
+{
+    QPixmap resizedPixmap = avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    avatarLabel.setPixmap(resizedPixmap);
+    QWidget::resizeEvent(event);
 }

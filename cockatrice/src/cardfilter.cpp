@@ -1,45 +1,49 @@
 #include "cardfilter.h"
 
-const char *CardFilter::typeName(Type t)
+const QString CardFilter::typeName(Type t)
 {
     switch (t) {
         case TypeAnd:
-            return "and";
+            return tr("AND", "Logical conjunction operator used in card filter");
         case TypeOr:
-            return "or";
+            return tr("OR", "Logical disjunction operator used in card filter");
         case TypeAndNot:
-            return "and not";
+            return tr("AND NOT", "Negated logical conjunction operator used in card filter");
         case TypeOrNot:
-            return "or not";
+            return tr("OR NOT", "Negated logical disjunction operator used in card filter");
         default:
-            return "";
+            return QString("");
     }
 }
 
-const char *CardFilter::attrName(Attr a)
+const QString CardFilter::attrName(Attr a)
 {
     switch (a) {
         case AttrName:
-            return "name";
+            return tr("Name");
         case AttrType:
-            return "type";
+            return tr("Type");
         case AttrColor:
-            return "color";
+            return tr("Color");
         case AttrText:
-            return "text";
+            return tr("Text");
         case AttrSet:
-            return "set";
+            return tr("Set");
         case AttrManaCost:
-            return "mana cost";
+            return tr("Mana Cost");
         case AttrCmc:
-            return "cmc";
+            return tr("CMC");
         case AttrRarity:
-            return "rarity";
+            return tr("Rarity");
         case AttrPow:
-            return "power";
+            return tr("Power");
         case AttrTough:
-            return "toughness";
+            return tr("Toughness");
+        case AttrLoyalty:
+            return tr("Loyalty");
+        case AttrFormat:
+            return tr("Format");
         default:
-            return "";
+            return QString("");
     }
 }

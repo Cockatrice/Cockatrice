@@ -2,11 +2,13 @@
 #define MAIN_H
 
 class CardDatabase;
-class QTranslator;
+class QString;
 class QSystemTrayIcon;
+class QTranslator;
 class SoundEngine;
 
 extern CardDatabase *db;
+
 extern QSystemTrayIcon *trayIcon;
 extern QTranslator *translator;
 extern const QString translationPrefix;

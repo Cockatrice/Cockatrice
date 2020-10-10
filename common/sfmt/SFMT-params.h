@@ -46,8 +46,8 @@
 */
 
 /** the parameter of shift right as one 128-bit register.
- * The 128-bit integer is shifted by (SFMT_SL2 * 8) bits.
-#define SFMT_SR21 1
+ * The 128-bit integer is shifted by (SFMT_SR2 * 8) bits.
+#define SFMT_SR2 1
 */
 
 /** A bitmask, used in the recursion.  These parameters are introduced
@@ -59,10 +59,10 @@
 */
 
 /** These definitions are part of a 128-bit period certification vector.
-#define SFMT_PARITY1	0x00000001U
-#define SFMT_PARITY2	0x00000000U
-#define SFMT_PARITY3	0x00000000U
-#define SFMT_PARITY4	0xc98e126aU
+#define SFMT_PARITY1    0x00000001U
+#define SFMT_PARITY2    0x00000000U
+#define SFMT_PARITY3    0x00000000U
+#define SFMT_PARITY4    0xc98e126aU
 */
 
 #if SFMT_MEXP == 607

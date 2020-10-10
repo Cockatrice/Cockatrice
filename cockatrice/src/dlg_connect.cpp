@@ -1,100 +1,111 @@
-#include <QLabel>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QRadioButton>
-#include <QGridLayout>
-#include <QDialogButtonBox>
-#include <QDebug>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QMessageBox>
-#include <QGroupBox>
-#include <QPushButton>
 #include "dlg_connect.h"
+
 #include "settingscache.h"
 #include "userconnection_information.h"
 
-#define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDebug>
+#include <QDialogButtonBox>
+#include <QEvent>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QRadioButton>
 
-DlgConnect::DlgConnect(QWidget *parent)
-    : QDialog(parent)
+DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
-    rebuildComboBoxList();
+    hps = new HandlePublicServers(this);
+    btnRefreshServers = new QPushButton(this);
+    btnRefreshServers->setIcon(QPixmap("theme:icons/sync"));
+    btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
+    btnRefreshServers->setFixedWidth(30);
+
+    connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
+    connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
+    connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadThePublicServers()));
+
+    connect(this, SIGNAL(sigPublicServersDownloaded()), this, SLOT(rebuildComboBoxList()));
+    preRebuildComboBoxList();
 
     newHostButton = new QRadioButton(tr("New Host"), this);
-    
+
     saveLabel = new QLabel(tr("Name:"));
-    saveEdit = new QLineEdit(settingsCache->servers().getSaveName());
+    saveEdit = new QLineEdit;
     saveLabel->setBuddy(saveEdit);
 
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname());
+    hostEdit = new QLineEdit;
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
+    portEdit = new QLineEdit;
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
+    playernameEdit = new QLineEdit;
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
+    passwordEdit = new QLineEdit;
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
-    
+
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
-    savePasswordCheckBox->setChecked(settingsCache->servers().getSavePassword());
 
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    publicServersLabel = new QLabel(QString("(<a href=\"%1\">").arg(PUBLIC_SERVERS_URL)+tr("Public Servers")+QString("</a>)"));
-    publicServersLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-    publicServersLabel->setWordWrap(true);
-    publicServersLabel->setTextFormat(Qt::RichText);
-    publicServersLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    publicServersLabel->setOpenExternalLinks(true);
-    publicServersLabel->setAlignment(Qt::AlignCenter);
-
-    if (savePasswordCheckBox->isChecked())
-    {
-        autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
+    if (SettingsCache::instance().servers().getSavePassword()) {
+        autoConnectCheckBox->setChecked(static_cast<bool>(SettingsCache::instance().servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
-    }
-    else
-    {
-        settingsCache->servers().setAutoConnect(0);
-        autoConnectCheckBox->setChecked(0);
+    } else {
+        SettingsCache::instance().servers().setAutoConnect(0);
+        autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
     }
 
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
-    btnForgotPassword = new QPushButton(tr("Forgot password"));
+    serverIssuesLabel =
+        new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
+    serverIssuesLabel->setWordWrap(true);
+    serverContactLabel = new QLabel(tr("Webpage") + ":");
+    serverContactLink = new QLabel;
+    serverContactLink->setTextFormat(Qt::RichText);
+    serverContactLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    serverContactLink->setOpenExternalLinks(true);
+
+    updateDisplayInfo(previousHosts->currentText());
+
+    btnForgotPassword = new QPushButton(this);
+    btnForgotPassword->setIcon(QPixmap("theme:icons/forgot_password"));
+    btnForgotPassword->setToolTip(tr("Forgot Password"));
+    btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
-    btnOk = new QPushButton(tr("Connect"));
-    btnOk->setFixedWidth(100);
-    connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
+    btnConnect = new QPushButton(tr("&Connect"));
+    connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
-    btnCancel = new QPushButton(tr("Cancel"));
-    btnCancel->setFixedWidth(100);
-    connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+    buttonBox->addButton(btnConnect, QDialogButtonBox::AcceptRole);
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    QGridLayout *newHostLayout = new QGridLayout;
-    newHostLayout->addWidget(newHostButton, 0, 1);
-    newHostLayout->addWidget(publicServersLabel, 0, 2);
+    newHolderLayout = new QHBoxLayout;
+    newHolderLayout->addWidget(previousHosts);
+    newHolderLayout->addWidget(btnRefreshServers);
 
-    QGridLayout *connectionLayout = new QGridLayout;
+    connectionLayout = new QGridLayout;
     connectionLayout->addWidget(previousHostButton, 0, 1);
-    connectionLayout->addWidget(previousHosts, 1, 1);
-    connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
+    connectionLayout->addLayout(newHolderLayout, 1, 1, 1, 2);
+    connectionLayout->addWidget(newHostButton, 2, 1);
     connectionLayout->addWidget(saveLabel, 3, 0);
     connectionLayout->addWidget(saveEdit, 3, 1);
     connectionLayout->addWidget(hostLabel, 4, 0);
@@ -103,37 +114,39 @@ DlgConnect::DlgConnect(QWidget *parent)
     connectionLayout->addWidget(portEdit, 5, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
-    QGridLayout *buttons = new QGridLayout;
-    buttons->addWidget(btnOk, 0, 0);
-    buttons->addWidget(btnForgotPassword, 0, 1);
-    buttons->addWidget(btnCancel, 0, 2);
-
-    QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
+    restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
 
-    QGridLayout *loginLayout = new QGridLayout;
+    serverInfoLayout = new QGridLayout;
+    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0, 1, 4, Qt::AlignTop);
+    serverInfoLayout->addWidget(serverContactLabel, 1, 0);
+    serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 3);
+
+    loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
-    loginLayout->addWidget(playernameEdit, 0, 1);
+    loginLayout->addWidget(playernameEdit, 0, 1, 1, 2);
     loginLayout->addWidget(passwordLabel, 1, 0);
     loginLayout->addWidget(passwordEdit, 1, 1);
+    loginLayout->addWidget(btnForgotPassword, 1, 2);
     loginLayout->addWidget(savePasswordCheckBox, 2, 1);
 
-    QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
+    loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-    QGroupBox *btnGroupBox = new QGroupBox(tr(""));
-    btnGroupBox->setLayout(buttons);
+    serverInfoGroupBox = new QGroupBox(tr("Server Contact"));
+    serverInfoGroupBox->setLayout(serverInfoLayout);
 
-    QGridLayout *grid = new QGridLayout;
+    grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
-    grid->addWidget(loginGroupBox, 1, 0);
-    grid->addWidget(btnGroupBox, 2, 0);
-         
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    grid->addWidget(serverInfoGroupBox, 1, 0);
+    grid->addWidget(loginGroupBox, 2, 0);
+
+    mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
+    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Connect to server"));
+    setWindowTitle(tr("Connect to Server"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 
@@ -142,131 +155,168 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     previousHostButton->setChecked(true);
 
-    connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateDisplayInfo(const QString &)));
+    connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this,
+            SLOT(updateDisplayInfo(const QString &)));
 
     playernameEdit->setFocus();
 }
 
-void DlgConnect::actSaveConfig()
-{
-    if (!settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked()))
-        settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+DlgConnect::~DlgConnect() = default;
 
-    rebuildComboBoxList();
+void DlgConnect::downloadThePublicServers()
+{
+    btnRefreshServers->setDisabled(true);
+    previousHosts->clear();
+    previousHosts->addItem(placeHolderText);
+    hps->downloadPublicServers();
 }
 
-void DlgConnect::rebuildComboBoxList()
+void DlgConnect::preRebuildComboBoxList()
 {
+    UserConnection_Information uci;
+    savedHostList = uci.getServerInfo();
+
+    if (savedHostList.size() == 1) {
+        downloadThePublicServers();
+    } else {
+        rebuildComboBoxList();
+    }
+}
+
+void DlgConnect::rebuildComboBoxList(int failure)
+{
+    Q_UNUSED(failure);
+
     previousHosts->clear();
 
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    if (savedHostList.size() == 1)
-    {
-        settingsCache->servers().addNewServer("Woogerworks", "cockatrice.woogerworks.com", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Chickatrice", "chickatrice.net", "4747", "", "", false);
-        settingsCache->servers().addNewServer("cockatric.es", "cockatric.es", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Tetrarch", "mtg.tetrarch.co", "4747", "", "", false);
-    }
-    savedHostList = uci.getServerInfo();
+    bool autoConnectEnabled = static_cast<bool>(SettingsCache::instance().servers().getAutoConnect());
+    QString autoConnectSaveName = SettingsCache::instance().servers().getSaveName();
 
-    int i = 0;
-    foreach (UserConnection_Information tmp, savedHostList)
-    {
+    int index = 0;
+
+    for (const auto &pair : savedHostList) {
+        auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
-        if (saveName.size())
-        {
+        if (saveName.size()) {
             previousHosts->addItem(saveName);
-            
-            if (settingsCache->servers().getPrevioushostName() == saveName)
-                previousHosts->setCurrentIndex(i);
-            
-            i++;
+
+            if (autoConnectEnabled) {
+                if (saveName.compare(autoConnectSaveName) == 0) {
+                    previousHosts->setCurrentIndex(index);
+                }
+            } else if (saveName.compare("Rooster Ranges") == 0) {
+                previousHosts->setCurrentIndex(index);
+            }
+
+            ++index;
         }
     }
+
+    // Re-enable the refresh server button
+    btnRefreshServers->setDisabled(false);
 }
 
-
-void DlgConnect::previousHostSelected(bool state) {
+void DlgConnect::previousHostSelected(bool state)
+{
     if (state) {
         saveEdit->setDisabled(true);
+        hostEdit->setDisabled(true);
+        portEdit->setDisabled(true);
         previousHosts->setDisabled(false);
+        btnRefreshServers->setDisabled(false);
     }
 }
 
 void DlgConnect::updateDisplayInfo(const QString &saveName)
 {
+    if (saveEdit == nullptr || saveName == placeHolderText) {
+        return;
+    }
+
     UserConnection_Information uci;
     QStringList data = uci.getServerInfo(saveName);
 
-    if (saveEdit == nullptr)
-        return;
+    bool savePasswordStatus = (data.at(5) == "1");
 
-    bool savePasswordStatus = data.at(5) == "1";
-    
     saveEdit->setText(data.at(0));
     hostEdit->setText(data.at(1));
     portEdit->setText(data.at(2));
     playernameEdit->setText(data.at(3));
     savePasswordCheckBox->setChecked(savePasswordStatus);
 
-    if (savePasswordStatus)
+    if (savePasswordStatus) {
         passwordEdit->setText(data.at(4));
+    }
+
+    if (!data.at(6).isEmpty()) {
+        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(6) + "</a>";
+        serverContactLabel->setText(tr("Webpage") + ":");
+        serverContactLink->setText(formattedLink);
+    } else {
+        serverContactLabel->setText("");
+        serverContactLink->setText("");
+    }
 }
 
-void DlgConnect::newHostSelected(bool state) {
-    if (state)
-    {
+void DlgConnect::newHostSelected(bool state)
+{
+    if (state) {
         previousHosts->setDisabled(true);
+        btnRefreshServers->setDisabled(true);
         hostEdit->clear();
+        hostEdit->setPlaceholderText(tr("Server URL"));
+        hostEdit->setDisabled(false);
         portEdit->clear();
+        portEdit->setPlaceholderText(tr("Communication Port"));
+        portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
-        savePasswordCheckBox->setChecked(false);
         saveEdit->clear();
-        saveEdit->setPlaceholderText("New Menu Name");
+        saveEdit->setPlaceholderText(tr("Unique Server Name"));
         saveEdit->setDisabled(false);
-    }
-    else
-    {
-        rebuildComboBoxList();
+        serverContactLabel->setText("");
+        serverContactLink->setText("");
+    } else {
+        preRebuildComboBoxList();
     }
 }
-
 
 void DlgConnect::passwordSaved(int state)
 {
     Q_UNUSED(state);
-    if(savePasswordCheckBox->isChecked()) {
-       autoConnectCheckBox->setEnabled(true);
+    if (savePasswordCheckBox->isChecked()) {
+        autoConnectCheckBox->setEnabled(true);
     } else {
-        autoConnectCheckBox->setChecked(0);
+        autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
     }
 }
 
 void DlgConnect::actOk()
 {
-    if (newHostButton->isChecked())
-    {
-        if (saveEdit->text().isEmpty())
-        {
+    ServersSettings &servers = SettingsCache::instance().servers();
+
+    if (newHostButton->isChecked()) {
+        if (saveEdit->text().isEmpty()) {
             QMessageBox::critical(this, tr("Connection Warning"), tr("You need to name your new connection profile."));
             return;
         }
 
-        settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+        servers.addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
+                             playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+    } else {
+        servers.updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
+                                     playernameEdit->text().trimmed(), passwordEdit->text(),
+                                     savePasswordCheckBox->isChecked());
     }
-    else
-    {
-        settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
-    }
-    settingsCache->servers().setPrevioushostName(saveEdit->text());
-    settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked() ? 1 : 0);
 
-    if (playernameEdit->text().isEmpty())
-    {
+    servers.setPrevioushostName(saveEdit->text());
+    servers.setAutoConnect(autoConnectCheckBox->isChecked());
+
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
         return;
     }
@@ -274,28 +324,23 @@ void DlgConnect::actOk()
     accept();
 }
 
-
-QString DlgConnect::getHost() const {
-    return hostEdit->text();
-}
-
-void DlgConnect::actCancel()
+QString DlgConnect::getHost() const
 {
-    settingsCache->servers().setSavePassword(savePasswordCheckBox->isChecked() ? 1 : 0);
-    settingsCache->servers().setAutoConnect( autoConnectCheckBox->isChecked() ? 1 : 0);
-    reject();
+    return hostEdit->text().trimmed();
 }
 
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
+
         if (keyEvent->key() == Qt::Key_Delete) {
-            QComboBox* combobox = reinterpret_cast<QComboBox *>(obj);
+            auto *combobox = reinterpret_cast<QComboBox *>(obj);
             combobox->removeItem(combobox->currentIndex());
             return true;
         }
     }
+
     return QObject::eventFilter(obj, event);
 }
 

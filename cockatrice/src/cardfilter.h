@@ -1,11 +1,17 @@
 #ifndef CARDFILTER_H
 #define CARDFILTER_H
 
+#include <QObject>
 #include <QString>
+#include <utility>
 
-class CardFilter {
+class CardFilter : public QObject
+{
+    Q_OBJECT
+
 public:
-    enum Type {
+    enum Type
+    {
         TypeAnd = 0,
         TypeOr,
         TypeAndNot,
@@ -13,19 +19,22 @@ public:
         TypeEnd
     };
 
-    /* if you add an atribute here you also need to
+    /* if you add an attribute here you also need to
      * add its string representation in attrName */
-    enum Attr {
-        AttrName = 0,
-        AttrType,
+    enum Attr
+    {
+        AttrCmc = 0,
         AttrColor,
-        AttrText,
-        AttrSet,
+        AttrLoyalty,
         AttrManaCost,
-        AttrCmc,
-        AttrRarity,
+        AttrName,
         AttrPow,
+        AttrRarity,
+        AttrSet,
+        AttrText,
         AttrTough,
+        AttrType,
+        AttrFormat,
         AttrEnd
     };
 
@@ -35,14 +44,23 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString term, Type type, Attr attr) : trm(term), t(type), a(attr) {};
+    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr){};
 
-    Type type() const { return t; }
-    const QString &term() const { return trm; }
-    Attr attr() const { return a; }
+    Type type() const
+    {
+        return t;
+    }
+    const QString &term() const
+    {
+        return trm;
+    }
+    Attr attr() const
+    {
+        return a;
+    }
 
-    static const char *typeName(Type t);
-    static const char *attrName(Attr a);
+    static const QString typeName(Type t);
+    static const QString attrName(Attr a);
 };
 
 #endif

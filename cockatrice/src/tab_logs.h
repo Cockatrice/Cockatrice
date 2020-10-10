@@ -2,31 +2,35 @@
 #define TAB_LOG_H
 
 #include "tab.h"
+
 #include <QDialog>
 
 class AbstractClient;
+class LineEditUnfocusable;
 
 class QGroupBox;
 class QPushButton;
 class QSpinBox;
-class QLineEdit;
 class QCheckBox;
 class QRadioButton;
 class QLabel;
 class QDockWidget;
 class QWidget;
 class QGridLayout;
+class QVBoxLayout;
 class QTableWidget;
 class CommandContainer;
 class Response;
 class AbstractClient;
 
-class TabLog : public Tab {
+class TabLog : public Tab
+{
     Q_OBJECT
 private:
     AbstractClient *client;
-    QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum, *labelDescription;
-    QLineEdit *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
+    QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum,
+        *labelDescription;
+    LineEditUnfocusable *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
     QCheckBox *mainRoom, *gameRoom, *privateChat;
     QRadioButton *pastDays, *today, *lastHour;
     QSpinBox *maximumResults, *pastXDays;
@@ -34,7 +38,8 @@ private:
     QWidget *searchDockContents;
     QPushButton *getButton, *clearButton;
     QGridLayout *criteriaGrid, *locationGrid, *rangeGrid, *maxResultsGrid, *descriptionGrid, *buttonGrid;
-    QGroupBox *criteriaGroupBox, *locationGroupBox, *rangeGroupBox, *maxResultsGroupBox, *descriptionGroupBox, *buttonGroupBox;
+    QGroupBox *criteriaGroupBox, *locationGroupBox, *rangeGroupBox, *maxResultsGroupBox, *descriptionGroupBox,
+        *buttonGroupBox;
     QVBoxLayout *mainLayout;
     QTableWidget *roomTable, *gameTable, *chatTable;
 
@@ -48,10 +53,13 @@ private slots:
     void restartLayout();
 
 public:
-    TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
+    TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
     ~TabLog();
     void retranslateUi();
-    QString getTabText() const { return tr("Logs"); }
+    QString getTabText() const
+    {
+        return tr("Logs");
+    }
 };
 
 #endif

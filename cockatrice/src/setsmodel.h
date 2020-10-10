@@ -1,40 +1,71 @@
 #ifndef SETSMODEL_H
 #define SETSMODEL_H
 
+#include "carddatabase.h"
+
 #include <QAbstractTableModel>
 #include <QMimeData>
 #include <QSet>
-#include "carddatabase.h"
+#include <QSortFilterProxyModel>
 
 class SetsProxyModel;
 
-class SetsMimeData : public QMimeData {
+class SetsMimeData : public QMimeData
+{
     Q_OBJECT
 private:
     int oldRow;
+
 public:
-    SetsMimeData(int _oldRow) : oldRow(_oldRow) { }
-    int getOldRow() const { return oldRow; }
-    QStringList formats() const { return QStringList() << "application/x-cockatricecardset"; }
+    SetsMimeData(int _oldRow) : oldRow(_oldRow)
+    {
+    }
+    int getOldRow() const
+    {
+        return oldRow;
+    }
+    QStringList formats() const
+    {
+        return QStringList() << "application/x-cockatricecardset";
+    }
 };
 
-class SetsModel : public QAbstractTableModel {
+class SetsModel : public QAbstractTableModel
+{
     Q_OBJECT
     friend class SetsProxyModel;
+
 private:
     static const int NUM_COLS = 7;
     SetList sets;
-    QSet<CardSet *> enabledSets;
-public:
-    enum SetsColumns { SortKeyCol, IsKnownCol, EnabledCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
-    enum Role { SortRole=Qt::UserRole };
+    QSet<CardSetPtr> enabledSets;
 
-    SetsModel(CardDatabase *_db, QObject *parent = 0);
+public:
+    enum SetsColumns
+    {
+        SortKeyCol,
+        IsKnownCol,
+        EnabledCol,
+        LongNameCol,
+        ShortNameCol,
+        SetTypeCol,
+        ReleaseDateCol
+    };
+    enum Role
+    {
+        SortRole = Qt::UserRole
+    };
+
+    SetsModel(CardDatabase *_db, QObject *parent = nullptr);
     ~SetsModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent); return NUM_COLS; }
+    int columnCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        Q_UNUSED(parent);
+        return NUM_COLS;
+    }
     QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex & index, const QVariant & value, int role);
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     Qt::DropActions supportedDropActions() const;
@@ -49,6 +80,18 @@ public:
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
+};
+
+class SetsDisplayModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    SetsDisplayModel(QObject *parent = NULL);
+
+protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    void fetchMore(const QModelIndex &index) override;
 };
 
 #endif

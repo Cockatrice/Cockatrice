@@ -36,6 +36,7 @@ message Command_CreateGame {
     optional bool spectators_can_talk = 8;
     optional bool spectators_see_everything = 9;
     repeated uint32 game_type_ids = 10;
+    optional bool join_as_judge = 11;
 }
 
 message Command_JoinGame {
@@ -46,4 +47,5 @@ message Command_JoinGame {
     optional string password = 2;
     optional bool spectator = 3;
     optional bool override_restrictions = 4;
+    optional bool join_as_judge = 5;
 }

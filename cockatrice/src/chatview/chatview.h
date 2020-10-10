@@ -1,30 +1,39 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include <QTextBrowser>
-#include <QTextFragment>
-#include <QTextCursor>
-#include <QColor>
-#include <QAction>
-#include "../userlist.h"
-#include "user_level.h"
-#include "room_message_type.h"
 #include "../tab_supervisor.h"
+#include "../userlist.h"
+#include "room_message_type.h"
+#include "user_level.h"
 #include "userlistProxy.h"
+
+#include <QAction>
+#include <QColor>
+#include <QTextBrowser>
+#include <QTextCursor>
+#include <QTextFragment>
 
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
 class TabGame;
 
-class ChatView : public QTextBrowser {
+class ChatView : public QTextBrowser
+{
     Q_OBJECT
 protected:
-    const TabSupervisor * const tabSupervisor;
-    TabGame * const game;
+    const TabSupervisor *const tabSupervisor;
+    TabGame *const game;
+
 private:
-    enum HoveredItemType { HoveredNothing, HoveredUrl, HoveredCard, HoveredUser };
-    const UserlistProxy * const userlistProxy;
+    enum HoveredItemType
+    {
+        HoveredNothing,
+        HoveredUrl,
+        HoveredCard,
+        HoveredUser
+    };
+    const UserlistProxy *const userlistProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
     QString userName;
@@ -51,16 +60,34 @@ private:
     void checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel);
     void checkWord(QTextCursor &cursor, QString &message);
     QString extractNextWord(QString &message, QString &rest);
+
+    QColor otherUserColor = QColor(0, 65, 255); // dark blue
+    QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
+    QColor linkColor;
+
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
+
 public:
-    ChatView(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, bool _showTimestamps, QWidget *parent = 0);
+    ChatView(const TabSupervisor *_tabSupervisor,
+             const UserlistProxy *_userlistProxy,
+             TabGame *_game,
+             bool _showTimestamps,
+             QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
-    void appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
-    void appendMessage(QString message, RoomMessageTypeFlags messageType = 0, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), QString UserPrivLevel = "NONE", bool playerBold = false);
+    void virtual appendHtmlServerMessage(const QString &html,
+                                         bool optionalIsBold = false,
+                                         QString optionalFontColor = QString());
+    void appendMessage(QString message,
+                       RoomMessageTypeFlags messageType = {},
+                       QString sender = QString(),
+                       UserLevelFlags userLevel = UserLevelFlags(),
+                       QString UserPrivLevel = "NONE",
+                       bool playerBold = false);
     void clearChat();
+
 protected:
     void enterEvent(QEvent *event);
     void leaveEvent(QEvent *event);

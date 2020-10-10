@@ -7,7 +7,8 @@ class FilterTree;
 class CardFilter;
 class FilterTreeNode;
 
-class FilterTreeModel : public QAbstractItemModel {
+class FilterTreeModel : public QAbstractItemModel
+{
     Q_OBJECT
 private:
     FilterTree *fTree;
@@ -26,19 +27,20 @@ private:
     QModelIndex nodeIndex(const FilterTreeNode *node, int row, int column) const;
 
 public:
-    FilterTreeModel(QObject *parent = 0);
+    FilterTreeModel(QObject *parent = nullptr);
     ~FilterTreeModel();
-    FilterTree *filterTree() const { return fTree; }
+    FilterTree *filterTree() const
+    {
+        return fTree;
+    }
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
+    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value,
-                    int role = Qt::EditRole);
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
     QModelIndex parent(const QModelIndex &ind) const;
-    QModelIndex index(int row, int column,
-                    const QModelIndex &parent) const;
-    bool removeRows(int row, int count, const QModelIndex & parent);
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    bool removeRows(int row, int count, const QModelIndex &parent);
 };
 
 #endif

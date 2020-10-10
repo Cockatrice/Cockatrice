@@ -1,36 +1,35 @@
+#include <QGraphicsScene>
 #include <QPainter>
 #include <QSet>
-#include <QGraphicsScene>
 #include <cmath>
 #ifdef _WIN32
 #include "round.h"
 #endif /* _WIN32 */
-#include "tablezone.h"
-#include "player.h"
-#include "settingscache.h"
-#include "thememanager.h"
 #include "arrowitem.h"
-#include "carddragitem.h"
 #include "carddatabase.h"
+#include "carddragitem.h"
 #include "carditem.h"
-
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"
+#include "player.h"
+#include "settingscache.h"
+#include "tablezone.h"
+#include "thememanager.h"
 
-const QColor TableZone::BACKGROUND_COLOR    = QColor(100, 100, 100);
-const QColor TableZone::FADE_MASK           = QColor(0, 0, 0, 80);
-const QColor TableZone::GRADIENT_COLOR      = QColor(255, 255, 255, 150);
-const QColor TableZone::GRADIENT_COLORLESS  = QColor(255, 255, 255, 0);
+const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
+const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
+const QColor TableZone::GRADIENT_COLOR = QColor(255, 255, 255, 150);
+const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     : SelectZone(_p, "table", true, false, true, parent), active(false)
 {
     connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
-    connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
+    connect(&SettingsCache::instance(), SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
 
     updateBg();
 
-    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS-1) * PADDING_Y;
+    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS - 1) * PADDING_Y;
     width = MIN_WIDTH;
     currentMinimumWidth = width;
 
@@ -38,28 +37,31 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     setAcceptHoverEvents(true);
 }
 
-
 void TableZone::updateBg()
 {
     update();
 }
-
 
 QRectF TableZone::boundingRect() const
 {
     return QRectF(0, 0, width, height);
 }
 
-
 bool TableZone::isInverted() const
 {
-    return ((player->getMirrored() && !settingsCache->getInvertVerticalCoordinate()) || (!player->getMirrored() && settingsCache->getInvertVerticalCoordinate()));
+    return ((player->getMirrored() && !SettingsCache::instance().getInvertVerticalCoordinate()) ||
+            (!player->getMirrored() && SettingsCache::instance().getInvertVerticalCoordinate()));
 }
-
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
+    QBrush brush = themeManager->getTableBgBrush();
+
+    if (player->getZoneId() > 0) {
+        // If the extra image is not found, load the default one
+        brush = themeManager->getExtraTableBgBrush(QString::number(player->getZoneId()), brush);
+    }
+    painter->fillRect(boundingRect(), brush);
 
     if (active) {
         paintZoneOutline(painter);
@@ -72,13 +74,13 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     paintLandDivider(painter);
 }
 
-
 /**
    Render a soft outline around the edge of the TableZone.
 
    @param painter QPainter object
  */
-void TableZone::paintZoneOutline(QPainter *painter) {
+void TableZone::paintZoneOutline(QPainter *painter)
+{
     QLinearGradient grad1(0, 0, 0, 1);
     grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
     grad1.setColorAt(0, GRADIENT_COLOR);
@@ -96,13 +98,13 @@ void TableZone::paintZoneOutline(QPainter *painter) {
     painter->fillRect(QRectF(width - BOX_LINE_WIDTH, 0, BOX_LINE_WIDTH, height), QBrush(grad1));
 }
 
-
 /**
    Render a division line for land placement
 
    @painter QPainter object
  */
-void TableZone::paintLandDivider(QPainter *painter){
+void TableZone::paintLandDivider(QPainter *painter)
+{
     // Place the line 2 grid heights down then back it off just enough to allow
     // some space between a 3-card stack and the land area.
     qreal separatorY = MARGIN_TOP + 2 * (CARD_HEIGHT + PADDING_Y) - STACKED_CARD_OFFSET_Y / 2;
@@ -111,7 +113,6 @@ void TableZone::paintLandDivider(QPainter *painter){
     painter->setPen(QColor(255, 255, 255, 40));
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 }
-
 
 void TableZone::addCardImpl(CardItem *card, int _x, int _y)
 {
@@ -123,14 +124,14 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
     card->update();
 }
 
-
 void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
     handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint));
 }
 
-
-void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint)
+void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
+                                      CardZone *startZone,
+                                      const QPoint &gridPoint)
 {
     Command_MoveCard cmd;
     cmd.set_start_player_id(startZone->getPlayer()->getId());
@@ -139,25 +140,26 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems, Ca
     cmd.set_target_zone(getName().toStdString());
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
-    
-    for (int i = 0; i < dragItems.size(); ++i) {
+
+    for (const auto &item : dragItems) {
         CardToMove *ctm = cmd.mutable_cards_to_move()->add_card();
-        ctm->set_card_id(dragItems[i]->getId());
-        ctm->set_face_down(dragItems[i]->getFaceDown());
-        if(startZone->getName() != name && dragItems[i]->getItem()->getInfo())
-            ctm->set_pt(dragItems[i]->getItem()->getInfo()->getPowTough().toStdString());
-        else
-            ctm->set_pt(std::string());
+        ctm->set_card_id(item->getId());
+        ctm->set_face_down(item->getFaceDown());
+        if (startZone->getName() != name && !item->getFaceDown()) {
+            const auto &info = item->getItem()->getInfo();
+            if (info) {
+                ctm->set_pt(info->getPowTough().toStdString());
+            }
+        }
     }
-    
+
     startZone->getPlayer()->sendGameCommand(cmd);
 }
 
-
 void TableZone::reorganizeCards()
 {
-    QList<ArrowItem *> arrowsToUpdate;
-    
+    QSet<ArrowItem *> arrowsToUpdate;
+
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
 
@@ -165,20 +167,20 @@ void TableZone::reorganizeCards()
         QPoint gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
             continue;
-        
+
         QPointF mapPoint = mapFromGrid(gridPoint);
         qreal x = mapPoint.x();
         qreal y = mapPoint.y();
-        
+
         int numberAttachedCards = cards[i]->getAttachedCards().size();
         qreal actualX = x + numberAttachedCards * STACKED_CARD_OFFSET_X;
         qreal actualY = y;
         if (numberAttachedCards)
             actualY += 15;
-        
+
         cards[i]->setPos(actualX, actualY);
         cards[i]->setRealZValue((actualY + CARD_HEIGHT) * 100000 + (actualX + 1) * 100);
-        
+
         QListIterator<CardItem *> attachedCardIterator(cards[i]->getAttachedCards());
         int j = 0;
         while (attachedCardIterator.hasNext()) {
@@ -188,23 +190,28 @@ void TableZone::reorganizeCards()
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
-
-            arrowsToUpdate.append(attachedCard->getArrowsFrom());
-            arrowsToUpdate.append(attachedCard->getArrowsTo());
+            for (ArrowItem *item : attachedCard->getArrowsFrom()) {
+                arrowsToUpdate.insert(item);
+            }
+            for (ArrowItem *item : attachedCard->getArrowsTo()) {
+                arrowsToUpdate.insert(item);
+            }
         }
-        
-        arrowsToUpdate.append(cards[i]->getArrowsFrom());
-        arrowsToUpdate.append(cards[i]->getArrowsTo());
+
+        for (ArrowItem *item : cards[i]->getArrowsFrom()) {
+            arrowsToUpdate.insert(item);
+        }
+        for (ArrowItem *item : cards[i]->getArrowsTo()) {
+            arrowsToUpdate.insert(item);
+        }
+    }
+    for (ArrowItem *item : arrowsToUpdate) {
+        item->updatePath();
     }
 
-    QSetIterator<ArrowItem *> arrowIterator(QSet<ArrowItem *>::fromList(arrowsToUpdate));
-    while (arrowIterator.hasNext())
-        arrowIterator.next()->updatePath();
-    
     resizeToContents();
     update();
 }
-
 
 void TableZone::toggleTapped()
 {
@@ -215,7 +222,7 @@ void TableZone::toggleTapped()
             tapAll = true;
             break;
         }
-    QList< const ::google::protobuf::Message * > cmdList;
+    QList<const ::google::protobuf::Message *> cmdList;
     for (int i = 0; i < selectedItems.size(); i++) {
         CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
         if (temp->getTapped() != tapAll) {
@@ -230,7 +237,6 @@ void TableZone::toggleTapped()
     player->sendGameCommand(player->prepareGameCommand(cmdList));
 }
 
-
 CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
 {
     CardItem *result = CardZone::takeCard(position, cardId);
@@ -239,7 +245,6 @@ CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
     return result;
 }
 
-
 void TableZone::resizeToContents()
 {
     int xMax = 0;
@@ -247,7 +252,7 @@ void TableZone::resizeToContents()
     // Find rightmost card position, which includes the left margin amount.
     for (int i = 0; i < cards.size(); ++i)
         if (cards[i]->pos().x() > xMax)
-            xMax = (int) cards[i]->pos().x();
+            xMax = (int)cards[i]->pos().x();
 
     // Minimum width is the rightmost card position plus enough room for
     // another card with padding, then margin.
@@ -263,7 +268,6 @@ void TableZone::resizeToContents()
     }
 }
 
-
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 {
     for (int i = 0; i < cards.size(); i++)
@@ -272,13 +276,11 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
     return 0;
 }
 
-
 CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 {
     QPoint gridPoint = mapToGrid(point);
     return getCardFromGrid(gridPoint);
 }
-
 
 void TableZone::computeCardStackWidths()
 {
@@ -289,7 +291,7 @@ void TableZone::computeCardStackWidths()
         const QPoint &gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
             continue;
-        
+
         const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
         cardStackCount.insert(key, cardStackCount.value(key, 0) + 1);
     }
@@ -300,7 +302,7 @@ void TableZone::computeCardStackWidths()
         const QPoint &gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
             continue;
-        
+
         const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
         const int stackCount = cardStackCount.value(key, 0);
         if (stackCount == 1)
@@ -310,7 +312,6 @@ void TableZone::computeCardStackWidths()
     }
 }
 
-
 QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 {
     qreal x, y;
@@ -319,15 +320,14 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     x = MARGIN_LEFT + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_X;
 
     // Add in width of card stack plus padding for each column
-    for (int i = 0; i < gridPoint.x() / 3; ++i)
-    {
+    for (int i = 0; i < gridPoint.x() / 3; ++i) {
         const int key = getCardStackMapKey(i, gridPoint.y());
         x += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
     }
-    
+
     if (isInverted())
         gridPoint.setY(TABLEROWS - 1 - gridPoint.y());
-    
+
     // Start with margin plus stacked card offset
     y = MARGIN_TOP + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_Y;
 
@@ -337,7 +337,6 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 
     return QPointF(x, y);
 }
-
 
 QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
@@ -369,7 +368,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     int xStack = 0;
     int xNextStack = 0;
     int nextStackCol = 0;
-    while ((xNextStack <= x) && (xNextStack <= xMax)) { 
+    while ((xNextStack <= x) && (xNextStack <= xMax)) {
         xStack = xNextStack;
         const int key = getCardStackMapKey(nextStackCol, gridPointY);
         xNextStack += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
@@ -386,7 +385,6 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     return QPoint(gridPointX, gridPointY);
 }
 
-
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
     QPoint gridPoint = mapToGrid(point + QPoint(1, 1));
@@ -400,9 +398,9 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
 
 int TableZone::clampValidTableRow(const int row)
 {
-    if(row < 0)
+    if (row < 0)
         return 0;
-    if(row >= TABLEROWS)
+    if (row >= TABLEROWS)
         return TABLEROWS - 1;
     return row;
 }

@@ -1,0 +1,3 @@
+#!/bin/sh
+export CCACHE_CPP2=true
+exec "${RULE_LAUNCH_COMPILE}" "${CMAKE_CXX_COMPILER}" "$@"

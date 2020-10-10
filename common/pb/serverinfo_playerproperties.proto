@@ -10,4 +10,5 @@ message ServerInfo_PlayerProperties {
     optional string deck_hash = 6;
     optional sint32 ping_seconds = 7;
     optional bool sideboard_locked = 8;
+    optional bool judge = 9;
 }

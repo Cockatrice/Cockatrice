@@ -30,6 +30,7 @@ message GameEvent {
         DUMP_ZONE = 2018;
         STOP_DUMP_ZONE = 2019;
         CHANGE_ZONE_PROPERTIES = 2020;
+        REVERSE_TURN = 2021;
     }
     optional sint32 player_id = 1 [default = -1];
     extensions 100 to max;

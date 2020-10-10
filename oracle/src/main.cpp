@@ -1,24 +1,26 @@
-#include <QApplication>
-#include <QTextCodec>
-#include <QIcon>
-#include <QTranslator>
-#include <QLibraryInfo>
-
 #include "main.h"
+
 #include "oraclewizard.h"
 #include "settingscache.h"
 #include "thememanager.h"
 
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QIcon>
+#include <QLibraryInfo>
+#include <QTextCodec>
+#include <QTranslator>
+
 QTranslator *translator, *qtTranslator;
-SettingsCache *settingsCache;
 ThemeManager *themeManager;
 
 const QString translationPrefix = "oracle";
 QString translationPath;
+bool isSpoilersOnly;
 
 void installNewTranslator()
 {
-    QString lang = settingsCache->getLang();
+    QString lang = SettingsCache::instance().getLang();
 
     qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     qApp->installTranslator(qtTranslator);
@@ -28,34 +30,40 @@ void installNewTranslator()
 
 int main(int argc, char *argv[])
 {
-	QApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-	QCoreApplication::setOrganizationName("Cockatrice");
-	QCoreApplication::setOrganizationDomain("cockatrice");
-	// this can't be changed, as it influences the default savepath for cards.xml
-	QCoreApplication::setApplicationName("Cockatrice");
+    QCoreApplication::setOrganizationName("Cockatrice");
+    QCoreApplication::setOrganizationDomain("cockatrice");
+    // this can't be changed, as it influences the default save path for cards.xml
+    QCoreApplication::setApplicationName("Cockatrice");
+
+    // If the program is opened with the -s flag, it will only do spoilers. Otherwise it will do MTGJSON/Tokens
+    QCommandLineParser parser;
+    QCommandLineOption showProgressOption("s", QCoreApplication::translate("main", "Only run in spoiler mode"));
+    parser.addOption(showProgressOption);
+    parser.process(app);
+    isSpoilersOnly = parser.isSet(showProgressOption);
 
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
 #else // linux
-    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+    translationPath = qApp->applicationDirPath() + "/../share/oracle/translations";
 #endif
 
-	settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;
     installNewTranslator();
 
-	OracleWizard wizard;
+    OracleWizard wizard;
 
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
 
-	wizard.show();
+    wizard.show();
 
-	return app.exec();
+    return app.exec();
 }
