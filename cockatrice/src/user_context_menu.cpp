@@ -14,7 +14,7 @@
 #include "pending_command.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
-#include "tab_userlists.h"
+#include "tab_account.h"
 #include "userinfobox.h"
 #include "userlist.h"
 

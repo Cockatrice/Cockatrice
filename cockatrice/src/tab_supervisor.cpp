@@ -22,7 +22,7 @@
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
-#include "tab_userlists.h"
+#include "tab_account.h"
 #include "userlist.h"
 
 #include <QApplication>

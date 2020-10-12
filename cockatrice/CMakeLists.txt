@@ -79,7 +79,7 @@ SET(cockatrice_SOURCES
     src/tab_replays.cpp
     src/tab_supervisor.cpp
     src/tab_admin.cpp
-    src/tab_userlists.cpp
+    src/tab_account.cpp
     src/tab_deck_editor.cpp
     src/tab_logs.cpp
     src/replay_timeline_widget.cpp

@@ -3,7 +3,7 @@
 #include "../pixmapgenerator.h"
 #include "../settingscache.h"
 #include "../soundengine.h"
-#include "../tab_userlists.h"
+#include "../tab_account.h"
 #include "../user_context_menu.h"
 #include "user_level.h"
 
