@@ -13,6 +13,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
+#include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
@@ -22,7 +23,6 @@
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
-#include "tab_userlists.h"
 #include "userlist.h"
 
 #include <QApplication>
