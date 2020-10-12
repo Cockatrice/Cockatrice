@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QMessageBox>
 #include <algorithm>
@@ -519,11 +520,11 @@ LoadStatus CardDatabase::loadCardDatabases()
     loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
     loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
 
-    // load custom card databases
-    QDir dir(SettingsCache::instance().getCustomCardDatabasePath());
-    for (const QString &fileName :
-         dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
-        loadCardDatabase(dir.absoluteFilePath(fileName));
+    // load custom card databases, recursively & following symlinks
+    QDirIterator customDatabaseIterator(SettingsCache::instance().getCustomCardDatabasePath(), QStringList() << "*.xml",
+                                        QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    while (customDatabaseIterator.hasNext()) {
+        loadCardDatabase(customDatabaseIterator.next());
     }
 
     // AFTER all the cards have been loaded
