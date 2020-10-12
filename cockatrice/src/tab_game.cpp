@@ -855,10 +855,8 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                 case GameEvent::LEAVE:
                     eventSpectatorLeave(event.GetExtension(Event_Leave::ext), playerId, context);
                     break;
-                default: {
-                    qDebug() << "unhandled spectator game event" << eventType;
+                default:
                     break;
-                }
             }
         } else {
             if ((clients.size() > 1) && (playerId != -1))
