@@ -55,7 +55,7 @@ The message will look like this:
 ***  Then commit and push those changes to this branch. ***
 ***   Check our CONTRIBUTING.md file for more details.  ***
 ***                                                     ***
-***                    Thank you ❤️                     ***
+***                    Thank you ❤️                      ***
 ***                                                     ***
 ***********************************************************
 ```
