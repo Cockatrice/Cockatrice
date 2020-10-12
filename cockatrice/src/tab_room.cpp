@@ -14,8 +14,8 @@
 #include "pb/serverinfo_room.pb.h"
 #include "pending_command.h"
 #include "settingscache.h"
-#include "tab_supervisor.h"
 #include "tab_account.h"
+#include "tab_supervisor.h"
 #include "userlist.h"
 
 #include <QApplication>

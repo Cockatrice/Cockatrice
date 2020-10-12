@@ -8,9 +8,9 @@
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
+#include "tab_account.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
-#include "tab_account.h"
 
 #include <QApplication>
 #include <QCheckBox>
