@@ -43,7 +43,8 @@ Downloads are available for full releases and the current beta version in develo
 
 # Get Involved [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA) [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice)](https://gitter.im/Cockatrice/Cockatrice)
 
-[Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
+Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with the project or fellow users of the app. The Cockatrice developers are also available on [Gitter](https://gitter.im/Cockatrice/Cockatrice). Come here to talk about the application, features, or just to hang out.<br>
+For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
 To contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
 We maintain two tags for contributors to find issues to work on:
