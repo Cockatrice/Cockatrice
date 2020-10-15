@@ -138,7 +138,7 @@ void GameFiltersSettings::setShowOnlyIfSpectatorsCanWatch(bool show)
 bool GameFiltersSettings::isShowOnlyIfSpectatorsCanWatch()
 {
     QVariant previous = getValue("show_only_if_spectators_can_watch", "filter_games");
-    return previous == QVariant() ? true : previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setShowSpectatorPasswordProtected(bool show)

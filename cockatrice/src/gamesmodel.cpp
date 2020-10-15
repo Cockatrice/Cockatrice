@@ -27,7 +27,7 @@ const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
 const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
 const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
 const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
-const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_WATCH = true;
+const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_WATCH = false;
 const bool DEFAULT_SHOW_SPECTATOR_PASSWORD_PROTECTED = true;
 const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_CHAT = false;
 const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_SEE_HANDS = false;
@@ -528,8 +528,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         }
     }
 
-    if (showOnlyIfSpectatorsCanWatch)
-    {
+    if (showOnlyIfSpectatorsCanWatch) {
         if (!game.spectators_allowed())
             return false;
         if (!showSpectatorPasswordProtected && game.spectators_need_password())
