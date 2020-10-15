@@ -90,7 +90,6 @@ void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opt
         brush = themeManager->getExtraPlayerBgBrush(QString::number(playerZoneId), brush);
     }
     painter->fillRect(boundingRect(), brush);
-    // painter->fillRect(bRect, themeManager->getPlayerBgBrush());
 }
 
 void PlayerArea::setSize(qreal width, qreal height)

@@ -83,7 +83,6 @@ void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         brush = themeManager->getExtraHandBgBrush(QString::number(player->getZoneId()), brush);
     }
     painter->fillRect(boundingRect(), brush);
-    // painter->fillRect(boundingRect(), themeManager->getHandBgBrush());
 }
 
 void HandZone::reorganizeCards()
