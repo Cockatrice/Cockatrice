@@ -29,21 +29,22 @@ Cockatrice is an open-source, multiplatform program for playing tabletop card ga
 
 # Download [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
 
-Downloads are available for full releases and the current beta version in development.<br>
-Full releases are checkpoints featuring major feature or UI enhancements - we recommend to use those. There is no strict schedule for new full releases.
+Downloads are available for full releases and the current beta version in development. There is no strict release schedule for either of them.
 
-The beta release contains the most recently added features and bugfixes, but can be unstable. They are released as we feel need.
-
-- Latest `stable` release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![DL Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
+- Latest `stable` release: [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![DL Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
+  - Stable versions are checkpoints featuring major feature and UI enhancements.
+  - **Recommended for most users!**
 
 - Latest `beta` release: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) [![DL Count on Latest Pre-Release](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
-   - Beta versions may be unstable and contain bugs.
+   - Beta versions include the most recently added features and bugfixes, but can be unstable.
    - To be a Cockatrice Beta Tester, use this version. Find more information [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)!
+   
 
 
-# Get Involved [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
+# Get Involved [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA) [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice)](https://gitter.im/Cockatrice/Cockatrice)
 
-[Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
+Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with the project or fellow users of the app. The Cockatrice developers are also available on [Gitter](https://gitter.im/Cockatrice/Cockatrice). Come here to talk about the application, features, or just to hang out.<br>
+For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
 To contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
 We maintain two tags for contributors to find issues to work on:

@@ -731,7 +731,7 @@ void Player::retranslateUi()
             counterIterator.next().value()->retranslateUi();
         }
 
-        aCardMenu->setText(tr("C&ard"));
+        aCardMenu->setText(tr("Selec&ted cards"));
 
         for (auto &allPlayersAction : allPlayersActions) {
             allPlayersAction->setText(tr("&All players"));

@@ -3,7 +3,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
-#include "tab_userlists.h"
+#include "tab_account.h"
 #include "userlist.h"
 
 #include <QDateTime>

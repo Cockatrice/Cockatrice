@@ -6,4 +6,3 @@ message Command_DrawCards {
     }
     optional uint32 number = 1;
 }
-

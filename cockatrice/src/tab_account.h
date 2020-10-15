@@ -1,5 +1,5 @@
-#ifndef TAB_USERLISTS_H
-#define TAB_USERLISTS_H
+#ifndef TAB_ACCOUNT_H
+#define TAB_ACCOUNT_H
 
 #include "pb/serverinfo_user.pb.h"
 #include "tab.h"
