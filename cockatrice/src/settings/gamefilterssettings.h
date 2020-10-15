@@ -10,7 +10,8 @@ class GameFiltersSettings : public SettingsManager
 
 public:
     bool isShowBuddiesOnlyGames();
-    bool isUnavailableGamesVisible();
+    bool isShowFullGames();
+    bool isShowGamesThatStarted();
     bool isShowPasswordProtectedGames();
     bool isHideIgnoredUserGames();
     QString getGameNameFilter();
@@ -26,7 +27,8 @@ public:
 
     void setShowBuddiesOnlyGames(bool show);
     void setHideIgnoredUserGames(bool hide);
-    void setUnavailableGamesVisible(bool enabled);
+    void setShowFullGames(bool show);
+    void setShowGamesThatStarted(bool show);
     void setShowPasswordProtectedGames(bool show);
     void setGameNameFilter(QString gameName);
     void setCreatorNameFilter(QString creatorName);

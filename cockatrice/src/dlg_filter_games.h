@@ -22,7 +22,8 @@ class DlgFilterGames : public QDialog
 private:
     QGroupBox *generalGroupBox;
     QCheckBox *showBuddiesOnlyGames;
-    QCheckBox *unavailableGamesVisibleCheckBox;
+    QCheckBox *showFullGames;
+    QCheckBox *showGamesThatStarted;
     QCheckBox *showPasswordProtectedGames;
     QCheckBox *hideIgnoredUserGames;
     QLineEdit *gameNameFilterEdit;
@@ -49,8 +50,8 @@ public:
                    const GamesProxyModel *_gamesProxyModel,
                    QWidget *parent = nullptr);
 
-    bool getUnavailableGamesVisible() const;
-    void setUnavailableGamesVisible(bool _unavailableGamesVisible);
+    bool getShowFullGames() const;
+    bool getShowGamesThatStarted() const;
     bool getShowPasswordProtectedGames() const;
     void setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden);
     bool getShowBuddiesOnlyGames() const;

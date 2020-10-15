@@ -28,14 +28,25 @@ bool GameFiltersSettings::isShowBuddiesOnlyGames()
     return previous == QVariant() ? true : previous.toBool();
 }
 
-void GameFiltersSettings::setUnavailableGamesVisible(bool enabled)
+void GameFiltersSettings::setShowFullGames(bool show)
 {
-    setValue(enabled, "unavailable_games_visible", "filter_games");
+    setValue(show, "show_full_games", "filter_games");
 }
 
-bool GameFiltersSettings::isUnavailableGamesVisible()
+bool GameFiltersSettings::isShowFullGames()
 {
-    QVariant previous = getValue("unavailable_games_visible", "filter_games");
+    QVariant previous = getValue("show_full_games", "filter_games");
+    return previous == QVariant() ? false : previous.toBool();
+}
+
+void GameFiltersSettings::setShowGamesThatStarted(bool show)
+{
+    setValue(show, "show_games_that_started", "filter_games");
+}
+
+bool GameFiltersSettings::isShowGamesThatStarted()
+{
+    QVariant previous = getValue("show_games_that_started", "filter_games");
     return previous == QVariant() ? false : previous.toBool();
 }
 

@@ -27,8 +27,11 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
     showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
 
-    unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
-    unavailableGamesVisibleCheckBox->setChecked(gamesProxyModel->getUnavailableGamesVisible());
+    showFullGames = new QCheckBox(tr("Show &full games"));
+    showFullGames->setChecked(gamesProxyModel->getShowFullGames());
+
+    showGamesThatStarted = new QCheckBox(tr("Show games &that have started"));
+    showGamesThatStarted->setChecked(gamesProxyModel->getShowGamesThatStarted());
 
     showPasswordProtectedGames = new QCheckBox(tr("Show &password protected games"));
     showPasswordProtectedGames->setChecked(gamesProxyModel->getShowPasswordProtectedGames());
@@ -105,10 +108,11 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     maxPlayersGroupBox->setLayout(maxPlayersFilterLayout);
 
     auto *restrictionsLayout = new QGridLayout;
-    restrictionsLayout->addWidget(unavailableGamesVisibleCheckBox, 0, 0);
-    restrictionsLayout->addWidget(showPasswordProtectedGames, 1, 0);
-    restrictionsLayout->addWidget(showBuddiesOnlyGames, 2, 0);
-    restrictionsLayout->addWidget(hideIgnoredUserGames, 3, 0);
+    restrictionsLayout->addWidget(showFullGames, 0, 0);
+    restrictionsLayout->addWidget(showGamesThatStarted, 1, 0);
+    restrictionsLayout->addWidget(showPasswordProtectedGames, 2, 0);
+    restrictionsLayout->addWidget(showBuddiesOnlyGames, 3, 0);
+    restrictionsLayout->addWidget(hideIgnoredUserGames, 4, 0);
 
     auto *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
@@ -138,14 +142,16 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     leftGrid->addWidget(generalGroupBox, 0, 0, 1, 2);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
     leftGrid->addWidget(restrictionsGroupBox, 3, 0, 1, 2);
-    leftGrid->addWidget(spectatorsGroupBox, 4, 0, 1, 2);
 
     auto *leftColumn = new QVBoxLayout;
     leftColumn->addLayout(leftGrid);
     leftColumn->addStretch();
 
+    auto *rightGrid = new QGridLayout;
+    rightGrid->addWidget(gameTypeFilterGroupBox, 0, 0, 1, 1);
+    rightGrid->addWidget(spectatorsGroupBox, 1, 0, 1, 1);
     auto *rightColumn = new QVBoxLayout;
-    rightColumn->addWidget(gameTypeFilterGroupBox);
+    rightColumn->addLayout(rightGrid);
 
     auto *hbox = new QHBoxLayout;
     hbox->addLayout(leftColumn);
@@ -175,14 +181,14 @@ void DlgFilterGames::toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled)
     showOnlyIfSpectatorsCanSeeHands->setDisabled(!spectatorsEnabled);
 }
 
-bool DlgFilterGames::getUnavailableGamesVisible() const
+bool DlgFilterGames::getShowFullGames() const
 {
-    return unavailableGamesVisibleCheckBox->isChecked();
+    return showFullGames->isChecked();
 }
 
-void DlgFilterGames::setUnavailableGamesVisible(bool _unavailableGamesVisible)
+bool DlgFilterGames::getShowGamesThatStarted() const
 {
-    unavailableGamesVisibleCheckBox->setChecked(_unavailableGamesVisible);
+    return showGamesThatStarted->isChecked();
 }
 
 bool DlgFilterGames::getShowBuddiesOnlyGames() const

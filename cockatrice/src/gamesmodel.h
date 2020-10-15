@@ -80,7 +80,8 @@ private:
     // - filterAcceptsRow()
     bool showBuddiesOnlyGames;
     bool hideIgnoredUserGames;
-    bool unavailableGamesVisible;
+    bool showFullGames;
+    bool showGamesThatStarted;
     bool showPasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
@@ -102,11 +103,16 @@ public:
         return hideIgnoredUserGames;
     }
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
-    bool getUnavailableGamesVisible() const
+    bool getShowFullGames() const
     {
-        return unavailableGamesVisible;
+        return showFullGames;
     }
-    void setUnavailableGamesVisible(bool _unavailableGamesVisible);
+    void setShowFullGames(bool _showFullGames);
+    bool getShowGamesThatStarted() const
+    {
+        return showGamesThatStarted;
+    }
+    void setShowGamesThatStarted(bool _showGamesThatStarted);
     bool getShowPasswordProtectedGames() const
     {
         return showPasswordProtectedGames;

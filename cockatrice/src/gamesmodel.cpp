@@ -23,7 +23,8 @@ enum GameListColumn
     SPECTATORS
 };
 
-const bool DEFAULT_UNAVAILABLE_GAMES_VISIBLE = false;
+const bool DEFAULT_SHOW_FULL_GAMES = false;
+const bool DEFAULT_SHOW_GAMES_THAT_STARTED = false;
 const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
 const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
 const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
@@ -292,9 +293,15 @@ void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
     invalidateFilter();
 }
 
-void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
+void GamesProxyModel::setShowFullGames(bool _showFullGames)
 {
-    unavailableGamesVisible = _unavailableGamesVisible;
+    showFullGames = _showFullGames;
+    invalidateFilter();
+}
+
+void GamesProxyModel::setShowGamesThatStarted(bool _showGamesThatStarted)
+{
+    showGamesThatStarted = _showGamesThatStarted;
     invalidateFilter();
 }
 
@@ -376,7 +383,8 @@ int GamesProxyModel::getNumFilteredGames() const
 
 void GamesProxyModel::resetFilterParameters()
 {
-    unavailableGamesVisible = DEFAULT_UNAVAILABLE_GAMES_VISIBLE;
+    showFullGames = DEFAULT_SHOW_FULL_GAMES;
+    showGamesThatStarted = DEFAULT_SHOW_GAMES_THAT_STARTED;
     showPasswordProtectedGames = DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES;
     showBuddiesOnlyGames = DEFAULT_SHOW_BUDDIES_ONLY_GAMES;
     hideIgnoredUserGames = DEFAULT_HIDE_IGNORED_USER_GAMES;
@@ -396,7 +404,7 @@ void GamesProxyModel::resetFilterParameters()
 
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
 {
-    return unavailableGamesVisible == DEFAULT_UNAVAILABLE_GAMES_VISIBLE &&
+    return showFullGames == DEFAULT_SHOW_FULL_GAMES && showGamesThatStarted == DEFAULT_SHOW_GAMES_THAT_STARTED &&
            showPasswordProtectedGames == DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES &&
            showBuddiesOnlyGames == DEFAULT_SHOW_BUDDIES_ONLY_GAMES &&
            hideIgnoredUserGames == DEFAULT_HIDE_IGNORED_USER_GAMES && gameNameFilter.isEmpty() &&
@@ -411,7 +419,8 @@ bool GamesProxyModel::areFilterParametersSetToDefaults() const
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
 {
     GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
-    unavailableGamesVisible = gameFilters.isUnavailableGamesVisible();
+    showFullGames = gameFilters.isShowFullGames();
+    showGamesThatStarted = gameFilters.isShowGamesThatStarted();
     showPasswordProtectedGames = gameFilters.isShowPasswordProtectedGames();
     hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
     showBuddiesOnlyGames = gameFilters.isShowBuddiesOnlyGames();
@@ -440,7 +449,8 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
 {
     GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
     gameFilters.setShowBuddiesOnlyGames(showBuddiesOnlyGames);
-    gameFilters.setUnavailableGamesVisible(unavailableGamesVisible);
+    gameFilters.setShowFullGames(showFullGames);
+    gameFilters.setShowGamesThatStarted(showGamesThatStarted);
     gameFilters.setShowPasswordProtectedGames(showPasswordProtectedGames);
     gameFilters.setHideIgnoredUserGames(hideIgnoredUserGames);
     gameFilters.setGameNameFilter(gameNameFilter);
@@ -488,15 +498,13 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
                                     QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
-    if (!unavailableGamesVisible) {
-        if (game.player_count() == game.max_players())
+    if (!showFullGames && game.player_count() == game.max_players())
+        return false;
+    if (!showGamesThatStarted && game.started())
+        return false;
+    if (!ownUserIsRegistered)
+        if (game.only_registered())
             return false;
-        if (game.started())
-            return false;
-        if (!ownUserIsRegistered)
-            if (game.only_registered())
-                return false;
-    }
     if (!showPasswordProtectedGames && game.with_password())
         return false;
     if (!gameNameFilter.isEmpty())
