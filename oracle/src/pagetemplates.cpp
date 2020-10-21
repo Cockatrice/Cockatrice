@@ -144,35 +144,31 @@ void SimpleDownloadFilePage::actDownloadFinished()
 
 bool SimpleDownloadFilePage::saveToFile()
 {
-    bool ok = false;
     QString defaultPath = getDefaultSavePath();
     QString windowName = getWindowTitle();
     QString fileType = getFileType();
 
-    do {
-        QString fileName;
-        if (defaultPathCheckBox->isChecked()) {
-            fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
-        } else {
-            fileName = defaultPath;
-        }
+    QString fileName;
+    if (defaultPathCheckBox->isChecked()) {
+        fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
+    } else {
+        fileName = defaultPath;
+    }
 
-        if (fileName.isEmpty()) {
-            return false;
-        }
+    if (fileName.isEmpty()) {
+        return false;
+    }
 
-        QFileInfo fi(fileName);
-        QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-            return false;
-        }
+    QFileInfo fi(fileName);
+    QDir fileDir(fi.path());
+    if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
+        return false;
+    }
 
-        if (internalSaveToFile(fileName)) {
-            ok = true;
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        }
-    } while (!ok);
+    if (!internalSaveToFile(fileName)) {
+        QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
+        return false;
+    }
 
     // clean saved downloadData
     downloadData = QByteArray();

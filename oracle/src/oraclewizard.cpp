@@ -607,35 +607,31 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, co
 
 bool SaveSetsPage::validatePage()
 {
-    bool ok = false;
     QString defaultPath = SettingsCache::instance().getCardDatabasePath();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
 
-    do {
-        QString fileName;
-        if (defaultPathCheckBox->isChecked()) {
-            fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
-        } else {
-            fileName = defaultPath;
-        }
+    QString fileName;
+    if (defaultPathCheckBox->isChecked()) {
+        fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
+    } else {
+        fileName = defaultPath;
+    }
 
-        if (fileName.isEmpty()) {
-            return false;
-        }
+    if (fileName.isEmpty()) {
+        return false;
+    }
 
-        QFileInfo fi(fileName);
-        QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-            return false;
-        }
+    QFileInfo fi(fileName);
+    QDir fileDir(fi.path());
+    if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
+        return false;
+    }
 
-        if (wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(), wizard()->getCardSourceVersion())) {
-            ok = true;
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        }
-    } while (!ok);
+    if (!wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(), wizard()->getCardSourceVersion())) {
+        QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
+        return false;
+    }
 
     return true;
 }
