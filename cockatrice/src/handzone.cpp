@@ -76,7 +76,13 @@ QRectF HandZone::boundingRect() const
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(boundingRect(), themeManager->getHandBgBrush());
+    QBrush brush = themeManager->getHandBgBrush();
+
+    if (player->getZoneId() > 0) {
+        // If the extra image is not found, load the default one
+        brush = themeManager->getExtraHandBgBrush(QString::number(player->getZoneId()), brush);
+    }
+    painter->fillRect(boundingRect(), brush);
 }
 
 void HandZone::reorganizeCards()

@@ -73,6 +73,7 @@ class PlayerArea : public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 private:
     QRectF bRect;
+    int playerZoneId;
 private slots:
     void updateBg();
 
@@ -94,6 +95,12 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(qreal width, qreal height);
+
+    void setPlayerZoneId(int _playerZoneId);
+    int getPlayerZoneId() const
+    {
+        return playerZoneId;
+    }
 };
 
 class Player : public QObject, public QGraphicsItem
