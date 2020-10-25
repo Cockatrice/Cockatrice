@@ -159,7 +159,7 @@ jobs:
     before_cache:
     - brew cleanup
 
-  #macOS Mojave
+  #macOS Mojave (additional build to offer Dark Mode support introduced in macOS 10.14)
   - name: macOS Mojave (Debug)
     if: tag IS NOT present
     os: osx
