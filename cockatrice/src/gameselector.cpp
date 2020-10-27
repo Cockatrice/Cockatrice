@@ -152,7 +152,8 @@ void GameSelector::actSetFilter()
         return;
 
     gameListProxyModel->setShowBuddiesOnlyGames(dlg.getShowBuddiesOnlyGames());
-    gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
+    gameListProxyModel->setShowFullGames(dlg.getShowFullGames());
+    gameListProxyModel->setShowGamesThatStarted(dlg.getShowGamesThatStarted());
     gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
     gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
@@ -160,6 +161,10 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
     gameListProxyModel->setMaxGameAge(dlg.getMaxGameAge());
+    gameListProxyModel->setShowOnlyIfSpectatorsCanWatch(dlg.getShowOnlyIfSpectatorsCanWatch());
+    gameListProxyModel->setShowSpectatorPasswordProtected(dlg.getShowSpectatorPasswordProtected());
+    gameListProxyModel->setShowOnlyIfSpectatorsCanChat(dlg.getShowOnlyIfSpectatorsCanChat());
+    gameListProxyModel->setShowOnlyIfSpectatorsCanSeeHands(dlg.getShowOnlyIfSpectatorsCanSeeHands());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());

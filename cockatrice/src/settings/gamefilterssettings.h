@@ -10,7 +10,8 @@ class GameFiltersSettings : public SettingsManager
 
 public:
     bool isShowBuddiesOnlyGames();
-    bool isUnavailableGamesVisible();
+    bool isShowFullGames();
+    bool isShowGamesThatStarted();
     bool isShowPasswordProtectedGames();
     bool isHideIgnoredUserGames();
     QString getGameNameFilter();
@@ -19,10 +20,15 @@ public:
     int getMaxPlayers();
     QTime getMaxGameAge();
     bool isGameTypeEnabled(QString gametype);
+    bool isShowOnlyIfSpectatorsCanWatch();
+    bool isShowSpectatorPasswordProtected();
+    bool isShowOnlyIfSpectatorsCanChat();
+    bool isShowOnlyIfSpectatorsCanSeeHands();
 
     void setShowBuddiesOnlyGames(bool show);
     void setHideIgnoredUserGames(bool hide);
-    void setUnavailableGamesVisible(bool enabled);
+    void setShowFullGames(bool show);
+    void setShowGamesThatStarted(bool show);
     void setShowPasswordProtectedGames(bool show);
     void setGameNameFilter(QString gameName);
     void setCreatorNameFilter(QString creatorName);
@@ -31,6 +37,10 @@ public:
     void setMaxGameAge(const QTime &maxGameAge);
     void setGameTypeEnabled(QString gametype, bool enabled);
     void setGameHashedTypeEnabled(QString gametypeHASHED, bool enabled);
+    void setShowOnlyIfSpectatorsCanWatch(bool show);
+    void setShowSpectatorPasswordProtected(bool show);
+    void setShowOnlyIfSpectatorsCanChat(bool show);
+    void setShowOnlyIfSpectatorsCanSeeHands(bool show);
 signals:
 
 public slots:
