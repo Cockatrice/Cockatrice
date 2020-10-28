@@ -169,6 +169,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     setLayout(mainLayout);
     setWindowTitle(tr("Filter games"));
+
+    setFixedHeight(sizeHint().height());
 }
 
 void DlgFilterGames::actOk()
