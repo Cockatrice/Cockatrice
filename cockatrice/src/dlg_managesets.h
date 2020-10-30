@@ -1,5 +1,5 @@
-#ifndef WINDOW_SETS_H
-#define WINDOW_SETS_H
+#ifndef DLG_MANAGESETS_H
+#define DLG_MANAGESETS_H
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

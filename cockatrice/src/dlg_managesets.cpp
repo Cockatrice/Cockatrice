@@ -1,4 +1,4 @@
-#include "window_sets.h"
+#include "dlg_managesets.h"
 
 #include "customlineedit.h"
 #include "main.h"
