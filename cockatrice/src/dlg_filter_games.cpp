@@ -150,8 +150,10 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     auto *rightGrid = new QGridLayout;
     rightGrid->addWidget(gameTypeFilterGroupBox, 0, 0, 1, 1);
     rightGrid->addWidget(spectatorsGroupBox, 1, 0, 1, 1);
+
     auto *rightColumn = new QVBoxLayout;
     rightColumn->addLayout(rightGrid);
+    rightColumn->addStretch();
 
     auto *hbox = new QHBoxLayout;
     hbox->addLayout(leftColumn);
@@ -167,6 +169,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     setLayout(mainLayout);
     setWindowTitle(tr("Filter games"));
+
+    setFixedHeight(sizeHint().height());
 }
 
 void DlgFilterGames::actOk()
