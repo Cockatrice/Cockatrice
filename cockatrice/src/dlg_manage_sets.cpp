@@ -1,4 +1,4 @@
-#include "dlg_managesets.h"
+#include "dlg_manage_sets.h"
 
 #include "customlineedit.h"
 #include "main.h"

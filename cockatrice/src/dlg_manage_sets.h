@@ -1,5 +1,5 @@
-#ifndef DLG_MANAGESETS_H
-#define DLG_MANAGESETS_H
+#ifndef DLG_MANAGE_SETS_H
+#define DLG_MANAGE_SETS_H
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
