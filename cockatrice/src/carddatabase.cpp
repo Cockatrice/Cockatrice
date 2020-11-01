@@ -520,11 +520,21 @@ LoadStatus CardDatabase::loadCardDatabases()
     loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
     loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
 
-    // load custom card databases, recursively & following symlinks
+    // find all custom card databases, recursively & following symlinks
+    // then load them alphabetically
     QDirIterator customDatabaseIterator(SettingsCache::instance().getCustomCardDatabasePath(), QStringList() << "*.xml",
                                         QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    QStringList databasePaths;
     while (customDatabaseIterator.hasNext()) {
-        loadCardDatabase(customDatabaseIterator.next());
+        customDatabaseIterator.next();
+        databasePaths.push_back(customDatabaseIterator.filePath());
+    }
+    databasePaths.sort();
+
+    for (auto i = 0; i < databasePaths.size(); ++i) {
+        const auto &databasePath = databasePaths.at(i);
+        qDebug() << "Loading Custom Set" << i << "(" << databasePath << ")";
+        loadCardDatabase(databasePath);
     }
 
     // AFTER all the cards have been loaded
