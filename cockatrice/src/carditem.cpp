@@ -370,7 +370,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                (!SettingsCache::instance().getDoubleClickToPlay())) {
         bool hideCard = false;
         if (zone && zone->getIsView()) {
-            ZoneViewZone *view = static_cast<ZoneViewZone *>(zone);
+            auto *view = static_cast<ZoneViewZone *>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 hideCard = true;
         }
@@ -381,7 +381,6 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    setCursor(Qt::OpenHandCursor);
     AbstractCardItem::mouseReleaseEvent(event);
 }
 
