@@ -9,7 +9,7 @@
 #include "deckview.h"
 #include "dlg_creategame.h"
 #include "dlg_load_remote_deck.h"
-#include "dlg_managesets.h"
+#include "dlg_manage_sets.h"
 #include "gamescene.h"
 #include "gameview.h"
 #include "get_pb_extension.h"

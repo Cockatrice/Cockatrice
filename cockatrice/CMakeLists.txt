@@ -18,7 +18,7 @@ SET(cockatrice_SOURCES
     src/dlg_forgotpasswordrequest.cpp
     src/dlg_forgotpasswordreset.cpp
     src/dlg_forgotpasswordchallenge.cpp
-    src/dlg_managesets.cpp
+    src/dlg_manage_sets.cpp
     src/dlg_register.cpp
     src/dlg_tip_of_the_day.cpp
     src/tip_of_the_day.cpp

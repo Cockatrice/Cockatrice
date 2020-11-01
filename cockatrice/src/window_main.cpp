@@ -25,7 +25,7 @@
 #include "dlg_forgotpasswordchallenge.h"
 #include "dlg_forgotpasswordrequest.h"
 #include "dlg_forgotpasswordreset.h"
-#include "dlg_managesets.h"
+#include "dlg_manage_sets.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_tip_of_the_day.h"
