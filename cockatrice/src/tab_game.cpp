@@ -9,6 +9,7 @@
 #include "deckview.h"
 #include "dlg_creategame.h"
 #include "dlg_load_remote_deck.h"
+#include "dlg_manage_sets.h"
 #include "gamescene.h"
 #include "gameview.h"
 #include "get_pb_extension.h"
@@ -52,7 +53,6 @@
 #include "replay_timeline_widget.h"
 #include "settingscache.h"
 #include "tab_supervisor.h"
-#include "window_sets.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 

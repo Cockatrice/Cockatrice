@@ -2,10 +2,10 @@
 
 #include "abstractclient.h"
 #include "customlineedit.h"
+#include "dlg_manage_sets.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
 #include "pending_command.h"
-#include "window_sets.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
