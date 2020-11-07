@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Check formatting using clang-format
+# Check formatting using clangify
 echo "Checking your code using clang-format..."
 
 diff="$(./clangify.sh --diff --cf-version)"

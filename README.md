@@ -79,7 +79,7 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice and
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
-# Build [![Travis Build Status - master](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice) [![Appveyor Build Status - master](https://ci.appveyor.com/api/projects/status/oauxf5a0sj689rcg/branch/master?svg=true)](https://ci.appveyor.com/project/ZeldaZach/cockatrice/branch/master) <!-- link to zachs appveyor not correct yet -->
+# Build ![macOS builds](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20mac%20os/badge.svg) ![linux builds](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20linux%20using%20docker/badge.svg) [![Appveyor Build Status - master](https://ci.appveyor.com/api/projects/status/oauxf5a0sj689rcg/branch/master?svg=true)](https://ci.appveyor.com/project/ZeldaZach/cockatrice/branch/master) <!-- link to zachs appveyor not correct yet -->
 
 **Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 

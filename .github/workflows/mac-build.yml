@@ -1,0 +1,137 @@
+name: Build on mac os
+
+on:
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        type:
+          - Debug
+          - Release
+        xcode:
+          - 12
+          - 10.3
+        include:
+          - type: Debug
+            do_tests: 0 # tests do not work yet on mac
+            make_package: false
+
+          - type: Release
+            do_tests: 0
+            make_package: true
+
+    runs-on:
+      - macos-latest
+
+    env:
+      CCACHE_DIR: ~/.ccache
+      DEVELOPER_DIR:
+        /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies using homebrew
+        shell: bash
+        # cmake cannot find the mysql connector
+        # neither of these works: mariadb-connector-c mysql-connector-c++
+        run: brew install ccache protobuf
+
+# in case we'd want to modify this for windows:
+#     - if: runner.os == 'windows'
+#       name: Install dependencies using vcpkg
+#       shell: bash
+#       run: vcpkg install protobuf liblzma zlib --triplet x64-windows
+
+      - name: Install QT
+        uses: jurplel/install-qt-action@v2
+
+      - name: Get ccache timestamp
+        id: ccache_timestamp
+        shell: bash
+        run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
+
+      - name: Restore ccache cache
+        uses: actions/cache@v2
+        env:
+          timestamp: ${{steps.ccache_timestamp.outputs.timestamp}}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-${{env.timestamp}}
+          restore-keys: |
+            ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-
+
+      - name: Create build environment
+        run: cmake -E make_directory build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: build
+        run: |
+          ccache --show-stats
+          mkdir -p $CCACHE_DIR
+          ls $CCACHE_DIR
+          cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 -DTEST=${{matrix.do_tests}}
+
+      - name: Build on xcode ${{matrix.xcode}}
+        shell: bash
+        working-directory: build
+        run: cmake --build .
+
+      - name: Test
+        if: matrix.do_tests == 1
+        shell: bash
+        working-directory: build
+        run: cmake --build . --target test
+
+      - name: Package
+        if: matrix.make_package
+        id: build_package
+        shell: bash
+        working-directory: build
+        run: |
+          cmake --build . --target package
+          file=$(echo Cockatrice-*.*)
+          extension="${file#*.}"
+          name="${file%%.*}"
+          newfile="$name-xcode-${{matrix.xcode}}.$extension"
+          mv "$file" "$newfile" # avoid file name conflicts
+          echo "::set-output name=file::$newfile"
+
+      - name: Upload artifacts
+        if: matrix.make_package
+        uses: actions/upload-artifact@v2
+        with:
+          name: xcode-${{matrix.xcode}}-dmg
+          path: build/${{steps.build_package.outputs.file}}
+
+      - name: Get release upload url
+        if: matrix.make_package && startsWith(github.ref, 'refs/tags/')
+        id: get_url
+        shell: bash
+        env:
+          ref: "${{github.ref}}"
+          repo: "${{github.repository}}"
+        run: |
+          url=$(./.ci/get_github_upload_url.sh)
+          echo "::set-output name=upload_url::$url"
+
+      - name: Upload release
+        if: steps.get_url.outcome == 'success'
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.get_url.outputs.upload_url}}
+          asset_path: build/${{steps.build_package.outputs.file}}
+          asset_name: ${{steps.build_package.outputs.file}}
+          asset_content_type: binary_package # required but arbitrary
