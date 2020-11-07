@@ -1,7 +1,6 @@
 name: Clangify
 
 on:
-  push:  # for testing
   pull_request:
     branches:
     - main
@@ -17,6 +16,6 @@ jobs:
       shell: bash
       run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang-format
 
-    - name: Build
+    - name: Run
       shell: bash
       run: ./.ci/travis-lint.sh
