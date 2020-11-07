@@ -15,7 +15,7 @@ jobs:
 
     - name: Install clang-format
       shell: bash
-      run: apt-get update && apt-get install -y --no-install-recommends clang-format
+      run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang-format
 
     - name: Build
       shell: bash
