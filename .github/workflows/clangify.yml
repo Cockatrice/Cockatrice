@@ -1,6 +1,7 @@
 name: Clangify
 
 on:
+  push:  # for testing
   pull_request:
     branches:
     - main
