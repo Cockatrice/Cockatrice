@@ -1,0 +1,21 @@
+name: Clangify
+
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install clang-format
+      shell: bash
+      run: apt-get update && apt-get install -y --no-install-recommends clang-format
+
+    - name: Build
+      shell: bash
+      run: ./.ci/travis-lint.sh
