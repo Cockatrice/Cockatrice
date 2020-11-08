@@ -5,6 +5,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         ccache \
         cmake \
         git \
+        mariadb-libs \
         protobuf \
         qt5-base \
         qt5-multimedia \
