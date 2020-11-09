@@ -37,6 +37,7 @@
 #define ZIP_SIGNATURE "PK"
 // Xz stream header: 0xFD + "7zXZ"
 #define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
+#define MTGJSON_V4_URL_COMPONENT "mtgjson.com/files/"
 #define ALLSETS_URL_FALLBACK "https://www.mtgjson.com/api/v5/AllPrintings.json"
 #define MTGJSON_VERSION_URL "https://www.mtgjson.com/api/v5/Meta.json"
 
@@ -298,7 +299,13 @@ bool LoadSetsPage::validatePage()
 
     // else, try to import sets
     if (urlRadioButton->isChecked()) {
-        QUrl url = QUrl::fromUserInput(urlLineEdit->text());
+        // If a user attempts to download from V4, redirect them to V4
+        if (urlLineEdit->text().contains(MTGJSON_V4_URL_COMPONENT)) {
+            actRestoreDefaultUrl();
+        }
+
+        const auto url = QUrl::fromUserInput(urlLineEdit->text());
+
         if (!url.isValid()) {
             QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
             return false;
