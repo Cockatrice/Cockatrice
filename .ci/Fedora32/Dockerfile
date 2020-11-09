@@ -10,6 +10,7 @@ RUN dnf install -y \
         git \
         hicolor-icon-theme \
         libappstream-glib \
+        mariadb-devel \
         protobuf-devel \
         qt5-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
         rpm-build \
