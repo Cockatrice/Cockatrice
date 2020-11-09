@@ -125,7 +125,7 @@ void SimpleDownloadFilePage::actDownloadFinished()
         return;
     }
 
-    // save downlaoded file url, but only if the user customized it and download was successfull
+    // save downloaded file url, but only if the user customized it and download was successful
     if (urlLineEdit->text() != getDefaultUrl()) {
         wizard()->settings->setValue(getCustomUrlSettingsKey(), urlLineEdit->text());
     } else {
