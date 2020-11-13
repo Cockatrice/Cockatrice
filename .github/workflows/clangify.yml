@@ -3,7 +3,7 @@ name: Clangify
 on:
   pull_request:
     branches:
-    - main
+    - master
 
 jobs:
   linter:
