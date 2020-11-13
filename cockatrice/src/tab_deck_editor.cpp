@@ -26,8 +26,6 @@
 #include <QDir>
 #include <QDockWidget>
 #include <QFileDialog>
-#include <QGroupBox>
-#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -89,6 +87,7 @@ void TabDeckEditor::createDeckDock()
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
+    commentsEdit->setMinimumHeight(nameEdit->minimumSizeHint().height());
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
@@ -147,7 +146,7 @@ void TabDeckEditor::createDeckDock()
     auto *split = new QSplitter;
     split->setObjectName("deckSplitter");
     split->setOrientation(Qt::Vertical);
-    split->setChildrenCollapsible(false);
+    split->setChildrenCollapsible(true);
     split->addWidget(topWidget);
     split->addWidget(bottomWidget);
     split->setStretchFactor(0, 1);
