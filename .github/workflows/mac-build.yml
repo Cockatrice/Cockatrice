@@ -101,8 +101,8 @@ jobs:
         run: |
           cmake --build . --target package
           file=$(echo Cockatrice-*.*)
-          extension="${file#*.}"
-          name="${file%%.*}"
+          extension="${file##*.}"
+          name="${file%.*}"
           newfile="$name-xcode-${{matrix.xcode}}.$extension"
           mv "$file" "$newfile" # avoid file name conflicts
           echo "::set-output name=file::$newfile"
