@@ -111,7 +111,7 @@ public:
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
-    int importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cards, bool skipSpecialNums = true);
+    int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cards, bool skipSpecialNums = true);
     QList<SetToDownload> &getSets()
     {
         return allSets;
@@ -123,7 +123,7 @@ public:
     void clear();
 
 protected:
-    inline QString getStringPropertyFromMap(QVariantMap card, QString propertyName);
+    inline QString getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName);
     void sortAndReduceColors(QString &colors);
 };
 

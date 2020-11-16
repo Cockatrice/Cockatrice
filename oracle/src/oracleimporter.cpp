@@ -178,28 +178,33 @@ CardInfoPtr OracleImporter::addCard(QString name,
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, tableRow, upsideDown);
 
-    cards.insert(name, newCard);
+    if (!name.isEmpty()) {
+        cards.insert(name, newCard);
+    }
+
     return newCard;
 }
 
-QString OracleImporter::getStringPropertyFromMap(QVariantMap card, QString propertyName)
+QString OracleImporter::getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName)
 {
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
 
-int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cardsList, bool skipSpecialCards)
+int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
+                                       const QList<QVariant> &cardsList,
+                                       bool skipSpecialCards)
 {
+    // mtgjson name => xml name
     static const QMap<QString, QString> cardProperties{
-        // mtgjson name => xml name
         {"manaCost", "manacost"}, {"convertedManaCost", "cmc"}, {"type", "type"},
         {"loyalty", "loyalty"},   {"layout", "layout"},         {"side", "side"},
     };
 
-    static const QMap<QString, QString> setInfoProperties{// mtgjson name => xml name
-                                                          {"multiverseId", "muid"},
-                                                          {"scryfallId", "uuid"},
-                                                          {"number", "num"},
-                                                          {"rarity", "rarity"}};
+    // mtgjson name => xml name
+    static const QMap<QString, QString> setInfoProperties{{"number", "num"}, {"rarity", "rarity"}};
+
+    // mtgjson name => xml name
+    static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
 
     int numCards = 0;
     QMultiMap<QString, SplitCardPart> splitCards;
@@ -255,6 +260,18 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty())
                 setInfo.setProperty(xmlPropertyName, propertyValue);
+        }
+
+        // Identifiers
+        QMapIterator<QString, QString> it3(identifierProperties);
+        while (it3.hasNext()) {
+            it3.next();
+            auto mtgjsonProperty = it3.key();
+            auto xmlPropertyName = it3.value();
+            auto propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
+            if (!propertyValue.isEmpty()) {
+                setInfo.setProperty(xmlPropertyName, propertyValue);
+            }
         }
 
         // skip alternatives
