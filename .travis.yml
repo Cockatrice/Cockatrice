@@ -92,31 +92,6 @@ jobs:
     before_install: source .ci/docker.sh --build
     script: RUN --server --package $NAME --release
 
-
-  #Fedora 32 (on Docker)
-  - name: Fedora 32 (Compile)
-    if: tag IS NOT present
-    services: docker
-    language: minimal
-    env: NAME=Fedora32 CACHE=$HOME/$NAME
-    cache:
-      directories:
-      - $CACHE
-    before_install: source .ci/docker.sh --build
-    script: RUN --server
-
-  - name: Fedora 32 (Release)
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
-    services: docker
-    language: minimal
-    env: NAME=Fedora32 CACHE=$HOME/$NAME
-    cache:
-      directories:
-      - $CACHE
-    before_install: source .ci/docker.sh --build
-    script: RUN --server --package $NAME RPM --release
-
-
   #macOS High Sierra
   - name: macOS High Sierra (Debug)
     if: tag IS NOT present
@@ -163,7 +138,7 @@ jobs:
   - name: macOS Catalina (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode11.6
+    osx_image: xcode12.2
     cache:
     - ccache
     - directories:
@@ -183,7 +158,7 @@ jobs:
   - name: macOS Catalina (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode11.6
+    osx_image: xcode12.2
     env: OSX_VERSION=10.15
     cache:
     - ccache
