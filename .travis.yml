@@ -92,6 +92,30 @@ jobs:
     before_install: source .ci/docker.sh --build
     script: RUN --server --package $NAME --release
 
+  #Fedora 33 (on Docker)
+  - name: Fedora 33 (Compile)
+    if: tag IS NOT present
+    services: docker
+    language: minimal
+    env: NAME=Fedora33 CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/docker.sh --build
+    script: RUN --server
+
+  - name: Fedora 33 (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    services: docker
+    language: minimal
+    env: NAME=Fedora33 CACHE=$HOME/$NAME
+    cache:
+      directories:
+      - $CACHE
+    before_install: source .ci/docker.sh --build
+    script: RUN --server --package $NAME RPM --release
+
+
   #macOS High Sierra
   - name: macOS High Sierra (Debug)
     if: tag IS NOT present
