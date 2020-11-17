@@ -18,6 +18,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends clang-format
 
-    - name: Run
+    - name: Run clangify
       shell: bash
       run: ./.ci/lint.sh
