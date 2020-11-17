@@ -1,4 +1,4 @@
-name: Build on linux using docker
+name: Build on Linux (Docker)
 
 on:
   pull_request:
@@ -47,7 +47,8 @@ jobs:
       CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Get cache timestamp
         id: cache_timestamp
@@ -64,7 +65,7 @@ jobs:
           restore-keys: |
             docker-${{matrix.distro}}-cache-
 
-      - name: Build ${{matrix.distro}} docker image
+      - name: Build ${{matrix.distro}} Docker image
         shell: bash
         run: |
           source .ci/docker.sh --build
@@ -107,7 +108,7 @@ jobs:
           url="$(./.ci/get_github_upload_url.sh)"
           echo "::set-output name=upload_url::$url"
 
-      - name: Upload release
+      - name: Upload release to GitHub
         if: steps.get_url.outcome == 'success'
         uses: actions/upload-release-asset@v1.0.2
         env:

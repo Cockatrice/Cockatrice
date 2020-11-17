@@ -1,4 +1,4 @@
-name: Build on mac os
+name: Build on macOS
 
 on:
   pull_request:
@@ -46,7 +46,7 @@ jobs:
         # neither of these works: mariadb-connector-c mysql-connector-c++
         run: brew install ccache protobuf
 
-# in case we'd want to modify this for windows:
+# in case we'd want to modify this for windows (should be its own workflow):
 #     - if: runner.os == 'windows'
 #       name: Install dependencies using vcpkg
 #       shell: bash
@@ -82,7 +82,7 @@ jobs:
           ls $CCACHE_DIR
           cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 -DTEST=${{matrix.do_tests}}
 
-      - name: Build on xcode ${{matrix.xcode}}
+      - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
         working-directory: build
         run: cmake --build .
@@ -114,7 +114,7 @@ jobs:
           name: xcode-${{matrix.xcode}}-dmg
           path: build/${{steps.build_package.outputs.file}}
 
-      - name: Get release upload url
+      - name: Get release upload URL
         if: matrix.make_package && startsWith(github.ref, 'refs/tags/')
         id: get_url
         shell: bash
@@ -125,7 +125,7 @@ jobs:
           url=$(./.ci/get_github_upload_url.sh)
           echo "::set-output name=upload_url::$url"
 
-      - name: Upload release
+      - name: Upload release to GitHub
         if: steps.get_url.outcome == 'success'
         uses: actions/upload-release-asset@v1.0.2
         env:

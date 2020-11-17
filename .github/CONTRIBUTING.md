@@ -271,11 +271,11 @@ https://github.com/Cockatrice/Cockatrice/wiki/Client-server-protocol)
 # Reviewing Pull Requests #
 
 After you have finished your changes to the project you should put them on a
-separate branch of your fork on Github and open a [pull request](
+separate branch of your fork on GitHub and open a [pull request](
 https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/creating-an-issue-or-pull-request
 ).
-Your code will then be automatically compiled by Github actions for Linux and
-macOS, and by Appveyor for Windows. Additionally Github will perform a [Linting
+Your code will then be automatically compiled by GitHub actions for Linux and
+macOS, and by Appveyor for Windows. Additionally GitHub will perform a [Linting
 check](#formatting-and-continuous-integration-ci). If any issues come up you
 can check their status at the bottom of the pull request page, click on details
 to go to the CI website and see the different build logs.
@@ -291,7 +291,7 @@ be included in the next release 👍
 Basic workflow for translations:
  1. Developer adds a `tr("foo")` string in the code;
  2. Every few days, a maintainer updates the `*_en.ts files` with the new strings;
- 3. Transifex picks up the new files from Github every 24 hours;
+ 3. Transifex picks up the new files from GitHub every 24 hours;
  4. Translators translate the new untranslated strings on Transifex;
  5. Before a release, a maintainer fetches the updated translations from Transifex.
 
@@ -387,11 +387,12 @@ https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
 # Release Management #
 
-### Publishing A New Beta Release ###
+### Publishing A New Release ###
 
-AppVeyor (windows) is configured to upload files to GitHub Releases whenever a
+GitHub Actions will upload binaries (Linux & macOS) when any release is published 
+on GitHub.<br>
+AppVeyor is configured to upload binaries (Windows) to GitHub Releases whenever a
 <kbd>tag</kbd> is pushed.<br>
-Github will upload files when any release is published on Github.<br>
 You can create a tag when publishing a (pre-)release, but you can also push one
 manually and use it in the release.
 
@@ -414,10 +415,10 @@ You should define the variables as such:
 
 This will cause a tagged release to be established on the GitHub repository,
 which will then lead to the upload of binaries by Appveyor.
-If you use this method, the tag that you created will be marked as a
-"Pre-release".
-The `/latest` URL will not be changed, it always points to the latest stable
-release and not prereleases.
+If you use a SemVer tag including "beta", the release that will be created at GitHub 
+by the CI will be marked as a "Pre-release".
+The target of the `.../latest` URL will not be changed in that case - 
+it always points to the latest stable release and not pre-releases.
 
 If you accidentally push a tag incorrectly (the tag is outdated, you didn't
 pull in the latest branch accidentally, you named the tag wrong, etc.) you can
@@ -428,27 +429,30 @@ git tag -d $TAG_NAME
 ```
 
 **NOTE:** Unfortunately, due to the method of how AppVeyor works, to publish a
-stable release you will need to make a copy of the release notes locally and
-then paste them into the GitHub GUI once the binaries have been uploaded by
-it. AppVeyor services will automatically overwrite the name of the release
-(to "Cockatrice $TAG_NAME"), the status of the release (to "Pre-release"), and
-the release body (to "Beta build of Cockatrice").
+stable release you will need to make a copy of the drafted release notes locally before 
+pushing the tag, and paste them back into the GitHub releases GUI once the binaries have 
+been uploaded by the CI.
+<br>
+The AppVeyor service will automatically overwrite the name of the release to 
+"Cockatrice $TAG_NAME".
+In addition, for beta releases, the status of the release will be set to "Pre-release", and
+the release body will get renamed to "Beta build of Cockatrice".
 
 **NOTE 2:** In the first lines of [CMakeLists.txt](
 https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt)
-there's an hardcoded version number used when compiling custom (not tagged)
+there's an hardcoded version number used when compiling from master or custom (not tagged)
 versions. While on tagged versions these numbers are overridden by the version
-numbers coming from the tag title, it's good practice to keep them aligned with
-the real ones.
+numbers coming from the tag title, it's good practice to increment the ones at CMake 
+after every full release to stress that master is ahead of the last stable release.
 The preferred flow of operation is:
- * just before a release, make sure the version number in CMakeLists.txt is set
- to the next release version;
- * tag the release following the previously described syntax in order to get it
- built by CI;
- * wait for CI to upload the binaries, double check if everything is in order
- * after the release is complete, update the version number again to "next
- targeted beta version", typically increasing `PROJECT_VERSION_PATCH` by one.
+ * Just before a release, make sure the version number in CMakeLists.txt is set
+ to the same release version you are about to tag.
+ * Tag the release following the previously described syntax in order to get it correctly 
+ built and deployed by CI.
+ * Wait for them to upload all binaries, then double check if everything is in order.
+ * After the release is complete, update the CMake version number again to the next
+ targeted beta version, typically increasing `PROJECT_VERSION_PATCH` by one.
 
-**NOTE 3:** When releasing a new stable version, all the previous beta versions
-should be deleted. This is needed for Cockatrice to update users of the "beta"
-release channel to the latest version like other users.
+**NOTE 3:** When releasing a new stable version, all previous beta releases (and tags) 
+should be deleted. This is needed for Cockatrice to update users of the "Beta"
+release channel correctly to the latest stable version as well.
