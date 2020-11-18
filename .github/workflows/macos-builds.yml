@@ -115,8 +115,8 @@ jobs:
         run: |
           ccache --show-stats
           if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
-            export Qt5_Dir="$(echo /usr/local/Cellar/qt/*)"
-            echo "set Qt5_Dir to $Qt5_Dir"
+            export Qt5_DIR="$(echo /usr/local/Cellar/qt/*)"
+            echo "set Qt5_DIR to $Qt5_DIR"
           fi
           mkdir -p $CCACHE_DIR
           ls $CCACHE_DIR
