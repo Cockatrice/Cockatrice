@@ -13,23 +13,37 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        type:
-          - Debug
-          - Release
-        xcode:
-          - 12
-          - 10.3
         include:
-          - type: Debug
+          - os: macos-10.13
+            target: HighSierra # tests only
+            xcode: 8.2.1
+            type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
 
-          - type: Release
+          - os: macos-10.13 # runs on HighSierra
+            target: ElCapitan # xcode 8.2.1 should be compatible with macos 10.11.5
+            xcode: 8.2.1
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - os: macos-10.15
+            target: Catalina
+            xcode: 11.7
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - os: macos-11.0
+            target: BigSur
+            xcode: 12.2
+            type: Release
             do_tests: 0
             make_package: true
 
     runs-on:
-      - macos-latest
+      - ${{matrix.os}}
 
     env:
       CCACHE_DIR: ~/.ccache
@@ -52,7 +66,14 @@ jobs:
 #       shell: bash
 #       run: vcpkg install protobuf liblzma zlib --triplet x64-windows
 
-      - name: Install QT
+      - name: Install QT using homebrew
+        id: brew_install_qt
+        continue-on-error: true
+        shell: bash
+        run: brew install qt --force-bottle
+
+      - name: Install QT using actions
+        if: steps.brew_install_qt.outcome == 'failure'
         uses: jurplel/install-qt-action@v2
 
       - name: Get ccache timestamp
@@ -93,7 +114,7 @@ jobs:
         working-directory: build
         run: cmake --build . --target test
 
-      - name: Package
+      - name: Package for ${{matrix.target}}
         if: matrix.make_package
         id: build_package
         shell: bash
@@ -103,7 +124,7 @@ jobs:
           file=$(echo Cockatrice-*.*)
           extension="${file##*.}"
           name="${file%.*}"
-          newfile="$name-xcode-${{matrix.xcode}}.$extension"
+          newfile="$name-macOS-${{matrix.target}}.$extension"
           mv "$file" "$newfile" # avoid file name conflicts
           echo "::set-output name=file::$newfile"
 
@@ -111,7 +132,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v2
         with:
-          name: xcode-${{matrix.xcode}}-dmg
+          name: macOS-${{matrix.target}}-xcode-${{matrix.xcode}}-dmg
           path: build/${{steps.build_package.outputs.file}}
 
       - name: Get release upload URL
@@ -125,7 +146,7 @@ jobs:
           url=$(./.ci/get_github_upload_url.sh)
           echo "::set-output name=upload_url::$url"
 
-      - name: Upload release to GitHub
+      - name: Upload release for ${{matrix.target}}
         if: steps.get_url.outcome == 'success'
         uses: actions/upload-release-asset@v1.0.2
         env:
