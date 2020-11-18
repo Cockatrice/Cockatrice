@@ -114,13 +114,14 @@ jobs:
         working-directory: build
         run: |
           ccache --show-stats
-          if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
-            export Qt5_DIR="$(echo /usr/local/Cellar/qt/*)"
-            echo "set Qt5_DIR to $Qt5_DIR"
-          fi
           mkdir -p $CCACHE_DIR
           ls $CCACHE_DIR
-          cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 -DTEST=${{matrix.do_tests}}
+          if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
+            cmake_args=" -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/*)"
+            echo "added$cmake_args cmake argument for homebrew"
+          fi
+          cmake_args+=" -DTEST=${{matrix.do_tests}}"
+          cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 $cmake_args
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
