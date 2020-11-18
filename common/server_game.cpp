@@ -169,26 +169,29 @@ void Server_Game::pingClockTimeout()
     GameEventStorage ges;
     ges.setGameEventContext(Context_PingChanged());
 
-    QList<ServerInfo_PlayerPing *> pingList;
-    QMapIterator<int, Server_Player *> playerIterator(players);
     bool allPlayersInactive = true;
     int playerCount = 0;
-    while (playerIterator.hasNext()) {
-        Server_Player *player = playerIterator.next().value();
+    for (auto *player : players) {
+        if (player == nullptr)
+            continue;
+
         if (!player->getSpectator())
             ++playerCount;
 
-        const int oldPingTime = player->getPingTime();
-        player->playerMutex.lock();
+        int oldPingTime = player->getPingTime();
         int newPingTime;
-        if (player->getUserInterface())
-            newPingTime = player->getUserInterface()->getLastCommandTime();
-        else
-            newPingTime = -1;
-        player->playerMutex.unlock();
+        {
+            QMutexLocker(&player->playerMutex);
+            if (player->getUserInterface()) {
+                newPingTime = player->getUserInterface()->getLastCommandTime();
+            } else {
+                newPingTime = -1;
+            }
+        }
 
-        if ((newPingTime != -1) && !player->getSpectator())
+        if ((newPingTime != -1) && !player->getSpectator()) {
             allPlayersInactive = false;
+        }
 
         if ((abs(oldPingTime - newPingTime) > 1) || ((newPingTime == -1) && (oldPingTime != -1)) ||
             ((newPingTime != -1) && (oldPingTime == -1))) {
@@ -203,10 +206,12 @@ void Server_Game::pingClockTimeout()
 
     const int maxTime = room->getServer()->getMaxGameInactivityTime();
     if (allPlayersInactive) {
-        if (((++inactivityCounter >= maxTime) && (maxTime > 0)) || (playerCount < maxPlayers))
+        if (((maxTime > 0) && (++inactivityCounter >= maxTime)) || (playerCount < maxPlayers)) {
             deleteLater();
-    } else
+        }
+    } else {
         inactivityCounter = 0;
+    }
 }
 
 int Server_Game::getPlayerCount() const
