@@ -140,7 +140,13 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          cmake --build . --target package
+          # temporary workaround for big sur images having old cmake
+          if [[ ${{matrix.os}} == macos-11.0 ]]; then
+            curl https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Darwin-x86_64.tar.gz | tar -xz
+            ./cmake-3.19.0-Darwin-x86_64/CMake.app/Contents/bin/cpack --config ./CPackConfig.cmake
+          else
+            cmake --build . --target package
+          fi
           file=$(echo Cockatrice-*.*)
           extension="${file##*.}"
           name="${file%.*}"
