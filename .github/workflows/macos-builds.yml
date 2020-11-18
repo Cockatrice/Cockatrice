@@ -13,37 +13,52 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        target:
+          - Debug
+          - ElCapitan
+          - Mojave
+          - Catalina
+          - BigSur
         include:
-          - os: macos-10.13
-            target: HighSierra # tests only
-            xcode: 8.2.1
+          - target: Debug # tests only
+            os: macos-latest
+            xcode: 11.7
             type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
 
-          - os: macos-10.13 # runs on HighSierra
-            target: ElCapitan # xcode 8.2.1 should be compatible with macos 10.11.5
+          - target: ElCapitan # xcode 8.2.1 should be compatible with macos 10.11.5
+            os: macos-10.13 # runs on HighSierra
+            allow-failure: yes # we don't know if it'll be added
             xcode: 8.2.1
             type: Release
             do_tests: 0
             make_package: true
 
-          - os: macos-10.15
-            target: Catalina
+          - target: Mojave # xcode 10.3 should be compatible with macos 10.14.3
+            os: macos-10.15 # runs on Catalina
+            xcode: 10.3
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: Catalina
+            os: macos-10.15
             xcode: 11.7
             type: Release
             do_tests: 0
             make_package: true
 
-          - os: macos-11.0
-            target: BigSur
+          - target: BigSur
+            os: macos-11.0
             xcode: 12.2
             type: Release
             do_tests: 0
             make_package: true
 
-    runs-on:
-      - ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+
+    continue-on-error: ${{matrix.allow-failure == 'yes'}}
 
     env:
       CCACHE_DIR: ~/.ccache
@@ -99,6 +114,10 @@ jobs:
         working-directory: build
         run: |
           ccache --show-stats
+          if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
+            export Qt5_Dir="$(echo /usr/local/Cellar/qt/*)"
+            echo "set Qt5_Dir to $Qt5_Dir"
+          fi
           mkdir -p $CCACHE_DIR
           ls $CCACHE_DIR
           cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 -DTEST=${{matrix.do_tests}}
