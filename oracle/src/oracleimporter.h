@@ -60,10 +60,10 @@ public:
 class SplitCardPart
 {
 public:
-    SplitCardPart(int _index, const QString &_text, const QVariantHash &_properties, CardInfoPerSet setInfo);
-    inline const int &getIndex() const
+    SplitCardPart(const QString &_name, const QString &_text, const QVariantHash &_properties, CardInfoPerSet setInfo);
+    inline const QString &getName() const
     {
-        return index;
+        return name;
     }
     inline const QString &getText() const
     {
@@ -79,7 +79,7 @@ public:
     }
 
 private:
-    int index;
+    QString name;
     QString text;
     QVariantHash properties;
     CardInfoPerSet setInfo;

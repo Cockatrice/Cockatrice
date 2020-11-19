@@ -7,11 +7,11 @@
 #include <algorithm>
 #include <climits>
 
-SplitCardPart::SplitCardPart(const int _index,
+SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QVariantHash &_properties,
                              const CardInfoPerSet _setInfo)
-    : index(_index), text(_text), properties(_properties), setInfo(_setInfo)
+    : name(_name), text(_text), properties(_properties), setInfo(_setInfo)
 {
 }
 
@@ -212,7 +212,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     QVariantMap card;
     QString layout, name, text, colors, colorIdentity, maintype, power, toughness;
     static const bool isToken = false;
-    QStringList additionalNames;
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
@@ -330,8 +329,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             properties.insert("pt", power + ptSeparator + toughness);
         }
 
-        additionalNames = card.value("names").toStringList();
-
         auto legalities = card.value("legalities").toMap();
         for (const QString &fmtName : legalities.keys()) {
             properties.insert(QString("format-%1").arg(fmtName), legalities.value(fmtName).toString().toLower());
@@ -339,20 +336,31 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // split cards are considered a single card, enqueue for later merging
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
-            // get the position of this card part
-            int index = additionalNames.indexOf(name);
-            // construct full card name
-            name = additionalNames.join(QString(" // "));
-            SplitCardPart split(index, text, properties, setInfo);
+            auto faceName = getStringPropertyFromMap(card, "faceName");
+            SplitCardPart split(faceName, text, properties, setInfo);
             splitCards.insert(name, split);
         } else {
             // relations
             relatedCards.clear();
-            if (additionalNames.size() > 1) {
-                for (const QString &additionalName : additionalNames) {
-                    if (additionalName != name)
+
+            // add other face for split cards as card relation
+            auto faceName = getStringPropertyFromMap(card, "faceName");
+            if (!faceName.isEmpty()) {
+                properties["cmc"] = getStringPropertyFromMap(card, "faceConvertedManaCost");
+                if (layout == "meld") { // meld cards don't work
+                    QRegularExpression meldNameRegex{"Melds with ([\\.]*)"};
+                    QString additionalName = meldNameRegex.match(text).captured(1);
+                    if (!additionalName.isNull()) {
                         relatedCards.append(new CardRelation(additionalName, true));
+                    }
+                } else {
+                    for (const QString &additionalName : name.split(" // ")) {
+                        if (additionalName != faceName) {
+                            relatedCards.append(new CardRelation(additionalName, true));
+                        }
+                    }
                 }
+                name = faceName;
             }
 
             CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, setInfo);
@@ -366,21 +374,22 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     for (const QString &nameSplit : splitCards.uniqueKeys()) {
         // get all parts for this specific card
         QList<SplitCardPart> splitCardParts = splitCards.values(nameSplit);
-        // sort them by index (aka position)
+        // sort them by face name
         std::sort(splitCardParts.begin(), splitCardParts.end(),
-                  [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getIndex() < b.getIndex(); });
+                  [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getName() < b.getName(); });
 
         text = QString("");
         properties.clear();
         relatedCards.clear();
 
-        int lastIndex = -1;
+        QString lastName{};
         for (const SplitCardPart &tmp : splitCardParts) {
             // some sets have 2 different variations of the same split card,
             // eg. Fire // Ice in WC02. Avoid adding duplicates.
-            if (lastIndex == tmp.getIndex())
+            if (lastName == tmp.getName())
                 continue;
-            lastIndex = tmp.getIndex();
+
+            lastName = tmp.getName();
 
             if (!text.isEmpty())
                 text.append(splitCardTextSeparator);
