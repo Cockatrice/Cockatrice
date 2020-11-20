@@ -21,4 +21,6 @@ jobs:
 
     - name: Run clangify
       shell: bash
-      run: ./.ci/lint.sh
+      run: |
+        git fetch origin master
+        ./.ci/lint.sh
