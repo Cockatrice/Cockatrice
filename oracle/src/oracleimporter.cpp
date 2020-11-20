@@ -174,7 +174,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
                                                 setsInfo, cipt, tableRow, upsideDown);
 
     if (name.isEmpty()) {
-      qDebug() << "AAAAA an empty card\n" << text;
+        qDebug() << "warning: an empty card was added to set" << setInfo.getPtr()->getShortName();
     }
     cards.insert(name, newCard);
 
@@ -238,7 +238,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         name = getStringPropertyFromMap(card, "name");
         text = getStringPropertyFromMap(card, "text");
         faceName = getStringPropertyFromMap(card, "faceName");
-        if (faceName.isEmpty()){
+        if (faceName.isEmpty()) {
             faceName = name;
         }
 
@@ -284,7 +284,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 continue;
             }
             if (getStringPropertyFromMap(card, "isPromo") == "true") {
-                specialPromoCards.insert(name, cardVar);
+                specialPromoCards.insert(faceName, cardVar);
                 continue;
             }
             QString numProperty = setInfo.getProperty("num");
@@ -297,7 +297,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 }
             }
             if (skip) {
-                specialPromoCards.insert(name, cardVar);
+                specialPromoCards.insert(faceName, cardVar);
                 continue;
             } else {
                 allNameProps.append(faceName);
