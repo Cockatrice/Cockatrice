@@ -161,14 +161,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // upsideDown (flip cards)
     bool upsideDown = false;
-    QStringList additionalNames = properties.value("names").toStringList();
     QString layout = properties.value("layout").toString();
     if (layout == "flip") {
-        if (properties.value("side").toString() != "front") {
-            upsideDown = true;
-        }
-        // reset the side property, since the card has no back image
-        properties.insert("side", "front");
+        upsideDown = properties.value("side").toString() != "a";
     }
 
     // insert the card and its properties
@@ -178,9 +173,10 @@ CardInfoPtr OracleImporter::addCard(QString name,
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, tableRow, upsideDown);
 
-    if (!name.isEmpty()) {
-        cards.insert(name, newCard);
+    if (name.isEmpty()) {
+      qDebug() << "AAAAA an empty card\n" << text;
     }
+    cards.insert(name, newCard);
 
     return newCard;
 }
@@ -210,7 +206,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     QMultiMap<QString, SplitCardPart> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, maintype, power, toughness;
+    QString layout, name, text, colors, colorIdentity, maintype, power, toughness, faceName;
     static const bool isToken = false;
     QVariantHash properties;
     CardInfoPerSet setInfo;
@@ -221,6 +217,11 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
     for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
+
+        // skip alternatives
+        if (getStringPropertyFromMap(card, "isAlternative") == "true") {
+            continue;
+        }
 
         /* Currently used layouts are:
          * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
@@ -236,6 +237,10 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         // normal cards handling
         name = getStringPropertyFromMap(card, "name");
         text = getStringPropertyFromMap(card, "text");
+        faceName = getStringPropertyFromMap(card, "faceName");
+        if (faceName.isEmpty()){
+            faceName = name;
+        }
 
         // card properties
         properties.clear();
@@ -273,14 +278,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             }
         }
 
-        // skip alternatives
-        if (getStringPropertyFromMap(card, "isAlternative") == "true") {
-            continue;
-        }
-
         if (skipSpecialCards) {
-            // skip promo cards if it's not the only print
-            if (allNameProps.contains(name)) {
+            // skip promo cards if it's not the only print, cards with two faces are different cards
+            if (allNameProps.contains(faceName)) {
                 continue;
             }
             if (getStringPropertyFromMap(card, "isPromo") == "true") {
@@ -300,7 +300,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 specialPromoCards.insert(name, cardVar);
                 continue;
             } else {
-                allNameProps.append(name);
+                allNameProps.append(faceName);
             }
         }
 
@@ -344,11 +344,10 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             relatedCards.clear();
 
             // add other face for split cards as card relation
-            auto faceName = getStringPropertyFromMap(card, "faceName");
-            if (!faceName.isEmpty()) {
+            if (!getStringPropertyFromMap(card, "side").isEmpty()) {
                 properties["cmc"] = getStringPropertyFromMap(card, "faceConvertedManaCost");
                 if (layout == "meld") { // meld cards don't work
-                    QRegularExpression meldNameRegex{"Melds with ([\\.]*)"};
+                    QRegularExpression meldNameRegex{"then meld them into ([\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
                         relatedCards.append(new CardRelation(additionalName, true));
@@ -400,7 +399,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 setInfo = tmp.getSetInfo();
             } else {
                 const QVariantHash &props = tmp.getProperties();
-                layout = properties.value("layout").toString();
                 for (const QString &prop : props.keys()) {
                     QString originalPropertyValue = properties.value(prop).toString();
                     QString thisCardPropertyValue = props.value(prop).toString();
