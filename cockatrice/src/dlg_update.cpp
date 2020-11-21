@@ -52,6 +52,10 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     parentLayout->addWidget(buttonBox);
 
     setLayout(parentLayout);
+    setWindowTitle(tr("Check for Client Updates"));
+
+    setFixedHeight(sizeHint().height());
+    setFixedWidth(sizeHint().width());
 
     // Check for SSL (this probably isn't necessary)
     if (!QSslSocket::supportsSsl()) {

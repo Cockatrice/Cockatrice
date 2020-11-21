@@ -10,4 +10,3 @@ message Response_GetGamesOfUser {
     repeated ServerInfo_Room room_list = 1;
     repeated ServerInfo_Game game_list = 2;
 }
- 

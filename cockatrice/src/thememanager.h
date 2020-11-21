@@ -23,9 +23,9 @@ private:
     QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;
     QStringMap availableThemes;
     /*
-      Internal cache for table backgrounds
+      Internal cache for multiple backgrounds
     */
-    QBrushMap tableBgBrushesCache;
+    QBrushMap tableBgBrushesCache, stackBgBrushesCache, playerBgBrushesCache, handBgBrushesCache;
 
 protected:
     void ensureThemeDirectoryExists();
@@ -51,6 +51,9 @@ public:
     }
     QStringMap &getAvailableThemes();
     QBrush getExtraTableBgBrush(QString extraNumber, QBrush &fallbackBrush);
+    QBrush getExtraStackBgBrush(QString extraNumber, QBrush &fallbackBrush);
+    QBrush getExtraPlayerBgBrush(QString extraNumber, QBrush &fallbackBrush);
+    QBrush getExtraHandBgBrush(QString extraNumber, QBrush &fallbackBrush);
 protected slots:
     void themeChangedSlot();
 signals:

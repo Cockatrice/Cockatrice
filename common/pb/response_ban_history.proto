@@ -2,7 +2,7 @@ syntax = "proto2";
 import "response.proto";
 import "serverinfo_ban.proto";
 
-message Response_BanHistory{
+message Response_BanHistory {
     extend Response {
         optional Response_BanHistory ext = 1012;
     }

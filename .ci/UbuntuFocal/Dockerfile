@@ -10,6 +10,7 @@ RUN apt-get update && \
         g++ \
         git \
         liblzma-dev \
+        libmariadb-dev-compat \
         libprotobuf-dev \
         libqt5multimedia5-plugins \
         libqt5sql5-mysql \

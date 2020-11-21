@@ -6,4 +6,3 @@ message Command_Mulligan {
     }
     optional uint32 number = 7;
 }
-

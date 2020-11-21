@@ -6,4 +6,3 @@ message Event_Kicked {
         optional Event_Kicked ext = 1004;
     }
 }
-

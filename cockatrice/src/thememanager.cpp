@@ -118,6 +118,9 @@ void ThemeManager::themeChangedSlot()
     playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
     stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
     tableBgBrushesCache.clear();
+    stackBgBrushesCache.clear();
+    playerBgBrushesCache.clear();
+    handBgBrushesCache.clear();
 
     QPixmapCache::clear();
 
@@ -133,6 +136,48 @@ QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber, QBrush &fallbackB
         tableBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
     } else {
         returnBrush = tableBgBrushesCache.value(extraNumber.toInt());
+    }
+
+    return returnBrush;
+}
+
+QBrush ThemeManager::getExtraStackBgBrush(QString extraNumber, QBrush &fallbackBrush)
+{
+    QBrush returnBrush;
+
+    if (!stackBgBrushesCache.contains(extraNumber.toInt())) {
+        returnBrush = loadExtraBrush(STACKZONE_BG_NAME + extraNumber, fallbackBrush);
+        stackBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
+    } else {
+        returnBrush = stackBgBrushesCache.value(extraNumber.toInt());
+    }
+
+    return returnBrush;
+}
+
+QBrush ThemeManager::getExtraPlayerBgBrush(QString extraNumber, QBrush &fallbackBrush)
+{
+    QBrush returnBrush;
+
+    if (!playerBgBrushesCache.contains(extraNumber.toInt())) {
+        returnBrush = loadExtraBrush(PLAYERZONE_BG_NAME + extraNumber, fallbackBrush);
+        playerBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
+    } else {
+        returnBrush = playerBgBrushesCache.value(extraNumber.toInt());
+    }
+
+    return returnBrush;
+}
+
+QBrush ThemeManager::getExtraHandBgBrush(QString extraNumber, QBrush &fallbackBrush)
+{
+    QBrush returnBrush;
+
+    if (!handBgBrushesCache.contains(extraNumber.toInt())) {
+        returnBrush = loadExtraBrush(HANDZONE_BG_NAME + extraNumber, fallbackBrush);
+        handBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
+    } else {
+        returnBrush = handBgBrushesCache.value(extraNumber.toInt());
     }
 
     return returnBrush;

@@ -15,5 +15,3 @@ message Command_CreateToken {
     optional string target_zone = 9;
     optional sint32 target_card_id = 10 [default = -1];
 }
-
-

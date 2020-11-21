@@ -10,5 +10,3 @@ message Command_AttachCard {
     optional string target_zone = 4;
     optional sint32 target_card_id = 5 [default = -1];
 }
-
-

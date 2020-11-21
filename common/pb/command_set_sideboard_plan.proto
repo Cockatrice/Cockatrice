@@ -8,4 +8,3 @@ message Command_SetSideboardPlan {
     }
     repeated MoveCard_ToZone move_list = 1;
 }
-

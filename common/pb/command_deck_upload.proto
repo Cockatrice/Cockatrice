@@ -5,7 +5,7 @@ message Command_DeckUpload {
     extend SessionCommand {
         optional Command_DeckUpload ext = 1013;
     }
-    optional string path = 1;      // to upload a new deck
-    optional uint32 deck_id = 2;   // to replace an existing deck
+    optional string path = 1;    // to upload a new deck
+    optional uint32 deck_id = 2; // to replace an existing deck
     optional string deck_list = 3;
 }

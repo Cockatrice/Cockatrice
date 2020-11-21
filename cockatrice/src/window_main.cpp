@@ -25,6 +25,7 @@
 #include "dlg_forgotpasswordchallenge.h"
 #include "dlg_forgotpasswordrequest.h"
 #include "dlg_forgotpasswordreset.h"
+#include "dlg_manage_sets.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_tip_of_the_day.h"
@@ -44,7 +45,6 @@
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "version_string.h"
-#include "window_sets.h"
 
 #include <QAction>
 #include <QApplication>
@@ -769,8 +769,8 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), cardUpdateProcess(nullptr),
-      logviewDialog(nullptr)
+    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
+      cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
     connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
@@ -1003,6 +1003,10 @@ void MainWindow::showWindowIfHidden()
 
 void MainWindow::cardDatabaseLoadingFailed()
 {
+    if (askedForDbUpdater) {
+        return;
+    }
+    askedForDbUpdater = true;
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Card database"));
     msgBox.setIcon(QMessageBox::Question);
@@ -1109,15 +1113,32 @@ void MainWindow::actCheckCardUpdates()
 
     if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
+    } else { // try and find the directory oracle is stored in the build directory
+        QDir findLocalDir(dir);
+        findLocalDir.cdUp();
+        findLocalDir.cd(getCardUpdaterBinaryName());
+        if (findLocalDir.exists(binaryName)) {
+            dir = findLocalDir;
+            updaterCmd = dir.absoluteFilePath(binaryName);
+        }
     }
 
     if (updaterCmd.isEmpty()) {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
+        exitCardDatabaseUpdate();
         return;
     }
 
     cardUpdateProcess->start(updaterCmd, QStringList());
+}
+
+void MainWindow::exitCardDatabaseUpdate()
+{
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = nullptr;
+
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1145,18 +1166,13 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-
+    exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 {
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    exitCardDatabaseUpdate();
 }
 
 void MainWindow::actCheckServerUpdates()

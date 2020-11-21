@@ -149,9 +149,9 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Create zones
-    Server_CardZone *deckZone = new Server_CardZone(this, "deck", false, ServerInfo_Zone::HiddenZone);
+    auto *deckZone = new Server_CardZone(this, "deck", false, ServerInfo_Zone::HiddenZone);
     addZone(deckZone);
-    Server_CardZone *sbZone = new Server_CardZone(this, "sb", false, ServerInfo_Zone::HiddenZone);
+    auto *sbZone = new Server_CardZone(this, "sb", false, ServerInfo_Zone::HiddenZone);
     addZone(sbZone);
     addZone(new Server_CardZone(this, "table", true, ServerInfo_Zone::PublicZone));
     addZone(new Server_CardZone(this, "hand", false, ServerInfo_Zone::PrivateZone));
@@ -424,12 +424,13 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 
         int originalPosition = cardsToMove[cardIndex].second;
         int position = startzone->removeCard(card);
-        if (startzone->getName() == "hand") {
-            if (undoingDraw) {
-                lastDrawList.removeAt(lastDrawList.indexOf(card->getId()));
-            } else if (lastDrawList.contains(card->getId())) {
-                lastDrawList.clear();
-            }
+
+        // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
+        // reorder their hand). If a just-drawn card leaves the hand then clear lastDrawList to invalidate "undo draw."
+        // (Ignore the case where the card is currently being un-drawn.)
+        if (startzone->getName() == "hand" && targetzone->getName() != "hand" && lastDrawList.contains(card->getId()) &&
+            !undoingDraw) {
+            lastDrawList.clear();
         }
 
         if ((startzone == targetzone) && !startzone->hasCoords()) {
@@ -1340,7 +1341,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         y = 0;
     }
 
-    Server_Card *card = new Server_Card(cardName, newCardId(), x, y);
+    auto *card = new Server_Card(cardName, newCardId(), x, y);
     card->moveToThread(thread());
     card->setPT(QString::fromStdString(cmd.pt()));
     card->setColor(QString::fromStdString(cmd.color()));
@@ -1624,8 +1625,8 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
         return Response::RespContextError;
     }
 
-    Server_Counter *c = new Server_Counter(newCounterId(), QString::fromStdString(cmd.counter_name()),
-                                           cmd.counter_color(), cmd.radius(), cmd.value());
+    auto *c = new Server_Counter(newCounterId(), QString::fromStdString(cmd.counter_name()), cmd.counter_color(),
+                                 cmd.radius(), cmd.value());
     addCounter(c);
 
     Event_CreateCounter event;

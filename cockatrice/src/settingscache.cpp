@@ -95,7 +95,8 @@ void SettingsCache::translateLegacySettings()
 
     // Game filters
     legacySetting.beginGroup("filter_games");
-    gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowFullGames(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowGamesThatStarted(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
     gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());

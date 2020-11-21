@@ -47,7 +47,13 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(boundingRect(), themeManager->getStackBgBrush());
+    QBrush brush = themeManager->getStackBgBrush();
+
+    if (player->getZoneId() > 0) {
+        // If the extra image is not found, load the default one
+        brush = themeManager->getExtraStackBgBrush(QString::number(player->getZoneId()), brush);
+    }
+    painter->fillRect(boundingRect(), brush);
 }
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,

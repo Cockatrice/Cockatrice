@@ -14,5 +14,4 @@ message Event_RoomSay {
     optional string message = 2;
     optional RoomMessageType message_type = 3;
     optional uint64 time_of = 4;
-
 }
