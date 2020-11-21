@@ -299,7 +299,7 @@ bool LoadSetsPage::validatePage()
 
     // else, try to import sets
     if (urlRadioButton->isChecked()) {
-        // If a user attempts to download from V4, redirect them to V4
+        // If a user attempts to download from V4, redirect them to V5
         if (urlLineEdit->text().contains(MTGJSON_V4_URL_COMPONENT)) {
             actRestoreDefaultUrl();
         }
