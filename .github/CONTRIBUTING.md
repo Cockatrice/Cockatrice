@@ -389,12 +389,15 @@ https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
 ### Publishing A New Release ###
 
-GitHub Actions will upload binaries (Linux & macOS) when any release is published 
-on GitHub.<br>
-AppVeyor is configured to upload binaries (Windows) to GitHub Releases whenever a
-<kbd>tag</kbd> is pushed.<br>
-You can create a tag when publishing a (pre-)release, but you can also push one
-manually and use it in the release.
+We use [GitHub Releases](https://github.com/Cockatrice/Cockatrice/releases) to publish 
+new stable versions and betas:
+- GitHub Actions will upload binaries (**Linux & macOS**) when any release is published 
+on GitHub.
+- AppVeyor will upload binaries (**Windows**) whenever a
+git "tag" is pushed to the repository.
+
+To trigger both processes correctly you can publish a tagged (pre-)release right on GitHub, 
+or create a tag manually first and use it for the (pre-)release creation afterwards.
 
 To create a tag, simply do the following:
 ```bash
@@ -413,12 +416,16 @@ You should define the variables as such:
     With *MAJ.MIN.PATCH* being the NEXT release version!
 ```
 
+>**Important:** You have to use the naming pattern `-beta` for the first beta release of one 
+version, followed by `-beta.2`, `-beta.3` and counting...
+>This is crucial as Appveyor listens only for correct tags matching our defined pattern.
+
 This will cause a tagged release to be established on the GitHub repository,
-which will then lead to the upload of binaries by Appveyor.
+which will then lead to the upload of binaries by AppVeyor.
 If you use a SemVer tag including "beta", the release that will be created at GitHub 
-by the CI will be marked as a "Pre-release".
+by AppVeyor will be marked as a "Pre-release" automatically.
 The target of the `.../latest` URL will not be changed in that case - 
-it always points to the latest stable release and not pre-releases.
+it always points to the latest stable release and not pre-releases/betas.
 
 If you accidentally push a tag incorrectly (the tag is outdated, you didn't
 pull in the latest branch accidentally, you named the tag wrong, etc.) you can
