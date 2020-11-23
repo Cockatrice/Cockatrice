@@ -278,16 +278,30 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             }
         }
 
+        QString numComponent{};
         if (skipSpecialCards) {
+            QString numProperty = setInfo.getProperty("num");
             // skip promo cards if it's not the only print, cards with two faces are different cards
             if (allNameProps.contains(faceName)) {
-                continue;
+                // check for alternative versions
+                if (layout == "normal") {
+                    // alternative versions have a letter in the end of num like abc
+                    // note this will also catch p and s, those will get removed later anyway
+                    QChar lastChar = numProperty.back();
+                    if (lastChar.isLetter()) {
+                        numComponent = " (" + QString(lastChar) + ")";
+                        faceName += numComponent; // add to facename to make it unique
+                    } else {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
             }
             if (getStringPropertyFromMap(card, "isPromo") == "true") {
                 specialPromoCards.insert(faceName, cardVar);
                 continue;
             }
-            QString numProperty = setInfo.getProperty("num");
             bool skip = false;
             // skip cards containing special stuff in the collectors number like promo cards
             for (const QString &specialChar : specialNumChars) {
@@ -362,7 +376,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 name = faceName;
             }
 
-            CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, setInfo);
+            CardInfoPtr newCard = addCard(name + numComponent, text, isToken, properties, relatedCards, setInfo);
             numCards++;
         }
     }
