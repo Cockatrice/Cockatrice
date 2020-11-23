@@ -1242,7 +1242,7 @@ void Player::actCreateToken()
 
     lastTokenName = dlg.getName();
     lastTokenPT = dlg.getPT();
-    CardInfoPtr correctedCard = db->getCardBySimpleName(lastTokenName);
+    CardInfoPtr correctedCard = db->guessCard(lastTokenName);
     if (correctedCard) {
         lastTokenName = correctedCard->getName();
         lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard->getTableRow());
