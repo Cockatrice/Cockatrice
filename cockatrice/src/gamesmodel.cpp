@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <QStringList>
+#include <QTime>
 
 enum GameListColumn
 {
@@ -38,23 +39,35 @@ constexpr QTime DEFAULT_MAX_GAME_AGE = QTime();
 
 const QString GamesModel::getGameCreatedString(const int secs)
 {
+    static const QTime zeroTime{0, 0};
+    static const int halfHourSecs = zeroTime.secsTo(QTime(1, 0)) / 2;
+    static const int halfMinSecs = zeroTime.secsTo(QTime(0, 1)) / 2;
+    static const int wrapSeconds = zeroTime.secsTo(zeroTime.addSecs(-halfHourSecs)); // round up
 
-    QString ret;
-    if (secs < SECS_PER_MIN * 2) // for first min we display "New"
-        ret = tr("New");
-    else if (secs < SECS_PER_MIN * 10) // from 2 - 10 mins we show the mins
-        ret = QString("%1 min").arg(QString::number(secs / SECS_PER_MIN));
-    else if (secs < SECS_PER_MIN * 60) { // from 10 mins to 1h we aggregate every 10 mins
-        int unitOfTen = secs / SECS_PER_TEN_MIN;
-        QString str = "%1%2";
-        ret = str.arg(QString::number(unitOfTen), "0+ min");
-    } else { // from 1 hr onward we show hrs
-        int hours = secs / SECS_PER_HOUR;
-        if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
-            ++hours;
-        ret = QString("%1+ h").arg(QString::number(hours));
+    if (secs >= wrapSeconds) { // QTime wraps after a day
+        return tr(">1 day");
     }
-    return ret;
+
+    QTime total = zeroTime.addSecs(secs);
+    QTime totalRounded = total.addSecs(halfMinSecs); // round up
+    QString form;
+    int amount;
+    if (totalRounded.hour()) {
+        amount = total.addSecs(halfHourSecs).hour(); // round up separately
+        form = tr("%1%2 hr", "short age in hours", amount);
+    } else if (total.minute() < 2) { // games are new during their first minute
+        return tr("new");
+    } else {
+        amount = totalRounded.minute();
+        form = tr("%1%2 min", "short age in minutes", amount);
+    }
+
+    for (int aggregate : {40, 20, 10, 5}) { // floor to values in this list
+        if (amount >= aggregate) {
+            return form.arg(">").arg(aggregate);
+        }
+    }
+    return form.arg("").arg(amount);
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
