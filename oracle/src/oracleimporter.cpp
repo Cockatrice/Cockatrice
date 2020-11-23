@@ -289,7 +289,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
                 // alternative versions have a letter in the end of num like abc
                 // note this will also catch p and s, those will get removed later anyway
-                QChar lastChar = numProperty.back();
+                QChar lastChar = numProperty.at(numProperty.size() - 1);
                 if (!lastChar.isLetter())
                     continue;
 
