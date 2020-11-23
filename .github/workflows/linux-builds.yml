@@ -17,12 +17,16 @@ jobs:
       fail-fast: false
       matrix:
         distro: # these names correspond to the files in .ci/$distro
+          - UbuntuGroovy
           - UbuntuFocal
           - UbuntuBionic
           - ArchLinux
           - DebianBuster
           - Fedora33
         include:
+          - distro: UbuntuGroovy
+            package: DEB
+
           - distro: UbuntuFocal
             package: DEB
             test: skip # UbuntuFocal has a broken qt for debug builds
