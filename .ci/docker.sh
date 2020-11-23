@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# This script is to be sourced in .travis.yaml from the project root directory, do not use it from somewhere else.
+# This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
+
 # Creates or loads docker images to use in compilation, creates RUN function to start compilation on the docker image.
 # --get loads the image from a previously saved image cache, will build if no image is found
 # --build builds the image from the Dockerfile in .ci/$NAME
@@ -9,7 +10,7 @@
 # uses env: NAME CACHE BUILD GET SAVE (correspond to args: <name> --set-cache <cache> --build --get --save)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
-export BUILD_SCRIPT=".ci/travis-compile.sh"
+export BUILD_SCRIPT=".ci/compile.sh"
 
 project_name="cockatrice"
 save_extension=".tar.gz"
@@ -64,10 +65,14 @@ if ! [[ -r $docker_dir/Dockerfile ]]; then
   return 2 # even if the image is cached, we do not want to run if there is no way to build this image
 fi
 
-if ! [[ -d $CACHE ]]; then
-  echo "could not find cache dir: $CACHE" >&2
-  unset CACHE
+if ! [[ $CACHE ]]; then
+  echo "cache dir is not set!" >&2
 else
+  if ! [[ -d $CACHE ]]; then
+    echo "could not find cache dir: $CACHE" >&2
+    mkdir -p $CACHE
+    unset GET # the dir is empty
+  fi
   if [[ $GET || $SAVE ]]; then
     img_dir="$CACHE/$image_cache"
     img_save="$img_dir/$IMAGE_NAME$save_extension"
