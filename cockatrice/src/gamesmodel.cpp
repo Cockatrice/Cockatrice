@@ -45,7 +45,7 @@ const QString GamesModel::getGameCreatedString(const int secs)
     static const int wrapSeconds = zeroTime.secsTo(zeroTime.addSecs(-halfHourSecs)); // round up
 
     if (secs >= wrapSeconds) { // QTime wraps after a day
-        return tr(">day");
+        return tr(">1 day");
     }
 
     QTime total = zeroTime.addSecs(secs);
