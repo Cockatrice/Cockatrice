@@ -180,14 +180,13 @@ void Server_Game::pingClockTimeout()
 
         int oldPingTime = player->getPingTime();
         int newPingTime;
-        {
-            QMutexLocker(&player->playerMutex);
-            if (player->getUserInterface()) {
-                newPingTime = player->getUserInterface()->getLastCommandTime();
-            } else {
-                newPingTime = -1;
-            }
+        player->playerMutex.lock();
+        if (player->getUserInterface()) {
+            newPingTime = player->getUserInterface()->getLastCommandTime();
+        } else {
+            newPingTime = -1;
         }
+        player->playerMutex.unlock();
 
         if ((newPingTime != -1) && !player->getSpectator()) {
             allPlayersInactive = false;
