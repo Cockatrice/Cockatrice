@@ -284,19 +284,17 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             // skip promo cards if it's not the only print, cards with two faces are different cards
             if (allNameProps.contains(faceName)) {
                 // check for alternative versions
-                if (layout == "normal") {
-                    // alternative versions have a letter in the end of num like abc
-                    // note this will also catch p and s, those will get removed later anyway
-                    QChar lastChar = numProperty.back();
-                    if (lastChar.isLetter()) {
-                        numComponent = " (" + QString(lastChar) + ")";
-                        faceName += numComponent; // add to facename to make it unique
-                    } else {
-                        continue;
-                    }
-                } else {
+                if (layout != "normal")
                     continue;
-                }
+
+                // alternative versions have a letter in the end of num like abc
+                // note this will also catch p and s, those will get removed later anyway
+                QChar lastChar = numProperty.back();
+                if (!lastChar.isLetter())
+                    continue;
+
+                numComponent = " (" + QString(lastChar) + ")";
+                faceName += numComponent; // add to facename to make it unique
             }
             if (getStringPropertyFromMap(card, "isPromo") == "true") {
                 specialPromoCards.insert(faceName, cardVar);
