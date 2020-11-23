@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QMessageBox>
 #include <QRegularExpression>
@@ -534,11 +535,21 @@ LoadStatus CardDatabase::loadCardDatabases()
     loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
     loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
 
-    // load custom card databases
-    QDir dir(SettingsCache::instance().getCustomCardDatabasePath());
-    for (const QString &fileName :
-         dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
-        loadCardDatabase(dir.absoluteFilePath(fileName));
+    // find all custom card databases, recursively & following symlinks
+    // then load them alphabetically
+    QDirIterator customDatabaseIterator(SettingsCache::instance().getCustomCardDatabasePath(), QStringList() << "*.xml",
+                                        QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    QStringList databasePaths;
+    while (customDatabaseIterator.hasNext()) {
+        customDatabaseIterator.next();
+        databasePaths.push_back(customDatabaseIterator.filePath());
+    }
+    databasePaths.sort();
+
+    for (auto i = 0; i < databasePaths.size(); ++i) {
+        const auto &databasePath = databasePaths.at(i);
+        qDebug() << "Loading Custom Set" << i << "(" << databasePath << ")";
+        loadCardDatabase(databasePath);
     }
 
     // AFTER all the cards have been loaded
