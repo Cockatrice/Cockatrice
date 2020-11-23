@@ -54,7 +54,7 @@ const QString GamesModel::getGameCreatedString(const int secs)
     int amount;
     if (totalRounded.hour()) {
         amount = total.addSecs(halfHourSecs).hour(); // round up separately
-        form = tr("%1%2 h", "short age in hours", amount);
+        form = tr("%1%2 hr", "short age in hours", amount);
     } else if (total.minute() < 2) { // games are new during their first minute
         return tr("new");
     } else {
