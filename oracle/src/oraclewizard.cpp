@@ -20,7 +20,6 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
-#include <QScrollArea>
 #include <QScrollBar>
 #include <QStandardPaths>
 #include <QTextEdit>
@@ -38,15 +37,16 @@
 #define ZIP_SIGNATURE "PK"
 // Xz stream header: 0xFD + "7zXZ"
 #define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
-#define ALLSETS_URL_FALLBACK "https://www.mtgjson.com/files/AllPrintings.json"
-#define MTGJSON_VERSION_URL "https://www.mtgjson.com/files/version.json"
+#define MTGJSON_V4_URL_COMPONENT "mtgjson.com/files/"
+#define ALLSETS_URL_FALLBACK "https://www.mtgjson.com/api/v5/AllPrintings.json"
+#define MTGJSON_VERSION_URL "https://www.mtgjson.com/api/v5/Meta.json"
 
 #ifdef HAS_LZMA
-#define ALLSETS_URL "https://www.mtgjson.com/files/AllPrintings.json.xz"
+#define ALLSETS_URL "https://www.mtgjson.com/api/v5/AllPrintings.json.xz"
 #elif defined(HAS_ZLIB)
-#define ALLSETS_URL "https://www.mtgjson.com/files/AllPrintings.json.zip"
+#define ALLSETS_URL "https://www.mtgjson.com/api/v5/AllPrintings.json.zip"
 #else
-#define ALLSETS_URL "https://www.mtgjson.com/files/AllPrintings.json"
+#define ALLSETS_URL "https://www.mtgjson.com/api/v5/AllPrintings.json"
 #endif
 
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
@@ -299,7 +299,13 @@ bool LoadSetsPage::validatePage()
 
     // else, try to import sets
     if (urlRadioButton->isChecked()) {
-        QUrl url = QUrl::fromUserInput(urlLineEdit->text());
+        // If a user attempts to download from V4, redirect them to V5
+        if (urlLineEdit->text().contains(MTGJSON_V4_URL_COMPONENT)) {
+            actRestoreDefaultUrl();
+        }
+
+        const auto url = QUrl::fromUserInput(urlLineEdit->text());
+
         if (!url.isValid()) {
             QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
             return false;
@@ -342,23 +348,24 @@ bool LoadSetsPage::validatePage()
 }
 
 #include <iostream>
-void LoadSetsPage::downloadSetsFile(QUrl url)
+void LoadSetsPage::downloadSetsFile(const QUrl &url)
 {
     wizard()->setCardSourceVersion("unknown");
 
-    QString urlString = url.toString();
+    const auto urlString = url.toString();
     if (urlString == ALLSETS_URL || urlString == ALLSETS_URL_FALLBACK) {
-        QUrl versionUrl = QUrl::fromUserInput(MTGJSON_VERSION_URL);
-        QNetworkReply *versionReply = wizard()->nam->get(QNetworkRequest(versionUrl));
+        const auto versionUrl = QUrl::fromUserInput(MTGJSON_VERSION_URL);
+        auto *versionReply = wizard()->nam->get(QNetworkRequest(versionUrl));
         connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
             if (versionReply->error() == QNetworkReply::NoError) {
-                QByteArray jsonData = versionReply->readAll();
-                QJsonParseError jsonError;
-                QJsonDocument jsonResponse = QJsonDocument::fromJson(jsonData, &jsonError);
+                auto jsonData = versionReply->readAll();
+                QJsonParseError jsonError{};
+                auto jsonResponse = QJsonDocument::fromJson(jsonData, &jsonError);
 
                 if (jsonError.error == QJsonParseError::NoError) {
-                    QVariantMap jsonMap = jsonResponse.toVariant().toMap();
-                    QString versionString = jsonMap["version"].toString();
+                    const auto jsonMap = jsonResponse.toVariant().toMap();
+
+                    auto versionString = jsonMap.value("meta").toMap().value("version").toString();
                     if (versionString.isEmpty()) {
                         versionString = "unknown";
                     }
@@ -372,7 +379,7 @@ void LoadSetsPage::downloadSetsFile(QUrl url)
 
     wizard()->setCardSourceUrl(url.toString());
 
-    QNetworkReply *reply = wizard()->nam->get(QNetworkRequest(url));
+    auto *reply = wizard()->nam->get(QNetworkRequest(url));
 
     connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSetsFile()));
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressSetsFile(qint64, qint64)));
@@ -391,7 +398,7 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
 {
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
+    auto errorCode = reply->error();
     if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
 
@@ -402,9 +409,9 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
         return;
     }
 
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    auto statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302) {
-        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        const auto redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
         qDebug() << "following redirect url:" << redirectUrl.toString();
         downloadSetsFile(redirectUrl);
         reply->deleteLater();
@@ -414,7 +421,7 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
     progressLabel->hide();
     progressBar->hide();
 
-    // save allsets.json url, but only if the user customized it and download was successfull
+    // save AllPrintings.json url, but only if the user customized it and download was successful
     if (urlLineEdit->text() != QString(ALLSETS_URL)) {
         wizard()->settings->setValue("allsetsurl", urlLineEdit->text());
     } else {
