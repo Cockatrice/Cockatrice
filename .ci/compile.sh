@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script is to be used in .travis.yaml from the project root directory, do not use it from somewhere else.
+# This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
 
 # Read arguments
 while [[ "$@" ]]; do
@@ -58,7 +58,7 @@ done
 
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
-  source ./.ci/travis-lint.sh
+  source ./.ci/lint.sh
 fi
 
 set -e
@@ -69,7 +69,7 @@ mkdir -p build
 cd build
 
 if ! [[ $CORE_AMOUNT ]]; then
-  CORE_AMOUNT="2" # travis machines have 2 cores
+  CORE_AMOUNT="2" # default machines have 2 cores
 fi
 
 # Add cmake flags

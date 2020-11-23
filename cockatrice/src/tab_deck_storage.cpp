@@ -196,6 +196,9 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
 void TabDeckStorage::actDeleteLocalDeck()
 {
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
+    if (localDirModel->isDir(curLeft))
+        return;
+
     if (QMessageBox::warning(this, tr("Delete local file"),
                              tr("Are you sure you want to delete \"%1\"?").arg(localDirModel->fileName(curLeft)),
                              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)

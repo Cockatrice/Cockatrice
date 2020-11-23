@@ -21,9 +21,6 @@ private:
     QMap<int, GameTypeMap> gameTypes;
 
     static const int NUM_COLS = 8;
-    static const int SECS_PER_MIN = 60;
-    static const int SECS_PER_TEN_MIN = 600;
-    static const int SECS_PER_HOUR = 3600;
 
 public:
     static const int SORT_ROLE = Qt::UserRole + 1;

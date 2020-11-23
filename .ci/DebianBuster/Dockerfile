@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         g++ \
         git \
         liblzma-dev \
+        libmariadb-dev-compat \
         libprotobuf-dev \
         libqt5multimedia5-plugins \
         libqt5sql5-mysql \

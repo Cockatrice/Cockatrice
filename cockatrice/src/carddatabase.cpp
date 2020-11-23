@@ -10,8 +10,10 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <algorithm>
 #include <utility>
 
@@ -291,22 +293,23 @@ void CardInfo::refreshCachedSetNames()
 
 QString CardInfo::simplifyName(const QString &name)
 {
-    QString simpleName(name);
+    static const QRegularExpression spaceOrSplit("(\\s+|\\/\\/.*)");
+    static const QRegularExpression nonAlnum("[^a-z0-9]");
+
+    QString simpleName = name.toLower();
+
+    // remove spaces and right halves of split cards
+    simpleName.remove(spaceOrSplit);
 
     // So Aetherling would work, but not Ætherling since 'Æ' would get replaced
     // with nothing.
     simpleName.replace("æ", "ae");
-    simpleName.replace("Æ", "AE");
 
     // Replace Jötun Grunt with Jotun Grunt.
     simpleName = simpleName.normalized(QString::NormalizationForm_KD);
 
-    // Replace dashes with spaces so that we can say "garruk the veil cursed"
-    // instead of the unintuitive "garruk the veilcursed".
-    simpleName = simpleName.replace("-", " ");
-
-    simpleName.remove(QRegExp("[^a-zA-Z0-9 ]"));
-    simpleName = simpleName.toLower();
+    // remove all non alphanumeric characters from the name
+    simpleName.remove(nonAlnum);
     return simpleName;
 }
 
@@ -437,6 +440,19 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
     return getCardFromMap(simpleNameCards, CardInfo::simplifyName(cardName));
 }
 
+CardInfoPtr CardDatabase::guessCard(const QString &cardName) const
+{
+    CardInfoPtr temp = getCard(cardName);
+    if (temp == nullptr) { // get card by simple name instead
+        temp = getCardBySimpleName(cardName);
+        if (temp == nullptr) { // still could not find the card, so simplify the cardName too
+            QString simpleCardName = CardInfo::simplifyName(cardName);
+            temp = getCardBySimpleName(simpleCardName);
+        }
+    }
+    return temp; // returns nullptr if not found
+}
+
 CardSetPtr CardDatabase::getSet(const QString &setName)
 {
     if (sets.contains(setName)) {
@@ -519,11 +535,21 @@ LoadStatus CardDatabase::loadCardDatabases()
     loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
     loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
 
-    // load custom card databases
-    QDir dir(SettingsCache::instance().getCustomCardDatabasePath());
-    for (const QString &fileName :
-         dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
-        loadCardDatabase(dir.absoluteFilePath(fileName));
+    // find all custom card databases, recursively & following symlinks
+    // then load them alphabetically
+    QDirIterator customDatabaseIterator(SettingsCache::instance().getCustomCardDatabasePath(), QStringList() << "*.xml",
+                                        QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    QStringList databasePaths;
+    while (customDatabaseIterator.hasNext()) {
+        customDatabaseIterator.next();
+        databasePaths.push_back(customDatabaseIterator.filePath());
+    }
+    databasePaths.sort();
+
+    for (auto i = 0; i < databasePaths.size(); ++i) {
+        const auto &databasePath = databasePaths.at(i);
+        qDebug() << "Loading Custom Set" << i << "(" << databasePath << ")";
+        loadCardDatabase(databasePath);
     }
 
     // AFTER all the cards have been loaded
