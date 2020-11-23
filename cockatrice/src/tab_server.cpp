@@ -112,7 +112,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room &room)
 {
     /*
-     * A room can have a permission level and a privilege level. How ever we want to display only the necessary
+     * A server room can have a permission level and a privilege level. How ever we want to display only the necessary
      * information on the server tab needed to inform users of required permissions to enter a room. If the room has a
      * privilege level the server tab will display the privilege level in the "permissions" column in the row however if
      * the room contains a permissions level for the room the permissions level defined for the room will be displayed.
@@ -206,19 +206,23 @@ void TabServer::joinRoomFinished(const Response &r,
         case Response::RespOk:
             break;
         case Response::RespNameNotFound:
-            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room: it doesn't exist on the server."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("Failed to join the server room: it doesn't exist on the server."));
             return;
         case Response::RespContextError:
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("The server thinks you are in the room but your client is unable to display it. "
-                                     "Try restarting your client."));
+            QMessageBox::critical(
+                this, tr("Error"),
+                tr("The server thinks you are in the server room but your client is unable to display it. "
+                   "Try restarting your client."));
             return;
         case Response::RespUserLevelTooLow:
-            QMessageBox::critical(this, tr("Error"), tr("You do not have the required permission to join this room."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("You do not have the required permission to join this server room."));
             return;
         default:
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("Failed to join the room due to an unknown error: %1.").arg(r.response_code()));
+            QMessageBox::critical(
+                this, tr("Error"),
+                tr("Failed to join the server room due to an unknown error: %1.").arg(r.response_code()));
             return;
     }
 
