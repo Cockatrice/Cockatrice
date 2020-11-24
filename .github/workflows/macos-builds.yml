@@ -24,7 +24,6 @@ jobs:
         include:
           - target: Debug # tests only
             os: macos-latest
-            xcode: default
             type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
@@ -38,7 +37,6 @@ jobs:
 
           - target: Catalina
             os: macos-10.15 # runs on Catalina, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md#xcode
-            xcode: default
             type: Release
             do_tests: 0
             make_package: false
