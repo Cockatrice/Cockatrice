@@ -18,13 +18,13 @@ jobs:
       matrix:
         target:
           - Debug
-          - HighSierra
           - Mojave
           - Catalina
           - BigSur
         include:
           - target: Debug # tests only
             os: macos-latest
+            xcode: default
             type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
