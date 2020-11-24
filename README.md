@@ -68,7 +68,7 @@ Cockatrice uses the [Google Developer Documentation Style Guide](https://develop
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
-# Translations [![Cockatrice on Transiflex](https://tx-assets.scdn5.secure.raxcdn.com/static/charts/images/tx-logo-micro.c5603f91c780.png)](https://www.transifex.com/projects/p/cockatrice/)
+# Translations [![Cockatrice on Transifex](https://tx-assets.scdn5.secure.raxcdn.com/static/charts/images/tx-logo-micro.c5603f91c780.png)](https://www.transifex.com/projects/p/cockatrice/)
 
 Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
 
