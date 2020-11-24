@@ -132,7 +132,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
         sortAndReduceColors(allColors);
         properties.insert("colors", allColors);
     }
-    QString allColorIdent = properties.value("colorIdenity").toString();
+    QString allColorIdent = properties.value("coloridentity").toString();
     if (allColorIdent.size() > 1) {
         sortAndReduceColors(allColorIdent);
         properties.insert("coloridentity", allColorIdent);
