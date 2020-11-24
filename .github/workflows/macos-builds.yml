@@ -30,10 +30,10 @@ jobs:
             do_tests: 0 # tests do not work yet on mac
             make_package: false
 
-          - target: ElCapitan # xcode 8.2.1 should be compatible with macos 10.11.5
-            os: macos-10.13 # runs on HighSierra
+          - target: ElCapitan # xcode 9.4.1 should be compatible with macos 10.13, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.14-Readme.md#xcode
+            os: macos-10.14 # runs on Mojave
             allow-failure: yes # we don't know if it'll be added
-            xcode: 8.2.1
+            xcode: 9.4.1
             type: Release
             do_tests: 0
             make_package: true
