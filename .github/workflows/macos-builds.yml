@@ -18,7 +18,7 @@ jobs:
       matrix:
         target:
           - Debug
-          - ElCapitan
+          - HighSierra
           - Mojave
           - Catalina
           - BigSur
@@ -30,30 +30,30 @@ jobs:
             do_tests: 0 # tests do not work yet on mac
             make_package: false
 
-          - target: ElCapitan # xcode 9.4.1 should be compatible with macos 10.13, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.14-Readme.md#xcode
-            os: macos-10.14 # runs on Mojave
+          - target: HighSierra # Xcode 9.4.1 is compatible with macOS 10.13+
+            os: macos-10.14 # runs on Mojave, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.14-Readme.md#xcode
             allow-failure: yes # we don't know if it'll be added
             xcode: 9.4.1
             type: Release
             do_tests: 0
             make_package: true
 
-          - target: Mojave # xcode 10.3 should be compatible with macos 10.14.3
-            os: macos-10.15 # runs on Catalina
+          - target: Mojave # Xcode 10.3 is compatible with macOS 10.14+
+            os: macos-10.15 # runs on Catalina, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md#xcode
             xcode: 10.3
             type: Release
             do_tests: 0
             make_package: true
 
-          - target: Catalina
-            os: macos-10.15
+          - target: Catalina # Xcode 11.7 is compatible with macOS 10.15+
+            os: macos-10.15 # runs on Catalina, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md#xcode
             xcode: 11.7
             type: Release
             do_tests: 0
             make_package: true
 
-          - target: BigSur
-            os: macos-11.0
+          - target: BigSur # Xcode 12.2 is compatible with macOS 11.0+
+            os: macos-11.0 # runs on Big Sur, https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11.0-Readme.md#xcode
             xcode: 12.2
             type: Release
             do_tests: 0
