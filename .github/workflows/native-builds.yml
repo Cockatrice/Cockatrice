@@ -1,4 +1,4 @@
-name: Build on macOS
+name: Build on macOS and Windows
 
 on:
   push:
@@ -22,10 +22,12 @@ jobs:
       matrix:
         target:
           - Debug
-          - ElCapitan
-          - Mojave
-          - Catalina
-          - BigSur
+          - macOS-ElCapitan
+          - macOS-Mojave
+          - macOS-Catalina
+          - macOS-BigSur
+          - Windows-x64
+          - Windows-x86
         include:
           - target: Debug # tests only
             os: macos-latest
@@ -34,7 +36,8 @@ jobs:
             do_tests: 0 # tests do not work yet on mac
             make_package: false
 
-          - target: ElCapitan # xcode 8.2.1 should be compatible with macos 10.11.5
+          - target: macOS-ElCapitan
+            # xcode 8.2.1 should be compatible with macos 10.11.5
             os: macos-10.13 # runs on HighSierra
             allow-failure: yes # we don't know if it'll be added
             xcode: 8.2.1
@@ -42,26 +45,40 @@ jobs:
             do_tests: 0
             make_package: true
 
-          - target: Mojave # xcode 10.3 should be compatible with macos 10.14.3
+          - target: macOS-Mojave
+            # xcode 10.3 should be compatible with macos 10.14.3
             os: macos-10.15 # runs on Catalina
             xcode: 10.3
             type: Release
             do_tests: 0
             make_package: true
 
-          - target: Catalina
+          - target: macOS-Catalina
             os: macos-10.15
             xcode: 11.7
             type: Release
             do_tests: 0
             make_package: true
 
-          - target: BigSur
+          - target: macOS-BigSur
             os: macos-11.0
             xcode: 12.2
             type: Release
             do_tests: 0
             make_package: true
+
+          - target: Windows-x64
+            os: windows-latest
+            arch: x64
+            do_tests: 0
+            make_package: true
+
+          - target: Windows-x86
+            os: windows-latest
+            arch: x86
+            do_tests: 0
+            make_package: true
+
 
     runs-on: ${{matrix.os}}
 
@@ -69,41 +86,42 @@ jobs:
 
     env:
       CCACHE_DIR: ~/.ccache
-      DEVELOPER_DIR:
-        /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install dependencies using homebrew
+      - if: runner.os == 'macos'
+        name: Install dependencies using homebrew
         shell: bash
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
         run: brew install ccache protobuf
 
-# in case we'd want to modify this for windows (should be its own workflow):
-#     - if: runner.os == 'windows'
-#       name: Install dependencies using vcpkg
-#       shell: bash
-#       run: vcpkg install protobuf liblzma zlib --triplet x64-windows
+      - if: runner.os == 'windows'
+        name: Install dependencies using vcpkg
+        shell: bash
+        run: vcpkg install protobuf liblzma zlib --triplet ${{matrix.arch}}-windows
 
-      - name: Install QT using homebrew
+      - if: runner.os == 'macos'
+        name: Install QT using homebrew
         id: brew_install_qt
         continue-on-error: true
         shell: bash
         run: brew install qt --force-bottle
 
       - name: Install QT using actions
-        if: steps.brew_install_qt.outcome == 'failure'
+        if: steps.brew_install_qt.outcome != 'success'
         uses: jurplel/install-qt-action@v2
 
-      - name: Get ccache timestamp
+      - if: runner.os == 'macos'
+        name: Get ccache timestamp
         id: ccache_timestamp
         shell: bash
         run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
 
-      - name: Restore ccache cache
+      - if: runner.os == 'macos'
+        name: Restore ccache cache
         uses: actions/cache@v2
         env:
           timestamp: ${{steps.ccache_timestamp.outputs.timestamp}}
@@ -113,24 +131,41 @@ jobs:
           restore-keys: |
             ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-
 
+      - if: runner.os == 'macos'
+        name: Show ccache stats
+        shell: bash
+        run: |
+          mkdir -p $CCACHE_DIR
+          ccache --show-stats
+
       - name: Create build environment
         run: cmake -E make_directory build
 
       - name: Configure CMake
+        id: configure
         shell: bash
         working-directory: build
         run: |
-          ccache --show-stats
-          mkdir -p $CCACHE_DIR
-          ls $CCACHE_DIR
-          if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
-            cmake_args=" -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/*)"
-            echo "added$cmake_args cmake argument for homebrew"
-          fi
+          cmake_args="-DCMAKE_BUILD_TYPE=${{matrix.type}}"
           cmake_args+=" -DTEST=${{matrix.do_tests}}"
-          cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 $cmake_args
+          if [[ ${{runner.os == 'macos'}} == true ]]; then
+            DEVELOPER_DIR="/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer"
+            export DEVELOPER_DIR
+            using="macOS with XCode ${{matrix.xcode}}"
+            if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
+              qt_path="$(echo /usr/local/Cellar/qt/*)"
+              cmake_args+=" -DCMAKE_PREFIX_PATH='$qt_path'"
+            fi
+          else
+            using="Windows 10 ${{matrix.arch}}"
+            vcpkg_path="C:\vcpkg\installed\${{matrix.arch}}-windows\bin"
+            cmake_args+=" -DCMAKE_PREFIX_PATH=$vcpkg_path'"
+            # TODO: set sql libraries
+          fi
+          cmake .. -DWITH_SERVER=1 $cmake_args
+          echo "::set-output name=using::$using"
 
-      - name: Build on Xcode ${{matrix.xcode}}
+      - name: Build on ${{steps.configure.outputs.using}}
         shell: bash
         working-directory: build
         run: cmake --build .
@@ -157,7 +192,7 @@ jobs:
           file=$(echo Cockatrice-*.*)
           extension="${file##*.}"
           name="${file%.*}"
-          newfile="$name-macOS-${{matrix.target}}.$extension"
+          newfile="$name-${{matrix.target}}.$extension"
           mv "$file" "$newfile" # avoid file name conflicts
           echo "::set-output name=file::$newfile"
 
@@ -165,7 +200,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v2
         with:
-          name: macOS-${{matrix.target}}-xcode-${{matrix.xcode}}-dmg
+          name: ${{matrix.target}}-xcode-${{matrix.xcode}}-dmg
           path: build/${{steps.build_package.outputs.file}}
 
       - name: Get release upload URL
