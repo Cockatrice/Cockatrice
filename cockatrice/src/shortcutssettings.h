@@ -219,7 +219,7 @@ private:
                                                 parseSequenceString("Ctrl+S"),
                                                 ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aSaveDeckAs", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Save Deck as..."),
-                                                  parseSequenceString(""),
+                                                  parseSequenceString("Ctrl+Shift+S"),
                                                   ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aSaveDeckToClipboard",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Save Deck to Clipboard, Annotated"),
