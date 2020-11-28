@@ -4,14 +4,12 @@ version: build {build}
 # More details here: https://www.appveyor.com/docs/appveyor-yml and https://www.appveyor.com/docs/how-to/filtering-commits
 skip_commits:
   files:
-    - .ci/travis-*
     - .github/
     - .tx/
     - webclient/
     - .clang-format
     - .*ignore
     - .codacy.yml
-    - .travis.yml
     - '**/*.md'
     - Dockerfile
     - LICENSE
