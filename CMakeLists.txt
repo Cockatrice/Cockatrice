@@ -35,6 +35,11 @@ if(USE_CCACHE)
     endif()
 endif()
 
+if(WIN32)
+    # Use vcpkg toolchain on Windows
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        CACHE STRING "Vcpkg toolchain file")
+endif()		 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
 PROJECT("Cockatrice" VERSION 2.7.6)
