@@ -287,14 +287,14 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
     if (event->button() == Qt::LeftButton)
         setCursor(Qt::ClosedHandCursor);
-    else if (event->button() == Qt::MidButton)
+    else if (event->button() == Qt::MiddleButton)
         emit showCardInfoPopup(event->screenPos(), name);
     event->accept();
 }
 
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::MidButton)
+    if (event->button() == Qt::MiddleButton)
         emit deleteCardInfoPopup(name);
 
     // This function ensures the parent function doesn't mess around with our selection.

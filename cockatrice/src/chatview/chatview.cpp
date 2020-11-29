@@ -529,12 +529,12 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 {
     switch (hoveredItemType) {
         case HoveredCard: {
-            if ((event->button() == Qt::MidButton) || (event->button() == Qt::LeftButton))
+            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
                 emit showCardInfoPopup(event->globalPos(), hoveredContent);
             break;
         }
         case HoveredUser: {
-            if (event->button() != Qt::MidButton) {
+            if (event->button() != Qt::MiddleButton) {
                 const int delimiterIndex = hoveredContent.indexOf("_");
                 const QString userName = hoveredContent.mid(delimiterIndex + 1);
                 switch (event->button()) {
@@ -564,7 +564,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 
 void ChatView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if ((event->button() == Qt::MidButton) || (event->button() == Qt::LeftButton))
+    if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
         emit deleteCardInfoPopup(QString("_"));
 
     QTextBrowser::mouseReleaseEvent(event);
