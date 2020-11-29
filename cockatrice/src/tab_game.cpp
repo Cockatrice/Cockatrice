@@ -1194,8 +1194,9 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
         Player *newPlayer = addPlayer(playerId, playerInfo.user_info());
         messageLog->logJoin(newPlayer);
         if (trayIcon) {
-            trayIcon->showMessage(tr("A player has joined your game"),
-                                  tr("%1 has joined your game").arg(newPlayer->getName()));
+            QString gameId(QString::number(gameInfo.game_id()));
+            trayIcon->showMessage(tr("A player has joined game #%1").arg(gameId),
+                                  tr("%1 has joined the game").arg(newPlayer->getName()));
         }
     }
     playerListWidget->addPlayer(playerInfo);
