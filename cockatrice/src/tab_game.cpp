@@ -53,6 +53,7 @@
 #include "replay_timeline_widget.h"
 #include "settingscache.h"
 #include "tab_supervisor.h"
+#include "window_main.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 
@@ -1192,6 +1193,11 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     } else {
         Player *newPlayer = addPlayer(playerId, playerInfo.user_info());
         messageLog->logJoin(newPlayer);
+        if (trayIcon) {
+            QString gameId(QString::number(gameInfo.game_id()));
+            trayIcon->showMessage(tr("A player has joined game #%1").arg(gameId),
+                                  tr("%1 has joined the game").arg(newPlayer->getName()));
+        }
     }
     playerListWidget->addPlayer(playerInfo);
     emitUserEvent();
