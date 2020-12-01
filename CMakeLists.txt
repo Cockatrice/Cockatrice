@@ -6,15 +6,7 @@
 # like the installation path, compilation flags etc..
 
 # Cmake 3.1 is required to enable C++11 support correctly
-cmake_minimum_required(VERSION 3.1)
-
-if(POLICY CMP0064)
-    cmake_policy(SET CMP0064 NEW)
-endif()
-
-if(POLICY CMP0071)
-    cmake_policy(SET CMP0071 NEW)
-endif()
+cmake_minimum_required(VERSION 3.10)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -35,6 +27,17 @@ if(USE_CCACHE)
     endif()
 endif()
 
+if(WIN32)
+    # Use vcpkg toolchain on Windows
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        CACHE STRING "Vcpkg toolchain file")
+    # Qt path set by user or env var
+    if (QTDIR OR DEFINED ENV{QTDIR} OR DEFINED ENV{QTDIR32} OR DEFINED ENV{QTDIR64})
+    else()
+        set(QTDIR "" CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)")
+        message(WARNING "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)")
+    endif()
+endif()
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
 PROJECT("Cockatrice" VERSION 2.7.6)
@@ -139,8 +142,15 @@ ENDIF()
 FIND_PACKAGE(Threads REQUIRED)
 
 # Find Qt5
-OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+if(DEFINED QTDIR${_lib_suffix})
+	list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
+elseif(DEFINED QTDIR)
+	list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
+elseif(DEFINED ENV{QTDIR${_lib_suffix}})
+	list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
+elseif(DEFINED ENV{QTDIR})
+	list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
+endif()
 
 FIND_PACKAGE(Qt5Core 5.5.0 REQUIRED)
 
@@ -160,6 +170,10 @@ IF(Qt5Core_FOUND)
 ELSE()
     MESSAGE(FATAL_ERROR "No Qt5 found!")
 ENDIF()
+
+# Check for translation updates
+OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
+MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
 set(CMAKE_AUTOMOC TRUE)
 
@@ -215,7 +229,7 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-    if("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+    if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
         set(TRICE_IS_64_BIT 1)
     else()
         set(TRICE_IS_64_BIT 0)

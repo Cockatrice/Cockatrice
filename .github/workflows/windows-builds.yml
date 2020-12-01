@@ -1,0 +1,214 @@
+name: 'Build on Windows'
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  win64:
+    name: 'Windows 64-bit'
+    runs-on: [windows-latest]
+    env:
+      QT_VERSION: '5.12.9'
+      CMAKE_GENERATOR: "Visual Studio 16 2019"
+    steps:
+      - name: 'Add msbuild to PATH'
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: 'Get Cockatrice git info'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          git fetch --prune --unshallow
+          echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+      - name: 'Restore Qt 64-bit from cache'
+        id: cache-qt32
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ runner.workspace }}/Qt64
+          key: ${{ runner.os }}-QtCache-64bit
+      - name: 'Install 64-bit Qt'
+        uses: jurplel/install-qt-action@v2
+        with:
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          version: '${{ env.QT_VERSION }}'
+          arch: 'win64_msvc2017_64'
+          dir: ${{ runner.workspace }}/Qt64
+      - name: 'Restore or setup vcpkg'
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          appendedCacheKey: ${{ hashFiles('**/vcpkg.txt') }}
+          vcpkgTriplet: x64-windows
+      - name: 'Configure Cockatrice 64-bit'
+        working-directory: ${{ github.workspace }}
+        run: |
+          New-Item build64 -type directory -force
+          cd build64
+          cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A "x64" -DQTDIR="${{ runner.workspace }}\Qt64\Qt\5.12.9\msvc2017_64" -DCMAKE_BUILD_TYPE="Release" -DWITH_SERVER=1 -DTEST=t
+      - name: 'Build Cockatrice 64-bit'
+        working-directory: ${{ github.workspace }}
+        run: msbuild /m /p:Configuration=Release .\build64\Cockatrice.sln
+      - name: 'Build Cockatrice Installer Package 64-bit'
+        working-directory: ${{ github.workspace }}
+        run: |
+          cd build64
+          msbuild /m /p:Configuration=Release PACKAGE.vcxproj
+          cp *.exe ../Cockatrice-${{ env.GIT_TAG }}-${{ env.GIT_HASH }}-64bit-installer.exe
+      - name: 'Run Tests'
+        working-directory: ${{ github.workspace }}/build64
+        run: ctest -T Test -C Release
+      - name: 'Publish'
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'Cockatrice-${{ env.GIT_TAG }}-64bit'
+          path: './*.exe'
+  win32:
+    name: 'Windows 32-bit'
+    runs-on: [windows-latest]
+    env:
+      QT_VERSION: '5.12.9'
+      CMAKE_GENERATOR: "Visual Studio 16 2019"
+    steps:
+      - name: 'Add msbuild to PATH'
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: 'Get Cockatrice git info'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          git fetch --prune --unshallow
+          echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+      - name: 'Restore Qt from cache'
+        id: cache-qt32
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ runner.workspace }}/Qt32
+          key: ${{ runner.os }}-QtCache-32bit
+      - name: 'Install 32-bit Qt'
+        uses: jurplel/install-qt-action@v2
+        with:
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          version: '${{ env.QT_VERSION }}'
+          arch: 'win32_msvc2017'
+          dir: ${{ runner.workspace }}/Qt32
+      - name: 'Restore or setup vcpkg'
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          appendedCacheKey: ${{ hashFiles('**/vcpkg.txt') }}
+          vcpkgTriplet: x86-windows
+      - name: 'Configure Cockatrice 32-bit'
+        working-directory: ${{ github.workspace }}
+        run: |
+          New-Item build32 -type directory -force
+          cd build32
+          cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A "Win32" -DQTDIR="${{ runner.workspace }}\Qt32\Qt\5.12.9\msvc2017" -DCMAKE_BUILD_TYPE="Release" -DWITH_SERVER=1 -DTEST=1
+      - name: 'Build Cockatrice 32-bit'
+        working-directory: ${{ github.workspace }}
+        run: msbuild /m /p:Configuration=Release .\build32\Cockatrice.sln
+      - name: 'Build Cockatrice Installer Package 32-bit'
+        working-directory: ${{ github.workspace }}
+        run: |
+          cd build32
+          msbuild /m /p:Configuration=Release PACKAGE.vcxproj
+          cp *.exe ../Cockatrice-${{ env.GIT_TAG }}-${{ env.GIT_HASH }}-32bit-installer.exe
+      - name: 'Run Tests'
+        working-directory: ${{ github.workspace }}/build32
+        run: ctest -T Test -C Release
+      - name: 'Publish'
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'Cockatrice-${{ env.GIT_TAG }}-32bit'
+          path: './*.exe'
+  make-release:
+    name: 'Create and upload release'
+    runs-on: [ubuntu-latest]
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    needs: [win32,win64]
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: 'Fetch git tags and generate file name'
+        shell: bash
+        run: |
+          git fetch --prune --unshallow
+          echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+      - name: 'Checking if beta'
+        if: contains(env.GIT_TAG, 'beta')
+        shell: bash
+        run: |
+          echo 'IS_BETA=true' >> $GITHUB_ENV
+      - name: 'Checking if beta'
+        if: "!contains(env.GIT_TAG, 'beta')"
+        shell: bash
+        run: |
+          echo 'IS_BETA=false' >> $GITHUB_ENV
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.GIT_TAG }}
+          release_name: Cockatrice ${{ env.GIT_TAG }}
+          draft: true
+          prerelease: ${{ env.IS_BETA }}
+      - name: 'Generate filenames'
+        shell: bash
+        run: |
+          FILE_NAME=Cockatrice-${{ env.GIT_TAG }}-${{ env.GIT_HASH }}
+          echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
+      - name: 'Download artifacts'
+        uses: actions/download-artifact@v2
+        with:
+          path: ./
+      - name: 'Upload 32bit to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Cockatrice-${{ env.GIT_TAG }}-32bit/${{ env.FILE_NAME }}-32bit-installer.exe
+          asset_name: Cockatrice-${{ env.GIT_TAG }}-32bit-installer.exe
+          asset_content_type: application/octet-stream
+      - name: 'Upload 64bit to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Cockatrice-${{ env.GIT_TAG }}-64bit/${{ env.FILE_NAME }}-64bit-installer.exe
+          asset_name: Cockatrice-${{ env.GIT_TAG }}-64bit-installer.exe
+          asset_content_type: application/octet-stream
+
