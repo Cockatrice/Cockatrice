@@ -79,9 +79,7 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice and
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
-# Build [![Linux builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Linux%20(Docker)/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Linux+%28Docker%29%22+branch%3Amaster) [![macOS builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20macOS/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+macOS%22+branch%3Amaster) [![Windows builds - master](https://ci.appveyor.com/api/projects/status/oauxf5a0sj689rcg/branch/master?svg=true)](https://ci.appveyor.com/project/ZeldaZach/cockatrice-k884w)
-
-<!-- link to zachs appveyor not correct yet -->
+# Build [![Linux builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Linux%20(Docker)/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Linux+%28Docker%29%22+branch%3Amaster) [![macOS builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20macOS/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+macOS%22+branch%3Amaster) [![Windows builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Windows/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Windows%22+branch%3Amaster)
 
 **Detailed compiling instructions can be found on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
