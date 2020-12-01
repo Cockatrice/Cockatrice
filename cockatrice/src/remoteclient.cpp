@@ -337,9 +337,9 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-    unsigned int size = cont.ByteSizeLong();
+    auto size = static_cast<unsigned int>(cont.ByteSizeLong());
 #else
-    unsigned int size = cont.ByteSize();
+    auto size = static_cast<unsigned int>(cont.ByteSize());
 #endif
 #ifdef QT_DEBUG
     qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
@@ -419,7 +419,7 @@ void RemoteClient::doActivateToServer(const QString &_token)
 
     token = _token.trimmed();
 
-    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
+    connectToHost(lastHostname, lastPort);
     setStatus(StatusActivating);
 }
 
@@ -502,7 +502,7 @@ void RemoteClient::disconnectFromServer()
     emit sigDisconnectFromServer();
 }
 
-QString RemoteClient::getSrvClientID(const QString _hostname)
+QString RemoteClient::getSrvClientID(const QString &_hostname)
 {
     QString srvClientID = SettingsCache::instance().getClientID();
     QHostInfo hostInfo = QHostInfo::fromName(_hostname);
@@ -518,11 +518,11 @@ QString RemoteClient::getSrvClientID(const QString _hostname)
     return uniqueServerClientID;
 }
 
-bool RemoteClient::newMissingFeatureFound(QString _serversMissingFeatures)
+bool RemoteClient::newMissingFeatureFound(const QString &_serversMissingFeatures)
 {
     bool newMissingFeature = false;
     QStringList serversMissingFeaturesList = _serversMissingFeatures.split(",");
-    foreach (const QString &feature, serversMissingFeaturesList) {
+    for (const QString &feature : serversMissingFeaturesList) {
         if (!feature.isEmpty()) {
             if (!SettingsCache::instance().getKnownMissingFeatures().contains(feature))
                 return true;
@@ -535,7 +535,7 @@ void RemoteClient::clearNewClientFeatures()
 {
     QString newKnownMissingFeatures;
     QStringList existingKnownMissingFeatures = SettingsCache::instance().getKnownMissingFeatures().split(",");
-    foreach (const QString &existingKnownFeature, existingKnownMissingFeatures) {
+    for (const QString &existingKnownFeature : existingKnownMissingFeatures) {
         if (!existingKnownFeature.isEmpty()) {
             if (!clientFeatures.contains(existingKnownFeature))
                 newKnownMissingFeatures.append("," + existingKnownFeature);
@@ -566,7 +566,7 @@ void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsi
     lastHostname = hostname;
     lastPort = port;
 
-    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
+    connectToHost(lastHostname, lastPort);
     setStatus(StatusRequestingForgotPassword);
 }
 
@@ -598,7 +598,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
     token = _token.trimmed();
     password = _newpassword;
 
-    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
+    connectToHost(lastHostname, lastPort);
     setStatus(StatusSubmitForgotPasswordReset);
 }
 
@@ -632,7 +632,7 @@ void RemoteClient::doSubmitForgotPasswordChallengeToServer(const QString &hostna
     lastPort = port;
     email = _email;
 
-    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
+    connectToHost(lastHostname, lastPort);
     setStatus(StatusSubmitForgotPasswordChallenge);
 }
 

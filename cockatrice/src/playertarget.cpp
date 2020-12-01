@@ -24,7 +24,7 @@ PlayerCounter::PlayerCounter(Player *_player,
 
 QRectF PlayerCounter::boundingRect() const
 {
-    return QRectF(0, 0, 50, 30);
+    return {0, 0, 50, 30};
 }
 
 void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -56,13 +56,14 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
 }
 
 PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem, QWidget *_game)
-    : ArrowTarget(_owner, parentItem), playerCounter(0), game(_game)
+    : ArrowTarget(_owner, parentItem), playerCounter(nullptr), game(_game)
 {
     setCacheMode(DeviceCoordinateCache);
 
     const std::string &bmp = _owner->getUserInfo()->avatar_bmp();
-    if (!fullPixmap.loadFromData((const uchar *)bmp.data(), bmp.size()))
+    if (!fullPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
         fullPixmap = QPixmap();
+    }
 }
 
 PlayerTarget::~PlayerTarget()
@@ -74,7 +75,7 @@ PlayerTarget::~PlayerTarget()
 
 QRectF PlayerTarget::boundingRect() const
 {
-    return QRectF(0, 0, 160, 64);
+    return {0, 0, 160, 64};
 }
 
 void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -153,7 +154,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, int _value)
 {
     if (playerCounter) {
-        disconnect(playerCounter, 0, this, 0);
+        disconnect(playerCounter, nullptr, this, nullptr);
         playerCounter->delCounter();
     }
 
@@ -167,5 +168,5 @@ AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, 
 
 void PlayerTarget::counterDeleted()
 {
-    playerCounter = 0;
+    playerCounter = nullptr;
 }

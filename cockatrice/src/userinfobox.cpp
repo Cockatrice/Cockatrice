@@ -31,13 +31,13 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     avatarLabel.setAlignment(Qt::AlignCenter);
 
-    QHBoxLayout *avatarLayout = new QHBoxLayout;
+    auto *avatarLayout = new QHBoxLayout;
     avatarLayout->setContentsMargins(0, 0, 0, 0);
     avatarLayout->addStretch(1);
     avatarLayout->addWidget(&avatarLabel, 3);
     avatarLayout->addStretch(1);
 
-    QGridLayout *mainLayout = new QGridLayout;
+    auto *mainLayout = new QGridLayout;
     mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
     mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
@@ -53,7 +53,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->setColumnStretch(2, 10);
 
     if (editable) {
-        QHBoxLayout *buttonsLayout = new QHBoxLayout;
+        auto *buttonsLayout = new QHBoxLayout;
         buttonsLayout->addWidget(&editButton);
         buttonsLayout->addWidget(&passwordButton);
         buttonsLayout->addWidget(&avatarButton);
@@ -85,10 +85,11 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
     const UserLevelFlags userLevel(user.user_level());
 
-    const std::string bmp = user.avatar_bmp();
-    if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), bmp.size()))
+    const std::string &bmp = user.avatar_bmp();
+    if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
         avatarPixmap =
             UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
+    }
     avatarLabel.setPixmap(avatarPixmap.scaled(400, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     nameLabel.setText(QString::fromStdString(user.name()));
