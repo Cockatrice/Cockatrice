@@ -38,23 +38,6 @@ function(get_commit_date)
 	set(GIT_COMMIT_DATE "${GIT_COM_DATE}" PARENT_SCOPE)
 endfunction()
 
-function(clean_release_name name)
-	#  <title>Release Cockatrice 2.7.3: Dawn of Hope · Cockatrice/Cockatrice · GitHub</title>
-	# Remove prefix
-	STRING(REGEX REPLACE "<title>Release Cockatrice [0-9\.]+: " "" name "${name}")
-	# Remove suffix
-	STRING(REPLACE " · Cockatrice/Cockatrice · GitHub</title>" "" name "${name}")
-	# Remove all unwanted chars
-	STRING(REGEX REPLACE "[^A-Za-z0-9_ ]" "" name "${name}")
-	# Strip (trim) whitespaces
-	STRING(STRIP "${name}" name)
-	# Replace all spaces with underscores
-	STRING(REPLACE " " "_" name "${name}")
-
-	MESSAGE(STATUS "Friendly tag name: ${name}")
-	set(GIT_TAG_RELEASENAME "${name}" PARENT_SCOPE)
-endfunction()
-
 function(get_tag_name commit)
 	if(${commit} STREQUAL "unknown")
 		return()
@@ -163,23 +146,8 @@ function(get_tag_name commit)
 		set(PROJECT_VERSION_LABEL ${GIT_TAG_LABEL} PARENT_SCOPE)
 	elseif(${GIT_TAG_TYPE} STREQUAL "Release")
 		set(PROJECT_VERSION_LABEL "" PARENT_SCOPE)
-
-		# get version name from github
-		set(GIT_TAG_TEMP_FILE "${PROJECT_BINARY_DIR}/tag_informations.txt")
-		set(GIT_TAG_TEMP_URL "https://github.com/Cockatrice/Cockatrice/releases/tag/${GIT_TAG}")
-		message(STATUS "Fetching tag informations from ${GIT_TAG_TEMP_URL}")
-		file(REMOVE "${GIT_TAG_TEMP_FILE}")
-		file(DOWNLOAD "${GIT_TAG_TEMP_URL}" "${GIT_TAG_TEMP_FILE}" STATUS status LOG log INACTIVITY_TIMEOUT 30 TIMEOUT 300 SHOW_PROGRESS)
-    	list(GET status 0 err)
-    	list(GET status 1 msg)
-	    if(err)
-	    	message(WARNING "Download failed with error ${msg}: ${log}")
-	    	return()
-    	endif()
-    	file(STRINGS "${GIT_TAG_TEMP_FILE}" GIT_TAG_RAW_RELEASENAME REGEX "<title>Release Cockatrice .*</title>" LIMIT_COUNT 1 ENCODING UTF-8)
-
-    	clean_release_name("${GIT_TAG_RAW_RELEASENAME}")
-    	set(PROJECT_VERSION_RELEASENAME "${GIT_TAG_RELEASENAME}" PARENT_SCOPE)
+		# set release name from env var
+		set(PROJECT_VERSION_RELEASENAME "${GIT_TAG_RELEASENAME}" PARENT_SCOPE)
 	endif()
 
 endfunction()
@@ -188,9 +156,9 @@ endfunction()
 
 # fallback defaults
 set(GIT_COMMIT_ID "unknown")
-set(GIT_COMMIT_DATE "unknown")
-set(GIT_COMMIT_DATE_FRIENDLY "unknown")
-set(PROJECT_VERSION_LABEL "custom(unknown)")
+set(GIT_COMMIT_DATE "")
+set(GIT_COMMIT_DATE_FRIENDLY "")
+set(PROJECT_VERSION_LABEL "")
 set(PROJECT_VERSION_RELEASENAME "")
 
 find_package(Git)
