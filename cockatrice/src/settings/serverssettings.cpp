@@ -50,7 +50,8 @@ QString ServersSettings::getSite(QString defaultSite)
 
 QString ServersSettings::getPrevioushostName()
 {
-    return getValue("previoushostName", "server").toString();
+    QVariant value = getValue("previoushostName", "server");
+    return value == QVariant() ? "Rooster Ranges" : value.toString();
 }
 
 int ServersSettings::getPrevioushostindex(const QString &saveName)
