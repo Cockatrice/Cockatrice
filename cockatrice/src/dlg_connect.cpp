@@ -193,12 +193,13 @@ void DlgConnect::rebuildComboBoxList(int failure)
     savedHostList = uci.getServerInfo();
 
     bool autoConnectEnabled = static_cast<bool>(SettingsCache::instance().servers().getAutoConnect());
+    QString previousHostName = SettingsCache::instance().servers().getPrevioushostName();
     QString autoConnectSaveName = SettingsCache::instance().servers().getSaveName();
 
     int index = 0;
 
     for (const auto &pair : savedHostList) {
-        auto tmp = pair.second;
+        const auto &tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
             previousHosts->addItem(saveName);
@@ -207,7 +208,7 @@ void DlgConnect::rebuildComboBoxList(int failure)
                 if (saveName.compare(autoConnectSaveName) == 0) {
                     previousHosts->setCurrentIndex(index);
                 }
-            } else if (saveName.compare("Rooster Ranges") == 0) {
+            } else if (saveName.compare(previousHostName) == 0) {
                 previousHosts->setCurrentIndex(index);
             }
 
