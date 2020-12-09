@@ -160,11 +160,8 @@ CardInfoPtr OracleImporter::addCard(QString name,
     properties.insert("side", side);
 
     // upsideDown (flip cards)
-    bool upsideDown = false;
     QString layout = properties.value("layout").toString();
-    if (layout == "flip") {
-        upsideDown = properties.value("side").toString() != "a";
-    }
+    bool upsideDown = layout == "flip" && side == "back";
 
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
