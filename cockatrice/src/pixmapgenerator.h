@@ -1,65 +1,102 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
-#include <QPixmap>
-#include <QMap>
-
 #include "user_level.h"
 
-class PhasePixmapGenerator {
+#include <QMap>
+#include <QPixmap>
+
+class PhasePixmapGenerator
+{
 private:
     static QMap<QString, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int size, QString name);
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
 
-class CounterPixmapGenerator {
+class CounterPixmapGenerator
+{
 private:
     static QMap<QString, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int size, QString name, bool highlight);
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
 
-class PingPixmapGenerator {
+class PingPixmapGenerator
+{
 private:
     static QMap<int, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int size, int value, int max);
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
 
-class GenderPixmapGenerator {
+class GenderPixmapGenerator
+{
 private:
     static QMap<int, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int height);
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
 
-class CountryPixmapGenerator {
+class CountryPixmapGenerator
+{
 private:
     static QMap<QString, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int height, const QString &countryCode);
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
 
-class UserLevelPixmapGenerator {
+class UserLevelPixmapGenerator
+{
 private:
     static QMap<QString, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
 
-class LockPixmapGenerator {
+class LockPixmapGenerator
+{
 private:
     static QMap<int, QPixmap> pmCache;
+
 public:
     static QPixmap generatePixmap(int height);
-    static void clear() { pmCache.clear(); }
+    static void clear()
+    {
+        pmCache.clear();
+    }
 };
+
+const QPixmap loadColorAdjustedPixmap(QString name);
 
 #endif

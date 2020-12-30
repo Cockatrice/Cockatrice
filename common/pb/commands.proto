@@ -7,10 +7,10 @@ import "admin_commands.proto";
 
 message CommandContainer {
     optional uint64 cmd_id = 1;
-    
+
     optional uint32 game_id = 10;
     optional uint32 room_id = 20;
-    
+
     repeated SessionCommand session_command = 100;
     repeated GameCommand game_command = 101;
     repeated RoomCommand room_command = 102;

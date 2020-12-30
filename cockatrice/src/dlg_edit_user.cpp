@@ -1,14 +1,14 @@
-#include <QLabel>
-#include <QGridLayout>
-#include <QHBoxLayout>
-#include <QDialogButtonBox>
-#include <QDebug>
-
 #include "dlg_edit_user.h"
+
 #include "settingscache.h"
 
-DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName)
-    : QDialog(parent)
+#include <QDebug>
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+
+DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName) : QDialog(parent)
 {
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
@@ -21,10 +21,9 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
     countryEdit->insertItem(0, tr("Undefined"));
     countryEdit->setCurrentIndex(0);
 
-    QStringList countries = settingsCache->getCountries();
+    QStringList countries = SettingsCache::instance().getCountries();
     int i = 1;
-    foreach(QString c, countries)
-    {
+    foreach (QString c, countries) {
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
         if (c == country)
             countryEdit->setCurrentIndex(i);
@@ -47,7 +46,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -62,9 +61,4 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
 void DlgEditUser::actOk()
 {
     accept();
-}
-
-void DlgEditUser::actCancel()
-{
-    reject();
 }

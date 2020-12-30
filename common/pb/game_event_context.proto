@@ -10,6 +10,7 @@ message GameEventContext {
         PING_CHANGED = 1006;
         CONNECTION_STATE_CHANGED = 1007;
         SET_SIDEBOARD_LOCK = 1008;
+        UNCONCEDE = 1009;
     }
     extensions 100 to max;
 }

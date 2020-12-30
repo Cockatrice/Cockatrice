@@ -7,4 +7,3 @@ message Response_ReplayDownload {
     }
     optional bytes replay_data = 1;
 }
- 

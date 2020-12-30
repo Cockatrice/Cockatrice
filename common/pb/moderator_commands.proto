@@ -60,13 +60,12 @@ message Command_ViewLogHistory {
     extend ModeratorCommand {
         optional Command_ViewLogHistory ext = 1005;
     }
-    optional string user_name = 1;  // user that created message
-    optional string ip_address = 2; // ip address of user that created message
-    optional string game_name = 3; // client id of user that created the message
-    optional string game_id = 4; // game number the message was sent to
-    optional string message = 5; // raw message that was sent
-    repeated string log_location = 6; // destination of message (ex: main room, game room, private chat)
-    required uint32 date_range = 7; // the length of time (in minutes) to look back for
+    optional string user_name = 1;       // user that created message
+    optional string ip_address = 2;      // ip address of user that created message
+    optional string game_name = 3;       // client id of user that created the message
+    optional string game_id = 4;         // game number the message was sent to
+    optional string message = 5;         // raw message that was sent
+    repeated string log_location = 6;    // destination of message (ex: main room, game room, private chat)
+    required uint32 date_range = 7;      // the length of time (in minutes) to look back for
     optional uint32 maximum_results = 8; // the maximum number of query results
-
 }

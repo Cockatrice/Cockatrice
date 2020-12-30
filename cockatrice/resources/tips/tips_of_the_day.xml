@@ -1,0 +1,99 @@
+<tips>
+    <tip>
+        <title>Tip of the Day</title>
+        <text>Tip of the Day is a new feature to Cockatrice that allows users to get information about the newest features of the program and some of the most commonly asked questions!</text>
+        <image>tip_of_the_day.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Suggesting New Tips</title>
+        <text>You can suggest new Tips of the Day by reaching out to the development team on &lt;a href="https://gitter.im/cockatrice/cockatrice"&gt;Gitter&lt;/a&gt;!</text>
+        <image>gitter.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Reporting Bugs</title>
+        <text>If you encounter a bug while using Cockatrice, you can report the bug to the development team via &lt;a href="https://github.com/cockatrice/cockatrice/issues"&gt;GitHub&lt;a&gt;</text>
+        <image>github_logo.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>FAQ/Troubleshooting Wiki</title>
+        <text>You can find answers to the most common questions and some helpful Cockatrice toubleshooting over on the &lt;a href="https://github.com/cockatrice/cockatrice/wiki"&gt;GitHub wiki&lt;a&gt;</text>
+        <image>cockatrice_wiki.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Register for a Server</title>
+        <text>Click on either Cockatrice (Windows) or Actions (Mac) and then Register to server...  When the dialogue appears, fill out the desired server information.</text>
+        <image>cockatrice_register.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Drawing Arrows</title>
+        <text>You can draw arrows of different color by holding a combination of keys!
+            Right Click: Red Arrow
+            Shift + Right Click: Green Arrow
+            Alt + Right Click: Blue Arrow
+            Cmd + Right Click: Yellow Arrow
+        </text>
+        <image>arrows.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Filtering Games</title>
+        <text>Don't see all the active games? Want to see a smaller selection? Use the Game Filters to change your horizon</text>
+        <image>filter_games.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Upload Custom Avatar</title>
+        <text>Want to show off your hippo avatar? Need to update your password? Check out the Accounts Tab for more info!</text>
+        <image>accounts_tab.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Common Shortcuts</title>
+        <text>You can find a full list of shortcuts &lt;a href="https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"&gt;on the wiki&lt;/a&gt;, but a short list:
+            &lt;br&gt;Roll a die: CTRL + I
+            &lt;br&gt;Mulligan: CTRL + M
+            &lt;br&gt;Draw a card: CTRL + D
+            &lt;br&gt;Undo a draw: CTRL + SHIFT + D
+            &lt;br&gt;View Sideboard: CTRL + F3
+            &lt;br&gt;Change Life: CTRL + L
+            &lt;br&gt;All shortcuts can be customized via Settings->Shortcuts!
+        </text>
+        <image>shortcuts.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Changing Themes</title>
+        <text>Did you know Cockatrice has custom themes? You can either &lt;a href="https://github.com/Cockatrice/Cockatrice/wiki/Themes"&gt;create one yourself&lt;/a&gt; or use one of the several pre-loaded ones! Go to Settings->Appearance and try them out!</text>
+        <image>themes.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Flip of the Coin</title>
+        <text>You can flip a coin instead of rolling a die by rolling a 2 sided die instead!</text>
+        <image>coin_flip.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Face Down Cards</title>
+        <text>You can hold Shift while dragging or clicking on a card to have it enter play face down</text>
+        <image>face_down.png</image>
+        <date>2018-03-01</date>
+    </tip>
+    <tip>
+        <title>Counter expressions</title>
+        <text>When setting a counter value, you can type a math expression in the box and the counter will be set to the result.&lt;br&gt;The "x" variable contains the current counter value.</text>
+        <image>counter_expression.png</image>
+        <date>2019-02-02</date>
+    </tip>
+    <tip>
+        <title>Power and Toughness</title>
+        <text>You can add and subtract to a creature's stats.&lt;br&gt;With a card selected, set the power and toughness ( default: ctrl + p ) and enter +3/-1 to increase power by three while decreasing toughness by one.&lt;br&gt;You can also reset it to the original value ( default: ctrl + alt + 0 ).</text>
+        <image>setpt.png</image>
+        <date>2019-03-02</date>
+    </tip>
+</tips>

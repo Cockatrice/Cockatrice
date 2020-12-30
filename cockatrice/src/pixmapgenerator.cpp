@@ -1,6 +1,10 @@
 #include "pixmapgenerator.h"
+
 #include "pb/serverinfo_user.pb.h"
+
+#include <QApplication>
 #include <QPainter>
+#include <QPalette>
 #include <cmath>
 #ifdef _WIN32
 #include "round.h"
@@ -15,7 +19,8 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = QPixmap("theme:phases/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap =
+        QPixmap("theme:phases/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -31,14 +36,14 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    if(pixmap.isNull())
-    {
+    QPixmap pixmap =
+        QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    if (pixmap.isNull()) {
         name = "general";
         if (highlight)
             name.append("_highlight");
-        pixmap = QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
+        pixmap =
+            QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 
     pmCache.insert(key, pixmap);
@@ -58,9 +63,10 @@ QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
     if ((max == -1) || (value == -1))
         color = Qt::black;
     else
-        color.setHsv(120 * (1.0 - ((double) value / max)), 255, 255);
+        color.setHsv(120 * (1.0 - ((double)value / max)), 255, 255);
 
-    QRadialGradient g(QPointF((double) pixmap.width() / 2, (double) pixmap.height() / 2), qMin(pixmap.width(), pixmap.height()) / 2.0);
+    QRadialGradient g(QPointF((double)pixmap.width() / 2, (double)pixmap.height() / 2),
+                      qMin(pixmap.width(), pixmap.height()) / 2.0);
     g.setColorAt(0, color);
     g.setColorAt(1, Qt::transparent);
     painter.fillRect(0, 0, pixmap.width(), pixmap.height(), QBrush(g));
@@ -74,7 +80,7 @@ QMap<int, QPixmap> PingPixmapGenerator::pmCache;
 
 QPixmap GenderPixmapGenerator::generatePixmap(int height)
 {
-     ServerInfo_User::Gender gender = ServerInfo_User::GenderUnknown;
+    ServerInfo_User::Gender gender = ServerInfo_User::GenderUnknown;
 
     int key = gender * 100000 + height;
     if (pmCache.contains(key))
@@ -83,8 +89,8 @@ QPixmap GenderPixmapGenerator::generatePixmap(int height)
     QString genderStr;
     genderStr = "unknown";
 
-
-    QPixmap pixmap = QPixmap("theme:genders/" + genderStr).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap =
+        QPixmap("theme:genders/" + genderStr).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -100,7 +106,8 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
         return pmCache.value(key);
 
     int width = height * 2;
-    QPixmap pixmap = QPixmap("theme:countries/" + countryCode.toLower()).scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap = QPixmap("theme:countries/" + countryCode.toLower())
+                         .scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
@@ -114,7 +121,7 @@ QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
 QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
 {
-    
+
     QString key = QString::number(height * 10000) + ":" + (int)userLevel + ":" + (int)isBuddy + ":" + privLevel;
     if (pmCache.contains(key))
         return pmCache.value(key);
@@ -137,14 +144,15 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
 
     if (isBuddy)
         levelString.append("_buddy");
-   
-    QPixmap pixmap = QPixmap("theme:userlevels/" + levelString).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    QPixmap pixmap = QPixmap("theme:userlevels/" + levelString)
+                         .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     pmCache.insert(key, pixmap);
     return pixmap;
 }
 
 QMap<QString, QPixmap> UserLevelPixmapGenerator::pmCache;
-
 
 QPixmap LockPixmapGenerator::generatePixmap(int height)
 {
@@ -159,3 +167,16 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
 }
 
 QMap<int, QPixmap> LockPixmapGenerator::pmCache;
+
+const QPixmap loadColorAdjustedPixmap(QString name)
+{
+    if (qApp->palette().windowText().color().lightness() > 200) {
+        QImage img(name);
+        img.invertPixels();
+        QPixmap result;
+        result.convertFromImage(img);
+        return result;
+    } else {
+        return QPixmap(name);
+    }
+}

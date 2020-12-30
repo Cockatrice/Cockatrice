@@ -1,8 +1,8 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
-#include <QComboBox>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>
 #include <QLabel>
@@ -10,43 +10,42 @@
 #include <QSpinBox>
 
 class CardDatabase;
+class QCloseEvent;
+class QGridLayout;
+class QHBoxLayout;
+class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
-class QStackedWidget;
-class QLineEdit;
-class QPushButton;
-class QComboBox;
-class QGroupBox;
-class QCheckBox;
-class QLabel;
-class QCloseEvent;
-class QSpinBox;
 class QRadioButton;
-class QSpinBox;
 class QSlider;
-class QSpinBox;
+class QStackedWidget;
+class QTreeWidget;
+class QTreeWidgetItem;
+class QVBoxLayout;
+class SequenceEdit;
 
-class AbstractSettingsPage : public QWidget {
+class AbstractSettingsPage : public QWidget
+{
 public:
     virtual void retranslateUi() = 0;
 };
 
-class GeneralSettingsPage : public AbstractSettingsPage {
+class GeneralSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 public:
     GeneralSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
+
 private slots:
     void deckPathButtonClicked();
     void replaysPathButtonClicked();
     void picsPathButtonClicked();
-    void clearDownloadedPicsButtonClicked();
     void cardDatabasePathButtonClicked();
+    void customCardDatabaseButtonClicked();
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
-    void setEnabledStatus(bool);
-    void defaultUrlRestoreButtonClicked();
-    void fallbackUrlRestoreButtonClicked();
+
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
@@ -54,15 +53,14 @@ private:
     QLineEdit *replaysPathEdit;
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
+    QLineEdit *customCardDatabasePathEdit;
     QLineEdit *tokenDatabasePathEdit;
-    QLineEdit *defaultUrlEdit;
-    QLineEdit *fallbackUrlEdit;
     QSpinBox pixmapCacheEdit;
-    QGroupBox *personalGroupBox; 
+    QGroupBox *personalGroupBox;
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
-    QCheckBox picDownloadCheckBox;
     QCheckBox updateNotificationCheckBox;
+    QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
     QLabel pixmapCacheLabel;
@@ -70,20 +68,18 @@ private:
     QLabel replaysPathLabel;
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
+    QLabel customCardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
-    QLabel defaultUrlLabel;
-    QLabel fallbackUrlLabel;
-    QLabel urlLinkLabel;
     QLabel updateReleaseChannelLabel;
-    QPushButton clearDownloadedPicsButton;
-    QPushButton defaultUrlRestoreButton;
-    QPushButton fallbackUrlRestoreButton;
+    QCheckBox showTipsOnStartup;
 };
 
-class AppearanceSettingsPage : public AbstractSettingsPage {
+class AppearanceSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 private slots:
     void themeBoxChanged(int index);
+
 private:
     QLabel themeLabel;
     QComboBox themeBox;
@@ -100,56 +96,95 @@ private:
     QGroupBox *tableGroupBox;
     QSpinBox minPlayersForMultiColumnLayoutEdit;
     QSpinBox maxFontSizeForCardsEdit;
+
 public:
     AppearanceSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
 };
 
-class UserInterfaceSettingsPage : public AbstractSettingsPage {
+class UserInterfaceSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 private slots:
     void setSpecNotificationEnabled(int);
+
 private:
     QCheckBox notificationsEnabledCheckBox;
     QCheckBox specNotificationsEnabledCheckBox;
+    QCheckBox buddyConnectNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
+    QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
+    QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
-    
+
 public:
     UserInterfaceSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
 };
 
-class DeckEditorSettingsPage : public AbstractSettingsPage {
+class DeckEditorSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 public:
     DeckEditorSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
+    QString getLastUpdateTime();
+
 private slots:
-signals:
+    void storeSettings();
+    void urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int);
+    void setSpoilersEnabled(bool);
+    void spoilerPathButtonClicked();
+    void updateSpoilers();
+    void unlockSettings();
+    void actAddURL();
+    void actRemoveURL();
+    void actEditURL();
+    void clearDownloadedPicsButtonClicked();
+    void resetDownloadedURLsButtonClicked();
+
 private:
-    QGroupBox *generalGroupBox;
+    QPushButton clearDownloadedPicsButton;
+    QPushButton resetDownloadURLs;
+    QLabel urlLinkLabel;
+    QCheckBox picDownloadCheckBox;
+    QListWidget *urlList;
+    QCheckBox mcDownloadSpoilersCheckBox;
+    QLabel msDownloadSpoilersLabel;
+    QGroupBox *mpGeneralGroupBox;
+    QGroupBox *mpSpoilerGroupBox;
+    QLineEdit *mpSpoilerSavePathLineEdit;
+    QLabel mcSpoilerSaveLabel;
+    QLabel lastUpdatedLabel;
+    QLabel infoOnSpoilersLabel;
+    QPushButton *mpSpoilerPathButton;
+    QPushButton *updateNowButton;
 };
 
-class MessagesSettingsPage : public AbstractSettingsPage {
+class MessagesSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 public:
     MessagesSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
+
 private slots:
     void actAdd();
+    void actEdit();
     void actRemove();
     void updateColor(const QString &value);
     void updateHighlightColor(const QString &value);
     void updateTextColor(int value);
     void updateTextHighlightColor(int value);
+
 private:
     QListWidget *messageList;
     QAction *aAdd;
+    QAction *aEdit;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
     QCheckBox chatMentionCompleterCheckbox;
@@ -175,11 +210,13 @@ private:
     void updateHighlightPreview();
 };
 
-class SoundSettingsPage : public AbstractSettingsPage {
+class SoundSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 public:
     SoundSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
+
 private:
     QLabel themeLabel;
     QComboBox themeBox;
@@ -189,29 +226,65 @@ private:
     QLabel masterVolumeLabel;
     QSlider *masterVolumeSlider;
     QSpinBox *masterVolumeSpinBox;
+
 private slots:
     void masterVolumeChanged(int value);
     void themeBoxChanged(int index);
 };
 
-class DlgSettings : public QDialog {
+class ShortcutSettingsPage : public AbstractSettingsPage
+{
     Q_OBJECT
 public:
-    DlgSettings(QWidget *parent = 0);
+    ShortcutSettingsPage();
+    void retranslateUi() override;
+
+private:
+    QTreeWidget *shortcutsTable;
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *buttonsLayout;
+    QGroupBox *editShortcutGroupBox;
+    QGridLayout *editLayout;
+    QLabel *currentActionGroupLabel;
+    QLabel *currentActionGroupName;
+    QLabel *currentActionLabel;
+    QLabel *currentActionName;
+    QLabel *currentShortcutLabel;
+    SequenceEdit *editTextBox;
+    QLabel *faqLabel;
+    QPushButton *btnResetAll;
+    QPushButton *btnClearAll;
+
+private slots:
+    void resetShortcuts();
+    void refreshShortcuts();
+    void createShortcuts();
+    void clearShortcuts();
+    void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+};
+
+class DlgSettings : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit DlgSettings(QWidget *parent = nullptr);
     void setTab(int index);
+
 private slots:
     void changePage(QListWidgetItem *current, QListWidgetItem *previous);
     void updateLanguage();
+
 private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
-    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton, *soundButton;
-    QListWidgetItem *shortcutsButton;
+    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton,
+        *soundButton, *shortcutsButton;
     void createIcons();
     void retranslateUi();
+
 protected:
-    void changeEvent(QEvent *event);
-    void closeEvent(QCloseEvent *event);
+    void changeEvent(QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
-#endif 
+#endif

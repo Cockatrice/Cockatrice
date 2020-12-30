@@ -1,0 +1,191 @@
+name: Build on macOS
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - Debug
+          - ElCapitan
+          - Mojave
+          - Catalina
+          - BigSur
+        include:
+          - target: Debug # tests only
+            os: macos-latest
+            xcode: 11.7
+            type: Debug
+            do_tests: 0 # tests do not work yet on mac
+            make_package: false
+
+          - target: ElCapitan # xcode 8.2.1 should be compatible with macos 10.11.5
+            os: macos-10.13 # runs on HighSierra
+            allow-failure: yes # we don't know if it'll be added
+            xcode: 8.2.1
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: Mojave # xcode 10.3 should be compatible with macos 10.14.3
+            os: macos-10.15 # runs on Catalina
+            xcode: 10.3
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: Catalina
+            os: macos-10.15
+            xcode: 11.7
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: BigSur
+            os: macos-11.0
+            xcode: 12.2
+            type: Release
+            do_tests: 0
+            make_package: true
+
+    runs-on: ${{matrix.os}}
+
+    continue-on-error: ${{matrix.allow-failure == 'yes'}}
+
+    env:
+      CCACHE_DIR: ~/.ccache
+      DEVELOPER_DIR:
+        /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies using homebrew
+        shell: bash
+        # cmake cannot find the mysql connector
+        # neither of these works: mariadb-connector-c mysql-connector-c++
+        run: brew install ccache protobuf
+
+# in case we'd want to modify this for windows (should be its own workflow):
+#     - if: runner.os == 'windows'
+#       name: Install dependencies using vcpkg
+#       shell: bash
+#       run: vcpkg install protobuf liblzma zlib --triplet x64-windows
+
+      - name: Install QT using homebrew
+        id: brew_install_qt
+        continue-on-error: true
+        shell: bash
+        run: brew install qt --force-bottle
+
+      - name: Install QT using actions
+        if: steps.brew_install_qt.outcome == 'failure'
+        uses: jurplel/install-qt-action@v2
+
+      - name: Get ccache timestamp
+        id: ccache_timestamp
+        shell: bash
+        run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
+
+      - name: Restore ccache cache
+        uses: actions/cache@v2
+        env:
+          timestamp: ${{steps.ccache_timestamp.outputs.timestamp}}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-${{env.timestamp}}
+          restore-keys: |
+            ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-
+
+      - name: Create build environment
+        run: cmake -E make_directory build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: build
+        run: |
+          ccache --show-stats
+          mkdir -p $CCACHE_DIR
+          ls $CCACHE_DIR
+          if [[ ${{steps.brew_install_qt.outcome}} == 'success' ]]; then
+            cmake_args=" -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/*)"
+            echo "added$cmake_args cmake argument for homebrew"
+          fi
+          cmake_args+=" -DTEST=${{matrix.do_tests}}"
+          cmake .. -DCMAKE_BUILD_TYPE=${{matrix.type}} -DWITH_SERVER=1 $cmake_args
+
+      - name: Build on Xcode ${{matrix.xcode}}
+        shell: bash
+        working-directory: build
+        run: cmake --build .
+
+      - name: Test
+        if: matrix.do_tests == 1
+        shell: bash
+        working-directory: build
+        run: cmake --build . --target test
+
+      - name: Package for ${{matrix.target}}
+        if: matrix.make_package
+        id: build_package
+        shell: bash
+        working-directory: build
+        run: |
+          # temporary workaround for big sur images having old cmake
+          if [[ ${{matrix.os}} == macos-11.0 ]]; then
+            curl -L https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Darwin-x86_64.tar.gz | tar -xz
+            ./cmake-3.19.0-Darwin-x86_64/CMake.app/Contents/bin/cpack --config ./CPackConfig.cmake
+          else
+            cmake --build . --target package
+          fi
+          file=$(echo Cockatrice-*.*)
+          extension="${file##*.}"
+          name="${file%.*}"
+          newfile="$name-macOS-${{matrix.target}}.$extension"
+          mv "$file" "$newfile" # avoid file name conflicts
+          echo "::set-output name=file::$newfile"
+
+      - name: Upload artifacts
+        if: matrix.make_package
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS-${{matrix.target}}-xcode-${{matrix.xcode}}-dmg
+          path: build/${{steps.build_package.outputs.file}}
+
+      - name: Get release upload URL
+        if: matrix.make_package && startsWith(github.ref, 'refs/tags/')
+        id: get_url
+        shell: bash
+        env:
+          ref: "${{github.ref}}"
+          repo: "${{github.repository}}"
+        run: |
+          url=$(./.ci/get_github_upload_url.sh)
+          echo "::set-output name=upload_url::$url"
+
+      - name: Upload release for ${{matrix.target}}
+        if: steps.get_url.outcome == 'success'
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.get_url.outputs.upload_url}}
+          asset_path: build/${{steps.build_package.outputs.file}}
+          asset_name: ${{steps.build_package.outputs.file}}
+          asset_content_type: binary_package # required but arbitrary

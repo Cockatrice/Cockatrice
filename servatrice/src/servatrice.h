@@ -20,19 +20,18 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
-#include <QTcpServer>
-#if QT_VERSION > 0x050300
-  #include <QWebSocketServer>
-#endif
-#include <QMutex>
-#include <QSslCertificate>
-#include <QSslKey>
-#include <QHostAddress>
-#include <QReadWriteLock>
-#include <QSqlDatabase>
-#include <QMetaType>
 #include "server.h"
 
+#include <QHostAddress>
+#include <QMetaType>
+#include <QMutex>
+#include <QReadWriteLock>
+#include <QSqlDatabase>
+#include <QSslCertificate>
+#include <QSslKey>
+#include <QTcpServer>
+#include <QWebSocketServer>
+#include <utility>
 
 Q_DECLARE_METATYPE(QSqlDatabase)
 
@@ -47,49 +46,68 @@ class AbstractServerSocketInterface;
 class IslInterface;
 class FeatureSet;
 
-class Servatrice_GameServer : public QTcpServer {
+class Servatrice_GameServer : public QTcpServer
+{
     Q_OBJECT
 private:
     Servatrice *server;
     QList<Servatrice_ConnectionPool *> connectionPools;
+
 public:
-    Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
-    ~Servatrice_GameServer();
+    Servatrice_GameServer(Servatrice *_server,
+                          int _numberPools,
+                          const QSqlDatabase &_sqlDatabase,
+                          QObject *parent = nullptr);
+    ~Servatrice_GameServer() override;
+
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor) override;
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
 
-#if QT_VERSION > 0x050300
-class Servatrice_WebsocketGameServer : public QWebSocketServer {
+class Servatrice_WebsocketGameServer : public QWebSocketServer
+{
     Q_OBJECT
 private:
     Servatrice *server;
     QList<Servatrice_ConnectionPool *> connectionPools;
+
 public:
-    Servatrice_WebsocketGameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
-    ~Servatrice_WebsocketGameServer();
+    Servatrice_WebsocketGameServer(Servatrice *_server,
+                                   int _numberPools,
+                                   const QSqlDatabase &_sqlDatabase,
+                                   QObject *parent = nullptr);
+    ~Servatrice_WebsocketGameServer() override;
+
 protected:
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 protected slots:
     void onNewConnection();
 };
-#endif
 
-class Servatrice_IslServer : public QTcpServer {
+class Servatrice_IslServer : public QTcpServer
+{
     Q_OBJECT
 private:
     Servatrice *server;
     QSslCertificate cert;
     QSslKey privateKey;
+
 public:
-    Servatrice_IslServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
-        : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
+    Servatrice_IslServer(Servatrice *_server,
+                         const QSslCertificate &_cert,
+                         const QSslKey &_privateKey,
+                         QObject *parent = nullptr)
+        : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey)
+    {
+    }
+
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor) override;
 };
 
-class ServerProperties {
+class ServerProperties
+{
 public:
     int id;
     QSslCertificate cert;
@@ -98,29 +116,46 @@ public:
     int gamePort;
     int controlPort;
 
-    ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
-        : id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
+    ServerProperties(int _id,
+                     const QSslCertificate &_cert,
+                     QString _hostname,
+                     const QHostAddress &_address,
+                     int _gamePort,
+                     int _controlPort)
+        : id(_id), cert(_cert), hostname(std::move(_hostname)), address(_address), gamePort(_gamePort),
+          controlPort(_controlPort)
+    {
+    }
 };
 
 class Servatrice : public Server
 {
     Q_OBJECT
 public:
-    enum AuthenticationMethod { AuthenticationNone, AuthenticationSql, AuthenticationPassword };
+    enum AuthenticationMethod
+    {
+        AuthenticationNone,
+        AuthenticationSql,
+        AuthenticationPassword
+    };
 private slots:
     void statusUpdate();
     void shutdownTimeout();
+
 protected:
-    void doSendIslMessage(const IslMessage &msg, int serverId);
+    void doSendIslMessage(const IslMessage &msg, int serverId) override;
+
 private:
-    enum DatabaseType { DatabaseNone, DatabaseMySql };
+    enum DatabaseType
+    {
+        DatabaseNone,
+        DatabaseMySql
+    };
     AuthenticationMethod authenticationMethod;
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
     Servatrice_GameServer *gameServer;
-#if QT_VERSION > 0x050300
     Servatrice_WebsocketGameServer *websocketGameServer;
-#endif
     Servatrice_IslServer *islServer;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
@@ -162,53 +197,80 @@ private:
     int getISLNetworkPort() const;
     bool getISLNetworkEnabled() const;
     bool getEnableInternalSMTPClient() const;
+    QHostAddress getServerTCPHost() const;
+    QHostAddress getServerWebSocketHost() const;
 
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
-    void setRequiredFeatures(const QString featureList);
+    void setRequiredFeatures(QString featureList);
+
 public:
-    Servatrice(QObject *parent = 0);
-    ~Servatrice();
+    explicit Servatrice(QObject *parent = nullptr);
+    ~Servatrice() override;
     bool initServer();
-    QMap<QString, bool> getServerRequiredFeatureList() const { return serverRequiredFeatureList; }
-    QString getOfficialWarningsList() const { return officialWarnings; }
+    QMap<QString, bool> getServerRequiredFeatureList() const override
+    {
+        return serverRequiredFeatureList;
+    }
+    QString getOfficialWarningsList() const
+    {
+        return officialWarnings;
+    }
     QString getServerName() const;
-    QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
-    QString getRequiredFeatures() const;
+    QString getLoginMessage() const override
+    {
+        QMutexLocker locker(&loginMessageMutex);
+        return loginMessage;
+    }
+    QString getRequiredFeatures() const override;
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
-    QString getDbPrefix() const { return dbPrefix; }
+    QString getDbPrefix() const
+    {
+        return dbPrefix;
+    }
     QString getEmailBlackList() const;
-    AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
-    bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
-    bool getGameShouldPing() const { return true; }
-    bool getClientIDRequiredEnabled() const;
-    bool getRegOnlyServerEnabled() const;
-    bool getMaxUserLimitEnabled() const;
-    bool getStoreReplaysEnabled() const;
+    AuthenticationMethod getAuthenticationMethod() const
+    {
+        return authenticationMethod;
+    }
+    bool permitUnregisteredUsers() const override
+    {
+        return authenticationMethod != AuthenticationNone;
+    }
+    bool getGameShouldPing() const override
+    {
+        return true;
+    }
+    bool getClientIDRequiredEnabled() const override;
+    bool getRegOnlyServerEnabled() const override;
+    bool getMaxUserLimitEnabled() const override;
+    bool getStoreReplaysEnabled() const override;
     bool getRegistrationEnabled() const;
     bool getRequireEmailForRegistrationEnabled() const;
     bool getRequireEmailActivationEnabled() const;
-    bool getEnableLogQuery() const;
+    bool getEnableLogQuery() const override;
     bool getEnableForgotPassword() const;
     bool getEnableForgotPasswordChallenge() const;
     bool getEnableAudit() const;
     bool getEnableRegistrationAudit() const;
     bool getEnableForgotPasswordAudit() const;
-    int getIdleClientTimeout() const;
-    int getServerID() const;
-    int getMaxGameInactivityTime() const;
-    int getMaxPlayerInactivityTime() const;
-    int getClientKeepAlive() const;
+    int getMinPasswordLength() const;
+    int getIdleClientTimeout() const override;
+    int getServerID() const override;
+    int getMaxGameInactivityTime() const override;
+    int getMaxPlayerInactivityTime() const override;
+    int getClientKeepAlive() const override;
     int getMaxUsersPerAddress() const;
-    int getMessageCountingInterval() const;
-    int getMaxMessageCountPerInterval() const;
-    int getMaxMessageSizePerInterval() const;
-    int getMaxGamesPerUser() const;
-    int getCommandCountingInterval() const;
-    int getMaxCommandCountPerInterval() const;
-    int getMaxUserTotal() const;
+    int getMessageCountingInterval() const override;
+    int getMaxMessageCountPerInterval() const override;
+    int getMaxMessageSizePerInterval() const override;
+    int getMaxGamesPerUser() const override;
+    int getCommandCountingInterval() const override;
+    int getMaxCommandCountPerInterval() const override;
+    int getMaxUserTotal() const override;
+    bool permitCreateGameAsJudge() const override;
     int getMaxTcpUserLimit() const;
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;

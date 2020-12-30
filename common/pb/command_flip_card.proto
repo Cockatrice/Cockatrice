@@ -7,6 +7,5 @@ message Command_FlipCard {
     optional string zone = 1;
     optional sint32 card_id = 2 [default = -1];
     optional bool face_down = 3;
+    optional string pt = 4;
 }
-
-

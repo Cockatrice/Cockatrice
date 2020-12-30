@@ -1,22 +1,22 @@
-#ifndef SECUENCEEDIT_H
-#define SECUENCEEDIT_H
+#ifndef SEQUENCEEDIT_H
+#define SEQUENCEEDIT_H
 
-#include <QWidget>
+#include <QEvent>
 #include <QKeySequence>
-
-class QLineEdit;
-class QPushButton;
-class QEvent;
+#include <QLineEdit>
+#include <QPushButton>
+#include <QWidget>
 
 class SequenceEdit : public QWidget
 {
     Q_OBJECT
 public:
-    SequenceEdit(QString _shorcutName, QWidget *parent = 0);
-    QString getSecuence();
+    SequenceEdit(const QString &_shortcutName, QWidget *parent = nullptr);
+    QString getSequence();
+    void setShortcutName(const QString &_shortcutName);
     void refreshShortcut();
     void clear();
-signals:
+    void retranslateUi();
 
 private slots:
     void removeLastShortcut();
@@ -24,15 +24,15 @@ private slots:
 
 protected:
     bool eventFilter(QObject *, QEvent *event);
+
 private:
-    QString shorcutName;
+    QString shortcutName;
     QLineEdit *lineEdit;
     QPushButton *clearButton;
     QPushButton *defaultButton;
-    int keys;
-    int currentKey;
-    int maxKeys;
-    bool valid;
+    int keys = 0;
+    int currentKey = 0;
+    bool valid = false;
 
     void processKey(QKeyEvent *e);
     int translateModifiers(Qt::KeyboardModifiers state, const QString &text);
@@ -40,4 +40,4 @@ private:
     void updateSettings();
 };
 
-#endif // SECUENCEEDIT_H
+#endif // SEQUENCEEDIT_H

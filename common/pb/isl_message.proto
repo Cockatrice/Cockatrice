@@ -9,17 +9,17 @@ message IslMessage {
     enum MessageType {
         GAME_COMMAND_CONTAINER = 0;
         ROOM_COMMAND_CONTAINER = 1;
-        
+
         RESPONSE = 10;
         SESSION_EVENT = 11;
         GAME_EVENT_CONTAINER = 12;
         ROOM_EVENT = 13;
     }
     optional MessageType message_type = 1;
-    
+
     optional uint64 session_id = 9;
     optional sint32 player_id = 10 [default = -1];
-    
+
     optional CommandContainer game_command = 100;
     optional CommandContainer room_command = 101;
 

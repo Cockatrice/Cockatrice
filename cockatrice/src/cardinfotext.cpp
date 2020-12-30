@@ -1,90 +1,81 @@
 #include "cardinfotext.h"
 
-#include <QLabel>
-#include <QTextEdit>
-#include <QGridLayout>
 #include "carditem.h"
-#include "carddatabase.h"
+#include "game_specific_terms.h"
 #include "main.h"
 
-CardInfoText::CardInfoText(QWidget *parent)
-    : QFrame(parent), info(nullptr)
+#include <QGridLayout>
+#include <QLabel>
+#include <QTextEdit>
+
+CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
 {
-    nameLabel1 = new QLabel;
-    nameLabel2 = new QLabel;
-    nameLabel2->setWordWrap(true);
-    nameLabel2->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    manacostLabel1 = new QLabel;
-    manacostLabel2 = new QLabel;
-    manacostLabel2->setWordWrap(true);
-    manacostLabel2->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    colorLabel1 = new QLabel;
-    colorLabel2 = new QLabel;
-    colorLabel2->setWordWrap(true);
-    colorLabel2->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    cardtypeLabel1 = new QLabel;
-    cardtypeLabel2 = new QLabel;
-    cardtypeLabel2->setWordWrap(true);
-    cardtypeLabel2->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    powtoughLabel1 = new QLabel;
-    powtoughLabel2 = new QLabel;
-    powtoughLabel2->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    loyaltyLabel1 = new QLabel;
-    loyaltyLabel2 = new QLabel;
-    loyaltyLabel1->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    nameLabel = new QLabel;
+    nameLabel->setOpenExternalLinks(false);
+    nameLabel->setWordWrap(true);
+    connect(nameLabel, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
 
     textLabel = new QTextEdit();
     textLabel->setReadOnly(true);
 
-    QGridLayout *grid = new QGridLayout(this);
-    int row = 0;
-    grid->addWidget(nameLabel1, row, 0);
-    grid->addWidget(nameLabel2, row++, 1);
-    grid->addWidget(manacostLabel1, row, 0);
-    grid->addWidget(manacostLabel2, row++, 1);
-    grid->addWidget(colorLabel1, row, 0);
-    grid->addWidget(colorLabel2, row++, 1);
-    grid->addWidget(cardtypeLabel1, row, 0);
-    grid->addWidget(cardtypeLabel2, row++, 1);
-    grid->addWidget(powtoughLabel1, row, 0);
-    grid->addWidget(powtoughLabel2, row++, 1);
-    grid->addWidget(loyaltyLabel1, row, 0);
-    grid->addWidget(loyaltyLabel2, row++, 1);
-    grid->addWidget(textLabel, row, 0, -1, 2);
-    grid->setRowStretch(row, 1);
+    auto *grid = new QGridLayout(this);
+    grid->addWidget(nameLabel, 0, 0);
+    grid->addWidget(textLabel, 1, 0, -1, 2);
+    grid->setRowStretch(1, 1);
     grid->setColumnStretch(1, 1);
 
     retranslateUi();
 }
 
-void CardInfoText::setCard(CardInfo *card)
+void CardInfoText::setCard(CardInfoPtr card)
 {
-    if(card)
-    {
-        nameLabel2->setText(card->getName());
-        manacostLabel2->setText(card->getManaCost());
-        colorLabel2->setText(card->getColors().join(""));
-        cardtypeLabel2->setText(card->getCardType());
-        powtoughLabel2->setText(card->getPowTough());
-        loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
-        textLabel->setText(card->getText());
-    } else {
-        nameLabel2->setText("");
-        manacostLabel2->setText("");
-        colorLabel2->setText("");
-        cardtypeLabel2->setText("");
-        powtoughLabel2->setText("");
-        loyaltyLabel2->setText("");
+    if (card == nullptr) {
+        nameLabel->setText("");
         textLabel->setText("");
+        return;
     }
+
+    QString text = "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
+    text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
+                .arg(tr("Name:"), card->getName().toHtmlEscaped());
+
+    QStringList cardProps = card->getProperties();
+    for (const QString &key : cardProps) {
+        if (key.contains("-"))
+            continue;
+        QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
+        text +=
+            QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, card->getProperty(key).toHtmlEscaped());
+    }
+
+    auto relatedCards = card->getAllRelatedCards();
+    if (!relatedCards.empty()) {
+        text += QString("<tr><td>%1</td><td width=\"5\"></td><td>").arg(tr("Related cards:"));
+
+        for (auto *relatedCard : relatedCards) {
+            QString tmp = relatedCard->getName().toHtmlEscaped();
+            text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
+        }
+
+        text += "</td></tr>";
+    }
+
+    text += "</table>";
+    nameLabel->setText(text);
+    textLabel->setText(card->getText());
+}
+
+void CardInfoText::setInvalidCardName(const QString &cardName)
+{
+    nameLabel->setText(tr("Unknown card:") + " " + cardName);
+    textLabel->setText("");
 }
 
 void CardInfoText::retranslateUi()
 {
-    nameLabel1->setText(tr("Name:"));
-    manacostLabel1->setText(tr("Mana cost:"));
-    colorLabel1->setText(tr("Color(s):"));
-    cardtypeLabel1->setText(tr("Card type:"));
-    powtoughLabel1->setText(tr("P / T:"));
-    loyaltyLabel1->setText(tr("Loyalty:"));
+    /*
+     * There's no way we can really translate the text currently being rendered.
+     * The best we can do is invalidate the current text.
+     */
+    setInvalidCardName("");
 }

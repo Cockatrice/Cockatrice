@@ -33,6 +33,17 @@ message GameCommand {
         DECK_SELECT = 1029;
         SET_SIDEBOARD_LOCK = 1030;
         CHANGE_ZONE_PROPERTIES = 1031;
+        UNCONCEDE = 1032;
+        JUDGE = 1033;
+        REVERSE_TURN = 1034;
     }
     extensions 100 to max;
+}
+
+message Command_Judge {
+    extend GameCommand {
+        optional Command_Judge ext = 1033;
+    }
+    optional sint32 target_id = 1 [default = -1];
+    repeated GameCommand game_command = 2;
 }

@@ -27,41 +27,41 @@
 
 #include "qxtglobal.h"
 
-#include <QStringList>
-#include <QHash>
 #include <QByteArray>
+#include <QHash>
+#include <QIODevice>
 #include <QMetaType>
 #include <QSharedDataPointer>
-#include <QIODevice>
+#include <QStringList>
 
 struct QxtMailAttachmentPrivate;
 class QXT_NETWORK_EXPORT QxtMailAttachment
 {
 public:
     QxtMailAttachment();
-    QxtMailAttachment(const QxtMailAttachment& other);
-    QxtMailAttachment(const QByteArray& content, const QString& contentType = QString("application/octet-stream"));
-    QxtMailAttachment(QIODevice* content, const QString& contentType = QString("application/octet-stream"));
-    QxtMailAttachment& operator=(const QxtMailAttachment& other);
+    QxtMailAttachment(const QxtMailAttachment &other);
+    QxtMailAttachment(const QByteArray &content, const QString &contentType = QString("application/octet-stream"));
+    QxtMailAttachment(QIODevice *content, const QString &contentType = QString("application/octet-stream"));
+    QxtMailAttachment &operator=(const QxtMailAttachment &other);
     ~QxtMailAttachment();
-    static QxtMailAttachment fromFile(const QString& filename);
+    static QxtMailAttachment fromFile(const QString &filename);
 
-    QIODevice* content() const;
-    void setContent(const QByteArray& content);
-    void setContent(QIODevice* content);
+    QIODevice *content() const;
+    void setContent(const QByteArray &content);
+    void setContent(QIODevice *content);
 
     bool deleteContent() const;
     void setDeleteContent(bool enable);
 
     QString contentType() const;
-    void setContentType(const QString& contentType);
+    void setContentType(const QString &contentType);
 
     QHash<QString, QString> extraHeaders() const;
-    QString extraHeader(const QString&) const;
-    bool hasExtraHeader(const QString&) const;
-    void setExtraHeader(const QString& key, const QString& value);
-    void setExtraHeaders(const QHash<QString, QString>&);
-    void removeExtraHeader(const QString& key);
+    QByteArray extraHeader(const QString &) const;
+    bool hasExtraHeader(const QString &) const;
+    void setExtraHeader(const QString &key, const QString &value);
+    void setExtraHeaders(const QHash<QString, QString> &);
+    void removeExtraHeader(const QString &key);
 
     QByteArray mimeData();
 

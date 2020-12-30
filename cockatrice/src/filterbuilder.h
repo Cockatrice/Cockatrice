@@ -5,22 +5,23 @@
 
 class QCheckBox;
 class QComboBox;
-class QLineEdit;
+class LineEditUnfocusable;
 class CardFilter;
 
-class FilterBuilder : public QWidget {
+class FilterBuilder : public QWidget
+{
     Q_OBJECT
 
 private:
     QComboBox *typeCombo;
     QComboBox *filterCombo;
-    QLineEdit *edit;
+    LineEditUnfocusable *edit;
     CardFilter *fltr;
 
     void destroyFilter();
 
 public:
-    FilterBuilder(QWidget *parent = 0);
+    FilterBuilder(QWidget *parent = nullptr);
     ~FilterBuilder();
 
 signals:
@@ -29,6 +30,7 @@ signals:
 public slots:
 private slots:
     void emit_add();
+
 protected:
 };
 

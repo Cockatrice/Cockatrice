@@ -1,43 +1,71 @@
 #include "settingsmanager.h"
 
 SettingsManager::SettingsManager(QString settingPath, QObject *parent)
-    : QObject(parent),
-      settings(settingPath, QSettings::IniFormat)
+    : QObject(parent), settings(settingPath, QSettings::IniFormat)
 {
 }
 
 void SettingsManager::setValue(QVariant value, QString name, QString group, QString subGroup)
 {
-    if(!group.isEmpty())
+    if (!group.isEmpty()) {
         settings.beginGroup(group);
+    }
 
-    if(!subGroup.isEmpty())
+    if (!subGroup.isEmpty()) {
         settings.beginGroup(subGroup);
+    }
 
     settings.setValue(name, value);
 
-    if(!subGroup.isEmpty())
+    if (!subGroup.isEmpty()) {
         settings.endGroup();
+    }
 
-    if(!group.isEmpty())
+    if (!group.isEmpty()) {
         settings.endGroup();
+    }
+}
+
+void SettingsManager::deleteValue(QString name, QString group, QString subGroup)
+{
+    if (!group.isEmpty()) {
+        settings.beginGroup(group);
+    }
+
+    if (!subGroup.isEmpty()) {
+        settings.beginGroup(subGroup);
+    }
+
+    settings.remove(name);
+
+    if (!subGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    if (!group.isEmpty()) {
+        settings.endGroup();
+    }
 }
 
 QVariant SettingsManager::getValue(QString name, QString group, QString subGroup)
 {
-    if(!group.isEmpty())
+    if (!group.isEmpty()) {
         settings.beginGroup(group);
+    }
 
-    if(!subGroup.isEmpty())
+    if (!subGroup.isEmpty()) {
         settings.beginGroup(subGroup);
+    }
 
     QVariant value = settings.value(name);
 
-    if(!subGroup.isEmpty())
+    if (!subGroup.isEmpty()) {
         settings.endGroup();
+    }
 
-    if(!group.isEmpty())
+    if (!group.isEmpty()) {
         settings.endGroup();
+    }
 
     return value;
 }

@@ -19,11 +19,8 @@ signals:
 public slots:
 
 private:
-    MessageSettings(QString settingPath, QObject *parent = 0);
-    MessageSettings( const MessageSettings& /*other*/ );
-    MessageSettings( MessageSettings& /*other*/ );
-    MessageSettings( volatile const MessageSettings& /*other*/ );
-    MessageSettings( volatile MessageSettings& /*other*/ );
+    explicit MessageSettings(QString settingPath, QObject *parent = nullptr);
+    MessageSettings(const MessageSettings & /*other*/);
 };
 
 #endif // MESSAGESETTINGS_H

@@ -1,0 +1,88 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:complexType name="relatedType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="count" use="optional" />
+                <xs:attribute type="xs:string" name="exclude" use="optional" />
+                <xs:attribute type="xs:string" name="attach" use="optional" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="setType">
+        <xs:all>
+            <xs:element type="xs:string" name="name" minOccurs="1" maxOccurs="1" />
+            <xs:element type="xs:string" name="longname" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:string" name="settype" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:string" name="releasedate" minOccurs="0" maxOccurs="1" />
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="cardInSetType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="muid" use="optional" />
+                <xs:attribute type="xs:string" name="uuid" use="optional" />
+                <xs:attribute type="xs:anyURI" name="picurl" use="optional" />
+                <!-- permit usage of the old, half-uppercase tag -->
+                <xs:attribute type="xs:anyURI" name="picURL" use="optional" />
+                <xs:attribute type="xs:string" name="num" use="optional" />
+                <xs:attribute type="xs:string" name="rarity" use="optional" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:group name="cardPropertyGroup">
+        <xs:sequence>
+            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:group>
+    <xs:complexType name="cardType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name" minOccurs="1"/>
+            <xs:element type="xs:string" name="text" minOccurs="0" maxOccurs="1" />
+            <xs:element name="prop" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:group ref="cardPropertyGroup"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element type="cardInSetType" name="set" minOccurs="1" maxOccurs="unbounded" />
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element type="relatedType" name="related" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element type="relatedType" name="reverse-related" minOccurs="0" maxOccurs="unbounded" />
+            </xs:choice>
+            <xs:element type="xs:boolean" name="token" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:integer" name="tablerow" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:boolean" name="cipt" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:boolean" name="upsidedown" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="cockatrice_carddatabase">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="info" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element type="xs:string" name="author" minOccurs="0" maxOccurs="1" />
+                            <xs:element type="xs:string" name="createdAt" minOccurs="0" maxOccurs="1" />
+                            <xs:element type="xs:string" name="sourceUrl" minOccurs="0" maxOccurs="1" />
+                            <xs:element type="xs:string" name="sourceVersion" minOccurs="0" maxOccurs="1" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="sets" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="setType" name="set" maxOccurs="unbounded" minOccurs="0" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="cards" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="cardType" name="card" maxOccurs="unbounded" minOccurs="0" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute type="xs:integer" name="version" fixed="4" />
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

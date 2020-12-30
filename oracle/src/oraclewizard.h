@@ -1,9 +1,10 @@
 #ifndef ORACLEWIZARD_H
 #define ORACLEWIZARD_H
 
-#include <QWizard>
-#include <QFutureWatcher>
 #include <QFuture>
+#include <QFutureWatcher>
+#include <QWizard>
+#include <utility>
 
 class QCheckBox;
 class QGroupBox;
@@ -18,141 +19,174 @@ class QVBoxLayout;
 class OracleImporter;
 class QSettings;
 
+#include "pagetemplates.h"
+
 class OracleWizard : public QWizard
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-     OracleWizard(QWidget *parent = 0);
-     void accept();
-     void enableButtons();
-     void disableButtons();
-     void retranslateUi();
-     void setTokensData(QByteArray _tokensData) { tokensData = _tokensData; }
-     bool hasTokensData() { return !tokensData.isEmpty(); }
-     bool saveTokensToFile(const QString & fileName);
-public: 
-     OracleImporter *importer;
-     QSettings * settings;
+    explicit OracleWizard(QWidget *parent = nullptr);
+    void accept() override;
+    void enableButtons();
+    void disableButtons();
+    void retranslateUi();
+    void setTokensData(QByteArray _tokensData)
+    {
+        tokensData = std::move(_tokensData);
+    }
+    bool hasTokensData()
+    {
+        return !tokensData.isEmpty();
+    }
+    void setCardSourceUrl(const QString &sourceUrl)
+    {
+        cardSourceUrl = sourceUrl;
+    }
+    void setCardSourceVersion(const QString &sourceVersion)
+    {
+        cardSourceVersion = sourceVersion;
+    }
+    const QString &getCardSourceUrl() const
+    {
+        return cardSourceUrl;
+    }
+    const QString &getCardSourceVersion() const
+    {
+        return cardSourceVersion;
+    }
+    bool saveTokensToFile(const QString &fileName);
+
+public:
+    OracleImporter *importer;
+    QSettings *settings;
+    QNetworkAccessManager *nam;
+
 private slots:
     void updateLanguage();
+
 private:
-    QStringList findQmFiles();
-    QString languageName(const QString &qmFile);
     QByteArray tokensData;
-protected:
-    void changeEvent(QEvent *event);
-};
+    QString cardSourceUrl;
+    QString cardSourceVersion;
 
-
-class OracleWizardPage : public QWizardPage
-{
-     Q_OBJECT
-public:
-     OracleWizardPage(QWidget *parent = 0): QWizardPage(parent) {};
-     virtual void retranslateUi() = 0;
 protected:
-     inline OracleWizard *wizard() { return (OracleWizard*) QWizardPage::wizard(); };
+    void changeEvent(QEvent *event) override;
 };
 
 class IntroPage : public OracleWizardPage
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-    IntroPage(QWidget *parent = 0);
-    void retranslateUi();
+    explicit IntroPage(QWidget *parent = nullptr);
+    void retranslateUi() override;
+
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
+
 private:
-     QLabel *label, *languageLabel;
-     QComboBox *languageBox;
+    QLabel *label, *languageLabel, *versionLabel;
+    QComboBox *languageBox;
+
 private slots:
     void languageBoxChanged(int index);
 };
 
+class OutroPage : public OracleWizardPage
+{
+    Q_OBJECT
+public:
+    explicit OutroPage(QWidget * = nullptr)
+    {
+    }
+    void retranslateUi() override;
+};
+
 class LoadSetsPage : public OracleWizardPage
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-     LoadSetsPage(QWidget *parent = 0);
-    void retranslateUi();
-protected:
-     void initializePage();
-     bool validatePage();
-     void readSetsFromByteArray(QByteArray data);
-     void downloadSetsFile(QUrl url);
-private:
-     QRadioButton *urlRadioButton;
-     QRadioButton *fileRadioButton;
-     QLineEdit *urlLineEdit;
-     QLineEdit *fileLineEdit;
-     QPushButton *urlButton;
-     QPushButton *fileButton;
-     QLabel *progressLabel;
-     QProgressBar * progressBar;
+    explicit LoadSetsPage(QWidget *parent = nullptr);
+    void retranslateUi() override;
 
-     QNetworkAccessManager *nam;
-     QFutureWatcher<bool> watcher;
-     QFuture<bool> future;
+protected:
+    void initializePage() override;
+    bool validatePage() override;
+    void readSetsFromByteArray(QByteArray data);
+    void downloadSetsFile(const QUrl &url);
+
+private:
+    QRadioButton *urlRadioButton;
+    QRadioButton *fileRadioButton;
+    QLineEdit *urlLineEdit;
+    QLineEdit *fileLineEdit;
+    QPushButton *urlButton;
+    QPushButton *fileButton;
+    QLabel *progressLabel;
+    QProgressBar *progressBar;
+
+    QFutureWatcher<bool> watcher;
+    QFuture<bool> future;
+
 private slots:
-     void actLoadSetsFile();
-     void actRestoreDefaultUrl();
-     void actDownloadProgressSetsFile(qint64 received, qint64 total);
-     void actDownloadFinishedSetsFile();
-     void importFinished();
-     void zipDownloadFailed(const QString &message);
+    void actLoadSetsFile();
+    void actRestoreDefaultUrl();
+    void actDownloadProgressSetsFile(qint64 received, qint64 total);
+    void actDownloadFinishedSetsFile();
+    void importFinished();
+    void zipDownloadFailed(const QString &message);
 };
 
 class SaveSetsPage : public OracleWizardPage
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-     SaveSetsPage(QWidget *parent = 0);
-    void retranslateUi();
+    explicit SaveSetsPage(QWidget *parent = nullptr);
+    void retranslateUi() override;
+
 private:
-     QTextEdit *messageLog;
-     QCheckBox * defaultPathCheckBox;
+    QTextEdit *messageLog;
+    QCheckBox *defaultPathCheckBox;
+    QLabel *pathLabel;
+    QLabel *saveLabel;
+
 protected:
-     void initializePage();
-     void cleanupPage();
-     bool validatePage();
+    void initializePage() override;
+    void cleanupPage() override;
+    bool validatePage() override;
+
 private slots:
-     void updateTotalProgress(int cardsImported, int setIndex, const QString &setName);
+    void updateTotalProgress(int cardsImported, int setIndex, const QString &setName);
 };
 
-class LoadTokensPage : public OracleWizardPage
+class LoadSpoilersPage : public SimpleDownloadFilePage
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-     LoadTokensPage(QWidget *parent = 0);
-    void retranslateUi();
-protected:
-     void initializePage();
-     bool validatePage();
-     void downloadTokensFile(QUrl url);
-private:
-     QLabel *urlLabel;
-     QLineEdit *urlLineEdit;
-     QPushButton *urlButton;
-     QLabel *progressLabel;
-     QProgressBar * progressBar;
+    explicit LoadSpoilersPage(QWidget * = nullptr){};
+    void retranslateUi() override;
 
-     QNetworkAccessManager *nam;
-private slots:
-     void actRestoreDefaultUrl();
-     void actDownloadProgressTokensFile(qint64 received, qint64 total);
-     void actDownloadFinishedTokensFile();
+protected:
+    QString getDefaultUrl() override;
+    QString getCustomUrlSettingsKey() override;
+    QString getDefaultSavePath() override;
+    QString getWindowTitle() override;
+    QString getFileType() override;
 };
 
-class SaveTokensPage : public OracleWizardPage
+class LoadTokensPage : public SimpleDownloadFilePage
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-     SaveTokensPage(QWidget *parent = 0);
-    void retranslateUi();
-private:
-     QCheckBox * defaultPathCheckBox;
+    explicit LoadTokensPage(QWidget * = nullptr){};
+    void retranslateUi() override;
+
 protected:
-     bool validatePage();
+    QString getDefaultUrl() override;
+    QString getCustomUrlSettingsKey() override;
+    QString getDefaultSavePath() override;
+    QString getWindowTitle() override;
+    QString getFileType() override;
 };
+
 #endif

@@ -1,24 +1,21 @@
-#include <QFont>
 #include "filtertreemodel.h"
-#include "filtertree.h"
-#include "cardfilter.h"
 
-FilterTreeModel::FilterTreeModel(QObject *parent)
-    : QAbstractItemModel(parent)
+#include "cardfilter.h"
+#include "filtertree.h"
+
+#include <QFont>
+
+FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
 {
     fTree = new FilterTree;
-    connect(fTree,
-            SIGNAL(preInsertRow(const FilterTreeNode *, int)),
-            this, SLOT(proxyBeginInsertRow(const FilterTreeNode *, int)));
-    connect(fTree,
-            SIGNAL(postInsertRow(const FilterTreeNode *, int)),
-            this, SLOT(proxyEndInsertRow(const FilterTreeNode *, int)));
-    connect(fTree,
-            SIGNAL(preRemoveRow(const FilterTreeNode *, int)),
-            this, SLOT(proxyBeginRemoveRow(const FilterTreeNode *, int)));
-    connect(fTree,
-            SIGNAL(postRemoveRow(const FilterTreeNode *, int)),
-            this, SLOT(proxyEndRemoveRow(const FilterTreeNode *, int)));
+    connect(fTree, SIGNAL(preInsertRow(const FilterTreeNode *, int)), this,
+            SLOT(proxyBeginInsertRow(const FilterTreeNode *, int)));
+    connect(fTree, SIGNAL(postInsertRow(const FilterTreeNode *, int)), this,
+            SLOT(proxyEndInsertRow(const FilterTreeNode *, int)));
+    connect(fTree, SIGNAL(preRemoveRow(const FilterTreeNode *, int)), this,
+            SLOT(proxyBeginRemoveRow(const FilterTreeNode *, int)));
+    connect(fTree, SIGNAL(postRemoveRow(const FilterTreeNode *, int)), this,
+            SLOT(proxyEndRemoveRow(const FilterTreeNode *, int)));
 }
 
 FilterTreeModel::~FilterTreeModel()
@@ -26,13 +23,13 @@ FilterTreeModel::~FilterTreeModel()
     delete fTree;
 }
 
-void FilterTreeModel::proxyBeginInsertRow(const FilterTreeNode *node, int i) 
+void FilterTreeModel::proxyBeginInsertRow(const FilterTreeNode *node, int i)
 {
     int idx;
 
     idx = node->index();
     if (idx >= 0)
-        beginInsertRows(createIndex(idx, 0, (void *) node), i, i);
+        beginInsertRows(createIndex(idx, 0, (void *)node), i, i);
 }
 
 void FilterTreeModel::proxyEndInsertRow(const FilterTreeNode *node, int)
@@ -44,13 +41,13 @@ void FilterTreeModel::proxyEndInsertRow(const FilterTreeNode *node, int)
         endInsertRows();
 }
 
-void FilterTreeModel::proxyBeginRemoveRow(const FilterTreeNode *node, int i) 
+void FilterTreeModel::proxyBeginRemoveRow(const FilterTreeNode *node, int i)
 {
     int idx;
 
     idx = node->index();
     if (idx >= 0)
-        beginRemoveRows(createIndex(idx, 0, (void *) node), i, i);
+        beginRemoveRows(createIndex(idx, 0, (void *)node), i, i);
 }
 
 void FilterTreeModel::proxyEndRemoveRow(const FilterTreeNode *node, int)
@@ -102,7 +99,7 @@ int FilterTreeModel::rowCount(const QModelIndex &parent) const
     return result;
 }
 
-int FilterTreeModel::columnCount(const QModelIndex &/*parent*/) const
+int FilterTreeModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 1;
 }
@@ -133,10 +130,7 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
         case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
-            if(!node->isLeaf())
-                return tr(node->textCStr());
-            else
-                return node->text();
+            return node->text();
         case Qt::CheckStateRole:
             if (node->isEnabled())
                 return Qt::Checked;
@@ -149,8 +143,7 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool FilterTreeModel::setData(const QModelIndex &index,
-                                const QVariant &value, int role)
+bool FilterTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     FilterTreeNode *node;
 
@@ -158,7 +151,7 @@ bool FilterTreeModel::setData(const QModelIndex &index,
         return false;
     if (index.column() >= columnCount())
         return false;
-    if (role != Qt::CheckStateRole )
+    if (role != Qt::CheckStateRole)
         return false;
 
     node = indexToNode(index);
@@ -181,11 +174,11 @@ Qt::ItemFlags FilterTreeModel::flags(const QModelIndex &index) const
     Qt::ItemFlags result;
 
     if (!index.isValid())
-        return 0;
+        return Qt::NoItemFlags;
 
     node = indexToNode(index);
     if (node == NULL)
-        return 0;
+        return Qt::NoItemFlags;
 
     result = Qt::ItemIsEnabled;
     if (node == fTree)
@@ -208,8 +201,7 @@ QModelIndex FilterTreeModel::nodeIndex(const FilterTreeNode *node, int row, int 
     return createIndex(row, column, child);
 }
 
-QModelIndex FilterTreeModel::index(int row, int column, 
-                    const QModelIndex &parent) const
+QModelIndex FilterTreeModel::index(int row, int column, const QModelIndex &parent) const
 {
     const FilterTreeNode *node;
 
@@ -227,7 +219,6 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
 {
     const FilterTreeNode *node;
     FilterTreeNode *parent;
-    int row;
     QModelIndex idx;
 
     if (!ind.isValid())
@@ -239,7 +230,7 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
 
     parent = node->parent();
     if (parent) {
-        row = parent->index();
+        int row = parent->index();
         if (row < 0)
             return QModelIndex();
         idx = createIndex(row, 0, parent);
@@ -249,12 +240,12 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
     return QModelIndex();
 }
 
-bool FilterTreeModel::removeRows(int row, int count, const QModelIndex & parent)
+bool FilterTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     FilterTreeNode *node;
     int i, last;
 
-    last = row+count-1;
+    last = row + count - 1;
     if (!parent.isValid() || count < 1 || row < 0)
         return false;
 

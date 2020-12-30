@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "game_event.proto";
+
+message Event_ReverseTurn {
+    extend GameEvent {
+        optional Event_ReverseTurn ext = 2021;
+    }
+    optional bool reversed = 1;
+}

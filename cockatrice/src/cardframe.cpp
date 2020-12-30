@@ -1,23 +1,23 @@
 #include "cardframe.h"
 
-#include "carditem.h"
-#include "carddatabase.h"
-#include "main.h"
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
+#include "carditem.h"
+#include "main.h"
 #include "settingscache.h"
 
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <utility>
 
-CardFrame::CardFrame(const QString &cardName, QWidget *parent)
-    : QTabWidget(parent), info(nullptr), cardTextOnly(false)
+CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(parent), info(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPicture();
     pic->setObjectName("pic");
     text = new CardInfoText();
     text->setObjectName("text");
+    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
@@ -55,7 +55,7 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent)
     tab3Layout->addWidget(splitter);
     tab3->setLayout(tab3Layout);
 
-    setViewMode(settingsCache->getCardInfoViewMode());
+    setViewMode(SettingsCache::instance().getCardInfoViewMode());
 
     setCard(db->getCard(cardName));
 }
@@ -69,11 +69,10 @@ void CardFrame::retranslateUi()
 
 void CardFrame::setViewMode(int mode)
 {
-    if(currentIndex() != mode)
+    if (currentIndex() != mode)
         setCurrentIndex(mode);
 
-    switch(mode)
-    {
+    switch (mode) {
         case ImageOnlyView:
         case TextOnlyView:
             tab1Layout->addWidget(pic);
@@ -83,18 +82,24 @@ void CardFrame::setViewMode(int mode)
             splitter->addWidget(pic);
             splitter->addWidget(text);
             break;
+        default:
+            break;
     }
 
-    settingsCache->setCardInfoViewMode(mode);
+    SettingsCache::instance().setCardInfoViewMode(mode);
 }
 
-void CardFrame::setCard(CardInfo *card)
+void CardFrame::setCard(CardInfoPtr card)
 {
-    if (info)
-        disconnect(info, nullptr, this, nullptr);
-    info = card;
-    if(info)
-        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+    if (info) {
+        disconnect(info.data(), nullptr, this, nullptr);
+    }
+
+    info = std::move(card);
+
+    if (info) {
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
+    }
 
     text->setCard(info);
     pic->setCard(info);
@@ -102,15 +107,17 @@ void CardFrame::setCard(CardInfo *card)
 
 void CardFrame::setCard(const QString &cardName)
 {
-    setCard(db->getCardBySimpleName(cardName));
+    setCard(db->guessCard(cardName));
 }
 
 void CardFrame::setCard(AbstractCardItem *card)
 {
-    setCard(card->getInfo());
+    if (card) {
+        setCard(card->getInfo());
+    }
 }
 
-void CardFrame::clear()
+void CardFrame::clearCard()
 {
-    setCard((CardInfo*) nullptr);
+    setCard((CardInfoPtr) nullptr);
 }

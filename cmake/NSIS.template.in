@@ -3,9 +3,6 @@ Name "@CPACK_PACKAGE_NAME@"
 BrandingText "@CPACK_PACKAGE_FILE_NAME@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 
-!define UNINSTKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
-!define DEFAULTNORMALDESTINATON "$ProgramFiles\Cockatrice"
-!define DEFAULTPORTABLEDESTINATON "$Desktop\CockatricePortable"
 !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
 
 RequestExecutionlevel highest
@@ -18,6 +15,7 @@ Var PortableMode
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
+!include x64.nsh
 
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
@@ -30,7 +28,7 @@ Var PortableMode
 !define MUI_FINISHPAGE_RUN_TEXT "Run 'Cockatrice' now"
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\COPYING"
+!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\LICENSE"
 Page Custom PortableModePageCreate PortableModePageLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE componentsPagePre
 !insertmacro MUI_PAGE_COMPONENTS
@@ -46,8 +44,25 @@ Page Custom PortableModePageCreate PortableModePageLeave
 !insertmacro MUI_LANGUAGE English
 
 Function .onInit
-StrCpy $NormalDestDir "${DEFAULTNORMALDESTINATON}"
-StrCpy $PortableDestDir "${DEFAULTPORTABLEDESTINATON}"
+
+${If} ${NSIS_IS_64_BIT} == 1    #NSIS 64bit
+    ${IfNot} ${RunningX64}
+        MessageBox MB_OK|MB_ICONSTOP "This version of Cockatrice requires a 64-bit Windows system."
+        Abort
+    ${EndIf}
+    StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
+    SetRegView 64
+${Else}    #NSIS 32bit
+    ${If} ${RunningX64}
+        MessageBox MB_OK|MB_ICONEXCLAMATION \
+        "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n\
+        We advise you to use the correct 64-bit installer instead to get around potential issues.$\n$\n\
+        Download from our webpage: https://cockatrice.github.io"
+    ${EndIf}
+    StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
+${EndIf}
+
+StrCpy $PortableDestDir "$Desktop\CockatricePortable"
 
 ${GetParameters} $9
 
@@ -75,7 +90,7 @@ ${Else}
 ${EndIf}
 
 ${If} $InstDir == ""
-    ; User did not use /D to specify a directory, 
+    ; User did not use /D to specify a directory,
     ; we need to set a default based on the install mode
     StrCpy $InstDir $0
 ${EndIf}
@@ -83,6 +98,13 @@ Call SetModeDestinationFromInstdir
 
 FunctionEnd
 
+Function un.onInit
+
+${If} ${NSIS_IS_64_BIT} == 1
+    SetRegView 64
+${EndIf}
+
+FunctionEnd
 
 Function RequireAdmin
 UserInfo::GetAccountType
@@ -138,17 +160,39 @@ FunctionEnd
 Function componentsPagePre
 ${If} $PortableMode = 0
     SetShellVarContext all
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
-    StrCmp $R0 "" done
 
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst
+    # uninstall 32bit version
+    SetRegView 32
+
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+    StrCmp $R0 "" done32
+
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
     Abort
 
-    uninst:
+    uninst32:
     ClearErrors
     ExecWait "$R0"
 
-	done:
+	done32:
+
+	# uninstall 64bit version
+	${If} ${NSIS_IS_64_BIT} == 1
+	    SetRegView 64
+
+	    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+	    StrCmp $R0 "" done64
+
+	    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
+	    Abort
+
+	    uninst64:
+	    ClearErrors
+	    ExecWait "$R0"
+
+		done64:
+	${EndIf}
+
 ${Else}
     Abort
 ${EndIf}
@@ -169,6 +213,7 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	Delete "$INSTDIR\uninstall.exe"
 	Delete "$INSTDIR\cockatrice.exe"
 	Delete "$INSTDIR\oracle.exe"
+	Delete "$INSTDIR\dbconverter.exe"
 	Delete "$INSTDIR\servatrice.exe"
 	Delete "$INSTDIR\Qt*.dll"
 	Delete "$INSTDIR\libmysql.dll"
@@ -190,12 +235,35 @@ ${If} $PortableMode = 0
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayVersion" "@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoModify" "1"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoRepair" "1"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "Publisher" "Cockatrice team"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
+
+	IfFileExists "$INSTDIR\vcredist_x86.exe" VcRedist86Exists PastVcRedist86Check
+	VcRedist86Exists:
+		ExecWait '"$INSTDIR\vcredist_x86.exe" /passive /norestart'
+		DetailPrint "Wait to ensure unlock of vc_redist file after installation..."
+		Sleep 3000
+		Delete "$INSTDIR\vcredist_x86.exe"
+	PastVcRedist86Check:
+
+	IfFileExists "$INSTDIR\vcredist_x64.exe" VcRedist64Exists PastVcRedist64Check
+	VcRedist64Exists:
+		ExecWait '"$INSTDIR\vcredist_x64.exe" /passive /norestart'
+		DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
+		Sleep 3000
+		Delete "$INSTDIR\vcredist_x64.exe"
+	PastVcRedist64Check:
+
 ${Else}
     ; Create the file the application uses to detect portable mode
     FileOpen $0 "$INSTDIR\portable.dat" w
@@ -220,20 +288,12 @@ Section "un.Application" UnSecApplication
 	RMDir /r "$INSTDIR\sounds"
 	RMDir /r "$INSTDIR\themes"
 	RMDir /r "$INSTDIR\translations"
-	Delete "$INSTDIR\uninstall.exe"
-	Delete "$INSTDIR\cockatrice.exe"
-	Delete "$INSTDIR\oracle.exe"
-	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
+	Delete "$INSTDIR\*.exe"
+	Delete "$INSTDIR\*.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib*.dll"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"

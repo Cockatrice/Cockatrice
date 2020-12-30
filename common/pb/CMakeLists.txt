@@ -38,6 +38,7 @@ SET(PROTO_FILES
     command_replay_download.proto
     command_replay_modify_match.proto
     command_reveal_cards.proto
+    command_reverse_turn.proto
     command_roll_die.proto
     command_set_active_phase.proto
     command_set_card_attr.proto
@@ -88,6 +89,7 @@ SET(PROTO_FILES
     event_remove_from_list.proto
     event_replay_added.proto
     event_reveal_cards.proto
+    event_reverse_turn.proto
     event_roll_die.proto
     event_room_say.proto
     event_server_complete_list.proto
@@ -168,3 +170,13 @@ if (UNIX)
     set(cockatrice_protocol_LIBS ${cockatrice_protocol_LIBS} -lpthread)
 endif (UNIX)
 target_link_libraries(cockatrice_protocol ${cockatrice_protocol_LIBS})
+
+# ubuntu uses an outdated package for protobuf, 3.1.0 is required
+if(${Protobuf_VERSION} VERSION_LESS "3.1.0")
+    # remove unused parameter and misleading indentation warnings when compiling to avoid errors
+    set(CMAKE_CXX_FLAGS_DEBUG
+        "${CMAKE_CXX_FLAGS_DEBUG} -Wno-unused-parameter -Wno-misleading-indentation")
+    message(WARNING "Older protobuf version found (${Protobuf_VERSION} < 3.1.0), "
+        "disabled the warnings 'unused-parameter' and 'misleading-indentation' for protobuf generated code "
+        "to avoid compilation errors.")
+endif()

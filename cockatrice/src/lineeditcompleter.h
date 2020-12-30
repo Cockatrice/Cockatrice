@@ -1,25 +1,28 @@
 #ifndef LINEEDITCOMPLETER_H
 #define LINEEDITCOMPLETER_H
 
-#include <QLineEdit>
-#include <QKeyEvent>
+#include "customlineedit.h"
+
 #include <QFocusEvent>
+#include <QKeyEvent>
 #include <QStringList>
 
-class LineEditCompleter : public QLineEdit
+class LineEditCompleter : public LineEditUnfocusable
 {
     Q_OBJECT
 private:
-    QString cursorWord(const QString& line) const;
-    QCompleter* c;
+    QString cursorWord(const QString &line) const;
+    QCompleter *c;
 private slots:
     void insertCompletion(QString);
+
 protected:
-    void keyPressEvent(QKeyEvent * event);
-    void focusOutEvent(QFocusEvent * e);
+    void keyPressEvent(QKeyEvent *event);
+    void focusOutEvent(QFocusEvent *e);
+
 public:
-    explicit LineEditCompleter(QWidget *parent = 0);
-    void setCompleter(QCompleter*);
+    explicit LineEditCompleter(QWidget *parent = nullptr);
+    void setCompleter(QCompleter *);
     void setCompletionList(QStringList);
 };
 

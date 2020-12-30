@@ -1,51 +1,95 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
+#include "tearoffmenu.h"
+
 #include <QGraphicsItem>
+#include <QInputDialog>
 
 class Player;
-class QMenu;
 class QAction;
+class QKeyEvent;
+class QMenu;
+class QString;
 
-class AbstractCounter : public QObject, public QGraphicsItem {
+class AbstractCounter : public QObject, public QGraphicsItem
+{
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
+
 protected:
     Player *player;
     int id;
     QString name;
     int value;
-    bool hovered;
-    
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    bool useNameForShortcut, hovered;
+
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
 private:
     QAction *aSet, *aDec, *aInc;
-    QMenu *menu;
+    TearOffMenu *menu;
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
+    bool shortcutActive;
+    QWidget *game;
+
 private slots:
     void refreshShortcuts();
     void incrementCounter();
     void setCounter();
+
 public:
-    AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent = 0);
-    ~AbstractCounter();
-    
-    QMenu *getMenu() const { return menu; }
+    AbstractCounter(Player *_player,
+                    int _id,
+                    const QString &_name,
+                    bool _shownInCounterArea,
+                    int _value,
+                    bool _useNameForShortcut = false,
+                    QGraphicsItem *parent = nullptr,
+                    QWidget *game = nullptr);
+    ~AbstractCounter() override;
+
     void retranslateUi();
-    
-    int getId() const { return id; }
-    QString getName() const { return name; }
-    bool getShownInCounterArea() const { return shownInCounterArea; }
-    int getValue() const { return value; }
     void setValue(int _value);
-    void delCounter();
-    
     void setShortcutsActive();
     void setShortcutsInactive();
-    bool shortcutActive;
+    void delCounter();
+
+    QMenu *getMenu() const
+    {
+        return menu;
+    }
+
+    int getId() const
+    {
+        return id;
+    }
+    QString getName() const
+    {
+        return name;
+    }
+    bool getShownInCounterArea() const
+    {
+        return shownInCounterArea;
+    }
+    int getValue() const
+    {
+        return value;
+    }
+};
+
+class AbstractCounterDialog : public QInputDialog
+{
+    Q_OBJECT
+public:
+    AbstractCounterDialog(const QString &name, const QString &value, QWidget *parent = nullptr);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void changeValue(int diff);
 };
 
 #endif

@@ -1,40 +1,79 @@
 #ifndef PICTURELOADER_H
 #define PICTURELOADER_H
 
-#include <QMap>
-#include <QList>
-#include <QNetworkRequest>
-#include <QMutex>
+#include "carddatabase.h"
 
-class CardInfo;
-class CardSet;
+#include <QList>
+#include <QMap>
+#include <QMutex>
+#include <QNetworkRequest>
 class QNetworkAccessManager;
 class QNetworkReply;
 class QThread;
 
-class PictureToLoad {
+class PictureToLoad
+{
 private:
-    class SetDownloadPriorityComparator;
+    class SetDownloadPriorityComparator
+    {
+    public:
+        /*
+         * Returns true if a has higher download priority than b
+         * Enabled sets have priority over disabled sets
+         * Both groups follows the user-defined order
+         */
+        inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
+        {
+            if (a->getEnabled()) {
+                return !b->getEnabled() || a->getSortKey() < b->getSortKey();
+            } else {
+                return !b->getEnabled() && a->getSortKey() < b->getSortKey();
+            }
+        }
+    };
 
-    CardInfo *card;
-    QList<CardSet *> sortedSets;
-    int setIndex;
-    bool hq;
+    CardInfoPtr card;
+    QList<CardSetPtr> sortedSets;
+    QList<QString> urlTemplates;
+    QList<QString> currentSetUrls;
+    QString currentUrl;
+    CardSetPtr currentSet;
+
 public:
-    PictureToLoad(CardInfo *_card = 0);
-    CardInfo *getCard() const { return card; }
-    CardSet *getCurrentSet() const;
+    explicit PictureToLoad(CardInfoPtr _card = CardInfoPtr());
+
+    CardInfoPtr getCard() const
+    {
+        return card;
+    }
+    void clear()
+    {
+        card.clear();
+    }
+    QString getCurrentUrl() const
+    {
+        return currentUrl;
+    }
+    CardSetPtr getCurrentSet() const
+    {
+        return currentSet;
+    }
     QString getSetName() const;
+    QString transformUrl(const QString &urlTemplate) const;
     bool nextSet();
+    bool nextUrl();
+    void populateSetUrls();
 };
 
-class PictureLoaderWorker : public QObject {
-Q_OBJECT
+class PictureLoaderWorker : public QObject
+{
+    Q_OBJECT
 public:
-    PictureLoaderWorker();
-    ~PictureLoaderWorker();
+    explicit PictureLoaderWorker();
+    ~PictureLoaderWorker() override;
 
-    void enqueueImageLoad(CardInfo *card);
+    void enqueueImageLoad(CardInfoPtr card);
+
 private:
     static QStringList md5Blacklist;
 
@@ -48,9 +87,8 @@ private:
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
-    QString getPicUrl();
-    bool cardImageExistsOnDisk(QString & setName, QString & correctedCardname);
-    bool imageIsBlackListed(const QByteArray &picData);
+    bool cardImageExistsOnDisk(QString &, QString &);
+    bool imageIsBlackListed(const QByteArray &);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
@@ -61,35 +99,38 @@ public slots:
     void processLoadQueue();
 signals:
     void startLoadQueue();
-    void imageLoaded(CardInfo *card, const QImage &image);
+    void imageLoaded(CardInfoPtr card, const QImage &image);
 };
 
-class PictureLoader : public QObject {
-Q_OBJECT
+class PictureLoader : public QObject
+{
+    Q_OBJECT
 public:
-    static PictureLoader& getInstance()
+    static PictureLoader &getInstance()
     {
         static PictureLoader instance;
         return instance;
     }
-private:
-    PictureLoader();
-    ~PictureLoader();
-    // Singleton - Don't implement copy constructor and assign operator
-    PictureLoader(PictureLoader const&);
-    void operator=(PictureLoader const&); 
 
-    PictureLoaderWorker * worker;
+private:
+    explicit PictureLoader();
+    ~PictureLoader() override;
+    // Singleton - Don't implement copy constructor and assign operator
+    PictureLoader(PictureLoader const &);
+    void operator=(PictureLoader const &);
+
+    PictureLoaderWorker *worker;
+
 public:
-    static void getPixmap(QPixmap &pixmap, CardInfo *card, QSize size);
+    static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
     static void getCardBackPixmap(QPixmap &pixmap, QSize size);
-    static void clearPixmapCache(CardInfo *card);
+    static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
-    static void cacheCardPixmaps(QList<CardInfo *> cards);
+    static void cacheCardPixmaps(QList<CardInfoPtr> cards);
 private slots:
     void picDownloadChanged();
     void picsPathChanged();
 public slots:
-    void imageLoaded(CardInfo *card, const QImage &image);
+    void imageLoaded(CardInfoPtr card, const QImage &image);
 };
 #endif

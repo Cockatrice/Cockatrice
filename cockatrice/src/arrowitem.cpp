@@ -1,25 +1,26 @@
 #define _USE_MATH_DEFINES
-#include <cmath>
-
 #include "arrowitem.h"
-#include "playertarget.h"
-#include "carditem.h"
-#include "carddatabase.h"
-#include "cardzone.h"
-#include "player.h"
-#include "settingscache.h"
-#include <QPainter>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsScene>
-#include <QDebug>
 
+#include "carddatabase.h"
+#include "carditem.h"
+#include "cardzone.h"
 #include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"
 #include "pb/command_delete_arrow.pb.h"
+#include "player.h"
+#include "playertarget.h"
+#include "settingscache.h"
+
+#include <QDebug>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <cmath>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
-    : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color), fullColor(true)
+    : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color),
+      fullColor(true)
 {
     qDebug() << "ArrowItem constructor: startItem=" << static_cast<QGraphicsItem *>(startItem);
     setZValue(2000000005);
@@ -60,7 +61,8 @@ void ArrowItem::updatePath()
     if (!targetItem)
         return;
 
-    QPointF endPoint = targetItem->mapToScene(QPointF(targetItem->boundingRect().width() / 2, targetItem->boundingRect().height() / 2));
+    QPointF endPoint = targetItem->mapToScene(
+        QPointF(targetItem->boundingRect().width() / 2, targetItem->boundingRect().height() / 2));
     updatePath(endPoint);
 }
 
@@ -68,13 +70,15 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 {
     const double arrowWidth = 15.0;
     const double headWidth = 40.0;
-    const double headLength = headWidth / pow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
+    const double headLength =
+        headWidth / pow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
     const double phi = 15;
 
     if (!startItem)
         return;
 
-    QPointF startPoint = startItem->mapToScene(QPointF(startItem->boundingRect().width() / 2, startItem->boundingRect().height() / 2));
+    QPointF startPoint =
+        startItem->mapToScene(QPointF(startItem->boundingRect().width() / 2, startItem->boundingRect().height() / 2));
     QLineF line(startPoint, endPoint);
     qreal lineLength = line.length();
 
@@ -92,10 +96,14 @@ void ArrowItem::updatePath(const QPointF &endPoint)
         QPointF arrowBodyEndPoint = centerLine.pointAtPercent(percentage);
         QLineF testLine(arrowBodyEndPoint, centerLine.pointAtPercent(percentage + 0.001));
         qreal alpha = testLine.angle() - 90;
-        QPointF endPoint1 = arrowBodyEndPoint + arrowWidth / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
-        QPointF endPoint2 = arrowBodyEndPoint + arrowWidth / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
-        QPointF point1 = endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
-        QPointF point2 = endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+        QPointF endPoint1 =
+            arrowBodyEndPoint + arrowWidth / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+        QPointF endPoint2 =
+            arrowBodyEndPoint + arrowWidth / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+        QPointF point1 =
+            endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+        QPointF point2 =
+            endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
 
         path = QPainterPath(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
         path.quadTo(c, endPoint1);
@@ -229,15 +237,15 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             PlayerTarget *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
             cmd.set_target_player_id(targetPlayer->getOwner()->getId());
         }
-        if (startZone->getName().compare("hand") == 0)  {
+        if (startZone->getName().compare("hand") == 0) {
             startCard->playCard(false);
-            CardInfo *ci = startCard->getInfo();
-            if (ci && (((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
-                ((settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
-                startCard->getZone()->getName().toStdString() != "stack"))))
+            CardInfoPtr ci = startCard->getInfo();
+            if (ci && (((!SettingsCache::instance().getPlayToStack() && ci->getTableRow() == 3) ||
+                        ((SettingsCache::instance().getPlayToStack() && ci->getTableRow() != 0) &&
+                         startCard->getZone()->getName().toStdString() != "stack"))))
                 cmd.set_start_zone("stack");
             else
-                cmd.set_start_zone(settingsCache->getPlayToStack() ? "stack" :"table");
+                cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? "stack" : "table");
         }
         player->sendGameCommand(cmd);
     }

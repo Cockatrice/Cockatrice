@@ -3,8 +3,8 @@ syntax = "proto2";
  * Historical warning information stored in the warnings table
  */
 message ServerInfo_Warning {
-    optional string user_name = 1; // name of user being warned
+    optional string user_name = 1;  // name of user being warned
     optional string admin_name = 2; // name of the moderator making the warning
-    optional string reason = 3; // type of warning being placed
-    optional string time_of = 4; // time of warning
+    optional string reason = 3;     // type of warning being placed
+    optional string time_of = 4;    // time of warning
 }

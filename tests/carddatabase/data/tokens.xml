@@ -1,29 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cockatrice_carddatabase version="3">
+<cockatrice_carddatabase version="4">
     <cards>
         <card>
             <name>Kitten</name>
-            <set muId="112">CAT</set>
-            <color>G</color>
-            <manacost></manacost>
-            <cmc></cmc>
-            <type>Token</type>
-            <pt>1/1</pt>
+            <set>CAT</set>
             <tablerow>0</tablerow>
             <text></text>
             <token>1</token>
+            <prop>
+                <muid>112</muid>
+                <colors>G</colors>
+                <manacost></manacost>
+                <cmc></cmc>
+                <type>Token</type>
+                <maintype>Token</maintype>
+                <pt>1/1</pt>
+            </prop>
         </card>
         <card>
             <name>Puppy</name>
-            <set muId="223">DOG</set>
-            <color>R</color>
-            <manacost></manacost>
-            <cmc></cmc>
-            <type>Token</type>
-            <pt>1/1</pt>
+            <set>DOG</set>
             <tablerow>0</tablerow>
             <text></text>
             <token>1</token>
+            <prop>
+                <muid>223</muid>
+                <colors>R</colors>
+                <manacost></manacost>
+                <cmc></cmc>
+                <type>Token</type>
+                <maintype>Token</maintype>
+                <pt>1/1</pt>
+            </prop>
         </card>
     </cards>
 </cockatrice_carddatabase>

@@ -1,17 +1,22 @@
 #include "settingscache.h"
+
 #include "releasechannel.h"
 
-#include <QSettings>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
 #include <QApplication>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QGlobalStatic>
+#include <QSettings>
 #include <QStandardPaths>
+#include <utility>
+
+Q_GLOBAL_STATIC(SettingsCache, settingsCache);
 
 QString SettingsCache::getDataPath()
 {
-    if(isPortableBuild)
-        return qApp->applicationDirPath() + "/data/";
+    if (isPortableBuild)
+        return qApp->applicationDirPath() + "/data";
     else
         return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 }
@@ -23,22 +28,22 @@ QString SettingsCache::getSettingsPath()
 
 void SettingsCache::translateLegacySettings()
 {
-    if(isPortableBuild)
+    if (isPortableBuild)
         return;
 
-    //Layouts
-    QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
-    if(layoutFile.exists())
-        if(layoutFile.copy(getSettingsPath()+"layouts.ini"))
+    // Layouts
+    QFile layoutFile(getSettingsPath() + "layouts/deckLayout.ini");
+    if (layoutFile.exists())
+        if (layoutFile.copy(getSettingsPath() + "layouts.ini"))
             layoutFile.remove();
 
     QStringList usedKeys;
     QSettings legacySetting;
 
-    //Sets
+    // Sets
     legacySetting.beginGroup("sets");
     QStringList setsGroups = legacySetting.childGroups();
-    for(int i = 0; i < setsGroups.size(); i++){        
+    for (int i = 0; i < setsGroups.size(); i++) {
         legacySetting.beginGroup(setsGroups.at(i));
         cardDatabase().setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
         cardDatabase().setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
@@ -47,11 +52,11 @@ void SettingsCache::translateLegacySettings()
     }
     QStringList setsKeys = legacySetting.allKeys();
     for (int i = 0; i < setsKeys.size(); ++i) {
-        usedKeys.append("sets/"+setsKeys.at(i));
+        usedKeys.append("sets/" + setsKeys.at(i));
     }
     legacySetting.endGroup();
 
-    //Servers
+    // Servers
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
@@ -67,33 +72,35 @@ void SettingsCache::translateLegacySettings()
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {
-        usedKeys.append("server/"+allKeysServer.at(i));
+        usedKeys.append("server/" + allKeysServer.at(i));
     }
     legacySetting.endGroup();
 
-    //Messages
+    // Messages
     legacySetting.beginGroup("messages");
     QStringList allMessages = legacySetting.allKeys();
     for (int i = 0; i < allMessages.size(); ++i) {
-        if(allMessages.at(i) != "count"){
+        if (allMessages.at(i) != "count") {
             QString temp = allMessages.at(i);
             int index = temp.remove("msg").toInt();
-            messages().setMessageAt(index,legacySetting.value(allMessages.at(i)).toString());
+            messages().setMessageAt(index, legacySetting.value(allMessages.at(i)).toString());
         }
     }
     messages().setCount(legacySetting.value("count").toInt());
     QStringList allKeysmessages = legacySetting.allKeys();
     for (int i = 0; i < allKeysmessages.size(); ++i) {
-        usedKeys.append("messages/"+allKeysmessages.at(i));
+        usedKeys.append("messages/" + allKeysmessages.at(i));
     }
     legacySetting.endGroup();
 
-    //Game filters
+    // Game filters
     legacySetting.beginGroup("filter_games");
-    gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowFullGames(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowGamesThatStarted(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
     gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
+    gameFilters().setHideIgnoredUserGames(legacySetting.value("hide_ignored_user_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
     if (legacySetting.value("max_players").toInt() > 1)
@@ -103,19 +110,19 @@ void SettingsCache::translateLegacySettings()
 
     QStringList allFilters = legacySetting.allKeys();
     for (int i = 0; i < allFilters.size(); ++i) {
-        if(allFilters.at(i).startsWith("game_type")){
+        if (allFilters.at(i).startsWith("game_type")) {
             gameFilters().setGameHashedTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
         }
     }
     QStringList allKeysfilter_games = legacySetting.allKeys();
     for (int i = 0; i < allKeysfilter_games.size(); ++i) {
-        usedKeys.append("filter_games/"+allKeysfilter_games.at(i));
+        usedKeys.append("filter_games/" + allKeysfilter_games.at(i));
     }
     legacySetting.endGroup();
 
     QStringList allLegacyKeys = legacySetting.allKeys();
     for (int i = 0; i < allLegacyKeys.size(); ++i) {
-        if(usedKeys.contains(allLegacyKeys.at(i)))
+        if (usedKeys.contains(allLegacyKeys.at(i)))
             continue;
         settings->setValue(allLegacyKeys.at(i), legacySetting.value(allLegacyKeys.at(i)));
     }
@@ -127,7 +134,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     // if the config settings is empty or refers to a not-existing folder,
     // ensure that the defaut path exists and return it
     if (!QDir(tmp).exists() || tmp.isEmpty()) {
-        if(!QDir().mkpath(defaultPath))
+        if (!QDir().mkpath(defaultPath))
             qDebug() << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
     }
@@ -140,14 +147,15 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
     // if the config settings is empty or refers to a not-existing file,
     // return the default Path
     if (!QFile::exists(tmp) || tmp.isEmpty())
-        tmp = defaultPath;
+        tmp = std::move(defaultPath);
     return tmp;
 }
+
 SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
-    if(isPortableBuild)
+    if (isPortableBuild)
         qDebug() << "Portable mode enabled";
 
     // define a dummy context that will be used where needed
@@ -155,38 +163,52 @@ SettingsCache::SettingsCache()
 
     QString dataPath = getDataPath();
     QString settingsPath = getSettingsPath();
-    settings = new QSettings(settingsPath+"global.ini", QSettings::IniFormat, this);
-    shortcutsSettings = new ShortcutsSettings(settingsPath,this);
-    cardDatabaseSettings = new CardDatabaseSettings(settingsPath,this);
-    serversSettings = new ServersSettings(settingsPath,this);
-    messageSettings = new MessageSettings(settingsPath,this);
+    settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
+    shortcutsSettings = new ShortcutsSettings(settingsPath, this);
+    cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
+    serversSettings = new ServersSettings(settingsPath, this);
+    messageSettings = new MessageSettings(settingsPath, this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
+    downloadSettings = new DownloadSettings(settingsPath, this);
 
-    if(!QFile(settingsPath+"global.ini").exists())
+    if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
 
     // updates - don't reorder them or their index in the settings won't match
     // append channels one by one, or msvc will add them in the wrong order.
     releaseChannels << new StableReleaseChannel();
-    releaseChannels << new DevReleaseChannel();
+    releaseChannels << new BetaReleaseChannel();
+
+    mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
 
+    // tip of the day settings
+    showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
+    for (const auto &tipNumber : settings->value("tipOfDay/seenTips").toList()) {
+        seenTips.append(tipNumber.toInt());
+    }
+
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
     // this has never been exposed as an user-configurable setting
-    customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
-    // this has never been exposed as an user-configurable setting
-    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");    
+    if (picsPath.endsWith("/")) {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
+    } else {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    }
+    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
+    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoiler.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -197,30 +219,31 @@ SettingsCache::SettingsCache()
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
         settings->setValue("personal/picturedownloadhq", false);
         settings->setValue("revert/pixmapCacheSize", true);
-    }
-    else
+    } else
         pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
-    //sanity check
-    if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
+    // sanity check
+    if (pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
-
-    picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
-    picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
+    buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
+    startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
+    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
+    useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
+
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
-    minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
+    minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
@@ -252,9 +275,9 @@ SettingsCache::SettingsCache()
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
     highlightWords = settings->value("personal/highlightWords", QString()).toString();
-    gameDescription = settings->value("game/gamedescription","").toString();
+    gameDescription = settings->value("game/gamedescription", "").toString();
     maxPlayers = settings->value("game/maxplayers", 2).toInt();
-    gameTypes = settings->value("game/gametypes","").toString();
+    gameTypes = settings->value("game/gametypes", "").toString();
     onlyBuddies = settings->value("game/onlybuddies", false).toBool();
     onlyRegistered = settings->value("game/onlyregistered", true).toBool();
     spectatorsAllowed = settings->value("game/spectatorsallowed", true).toBool();
@@ -262,54 +285,70 @@ SettingsCache::SettingsCache()
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
-    clientID = settings->value("personal/clientid", "notset").toString();
-    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
+    clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
+    clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
 }
 
-void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures) {
+void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)
+{
+    useTearOffMenus = _useTearOffMenus;
+    settings->setValue("interface/usetearoffmenus", useTearOffMenus);
+    emit useTearOffMenusChanged(useTearOffMenus);
+}
+
+void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
+{
     knownMissingFeatures = _knownMissingFeatures;
     settings->setValue("interface/knownmissingfeatures", knownMissingFeatures);
 }
 
-void SettingsCache::setCardInfoViewMode(const int _viewMode) {
+void SettingsCache::setCardInfoViewMode(const int _viewMode)
+{
     cardInfoViewMode = _viewMode;
     settings->setValue("cards/cardinfoviewmode", cardInfoViewMode);
 }
 
-void SettingsCache::setHighlightWords(const QString &_highlightWords) {
+void SettingsCache::setHighlightWords(const QString &_highlightWords)
+{
     highlightWords = _highlightWords;
     settings->setValue("personal/highlightWords", highlightWords);
 }
 
-void SettingsCache::setMasterVolume(int _masterVolume) {
+void SettingsCache::setMasterVolume(int _masterVolume)
+{
     masterVolume = _masterVolume;
     settings->setValue("sound/mastervolume", masterVolume);
     emit masterVolumeChanged(masterVolume);
 }
 
-void SettingsCache::setLeftJustified(const int _leftJustified) {
-    leftJustified = _leftJustified;
+void SettingsCache::setLeftJustified(const int _leftJustified)
+{
+    leftJustified = (bool)_leftJustified;
     settings->setValue("interface/leftjustified", leftJustified);
     emit handJustificationChanged();
 }
 
-void SettingsCache::setCardScaling(const int _scaleCards) {
-    scaleCards = _scaleCards;
+void SettingsCache::setCardScaling(const int _scaleCards)
+{
+    scaleCards = (bool)_scaleCards;
     settings->setValue("cards/scaleCards", scaleCards);
 }
 
-void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
-    showMessagePopups = _showMessagePopups;
+void SettingsCache::setShowMessagePopups(const int _showMessagePopups)
+{
+    showMessagePopups = (bool)_showMessagePopups;
     settings->setValue("chat/showmessagepopups", showMessagePopups);
 }
 
-void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
-    showMentionPopups = _showMentionPopus;
+void SettingsCache::setShowMentionPopups(const int _showMentionPopus)
+{
+    showMentionPopups = (bool)_showMentionPopus;
     settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
-void SettingsCache::setRoomHistory(const int _roomHistory) {
-    roomHistory = _roomHistory;
+void SettingsCache::setRoomHistory(const int _roomHistory)
+{
+    roomHistory = (bool)_roomHistory;
     settings->setValue("chat/roomhistory", roomHistory);
 }
 
@@ -318,6 +357,22 @@ void SettingsCache::setLang(const QString &_lang)
     lang = _lang;
     settings->setValue("personal/lang", lang);
     emit langChanged();
+}
+
+void SettingsCache::setShowTipsOnStartup(bool _showTipsOnStartup)
+{
+    showTipsOnStartup = _showTipsOnStartup;
+    settings->setValue("tipOfDay/showTips", showTipsOnStartup);
+}
+
+void SettingsCache::setSeenTips(const QList<int> &_seenTips)
+{
+    seenTips = _seenTips;
+    QList<QVariant> storedTipList;
+    for (auto tipNumber : seenTips) {
+        storedTipList.append(tipNumber);
+    }
+    settings->setValue("tipOfDay/seenTips", storedTipList);
 }
 
 void SettingsCache::setDeckPath(const QString &_deckPath)
@@ -330,6 +385,12 @@ void SettingsCache::setReplaysPath(const QString &_replaysPath)
 {
     replaysPath = _replaysPath;
     settings->setValue("paths/replays", replaysPath);
+}
+
+void SettingsCache::setCustomCardDatabasePath(const QString &_customCardDatabasePath)
+{
+    customCardDatabasePath = _customCardDatabasePath;
+    settings->setValue("paths/customsets", customCardDatabasePath);
 }
 
 void SettingsCache::setPicsPath(const QString &_picsPath)
@@ -345,6 +406,13 @@ void SettingsCache::setCardDatabasePath(const QString &_cardDatabasePath)
 {
     cardDatabasePath = _cardDatabasePath;
     settings->setValue("paths/carddatabase", cardDatabasePath);
+    emit cardDatabasePathChanged();
+}
+
+void SettingsCache::setSpoilerDatabasePath(const QString &_spoilerDatabasePath)
+{
+    spoilerDatabasePath = _spoilerDatabasePath;
+    settings->setValue("paths/spoilerdatabase", spoilerDatabasePath);
     emit cardDatabasePathChanged();
 }
 
@@ -364,49 +432,50 @@ void SettingsCache::setThemeName(const QString &_themeName)
 
 void SettingsCache::setPicDownload(int _picDownload)
 {
-    picDownload = _picDownload;
+    picDownload = static_cast<bool>(_picDownload);
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
 }
 
-void SettingsCache::setPicUrl(const QString &_picUrl)
-{
-    picUrl = _picUrl;
-    settings->setValue("personal/picUrl", picUrl);
-}
-
-void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
-{
-    picUrlFallback = _picUrlFallback;
-    settings->setValue("personal/picUrlFallback", picUrlFallback);
-}
-
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
 {
-    notificationsEnabled = _notificationsEnabled;
+    notificationsEnabled = static_cast<bool>(_notificationsEnabled);
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
-void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled) {
-    spectatorNotificationsEnabled = _spectatorNotificationsEnabled;
+void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled)
+{
+    spectatorNotificationsEnabled = static_cast<bool>(_spectatorNotificationsEnabled);
     settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
+}
+
+void SettingsCache::setBuddyConnectNotificationsEnabled(int _buddyConnectNotificationsEnabled)
+{
+    buddyConnectNotificationsEnabled = static_cast<bool>(_buddyConnectNotificationsEnabled);
+    settings->setValue("interface/buddyconnectnotificationsenabled", buddyConnectNotificationsEnabled);
 }
 
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
-    doubleClickToPlay = _doubleClickToPlay;
+    doubleClickToPlay = static_cast<bool>(_doubleClickToPlay);
     settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
 void SettingsCache::setPlayToStack(int _playToStack)
 {
-    playToStack = _playToStack;
+    playToStack = static_cast<bool>(_playToStack);
     settings->setValue("interface/playtostack", playToStack);
+}
+
+void SettingsCache::setStartingHandSize(int _startingHandSize)
+{
+    startingHandSize = _startingHandSize;
+    settings->setValue("interface/startinghandsize", startingHandSize);
 }
 
 void SettingsCache::setAnnotateTokens(int _annotateTokens)
 {
-    annotateTokens = _annotateTokens;
+    annotateTokens = static_cast<bool>(_annotateTokens);
     settings->setValue("interface/annotatetokens", annotateTokens);
 }
 
@@ -418,21 +487,21 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
 
 void SettingsCache::setDisplayCardNames(int _displayCardNames)
 {
-    displayCardNames = _displayCardNames;
+    displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
 }
 
 void SettingsCache::setHorizontalHand(int _horizontalHand)
 {
-    horizontalHand = _horizontalHand;
+    horizontalHand = static_cast<bool>(_horizontalHand);
     settings->setValue("hand/horizontal", horizontalHand);
     emit horizontalHandChanged();
 }
 
 void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
 {
-    invertVerticalCoordinate = _invertVerticalCoordinate;
+    invertVerticalCoordinate = static_cast<bool>(_invertVerticalCoordinate);
     settings->setValue("table/invert_vertical", invertVerticalCoordinate);
     emit invertVerticalCoordinateChanged();
 }
@@ -446,62 +515,68 @@ void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiCol
 
 void SettingsCache::setTapAnimation(int _tapAnimation)
 {
-    tapAnimation = _tapAnimation;
+    tapAnimation = static_cast<bool>(_tapAnimation);
     settings->setValue("cards/tapanimation", tapAnimation);
 }
 
-void SettingsCache::setChatMention(int _chatMention) {
-    chatMention = _chatMention;
+void SettingsCache::setChatMention(int _chatMention)
+{
+    chatMention = static_cast<bool>(_chatMention);
     settings->setValue("chat/mention", chatMention);
 }
 
 void SettingsCache::setChatMentionCompleter(const int _enableMentionCompleter)
 {
-    chatMentionCompleter = _enableMentionCompleter;
+    chatMentionCompleter = (bool)_enableMentionCompleter;
     settings->setValue("chat/mentioncompleter", chatMentionCompleter);
     emit chatMentionCompleterChanged();
 }
 
-void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
-    chatMentionForeground = _chatMentionForeground;
+void SettingsCache::setChatMentionForeground(int _chatMentionForeground)
+{
+    chatMentionForeground = static_cast<bool>(_chatMentionForeground);
     settings->setValue("chat/mentionforeground", chatMentionForeground);
 }
 
-void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground) {
-    chatHighlightForeground = _chatHighlightForeground;
+void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground)
+{
+    chatHighlightForeground = static_cast<bool>(_chatHighlightForeground);
     settings->setValue("chat/highlightforeground", chatHighlightForeground);
 }
 
-void SettingsCache::setChatMentionColor(const QString &_chatMentionColor) {
+void SettingsCache::setChatMentionColor(const QString &_chatMentionColor)
+{
     chatMentionColor = _chatMentionColor;
     settings->setValue("chat/mentioncolor", chatMentionColor);
 }
 
-void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor) {
+void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor)
+{
     chatHighlightColor = _chatHighlightColor;
     settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
 {
-    zoneViewSortByName = _zoneViewSortByName;
+    zoneViewSortByName = static_cast<bool>(_zoneViewSortByName);
     settings->setValue("zoneview/sortbyname", zoneViewSortByName);
 }
 
 void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
 {
-    zoneViewSortByType = _zoneViewSortByType;
+    zoneViewSortByType = static_cast<bool>(_zoneViewSortByType);
     settings->setValue("zoneview/sortbytype", zoneViewSortByType);
 }
 
-void SettingsCache::setZoneViewPileView(int _zoneViewPileView){
-    zoneViewPileView = _zoneViewPileView;
+void SettingsCache::setZoneViewPileView(int _zoneViewPileView)
+{
+    zoneViewPileView = static_cast<bool>(_zoneViewPileView);
     settings->setValue("zoneview/pileview", zoneViewPileView);
 }
 
 void SettingsCache::setSoundEnabled(int _soundEnabled)
 {
-    soundEnabled = _soundEnabled;
+    soundEnabled = static_cast<bool>(_soundEnabled);
     settings->setValue("sound/enabled", soundEnabled);
     emit soundEnabledChanged();
 }
@@ -515,13 +590,13 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
 
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
-    ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
+    ignoreUnregisteredUsers = static_cast<bool>(_ignoreUnregisteredUsers);
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
 }
 
 void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages)
 {
-    ignoreUnregisteredUserMessages = _ignoreUnregisteredUserMessages;
+    ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
 }
 
@@ -544,40 +619,269 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     emit pixmapCacheSizeChanged(pixmapCacheSize);
 }
 
-void SettingsCache::setClientID(QString _clientID)
+void SettingsCache::setClientID(const QString &_clientID)
 {
     clientID = _clientID;
     settings->setValue("personal/clientid", clientID);
 }
 
+void SettingsCache::setClientVersion(const QString &_clientVersion)
+{
+    clientVersion = _clientVersion;
+    settings->setValue("personal/clientversion", clientVersion);
+}
+
 QStringList SettingsCache::getCountries() const
 {
-    static QStringList countries = QStringList()
-    << "ad" << "ae" << "af" << "ag" << "ai" << "al" << "am" << "ao" << "aq" << "ar"
-    << "as" << "at" << "au" << "aw" << "ax" << "az" << "ba" << "bb" << "bd" << "be"
-    << "bf" << "bg" << "bh" << "bi" << "bj" << "bl" << "bm" << "bn" << "bo" << "bq"
-    << "br" << "bs" << "bt" << "bv" << "bw" << "by" << "bz" << "ca" << "cc" << "cd"
-    << "cf" << "cg" << "ch" << "ci" << "ck" << "cl" << "cm" << "cn" << "co" << "cr"
-    << "cu" << "cv" << "cw" << "cx" << "cy" << "cz" << "de" << "dj" << "dk" << "dm"
-    << "do" << "dz" << "ec" << "ee" << "eg" << "eh" << "er" << "es" << "et" << "fi"
-    << "fj" << "fk" << "fm" << "fo" << "fr" << "ga" << "gb" << "gd" << "ge" << "gf"
-    << "gg" << "gh" << "gi" << "gl" << "gm" << "gn" << "gp" << "gq" << "gr" << "gs"
-    << "gt" << "gu" << "gw" << "gy" << "hk" << "hm" << "hn" << "hr" << "ht" << "hu"
-    << "id" << "ie" << "il" << "im" << "in" << "io" << "iq" << "ir" << "is" << "it"
-    << "je" << "jm" << "jo" << "jp" << "ke" << "kg" << "kh" << "ki" << "km" << "kn"
-    << "kp" << "kr" << "kw" << "ky" << "kz" << "la" << "lb" << "lc" << "li" << "lk"
-    << "lr" << "ls" << "lt" << "lu" << "lv" << "ly" << "ma" << "mc" << "md" << "me"
-    << "mf" << "mg" << "mh" << "mk" << "ml" << "mm" << "mn" << "mo" << "mp" << "mq"
-    << "mr" << "ms" << "mt" << "mu" << "mv" << "mw" << "mx" << "my" << "mz" << "na"
-    << "nc" << "ne" << "nf" << "ng" << "ni" << "nl" << "no" << "np" << "nr" << "nu"
-    << "nz" << "om" << "pa" << "pe" << "pf" << "pg" << "ph" << "pk" << "pl" << "pm"
-    << "pn" << "pr" << "ps" << "pt" << "pw" << "py" << "qa" << "re" << "ro" << "rs"
-    << "ru" << "rw" << "sa" << "sb" << "sc" << "sd" << "se" << "sg" << "sh" << "si"
-    << "sj" << "sk" << "sl" << "sm" << "sn" << "so" << "sr" << "ss" << "st" << "sv"
-    << "sx" << "sy" << "sz" << "tc" << "td" << "tf" << "tg" << "th" << "tj" << "tk"
-    << "tl" << "tm" << "tn" << "to" << "tr" << "tt" << "tv" << "tw" << "tz" << "ua"
-    << "ug" << "um" << "us" << "uy" << "uz" << "va" << "vc" << "ve" << "vg" << "vi"
-    << "vn" << "vu" << "wf" << "ws" << "ye" << "yt" << "za" << "zm" << "zw";
+    static QStringList countries = QStringList() << "ad"
+                                                 << "ae"
+                                                 << "af"
+                                                 << "ag"
+                                                 << "ai"
+                                                 << "al"
+                                                 << "am"
+                                                 << "ao"
+                                                 << "aq"
+                                                 << "ar"
+                                                 << "as"
+                                                 << "at"
+                                                 << "au"
+                                                 << "aw"
+                                                 << "ax"
+                                                 << "az"
+                                                 << "ba"
+                                                 << "bb"
+                                                 << "bd"
+                                                 << "be"
+                                                 << "bf"
+                                                 << "bg"
+                                                 << "bh"
+                                                 << "bi"
+                                                 << "bj"
+                                                 << "bl"
+                                                 << "bm"
+                                                 << "bn"
+                                                 << "bo"
+                                                 << "bq"
+                                                 << "br"
+                                                 << "bs"
+                                                 << "bt"
+                                                 << "bv"
+                                                 << "bw"
+                                                 << "by"
+                                                 << "bz"
+                                                 << "ca"
+                                                 << "cc"
+                                                 << "cd"
+                                                 << "cf"
+                                                 << "cg"
+                                                 << "ch"
+                                                 << "ci"
+                                                 << "ck"
+                                                 << "cl"
+                                                 << "cm"
+                                                 << "cn"
+                                                 << "co"
+                                                 << "cr"
+                                                 << "cu"
+                                                 << "cv"
+                                                 << "cw"
+                                                 << "cx"
+                                                 << "cy"
+                                                 << "cz"
+                                                 << "de"
+                                                 << "dj"
+                                                 << "dk"
+                                                 << "dm"
+                                                 << "do"
+                                                 << "dz"
+                                                 << "ec"
+                                                 << "ee"
+                                                 << "eg"
+                                                 << "eh"
+                                                 << "er"
+                                                 << "es"
+                                                 << "et"
+                                                 << "fi"
+                                                 << "fj"
+                                                 << "fk"
+                                                 << "fm"
+                                                 << "fo"
+                                                 << "fr"
+                                                 << "ga"
+                                                 << "gb"
+                                                 << "gd"
+                                                 << "ge"
+                                                 << "gf"
+                                                 << "gg"
+                                                 << "gh"
+                                                 << "gi"
+                                                 << "gl"
+                                                 << "gm"
+                                                 << "gn"
+                                                 << "gp"
+                                                 << "gq"
+                                                 << "gr"
+                                                 << "gs"
+                                                 << "gt"
+                                                 << "gu"
+                                                 << "gw"
+                                                 << "gy"
+                                                 << "hk"
+                                                 << "hm"
+                                                 << "hn"
+                                                 << "hr"
+                                                 << "ht"
+                                                 << "hu"
+                                                 << "id"
+                                                 << "ie"
+                                                 << "il"
+                                                 << "im"
+                                                 << "in"
+                                                 << "io"
+                                                 << "iq"
+                                                 << "ir"
+                                                 << "is"
+                                                 << "it"
+                                                 << "je"
+                                                 << "jm"
+                                                 << "jo"
+                                                 << "jp"
+                                                 << "ke"
+                                                 << "kg"
+                                                 << "kh"
+                                                 << "ki"
+                                                 << "km"
+                                                 << "kn"
+                                                 << "kp"
+                                                 << "kr"
+                                                 << "kw"
+                                                 << "ky"
+                                                 << "kz"
+                                                 << "la"
+                                                 << "lb"
+                                                 << "lc"
+                                                 << "li"
+                                                 << "lk"
+                                                 << "lr"
+                                                 << "ls"
+                                                 << "lt"
+                                                 << "lu"
+                                                 << "lv"
+                                                 << "ly"
+                                                 << "ma"
+                                                 << "mc"
+                                                 << "md"
+                                                 << "me"
+                                                 << "mf"
+                                                 << "mg"
+                                                 << "mh"
+                                                 << "mk"
+                                                 << "ml"
+                                                 << "mm"
+                                                 << "mn"
+                                                 << "mo"
+                                                 << "mp"
+                                                 << "mq"
+                                                 << "mr"
+                                                 << "ms"
+                                                 << "mt"
+                                                 << "mu"
+                                                 << "mv"
+                                                 << "mw"
+                                                 << "mx"
+                                                 << "my"
+                                                 << "mz"
+                                                 << "na"
+                                                 << "nc"
+                                                 << "ne"
+                                                 << "nf"
+                                                 << "ng"
+                                                 << "ni"
+                                                 << "nl"
+                                                 << "no"
+                                                 << "np"
+                                                 << "nr"
+                                                 << "nu"
+                                                 << "nz"
+                                                 << "om"
+                                                 << "pa"
+                                                 << "pe"
+                                                 << "pf"
+                                                 << "pg"
+                                                 << "ph"
+                                                 << "pk"
+                                                 << "pl"
+                                                 << "pm"
+                                                 << "pn"
+                                                 << "pr"
+                                                 << "ps"
+                                                 << "pt"
+                                                 << "pw"
+                                                 << "py"
+                                                 << "qa"
+                                                 << "re"
+                                                 << "ro"
+                                                 << "rs"
+                                                 << "ru"
+                                                 << "rw"
+                                                 << "sa"
+                                                 << "sb"
+                                                 << "sc"
+                                                 << "sd"
+                                                 << "se"
+                                                 << "sg"
+                                                 << "sh"
+                                                 << "si"
+                                                 << "sj"
+                                                 << "sk"
+                                                 << "sl"
+                                                 << "sm"
+                                                 << "sn"
+                                                 << "so"
+                                                 << "sr"
+                                                 << "ss"
+                                                 << "st"
+                                                 << "sv"
+                                                 << "sx"
+                                                 << "sy"
+                                                 << "sz"
+                                                 << "tc"
+                                                 << "td"
+                                                 << "tf"
+                                                 << "tg"
+                                                 << "th"
+                                                 << "tj"
+                                                 << "tk"
+                                                 << "tl"
+                                                 << "tm"
+                                                 << "tn"
+                                                 << "to"
+                                                 << "tr"
+                                                 << "tt"
+                                                 << "tv"
+                                                 << "tw"
+                                                 << "tz"
+                                                 << "ua"
+                                                 << "ug"
+                                                 << "um"
+                                                 << "us"
+                                                 << "uy"
+                                                 << "uz"
+                                                 << "va"
+                                                 << "vc"
+                                                 << "ve"
+                                                 << "vg"
+                                                 << "vi"
+                                                 << "vn"
+                                                 << "vu"
+                                                 << "wf"
+                                                 << "ws"
+                                                 << "ye"
+                                                 << "yt"
+                                                 << "za"
+                                                 << "zm"
+                                                 << "zw";
 
     return countries;
 }
@@ -644,8 +948,21 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate;
+    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setNotifyAboutNewVersion(int _notifyaboutnewversion)
+{
+    notifyAboutNewVersion = static_cast<bool>(_notifyaboutnewversion);
+    settings->setValue("personal/newversionnotification", notifyAboutNewVersion);
+}
+
+void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    mbDownloadSpoilers = _spoilerStatus;
+    settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
+    emit downloadSpoilerStatusChanged();
 }
 
 void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
@@ -658,4 +975,9 @@ void SettingsCache::setMaxFontSize(int _max)
 {
     maxFontSize = _max;
     settings->setValue("game/maxfontsize", maxFontSize);
+}
+
+SettingsCache &SettingsCache::instance()
+{
+    return *settingsCache;
 }

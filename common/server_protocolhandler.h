@@ -1,12 +1,13 @@
 #ifndef SERVER_PROTOCOLHANDLER_H
 #define SERVER_PROTOCOLHANDLER_H
 
-#include <QObject>
-#include <QPair>
-#include "server.h"
-#include "server_abstractuserinterface.h"
 #include "pb/response.pb.h"
 #include "pb/server_message.pb.h"
+#include "server.h"
+#include "server_abstractuserinterface.h"
+
+#include <QObject>
+#include <QPair>
 
 class Features;
 class Server_DatabaseInterface;
@@ -42,25 +43,29 @@ class Command_RoomSay;
 class Command_CreateGame;
 class Command_JoinGame;
 
-class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface {
+class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface
+{
     Q_OBJECT
 protected:
     QMap<int, Server_Room *> rooms;
-    
+
     bool deleted;
     Server_DatabaseInterface *databaseInterface;
     AuthenticationResult authState;
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
     bool idleClientWarningSent;
-    virtual void logDebugMessage(const QString & /* message */) { }
+    virtual void logDebugMessage(const QString & /* message */)
+    {
+    }
+
 private:
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
     int timeRunning, lastDataReceived, lastActionReceived;
     QTimer *pingClock;
 
     virtual void transmitProtocolItem(const ServerMessage &item) = 0;
-    
+
     Response::ResponseCode cmdPing(const Command_Ping &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdLogin(const Command_Login &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdMessage(const Command_Message &cmd, ResponseContainer &rc);
@@ -73,39 +78,63 @@ private:
     Response::ResponseCode cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc);
-    
+
     Response::ResponseCode processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
-    virtual Response::ResponseCode processExtendedSessionCommand(int /* cmdType */, const SessionCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+    virtual Response::ResponseCode
+    processExtendedSessionCommand(int /* cmdType */, const SessionCommand & /* cmd */, ResponseContainer & /* rc */)
+    {
+        return Response::RespFunctionNotAllowed;
+    }
     Response::ResponseCode processRoomCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     Response::ResponseCode processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     Response::ResponseCode processModeratorCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
-    virtual Response::ResponseCode processExtendedModeratorCommand(int /* cmdType */, const ModeratorCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+    virtual Response::ResponseCode
+    processExtendedModeratorCommand(int /* cmdType */, const ModeratorCommand & /* cmd */, ResponseContainer & /* rc */)
+    {
+        return Response::RespFunctionNotAllowed;
+    }
     Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
-    virtual Response::ResponseCode processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+    virtual Response::ResponseCode
+    processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */)
+    {
+        return Response::RespFunctionNotAllowed;
+    }
 
     void resetIdleTimer();
 private slots:
     void pingClockTimeout();
 public slots:
     void prepareDestroy();
+
 public:
     Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = 0);
     ~Server_ProtocolHandler();
-    
-    bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
-    bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
+
+    bool getAcceptsUserListChanges() const
+    {
+        return acceptsUserListChanges;
+    }
+    bool getAcceptsRoomListChanges() const
+    {
+        return acceptsRoomListChanges;
+    }
     virtual QString getAddress() const = 0;
     virtual QString getConnectionType() const = 0;
-    Server_DatabaseInterface *getDatabaseInterface() const { return databaseInterface; }
+    Server_DatabaseInterface *getDatabaseInterface() const
+    {
+        return databaseInterface;
+    }
 
-    int getLastCommandTime() const { return timeRunning - lastDataReceived; }
+    int getLastCommandTime() const
+    {
+        return timeRunning - lastDataReceived;
+    }
     void processCommandContainer(const CommandContainer &cont);
-    
+
     void sendProtocolItem(const Response &item);
     void sendProtocolItem(const SessionEvent &item);
     void sendProtocolItem(const GameEventContainer &item);
     void sendProtocolItem(const RoomEvent &item);
-
 };
 
 #endif

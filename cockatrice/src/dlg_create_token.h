@@ -17,15 +17,17 @@ class CardDatabaseModel;
 class TokenDisplayModel;
 class CardInfoPicture;
 
-class DlgCreateToken : public QDialog {
+class DlgCreateToken : public QDialog
+{
     Q_OBJECT
 public:
-    DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = 0);
+    DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
     QString getName() const;
     QString getColor() const;
     QString getPT() const;
     QString getAnnotation() const;
     bool getDestroy() const;
+
 protected:
     void closeEvent(QCloseEvent *event);
 private slots:
@@ -35,6 +37,7 @@ private slots:
     void actChooseTokenFromDeck(bool checked);
     void actOk();
     void actReject();
+
 private:
     CardDatabaseModel *cardDatabaseModel;
     TokenDisplayModel *cardDatabaseDisplayModel;
