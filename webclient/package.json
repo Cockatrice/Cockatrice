@@ -1,0 +1,58 @@
+{
+  "name": "webclient",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.6.1",
+    "@types/jest": "24.0.20",
+    "@types/jquery": "^3.3.31",
+    "@types/lodash": "^4.14.145",
+    "@types/material-ui": "^0.21.7",
+    "@types/node": "12.11.7",
+    "@types/prop-types": "^15.7.3",
+    "@types/protobufjs": "^6.0.0",
+    "@types/react": "16.9.11",
+    "@types/react-dom": "16.9.3",
+    "@types/react-redux": "^7.1.5",
+    "@types/react-router-dom": "^5.1.0",
+    "@types/redux": "^3.6.0",
+    "@types/redux-form": "^8.2.0",
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.15",
+    "prop-types": "^15.7.2",
+    "protobufjs": "^6.8.8",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-redux": "^7.1.1",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.2.0",
+    "react-virtualized-auto-sizer": "^1.0.2",
+    "react-window": "^1.8.5",
+    "redux": "^4.0.4",
+    "redux-form": "^8.2.6",
+    "redux-thunk": "^2.3.0",
+    "typescript": "3.6.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "postinstall": "./copy_shared_files.sh"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

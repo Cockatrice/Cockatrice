@@ -1,0 +1,35 @@
+.log-search {
+  margin-bottom: 20px;
+}
+
+hr.MuiDivider-root {
+  margin: 20px 0;
+}
+
+.log-search__form {
+  width: 100%;
+  padding: 20px;
+}
+
+.log-search__form-item {
+  display: flex;
+}
+
+.log-search__form-item.log-location {
+  display: flex;
+  justify-content: space-around;
+}
+
+.log-search__form-item.log-location .checkbox-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-search__form-item.log-location .checkbox-field__box {
+  order: 1;
+}
+
+.log-search__form-submit.MuiButton-root {
+  display: block;
+  margin: 0 auto;
+}

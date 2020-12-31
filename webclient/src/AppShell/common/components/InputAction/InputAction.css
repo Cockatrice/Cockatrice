@@ -1,0 +1,19 @@
+.input-action {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.input-action,
+.input-action__item,
+.input-action__submit {
+  padding: 5px;
+}
+
+.input-action__item {
+  width: 100%;
+  height: 100%; 
+}
+.input-action__item > div {
+  margin: 0;
+}
