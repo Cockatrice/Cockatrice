@@ -433,18 +433,23 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             lastDrawList.clear();
         }
 
-        if ((startzone == targetzone) && !startzone->hasCoords()) {
-            if (!secondHalf && (originalPosition < x)) {
-                xIndex = -1;
-                secondHalf = true;
-            } else if (secondHalf) {
-                --xIndex;
+        // Only mess about with x coordinates if the card is sticking around, otherwise it can have weird side effects
+        // if multiple cards are moved at once.
+        if (!card->getDestroyOnZoneChange()) {
+            if ((startzone == targetzone) && !startzone->hasCoords()) {
+                if (!secondHalf && (originalPosition < x)) {
+                    xIndex = -1;
+                    secondHalf = true;
+                } else if (secondHalf) {
+                    --xIndex;
+                } else {
+                    ++xIndex;
+                }
             } else {
                 ++xIndex;
             }
-        } else {
-            ++xIndex;
         }
+
         int newX = x + xIndex;
 
         // Attachment relationships can be retained when moving a card onto the opponent's table
