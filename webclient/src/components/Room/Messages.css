@@ -1,0 +1,17 @@
+.messages {
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.message {
+  padding: 5px 0;
+  margin: 2px 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
+}
+
+.message:last-of-type {
+  border: 0;
+}

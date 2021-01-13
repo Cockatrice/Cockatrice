@@ -1,0 +1,30 @@
+.games {
+}
+
+.games-header,
+.game {
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid black;
+}
+
+.games-header__cell {
+  max-width: 200px;
+}
+
+.games-header__label,
+.game__detail {
+  width: 10%;
+  flex-grow: 0;
+}
+
+.games-header__label.description,
+.game__detail.description {
+  width: 20%;
+  flex-grow: 1;
+}
+
+.games-header__label.creator,
+.game__detail.creator {
+  width: 20%;
+}

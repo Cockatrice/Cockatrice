@@ -1,0 +1,14 @@
+.connectForm {
+  width: 100%;
+  padding: 20px;
+}
+
+.connectForm-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.connectForm-submit.MuiButton-root {
+  display: block;
+  margin: 20px auto 0;
+}

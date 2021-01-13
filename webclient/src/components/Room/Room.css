@@ -1,0 +1,39 @@
+.room-view,
+.room-view__games,
+.room-view__messages,
+.room-view__messages-content,
+.room-view__side {
+  height: 100%;
+}
+
+.room-view__messages,
+.room-view__side {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-view__messages-sayMessage {
+  width: 100%;
+  margin: 10px auto 2px;
+}
+
+.room-view__side-label {
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  background: white;
+  z-index: 1;
+}
+
+.room-view__side-list,
+.room-view__side-list .room-view__side-list__item  {
+  height: 100%;
+}
+
+.room-view__side-list .room-view__side-list__item {
+  padding: 0;
+}
+
+.room-view__side-list .room-view__side-list__item  .user-display__details {
+  padding: 0 10px;
+}
