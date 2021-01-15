@@ -13,7 +13,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 
 // import { RoomsService } from "AppShell/common/services";
 
-import { SortUtil, RoomsDispatch, RoomsSelectors } from "ducks";
+import { SortUtil, RoomsDispatch, RoomsSelectors } from "store";
 import { UserDisplay } from "components";
 
 import "./Games.css";

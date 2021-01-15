@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import * as _ from "lodash";
 
-import { ServerDispatch, ServerSelectors, ServerStateLogs } from "ducks";
+import { ServerDispatch, ServerSelectors, ServerStateLogs } from "store";
 
 import { ModeratorService } from "websocket";
 

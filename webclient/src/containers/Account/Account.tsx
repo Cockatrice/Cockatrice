@@ -8,7 +8,7 @@ import Paper from "@material-ui/core/Paper";
 
 import { UserDisplay, VirtualList, AuthGuard } from "components";
 import { AuthenticationService, SessionService } from "websocket";
-import { ServerSelectors } from "ducks";
+import { ServerSelectors } from "store";
 import { User } from 'types';
 
 import AddToBuddies from './AddToBuddies';

@@ -7,7 +7,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
 import { SessionService } from "../../websocket";
-import { ServerSelectors } from "../../ducks";
+import { ServerSelectors } from "../../store";
 
 import { RouteEnum } from "../../types";
 

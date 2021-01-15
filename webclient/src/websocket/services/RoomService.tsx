@@ -1,4 +1,4 @@
-import { store, RoomsDispatch, RoomsSelectors } from "ducks";
+import { store, RoomsDispatch, RoomsSelectors } from "store";
 import { WebClient } from "../WebClient"; 
 
 import { NormalizeService } from "./index";

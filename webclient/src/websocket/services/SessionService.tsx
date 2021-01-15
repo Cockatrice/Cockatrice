@@ -1,4 +1,4 @@
-import { ServerDispatch, ServerConnectParams } from "ducks";
+import { ServerDispatch, ServerConnectParams } from "store";
 import { StatusEnum } from "types";
 
 import { sanitizeHtml } from "../utils";

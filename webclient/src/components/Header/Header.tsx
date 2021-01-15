@@ -6,7 +6,7 @@ import Chip from "@material-ui/core/Chip";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as _ from "lodash";
 
-import {  RoomsSelectors, ServerSelectors } from "ducks";
+import {  RoomsSelectors, ServerSelectors } from "store";
 import { Room, User } from "types";
 
 import { AuthenticationService } from "../../websocket";

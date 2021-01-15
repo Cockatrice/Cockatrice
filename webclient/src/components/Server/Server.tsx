@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 
-import { RoomsSelectors, ServerSelectors } from "ducks";
+import { RoomsSelectors, ServerSelectors } from "store";
 
 import { AuthenticationService } from "websocket";
 
