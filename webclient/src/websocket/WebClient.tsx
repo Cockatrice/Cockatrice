@@ -208,10 +208,8 @@ export class WebClient {
     this.options = { ...this.options, ...options };
 
     const { host, port } = this.options;
-    // const protocol = port === '443' ? 'wss' : 'ws';
-    const protocol = 'ws';
 
-    this.socket = new WebSocket(protocol + "://" + host + ":" + port);
+    this.socket = new WebSocket("ws://" + host + ":" + port);
     this.socket.binaryType = "arraybuffer"; // We are talking binary
 
     this.socket.onopen = () => {
