@@ -1,6 +1,6 @@
 import { reset } from 'redux-form';
 import { Actions } from "./server.actions";
-import { store } from "../store";
+import { store } from "store";
 
 export const Dispatch = {
   clearStore: () => {
