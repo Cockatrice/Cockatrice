@@ -1,4 +1,4 @@
-export * from "./store";
+export { store } from "./store";
 
 // Common
 export { SortUtil } from "./common";
@@ -9,12 +9,12 @@ export {
     Selectors as ServerSelectors,
     Dispatch as ServerDispatch} from './server';
 
-export * from "./server/server.interfaces";
+export * from "store/server/server.interfaces";
 
 export { 
     Selectors as RoomsSelectors,
-    Dispatch as RoomsDispatch } from './rooms';
+    Dispatch as RoomsDispatch } from 'store/rooms';
 
-export * from "./rooms/rooms.interfaces";
+export * from "store/rooms/rooms.interfaces";
 
 

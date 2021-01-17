@@ -1,9 +1,9 @@
 import { ServerDispatch, ServerConnectParams } from "store";
 import { StatusEnum } from "types";
 
-import { sanitizeHtml } from "../util";
-import { WebClient } from "../WebClient";
-import { NormalizeService } from "./index";
+import { sanitizeHtml } from "websocket/utils";
+import { WebClient } from "../../WebClient";
+import { NormalizeService } from "websocket";
 
 export default class SessionService {
   webClient: WebClient;

@@ -1,6 +1,6 @@
 import { RoomsDispatch, RoomsSelectors, store } from "store";
-import { WebClient } from "../WebClient";
-import { NormalizeService } from "./index";
+import { WebClient } from "../../WebClient";
+import { NormalizeService } from "websocket";
 
 export default class RoomService {
   webClient: WebClient;
