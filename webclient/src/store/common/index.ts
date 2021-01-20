@@ -1,1 +1,1 @@
-export * from "./SortUtil";
+export { default as SortUtil} from "./SortUtil";

@@ -1,6 +1,6 @@
 import { reset } from 'redux-form';
 import { Actions } from "./rooms.actions";
-import { store } from "../store";
+import { store } from "store";
 
 // const history = useHistory();
 

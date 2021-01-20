@@ -1,6 +1,5 @@
-export * from "./server.actions";
-export * from "./server.dispatch";
-export * from "./server.interfaces";
+export { Actions } from "./server.actions";
+export { Dispatch } from "./server.dispatch";
 export * from "./server.reducer";
-export * from "./server.selectors";
+export { Selectors } from "./server.selectors";
 export * from "./server.types";

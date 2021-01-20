@@ -1,6 +1,6 @@
 import { SortBy, SortDirection, User } from "types";
 
-export class SortUtil {
+export default class SortUtil {
   static sortByField(arr:  any[], sortBy: SortBy): void {
     if (arr.length) {
       const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
