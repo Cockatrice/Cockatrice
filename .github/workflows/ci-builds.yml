@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      name: ${{steps.configure.outputs.name}}
       tag: ${{steps.configure.outputs.tag}}
-      release_url: ${{steps.create_release.outputs.upload_url}}
+      upload_url: ${{steps.create_release.outputs.upload_url}}
       is_beta: ${{steps.configure.outputs.is_beta}}
+      sha: ${{steps.configure.outputs.sha}}
 
     steps:
       - name: Cancel previous runs
@@ -39,20 +39,22 @@ jobs:
           tag_regex='^refs/tags/'
           beta_regex='beta'
           if [[ $GITHUB_EVENT_NAME == pull-request ]]; then # pull request
-            name="${{github.event.pull_request.head.sha}}"
+            sha="${{github.event.pull_request.head.sha}}"
           elif [[ $GITHUB_REF =~ $tag_regex ]]; then # release
             tag="${GITHUB_REF/refs\/tags\//}"
-            name="$tag-$GITHUB_SHA"
+            sha="$GITHUB_SHA"
             echo "::set-output name=tag::$tag"
             if [[ $tag =~ beta_regex ]]; then
               echo "::set-output name=is_beta::yes"
             else
               echo "::set-output name=is_beta::no"
+              version="${tag##*-}"
+              echo "::set-output name=version::$version"
             fi
           else # push to branch
-            name="$GITHUB_SHA"
+            sha="$GITHUB_SHA"
           fi
-          echo "::set-output name=name::$name"
+          echo "::set-output name=sha::$sha"
 
       - name: Checkout
         if: steps.configure.outputs.tag != null
@@ -64,15 +66,22 @@ jobs:
         shell: bash
         run: |
           name_regex='set\(GIT_TAG_RELEASENAME "([[:print:]]+)")'
-          if [[ $(cat CMakeLists.txt) =~ $name_regex ]]; then
-            name="${BASH_REMATCH[1]}"
-            title="Cockatrice ${{steps.configure.name}}: $name"
-            echo "::set-output name=name::$name"
-            echo "::set-output name=title::$title"
+          if [[ "${{steps.configure.outputs.is_beta}}" == "yes" ]]; then
+            title="${{steps.configure.outputs.tag}}"
+            echo "creating beta release '$title'"
           else
-            echo "::error::could not find releasename in CMakeLists.txt"
-            exit 1
+            if [[ $(cat CMakeLists.txt) =~ $name_regex ]]; then
+              name="${BASH_REMATCH[1]}"
+              version="${{steps.configure.outputs.version}}"
+              title="Cockatrice $version: $name"
+              echo "::set-output name=friendly_name::$name"
+              echo "creating full release '$title'"
+            else
+              echo "::error::could not find releasename in CMakeLists.txt"
+              exit 1
+            fi
           fi
+          echo "::set-output name=title::$title"
 
       - name: Create release
         if: steps.configure.outputs.tag != null
@@ -84,7 +93,7 @@ jobs:
           tag_name: ${{github.ref}}
           release_name: ${{steps.title.outputs.title}}
           draft: true
-          prerelease: ${{steps.configure.is_beta == 'yes'}}
+          prerelease: ${{steps.configure.outputs.is_beta == 'yes'}}
 
   build-linux:
     strategy:
