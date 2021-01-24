@@ -1,0 +1,424 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  configure:
+    name: Configure
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      name: ${{steps.configure.outputs.name}}
+      tag: ${{steps.configure.outputs.tag}}
+      release_url: ${{steps.create_release.outputs.upload_url}}
+      is_beta: ${{steps.configure.outputs.is_beta}}
+
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.6.0
+        with:
+          access_token: ${{github.token}} # needs other token https://github.com/styfle/cancel-workflow-action/issues/7
+
+      - name: Configure
+        id: configure
+        shell: bash
+        run: |
+          tag_regex='^refs/tags/'
+          beta_regex='beta'
+          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then # pull request
+            name="${{github.event.pull_request.head.sha}}"
+          elif [[ $GITHUB_REF =~ $tag_regex ]]; then # release
+            tag="${GITHUB_REF/refs\/tags\//}"
+            name="$tag-$GITHUB_SHA"
+            echo "::set-output name=tag::$tag"
+            if [[ $tag =~ beta_regex ]]; then
+              echo "::set-output name=is_beta::yes"
+            else
+              echo "::set-output name=is_beta::no"
+            fi
+          else # push to branch
+            name="$GITHUB_SHA"
+          fi
+          echo "::set-output name=name::$name"
+
+      - name: Checkout
+        if: steps.configure.outputs.tag != null
+        uses: actions/checkout@v2
+
+      - name: Create release title
+        id: title
+        if: steps.configure.outputs.tag != null
+        shell: bash
+        run: |
+          name_regex='set\(GIT_TAG_RELEASENAME "([[:print:]]+)")'
+          if [[ $(cat CMakeLists.txt) =~ $name_regex ]]; then
+            name="${BASH_REMATCH[1]}"
+            title="Cockatrice ${{steps.configure.name}}: $name"
+            echo "::set-output name=name::$name"
+            echo "::set-output name=title::$title"
+          else
+            echo "::error::could not find releasename in CMakeLists.txt"
+            exit 1
+          fi
+
+      - name: Create release
+        if: steps.configure.outputs.tag != null
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{github.ref}}
+          release_name: ${{steps.title.outputs.title}}
+          draft: true
+          prerelease: ${{steps.configure.is_beta == 'yes'}}
+
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: # these names correspond to the files in .ci/$distro
+          - UbuntuGroovy
+          - UbuntuFocal
+          - UbuntuBionic
+          - ArchLinux
+          - DebianBuster
+          - Fedora33
+        include:
+          - distro: UbuntuGroovy
+            package: DEB
+
+          - distro: UbuntuFocal
+            package: DEB
+            test: skip # UbuntuFocal has a broken qt for debug builds
+
+          - distro: UbuntuBionic
+            package: DEB
+
+          - distro: ArchLinux
+            package: skip # we are packaged in arch already
+            allow-failure: yes
+
+          - distro: DebianBuster
+            package: DEB
+
+          - distro: Fedora33
+            package: RPM
+            test: skip # Fedora is our slowest build
+
+    name: ${{matrix.distro}}
+
+    needs: configure
+
+    runs-on: ubuntu-latest
+
+    continue-on-error: ${{matrix.allow-failure == 'yes'}}
+
+    env:
+      NAME: ${{matrix.distro}}
+      CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get cache timestamp
+        id: cache_timestamp
+        shell: bash
+        run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
+
+      - name: Restore cache
+        uses: actions/cache@v2
+        env:
+          timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
+        with:
+          path: ${{env.CACHE}}
+          key: docker-${{matrix.distro}}-cache-${{env.timestamp}}
+          restore-keys: |
+            docker-${{matrix.distro}}-cache-
+
+      - name: Build ${{matrix.distro}} Docker image
+        shell: bash
+        run: source .ci/docker.sh --build
+
+      - name: Build debug and test
+        if: matrix.test != 'skip'
+        shell: bash
+        run: |
+          source .ci/docker.sh
+          RUN --server --debug --test
+
+      - name: Build release package
+        id: package
+        if: matrix.package != 'skip'
+        shell: bash
+        env:
+          suffix: '-${{matrix.distro}}'
+          type: '${{matrix.package}}'
+        run: |
+          source .ci/docker.sh
+          RUN --server --release --package "$type" --suffix "$suffix"
+
+      - name: Upload artifact
+        if: matrix.package != 'skip'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.distro}}-package
+          path: ./build/${{steps.package.outputs.name}}
+          if-no-files-found: error
+
+      - name: Upload to release
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          upload_url: ${{needs.configure.outputs.upload_url}}
+          asset_path: ./build/${{steps.package.outputs.name}}
+          asset_name: ${{steps.package.outputs.name}}
+          asset_content_type: application/octet-stream
+
+  build-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - Debug
+          - 10.11_El_Capitan
+          - 10.14_Mojave
+          - 10.15_Catalina
+          - 11.0_Big_Sur
+        include:
+          - target: Debug # tests only
+            os: macos-latest
+            xcode: 11.7
+            type: Debug
+            do_tests: 0 # tests do not work yet on mac
+            make_package: false
+
+          - target: 10.11_El_Capitan
+            os: macos-10.13 # runs on HighSierra
+            allow-failure: yes # we don't know if it'll be added
+            xcode: 8.2.1 # should be compatible with macos 10.11.5
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: 10.14_Mojave
+            os: macos-10.15 # runs on Catalina
+            xcode: 10.3 # should be compatible with macos 10.14.3
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: 10.15_Catalina
+            os: macos-10.15
+            xcode: 11.7
+            type: Release
+            do_tests: 0
+            make_package: true
+
+          - target: 11.0_Big_Sur
+            os: macos-11.0
+            xcode: 12.2
+            type: Release
+            do_tests: 0
+            make_package: true
+
+    name: macOS ${{matrix.target}}
+
+    needs: configure
+
+    runs-on: ${{matrix.os}}
+
+    continue-on-error: ${{matrix.allow-failure == 'yes'}}
+
+    env:
+      CCACHE_DIR: ~/.ccache
+      DEVELOPER_DIR:
+        /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies using homebrew
+        shell: bash
+        # cmake cannot find the mysql connector
+        # neither of these works: mariadb-connector-c mysql-connector-c++
+        run: brew install ccache protobuf
+
+      - name: Install QT using homebrew
+        id: brew_install_qt
+        continue-on-error: true
+        shell: bash
+        run: brew install qt --force-bottle
+
+      - name: Install QT using actions
+        if: steps.brew_install_qt.outcome != 'success'
+        uses: jurplel/install-qt-action@v2
+
+      - name: Get ccache timestamp
+        id: ccache_timestamp
+        shell: bash
+        run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
+
+      - name: Restore ccache cache
+        uses: actions/cache@v2
+        env:
+          timestamp: ${{steps.ccache_timestamp.outputs.timestamp}}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-${{env.timestamp}}
+          restore-keys: |
+            ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-
+
+      - name: Build on Xcode ${{matrix.xcode}}
+        shell: bash
+        run: .ci/compile.sh ${{matrix.type}} --server
+
+      - name: Test
+        if: matrix.do_tests == 1
+        shell: bash
+        working-directory: build
+        run: cmake --build . --target test
+
+      - name: Package for ${{matrix.target}}
+        id: package
+        if: matrix.make_package
+        shell: bash
+        working-directory: build
+        run: |
+          cmake --build . --target package
+          ../.ci/name_build.sh "-macOS-${{matrix.target}}"
+
+      - name: Upload artifact
+        if: matrix.make_package
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS-${{matrix.target}}-xcode-${{matrix.xcode}}-dmg
+          path: ${{steps.package.outputs.path}}
+          if-no-files-found: error
+
+      - name: Upload to release
+        if: matrix.make_package && needs.configure.outputs.tag != null
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          upload_url: ${{needs.configure.outputs.upload_url}}
+          asset_path: ${{steps.package.outputs.path}}
+          asset_name: ${{steps.package.outputs.name}}
+          asset_content_type: application/octet-stream
+
+  windows-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - 64
+          - 32
+        include:
+          - arch: 64
+            triplet: x64
+            cmake: x64
+            append: _64
+
+          - arch: 32
+            triplet: x86
+            cmake: Win32
+
+    name: Windows ${{matrix.arch}}
+
+    needs: configure
+
+    runs-on: windows-latest
+
+    env:
+      QT_VERSION: '5.12.9'
+      QT_ARCH: msvc2017${{matrix.append}}
+      CMAKE_GENERATOR: 'Visual Studio 16 2019'
+
+    steps:
+      - name: Add msbuild to PATH
+        id: add-msbuild
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Restore Qt ${{env.QT_VERSION}} ${{matrix.arch}}-bit from cache
+        id: cache-qt
+        uses: actions/cache@v2
+        with:
+          key: ${{runner.os}}-QtCache-${{env.QT_VERSION}}-${{matrix.arch}}
+          path: ${{runner.workspace}}/Qt
+
+      - name: Install ${{matrix.arch}}-bit Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          cached: ${{steps.cache-qt.outputs.cache-hit}}
+          version: ${{env.QT_VERSION}}
+          arch: win${{matrix.arch}}_${{env.QT_ARCH}}
+
+      - name: Restore or setup vcpkg
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgArguments: '@${{github.workspace}}/vcpkg.txt'
+          vcpkgDirectory: ${{github.workspace}}/vcpkg
+          appendedCacheKey: ${{hashFiles('**/vcpkg.txt')}}
+          vcpkgTriplet: ${{matrix.triplet}}-windows
+
+      - name: Configure Cockatrice ${{matrix.arch}}-bit
+        shell: bash
+        run: |
+          mkdir -p build
+          cd build
+          export QTDIR="${{runner.workspace}}/Qt/$QT_VERSION/$QT_ARCH"
+          cmake .. -G "${{env.CMAKE_GENERATOR}}" -A "${{matrix.cmake}}" -DCMAKE_BUILD_TYPE="Release" -DWITH_SERVER=1 -DTEST=1
+
+      - name: Build Cockatrice ${{matrix.arch}}-bit
+        id: package
+        shell: bash
+        working-directory: build
+        run: |
+          cmake --build . --target package --config Release
+          ../.ci/name_build.sh "-win${{matrix.arch}}"
+
+      - name: Run tests
+        shell: bash
+        working-directory: build
+        run: ctest -T Test -C Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows-${{matrix.arch}}bit-installer
+          path: ./build/${{steps.package.outputs.name}}
+          if-no-files-found: error
+
+      - name: Upload to release
+        if: needs.configure.outputs.tag != null
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          upload_url: ${{needs.configure.outputs.upload_url}}
+          asset_path: ./build/${{steps.package.outputs.name}}
+          asset_name: ${{steps.package.outputs.name}}
+          asset_content_type: application/octet-stream

@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QNetworkReply>
+#include <QRegularExpression>
 #include <QSysInfo>
 #include <QtGlobal>
 
@@ -45,24 +46,19 @@ void ReleaseChannel::checkForUpdates()
 #if defined(Q_OS_OSX)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-    const int mac_os_version = QSysInfo::productVersion().split(".")[1].toInt();
-
-    // TODO: If we change macOS builds, this must be updated
-    if (mac_os_version <= 12) {
-        // We no longer compile files for macOS 10.12 Sierra or older
+    static QRegularExpression version_regex("macOS-(\\d+)\\.(\\d+)");
+    auto match = version_regex.match(fileName);
+    if (!match.hasMatch()) {
         return false;
-    } else if (mac_os_version == 13) {
-        // We support 10.13 High Sierra
-        return fileName.contains("macos10.13");
-    } else if (14 <= mac_os_version && mac_os_version <= 15) {
-        // We support 10.14 Mojave, and 10.15 Catalina
-        return fileName.contains("macos10.14");
-    } else {
-        // Future Mac releases we haven't heard of or accounted for yet
-        return (!fileName.contains("macos10.13") && !fileName.contains("macos10.14") && fileName.contains("macos"));
     }
-}
 
+    // older(smaller) releases are compatible with a newer or the same system version
+    int sys_maj = QSysInfo::productVersion().split(".")[0].toInt();
+    int sys_min = QSysInfo::productVersion().split(".")[1].toInt();
+    int rel_maj = match.captured(1).toInt();
+    int rel_min = match.captured(2).toInt();
+    return rel_maj < sys_maj || (rel_maj == sys_maj && rel_min <= rel_min);
+}
 #elif defined(Q_OS_WIN)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
@@ -283,18 +279,21 @@ void BetaReleaseChannel::fileListFinished()
     bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
     bool compatibleVersion = false;
 
-    foreach (QVariant file, resultList) {
+    QStringList resultUrlList{};
+    for (QVariant file : resultList) {
         QVariantMap map = file.toMap();
+        resultUrlList << map["browser_download_url"].toString();
+    }
 
-        QString url = map["browser_download_url"].toString();
-
-        if (!downloadMatchesCurrentOS(url))
-            continue;
-
-        compatibleVersion = true;
-        lastRelease->setDownloadUrl(url);
-        qDebug() << "Found compatible version url=" << url;
-        break;
+    resultUrlList.sort();
+    // iterate in reverse so the first item is the latest os version
+    for (auto url = resultUrlList.rbegin(); url < resultUrlList.rend(); ++url) {
+        if (downloadMatchesCurrentOS(*url)) {
+            compatibleVersion = true;
+            lastRelease->setDownloadUrl(*url);
+            qDebug() << "Found compatible version url=" << *url;
+            break;
+        }
     }
 
     emit finishedCheck(needToUpdate, compatibleVersion, lastRelease);

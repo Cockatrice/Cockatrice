@@ -5,6 +5,9 @@
 # Read arguments
 while [[ "$@" ]]; do
   case "$1" in
+    '--')
+      shift
+      ;;
     '--format')
       CHECK_FORMAT=1
       shift
@@ -17,13 +20,18 @@ while [[ "$@" ]]; do
       MAKE_PACKAGE=1
       shift
       if [[ $# != 0 && $1 != -* ]]; then
-        PACKAGE_NAME="$1"
+        PACKAGE_TYPE="$1"
         shift
-        if [[ $# != 0 && $1 != -* ]]; then
-          PACKAGE_TYPE="$1"
-          shift
-        fi
       fi
+      ;;
+    '--suffix')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--suffix expects an argument"
+        exit 1
+      fi
+      PACKAGE_SUFFIX="$1"
+      shift
       ;;
     '--server')
       MAKE_SERVER=1
@@ -41,13 +49,9 @@ while [[ "$@" ]]; do
       BUILDTYPE="Release"
       shift
       ;;
-    '--zip')
-      MAKE_ZIP=1
-      shift
-      ;;
     *)
       if [[ $1 == -* ]]; then
-        echo "unrecognized option: $1"
+        echo "::error file=$0::unrecognized option: $1"
         exit 3
       fi
       BUILDTYPE="$1"
@@ -58,7 +62,9 @@ done
 
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
+  echo "::group::Run linter"
   source ./.ci/lint.sh
+  echo "::endgroup::"
 fi
 
 set -e
@@ -68,8 +74,8 @@ set -e
 mkdir -p build
 cd build
 
-if ! [[ $CORE_AMOUNT ]]; then
-  CORE_AMOUNT="2" # default machines have 2 cores
+if [[ ! $CMAKE_BUILD_PARALLEL_LEVEL ]]; then
+  CMAKE_BUILD_PARALLEL_LEVEL=2 # default machines have 2 cores
 fi
 
 # Add cmake flags
@@ -78,7 +84,6 @@ if [[ $MAKE_SERVER ]]; then
 fi
 if [[ $MAKE_TEST ]]; then
   flags+=" -DTEST=1"
-  BUILDTYPE="Debug" # test requires buildtype Debug
 fi
 if [[ $BUILDTYPE ]]; then
   flags+=" -DCMAKE_BUILD_TYPE=$BUILDTYPE"
@@ -87,42 +92,51 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=" -DCPACK_GENERATOR=$PACKAGE_TYPE"
 fi
 
-# Add qt install location when using brew
 if [[ $(uname) == "Darwin" ]]; then
-  PATH="/usr/local/opt/ccache/bin:$PATH"
+  # prepend ccache compiler binaries to path
+  PATH="/usr/local/opt/ccache/libexec:$PATH"
+  # Add qt install location when using homebrew
   flags+=" -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/"
 fi
 
 # Compile
+echo "::group::Show ccache stats"
+ccache --show-stats
+echo "::endgroup::"
+
+echo "::group::Configure cmake"
 cmake --version
 cmake .. $flags
-make -j"$CORE_AMOUNT"
+echo "::endgroup::"
+
+echo "::group::Build project"
+cmake --build .
+echo "::endgroup::"
+
+echo "::group::Show ccache stats again"
+ccache --show-stats
+echo "::endgroup::"
 
 if [[ $MAKE_TEST ]]; then
-  make test
+  echo "::group::Run tests"
+  cmake --build . --target test
+  echo "::endgroup::"
 fi
 
 if [[ $MAKE_INSTALL ]]; then
-  make install
+  echo "::group::Install"
+  cmake --build . --target install
+  echo "::endgroup::"
 fi
 
 if [[ $MAKE_PACKAGE ]]; then
-  make package
-  if [[ $PACKAGE_NAME ]]; then
-    found="$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)"
-    path="${found%/*}"
-    file="${found##*/}"
-    if [[ ! $file ]]; then
-      echo "could not find package" >&2
-      exit 1
-    fi
-    new_name="$path/${file%.*}-$PACKAGE_NAME."
-    if [[ $MAKE_ZIP ]]; then
-      zip "${new_name}zip" "$path/$file"
-      mv "$path/$file" "$path/_$file"
-    else
-      extension="${file##*.}"
-      mv "$path/$file" "$new_name$extension"
-    fi
+  echo "::group::Create package"
+  cmake --build . --target package
+  echo "::endgroup::"
+
+  if [[ $PACKAGE_SUFFIX ]]; then
+    echo "::group::Update package name"
+    ../.ci/name_build.sh "$PACKAGE_SUFFIX"
+    echo "::endgroup::"
   fi
 fi
