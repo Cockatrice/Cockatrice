@@ -70,7 +70,7 @@ jobs:
         with:
           tag_name: ${{github.ref}}
           release_name: ${{steps.prepare.outputs.title}}
-          release_body: ${{steps.prepare.outputs.body}}
+          body: ${{steps.prepare.outputs.body}}
           draft: true
           prerelease: ${{steps.configure.prepare.is_beta == 'yes'}}
 
