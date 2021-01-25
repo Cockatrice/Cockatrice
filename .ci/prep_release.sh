@@ -76,16 +76,23 @@ else
     before="$next_before"
   done
   if [[ $previous ]]; then
-    if ! generated_list="$(git log "$previous..$TAG" --pretty="- %s")"; then
+    if generated_list="$(git log "$previous..$TAG" --pretty="- %s")"; then
+      count="$(git rev-list --count "$previous..$TAG")"
+      echo "adding list of commits to release notes:"
+      echo "'$previous' to '$TAG' ($count commits)"
+      # --> is the markdown comment escape sequence, emojis are way better
+      generated_list="${generated_list//-->/→}"
+      body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
+      if [[ $beta_list =~ $whitespace ]]; then
+        beta_list="-n there are no betas to delete!"
+      else
+        echo "the following betas should be deleted after publishing:"
+        echo "$beta_list"
+      fi
+      body="${body//--REPLACE-WITH-BETA-LIST--/$beta_list}"
+    else
       echo "::warning file=$0::failed to produce git log"
     fi
-    # --> is the markdown comment escape sequence, emojis are way better
-    generated_list="${generated_list//-->/→}"
-    body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
-    if [[ $beta_list =~ $whitespace ]]; then
-      beta_list="-n there are no betas to delete!"
-    fi
-    body="${body//--REPLACE-WITH-BETA-LIST--/$beta_list}"
   else
     echo "::warning file=$0::could not find previous tag"
   fi
