@@ -72,7 +72,7 @@ jobs:
           release_name: ${{steps.prepare.outputs.title}}
           body_path: ${{steps.prepare.outputs.body_path}}
           draft: true
-          prerelease: ${{steps.configure.prepare.is_beta == 'yes'}}
+          prerelease: ${{steps.prepare.outputs.is_beta == 'yes'}}
 
   build-linux:
     strategy:
