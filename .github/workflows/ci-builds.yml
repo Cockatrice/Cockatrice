@@ -22,9 +22,8 @@ jobs:
 
     outputs:
       tag: ${{steps.configure.outputs.tag}}
-      upload_url: ${{steps.create_release.outputs.upload_url}}
-      is_beta: ${{steps.configure.outputs.is_beta}}
       sha: ${{steps.configure.outputs.sha}}
+      upload_url: ${{steps.create_release.outputs.upload_url}}
 
     steps:
       - name: Cancel previous runs
@@ -37,20 +36,12 @@ jobs:
         shell: bash
         run: |
           tag_regex='^refs/tags/'
-          beta_regex='beta'
           if [[ $GITHUB_EVENT_NAME == pull-request ]]; then # pull request
             sha="${{github.event.pull_request.head.sha}}"
           elif [[ $GITHUB_REF =~ $tag_regex ]]; then # release
-            tag="${GITHUB_REF/refs\/tags\//}"
             sha="$GITHUB_SHA"
+            tag="${GITHUB_REF/refs\/tags\//}"
             echo "::set-output name=tag::$tag"
-            if [[ $tag =~ beta_regex ]]; then
-              echo "::set-output name=is_beta::yes"
-            else
-              echo "::set-output name=is_beta::no"
-              version="${tag##*-}"
-              echo "::set-output name=version::$version"
-            fi
           else # push to branch
             sha="$GITHUB_SHA"
           fi
@@ -59,29 +50,16 @@ jobs:
       - name: Checkout
         if: steps.configure.outputs.tag != null
         uses: actions/checkout@v2
+        with:
+          depth: 0
 
-      - name: Create release title
-        id: title
+      - name: Prepare release paramaters
+        id: prepare
         if: steps.configure.outputs.tag != null
         shell: bash
-        run: |
-          name_regex='set\(GIT_TAG_RELEASENAME "([[:print:]]+)")'
-          if [[ "${{steps.configure.outputs.is_beta}}" == "yes" ]]; then
-            title="${{steps.configure.outputs.tag}}"
-            echo "creating beta release '$title'"
-          else
-            if [[ $(cat CMakeLists.txt) =~ $name_regex ]]; then
-              name="${BASH_REMATCH[1]}"
-              version="${{steps.configure.outputs.version}}"
-              title="Cockatrice $version: $name"
-              echo "::set-output name=friendly_name::$name"
-              echo "creating full release '$title'"
-            else
-              echo "::error::could not find releasename in CMakeLists.txt"
-              exit 1
-            fi
-          fi
-          echo "::set-output name=title::$title"
+        env:
+          TAG: ${{steps.configure.outputs.tag}}
+        run: .ci/prep_release.sh
 
       - name: Create release
         if: steps.configure.outputs.tag != null
@@ -91,9 +69,10 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           tag_name: ${{github.ref}}
-          release_name: ${{steps.title.outputs.title}}
+          release_name: ${{steps.prepare.outputs.title}}
+          release_body: ${{steps.prepare.outputs.body}}
           draft: true
-          prerelease: ${{steps.configure.outputs.is_beta == 'yes'}}
+          prerelease: ${{steps.configure.prepare.is_beta == 'yes'}}
 
   build-linux:
     strategy:
