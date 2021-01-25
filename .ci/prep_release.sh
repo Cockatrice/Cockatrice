@@ -8,6 +8,7 @@ template_path=".ci/release_template.md"
 body_path="/tmp/release.md"
 beta_regex='beta'
 name_regex='set\(GIT_TAG_RELEASENAME "([[:print:]]+)")'
+whitespace='^\s*$'
 
 if [[ $1 ]]; then
   TAG="$1"
@@ -81,6 +82,9 @@ else
     # --> is the markdown comment escape sequence, emojis are way better
     generated_list="${generated_list//-->/→}"
     body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
+    if [[ $beta_list =~ $whitespace ]]; then
+      beta_list="-n there are no betas to delete!"
+    fi
     body="${body//--REPLACE-WITH-BETA-LIST--/$beta_list}"
   else
     echo "::warning file=$0::could not find previous tag"
