@@ -67,4 +67,5 @@ Use these label badges for highlighting important and key changes:
 
 ## Special Thanks
 <!-- Personalise this a bit! -->
-We continue to find it amazing that so many people contribute their time, knowledge, code, testing and more to the project. We'd like to thank the entire Cockatrice community for their efforts<!--, and we'd like to especially recognize @ZeldaZach, --ADD-CONTRIBUTORS-HERE-- for their help in preparing so many amazing new features for the user base-->.
+We continue to find it amazing that so many people contribute their time, knowledge, code, testing and more to the project. We'd like to thank the entire Cockatrice community for their efforts.
+<!-- We'd like to especially recognize @ZeldaZach, --ADD-CONTRIBUTORS-HERE-- for their help in preparing so many amazing new features for the user base. -->
