@@ -4,6 +4,8 @@
 # the releases are first made as drafts and will be vetted by a human
 # it just has to provide a template
 # this requires the repo to be unshallowed
+template_path=".ci/release_template.md"
+body_path="/tmp/release.md"
 beta_regex='beta'
 name_regex='set\(GIT_TAG_RELEASENAME "([[:print:]]+)")'
 
@@ -38,7 +40,7 @@ echo "::set-output name=title::$title"
 
 # add release notes template
 if [[ $no_beta ]]; then
-  body="$(cat ".ci/release_template.md")"
+  body="$(cat "$template_path")"
   if [[ ! $body ]]; then
     echo "::warning file=$0::could not find release template"
   fi
@@ -81,4 +83,7 @@ else
     body="${body//__REPLACE_WITH_BETA_LIST__/$beta_list}"
   fi
 fi
-echo "::set-output name=body::$body"
+
+# write to file
+echo "::set-output name=body_path::$body_path"
+echo "$body" >"$body_path"

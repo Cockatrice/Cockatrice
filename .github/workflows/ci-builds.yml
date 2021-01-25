@@ -51,7 +51,7 @@ jobs:
         if: steps.configure.outputs.tag != null
         uses: actions/checkout@v2
         with:
-          depth: 0
+          fetch-depth: 0
 
       - name: Prepare release paramaters
         id: prepare
@@ -70,7 +70,7 @@ jobs:
         with:
           tag_name: ${{github.ref}}
           release_name: ${{steps.prepare.outputs.title}}
-          body: ${{steps.prepare.outputs.body}}
+          body_path: ${{steps.prepare.outputs.body_path}}
           draft: true
           prerelease: ${{steps.configure.prepare.is_beta == 'yes'}}
 
