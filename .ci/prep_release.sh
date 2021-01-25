@@ -44,10 +44,10 @@ if [[ $no_beta ]]; then
   if [[ ! $body ]]; then
     echo "::warning file=$0::could not find release template"
   fi
-  body="${body//__REPLACE_WITH_RELEASE_TITLE__/$title}"
+  body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
   body="Included commits over previous version:
-__REPLACE_WITH_GENERATED_LIST__"
+--REPLACE-WITH-GENERATED-LIST--"
 fi
 
 # add git log to release notes
@@ -69,7 +69,6 @@ else
     next_before="${before%
 *}" # strip the last line
     if [[ $next_before == $before ]]; then
-      echo "::warning file=$0::could not find previous tag"
       unset previous
       break
     fi
@@ -79,8 +78,12 @@ else
     if ! generated_list="$(git log "$previous..$TAG" --pretty="- %s")"; then
       echo "::warning file=$0::failed to produce git log"
     fi
-    body="${body//__REPLACE_WITH_GENERATED_LIST__/$generated_list}"
-    body="${body//__REPLACE_WITH_BETA_LIST__/$beta_list}"
+    # --> is the markdown comment escape sequence, emojis are way better
+    generated_list="${generated_list//-->/→}"
+    body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
+    body="${body//--REPLACE-WITH-BETA-LIST--/$beta_list}"
+  else
+    echo "::warning file=$0::could not find previous tag"
   fi
 fi
 
