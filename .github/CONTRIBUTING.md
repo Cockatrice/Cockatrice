@@ -389,15 +389,10 @@ https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
 ### Publishing A New Release ###
 
-We use [GitHub Releases](https://github.com/Cockatrice/Cockatrice/releases) to publish 
-new stable versions and betas:
-- GitHub Actions will upload binaries (**Linux & macOS**) when any release is published 
-on GitHub.
-- AppVeyor will upload binaries (**Windows**) whenever a
-git "tag" is pushed to the repository.
-
-To trigger both processes correctly you can publish a tagged (pre-)release right on GitHub, 
-or create a tag manually first and use it for the (pre-)release creation afterwards.
+We use [GitHub Releases](https://github.com/Cockatrice/Cockatrice/releases) to
+publish new stable versions and betas.
+Whenever a git tag is pushed to the repository github will create a draft
+release and upload binaries automatically.
 
 To create a tag, simply do the following:
 ```bash
@@ -407,6 +402,7 @@ git pull
 git tag $TAG_NAME
 git push $UPSTREAM $TAG_NAME
 ```
+
 You should define the variables as such:
 ```
 `$UPSTREAM` - the remote for git@github.com:Cockatrice/Cockatrice.git
@@ -416,16 +412,14 @@ You should define the variables as such:
     With *MAJ.MIN.PATCH* being the NEXT release version!
 ```
 
->**Important:** You have to use the naming pattern `-beta` for the first beta release of one 
-version, followed by `-beta.2`, `-beta.3` and counting...
->This is crucial as Appveyor listens only for correct tags matching our defined pattern.
-
 This will cause a tagged release to be established on the GitHub repository,
-which will then lead to the upload of binaries by AppVeyor.
-If you use a SemVer tag including "beta", the release that will be created at GitHub 
-by AppVeyor will be marked as a "Pre-release" automatically.
-The target of the `.../latest` URL will not be changed in that case - 
-it always points to the latest stable release and not pre-releases/betas.
+with the binaries being added to the release whenever they are ready.
+The release is initially a draft, where the path notes can be edited and after
+all is good and ready it can be published on GitHub.
+If you use a SemVer tag including "beta", the release that will be created at
+GitHub will be marked as a "Pre-release" automatically.
+The target of the `.../latest` URL will not be changed in that case, it always
+points to the latest stable release and not pre-releases/betas.
 
 If you accidentally push a tag incorrectly (the tag is outdated, you didn't
 pull in the latest branch accidentally, you named the tag wrong, etc.) you can
@@ -434,32 +428,36 @@ revoke the tag by doing the following:
 git push --delete upstream $TAG_NAME
 git tag -d $TAG_NAME
 ```
+You can also do this on GitHub, you'll also want to delete the new release.
 
-**NOTE:** Unfortunately, due to the method of how AppVeyor works, to publish a
-stable release you will need to make a copy of the drafted release notes locally before 
-pushing the tag, and paste them back into the GitHub releases GUI once the binaries have 
-been uploaded by the CI.
-<br>
-The AppVeyor service will automatically overwrite the name of the release to 
-"Cockatrice $TAG_NAME".
-In addition, for beta releases, the status of the release will be set to "Pre-release", and
-the release body will get renamed to "Beta build of Cockatrice".
-
-**NOTE 2:** In the first lines of [CMakeLists.txt](
+In the first lines of [CMakeLists.txt](
 https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt)
-there's an hardcoded version number used when compiling from master or custom (not tagged)
-versions. While on tagged versions these numbers are overridden by the version
-numbers coming from the tag title, it's good practice to increment the ones at CMake 
-after every full release to stress that master is ahead of the last stable release.
+there's an hardcoded version number and pretty name used when compiling from
+master or custom (not tagged) versions.
+While on tagged versions these numbers are overridden by the version numbers
+coming from the tag title, it's good practice to increment the ones at CMake
+after every full release to stress that master is ahead of the last stable
+release.
 The preferred flow of operation is:
  * Just before a release, make sure the version number in CMakeLists.txt is set
  to the same release version you are about to tag.
- * Tag the release following the previously described syntax in order to get it correctly 
- built and deployed by CI.
- * Wait for them to upload all binaries, then double check if everything is in order.
- * After the release is complete, update the CMake version number again to the next
- targeted beta version, typically increasing `PROJECT_VERSION_PATCH` by one.
+ * This is also the time to change the pretty name in CMakeLists.txt called
+ GIT_TAG_RELEASENAME and commit and push these changes.
+ * Tag the release following the previously described syntax in order to get it
+ correctly built and deployed by CI.
+ * Wait for the configure step to create the release and update the patch
+ notes.
+ * Check on the github actions page for build progress which should be the top
+ listed [here](
+ https://github.com/Cockatrice/Cockatrice/actions?query=event%3Apush+-branch%3Amaster
+ ).
+ * When the build has been completed you can verify all uploaded files on the
+ release are in order and hit the publish button.
+ * After the release is complete, update the CMake version number again to the
+ next targeted beta version, typically increasing `PROJECT_VERSION_PATCH` by
+ one.
 
-**NOTE 3:** When releasing a new stable version, all previous beta releases (and tags) 
+When releasing a new stable version, all previous beta releases (and tags)
 should be deleted. This is needed for Cockatrice to update users of the "Beta"
 release channel correctly to the latest stable version as well.
+This can be done the same way as revoking tags, mentioned above.
