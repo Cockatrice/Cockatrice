@@ -14,7 +14,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="196"/>
         <source>Interface language:</source>
-        <translation type="unfinished"/>
+        <translation>Idioma da interface:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="197"/>

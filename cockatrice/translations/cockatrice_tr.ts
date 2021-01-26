@@ -70,7 +70,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="361"/>
         <source>Invert vertical coordinate</source>
-        <translation type="unfinished"/>
+        <translation>Dikey koordinatı ters çevir</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="362"/>
@@ -167,7 +167,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/userlist.cpp" line="208"/>
         <location filename="../src/userlist.cpp" line="216"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Hata</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="194"/>
@@ -195,22 +195,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/releasechannel.cpp" line="206"/>
         <source>Beta Releases</source>
-        <translation type="unfinished"/>
+        <translation>Beta Sürümü</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="232"/>
         <source>No reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>Sürüm güncelleme sunucusundan yanıt alınamadı.</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="241"/>
         <source>Invalid reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>Sürüm güncelleme sunucusundan geçersiz yanıt alındı.</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="274"/>
         <source>No reply received from the file update server.</source>
-        <translation type="unfinished"/>
+        <translation>Dosya güncelleme sunucusundan yanıt alınamadı.</translation>
     </message>
 </context>
 <context>
@@ -218,7 +218,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="70"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>İsim</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="72"/>
@@ -228,12 +228,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="74"/>
         <source>Mana cost</source>
-        <translation type="unfinished"/>
+        <translation>Mana bedeli</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="76"/>
         <source>Card type</source>
-        <translation type="unfinished"/>
+        <translation>Kart tipi</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="78"/>
@@ -243,7 +243,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="80"/>
         <source>Color(s)</source>
-        <translation type="unfinished"/>
+        <translation>Renk(ler)</translation>
     </message>
 </context>
 <context>
@@ -252,13 +252,13 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/cardfilter.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
-        <translation type="unfinished"/>
+        <translation>VE</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
-        <translation type="unfinished"/>
+        <translation>VEYA</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="11"/>
@@ -275,22 +275,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardfilter.cpp" line="23"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>İsim</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="25"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Tür</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="27"/>
         <source>Color</source>
-        <translation type="unfinished"/>
+        <translation>Renk</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="29"/>
         <source>Text</source>
-        <translation type="unfinished"/>
+        <translation>Yazı</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="31"/>
@@ -300,7 +300,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardfilter.cpp" line="33"/>
         <source>Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Mana Bedeli</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="35"/>
@@ -310,22 +310,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardfilter.cpp" line="37"/>
         <source>Rarity</source>
-        <translation type="unfinished"/>
+        <translation>Enderlik</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="39"/>
         <source>Power</source>
-        <translation type="unfinished"/>
+        <translation>Güç</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="41"/>
         <source>Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Dayanıklılık</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="43"/>
         <source>Loyalty</source>
-        <translation type="unfinished"/>
+        <translation>Sadakat</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="45"/>
@@ -343,7 +343,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardframe.cpp" line="66"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Açıklama</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="67"/>
@@ -361,12 +361,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfotext.cpp" line="70"/>
         <source>Unknown card:</source>
-        <translation type="unfinished"/>
+        <translation>Bilinmeyen kart:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="40"/>
         <source>Name:</source>
-        <translation type="unfinished"/>
+        <translation>İsim:</translation>
     </message>
 </context>
 <context>
@@ -517,7 +517,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/dlg_settings.cpp" line="548"/>
         <location filename="../src/dlg_settings.cpp" line="579"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Başarılı</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="548"/>
@@ -542,23 +542,23 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="588"/>
         <source>Add URL</source>
-        <translation type="unfinished"/>
+        <translation>URL ekle</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="588"/>
         <location filename="../src/dlg_settings.cpp" line="608"/>
         <source>URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="608"/>
         <source>Edit URL</source>
-        <translation type="unfinished"/>
+        <translation>URL&apos;yi düzenle</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="635"/>
         <source>Updating...</source>
-        <translation type="unfinished"/>
+        <translation>Güncelleniyor...</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="665"/>
@@ -797,7 +797,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="270"/>
         <source>Server URL</source>
-        <translation type="unfinished"/>
+        <translation>Sunucu URL</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="273"/>
@@ -1114,27 +1114,27 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="31"/>
         <source>white</source>
-        <translation type="unfinished"/>
+        <translation>beyaz</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="32"/>
         <source>blue</source>
-        <translation type="unfinished"/>
+        <translation>mavi</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="33"/>
         <source>black</source>
-        <translation type="unfinished"/>
+        <translation>siyah</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="34"/>
         <source>red</source>
-        <translation type="unfinished"/>
+        <translation>kırmızı</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="35"/>
         <source>green</source>
-        <translation type="unfinished"/>
+        <translation>yeşil</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="36"/>
