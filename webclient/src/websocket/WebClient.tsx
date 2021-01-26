@@ -52,8 +52,8 @@ export class WebClient {
       "user_ban_history",
       // satisfy server reqs for POC
       "websocket",
-      "2.6.1_min_version",
       "2.7.0_min_version",
+      "2.8.0_min_version"
     ]
   };
 
