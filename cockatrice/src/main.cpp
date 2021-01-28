@@ -151,6 +151,10 @@ int main(int argc, char *argv[])
     qDebug("main(): MainWindow constructor finished");
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    // set name of the app desktop file; used by wayland to load the window icon
+    QGuiApplication::setDesktopFileName("cockatrice");
+#endif
 
     SettingsCache::instance().setClientID(generateClientID());
 
