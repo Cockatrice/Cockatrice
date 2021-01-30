@@ -433,25 +433,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             lastDrawList.clear();
         }
 
-        // Only mess about with x coordinates if the card is sticking around, otherwise it can have weird side effects
-        // if multiple cards are moved at once.
-        if (!card->getDestroyOnZoneChange()) {
-            if ((startzone == targetzone) && !startzone->hasCoords()) {
-                if (!secondHalf && (originalPosition < x)) {
-                    xIndex = -1;
-                    secondHalf = true;
-                } else if (secondHalf) {
-                    --xIndex;
-                } else {
-                    ++xIndex;
-                }
-            } else {
-                ++xIndex;
-            }
-        }
-
-        int newX = x + xIndex;
-
         // Attachment relationships can be retained when moving a card onto the opponent's table
         if (startzone->getName() != targetzone->getName()) {
             // Delete all attachment relationships
@@ -491,6 +472,20 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 
             card->deleteLater();
         } else {
+            if ((startzone == targetzone) && !startzone->hasCoords()) {
+                if (!secondHalf && (originalPosition < x)) {
+                    xIndex = -1;
+                    secondHalf = true;
+                } else if (secondHalf) {
+                    --xIndex;
+                } else {
+                    ++xIndex;
+                }
+            } else {
+                ++xIndex;
+            }
+            int newX = x + xIndex;
+
             if (!targetzone->hasCoords()) {
                 y = 0;
                 card->resetState();
@@ -597,22 +592,22 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
                                   AttrPT, ptString);
             }
-        }
-        if (startzone->getAlwaysRevealTopCard() && !startzone->getCards().isEmpty() && (originalPosition == 0)) {
-            Event_RevealCards revealEvent;
-            revealEvent.set_zone_name(startzone->getName().toStdString());
-            revealEvent.set_card_id(0);
-            startzone->getCards().first()->getInfo(revealEvent.add_cards());
+            if (startzone->getAlwaysRevealTopCard() && !startzone->getCards().isEmpty() && (originalPosition == 0)) {
+                Event_RevealCards revealEvent;
+                revealEvent.set_zone_name(startzone->getName().toStdString());
+                revealEvent.set_card_id(0);
+                startzone->getCards().first()->getInfo(revealEvent.add_cards());
 
-            ges.enqueueGameEvent(revealEvent, playerId);
-        }
-        if (targetzone->getAlwaysRevealTopCard() && !targetzone->getCards().isEmpty() && (newX == 0)) {
-            Event_RevealCards revealEvent;
-            revealEvent.set_zone_name(targetzone->getName().toStdString());
-            revealEvent.set_card_id(0);
-            targetzone->getCards().first()->getInfo(revealEvent.add_cards());
+                ges.enqueueGameEvent(revealEvent, playerId);
+            }
+            if (targetzone->getAlwaysRevealTopCard() && !targetzone->getCards().isEmpty() && (newX == 0)) {
+                Event_RevealCards revealEvent;
+                revealEvent.set_zone_name(targetzone->getName().toStdString());
+                revealEvent.set_card_id(0);
+                targetzone->getCards().first()->getInfo(revealEvent.add_cards());
 
-            ges.enqueueGameEvent(revealEvent, playerId);
+                ges.enqueueGameEvent(revealEvent, playerId);
+            }
         }
     }
     if (undoingDraw) {
