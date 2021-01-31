@@ -152,6 +152,14 @@ void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bo
                                 .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
 }
 
+void MessageLogWidget::logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal)
+{
+    appendHtmlServerMessage((reveal ? tr("%1 is now looking at top card of their deck at any time.")
+                                    : tr("%1 is no longer looking at top card of their deck at any time."))
+                                .arg(sanitizeHtml(player->getName()))
+                                .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
+}
+
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
     appendHtmlServerMessage(tr("%1 attaches %2 to %3's %4.")
@@ -823,6 +831,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)));
     connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this,
             SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
+    connect(player, SIGNAL(logAlwaysLookAtTopCard(Player *, CardZone *, bool)), this,
+            SLOT(logAlwaysLookAtTopCard(Player *, CardZone *, bool)));
 }
 
 MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor,

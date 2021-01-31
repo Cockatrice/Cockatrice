@@ -7,5 +7,8 @@ message Event_ChangeZoneProperties {
     }
     optional string zone_name = 1;
 
+    // Reveal top card to all players.
     optional bool always_reveal_top_card = 10;
+    // reveal top card to the owner.
+    optional bool always_look_at_top_card = 11;
 }
