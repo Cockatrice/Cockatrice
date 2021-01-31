@@ -318,16 +318,34 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
     ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
     ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 
-    if (deckZone->getAlwaysRevealTopCard() && !deckZone->getCards().isEmpty()) {
+    revealTopCardIfNeeded(deckZone, ges);
+
+    return Response::RespOk;
+}
+
+void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorage &ges)
+{
+    if (zone->getCards().isEmpty()) {
+        return;
+    }
+    if (zone->getAlwaysRevealTopCard()) {
         Event_RevealCards revealEvent;
-        revealEvent.set_zone_name(deckZone->getName().toStdString());
+        revealEvent.set_zone_name(zone->getName().toStdString());
         revealEvent.set_card_id(0);
-        deckZone->getCards().first()->getInfo(revealEvent.add_cards());
+        zone->getCards().first()->getInfo(revealEvent.add_cards());
 
         ges.enqueueGameEvent(revealEvent, playerId);
     }
+    if (zone->getAlwaysLookAtTopCard()) {
+        Event_RevealCards revealEventPublic;
+        revealEventPublic.set_zone_name(zone->getName().toStdString());
+        Event_RevealCards revealEventPrivate(revealEventPublic);
+        revealEventPrivate.set_card_id(0);
+        zone->getCards().first()->getInfo(revealEventPrivate.add_cards());
 
-    return Response::RespOk;
+        ges.enqueueGameEvent(revealEventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
+        ges.enqueueGameEvent(revealEventPublic, playerId, GameEventStorageItem::SendToOthers);
+    }
 }
 
 class Server_Player::MoveCardCompareFunctor
@@ -598,21 +616,11 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                   AttrPT, ptString);
             }
         }
-        if (startzone->getAlwaysRevealTopCard() && !startzone->getCards().isEmpty() && (originalPosition == 0)) {
-            Event_RevealCards revealEvent;
-            revealEvent.set_zone_name(startzone->getName().toStdString());
-            revealEvent.set_card_id(0);
-            startzone->getCards().first()->getInfo(revealEvent.add_cards());
-
-            ges.enqueueGameEvent(revealEvent, playerId);
+        if (originalPosition == 0) {
+            revealTopCardIfNeeded(startzone, ges);
         }
-        if (targetzone->getAlwaysRevealTopCard() && !targetzone->getCards().isEmpty() && (newX == 0)) {
-            Event_RevealCards revealEvent;
-            revealEvent.set_zone_name(targetzone->getName().toStdString());
-            revealEvent.set_card_id(0);
-            targetzone->getCards().first()->getInfo(revealEvent.add_cards());
-
-            ges.enqueueGameEvent(revealEvent, playerId);
+        if (newX == 0) {
+            revealTopCardIfNeeded(targetzone, ges);
         }
     }
     if (undoingDraw) {
@@ -980,15 +988,7 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
     event.set_start(cmd.start());
     event.set_end(cmd.end());
     ges.enqueueGameEvent(event, playerId);
-
-    if (zone->getAlwaysRevealTopCard() && !zone->getCards().isEmpty()) {
-        Event_RevealCards revealEvent;
-        revealEvent.set_zone_name(zone->getName().toStdString());
-        revealEvent.set_card_id(0);
-        zone->getCards().first()->getInfo(revealEvent.add_cards());
-
-        ges.enqueueGameEvent(revealEvent, playerId);
-    }
+    revealTopCardIfNeeded(zone, ges);
 
     return Response::RespOk;
 }
@@ -1992,14 +1992,20 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 
         ges.enqueueGameEvent(event, playerId);
 
-        if (!zone->getCards().isEmpty() && cmd.always_reveal_top_card()) {
-            Event_RevealCards revealEvent;
-            revealEvent.set_zone_name(zone->getName().toStdString());
-            revealEvent.set_card_id(0);
-            zone->getCards().first()->getInfo(revealEvent.add_cards());
+        revealTopCardIfNeeded(zone, ges);
 
-            ges.enqueueGameEvent(revealEvent, playerId);
+        return Response::RespOk;
+    } else if (cmd.has_always_look_at_top_card()) {
+        if (zone->getAlwaysLookAtTopCard() == cmd.always_look_at_top_card()) {
+            return Response::RespContextError;
         }
+        zone->setAlwaysLookAtTopCard(cmd.always_look_at_top_card());
+        event.set_always_look_at_top_card(cmd.always_look_at_top_card());
+
+        ges.enqueueGameEvent(event, playerId);
+
+        revealTopCardIfNeeded(zone, ges);
+
         return Response::RespOk;
     } else {
         return Response::RespContextError;

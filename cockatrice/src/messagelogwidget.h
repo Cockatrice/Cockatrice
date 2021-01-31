@@ -42,6 +42,7 @@ public slots:
     void containerProcessingDone();
     void containerProcessingStarted(const GameEventContext &context);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
+    void logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
     void logConcede(Player *player);
     void logUnconcede(Player *player);
