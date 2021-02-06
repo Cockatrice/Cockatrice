@@ -200,7 +200,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
 
     int numCards = 0;
-    QMultiMap<QString, SplitCardPart> splitCards;
+    QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
     QString layout, name, text, colors, colorIdentity, maintype, power, toughness, faceName;
@@ -347,7 +347,14 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
             auto faceName = getStringPropertyFromMap(card, "faceName");
             SplitCardPart split(faceName, text, properties, setInfo);
-            splitCards.insert(name, split);
+            auto found_iter = splitCards.find(name);
+            if (found_iter == splitCards.end()) {
+                splitCards.insert(name, {split});
+            } else if (layout == "adventure") {
+                found_iter->insert(0, split);
+            } else {
+                found_iter->append(split);
+            }
         } else {
             // relations
             relatedCards.clear();
@@ -379,12 +386,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     // split cards handling
     static const QString splitCardPropSeparator = QString(" // ");
     static const QString splitCardTextSeparator = QString("\n\n---\n\n");
-    for (const QString &nameSplit : splitCards.uniqueKeys()) {
+    for (const QString &nameSplit : splitCards.keys()) {
         // get all parts for this specific card
-        QList<SplitCardPart> splitCardParts = splitCards.values(nameSplit);
+        QList<SplitCardPart> splitCardParts = splitCards.value(nameSplit);
         QSet<QString> done{};
 
-        text = QString("");
+        text.clear();
         properties.clear();
         relatedCards.clear();
 
