@@ -13,9 +13,20 @@ top (above the separation line) below "System Information" in this ticket!
 If you can't start Cockatrice to access these details, make
 sure to post your OS and the file name of the setup binary instead. -->
 
-<b>System Information:</b>
+**System Information:**
 
 
 _______________________________________________________________________________________
 
 <!-- Explain your issue in detail here! -->
+
+
+
+_______________________________________________________________________________________
+
+<!-- Describe the sequenze of actions needed to experience the bug -->
+
+**Steps to reproduce:**
+ - Do A
+ - Do B
+ - Do C ...
