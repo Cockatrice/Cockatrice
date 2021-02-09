@@ -701,7 +701,7 @@ void Player::retranslateUi()
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
         mRevealTopCard->setTitle(tr("Reveal t&op cards to..."));
         aAlwaysRevealTopCard->setText(tr("&Always reveal top card"));
-        aAlwaysLookAtTopCard->setText(tr("ALways look at top card"));
+        aAlwaysLookAtTopCard->setText(tr("Al&ways look at top card"));
         aOpenDeckInDeckEditor->setText(tr("O&pen deck in deck editor"));
         aViewSideboard->setText(tr("&View sideboard"));
         aDrawCard->setText(tr("&Draw card"));

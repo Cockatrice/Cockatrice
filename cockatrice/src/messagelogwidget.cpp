@@ -154,8 +154,8 @@ void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bo
 
 void MessageLogWidget::logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal)
 {
-    appendHtmlServerMessage((reveal ? tr("%1 is now looking at top card of their deck at any time.")
-                                    : tr("%1 is no longer looking at top card of their deck at any time."))
+    appendHtmlServerMessage((reveal ? tr("%1 can now look at top card %2 at any time.")
+                                    : tr("%1 no longer can look at top card %2 at any time."))
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
 }
