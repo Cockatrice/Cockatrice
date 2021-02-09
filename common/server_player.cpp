@@ -1988,8 +1988,10 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
     }
 
     // Neither value changed -> error.
-    bool alwaysRevealChanged = cmd.has_always_reveal_top_card() && zone->getAlwaysRevealTopCard() != cmd.always_reveal_top_card();
-    bool alwaysLookAtTopChanged = cmd.has_always_look_at_top_card() && zone->getAlwaysLookAtTopCard() != cmd.always_look_at_top_card();
+    bool alwaysRevealChanged =
+        cmd.has_always_reveal_top_card() && zone->getAlwaysRevealTopCard() != cmd.always_reveal_top_card();
+    bool alwaysLookAtTopChanged =
+        cmd.has_always_look_at_top_card() && zone->getAlwaysLookAtTopCard() != cmd.always_look_at_top_card();
     if (!alwaysRevealChanged && !alwaysLookAtTopChanged) {
         return Response::RespContextError;
     }
