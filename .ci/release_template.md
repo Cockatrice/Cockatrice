@@ -53,11 +53,16 @@ Use these label badges for highlighting important and key changes:
 --REPLACE-WITH-GENERATED-LIST--
  -->
 
+<details>
+<summary>Show complete list of changes</summary>
+
 ### User Interface
 ### Under the Hood
 ### Oracle
 ### Servatrice
 ### Webatrice
+
+</details>
 
 ## Translations
 - **Thanks for over 300 people contributing to 20+ different languages up to now!**
