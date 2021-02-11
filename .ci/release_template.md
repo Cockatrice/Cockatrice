@@ -47,7 +47,7 @@ Don't forget to update your card database right after! (<kbd>Help → Check for 
 <!--
 This list is generated and should be moved to their respective header and
 possibly edited a little.
-Append PR numbers of fixups into their main PR to keep the list coherent.
+Append PR numbers of fixups to their main PR to keep the list coherent.
 Remove empty headers after.
 Use these label badges for highlighting important and key changes:
 <kbd>New!</kbd>
