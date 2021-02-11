@@ -338,10 +338,11 @@ void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorag
         return;
     }
     if (zone->getAlwaysLookAtTopCard()) {
-        Event_DumpZone dumbEvent;
-        dumbEvent.set_zone_name(zone->getName().toStdString());
-        dumbEvent.set_number_cards(1);
-        ges.enqueueGameEvent(dumbEvent, playerId, GameEventStorageItem::SendToOthers);
+        Event_DumpZone dumpEvent;
+        dumpEvent.set_zone_owner_id(playerId);
+        dumpEvent.set_zone_name(zone->getName().toStdString());
+        dumpEvent.set_number_cards(1);
+        ges.enqueueGameEvent(dumpEvent, playerId, GameEventStorageItem::SendToOthers);
 
         Event_RevealCards revealEvent;
         revealEvent.set_zone_name(zone->getName().toStdString());
