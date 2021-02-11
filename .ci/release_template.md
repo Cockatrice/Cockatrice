@@ -22,6 +22,7 @@ include different targets -->
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
 
+
 ## General Notes
 
 <!-- --REPLACE-WITH-RELEASE-TITLE-- should be placed here by the ci -->
@@ -35,16 +36,18 @@ For any information relating to Cockatrice, please take a look at our official s
 
 If you'd like to help contribute to Cockatrice in any way, check out our [README](https://github.com/Cockatrice/Cockatrice#get-involved-). We're always available to answer questions you may have on how the program works and how you can provide a meaningful contribution.
 
+
 ## Upgrading Cockatrice
 - Run the internal software updater: <kbd>Help → Check for Client Updates</kbd>
 
 Don't forget to update your card database right after! (<kbd>Help → Check for Card Updates...</kbd>)
 
+
 ## Changelog
 <!--
-This list is generated and should be moved to their repective header and
+This list is generated and should be moved to their respective header and
 possibly edited a little.
-Move pr numbers of fixups into their main pr to keep the list coherent.
+Append PR numbers of fixups into their main PR to keep the list coherent.
 Remove empty headers after.
 Use these label badges for highlighting important and key changes:
 <kbd>New!</kbd>
@@ -53,8 +56,17 @@ Use these label badges for highlighting important and key changes:
 --REPLACE-WITH-GENERATED-LIST--
  -->
 
+ - ⚠️ **Important:**
+    - --REPLACE-WITH-HIGHLIGHTED-IMPORTANT-CHANGES--
+
+ - ✨ **New Features:**
+    - --REPLACE-WITH-HIGHLIGHTED-NEW-FEATURES--
+
+ - 🐛 **Fixed Bugs / Resolved issues:**
+    - --REPLACE-WITH-HIGHLIGHTED-FIXED-BUGS--
+
 <details>
-<summary>Show complete list of changes</summary>
+<summary>📘 <b>Show all changes <code> --REPLACE-WITH-CHANGES-COUNT-- </code></b></summary>
 
 ### User Interface
 ### Under the Hood
@@ -63,6 +75,7 @@ Use these label badges for highlighting important and key changes:
 ### Webatrice
 
 </details>
+
 
 ## Translations
 - **Thanks for over 300 people contributing to 20+ different languages up to now!**
