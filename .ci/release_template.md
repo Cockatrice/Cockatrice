@@ -57,16 +57,13 @@ Use these label badges for highlighting important and key changes:
  -->
 
  - ⚠️ **Important:**
-    - --REPLACE-WITH-HIGHLIGHTED-IMPORTANT-CHANGES--
 
  - ✨ **New Features:**
-    - --REPLACE-WITH-HIGHLIGHTED-NEW-FEATURES--
 
  - 🐛 **Fixed Bugs / Resolved issues:**
-    - --REPLACE-WITH-HIGHLIGHTED-FIXED-BUGS--
 
 <details>
-<summary>📘 <b>Show all changes <code> --REPLACE-WITH-CHANGES-COUNT-- </code></b></summary>
+<summary>📘 <b>Show all changes <code> xx </code></b></summary>
 
 ### User Interface
 ### Under the Hood
@@ -82,6 +79,7 @@ Use these label badges for highlighting important and key changes:
 - Without the help of the community we couldn't offer that great language support... keep up the good work!
 - It's actually very easy to join and help for yourself - find out more here:
     - [Help us Translate Cockatrice into your native language!](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ)
+
 
 ## Special Thanks
 <!-- Personalise this a bit! -->
