@@ -63,7 +63,7 @@ Use these label badges for highlighting important and key changes:
  - 🐛 **Fixed Bugs / Resolved issues:**
 
 <details>
-<summary>📘 <b>Show all changes <code> xx </code></b></summary>
+<summary>📘 <b>Show all changes <code> <!-- NUMBER OF CHANGES --> </code></b></summary>
 
 ### User Interface
 ### Under the Hood
