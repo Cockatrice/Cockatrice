@@ -18,7 +18,7 @@ sure to post your OS and the file name of the setup binary instead. -->
 
 _______________________________________________________________________________________
 
-<!-- Explain your issue in detail here! It's best to include screenshots as well. -->
+<!-- Explain your issue in detail here! Please attach screenshots if possible. -->
 
 
 
