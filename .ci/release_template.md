@@ -49,18 +49,13 @@ This list is generated and should be moved to their respective header and
 possibly edited a little.
 Append PR numbers of fixups to their main PR to keep the list coherent.
 Remove empty headers after.
-Use these label badges for highlighting important and key changes:
-<kbd>New!</kbd>
-<kbd>Fixed!</kbd> or <kbd>Resolved!</kbd>
 
 --REPLACE-WITH-GENERATED-LIST--
  -->
 
- - ⚠️ **Important:**
-
- - ✨ **New Features:**
-
- - 🐛 **Fixed Bugs / Resolved issues:**
+### ⚠️ Important:
+### ✨ New Features:
+### 🐛 Fixed Bugs / Resolved issues:
 
 <details>
 <summary>📘 <b>Show all changes <code> <!-- NUMBER OF CHANGES --> </code></b></summary>
