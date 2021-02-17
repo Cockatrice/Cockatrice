@@ -49,7 +49,7 @@ This list is generated and should be moved to their respective header and
 possibly edited a little.
 Append PR numbers of fixups to their main PR to keep the list coherent.
 Put the quantity of remaining PR's below the highlights section.
-Remove empty headers at the end.
+Remove empty headers when done.
 
 --REPLACE-WITH-GENERATED-LIST--
  -->
