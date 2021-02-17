@@ -48,17 +48,23 @@ Don't forget to update your card database right after! (<kbd>Help → Check for 
 This list is generated and should be moved to their respective header and
 possibly edited a little.
 Append PR numbers of fixups to their main PR to keep the list coherent.
-Remove empty headers after.
+Put the quantity of remaining PR's below the highlights section.
+Remove empty headers at the end.
 
 --REPLACE-WITH-GENERATED-LIST--
  -->
 
+<!-- Highlights of the release -->
 ### ⚠️ Important:
 ### ✨ New Features:
 ### 🐛 Fixed Bugs / Resolved issues:
 
+<!-- Complete list of changes (foldable) -->
 <details>
-<summary>📘 <b>Show all changes <code> <!-- NUMBER OF CHANGES --> </code></b></summary>
+<summary>📘 <b>Show all changes <code>
+<!-- Count of other changes -->
+ 
+</code></b></summary>
 
 ### User Interface
 ### Under the Hood
