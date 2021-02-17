@@ -22,6 +22,7 @@ include different targets -->
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
 
+
 ## General Notes
 
 <!-- --REPLACE-WITH-RELEASE-TITLE-- should be placed here by the ci -->
@@ -35,23 +36,35 @@ For any information relating to Cockatrice, please take a look at our official s
 
 If you'd like to help contribute to Cockatrice in any way, check out our [README](https://github.com/Cockatrice/Cockatrice#get-involved-). We're always available to answer questions you may have on how the program works and how you can provide a meaningful contribution.
 
+
 ## Upgrading Cockatrice
 - Run the internal software updater: <kbd>Help → Check for Client Updates</kbd>
 
 Don't forget to update your card database right after! (<kbd>Help → Check for Card Updates...</kbd>)
 
+
 ## Changelog
 <!--
-This list is generated and should be moved to their repective header and
+This list is generated and should be moved to their respective header and
 possibly edited a little.
-Move pr numbers of fixups into their main pr to keep the list coherent.
-Remove empty headers after.
-Use these label badges for highlighting important and key changes:
-<kbd>New!</kbd>
-<kbd>Fixed!</kbd> or <kbd>Resolved!</kbd>
+Append PR numbers of fixups to their main PR to keep the list coherent.
+Put the quantity of remaining PR's below the highlights section.
+Remove empty headers when done.
 
 --REPLACE-WITH-GENERATED-LIST--
  -->
+
+<!-- Highlights of the release -->
+### ⚠️ Important:
+### ✨ New Features:
+### 🐛 Fixed Bugs / Resolved issues:
+
+<!-- Complete list of changes (foldable) -->
+<details>
+<summary>📘 <b>Show all changes <code>
+<!-- Count of other changes -->
+ 
+</code></b></summary>
 
 ### User Interface
 ### Under the Hood
@@ -59,11 +72,15 @@ Use these label badges for highlighting important and key changes:
 ### Servatrice
 ### Webatrice
 
+</details>
+
+
 ## Translations
 - **Thanks for over 300 people contributing to 20+ different languages up to now!**
 - Without the help of the community we couldn't offer that great language support... keep up the good work!
 - It's actually very easy to join and help for yourself - find out more here:
     - [Help us Translate Cockatrice into your native language!](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ)
+
 
 ## Special Thanks
 <!-- Personalise this a bit! -->
