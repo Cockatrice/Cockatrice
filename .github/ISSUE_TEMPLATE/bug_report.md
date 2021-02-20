@@ -25,7 +25,7 @@ ________________________________________________________________________________
 
 _______________________________________________________________________________________
 
-<!-- Describe the sequenze of actions needed to experience the bug -->
+<!-- Describe the sequence of actions needed to experience the bug -->
 
 **Steps to reproduce:**
  - Do A
