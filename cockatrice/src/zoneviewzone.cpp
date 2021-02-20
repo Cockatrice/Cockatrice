@@ -81,15 +81,19 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
 
 void ZoneViewZone::zoneDumpReceived(const Response &r)
 {
+    static constexpr int MAX_VIEW_MENU = 300;
     const Response_DumpZone &resp = r.GetExtension(Response_DumpZone::ext);
     const int respCardListSize = resp.zone_info().card_list_size();
     for (int i = 0; i < respCardListSize; ++i) {
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
-        CardItem *card = new CardItem(player, QString::fromStdString(cardInfo.name()), cardInfo.id(), revealZone, this);
-        addCard(card, false, i);
+        auto cardName = QString::fromStdString(cardInfo.name());
+        // stop updating card menus after MAX_VIEW_MENU cards
+        // this means only the first cards in the menu have actions but others can still be dragged
+        auto *card = new CardItem(player, cardName, cardInfo.id(), revealZone, this, this, i < MAX_VIEW_MENU);
+        cards.insert(i, card);
     }
-
     reorganizeCards();
+    emit cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
