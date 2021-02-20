@@ -26,16 +26,18 @@ ZoneViewZone::ZoneViewZone(Player *_p,
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
 {
-    if (!(revealZone && !writeableRevealZone))
-        origZone->setView(this);
+    if (!(revealZone && !writeableRevealZone)) {
+        origZone->getViews().append(this);
+    }
 }
 
 ZoneViewZone::~ZoneViewZone()
 {
     emit beingDeleted();
     qDebug("ZoneViewZone destructor");
-    if (!(revealZone && !writeableRevealZone))
-        origZone->setView(NULL);
+    if (!(revealZone && !writeableRevealZone)) {
+        origZone->getViews().removeOne(this);
+    }
 }
 
 QRectF ZoneViewZone::boundingRect() const
@@ -238,11 +240,11 @@ QSizeF ZoneViewZone::sizeHint(Qt::SizeHint /*which*/, const QSizeF & /*constrain
 
 void ZoneViewZone::setWriteableRevealZone(bool _writeableRevealZone)
 {
-    if (writeableRevealZone && !_writeableRevealZone)
-        origZone->setView(this);
-    else if (!writeableRevealZone && _writeableRevealZone)
-        origZone->setView(NULL);
-
+    if (writeableRevealZone && !_writeableRevealZone) {
+        origZone->getViews().append(this);
+    } else if (!writeableRevealZone && _writeableRevealZone) {
+        origZone->getViews().removeOne(this);
+    }
     writeableRevealZone = _writeableRevealZone;
 }
 
