@@ -356,7 +356,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             if (!getStringPropertyFromMap(card, "side").isEmpty()) {
                 properties["cmc"] = getStringPropertyFromMap(card, "faceConvertedManaCost");
                 if (layout == "meld") { // meld cards don't work
-                    QRegularExpression meldNameRegex{"then meld them into ([\\.]*)"};
+                    static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
                         relatedCards.append(new CardRelation(additionalName, true));
