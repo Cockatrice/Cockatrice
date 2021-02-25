@@ -34,6 +34,7 @@
     "typescript": "3.6.4"
   },
   "scripts": {
+    "postinstall": "echo 'Copying shared files...' && ./copy_shared_files.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
