@@ -87,6 +87,7 @@ void TabDeckEditor::createDeckDock()
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
+    commentsEdit->setAcceptRichText(false);
     commentsEdit->setMinimumHeight(nameEdit->minimumSizeHint().height());
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
