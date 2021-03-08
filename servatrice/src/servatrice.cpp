@@ -955,12 +955,12 @@ int Servatrice::getMaxGamesPerUser() const
 
 int Servatrice::getCommandCountingInterval() const
 {
-    return settingsCache->value("game/command_counting_interval", 10).toInt();
+    return settingsCache->value("security/command_counting_interval", 10).toInt();
 }
 
 int Servatrice::getMaxCommandCountPerInterval() const
 {
-    return settingsCache->value("game/max_command_count_per_interval", 20).toInt();
+    return settingsCache->value("security/max_command_count_per_interval", 20).toInt();
 }
 
 int Servatrice::getServerStatusUpdateTime() const

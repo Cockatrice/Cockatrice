@@ -286,11 +286,13 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc)))
                 ++commandCountOverTime[0];
 
-            for (int i = 0; i < commandCountOverTime.size(); ++i)
+            for (int i = 0; i < commandCountOverTime.size(); ++i) {
                 totalCount += commandCountOverTime[i];
+            }
 
-            if (totalCount > maxCommandCountPerInterval)
+            if (maxCommandCountPerInterval > 0 && totalCount > maxCommandCountPerInterval) {
                 return Response::RespChatFlood;
+            }
         }
 
         Response::ResponseCode resp = player->processGameCommand(sc, rc, ges);
@@ -733,12 +735,16 @@ Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room
         if (messageCountOverTime.isEmpty())
             messageCountOverTime.prepend(0);
         ++messageCountOverTime[0];
-        for (int i = 0; i < messageCountOverTime.size(); ++i)
+        for (int i = 0; i < messageCountOverTime.size(); ++i) {
             totalCount += messageCountOverTime[i];
+        }
 
-        if ((totalSize > server->getMaxMessageSizePerInterval()) ||
-            (totalCount > server->getMaxMessageCountPerInterval()))
+        int maxMessageSizePerInterval = server->getMaxMessageSizePerInterval();
+        int maxMessageCountPerInterval = server->getMaxMessageCountPerInterval();
+        if ((maxMessageSizePerInterval > 0 && totalSize > maxMessageSizePerInterval) ||
+            (maxMessageCountPerInterval > 0 && totalCount > maxMessageCountPerInterval)) {
             return Response::RespChatFlood;
+        }
     }
     msg.replace(QChar('\n'), QChar(' '));
 
