@@ -37,6 +37,7 @@ message Command_CreateGame {
     optional bool spectators_see_everything = 9;
     repeated uint32 game_type_ids = 10;
     optional bool join_as_judge = 11;
+    optional bool join_as_spectator = 12;
 }
 
 message Command_JoinGame {
