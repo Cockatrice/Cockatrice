@@ -766,22 +766,24 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     if (gameId == -1)
         return Response::RespInternalError;
 
-    if (server->getMaxGamesPerUser() > 0)
-        if (room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= server->getMaxGamesPerUser())
-            return Response::RespContextError;
+    auto level = userInfo->user_level();
+    bool isJudge = level & ServerInfo_User::IsJudge;
+    int maxGames = server->getMaxGamesPerUser();
+    if (maxGames > 0 && room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= maxGames) {
+        return Response::RespContextError;
+    }
 
-    if (cmd.join_as_judge() && !server->permitCreateGameAsJudge() &&
-        !(userInfo->user_level() & ServerInfo_User::IsJudge)) {
+    // only if the server disallows normal users to create games as judge is being a judge required
+    if (cmd.join_as_judge() && !(server->permitCreateGameAsJudge() || isJudge)) {
         return Response::RespContextError;
     }
 
     QList<int> gameTypes;
-    for (int i = cmd.game_type_ids_size() - 1; i >= 0; --i)
+    for (int i = cmd.game_type_ids_size() - 1; i >= 0; --i) {
         gameTypes.append(cmd.game_type_ids(i));
+    }
 
-    QString description = QString::fromStdString(cmd.description());
-    if (description.size() > 60)
-        description = description.left(60);
+    QString description = QString::fromStdString(cmd.description()).left(60);
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());

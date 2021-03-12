@@ -66,7 +66,7 @@ void UserContextMenu::retranslateUi()
     aBanHistory->setText(tr("View user's &ban history"));
     aPromoteToMod->setText(tr("&Promote user to moderator"));
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
-    aPromoteToJudge->setText(tr("Promote user to &juge"));
+    aPromoteToJudge->setText(tr("Promote user to &judge"));
     aDemoteFromJudge->setText(tr("Demote user from judge"));
 }
 
