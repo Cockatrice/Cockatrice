@@ -173,20 +173,22 @@ void Server_Game::pingClockTimeout()
         if (player == nullptr)
             continue;
 
-        if (!player->getSpectator())
+        if (!player->getSpectator()) {
             ++playerCount;
+        }
 
         int oldPingTime = player->getPingTime();
         int newPingTime;
-        player->playerMutex.lock();
-        if (player->getUserInterface()) {
-            newPingTime = player->getUserInterface()->getLastCommandTime();
-        } else {
-            newPingTime = -1;
+        {
+            QMutexLocker playerMutexLocker(&player->playerMutex);
+            if (player->getUserInterface()) {
+                newPingTime = player->getUserInterface()->getLastCommandTime();
+            } else {
+                newPingTime = -1;
+            }
         }
-        player->playerMutex.unlock();
 
-        if ((newPingTime != -1) && !player->getSpectator()) {
+        if ((newPingTime != -1) && (!player->getSpectator() || player->getPlayerId() == hostId)) {
             allPlayersInactive = false;
         }
 

@@ -263,8 +263,9 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 
     QMutexLocker gameLocker(&game->gameMutex);
 
-    Response::ResponseCode result = game->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()),
-                                                 cmd.spectator(), cmd.override_restrictions(), cmd.join_as_judge());
+    Response::ResponseCode result =
+        game->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(),
+                        cmd.override_restrictions(), cmd.join_as_judge());
     if (result == Response::RespOk)
         game->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
 
