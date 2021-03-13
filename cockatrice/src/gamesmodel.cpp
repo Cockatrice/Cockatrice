@@ -278,8 +278,6 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
             return;
         }
     }
-    if (game.player_count() <= 0)
-        return;
     beginInsertRows(QModelIndex(), gameList.size(), gameList.size());
     gameList.append(game);
     endInsertRows();

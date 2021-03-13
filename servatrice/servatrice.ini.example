@@ -344,7 +344,7 @@ max_message_size_per_interval=1000
 ; Maximum number of messages in an interval before new messages gets dropped; default is 10
 max_message_count_per_interval=10
 
-; Maximum number of games a single user can create; default is 5
+; Maximum number of games a single user can create; default is 5; set to -1 to disable; 0 disallows game creation
 max_games_per_user=5
 
 ; Servatrice can avoid users from flooding games with large number of game commands in an interval of time.

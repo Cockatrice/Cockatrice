@@ -766,22 +766,28 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     if (gameId == -1)
         return Response::RespInternalError;
 
-    if (server->getMaxGamesPerUser() > 0)
-        if (room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= server->getMaxGamesPerUser())
-            return Response::RespContextError;
-
-    if (cmd.join_as_judge() && !server->permitCreateGameAsJudge() &&
-        !(userInfo->user_level() & ServerInfo_User::IsJudge)) {
+    auto level = userInfo->user_level();
+    bool isJudge = level & ServerInfo_User::IsJudge;
+    int maxGames = server->getMaxGamesPerUser();
+    bool asJudge = cmd.join_as_judge();
+    bool asSpectator = cmd.join_as_spectator();
+    // allow judges to open games as spectator without limit to facilitate bots etc, -1 means no limit
+    if (!(isJudge && asJudge && asSpectator) && maxGames >= 0 &&
+        room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= maxGames) {
         return Response::RespContextError;
     }
 
-    QList<int> gameTypes;
-    for (int i = cmd.game_type_ids_size() - 1; i >= 0; --i)
-        gameTypes.append(cmd.game_type_ids(i));
+    // if a non judge user tries to create a game as judge while not permitted, instead create a normal game
+    if (asJudge && !(server->permitCreateGameAsJudge() || isJudge)) {
+        asJudge = false;
+    }
 
-    QString description = QString::fromStdString(cmd.description());
-    if (description.size() > 60)
-        description = description.left(60);
+    QList<int> gameTypes;
+    for (int i = cmd.game_type_ids_size() - 1; i >= 0; --i) { // FIXME: why are these iterated in reverse?
+        gameTypes.append(cmd.game_type_ids(i));
+    }
+
+    QString description = QString::fromStdString(cmd.description()).left(60);
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
@@ -790,7 +796,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
         cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
         cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
 
-    game->addPlayer(this, rc, false, cmd.join_as_judge(), false);
+    game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
 
     return Response::RespOk;
