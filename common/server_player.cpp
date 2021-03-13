@@ -426,11 +426,13 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
         int position = startzone->removeCard(card);
 
         // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
-        // reorder their hand). If a just-drawn card leaves the hand then clear lastDrawList to invalidate "undo draw."
+        // reorder their hand). If a just-drawn card leaves the hand then remove cards before it from the list
         // (Ignore the case where the card is currently being un-drawn.)
-        if (startzone->getName() == "hand" && targetzone->getName() != "hand" && lastDrawList.contains(card->getId()) &&
-            !undoingDraw) {
-            lastDrawList.clear();
+        if (startzone->getName() == "hand" && targetzone->getName() != "hand" && !undoingDraw) {
+            int index = lastDrawList.lastIndexOf(card->getId());
+            if (index != -1) {
+                lastDrawList.erase(lastDrawList.begin(), lastDrawList.begin() + index);
+            }
         }
 
         // Attachment relationships can be retained when moving a card onto the opponent's table
