@@ -84,6 +84,7 @@ private:
     bool readyStart;
     bool conceded;
     bool sideboardLocked;
+    void revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorage &ges);
 
 public:
     mutable QMutex playerMutex;

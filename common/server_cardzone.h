@@ -42,6 +42,7 @@ private:
     int cardsBeingLookedAt;
     QSet<int> playersWithWritePermission;
     bool alwaysRevealTopCard;
+    bool alwaysLookAtTopCard;
     QList<Server_Card *> cards;
     QMap<int, QMap<int, Server_Card *>> coordinateMap; // y -> (x -> card)
     QMap<int, QMultiMap<QString, int>> freePilesMap;   // y -> (cardName -> x)
@@ -107,6 +108,14 @@ public:
     void setAlwaysRevealTopCard(bool _alwaysRevealTopCard)
     {
         alwaysRevealTopCard = _alwaysRevealTopCard;
+    }
+    bool getAlwaysLookAtTopCard() const
+    {
+        return alwaysLookAtTopCard;
+    }
+    void setAlwaysLookAtTopCard(bool _alwaysLookAtTopCard)
+    {
+        alwaysLookAtTopCard = _alwaysLookAtTopCard;
     }
 };
 
