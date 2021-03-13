@@ -18,13 +18,14 @@ sure to post your OS and the file name of the setup binary instead. -->
 
 _______________________________________________________________________________________
 
-<!-- Explain your issue in detail here! -->
+<!-- Explain your issue in detail here! Please attach screenshots if possible. -->
+
 
 
 
 _______________________________________________________________________________________
 
-<!-- Describe the sequenze of actions needed to experience the bug -->
+<!-- Describe the sequence of actions needed to experience the bug -->
 
 **Steps to reproduce:**
  - Do A

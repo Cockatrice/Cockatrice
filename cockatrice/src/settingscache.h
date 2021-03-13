@@ -124,6 +124,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
+    bool createGameAsSpectator;
     int keepalive;
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
@@ -394,6 +395,10 @@ public:
     {
         return spectatorsCanSeeEverything;
     }
+    bool getCreateGameAsSpectator() const
+    {
+        return createGameAsSpectator;
+    }
     bool getRememberGameSettings() const
     {
         return rememberGameSettings;
@@ -525,6 +530,7 @@ public slots:
     void setSpectatorsNeedPassword(const bool _spectatorsNeedPassword);
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
+    void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
     void setNotifyAboutNewVersion(int _notifyaboutnewversion);

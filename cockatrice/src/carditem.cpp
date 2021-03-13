@@ -18,9 +18,15 @@
 #include <QMenu>
 #include <QPainter>
 
-CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
-    : AbstractCardItem(_name, _owner, _cardid, parent), zone(0), revealedCard(_revealedCard), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
+CardItem::CardItem(Player *_owner,
+                   const QString &_name,
+                   int _cardid,
+                   bool _revealedCard,
+                   QGraphicsItem *parent,
+                   CardZone *_zone,
+                   bool updateMenu)
+    : AbstractCardItem(_name, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
+      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
@@ -29,7 +35,9 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
     moveMenu = new QMenu;
 
     retranslateUi();
-    emit updateCardMenu(this);
+    if (updateMenu) { // avoid updating card menu too often
+        emit updateCardMenu(this);
+    }
 }
 
 CardItem::~CardItem()
@@ -382,7 +390,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    if (owner != nullptr){ // cards without owner will be deleted
+    if (owner != nullptr) { // cards without owner will be deleted
         setCursor(Qt::OpenHandCursor);
     }
     AbstractCardItem::mouseReleaseEvent(event);

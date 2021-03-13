@@ -6,6 +6,7 @@ on:
       - master
     paths-ignore:
       - '**.md'
+      - 'webclient/**'
     tags:
       - '*'
   pull_request:
@@ -13,6 +14,7 @@ on:
       - master
     paths-ignore:
       - '**.md'
+      - 'webclient/**'
 
 jobs:
   configure:
@@ -78,13 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distro: # these names correspond to the files in .ci/$distro
-          - UbuntuGroovy
-          - UbuntuFocal
-          - UbuntuBionic
-          - ArchLinux
-          - DebianBuster
-          - Fedora33
+        # these names correspond to the files in .ci/$distro
         include:
           - distro: UbuntuGroovy
             package: DEB
@@ -140,7 +136,14 @@ jobs:
 
       - name: Build ${{matrix.distro}} Docker image
         shell: bash
-        run: source .ci/docker.sh --build
+        run: |
+          # temporary workaround for arch libc version requiring upgraded host
+          # see https://bugs.archlinux.org/task/69563#comment196582
+          if [[ $NAME == ArchLinux ]]; then
+            wget http://ftp.us.debian.org/debian/pool/main/r/runc/runc_1.0.0~rc93+ds1-2_amd64.deb
+            sudo dpkg -i --force-conflicts runc*.deb
+          fi
+          source .ci/docker.sh --build
 
       - name: Build debug and test
         if: matrix.test != 'skip'
@@ -253,7 +256,7 @@ jobs:
         id: brew_install_qt
         continue-on-error: true
         shell: bash
-        run: brew install qt --force-bottle
+        run: brew install qt@5 --force-bottle
 
       - name: Install QT using actions
         if: steps.brew_install_qt.outcome != 'success'

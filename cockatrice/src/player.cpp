@@ -1568,8 +1568,10 @@ void Player::eventShuffle(const Event_Shuffle &event)
     if (!zone) {
         return;
     }
-    if (zone->getView() && zone->getView()->getRevealZone()) {
-        zone->getView()->setWriteableRevealZone(false);
+    for (auto *view : zone->getViews()) {
+        if (view != nullptr) {
+            view->setWriteableRevealZone(false);
+        }
     }
     emit logShuffle(this, zone, event.start(), event.end());
 }

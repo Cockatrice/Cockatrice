@@ -26,16 +26,18 @@ ZoneViewZone::ZoneViewZone(Player *_p,
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
 {
-    if (!(revealZone && !writeableRevealZone))
-        origZone->setView(this);
+    if (!(revealZone && !writeableRevealZone)) {
+        origZone->getViews().append(this);
+    }
 }
 
 ZoneViewZone::~ZoneViewZone()
 {
     emit beingDeleted();
     qDebug("ZoneViewZone destructor");
-    if (!(revealZone && !writeableRevealZone))
-        origZone->setView(NULL);
+    if (!(revealZone && !writeableRevealZone)) {
+        origZone->getViews().removeOne(this);
+    }
 }
 
 QRectF ZoneViewZone::boundingRect() const
@@ -81,15 +83,19 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
 
 void ZoneViewZone::zoneDumpReceived(const Response &r)
 {
+    static constexpr int MAX_VIEW_MENU = 300;
     const Response_DumpZone &resp = r.GetExtension(Response_DumpZone::ext);
     const int respCardListSize = resp.zone_info().card_list_size();
     for (int i = 0; i < respCardListSize; ++i) {
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
-        CardItem *card = new CardItem(player, QString::fromStdString(cardInfo.name()), cardInfo.id(), revealZone, this);
-        addCard(card, false, i);
+        auto cardName = QString::fromStdString(cardInfo.name());
+        // stop updating card menus after MAX_VIEW_MENU cards
+        // this means only the first cards in the menu have actions but others can still be dragged
+        auto *card = new CardItem(player, cardName, cardInfo.id(), revealZone, this, this, i < MAX_VIEW_MENU);
+        cards.insert(i, card);
     }
-
     reorganizeCards();
+    emit cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
@@ -238,11 +244,11 @@ QSizeF ZoneViewZone::sizeHint(Qt::SizeHint /*which*/, const QSizeF & /*constrain
 
 void ZoneViewZone::setWriteableRevealZone(bool _writeableRevealZone)
 {
-    if (writeableRevealZone && !_writeableRevealZone)
-        origZone->setView(this);
-    else if (!writeableRevealZone && _writeableRevealZone)
-        origZone->setView(NULL);
-
+    if (writeableRevealZone && !_writeableRevealZone) {
+        origZone->getViews().append(this);
+    } else if (!writeableRevealZone && _writeableRevealZone) {
+        origZone->getViews().removeOne(this);
+    }
     writeableRevealZone = _writeableRevealZone;
 }
 

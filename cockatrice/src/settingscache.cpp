@@ -284,6 +284,7 @@ SettingsCache::SettingsCache()
     spectatorsNeedPassword = settings->value("game/spectatorsneedpassword", false).toBool();
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
+    createGameAsSpectator = settings->value("game/creategameasspectator", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
@@ -938,6 +939,12 @@ void SettingsCache::setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEv
 {
     spectatorsCanSeeEverything = _spectatorsCanSeeEverything;
     settings->setValue("game/spectatorscanseeeverything", spectatorsCanSeeEverything);
+}
+
+void SettingsCache::setCreateGameAsSpectator(const bool _createGameAsSpectator)
+{
+    createGameAsSpectator = _createGameAsSpectator;
+    settings->setValue("game/creategameasspectator", createGameAsSpectator);
 }
 
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)

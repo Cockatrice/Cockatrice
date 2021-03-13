@@ -39,7 +39,7 @@ private:
     QSpinBox *maxPlayersEdit;
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
-        *spectatorsSeeEverythingCheckBox;
+        *spectatorsSeeEverythingCheckBox, *createGameAsSpectatorCheckBox;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
     QCheckBox *rememberGameSettings;

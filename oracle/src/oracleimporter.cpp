@@ -200,7 +200,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
 
     int numCards = 0;
-    QMultiMap<QString, SplitCardPart> splitCards;
+    QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
     QString layout, name, text, colors, colorIdentity, maintype, power, toughness, faceName;
@@ -347,7 +347,14 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
             auto faceName = getStringPropertyFromMap(card, "faceName");
             SplitCardPart split(faceName, text, properties, setInfo);
-            splitCards.insert(name, split);
+            auto found_iter = splitCards.find(name);
+            if (found_iter == splitCards.end()) {
+                splitCards.insert(name, {split});
+            } else if (layout == "adventure") {
+                found_iter->insert(0, split);
+            } else {
+                found_iter->append(split);
+            }
         } else {
             // relations
             relatedCards.clear();
@@ -356,7 +363,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             if (!getStringPropertyFromMap(card, "side").isEmpty()) {
                 properties["cmc"] = getStringPropertyFromMap(card, "faceConvertedManaCost");
                 if (layout == "meld") { // meld cards don't work
-                    QRegularExpression meldNameRegex{"then meld them into ([\\.]*)"};
+                    static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
                         relatedCards.append(new CardRelation(additionalName, true));
@@ -377,45 +384,46 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     }
 
     // split cards handling
-    QString splitCardPropSeparator = QString(" // ");
-    QString splitCardTextSeparator = QString("\n\n---\n\n");
-    for (const QString &nameSplit : splitCards.uniqueKeys()) {
+    static const QString splitCardPropSeparator = QString(" // ");
+    static const QString splitCardTextSeparator = QString("\n\n---\n\n");
+    for (const QString &nameSplit : splitCards.keys()) {
         // get all parts for this specific card
-        QList<SplitCardPart> splitCardParts = splitCards.values(nameSplit);
-        // sort them by face name
-        std::sort(splitCardParts.begin(), splitCardParts.end(),
-                  [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getName() < b.getName(); });
+        QList<SplitCardPart> splitCardParts = splitCards.value(nameSplit);
+        QSet<QString> done{};
 
-        text = QString("");
+        text.clear();
         properties.clear();
         relatedCards.clear();
 
-        QString lastName{};
         for (const SplitCardPart &tmp : splitCardParts) {
             // some sets have 2 different variations of the same split card,
             // eg. Fire // Ice in WC02. Avoid adding duplicates.
-            if (lastName == tmp.getName())
+            QString splitName = tmp.getName();
+            if (done.contains(splitName)) {
                 continue;
+            }
+            done.insert(splitName);
 
-            lastName = tmp.getName();
-
-            if (!text.isEmpty())
+            if (!text.isEmpty()) {
                 text.append(splitCardTextSeparator);
+            }
             text.append(tmp.getText());
 
             if (properties.isEmpty()) {
                 properties = tmp.getProperties();
                 setInfo = tmp.getSetInfo();
             } else {
-                const QVariantHash &props = tmp.getProperties();
-                for (const QString &prop : props.keys()) {
+                const QVariantHash &tmpProps = tmp.getProperties();
+                for (const QString &prop : tmpProps.keys()) {
                     QString originalPropertyValue = properties.value(prop).toString();
-                    QString thisCardPropertyValue = props.value(prop).toString();
-                    if (originalPropertyValue != thisCardPropertyValue) {
-                        if (prop == "colors") {
+                    QString thisCardPropertyValue = tmpProps.value(prop).toString();
+                    if (!thisCardPropertyValue.isEmpty() && originalPropertyValue != thisCardPropertyValue) {
+                        if (originalPropertyValue.isEmpty()) { // don't create //es if one field is empty
+                            properties.insert(prop, thisCardPropertyValue);
+                        } else if (prop == "colors") { // the card is both colors
                             properties.insert(prop, originalPropertyValue + thisCardPropertyValue);
                         } else if (prop == "maintype") { // don't create maintypes with //es in them
-                            properties.insert(prop, originalPropertyValue);
+                            continue;
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
