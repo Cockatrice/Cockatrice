@@ -452,14 +452,18 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
     sendGameEventContainer(prepareGameEvent(joinEvent, -1));
 
     const QString playerName = QString::fromStdString(newPlayer->getUserInfo()->name());
-    if (spectator)
-        allSpectatorsEver.insert(playerName);
-    else
-        allPlayersEver.insert(playerName);
     players.insert(newPlayer->getPlayerId(), newPlayer);
-    if (newPlayer->getUserInfo()->name() == creatorInfo->name()) {
-        hostId = newPlayer->getPlayerId();
-        sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+    if (spectator) {
+        allSpectatorsEver.insert(playerName);
+    } else {
+        allPlayersEver.insert(playerName);
+
+        // if the original creator of the game joins, give them host status back
+        // FIXME: transferring host to spectators has side effects
+        if (newPlayer->getUserInfo()->name() == creatorInfo->name()) {
+            hostId = newPlayer->getPlayerId();
+            sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+        }
     }
 
     if (broadcastUpdate) {
