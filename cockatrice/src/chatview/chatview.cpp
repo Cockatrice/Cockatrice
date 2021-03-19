@@ -15,6 +15,7 @@
 #include <QTextEdit>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
+const QStringList ChatView::customSchemes{"game", "card", "user"};
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
@@ -109,6 +110,20 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
     prepareBlock().insertHtml(htmlText);
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void ChatView::appendGameTag(QTextCursor &cursor, const QString &gameId)
+{
+    QTextCharFormat oldFormat = cursor.charFormat();
+    QTextCharFormat anchorFormat = oldFormat;
+    anchorFormat.setForeground(linkColor);
+    anchorFormat.setAnchor(true);
+    anchorFormat.setAnchorHref("game://" + gameId);
+    anchorFormat.setFontItalic(true);
+
+    cursor.setCharFormat(anchorFormat);
+    cursor.insertText(gameId);
+    cursor.setCharFormat(oldFormat);
 }
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
@@ -261,6 +276,19 @@ void ChatView::appendMessage(QString message,
 
 void ChatView::checkTag(QTextCursor &cursor, QString &message)
 {
+    if (message.startsWith("[game]")) {
+        message = message.mid(6);
+        int closeTagIndex = message.indexOf("[/game]");
+        QString gameId = message.left(closeTagIndex);
+        if (closeTagIndex == -1)
+            message.clear();
+        else
+            message = message.mid(closeTagIndex + 7);
+
+        appendGameTag(cursor, gameId);
+        return;
+    }
+
     if (message.startsWith("[card]")) {
         message = message.mid(6);
         int closeTagIndex = message.indexOf("[/card]");
@@ -505,13 +533,16 @@ void ChatView::mouseMoveEvent(QMouseEvent *event)
         if (delimiterIndex != -1) {
             const QString scheme = anchorHref.left(delimiterIndex);
             hoveredContent = anchorHref.mid(delimiterIndex + 3);
-            if (scheme == "card") {
+            if (scheme == "game") {
+                hoveredItemType = HoveredGame;
+            } else if (scheme == "card") {
                 hoveredItemType = HoveredCard;
                 emit cardNameHovered(hoveredContent);
-            } else if (scheme == "user")
+            } else if (scheme == "user") {
                 hoveredItemType = HoveredUser;
-            else
+            } else {
                 hoveredItemType = HoveredUrl;
+            }
             viewport()->setCursor(Qt::PointingHandCursor);
         } else {
             hoveredItemType = HoveredNothing;
@@ -528,6 +559,14 @@ void ChatView::mouseMoveEvent(QMouseEvent *event)
 void ChatView::mousePressEvent(QMouseEvent *event)
 {
     switch (hoveredItemType) {
+        case HoveredGame: {
+            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton)) {
+                // focus game in list if possible
+            } else if (event->button() == Qt::RightButton) {
+                // open menu
+            }
+            break;
+        }
         case HoveredCard: {
             if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
                 emit showCardInfoPopup(event->globalPos(), hoveredContent);
@@ -572,7 +611,7 @@ void ChatView::mouseReleaseEvent(QMouseEvent *event)
 
 void ChatView::openLink(const QUrl &link)
 {
-    if ((link.scheme() == "card") || (link.scheme() == "user"))
+    if (customSchemes.contains(link.scheme()))
         return;
 
     QDesktopServices::openUrl(link);

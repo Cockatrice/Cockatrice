@@ -1,8 +1,8 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
+#include "gamelistitem.h"
 #include "gametypemap.h"
-#include "pb/serverinfo_game.pb.h"
 #include "tab_supervisor.h"
 
 #include <QAbstractTableModel>
@@ -16,16 +16,29 @@ class GamesModel : public QAbstractTableModel
 {
     Q_OBJECT
 private:
-    QList<ServerInfo_Game> gameList;
+    QList<int> gameList;
     QMap<int, QString> rooms;
     QMap<int, GameTypeMap> gameTypes;
+    QMap<int, GameListItem> &gameMap;
 
-    static const int NUM_COLS = 8;
+    void resetList();
 
 public:
     static const int SORT_ROLE = Qt::UserRole + 1;
+    static const int NUM_COLS = 8;
+    enum GameListColumn
+    {
+        ROOM,
+        CREATED,
+        DESCRIPTION,
+        CREATOR,
+        GAME_TYPE,
+        RESTRICTIONS,
+        PLAYERS,
+        SPECTATORS
+    };
 
-    GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = nullptr);
+    GamesModel(const QMap<int, QString> &_rooms, QObject *parent, QMap<int, GameListItem> &_gameMap);
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
         return parent.isValid() ? 0 : gameList.size();
@@ -37,12 +50,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     static const QString getGameCreatedString(const int secs);
-    const ServerInfo_Game &getGame(int row);
-
-    /**
-     * Update game list with a (possibly new) game.
-     */
-    void updateGameList(const ServerInfo_Game &game);
+    const GameListItem &getGame(int row);
+    void rebuildList();
+    void addGame(GameListItem &gamesToUpdate);
 
     int roomColIndex()
     {

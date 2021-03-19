@@ -1,6 +1,7 @@
 #ifndef TAB_ROOM_H
 #define TAB_ROOM_H
 
+#include "gamelistitem.h"
 #include "lineeditcompleter.h"
 #include "tab.h"
 
@@ -45,6 +46,7 @@ private:
     QString roomName;
     ServerInfo_User *ownUser;
     QMap<int, QString> gameTypes;
+    QMap<int, GameListItem> gamesById;
 
     GameSelector *gameSelector;
     UserList *userList;
@@ -61,6 +63,12 @@ private:
 
     QStringList autocompleteUserList;
     QCompleter *completer;
+
+    void processListGamesEvent(const Event_ListGames &event);
+    bool processGame(const ServerInfo_Game &game);
+    void processJoinRoomEvent(const Event_JoinRoom &event);
+    void processLeaveRoomEvent(const Event_LeaveRoom &event);
+    void processRoomSayEvent(const Event_RoomSay &event);
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);
@@ -78,10 +86,6 @@ private slots:
     void actShowPopup(const QString &message);
     void actCompleterChanged();
 
-    void processListGamesEvent(const Event_ListGames &event);
-    void processJoinRoomEvent(const Event_JoinRoom &event);
-    void processLeaveRoomEvent(const Event_LeaveRoom &event);
-    void processRoomSayEvent(const Event_RoomSay &event);
     void refreshShortcuts();
 
 public:

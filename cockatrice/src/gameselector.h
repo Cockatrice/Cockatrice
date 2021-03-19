@@ -9,6 +9,7 @@
 
 class QTreeView;
 class GamesModel;
+class GameListItem;
 class GamesProxyModel;
 class QPushButton;
 class QCheckBox;
@@ -55,12 +56,13 @@ public:
                  const TabSupervisor *_tabSupervisor,
                  TabRoom *_room,
                  const QMap<int, QString> &_rooms,
-                 const QMap<int, GameTypeMap> &_gameTypes,
                  const bool restoresettings,
                  const bool _showfilters,
-                 QWidget *parent = nullptr);
+                 QWidget *parent,
+                 QMap<int, GameListItem> &gamesMap);
     void retranslateUi();
-    void processGameInfo(const ServerInfo_Game &info);
+    void rebuildList();
+    void addGame(GameListItem &game);
 };
 
 #endif
