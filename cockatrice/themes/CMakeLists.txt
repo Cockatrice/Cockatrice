@@ -3,7 +3,6 @@
 # add themes subfolders
 
 SET(defthemes
-    Default
     Fabric
     Leather
     Plasma
