@@ -197,6 +197,7 @@ SettingsCache::SettingsCache()
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
+    themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
     // this has never been exposed as an user-configurable setting
     if (picsPath.endsWith("/")) {
@@ -386,6 +387,13 @@ void SettingsCache::setReplaysPath(const QString &_replaysPath)
 {
     replaysPath = _replaysPath;
     settings->setValue("paths/replays", replaysPath);
+}
+
+void SettingsCache::setThemesPath(const QString &_themesPath)
+{
+    themesPath = _themesPath;
+    settings->setValue("paths/themes", themesPath);
+    emit themeChanged();
 }
 
 void SettingsCache::setCustomCardDatabasePath(const QString &_customCardDatabasePath)

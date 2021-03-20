@@ -15,6 +15,7 @@
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QDialogButtonBox>
 #include <QFileDialog>
@@ -291,10 +292,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     }
 
     connect(&themeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(themeBoxChanged(int)));
+    connect(&openThemeButton, SIGNAL(clicked()), this, SLOT(openThemeLocation()));
 
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
     themeGrid->addWidget(&themeBox, 0, 1);
+    themeGrid->addWidget(&openThemeButton, 1, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -370,10 +373,24 @@ void AppearanceSettingsPage::themeBoxChanged(int index)
         SettingsCache::instance().setThemeName(themeDirs.at(index));
 }
 
+void AppearanceSettingsPage::openThemeLocation()
+{
+    QString dir = SettingsCache::instance().getThemesPath();
+    QDir dirDir = dir;
+    dirDir.cdUp();
+    // open if dir exists, create if parent dir does exist
+    if (dirDir.exists() && dirDir.mkpath(dir)) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Could not create themes directory at '%1'.").arg(dir));
+    }
+}
+
 void AppearanceSettingsPage::retranslateUi()
 {
     themeGroupBox->setTitle(tr("Theme settings"));
     themeLabel.setText(tr("Current theme:"));
+    openThemeButton.setText(tr("Open themes folder"));
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
