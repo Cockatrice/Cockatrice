@@ -103,7 +103,7 @@ bool AbstractServerSocketInterface::initSession()
         return true;
 
     int maxUsers = servatrice->getMaxUsersPerAddress();
-    if ((maxUsers > 0) && (servatrice->getUsersWithAddress(getPeerAddress()) >= maxUsers)) {
+    if ((maxUsers > 0) && (servatrice->getUsersWithAddress(getPeerAddress()) > maxUsers)) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
         SessionEvent *se = prepareSessionEvent(event);
