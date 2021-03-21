@@ -9,12 +9,17 @@
 #include <QPixmapCache>
 #include <QStandardPaths>
 
-#define DEFAULT_THEME_NAME "Default"
+#define NONE_THEME_NAME "None "
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
+static const QColor HANDZONE_BG_DEFAULT = QColor(80, 100, 50);
+static const QColor TABLEZONE_BG_DEFAULT = QColor(70, 50, 100);
+static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
+static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
+static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
@@ -28,7 +33,7 @@ void ThemeManager::ensureThemeDirectoryExists()
     if (SettingsCache::instance().getThemeName().isEmpty() ||
         !getAvailableThemes().contains(SettingsCache::instance().getThemeName())) {
         qDebug() << "Theme name not set, setting default value";
-        SettingsCache::instance().setThemeName(DEFAULT_THEME_NAME);
+        SettingsCache::instance().setThemeName(NONE_THEME_NAME);
     }
 }
 
@@ -37,12 +42,16 @@ QStringMap &ThemeManager::getAvailableThemes()
     QDir dir;
     availableThemes.clear();
 
-    // load themes from user profile dir
-    dir.setPath(SettingsCache::instance().getDataPath() + "/themes");
+    // add default value
+    availableThemes.insert(NONE_THEME_NAME, QString());
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
-        if (!availableThemes.contains(themeName))
+    // load themes from user profile dir
+    dir.setPath(SettingsCache::instance().getThemesPath());
+
+    for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(themeName)) {
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+        }
     }
 
     // load themes from cockatrice system dir
@@ -56,9 +65,10 @@ QStringMap &ThemeManager::getAvailableThemes()
 #endif
     );
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
-        if (!availableThemes.contains(themeName))
+    for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(themeName)) {
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+        }
     }
 
     return availableThemes;
@@ -97,26 +107,36 @@ void ThemeManager::themeChangedSlot()
     QString themeName = SettingsCache::instance().getThemeName();
     qDebug() << "Theme changed:" << themeName;
 
-    QDir dir = getAvailableThemes().value(themeName);
+    QString dirPath = getAvailableThemes().value(themeName);
+    QDir dir = dirPath;
 
     // css
-    if (dir.exists(STYLE_CSS_NAME))
-
+    if (!dirPath.isEmpty() && dir.exists(STYLE_CSS_NAME)) {
         qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
-    else
+    } else {
         qApp->setStyleSheet("");
+    }
 
-    // resources
-    QStringList resources;
-    resources << dir.absolutePath() << ":/resources";
-    QDir::setSearchPaths("theme", resources);
+    if (dirPath.isEmpty()) {
+        // set default values
+        QDir::setSearchPaths("theme", DEFAULT_RESOURCE_PATHS);
+        handBgBrush = HANDZONE_BG_DEFAULT;
+        tableBgBrush = TABLEZONE_BG_DEFAULT;
+        playerBgBrush = PLAYERZONE_BG_DEFAULT;
+        stackBgBrush = STACKZONE_BG_DEFAULT;
+    } else {
+        // resources
+        QStringList resources;
+        resources << dir.absolutePath() << DEFAULT_RESOURCE_PATHS;
+        QDir::setSearchPaths("theme", resources);
 
-    // zones bg
-    dir.cd("zones");
-    handBgBrush = loadBrush(HANDZONE_BG_NAME, QColor(80, 100, 50));
-    tableBgBrush = loadBrush(TABLEZONE_BG_NAME, QColor(70, 50, 100));
-    playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
-    stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
+        // zones bg
+        dir.cd("zones");
+        handBgBrush = loadBrush(HANDZONE_BG_NAME, HANDZONE_BG_DEFAULT);
+        tableBgBrush = loadBrush(TABLEZONE_BG_NAME, TABLEZONE_BG_DEFAULT);
+        playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, PLAYERZONE_BG_DEFAULT);
+        stackBgBrush = loadBrush(STACKZONE_BG_NAME, STACKZONE_BG_DEFAULT);
+    }
     tableBgBrushesCache.clear();
     stackBgBrushesCache.clear();
     playerBgBrushesCache.clear();

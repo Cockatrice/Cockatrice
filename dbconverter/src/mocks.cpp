@@ -96,6 +96,9 @@ void SettingsCache::setDeckPath(const QString &/* _deckPath */)
 void SettingsCache::setReplaysPath(const QString &/* _replaysPath */)
 {
 }
+void SettingsCache::setThemesPath(const QString &/* _themesPath */)
+{
+}
 void SettingsCache::setPicsPath(const QString &/* _picsPath */)
 {
 }

@@ -66,7 +66,7 @@ private:
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath,
+    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
@@ -156,6 +156,10 @@ public:
     QString getReplaysPath() const
     {
         return replaysPath;
+    }
+    QString getThemesPath() const
+    {
+        return themesPath;
     }
     QString getPicsPath() const
     {
@@ -479,6 +483,7 @@ public slots:
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
+    void setThemesPath(const QString &_themesPath);
     void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
     void setPicsPath(const QString &_picsPath);
     void setCardDatabasePath(const QString &_cardDatabasePath);
