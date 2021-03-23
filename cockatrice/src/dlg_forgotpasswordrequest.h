@@ -30,7 +30,7 @@ private slots:
     void actOk();
 
 private:
-    QLabel *hostLabel, *portLabel, *playernameLabel;
+    QLabel *infoLabel, *hostLabel, *portLabel, *playernameLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit;
 };
 

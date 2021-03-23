@@ -50,8 +50,8 @@ private slots:
     void actOk();
 
 private:
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel, *emailLabel,
-        *emailConfirmationLabel, *countryLabel, *realnameLabel;
+    QLabel *infoLabel, *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel,
+        *emailLabel, *emailConfirmationLabel, *countryLabel, *realnameLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *passwordConfirmationEdit, *emailEdit,
         *emailConfirmationEdit, *realnameEdit;
     QComboBox *countryEdit;

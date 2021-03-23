@@ -38,7 +38,8 @@ private slots:
     void actOk();
 
 private:
-    QLabel *hostLabel, *portLabel, *playernameLabel, *tokenLabel, *newpasswordLabel, *newpasswordverifyLabel;
+    QLabel *infoLabel, *hostLabel, *portLabel, *playernameLabel, *tokenLabel, *newpasswordLabel,
+        *newpasswordverifyLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *tokenEdit, *newpasswordEdit, *newpasswordverifyEdit;
 };
 

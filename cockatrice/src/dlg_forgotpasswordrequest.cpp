@@ -12,20 +12,22 @@
 
 DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(parent)
 {
-
     QString lastfphost;
     QString lastfpport;
     QString lastfpplayername;
     ServersSettings &servers = SettingsCache::instance().servers();
-    lastfphost = servers.getHostname("server.cockatrice.us");
-    lastfpport = servers.getPort("4747");
-    lastfpplayername = servers.getPlayerName("Player");
+    lastfphost = servers.getHostname();
+    lastfpport = servers.getPort();
+    lastfpplayername = servers.getPlayerName();
 
     if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {
         lastfphost = servers.getFPHostname();
         lastfpport = servers.getFPPort();
         lastfpplayername = servers.getFPPlayerName();
     }
+
+    infoLabel = new QLabel(tr("Enter the information of the server you'd like to request a new password for."));
+    infoLabel->setWordWrap(true);
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(lastfphost);
@@ -40,12 +42,13 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
     playernameLabel->setBuddy(playernameEdit);
 
     QGridLayout *grid = new QGridLayout;
-    grid->addWidget(hostLabel, 0, 0);
-    grid->addWidget(hostEdit, 0, 1);
-    grid->addWidget(portLabel, 1, 0);
-    grid->addWidget(portEdit, 1, 1);
-    grid->addWidget(playernameLabel, 2, 0);
-    grid->addWidget(playernameEdit, 2, 1);
+    grid->addWidget(infoLabel, 0, 0, 1, 2);
+    grid->addWidget(hostLabel, 1, 0);
+    grid->addWidget(hostEdit, 1, 1);
+    grid->addWidget(portLabel, 2, 0);
+    grid->addWidget(portEdit, 2, 1);
+    grid->addWidget(playernameLabel, 3, 0);
+    grid->addWidget(playernameEdit, 3, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));

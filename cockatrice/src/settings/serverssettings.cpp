@@ -86,7 +86,6 @@ QString ServersSettings::getPort(QString defaultPort)
 {
     int index = getPrevioushostindex(getPrevioushostName());
     QVariant port = getValue(QString("port%1").arg(index), "server", "server_details");
-    qDebug() << "getPort() index = " << index << " port.val = " << port.toString();
     return port == QVariant() ? std::move(defaultPort) : port.toString();
 }
 
@@ -99,7 +98,6 @@ QString ServersSettings::getPlayerName(QString defaultName)
 {
     int index = getPrevioushostindex(getPrevioushostName());
     QVariant name = getValue(QString("username%1").arg(index), "server", "server_details");
-    qDebug() << "getPlayerName() index = " << index << " name.val = " << name.toString();
     return name == QVariant() ? std::move(defaultName) : name.toString();
 }
 
