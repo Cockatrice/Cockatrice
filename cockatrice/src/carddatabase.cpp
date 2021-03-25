@@ -510,7 +510,7 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
 
 LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 {
-  auto startTime = QTime::currentTime();
+    auto startTime = QTime::currentTime();
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty()) {
         loadFromFileMutex->lock();
@@ -518,7 +518,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
         loadFromFileMutex->unlock();
     }
 
-  int msecs = startTime.msecsTo(QTime::currentTime());
+    int msecs = startTime.msecsTo(QTime::currentTime());
     qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus
              << "Cards =" << cards.size() << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
 
