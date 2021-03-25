@@ -131,12 +131,12 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     labNotes->setOpenExternalLinks(true);
     labNotes->setText(tr("Use ctrl+a to select all sets in the view.") + "<br><b>" + tr("Deck Editor") + ":</b> " +
                       tr("Only cards in enabled sets will appear in the card list of the deck editor.") + "<br><b>" +
-                      tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order:") + "<ol><li>" +
-                      tr("CUSTOM Folder") +
-                      " (<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets"
-                      "#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'>" +
-                      tr("How to use custom card art") + "</a>)</li><li>" + tr("Enabled Sets (Top to Bottom)") +
-                      "</li><li>" + tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
+                      tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order:") + "<br>" +
+                      tr("first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)",
+                         "%1 is a link to the wiki")
+                          .arg("<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets"
+                               "#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'>" +
+                               tr("How to use custom card art") + "</a>"));
 
     QGridLayout *hintsGrid = new QGridLayout;
     hintsGrid->setMargin(2);
