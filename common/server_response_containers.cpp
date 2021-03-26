@@ -55,9 +55,11 @@ void GameEventStorage::sendToGame(Server_Game *game)
 
     GameEventContainer *contPrivate = new GameEventContainer;
     GameEventContainer *contOthers = new GameEventContainer;
+    int id = privatePlayerId;
     if (forcedByJudge != -1) {
         contPrivate->set_forced_by_judge(forcedByJudge);
         contOthers->set_forced_by_judge(forcedByJudge);
+        id = forcedByJudge;
     }
     for (int i = 0; i < gameEventList.size(); ++i) {
         const GameEvent &event = gameEventList[i]->getGameEvent();
@@ -71,8 +73,8 @@ void GameEventStorage::sendToGame(Server_Game *game)
         contPrivate->mutable_context()->CopyFrom(*gameEventContext);
         contOthers->mutable_context()->CopyFrom(*gameEventContext);
     }
-    game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, privatePlayerId);
-    game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, privatePlayerId);
+    game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, id);
+    game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, id);
 }
 
 ResponseContainer::ResponseContainer(int _cmdId) : cmdId(_cmdId), responseExtension(0)
