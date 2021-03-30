@@ -1693,7 +1693,7 @@ WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
 void WebsocketServerSocketInterface::initConnection(void *_socket)
 {
     if (_socket == nullptr) {
-      return;
+        return;
     }
     socket = (QWebSocket *)_socket;
     socket->setParent(this);
