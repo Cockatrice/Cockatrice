@@ -146,12 +146,14 @@ void MainWindow::statusChanged(ClientStatus _status)
             aConnect->setEnabled(true);
             aRegister->setEnabled(true);
             aDisconnect->setEnabled(false);
+            aForgotPassword->setEnabled(true);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aRegister->setEnabled(false);
             aDisconnect->setEnabled(true);
+            aForgotPassword->setEnabled(false);
             break;
         case StatusConnecting:
         case StatusRegistering:
@@ -219,6 +221,7 @@ void MainWindow::actSinglePlayer()
 
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
+    aForgotPassword->setEnabled(false);
     aSinglePlayer->setEnabled(false);
 
     localServer = new LocalServer(this);
@@ -269,6 +272,7 @@ void MainWindow::localGameEnded()
 
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
+    aForgotPassword->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 
@@ -628,6 +632,7 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
+    aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -672,6 +677,8 @@ void MainWindow::createActions()
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
+    aForgotPassword = new QAction(this);
+    connect(aForgotPassword, SIGNAL(triggered()), this, SLOT(actForgotPasswordRequest()));
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
@@ -739,6 +746,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
+    cockatriceMenu->addAction(aForgotPassword);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
