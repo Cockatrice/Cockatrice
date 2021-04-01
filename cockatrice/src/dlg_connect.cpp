@@ -347,6 +347,11 @@ bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *o
 
 void DlgConnect::actForgotPassword()
 {
+    ServersSettings &servers = SettingsCache::instance().servers();
+    servers.setFPHostName(hostEdit->text());
+    servers.setFPPort(portEdit->text());
+    servers.setFPPlayerName(playernameEdit->text().trimmed());
+
     emit sigStartForgotPasswordRequest();
     reject();
 }
