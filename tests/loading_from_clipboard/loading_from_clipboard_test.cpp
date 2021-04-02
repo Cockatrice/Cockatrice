@@ -165,6 +165,39 @@ TEST(LoadingFromClipboardTest, CommentsBeforeCardsTesting)
     testDeck(clipboard, result);
 }
 
+TEST(LoadingFromClipboardTest, mainboardAsLine)
+{
+    QString clipboard("// Deck Name\n"
+                      "\n"
+                      "MainBoard: 3 cards\n"
+                      "3 card\n"
+                      "\n"
+                      "SideBoard: 2 cards\n"
+                      "2 sidecard\n");
+
+    Result result("Deck Name", "", {{"card", 3}}, {{"sidecard", 2}});
+    testDeck(clipboard, result);
+}
+
+TEST(LoadingFromClipboardTest, deckAsCard)
+{
+    QString clipboard("6 Deck of Cards But Animated\n"
+                      "\n"
+                      "7 Sideboard Card\n");
+
+    Result result("", "", {{"Deck of Cards But Animated", 6}}, {{"Sideboard Card", 7}});
+    testDeck(clipboard, result);
+}
+
+TEST(LoadingFromClipboardTest, emptyMainBoard)
+{
+    QString clipboard("deck\n"
+                      "\n"
+                      "sideboard\n");
+
+    testEmpty(clipboard);
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
