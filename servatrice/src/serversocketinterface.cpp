@@ -1692,6 +1692,9 @@ WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
 
 void WebsocketServerSocketInterface::initConnection(void *_socket)
 {
+    if (_socket == nullptr) {
+        return;
+    }
     socket = (QWebSocket *)_socket;
     socket->setParent(this);
     address = socket->peerAddress();
