@@ -10,12 +10,13 @@
 
 DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 {
-
     oldPasswordLabel = new QLabel(tr("Old password:"));
     oldPasswordEdit = new QLineEdit();
 
-    if (SettingsCache::instance().servers().getSavePassword())
-        oldPasswordEdit->setText(SettingsCache::instance().servers().getPassword());
+    auto &servers = SettingsCache::instance().servers();
+    if (servers.getSavePassword()) {
+        oldPasswordEdit->setText(servers.getPassword());
+    }
 
     oldPasswordLabel->setBuddy(oldPasswordEdit);
     oldPasswordEdit->setEchoMode(QLineEdit::Password);
@@ -59,7 +60,5 @@ void DlgEditPassword::actOk()
         return;
     }
 
-    // always save the password so it will be picked up by the connect dialog
-    SettingsCache::instance().servers().setPassword(newPasswordEdit->text());
     accept();
 }

@@ -14,20 +14,24 @@
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
     ServersSettings &servers = SettingsCache::instance().servers();
+    infoLabel = new QLabel(tr("Enter your information and the information of the server you'd like to register to.\n"
+                              "Your email will be used to verify your account."));
+    infoLabel->setWordWrap(true);
+
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(servers.getHostname("server.cockatrice.us"));
+    hostEdit = new QLineEdit(servers.getHostname());
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(servers.getPort("4747"));
+    portEdit = new QLineEdit(servers.getPort());
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(servers.getPlayerName("Player"));
+    playernameEdit = new QLineEdit(servers.getPlayerName());
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(servers.getPassword());
+    passwordEdit = new QLineEdit();
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
@@ -307,24 +311,25 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     realnameLabel->setBuddy(realnameEdit);
 
     QGridLayout *grid = new QGridLayout;
-    grid->addWidget(hostLabel, 0, 0);
-    grid->addWidget(hostEdit, 0, 1);
-    grid->addWidget(portLabel, 1, 0);
-    grid->addWidget(portEdit, 1, 1);
-    grid->addWidget(playernameLabel, 2, 0);
-    grid->addWidget(playernameEdit, 2, 1);
-    grid->addWidget(passwordLabel, 3, 0);
-    grid->addWidget(passwordEdit, 3, 1);
-    grid->addWidget(passwordConfirmationLabel, 4, 0);
-    grid->addWidget(passwordConfirmationEdit, 4, 1);
-    grid->addWidget(emailLabel, 5, 0);
-    grid->addWidget(emailEdit, 5, 1);
-    grid->addWidget(emailConfirmationLabel, 6, 0);
-    grid->addWidget(emailConfirmationEdit, 6, 1);
-    grid->addWidget(countryLabel, 8, 0);
-    grid->addWidget(countryEdit, 8, 1);
-    grid->addWidget(realnameLabel, 9, 0);
-    grid->addWidget(realnameEdit, 9, 1);
+    grid->addWidget(infoLabel, 0, 0, 1, 2);
+    grid->addWidget(hostLabel, 1, 0);
+    grid->addWidget(hostEdit, 1, 1);
+    grid->addWidget(portLabel, 2, 0);
+    grid->addWidget(portEdit, 2, 1);
+    grid->addWidget(playernameLabel, 3, 0);
+    grid->addWidget(playernameEdit, 3, 1);
+    grid->addWidget(passwordLabel, 4, 0);
+    grid->addWidget(passwordEdit, 4, 1);
+    grid->addWidget(passwordConfirmationLabel, 5, 0);
+    grid->addWidget(passwordConfirmationEdit, 5, 1);
+    grid->addWidget(emailLabel, 6, 0);
+    grid->addWidget(emailEdit, 6, 1);
+    grid->addWidget(emailConfirmationLabel, 7, 0);
+    grid->addWidget(emailConfirmationEdit, 7, 1);
+    grid->addWidget(countryLabel, 9, 0);
+    grid->addWidget(countryEdit, 9, 1);
+    grid->addWidget(realnameLabel, 10, 0);
+    grid->addWidget(realnameEdit, 10, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
@@ -354,13 +359,6 @@ void DlgRegister::actOk()
         QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
         return;
     }
-
-    ServersSettings &servers = SettingsCache::instance().servers();
-    servers.setHostName(hostEdit->text());
-    servers.setPort(portEdit->text());
-    servers.setPlayerName(playernameEdit->text());
-    // always save the password so it will be picked up by the connect dialog
-    servers.setPassword(passwordEdit->text());
 
     accept();
 }

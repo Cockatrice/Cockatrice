@@ -63,11 +63,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    if (SettingsCache::instance().servers().getSavePassword()) {
-        autoConnectCheckBox->setChecked(static_cast<bool>(SettingsCache::instance().servers().getAutoConnect()));
+    auto &servers = SettingsCache::instance().servers();
+    if (servers.getSavePassword()) {
+        autoConnectCheckBox->setChecked(servers.getAutoConnect() > 0);
         autoConnectCheckBox->setEnabled(true);
     } else {
-        SettingsCache::instance().servers().setAutoConnect(0);
+        servers.setAutoConnect(0);
         autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
     }
@@ -192,9 +193,10 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    bool autoConnectEnabled = static_cast<bool>(SettingsCache::instance().servers().getAutoConnect());
-    QString previousHostName = SettingsCache::instance().servers().getPrevioushostName();
-    QString autoConnectSaveName = SettingsCache::instance().servers().getSaveName();
+    auto &servers = SettingsCache::instance().servers();
+    bool autoConnectEnabled = servers.getAutoConnect() > 0;
+    QString previousHostName = servers.getPrevioushostName();
+    QString autoConnectSaveName = servers.getSaveName();
 
     int index = 0;
 

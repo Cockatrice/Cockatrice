@@ -84,6 +84,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     displayModel->setDynamicSortFilter(false);
     view = new QTreeView;
     view->setModel(displayModel);
+    view->setMinimumSize(QSize(500, 250));
 
     view->setAlternatingRowColors(true);
     view->setUniformRowHeights(true);
@@ -128,16 +129,17 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     labNotes->setWordWrap(true);
     labNotes->setTextInteractionFlags(Qt::TextBrowserInteraction);
     labNotes->setOpenExternalLinks(true);
-    labNotes->setText("<b>" + tr("Deck Editor") + ":</b> " +
-                      tr("Only cards in enabled sets will appear in the card list of the deck editor") + "<br><br>" +
-                      "<b>" + tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order") +
-                      "<ol><li>" + tr("CUSTOM Folder") +
-                      " (<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets"
-                      "#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'>" +
-                      tr("How to use custom card art") + "</a>)</li><li>" + tr("Enabled Sets (Top to Bottom)") +
-                      "</li><li>" + tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
+    labNotes->setText(tr("Use ctrl+a to select all sets in the view.") + "<br><b>" + tr("Deck Editor") + ":</b> " +
+                      tr("Only cards in enabled sets will appear in the card list of the deck editor.") + "<br><b>" +
+                      tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order:") + "<br>" +
+                      tr("first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)",
+                         "%1 is a link to the wiki")
+                          .arg("<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets"
+                               "#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'>" +
+                               tr("How to use custom card art") + "</a>"));
 
     QGridLayout *hintsGrid = new QGridLayout;
+    hintsGrid->setMargin(2);
     hintsGrid->addWidget(labNotes, 0, 0);
     hintsGroupBox = new QGroupBox(tr("Hints"));
     hintsGroupBox->setLayout(hintsGrid);
@@ -163,8 +165,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
 
     mainLayout = new QGridLayout;
-    mainLayout->addWidget(setsEditToolBar, 1, 0, 2, 1);
     mainLayout->addLayout(filterBox, 0, 1, 1, 2);
+    mainLayout->addWidget(setsEditToolBar, 1, 0, 2, 1);
     mainLayout->addWidget(view, 1, 1, 1, 2);
     mainLayout->addWidget(enableAllButton, 2, 1);
     mainLayout->addWidget(disableAllButton, 2, 2);
@@ -184,7 +186,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(centralWidget);
 
     setWindowTitle(tr("Manage sets"));
-    resize(700, 400);
+    resize(800, 500);
 }
 
 WndSets::~WndSets()

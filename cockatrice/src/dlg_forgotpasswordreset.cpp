@@ -12,14 +12,13 @@
 
 DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent)
 {
-
     QString lastfphost;
     QString lastfpport;
     QString lastfpplayername;
     ServersSettings &servers = SettingsCache::instance().servers();
-    lastfphost = servers.getHostname("server.cockatrice.us");
-    lastfpport = servers.getPort("4747");
-    lastfpplayername = servers.getPlayerName("Player");
+    lastfphost = servers.getHostname();
+    lastfpport = servers.getPort();
+    lastfpplayername = servers.getPlayerName();
 
     if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {
         lastfphost = servers.getFPHostname();
@@ -33,6 +32,9 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
                                 "process by using the forgot password button on the connection screen."));
         reject();
     }
+
+    infoLabel = new QLabel(tr("Enter the received token and the new password in order to set your new password."));
+    infoLabel->setWordWrap(true);
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(lastfphost);
@@ -70,18 +72,19 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     }
 
     QGridLayout *grid = new QGridLayout;
-    grid->addWidget(hostLabel, 0, 0);
-    grid->addWidget(hostEdit, 0, 1);
-    grid->addWidget(portLabel, 1, 0);
-    grid->addWidget(portEdit, 1, 1);
-    grid->addWidget(playernameLabel, 2, 0);
-    grid->addWidget(playernameEdit, 2, 1);
-    grid->addWidget(tokenLabel, 3, 0);
-    grid->addWidget(tokenEdit, 3, 1);
-    grid->addWidget(newpasswordLabel, 4, 0);
-    grid->addWidget(newpasswordEdit, 4, 1);
-    grid->addWidget(newpasswordverifyLabel, 5, 0);
-    grid->addWidget(newpasswordverifyEdit, 5, 1);
+    grid->addWidget(infoLabel, 0, 0, 1, 2);
+    grid->addWidget(hostLabel, 1, 0);
+    grid->addWidget(hostEdit, 1, 1);
+    grid->addWidget(portLabel, 2, 0);
+    grid->addWidget(portEdit, 2, 1);
+    grid->addWidget(playernameLabel, 3, 0);
+    grid->addWidget(playernameEdit, 3, 1);
+    grid->addWidget(tokenLabel, 4, 0);
+    grid->addWidget(tokenEdit, 4, 1);
+    grid->addWidget(newpasswordLabel, 5, 0);
+    grid->addWidget(newpasswordEdit, 5, 1);
+    grid->addWidget(newpasswordverifyLabel, 6, 0);
+    grid->addWidget(newpasswordverifyEdit, 6, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));

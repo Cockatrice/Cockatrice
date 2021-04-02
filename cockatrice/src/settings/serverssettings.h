@@ -4,6 +4,8 @@
 #include "settingsmanager.h"
 
 #include <QObject>
+#define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
+#define SERVERSETTINGS_DEFAULT_PORT "4748"
 
 class ServersSettings : public SettingsManager
 {
@@ -15,11 +17,11 @@ public:
     int getPrevioushostindex(const QString &);
     QStringList getPreviousHostList();
     QString getPrevioushostName();
-    QString getHostname(QString defaultHost = "");
-    QString getPort(QString defaultPort = "");
+    QString getHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST);
+    QString getPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT);
     QString getPlayerName(QString defaultName = "");
-    QString getFPHostname(QString defaultHost = "");
-    QString getFPPort(QString defaultPort = "");
+    QString getFPHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST);
+    QString getFPPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT);
     QString getFPPlayerName(QString defaultName = "");
     QString getPassword();
     QString getSaveName(QString defaultname = "");
@@ -30,15 +32,10 @@ public:
     void setPreviousHostLogin(int previous);
     void setPrevioushostName(const QString &);
     void setPreviousHostList(QStringList list);
-    void setHostName(QString hostname);
-    void setPort(QString port);
-    void setPlayerName(QString playerName);
     void setAutoConnect(int autoconnect);
     void setSite(QString site);
     void setFPHostName(QString hostname);
-    void setPassword(QString password);
     void setFPPort(QString port);
-    void setSavePassword(int save);
     void setFPPlayerName(QString playerName);
     void addNewServer(const QString &saveName,
                       const QString &serv,
