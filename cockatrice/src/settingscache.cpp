@@ -60,11 +60,6 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setHostName(legacySetting.value("hostname").toString());
-    servers().setPort(legacySetting.value("port").toString());
-    servers().setPlayerName(legacySetting.value("playername").toString());
-    servers().setPassword(legacySetting.value("password").toString());
-    servers().setSavePassword(legacySetting.value("save_password").toInt());
     servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
     servers().setFPHostName(legacySetting.value("fphostname").toString());
     servers().setFPPort(legacySetting.value("fpport").toString());

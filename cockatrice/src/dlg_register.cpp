@@ -31,7 +31,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(servers.getPassword());
+    passwordEdit = new QLineEdit();
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
@@ -359,13 +359,6 @@ void DlgRegister::actOk()
         QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
         return;
     }
-
-    ServersSettings &servers = SettingsCache::instance().servers();
-    servers.setHostName(hostEdit->text());
-    servers.setPort(portEdit->text());
-    servers.setPlayerName(playernameEdit->text());
-    // always save the password so it will be picked up by the connect dialog
-    servers.setPassword(passwordEdit->text());
 
     accept();
 }

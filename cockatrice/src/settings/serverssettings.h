@@ -32,15 +32,10 @@ public:
     void setPreviousHostLogin(int previous);
     void setPrevioushostName(const QString &);
     void setPreviousHostList(QStringList list);
-    void setHostName(QString hostname);
-    void setPort(QString port);
-    void setPlayerName(QString playerName);
     void setAutoConnect(int autoconnect);
     void setSite(QString site);
     void setFPHostName(QString hostname);
-    void setPassword(QString password);
     void setFPPort(QString port);
-    void setSavePassword(int save);
     void setFPPlayerName(QString playerName);
     void addNewServer(const QString &saveName,
                       const QString &serv,
