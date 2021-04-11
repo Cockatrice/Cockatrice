@@ -59,7 +59,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Forgot Password Request"));
+    setWindowTitle(tr("Reset Password Request"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
