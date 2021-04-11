@@ -28,7 +28,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
 
     if (servers.getFPHostname().isEmpty() && servers.getFPPort().isEmpty() && servers.getFPPlayerName().isEmpty()) {
         QMessageBox::warning(this, tr("Reset Password Warning"),
-                             tr("A problem has occored. Please try to request a new password again."));
+                             tr("A problem has occurred. Please try to request a new password again."));
         reject();
     }
 
