@@ -285,16 +285,16 @@ bool Servatrice::initServer()
         }
     }
 
-    qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
+    qDebug() << "Reset password enabled: " << getEnableForgotPassword();
     if (getEnableForgotPassword()) {
-        qDebug() << "Forgot password token life (in minutes): " << getForgotPasswordTokenLife();
-        qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
+        qDebug() << "Reset password token life (in minutes): " << getForgotPasswordTokenLife();
+        qDebug() << "Reset password challenge on: " << getEnableForgotPasswordChallenge();
     }
 
     qDebug() << "Auditing enabled: " << getEnableAudit();
     if (getEnableAudit()) {
         qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
-        qDebug() << "Audit forgot password attepts enabled: " << getEnableForgotPasswordAudit();
+        qDebug() << "Audit reset password attepts enabled: " << getEnableForgotPasswordAudit();
     }
 
     if (getDBTypeString() == "mysql") {

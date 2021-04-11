@@ -63,7 +63,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 6) Account page
 
-7) Register/Forgot Passoword forms
+7) Register/Reset Password forms
 
 8) Message User
 
