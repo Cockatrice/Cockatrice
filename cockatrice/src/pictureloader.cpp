@@ -196,8 +196,11 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
         QString thisPath(it.next());
         QFileInfo thisFileInfo(thisPath);
 
-        if (thisFileInfo.isFile() && thisFileInfo.baseName() == correctedCardname)
+        if (thisFileInfo.isFile() &&
+            (thisFileInfo.fileName() == correctedCardname || thisFileInfo.completeBaseName() == correctedCardname ||
+             thisFileInfo.baseName() == correctedCardname)) {
             picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
+        }
     }
 
     if (!setName.isEmpty()) {
