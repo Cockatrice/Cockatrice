@@ -129,7 +129,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     labNotes->setWordWrap(true);
     labNotes->setTextInteractionFlags(Qt::TextBrowserInteraction);
     labNotes->setOpenExternalLinks(true);
-    labNotes->setText(tr("Use ctrl+a to select all sets in the view.") + "<br><b>" + tr("Deck Editor") + ":</b> " +
+    labNotes->setText(tr("Use CTRL+A to select all sets in the view.") + "<br><b>" + tr("Deck Editor") + ":</b> " +
                       tr("Only cards in enabled sets will appear in the card list of the deck editor.") + "<br><b>" +
                       tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order:") + "<br>" +
                       tr("first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)",
