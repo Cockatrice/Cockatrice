@@ -27,9 +27,9 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     }
 
     if (servers.getFPHostname().isEmpty() && servers.getFPPort().isEmpty() && servers.getFPPlayerName().isEmpty()) {
-        QMessageBox::warning(this, tr("Forgot Password Reset Warning"),
-                             tr("Oops, looks like something has gone wrong. Please re-start the forgot password "
-                                "process by using the forgot password button on the connection screen."));
+        QMessageBox::warning(this, tr("Reset Password Issue"),
+                             tr("Oops, looks like something has gone wrong. Please re-start the process "
+                                "again by using the reset password button on the connection screen."));
         reject();
     }
 
