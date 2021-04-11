@@ -27,9 +27,8 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     }
 
     if (servers.getFPHostname().isEmpty() && servers.getFPPort().isEmpty() && servers.getFPPlayerName().isEmpty()) {
-        QMessageBox::warning(this, tr("Reset Password Issue"),
-                             tr("Oops, looks like something has gone wrong. Please re-start the process "
-                                "again by using the reset password button on the connection screen."));
+        QMessageBox::warning(this, tr("Reset Password Warning"),
+                             tr("A problem has occored. Please try to request a new password again."));
         reject();
     }
 
@@ -95,7 +94,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Forgot Password Reset"));
+    setWindowTitle(tr("Reset Password"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
@@ -103,22 +102,22 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
 void DlgForgotPasswordReset::actOk()
 {
     if (playernameEdit->text().isEmpty()) {
-        QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The player name can't be empty."));
+        QMessageBox::critical(this, tr("Reset Password Error"), tr("The player name can't be empty."));
         return;
     }
 
     if (tokenEdit->text().isEmpty()) {
-        QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The token can't be empty."));
+        QMessageBox::critical(this, tr("Reset Password Error"), tr("The token can't be empty."));
         return;
     }
 
     if (newpasswordEdit->text().isEmpty()) {
-        QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The new password can't be empty."));
+        QMessageBox::critical(this, tr("Reset Password Error"), tr("The new password can't be empty."));
         return;
     }
 
     if (newpasswordEdit->text() != newpasswordverifyEdit->text()) {
-        QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The passwords do not match."));
+        QMessageBox::critical(this, tr("Reset Password Error"), tr("The passwords do not match."));
         return;
     }
 
