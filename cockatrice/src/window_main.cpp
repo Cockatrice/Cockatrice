@@ -1321,7 +1321,7 @@ void MainWindow::actForgotPasswordRequest()
 void MainWindow::forgotPasswordSuccess()
 {
     QMessageBox::information(
-        this, tr("Forgot Password"),
+        this, tr("Reset Password"),
         tr("Your password has been reset successfully, you can now log in using the new credentials."));
     SettingsCache::instance().servers().setFPHostName("");
     SettingsCache::instance().servers().setFPPort("");
@@ -1331,7 +1331,7 @@ void MainWindow::forgotPasswordSuccess()
 void MainWindow::forgotPasswordError()
 {
     QMessageBox::warning(
-        this, tr("Forgot Password"),
+        this, tr("Reset Password"),
         tr("Failed to reset user account password, please contact the server operator to reset your password."));
     SettingsCache::instance().servers().setFPHostName("");
     SettingsCache::instance().servers().setFPPort("");
@@ -1340,7 +1340,7 @@ void MainWindow::forgotPasswordError()
 
 void MainWindow::promptForgotPasswordReset()
 {
-    QMessageBox::information(this, tr("Forgot Password"),
+    QMessageBox::information(this, tr("Reset Password"),
                              tr("Activation request received, please check your email for an activation token."));
     DlgForgotPasswordReset dlg(this);
     if (dlg.exec()) {

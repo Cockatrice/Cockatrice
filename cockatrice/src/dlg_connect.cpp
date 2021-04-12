@@ -88,7 +88,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     btnForgotPassword = new QPushButton(this);
     btnForgotPassword->setIcon(QPixmap("theme:icons/forgot_password"));
-    btnForgotPassword->setToolTip(tr("Forgot Password"));
+    btnForgotPassword->setToolTip(tr("Reset Password"));
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 

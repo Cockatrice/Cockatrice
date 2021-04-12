@@ -166,27 +166,27 @@ minpasswordlength = 6
 
 [forgotpassword]
 
-; Servatrice can process forgot password requests allowing users to reset their account
+; Servatrice can process reset password requests allowing users to reset their account
 ; passwords in the event they forget it.  Should this feature be enabled? Default: false.
 ; enable=false
 
-; Forgot password request should not be allowed to stay valid forever.  This settings
-; informs servatrice how long a players forgot password reset token is valid for (in minutes).
+; Reset password request should not be allowed to stay valid forever.  This settings
+; informs servatrice how long a players reset password reset token is valid for (in minutes).
 ; Default: 60
 ; tokenlife=60
 
-; Servatrice can challenge users that are making forgot password requests to answer
+; Servatrice can challenge users that are making reset password requests to answer
 ; questions in regards to their account to help validate they are the true owner of the account.
 ; Should this feature be enabled? Default: false
 ; enablechallenge=false
 
-; Email subject for the forgot password emails
-; subject="Cockatrice forgot password token"
+; Email subject for the reset password emails
+; subject="Cockatrice reset password token"
 
-; Forgot password email body. You can use these tags here: %username %token
+; Reset password email body. You can use these tags here: %username %token
 ; They will be substituted with the actual values in the email
 ;
-; body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nHere's the token to use to reset your account password:\r\n\r\n%token\r\n\r\nHappy gaming!"
+; body="Hi %username,\r\nthanks for reaching out to us with your password reset request for our Cockatrice server.\r\nHere's your unique token in order to reset your account password in the app:\r\n\r\n%token\r\n\r\nHappy gaming!"
 
 
 [smtp]

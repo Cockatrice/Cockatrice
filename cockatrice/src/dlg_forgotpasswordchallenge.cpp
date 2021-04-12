@@ -27,9 +27,8 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     }
 
     if (servers.getFPHostname().isEmpty() && servers.getFPPort().isEmpty() && servers.getFPPlayerName().isEmpty()) {
-        QMessageBox::warning(this, tr("Forgot Password Challenge Warning"),
-                             tr("Oops, looks like something has gone wrong.  Please restart the forgot password "
-                                "process by using the forgot password button on the connection screen."));
+        QMessageBox::warning(this, tr("Reset Password Challenge Warning"),
+                             tr("A problem has occurred. Please try to request a new password again."));
         reject();
     }
 
@@ -82,7 +81,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Forgot Password Challenge"));
+    setWindowTitle(tr("Reset Password Challenge"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
@@ -90,7 +89,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
 void DlgForgotPasswordChallenge::actOk()
 {
     if (emailEdit->text().isEmpty()) {
-        QMessageBox::critical(this, tr("Forgot Password Challenge Warning"), tr("The email address can't be empty."));
+        QMessageBox::critical(this, tr("Reset Password Challenge Error"), tr("The email address can't be empty."));
         return;
     }
 

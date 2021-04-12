@@ -1249,7 +1249,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd,
                                                                                ResponseContainer &rc)
 {
-    qDebug() << "Received forgot password request from user: " << QString::fromStdString(cmd.user_name());
+    qDebug() << "Received reset password request from user: " << QString::fromStdString(cmd.user_name());
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit())
@@ -1327,7 +1327,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
                                                                              ResponseContainer &rc)
 {
     Q_UNUSED(rc);
-    qDebug() << "Received forgot password reset from user: " << QString::fromStdString(cmd.user_name());
+    qDebug() << "Received reset password reset from user: " << QString::fromStdString(cmd.user_name());
 
     if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
         if (servatrice->getEnableForgotPasswordAudit())
@@ -1367,7 +1367,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
                                                           ResponseContainer &rc)
 {
     Q_UNUSED(rc);
-    qDebug() << "Received forgot password challenge from user: " << QString::fromStdString(cmd.user_name());
+    qDebug() << "Received reset password challenge from user: " << QString::fromStdString(cmd.user_name());
 
     if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
         if (servatrice->getEnableForgotPasswordAudit())
