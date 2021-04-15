@@ -255,6 +255,10 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aMoveTopCardToBottom = new QAction(this);
         connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
 
+        aDrawBottomCard = new QAction(this);
+        connect(aDrawBottomCard, SIGNAL(triggered()), this, SLOT(actDrawBottomCard()));
+        aDrawBottomCards = new QAction(this);
+        connect(aDrawBottomCards, SIGNAL(triggered()), this, SLOT(actDrawBottomCards()));
         aMoveBottomToPlay = new QAction(this);
         connect(aMoveBottomToPlay, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToPlay()));
         aMoveBottomToPlayFaceDown = new QAction(this);
@@ -321,6 +325,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         topLibraryMenu->addAction(aMoveTopCardsToGraveyard);
         topLibraryMenu->addAction(aMoveTopCardsToExile);
 
+        bottomLibraryMenu->addAction(aDrawBottomCard);
+        bottomLibraryMenu->addAction(aDrawBottomCards);
         bottomLibraryMenu->addAction(aMoveBottomToPlay);
         bottomLibraryMenu->addAction(aMoveBottomToPlayFaceDown);
         bottomLibraryMenu->addAction(aMoveBottomCardToTop);
@@ -742,6 +748,8 @@ void Player::retranslateUi()
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
         aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
 
+        aDrawBottomCard->setText(tr("&Draw bottom card"));
+        aDrawBottomCards->setText(tr("D&raw bottom cards..."));
         aMoveBottomToPlay->setText(tr("&Play bottom card"));
         aMoveBottomToPlayFaceDown->setText(tr("Play bottom card &face down"));
         aMoveBottomCardToGraveyard->setText(tr("Put bottom card &in graveyard"));
@@ -919,6 +927,8 @@ void Player::setShortcutsActive()
     aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
     aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
     aMoveTopCardToBottom->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToBottom"));
+    aDrawBottomCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawBottomCard"));
+    aDrawBottomCards->setShortcut(shortcuts.getSingleShortcut("Player/aDrawBottomCards"));
     aMoveBottomToPlay->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomToPlay"));
     aMoveBottomToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomToPlayFaceDown"));
     aMoveBottomCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToGrave"));
@@ -956,6 +966,8 @@ void Player::setShortcutsInactive()
     aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
     aMoveTopCardToExile->setShortcut(QKeySequence());
     aMoveTopCardsToExile->setShortcut(QKeySequence());
+    aDrawBottomCard->setShortcut(QKeySequence());
+    aDrawBottomCards->setShortcut(QKeySequence());
     aMoveBottomToPlay->setShortcut(QKeySequence());
     aMoveBottomToPlayFaceDown->setShortcut(QKeySequence());
     aMoveBottomCardToGraveyard->setShortcut(QKeySequence());
@@ -1342,7 +1354,7 @@ void Player::actMoveBottomCardsToGrave()
     cmd.set_x(0);
     cmd.set_y(0);
 
-    for (int i = number - 1; i >= 0; --i) {
+    for (int i = maxCards - number; i < maxCards; ++i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
     }
 
@@ -1370,7 +1382,7 @@ void Player::actMoveBottomCardsToExile()
     cmd.set_x(0);
     cmd.set_y(0);
 
-    for (int i = number - 1; i >= 0; --i) {
+    for (int i = maxCards - number; i < maxCards; ++i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
     }
 
@@ -1388,6 +1400,49 @@ void Player::actMoveBottomCardToTop()
     cmd.set_target_zone("deck");
     cmd.set_x(0); // top of deck
     cmd.set_y(0);
+
+    sendGameCommand(cmd);
+}
+
+void Player::actDrawBottomCard()
+{
+    if (zones.value("deck")->getCards().empty()) {
+        return;
+    }
+
+    Command_MoveCard cmd;
+    cmdSetBottomCard(cmd);
+    cmd.set_target_zone("hand");
+    cmd.set_x(0);
+    cmd.set_y(0);
+
+    sendGameCommand(cmd);
+}
+
+void Player::actDrawBottomCards()
+{
+    const int maxCards = zones.value("deck")->getCards().size();
+    if (maxCards == 0) {
+        return;
+    }
+
+    int number = QInputDialog::getInt(game, tr("Draw bottom cards"), tr("Number:"));
+    if (number == 0) {
+        return;
+    } else if (number > maxCards) {
+        number = maxCards;
+    }
+
+    Command_MoveCard cmd;
+    cmd.set_start_zone("deck");
+    cmd.set_target_player_id(getId());
+    cmd.set_target_zone("hand");
+    cmd.set_x(0);
+    cmd.set_y(0);
+
+    for (int i = maxCards - number; i < maxCards; ++i) {
+        cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
+    }
 
     sendGameCommand(cmd);
 }
