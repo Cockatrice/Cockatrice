@@ -239,7 +239,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
         aMulligan = new QAction(this);
         connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
-        
+
         aMoveTopToPlay = new QAction(this);
         connect(aMoveTopToPlay, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlay()));
         aMoveTopToPlayFaceDown = new QAction(this);
