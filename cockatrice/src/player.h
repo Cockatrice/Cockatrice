@@ -18,52 +18,52 @@ namespace protobuf
 class Message;
 }
 } // namespace google
-class CardDatabase;
-class DeckLoader;
-class QMenu;
-class QAction;
-class ZoneViewZone;
-class TabGame;
-class AbstractCounter;
 class AbstractCardItem;
-class CardItem;
-class ArrowTarget;
+class AbstractCounter;
 class ArrowItem;
+class ArrowTarget;
+class CardDatabase;
+class CardItem;
 class CardZone;
-class StackZone;
-class TableZone;
-class HandZone;
-class PlayerTarget;
-class ServerInfo_User;
-class ServerInfo_Player;
-class ServerInfo_Arrow;
-class ServerInfo_Counter;
 class CommandContainer;
+class Command_MoveCard;
+class DeckLoader;
+class Event_AttachCard;
+class Event_ChangeZoneProperties;
+class Event_CreateArrow;
+class Event_CreateCounter;
+class Event_CreateToken;
+class Event_DelCounter;
+class Event_DeleteArrow;
+class Event_DestroyCard;
+class Event_DrawCards;
+class Event_DumpZone;
+class Event_FlipCard;
+class Event_GameSay;
+class Event_MoveCard;
+class Event_RevealCards;
+class Event_RollDie;
+class Event_SetCardAttr;
+class Event_SetCardCounter;
+class Event_SetCounter;
+class Event_Shuffle;
+class Event_StopDumpZone;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
-// class Event_ConnectionStateChanged;
-class Event_GameSay;
-class Event_Shuffle;
-class Event_RollDie;
-class Event_CreateArrow;
-class Event_DeleteArrow;
-class Event_CreateToken;
-class Event_SetCardAttr;
-class Event_SetCardCounter;
-class Event_CreateCounter;
-class Event_SetCounter;
-class Event_DelCounter;
-class Event_DumpZone;
-class Event_StopDumpZone;
-class Event_MoveCard;
-class Event_FlipCard;
-class Event_DestroyCard;
-class Event_AttachCard;
-class Event_DrawCards;
-class Event_RevealCards;
-class Event_ChangeZoneProperties;
+class HandZone;
 class PendingCommand;
+class PlayerTarget;
+class QAction;
+class QMenu;
+class ServerInfo_Arrow;
+class ServerInfo_Counter;
+class ServerInfo_Player;
+class ServerInfo_User;
+class StackZone;
+class TabGame;
+class TableZone;
+class ZoneViewZone;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
@@ -165,7 +165,13 @@ public slots:
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
     void actMoveTopCardToBottom();
+    void actMoveBottomCardToPlay();
+    void actMoveBottomCardToPlayFaceDown();
     void actMoveBottomCardToGrave();
+    void actMoveBottomCardToExile();
+    void actMoveBottomCardsToGrave();
+    void actMoveBottomCardsToExile();
+    void actMoveBottomCardToTop();
 
     void actViewLibrary();
     void actViewHand();
@@ -217,7 +223,8 @@ private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
         *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
-    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *rfgMenu, *playerMenu;
+    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
+        *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -227,7 +234,8 @@ private:
         *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard,
         *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlay,
         *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu,
-        *aMoveBottomCardToGrave;
+        *aMoveBottomToPlay, *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard,
+        *aMoveBottomCardToExile, *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
@@ -305,6 +313,8 @@ private:
     void eventDrawCards(const Event_DrawCards &event);
     void eventRevealCards(const Event_RevealCards &event);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
+    void cmdSetTopCard(Command_MoveCard &cmd);
+    void cmdSetBottomCard(Command_MoveCard &cmd);
 
     QVariantList parsePT(const QString &pt);
 
