@@ -321,19 +321,20 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         topLibraryMenu->addAction(aMoveTopCardToBottom);
         topLibraryMenu->addSeparator();
         topLibraryMenu->addAction(aMoveTopCardToGraveyard);
-        topLibraryMenu->addAction(aMoveTopCardToExile);
         topLibraryMenu->addAction(aMoveTopCardsToGraveyard);
+        topLibraryMenu->addAction(aMoveTopCardToExile);
         topLibraryMenu->addAction(aMoveTopCardsToExile);
 
         bottomLibraryMenu->addAction(aDrawBottomCard);
         bottomLibraryMenu->addAction(aDrawBottomCards);
+        bottomLibraryMenu->addSeparator();
         bottomLibraryMenu->addAction(aMoveBottomToPlay);
         bottomLibraryMenu->addAction(aMoveBottomToPlayFaceDown);
         bottomLibraryMenu->addAction(aMoveBottomCardToTop);
         bottomLibraryMenu->addSeparator();
         bottomLibraryMenu->addAction(aMoveBottomCardToGraveyard);
-        bottomLibraryMenu->addAction(aMoveBottomCardToExile);
         bottomLibraryMenu->addAction(aMoveBottomCardsToGraveyard);
+        bottomLibraryMenu->addAction(aMoveBottomCardToExile);
         bottomLibraryMenu->addAction(aMoveBottomCardsToExile);
     }
 
@@ -752,7 +753,7 @@ void Player::retranslateUi()
         aDrawBottomCards->setText(tr("D&raw bottom cards..."));
         aMoveBottomToPlay->setText(tr("&Play bottom card"));
         aMoveBottomToPlayFaceDown->setText(tr("Play bottom card &face down"));
-        aMoveBottomCardToGraveyard->setText(tr("Put bottom card &in graveyard"));
+        aMoveBottomCardToGraveyard->setText(tr("Move bottom card to grave&yard"));
         aMoveBottomCardToExile->setText(tr("Move bottom card to e&xile"));
         aMoveBottomCardsToGraveyard->setText(tr("Move bottom cards to &graveyard..."));
         aMoveBottomCardsToExile->setText(tr("Move bottom cards to &exile..."));
