@@ -247,8 +247,12 @@ private:
         *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
-    int defaultNumberTopCards;
-    int defaultNumberTopCardsToPlaceBelow;
+    int defaultNumberTopCards = 1;
+    int defaultNumberTopCardsToPlaceBelow = 1;
+    int defaultNumberBottomCards = 1;
+    int defaultNumberDieRoll = 20;
+    static constexpr int minDieRoll = 2;
+    static constexpr int maxDieRoll = 1000000;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
     int lastTokenTableRow;

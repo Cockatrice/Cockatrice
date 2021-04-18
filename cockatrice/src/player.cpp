@@ -104,9 +104,8 @@ void PlayerArea::setPlayerZoneId(int _playerZoneId)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
-      defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
-      local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), zoneId(0),
+    : QObject(_parent), game(_parent), shortcutsActive(false), lastTokenDestroy(true), lastTokenTableRow(0), id(_id),
+      active(false), local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), zoneId(0),
       dialogSemaphore(false), deck(nullptr)
 {
     userInfo = new ServerInfo_User;
@@ -604,11 +603,11 @@ void Player::playerListActionTriggered()
     if (menu == mRevealLibrary) {
         cmd.set_zone_name("deck");
     } else if (menu == mRevealTopCard) {
-        int decksize = zones.value("deck")->getCards().size();
+        int deckSize = zones.value("deck")->getCards().size();
         bool ok;
         int number = QInputDialog::getInt(game, tr("Reveal top cards of library"),
-                                          tr("Number of cards: (max. %1)").arg(decksize), defaultNumberTopCards, 1,
-                                          decksize, 1, &ok);
+                                          tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1,
+                                          deckSize, 1, &ok);
         if (ok) {
             cmd.set_zone_name("deck");
             cmd.set_top_cards(number);
@@ -1037,9 +1036,11 @@ void Player::actViewHand()
 
 void Player::actViewTopCards()
 {
+    int deckSize = zones.value("deck")->getCards().size();
     bool ok;
-    int number = QInputDialog::getInt(game, tr("View top cards of library"), tr("Number of cards:"),
-                                      defaultNumberTopCards, 1, 2000000000, 1, &ok);
+    int number =
+        QInputDialog::getInt(game, tr("View top cards of library"), tr("Number of cards: (max. %1)").arg(deckSize),
+                             defaultNumberTopCards, 1, deckSize, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
         static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
@@ -1113,11 +1114,12 @@ void Player::actMulligan()
 {
     int startSize = SettingsCache::instance().getStartingHandSize();
     int handSize = zones.value("hand")->getCards().size();
-    int deckSize = zones.value("deck")->getCards().size() + handSize;
+    int deckSize = zones.value("deck")->getCards().size() + handSize; // hand is shuffled back into the deck
     bool ok;
-    int number = QInputDialog::getInt(
-        game, tr("Draw hand"), tr("Number of cards:") + '\n' + tr("0 and lower are in comparison to current hand size"),
-        startSize, -handSize, deckSize, 1, &ok);
+    int number = QInputDialog::getInt(game, tr("Draw hand"),
+                                      tr("Number of cards: (max. %1)").arg(deckSize) + '\n' +
+                                          tr("0 and lower are in comparison to current hand size"),
+                                      startSize, -handSize, deckSize, 1, &ok);
     if (!ok) {
         return;
     }
@@ -1138,8 +1140,12 @@ void Player::actMulligan()
 
 void Player::actDrawCards()
 {
-    int number = QInputDialog::getInt(game, tr("Draw cards"), tr("Number:"));
-    if (number) {
+    int deckSize = zones.value("deck")->getCards().size();
+    bool ok;
+    int number = QInputDialog::getInt(game, tr("Draw cards"), tr("Number of cards: (max. %1)").arg(deckSize),
+                                      defaultNumberTopCards, 1, deckSize, 1, &ok);
+    if (ok) {
+        defaultNumberTopCards = number;
         Command_DrawCards cmd;
         cmd.set_number(static_cast<google::protobuf::uint32>(number));
         sendGameCommand(cmd);
@@ -1206,12 +1212,16 @@ void Player::actMoveTopCardsToGrave()
         return;
     }
 
-    int number = QInputDialog::getInt(game, tr("Move top cards to grave"), tr("Number:"));
-    if (number == 0) {
+    bool ok;
+    int number =
+        QInputDialog::getInt(game, tr("Move top cards to grave"), tr("Number of cards: (max. %1)").arg(maxCards),
+                             defaultNumberTopCards, 1, maxCards, 1, &ok);
+    if (!ok) {
         return;
     } else if (number > maxCards) {
         number = maxCards;
     }
+    defaultNumberTopCards = number;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
@@ -1234,12 +1244,16 @@ void Player::actMoveTopCardsToExile()
         return;
     }
 
-    int number = QInputDialog::getInt(game, tr("Move top cards to exile"), tr("Number:"));
-    if (number == 0) {
+    bool ok;
+    int number =
+        QInputDialog::getInt(game, tr("Move top cards to exile"), tr("Number of cards: (max. %1)").arg(maxCards),
+                             defaultNumberTopCards, 1, maxCards, 1, &ok);
+    if (!ok) {
         return;
     } else if (number > maxCards) {
         number = maxCards;
     }
+    defaultNumberTopCards = number;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
@@ -1341,12 +1355,16 @@ void Player::actMoveBottomCardsToGrave()
         return;
     }
 
-    int number = QInputDialog::getInt(game, tr("Move bottom cards to grave"), tr("Number:"));
-    if (number == 0) {
+    bool ok;
+    int number =
+        QInputDialog::getInt(game, tr("Move bottom cards to grave"), tr("Number of cards: (max. %1)").arg(maxCards),
+                             defaultNumberBottomCards, 1, maxCards, 1, &ok);
+    if (!ok) {
         return;
     } else if (number > maxCards) {
         number = maxCards;
     }
+    defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
@@ -1369,12 +1387,16 @@ void Player::actMoveBottomCardsToExile()
         return;
     }
 
-    int number = QInputDialog::getInt(game, tr("Move bottom cards to exile"), tr("Number:"));
-    if (number == 0) {
+    bool ok;
+    int number =
+        QInputDialog::getInt(game, tr("Move bottom cards to exile"), tr("Number of cards: (max. %1)").arg(maxCards),
+                             defaultNumberBottomCards, 1, maxCards, 1, &ok);
+    if (!ok) {
         return;
     } else if (number > maxCards) {
         number = maxCards;
     }
+    defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
@@ -1427,12 +1449,15 @@ void Player::actDrawBottomCards()
         return;
     }
 
-    int number = QInputDialog::getInt(game, tr("Draw bottom cards"), tr("Number:"));
-    if (number == 0) {
+    bool ok;
+    int number = QInputDialog::getInt(game, tr("Draw bottom cards"), tr("Number of cards: (max. %1)").arg(maxCards),
+                                      defaultNumberBottomCards, 1, maxCards, 1, &ok);
+    if (!ok) {
         return;
     } else if (number > maxCards) {
         number = maxCards;
     }
+    defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
@@ -1499,8 +1524,10 @@ void Player::actUntapAll()
 void Player::actRollDie()
 {
     bool ok;
-    int sides = QInputDialog::getInt(game, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
+    int sides = QInputDialog::getInt(game, tr("Roll die"), tr("Number of sides:"), defaultNumberDieRoll, minDieRoll,
+                                     maxDieRoll, 1, &ok);
     if (ok) {
+        defaultNumberDieRoll = sides;
         Command_RollDie cmd;
         cmd.set_sides(static_cast<google::protobuf::uint32>(sides));
         sendGameCommand(cmd);
@@ -2695,11 +2722,13 @@ bool Player::clearCardsToDelete()
 
 void Player::actMoveCardXCardsFromTop()
 {
+    int deckSize = zones.value("deck")->getCards().size() + 1; // add the card to move to the deck
     bool ok;
-    int number = QInputDialog::getInt(game, tr("Place card X cards from top of library"),
-                                      tr("How many cards from the top of the deck should this card be placed:"),
-                                      defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
-    number--;
+    int number =
+        QInputDialog::getInt(game, tr("Place card X cards from top of library"),
+                             tr("Which position should this card be placed:") + "\n" + tr("(max. %1)").arg(deckSize),
+                             defaultNumberTopCardsToPlaceBelow, 1, deckSize, 1, &ok);
+    number -= 1; // indexes start at 0
 
     if (!ok) {
         return;
