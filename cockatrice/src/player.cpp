@@ -1842,14 +1842,17 @@ void Player::eventGameSay(const Event_GameSay &event)
 void Player::eventShuffle(const Event_Shuffle &event)
 {
     CardZone *zone = zones.value(QString::fromStdString(event.zone_name()));
+
     if (!zone) {
         return;
     }
-    for (auto *view : zone->getViews()) {
+
+    for (auto &view : zone->getViews()) {
         if (view != nullptr) {
-            view->setWriteableRevealZone(false);
+            emit view->beingDeleted();
         }
     }
+
     emit logShuffle(this, zone, event.start(), event.end());
 }
 

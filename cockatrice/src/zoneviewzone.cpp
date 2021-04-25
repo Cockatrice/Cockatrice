@@ -247,7 +247,7 @@ void ZoneViewZone::setWriteableRevealZone(bool _writeableRevealZone)
     if (writeableRevealZone && !_writeableRevealZone) {
         origZone->getViews().append(this);
     } else if (!writeableRevealZone && _writeableRevealZone) {
-        origZone->getViews().removeOne(this);
+        origZone->getViews().removeAll(this);
     }
     writeableRevealZone = _writeableRevealZone;
 }

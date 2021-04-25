@@ -8,6 +8,8 @@
 # Cmake 3.1 is required to enable C++11 support correctly
 cmake_minimum_required(VERSION 3.10)
 
+set(QTDIR C:/Qt/5.15.2/msvc2019_64)
+
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
 IF(DEFINED CMAKE_BUILD_TYPE)
@@ -28,12 +30,15 @@ if(USE_CCACHE)
 endif()
 
 if(WIN32)
+    #set(QTDIR "" CACHE PATH C:/Qt/5.14.2/msvc2017_64)
     # Use vcpkg toolchain on Windows
     set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        CACHE STRING "Vcpkg toolchain file")
+       CACHE STRING "Vcpkg toolchain file")
+    #set(CMAKE_TOOLCHAIN_FILE C:/vcpkg/scripts/buildsystems/vcpkg.cmake)  
     # Qt path set by user or env var
     if (QTDIR OR DEFINED ENV{QTDIR} OR DEFINED ENV{QTDIR32} OR DEFINED ENV{QTDIR64})
     else()
+	# set(QTDIR "" CACHE PATH C:/Qt/5.14.2/msvc2017_64)
         set(QTDIR "" CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)")
         message(WARNING "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)")
     endif()
