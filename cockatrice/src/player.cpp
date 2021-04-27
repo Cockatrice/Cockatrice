@@ -2999,7 +2999,9 @@ void Player::actResetPT()
         }
     }
 
-    game->sendGameCommand(prepareGameCommand(commandList), playerid);
+    if (!commandList.empty()){
+        game->sendGameCommand(prepareGameCommand(commandList), playerid);
+    }
 }
 
 QVariantList Player::parsePT(const QString &pt)
