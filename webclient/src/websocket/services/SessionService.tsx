@@ -36,6 +36,10 @@ export default class SessionService {
     ServerDispatch.updateBuddyList(buddyList);
   }
 
+  listDecks(decks) {
+    ServerDispatch.listDecks(decks);
+  }
+
   addToBuddyList(user) {
     ServerDispatch.addToBuddyList(user);
   }

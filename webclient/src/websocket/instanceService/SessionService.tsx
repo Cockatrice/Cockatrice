@@ -16,4 +16,8 @@ export default class SessionService {
   static removeFromIgnoreList(userName) {
     webClient.commands.session.removeFromIgnoreList(userName);
   }
+
+  static listDecks() {
+    webClient.commands.session.listDecks();
+  }
 }

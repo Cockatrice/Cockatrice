@@ -23,6 +23,7 @@ const initialState: ServerState = {
     game: [],
     chat: []
   },
+  decks: [],
   user: null,
   users: [],
   sortUsersBy: {
@@ -202,6 +203,13 @@ export const serverReducer = (state = initialState, action: any) => {
         logs: {
           ...initialState.logs
         }
+      }
+    }
+    case Types.LIST_DECKS: {
+      const { decks } = action;
+      return {
+        ...state,
+        decks
       }
     }
     default:

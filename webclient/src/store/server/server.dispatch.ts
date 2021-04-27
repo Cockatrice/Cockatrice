@@ -64,5 +64,8 @@ export const Dispatch = {
   },
   serverMessage: message => {
     store.dispatch(Actions.serverMessage(message));
+  },
+  listDecks: decks => {
+    store.dispatch(Actions.listDecks(decks));
   }
 }

@@ -69,5 +69,9 @@ export const Actions = {
   }),
   clearLogs: () => ({
     type: Types.CLEAR_LOGS
+  }),
+  listDecks: (decks) => ({
+    type: Types.LIST_DECKS,
+    decks
   })
 }

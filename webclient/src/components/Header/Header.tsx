@@ -53,6 +53,10 @@ class Header extends Component<HeaderProps> {
                       <NavLink to={RouteEnum.SERVER} className="plain-link">
                         Server ({server})
                       </NavLink>
+                      -
+                      <NavLink to={RouteEnum.DECKS} className="plain-link">
+                        Decks
+                      </NavLink>
                     </li>
                     <NavLink to={RouteEnum.ACCOUNT} className="plain-link">
                       <div className="Header-account">
