@@ -757,13 +757,6 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName,
     appendMessage(std::move(message), {}, spectatorName, spectatorUserLevel, userPrivLevel, false);
 }
 
-void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
-{
-    appendHtmlServerMessage(tr("%1 stops looking at %2.")
-                                .arg(sanitizeHtml(player->getName()))
-                                .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
-}
-
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 {
     appendHtmlServerMessage(
@@ -824,7 +817,6 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logAttachCard(Player *, QString, Player *, QString)));
     connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));
     connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
-    connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
     connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
     connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)), this,

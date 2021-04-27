@@ -55,7 +55,6 @@ class Command_DelCounter;
 class Command_NextTurn;
 class Command_SetActivePhase;
 class Command_DumpZone;
-class Command_StopDumpZone;
 class Command_RevealCards;
 class Command_ReverseTurn;
 class Command_MoveCard;
@@ -226,8 +225,6 @@ public:
     Response::ResponseCode
     cmdSetActivePhase(const Command_SetActivePhase &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
-    Response::ResponseCode
-    cmdStopDumpZone(const Command_StopDumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
