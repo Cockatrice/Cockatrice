@@ -13,6 +13,7 @@ export interface ServerState {
   info: ServerStateInfo;
   status: ServerStateStatus;
   logs: ServerStateLogs;
+  decks: any[]; // TODO
   user: User;
   users: User[];
   sortUsersBy: ServerStateSortUsersBy;

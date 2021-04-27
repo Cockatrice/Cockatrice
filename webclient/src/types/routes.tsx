@@ -6,5 +6,5 @@ export enum RouteEnum {
   GAME = "/game",
   DECKS = "/decks",
   DECK = "/deck",
-  ACCOUNT = "/account",
+  ACCOUNT = "/account"
 }

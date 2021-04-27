@@ -107,6 +107,29 @@ export default class SessionCommands {
     });
   }
 
+  listDecks() {
+    const CmdListDecks = this.webClient.pb.Command_DeckList.create();
+    const sc = this.webClient.pb.SessionCommand.create({
+      ".Command_DeckList.ext" : CmdListDecks
+    });
+    
+    this.webClient.sendSessionCommand(sc, raw => {
+      const { responseCode } = raw;
+      const response = raw[".Response_DeckList.ext"];
+
+      if (response) {
+        switch (responseCode) {
+          case this.webClient.pb.Response.ResponseCode.RespOk:
+            const decks = response.root.items
+            this.webClient.services.session.listDecks(decks);
+            break;
+          default:
+            console.log(`Failed to fetch Server Rooms [${responseCode}] : `, raw);
+        }
+      }
+    });
+  }
+
   listRooms() {
     const CmdListRooms = this.webClient.pb.Command_ListRooms.create();
 
