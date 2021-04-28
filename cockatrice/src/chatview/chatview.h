@@ -31,8 +31,10 @@ private:
         HoveredNothing,
         HoveredUrl,
         HoveredCard,
-        HoveredUser
+        HoveredUser,
+        HoveredGame
     };
+    static const QStringList customSchemes;
     const UserlistProxy *const userlistProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
@@ -50,6 +52,7 @@ private:
     QAction *messageClicked;
     QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
+    void appendGameTag(QTextCursor &cursor, const QString &gameId);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     QColor getCustomMentionColor();

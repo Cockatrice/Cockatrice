@@ -29,6 +29,7 @@ SET(cockatrice_SOURCES
     src/main.cpp
     src/window_main.cpp
     src/gamesmodel.cpp
+    src/gamelistitem.cpp
     src/player.cpp
     src/playertarget.cpp
     src/cardzone.cpp

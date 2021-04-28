@@ -2,6 +2,7 @@
 
 #include "abstractclient.h"
 #include "gameselector.h"
+#include "gamelistitem.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/commands.pb.h"
 #include "pb/moderator_commands.pb.h"
@@ -77,6 +78,7 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
 
     QMap<int, GameTypeMap> gameTypeMap;
     QMap<int, QString> roomMap;
+    QMap<int, GameListItem> gamesById;
     const int roomListSize = response.room_list_size();
     for (int i = 0; i < roomListSize; ++i) {
         const ServerInfo_Room &roomInfo = response.room_list(i);
@@ -90,12 +92,7 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
         gameTypeMap.insert(roomInfo.room_id(), tempMap);
     }
 
-    GameSelector *selector = new GameSelector(client, tabSupervisor, nullptr, roomMap, gameTypeMap, false, false);
-    selector->setParent(static_cast<QWidget *>(parent()), Qt::Window);
-    const int gameListSize = response.game_list_size();
-    for (int i = 0; i < gameListSize; ++i) {
-        selector->processGameInfo(response.game_list(i));
-    }
+    GameSelector *selector = new GameSelector(client, tabSupervisor, nullptr, roomMap, false, false, static_cast<QWidget *>(parent()), gamesById);
 
     selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
     selector->setMinimumWidth(800);

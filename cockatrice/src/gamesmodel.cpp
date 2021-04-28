@@ -1,8 +1,8 @@
 #include "gamesmodel.h"
 
 #include "pb/serverinfo_game.pb.h"
-#include "pixmapgenerator.h"
 #include "settingscache.h"
+#include "gamelistitem.h"
 #include "tab_account.h"
 #include "userlist.h"
 
@@ -11,18 +11,6 @@
 #include <QIcon>
 #include <QStringList>
 #include <QTime>
-
-enum GameListColumn
-{
-    ROOM,
-    CREATED,
-    DESCRIPTION,
-    CREATOR,
-    GAME_TYPE,
-    RESTRICTIONS,
-    PLAYERS,
-    SPECTATORS
-};
 
 const bool DEFAULT_SHOW_FULL_GAMES = false;
 const bool DEFAULT_SHOW_GAMES_THAT_STARTED = false;
@@ -70,8 +58,8 @@ const QString GamesModel::getGameCreatedString(const int secs)
     return form.arg("").arg(amount);
 }
 
-GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
-    : QAbstractTableModel(parent), rooms(_rooms), gameTypes(_gameTypes)
+GamesModel::GamesModel(const QMap<int, QString> &_rooms, QObject *parent, QMap<int, GameListItem> &_gameMap)
+    : QAbstractTableModel(parent), rooms(_rooms), gameMap(_gameMap)
 {
 }
 
@@ -86,133 +74,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
     if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
         return QVariant();
 
-    const ServerInfo_Game &gameentry = gameList[index.row()];
-    switch (index.column()) {
-        case ROOM:
-            return rooms.value(gameentry.room_id());
-        case CREATED: {
-            switch (role) {
-                case Qt::DisplayRole: {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-                    QDateTime then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), Qt::UTC);
-#else
-                    QDateTime then = QDateTime::fromTime_t(gameentry.start_time(), Qt::UTC);
-#endif
-                    int secs = then.secsTo(QDateTime::currentDateTimeUtc());
-                    return getGameCreatedString(secs);
-                }
-                case SORT_ROLE:
-                    return QVariant(-static_cast<qint64>(gameentry.start_time()));
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignCenter;
-                default:
-                    return QVariant();
-            }
-        }
-        case DESCRIPTION:
-            switch (role) {
-                case SORT_ROLE:
-                case Qt::DisplayRole:
-                    return QString::fromStdString(gameentry.description());
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignLeft;
-                default:
-                    return QVariant();
-            }
-        case CREATOR: {
-            switch (role) {
-                case SORT_ROLE:
-                case Qt::DisplayRole:
-                    return QString::fromStdString(gameentry.creator_info().name());
-                case Qt::DecorationRole: {
-                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(
-                        13, (UserLevelFlags)gameentry.creator_info().user_level(), false,
-                        QString::fromStdString(gameentry.creator_info().privlevel()));
-                    return QIcon(avatarPixmap);
-                }
-                default:
-                    return QVariant();
-            }
-        }
-        case GAME_TYPE:
-            switch (role) {
-                case SORT_ROLE:
-                case Qt::DisplayRole: {
-                    QStringList result;
-                    GameTypeMap gameTypeMap = gameTypes.value(gameentry.room_id());
-                    for (int i = gameentry.game_types_size() - 1; i >= 0; --i)
-                        result.append(gameTypeMap.value(gameentry.game_types(i)));
-                    return result.join(", ");
-                }
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignLeft;
-                default:
-                    return QVariant();
-            }
-        case RESTRICTIONS:
-            switch (role) {
-                case SORT_ROLE:
-                case Qt::DisplayRole: {
-                    QStringList result;
-                    if (gameentry.with_password())
-                        result.append(tr("password"));
-                    if (gameentry.only_buddies())
-                        result.append(tr("buddies only"));
-                    if (gameentry.only_registered())
-                        result.append(tr("reg. users only"));
-                    return result.join(", ");
-                }
-                case Qt::DecorationRole: {
-                    return gameentry.with_password() ? QIcon(LockPixmapGenerator::generatePixmap(13)) : QVariant();
-                    case Qt::TextAlignmentRole:
-                        return Qt::AlignLeft;
-                    default:
-                        return QVariant();
-                }
-            }
-        case PLAYERS:
-            switch (role) {
-                case SORT_ROLE:
-                case Qt::DisplayRole:
-                    return QString("%1/%2").arg(gameentry.player_count()).arg(gameentry.max_players());
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignCenter;
-                default:
-                    return QVariant();
-            }
-
-        case SPECTATORS:
-            switch (role) {
-                case SORT_ROLE:
-                case Qt::DisplayRole: {
-                    if (gameentry.spectators_allowed()) {
-                        QString result;
-                        result.append(QString::number(gameentry.spectators_count()));
-
-                        if (gameentry.spectators_can_chat() && gameentry.spectators_omniscient()) {
-                            result.append(" (")
-                                .append(tr("can chat"))
-                                .append(" & ")
-                                .append(tr("see hands"))
-                                .append(")");
-                        } else if (gameentry.spectators_can_chat()) {
-                            result.append(" (").append(tr("can chat")).append(")");
-                        } else if (gameentry.spectators_omniscient()) {
-                            result.append(" (").append(tr("can see hands")).append(")");
-                        }
-
-                        return result;
-                    }
-                    return QVariant(tr("not allowed"));
-                }
-                case Qt::TextAlignmentRole:
-                    return Qt::AlignLeft;
-                default:
-                    return QVariant();
-            }
-        default:
-            return QVariant();
-    }
+    return gameMap.find(gameList[index.row()])->data(index.column(), role);
 }
 
 QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, int role) const
@@ -257,30 +119,28 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
     }
 }
 
-const ServerInfo_Game &GamesModel::getGame(int row)
+const GameListItem &GamesModel::getGame(int row)
 {
     Q_ASSERT(row < gameList.size());
-    return gameList[row];
+    return gameMap.find(gameList[row]).value();
 }
 
-void GamesModel::updateGameList(const ServerInfo_Game &game)
+void GamesModel::rebuildList()
 {
-    for (int i = 0; i < gameList.size(); i++) {
-        if (gameList[i].game_id() == game.game_id()) {
-            if (game.closed()) {
-                beginRemoveRows(QModelIndex(), i, i);
-                gameList.removeAt(i);
-                endRemoveRows();
-            } else {
-                gameList[i].MergeFrom(game);
-                emit dataChanged(index(i, 0), index(i, NUM_COLS - 1));
-            }
-            return;
-        }
+    beginResetModel();
+    gameList.clear();
+    for (auto &game : gameMap.values()) {
+        addGame(game);
     }
-    beginInsertRows(QModelIndex(), gameList.size(), gameList.size());
-    gameList.append(game);
-    endInsertRows();
+    endResetModel();
+}
+
+void GamesModel::addGame(GameListItem &game)
+{
+    gameList.append(game.getId());
+    int row = gameList.size() - 1;
+    game.updateFunc([this, row]() { emit dataChanged(index(row, 0), index(row, NUM_COLS - 1)); });
+    game.setRow(row);
 }
 
 GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
@@ -500,7 +360,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (!model)
         return false;
 
-    const ServerInfo_Game &game = model->getGame(sourceRow);
+    const ServerInfo_Game &game = model->getGame(sourceRow).getGame();
 
     if (!showBuddiesOnlyGames && game.only_buddies()) {
         return false;

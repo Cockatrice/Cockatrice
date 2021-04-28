@@ -1,5 +1,4 @@
 #include "gameselector.h"
-
 #include "abstractclient.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
@@ -28,14 +27,14 @@ GameSelector::GameSelector(AbstractClient *_client,
                            const TabSupervisor *_tabSupervisor,
                            TabRoom *_room,
                            const QMap<int, QString> &_rooms,
-                           const QMap<int, GameTypeMap> &_gameTypes,
                            const bool restoresettings,
                            const bool _showfilters,
-                           QWidget *parent)
+                           QWidget *parent,
+                           QMap<int, GameListItem> &gameMap)
     : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room), showFilters(_showfilters)
 {
     gameListView = new QTreeView;
-    gameListModel = new GamesModel(_rooms, _gameTypes, this);
+    gameListModel = new GamesModel(_rooms, this, gameMap);
     if (showFilters) {
         gameListProxyModel = new GamesProxyModel(this, tabSupervisor);
         gameListProxyModel->setSourceModel(gameListModel);
@@ -237,11 +236,11 @@ void GameSelector::actJoin()
     QModelIndex ind = gameListView->currentIndex();
     if (!ind.isValid())
         return;
-    const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
-    bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
+    auto game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+    bool spectator = sender() == spectateButton || game.isFull();
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
-    if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
+    if (!overrideRestrictions && game.hasPassword() && !(spectator && !game.spectatorHasPassword())) {
         bool ok;
         password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
         if (!ok)
@@ -249,21 +248,21 @@ void GameSelector::actJoin()
     }
 
     Command_JoinGame cmd;
-    cmd.set_game_id(game.game_id());
+    cmd.set_game_id(game.getId());
     cmd.set_password(password.toStdString());
     cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
     cmd.set_join_as_judge((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
 
-    TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
-    if (!r) {
+    TabRoom *room = game.getRoom();
+    if (!room) {
         QMessageBox::critical(this, tr("Error"), tr("Please join the respective room first."));
         return;
     }
 
-    PendingCommand *pend = r->prepareRoomCommand(cmd);
+    PendingCommand *pend = room->prepareRoomCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
-    r->sendRoomCommand(pend);
+    room->sendRoomCommand(pend);
 
     if (createButton)
         createButton->setEnabled(false);
@@ -283,22 +282,16 @@ void GameSelector::retranslateUi()
     updateTitle();
 }
 
-void GameSelector::processGameInfo(const ServerInfo_Game &info)
-{
-    gameListModel->updateGameList(info);
-    updateTitle();
-}
-
 void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
     if (!current.isValid())
         return;
 
-    const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
+    auto game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
 
-    spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
-    joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
+    spectateButton->setEnabled(overrideRestrictions || game.canJoinAsSpectator());
+    joinButton->setEnabled(overrideRestrictions || game.canJoin());
 }
 
 void GameSelector::updateTitle()
@@ -310,4 +303,14 @@ void GameSelector::updateTitle()
     } else {
         setTitle(tr("Games"));
     }
+}
+
+void GameSelector::rebuildList()
+{
+    gameListModel->rebuildList();
+}
+
+void GameSelector::addGame(GameListItem &game)
+{
+    gameListModel->addGame(game);
 }

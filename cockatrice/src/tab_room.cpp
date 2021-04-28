@@ -37,14 +37,14 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
       ownUser(_ownUser)
 {
-    const int gameTypeListSize = info.gametype_list_size();
-    for (int i = 0; i < gameTypeListSize; ++i)
-        gameTypes.insert(info.gametype_list(i).game_type_id(),
-                         QString::fromStdString(info.gametype_list(i).description()));
+    for (auto gameType : info.gametype_list()) {
+        gameTypes.insert(gameType.game_type_id(), QString::fromStdString(gameType.description()));
+    }
+    for (auto game : info.game_list()) {
+        gamesById.insert(game.game_id(), GameListItem(this, game, gameTypes));
+    }
 
-    QMap<int, GameTypeMap> tempMap;
-    tempMap.insert(info.room_id(), gameTypes);
-    gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
+    gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), true, true, this, gamesById);
     userList = new UserList(tabSupervisor, client, UserList::RoomList);
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
@@ -110,10 +110,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
         autocompleteUserList.append("@" + QString::fromStdString(info.user_list(i).name()));
     }
     userList->sortItems();
-
-    const int gameListSize = info.game_list_size();
-    for (int i = 0; i < gameListSize; ++i)
-        gameSelector->processGameInfo(info.game_list(i));
 
     completer = new QCompleter(autocompleteUserList, sayEdit);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -258,9 +254,26 @@ void TabRoom::processRoomEvent(const RoomEvent &event)
 
 void TabRoom::processListGamesEvent(const Event_ListGames &event)
 {
-    const int gameListSize = event.game_list_size();
-    for (int i = 0; i < gameListSize; ++i)
-        gameSelector->processGameInfo(event.game_list(i));
+    bool rebuild = false;
+    for (const ServerInfo_Game &game : event.game_list()) {
+        int id = game.game_id();
+        auto index = gamesById.find(id);
+        if (index != gamesById.end()) {
+            bool removed = index->update(game);
+            if (removed) {
+                gamesById.erase(index);
+                rebuild = true;
+            }
+        } else {
+            index = gamesById.insert(id, GameListItem(this, game, gameTypes));
+            if (!rebuild) {
+                gameSelector->addGame(index.value());
+            }
+        }
+    }
+    if (rebuild) {
+        gameSelector->rebuildList();
+    }
 }
 
 void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
