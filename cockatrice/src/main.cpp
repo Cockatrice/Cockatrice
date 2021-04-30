@@ -126,79 +126,30 @@ int main(int argc, char *argv[])
     bool openInNewClient = m_instanceManager->isFirstInstance();
     QList<QString *> replays;
     QList<QString *> decks;
-
+    
+    QRegExp deckOrReplayRegex(".*\\.co(d|r)");
+    QRegExp deckRegex(".*\\.co(d|r)");
+    
     // Check for args. argv[0] is the command.
     if (argc > 1) {
         for (int i = 1; i < argc; i++) {
-            qDebug() << "Processing arg '" << argv[i] << "'";
-            // Check arg matches *.co(r|d) via a finite state machine
-            int state = 0;
-            /*
-             * states transitions
-             * 0 -> 1 if .
-             * 1 -> 2 if c else 1 -> 0
-             * 2 -> 3 if o else 2 -> 0
-             * 3 -> 4 if r or d else 3 -> 0
-             * 4 -> 0 if it is not an epsilon transition (accepting state)
-             */
+            QString currentArg = QString(argv[i]);
+            qDebug() << "Processing arg '" << currentArg << "'";
             
-            bool isDeckFile = 1;
-            
-            for (int j = 0; argv[i][j] != 0; j++) {
-                switch (argv[i][j]) {
-                    // 0 -> 1 if .
-                    case '.':
-                        state = 1;
-                        break;
-                        // 1 -> 2 if c
-                    case 'c':
-                        if (state == 1) {
-                            state = 2;
-                        } else {
-                            state = 0;
-                        }
-                        break;
-                        // 2 -> 3 if o
-                    case 'o':
-                        if (state == 2) {
-                            state = 3;
-                        } else {
-                            state = 0;
-                        }
-                        break;
-                        // 2 -> 3 if o
-                    case 'd':
-                        isDeckFile = true; // Dear linter, this statement should fall through
-                        // intentional fallthrough
-                    case 'r':
-                        if (state == 3) {
-                            state = 4;
-                        } else {
-                            state = 0;
-                        }
-                        break;
-                        // Reset state (all else statements from the above definition)
-                    default:
-                        state = 0;
-                        isDeckFile = false;
-                        break;
-                }
-            }
-            
-            // If accepting state
-            if (state == 4) {
+            if (deckOrReplayRegex.exactMatch(currentArg)) {
+                bool isDeckFile = deckRegex.exactMatch(currentArg);
+                
                 QString path = "";
                 if (!QString(argv[i]).contains('/')) {
                     path = QDir::currentPath() + "/";
                 }
                 
-                void actConnectWithDefault(QString name, QString address, unsigned int port);
                 if (isDeckFile) {
-                    qDebug() << "Deck detected " << argv[i];
-                    decks.append(new QString(path + argv[i]));
+                    qDebug() << "Deck detected " << currentArg;
+                    decks.append(new QString(path + currentArg));
                 } else {
-                    qDebug() << "Replay detected " << argv[i];
-                    replays.append(new QString(path + argv[i]));
+                    qDebug() << "Replay detected " << currentArg;
+                    replays.append(new QString(path + currentArg));
                 }
             }
         }
