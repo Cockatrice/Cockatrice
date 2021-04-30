@@ -169,6 +169,7 @@ int main(int argc, char *argv[])
                         // 2 -> 3 if o
                     case 'd':
                         isDeckFile = true; // Dear linter, this statement should fall through
+                        // intentional fallthrough
                     case 'r':
                         if (state == 3) {
                             state = 4;
