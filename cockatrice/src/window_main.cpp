@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "applicationinstancemanager.h"
 #include "carddatabase.h"
 #include "dlg_connect.h"
 #include "dlg_edit_tokens.h"
@@ -193,6 +194,58 @@ void MainWindow::actConnect()
     if (dlgConnect->exec()) {
         client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
                                 dlgConnect->getPlayerName(), dlgConnect->getPassword());
+    }
+}
+
+void MainWindow::processInterProcessCommunication(const QString &msg, QObject *socket)
+{
+    Q_UNUSED(socket)
+    
+    qDebug() << "MainWindow::processInterProcessCommunication(): Received message " << msg;
+
+    // index 0 is type (deck, replay, xscheme) and; 1 is the URI
+    // Check size
+    QStringList msgParts = msg.split(':');
+
+    // Check size. If the size is less than then it is probably the connected message
+    if (msgParts.size() > 1) {
+            qDebug("MainWindow::processInterProcessCommunication(): Parsing replay/deck open");
+
+            // Rejoin the URI
+            QString URI = "";
+            for (int i = 1; i < msgParts.size(); i++) {
+                URI += msgParts.at(i);
+                if (i < msgParts.size() - 1) {
+                    URI += ":";
+                }
+            }
+
+            if (msgParts.at(0) == "replay") {
+                qDebug() << "MainWindow::processInterProcessCommunication(): Opened a replay from external source "
+                         << URI;
+
+                QFile file(URI);
+                if (!file.open(QIODevice::ReadOnly))
+                    return;
+                QByteArray buf = file.readAll();
+                file.close();
+
+                GameReplay *replay = new GameReplay();
+                replay->ParseFromArray(buf.data(), buf.size());
+
+                tabSupervisor->openReplay(replay);
+            } else if (msgParts.at(0) == "deck") {
+                qDebug() << "MainWindow::processInterProcessCommunication(): Opened a deck from external source "
+                         << URI;
+
+                DeckLoader *dl = new DeckLoader();
+                qDebug() << "Loading deck status: " << dl->loadFromFile(URI, DeckLoader::FileFormat::CockatriceFormat);
+                tabSupervisor->addDeckEditorTab(dl);
+            } else {
+                qDebug("MainWindow::processInterProcessCommunication(): Unknown message - assuming it is important");
+            }        
+    } else {
+        qDebug("MainWindow::processInterProcessCommunication(): Unknown message - no :");
     }
 }
 
@@ -776,7 +829,7 @@ void MainWindow::createMenus()
     helpMenu->addAction(aViewLog);
 }
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(ApplicationInstanceManager *instanceManager, QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
@@ -842,6 +895,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(db, SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this,
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
+
+    // Setup instance manager
+    this->instanceManager = instanceManager;
+    connect(instanceManager, SIGNAL(messageReceived(const QString &, QObject *)), this,
+            SLOT(processInterProcessCommunication(const QString &, QObject *)));
 
     tip = new DlgTipOfTheDay();
 
@@ -1096,7 +1154,7 @@ void MainWindow::actCheckCardUpdates()
 
 #if defined(Q_OS_MAC)
     /*
-     * bypass app translocation: quarantined application will be started from a temporary directory eg.
+     * bypass app translocation: quarantined application will be started from a temporary directory eg. 
      * /private/var/folders/tk/qx76cyb50jn5dvj7rrgfscz40000gn/T/AppTranslocation/A0CBBD5A-9264-4106-8547-36B84DB161E2/d/oracle/
      */
     if (dir.absolutePath().startsWith("/private/var/folders")) {

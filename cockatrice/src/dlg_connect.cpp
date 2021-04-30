@@ -332,6 +332,36 @@ QString DlgConnect::getHost() const
     return hostEdit->text().trimmed();
 }
 
+void DlgConnect::setServer(QString serverName, QString address, unsigned int port)
+{
+    // Check if server is in saved list
+    bool serverSaved = false;
+    auto &servers = SettingsCache::instance().servers();
+    int index = 0;
+    
+    for (const auto &pair : savedHostList) {
+        const auto &tmp = pair.second;
+        QString saveName = tmp.getSaveName();
+        if (saveName.size()) {
+            previousHosts->addItem(saveName);
+            
+            if (saveName.compare(address) == 0) {
+                previousHosts->setCurrentIndex(index);
+                serverSaved = true;
+                break;
+            }
+            
+            index++;
+        }
+    }
+    if (!serverSaved) {
+        newHostSelected(true);
+        saveEdit->setText(serverName);
+        hostEdit->setText(address);
+        portEdit->setText(QString::number(port));
+    }
+}
+
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {

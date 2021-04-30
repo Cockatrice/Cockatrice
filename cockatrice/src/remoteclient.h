@@ -118,6 +118,7 @@ public:
             return socket->peerName();
         }
     }
+    bool isConnected();
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void registerToServer(const QString &hostname,

@@ -8,6 +8,7 @@
 #include "pb/game_event_container.pb.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/room_commands.pb.h"
+#include "pb/session_commands.pb.h"
 #include "pb/room_event.pb.h"
 #include "pb/serverinfo_room.pb.h"
 #include "pb/serverinfo_user.pb.h"
@@ -127,6 +128,28 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
 TabSupervisor::~TabSupervisor()
 {
     stop();
+}
+
+void TabSupervisor::joinGameRoom(int roomID, int gameID)
+{
+    // Check for room
+    bool inRoom = roomTabs.contains(roomID);
+    if (!inRoom) {
+        // Send join room
+        Command_JoinRoom roomJoin;
+        roomJoin.set_room_id(roomID);
+        getClient()->sendCommand(AbstractClient::prepareSessionCommand(roomJoin));
+    }
+    
+    // Check for game
+    bool inGame = roomTabs.contains(gameID);
+    if (!inGame) {
+        // Send join game
+        Command_JoinGame gameJoin;
+        gameJoin.set_game_id(gameID);
+        getClient()->sendCommand(AbstractClient::prepareRoomCommand(gameJoin, roomID));
+        
+    }
 }
 
 void TabSupervisor::retranslateUi()

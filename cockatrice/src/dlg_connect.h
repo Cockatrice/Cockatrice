@@ -47,6 +47,7 @@ public:
     {
         return passwordEdit->text();
     }
+    void setServer(QString serverName, QString address, unsigned int port);
 
 public slots:
     void downloadThePublicServers();
@@ -62,7 +63,7 @@ private slots:
     void preRebuildComboBoxList();
     void rebuildComboBoxList(int failure = -1);
 
-private:
+private:    
     QGridLayout *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
     QHBoxLayout *newHolderLayout;
     QGroupBox *loginGroupBox, *serverInfoGroupBox, *restrictionsGroupBox;

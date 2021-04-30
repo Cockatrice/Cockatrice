@@ -4,6 +4,13 @@
 
 PROJECT(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
+if (UNIX)
+    set (QT_LOCKED_FILE_IMPL "src/qtlocalpeer/qtlockedfile_unix.cpp")
+endif(UNIX)
+if (WIN32)
+    set (QT_LOCKED_FILE_IMPL "src/qtlocalpeer/qtlockedfile_win.cpp")
+endif(WIN32)
+
 SET(cockatrice_SOURCES
     src/abstractcounter.cpp
     src/counter_general.cpp
@@ -125,6 +132,10 @@ SET(cockatrice_SOURCES
     src/phase.cpp
     src/customlineedit.cpp
     src/translatecountername.cpp
+    src/applicationinstancemanager.cpp
+    src/qtlocalpeer/qtlocalpeer.cpp
+    src/qtlocalpeer/qtlockedfile.cpp
+    ${QT_LOCKED_FILE_IMPL}
     ${VERSION_STRING_CPP}
     )
 
@@ -212,6 +223,9 @@ if(UNIX)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
         INSTALL(FILES ${cockatrice_QM} DESTINATION share/cockatrice/translations)
+        # Run the mime type installer
+        install(CODE "execute_process(COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/mime/mime.sh)")
+
     endif()
 elseif(WIN32)
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION ./)

@@ -84,6 +84,7 @@ private:
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
     ~TabSupervisor();
+    void joinGameRoom(int roomID, int gameID);
     void retranslateUi();
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);

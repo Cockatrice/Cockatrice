@@ -72,6 +72,16 @@ RemoteClient::~RemoteClient()
     thread()->quit();
 }
 
+bool RemoteClient::isConnected()
+{
+    if (usingWebSocket) {
+        return websocket->state() == QAbstractSocket::ConnectedState;
+    } else {
+        return socket->state() == QAbstractSocket::ConnectedState;
+    }
+}
+
+
 void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
     QString errorString = socket->errorString();

@@ -18,7 +18,7 @@ private:
     bool savePassword;
     QString site;
     bool isCustom;
-
+    
 public:
     UserConnection_Information();
     UserConnection_Information(QString, QString, QString, QString, QString, bool, QString);

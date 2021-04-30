@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>  
+  <mime-type type="application/cod">
+    <comment>Cockatrice deck.</comment>
+    <glob pattern="*.cod"/>
+  </mime-type>
+  
+  <mime-type type="application/cor">
+    <comment>Cockatrice replay.</comment>
+    <glob pattern="*.cor"/>
+  </mime-type>
+</mime-info>
