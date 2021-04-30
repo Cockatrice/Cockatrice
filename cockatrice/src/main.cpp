@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     QList<QString *> decks;
     
     QRegExp deckOrReplayRegex(".*\\.co(d|r)");
-    QRegExp deckRegex(".*\\.co(d|r)");
+    QRegExp deckRegex(".*\\.cod");
     
     // Check for args. argv[0] is the command.
     if (argc > 1) {
