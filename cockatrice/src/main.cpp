@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
     QList<QString *> replays;
     QList<QString *> decks;
     
-    QRegExp deckOrReplayRegex(".*\\.co(d|r)");
-    QRegExp deckRegex(".*\\.cod");
+    QRegularExpression deckOrReplayRegex(".*\\.co(d|r)");
+    QRegularExpression deckRegex(".*\\.cod");
     
     // Check for args. argv[0] is the command.
     if (argc > 1) {
@@ -136,8 +136,8 @@ int main(int argc, char *argv[])
             QString currentArg = QString(argv[i]);
             qDebug() << "Processing arg '" << currentArg << "'";
             
-            if (deckOrReplayRegex.exactMatch(currentArg)) {
-                bool isDeckFile = deckRegex.exactMatch(currentArg);
+            if (deckOrReplayRegex.match(currentArg).hasMatch()) {
+                bool isDeckFile = deckRegex.match(currentArg).hasMatch();
                 
                 QString path = "";
                 if (!QString(argv[i]).contains('/')) {
