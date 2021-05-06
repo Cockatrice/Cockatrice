@@ -84,15 +84,15 @@ void installNewTranslator()
     qDebug() << "Language changed:" << lang;
 }
 
-static QString const getUserIDString()
+QString const getUserIDString()
 {
     QString uid = "0";
 #ifdef Q_OS_WIN
     const int UNLEN = 256;
-    WCHAR buffer[UNLEN + 1] = {0};
+    TCHAR buffer[UNLEN + 1] = {0};
     DWORD buffer_len = UNLEN + 1;
     if (GetUserNameW(buffer, &buffer_len)) {
-        uid = QString::fromWCharArray(buffer);
+        uid = (LPSTR) buffer;
     }
 #else
     uid = QString::number(getuid());

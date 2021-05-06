@@ -17,5 +17,6 @@ extern QString translationPath;
 void installNewTranslator();
 
 QString const generateClientID();
+QString const getUserIDString();
 
 #endif
