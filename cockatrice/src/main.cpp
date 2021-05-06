@@ -89,10 +89,10 @@ QString const getUserIDString()
     QString uid = "0";
 #ifdef Q_OS_WIN
     const int UNLEN = 256;
-    TCHAR buffer[UNLEN + 1] = {0};
+    WCHAR buffer[UNLEN + 1] = {0};
     DWORD buffer_len = UNLEN + 1;
     if (GetUserNameW(buffer, &buffer_len)) {
-        uid = (LPSTR) buffer;
+        uid = QString::fromWCharArray(buffer);
     }
 #else
     uid = QString::number(getuid());
