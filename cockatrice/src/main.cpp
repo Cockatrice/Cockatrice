@@ -90,7 +90,7 @@ static QString const getUserIDString()
 #ifdef Q_OS_WIN
     const int UNLEN = 256;
     WCHAR buffer[UNLEN + 1] = {0};
-    DWORD buffer_len = sizeof(buffer) / sizeof(*buffer);
+    DWORD buffer_len = UNLEN + 1;
     if (GetUserNameW(buffer, &buffer_len)) {
         uid = QString::fromWCharArray(buffer);
     }
