@@ -85,6 +85,15 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                                        QString &clientVersion,
                                        QString & /* connectionType */)
 {
+    bool hasClientId = false;
+    if (clientid.isEmpty()) {
+        // client id is empty, either out dated client or client has been modified
+        if (getClientIDRequiredEnabled())
+            return ClientIdRequired;
+    } else {
+        hasClientId = true;
+    }
+
     if (name.size() > 35)
         name = name.left(35);
 
@@ -164,15 +173,10 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
     event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
     locker.unlock();
 
-    if (clientid.isEmpty()) {
-        // client id is empty, either out dated client or client has been modified
-        if (getClientIDRequiredEnabled())
-            return ClientIdRequired;
-    } else {
+    if (hasClientId) {
         // update users database table with client id
         databaseInterface->updateUsersClientID(name, clientid);
     }
-
     databaseInterface->updateUsersLastLoginData(name, clientVersion);
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
