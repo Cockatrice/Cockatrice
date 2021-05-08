@@ -82,8 +82,12 @@ jobs:
       matrix:
         # these names correspond to the files in .ci/$distro
         include:
+          - distro: UbuntuHirsute
+            package: DEB
+
           - distro: UbuntuGroovy
             package: DEB
+            test: skip
 
           - distro: UbuntuFocal
             package: DEB
@@ -102,6 +106,9 @@ jobs:
           - distro: Fedora33
             package: RPM
             test: skip # Fedora is our slowest build
+
+          - distro: Fedora34
+            package: RPM
 
     name: ${{matrix.distro}}
 
