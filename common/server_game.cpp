@@ -575,15 +575,19 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
-    for (Server_CardZone *zone : player->getZones()) {
-        for (Server_Card *card : zone->getCards()) {
+    for (auto zone : player->getZones()) {
+        for (auto card : zone->getCards()) {
             if (card == nullptr) {
                 continue;
             }
 
+            const auto &attachedCardsBase = card->getAttachedCards();
+            if (attachedCardsBase.isEmpty()) {
+                continue;
+            }
+
             // Make a copy of the list because the original one gets modified during the loop
-            QList<Server_Card *> attachedCards = card->getAttachedCards();
+            QList<Server_Card *> attachedCards = {attachedCardsBase};
             for (Server_Card *attachedCard : attachedCards) {
                 attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
             }
