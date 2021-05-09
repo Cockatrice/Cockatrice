@@ -47,8 +47,11 @@ if [[ $no_beta ]]; then
   fi
   body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
-  body="Included commits over previous version:
---REPLACE-WITH-GENERATED-LIST--"
+  body="<details>
+<summary><b>Included commits over previous version</b></summary>
+
+--REPLACE-WITH-GENERATED-LIST--
+</details>"
 fi
 
 # add git log to release notes
