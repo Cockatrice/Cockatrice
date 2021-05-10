@@ -134,11 +134,7 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
 ELSE()
     # other: osx/llvm, bsd/llvm
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-    if(WARNING_AS_ERROR)
-      set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror")
-    else()
-      set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
-    endif()
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 ENDIF()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
