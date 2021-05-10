@@ -577,19 +577,17 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 
     for (auto zone : player->getZones()) {
         for (auto card : zone->getCards()) {
-            if (card == nullptr) {
-                continue;
-            }
-
-            const auto &attachedCardsBase = card->getAttachedCards();
-            if (attachedCardsBase.isEmpty()) {
-                continue;
-            }
-
             // Make a copy of the list because the original one gets modified during the loop
-            QList<Server_Card *> attachedCards = {attachedCardsBase};
+            QList<Server_Card *> attachedCards = card->getAttachedCards();
             for (Server_Card *attachedCard : attachedCards) {
-                attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
+                auto otherPlayer = attachedCard->getZone()->getPlayer();
+                // do not modify the current player's zone!
+                // this would cause the current card iterator to be invalidated!
+                // we only have to return cards owned by other players
+                // because the current player is leaving the game anyway
+                if (otherPlayer != player) {
+                    otherPlayer->unattachCard(ges, attachedCard);
+                }
             }
         }
     }
