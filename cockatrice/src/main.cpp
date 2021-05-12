@@ -88,12 +88,7 @@ QString const getUserIDString()
 {
     QString uid = "0";
 #ifdef Q_OS_WIN
-    const int UNLEN = 256;
-    WCHAR buffer[UNLEN + 1] = {0};
-    DWORD buffer_len = UNLEN + 1;
-    if (GetUserNameW(buffer, &buffer_len)) {
-        uid = QString::fromWCharArray(buffer);
-    }
+    uid = QDir::home().dirName();
 #else
     uid = QString::number(getuid());
 #endif
@@ -123,8 +118,9 @@ int main(int argc, char *argv[])
     const QString appId = QLatin1String("cockatrice-") + getUserIDString() + '-' + VERSION_STRING;
     ApplicationInstanceManager *m_instanceManager = new ApplicationInstanceManager(appId, &app);
 
-    // Check if session zero. If it is then open all of the inputs in this tab
-    bool openInNewClient = m_instanceManager->isFirstInstance();
+    // Check if session zero. If it is then open all of the inputs in this tab.
+    // If there are no arguments then open in a new tab
+    bool openInNewClient = m_instanceManager->isFirstInstance() || argc == 0;
     QList<QString *> replays;
     QList<QString *> decks;
     
