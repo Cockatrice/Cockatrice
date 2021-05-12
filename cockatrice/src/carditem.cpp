@@ -87,7 +87,6 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZone *_zone)
 {
     zone = _zone;
-    emit updateCardMenu(this);
 }
 
 void CardItem::retranslateUi()
