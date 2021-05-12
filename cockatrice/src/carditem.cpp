@@ -37,9 +37,9 @@ CardItem::CardItem(Player *_owner,
     retranslateUi();
     if (updateMenu) { // avoid updating card menu too often
         // Add a lambda that updates the card menu on right clicked
-        connect(getPTMenu(), &QMenu::triggered, this, [this] { emit updateCardMenu(this); });
-        connect(getCardMenu(), &QMenu::triggered, this, [this] { emit updateCardMenu(this); });
-        connect(getMoveMenu(), &QMenu::triggered, this, [this] { emit updateCardMenu(this); });
+        connect(getPTMenu(), &QMenu::aboutToShow, this, [this] { emit updateCardMenu(this); });
+        connect(getCardMenu(), &QMenu::aboutToShow, this, [this] { emit updateCardMenu(this); });
+        connect(getMoveMenu(), &QMenu::aboutToShow, this, [this] { emit updateCardMenu(this); });
     }
 }
 
