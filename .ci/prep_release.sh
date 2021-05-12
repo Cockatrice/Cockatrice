@@ -47,8 +47,10 @@ if [[ $no_beta ]]; then
   fi
   body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
-  body="<details>
-<summary><b>Included commits over previous version</b></summary>
+  body="--REPLACE-WITH-COMMIT-COUNT-- commits have been included over the previous version
+
+<details>
+<summary><b>show changes</b></summary>
 
 --REPLACE-WITH-GENERATED-LIST--
 </details>"
@@ -86,6 +88,7 @@ else
       # --> is the markdown comment escape sequence, emojis are way better
       generated_list="${generated_list//-->/→}"
       body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
+      body="${body//--REPLACE-WITH-COMMIT-COUNT--/$count}"
       if [[ $beta_list =~ $whitespace ]]; then
         beta_list="-n there are no betas to delete!"
       else
