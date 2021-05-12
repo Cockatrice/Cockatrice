@@ -23,8 +23,7 @@ CardItem::CardItem(Player *_owner,
                    int _cardid,
                    bool _revealedCard,
                    QGraphicsItem *parent,
-                   CardZone *_zone,
-                   bool updateMenu)
+                   CardZone *_zone)
     : AbstractCardItem(_name, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
       destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
@@ -35,12 +34,6 @@ CardItem::CardItem(Player *_owner,
     moveMenu = new QMenu;
 
     retranslateUi();
-    if (updateMenu) { // avoid updating card menu too often
-        // Add a lambda that updates the card menu on right clicked
-        connect(getPTMenu(), &QMenu::aboutToShow, this, [this] { emit updateCardMenu(this); });
-        connect(getCardMenu(), &QMenu::aboutToShow, this, [this] { emit updateCardMenu(this); });
-        connect(getMoveMenu(), &QMenu::aboutToShow, this, [this] { emit updateCardMenu(this); });
-    }
 }
 
 CardItem::~CardItem()
@@ -220,8 +213,6 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 
     if (zone)
         zone->reorganizeCards();
-
-    emit updateCardMenu(this);
 }
 
 void CardItem::resetState()
@@ -374,6 +365,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
         if (cardMenu && !cardMenu->isEmpty() && owner != nullptr) {
+            updateCardMenu(this);
             cardMenu->exec(event->screenPos());
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
