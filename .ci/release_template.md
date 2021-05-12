@@ -16,8 +16,10 @@ include different targets -->
  - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")</i>
  - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")</i>
  - <kbd>Ubuntu 20.10</kbd> ("Groovy Gorilla")</i>
+ - <kbd>Ubuntu 21.04</kbd> ("Hirsute Hippo")</i>
  - <kbd>Debian 10</kbd> ("Buster")</i>
  - <kbd>Fedora 33</kbd></i>
+ - <kbd>Fedora 34</kbd></i>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
@@ -38,6 +40,11 @@ If you'd like to help contribute to Cockatrice in any way, check out our [README
 
 
 ## Upgrading Cockatrice
+<!-- this optional section puts a warning banner for problems with updating
+> ⚠️ **With this release, we no longer provide a ready-to-install binary for:**
+> --DEPRECATED-OS-HERE--
+ -->
+ 
 - Run the internal software updater: <kbd>Help → Check for Client Updates</kbd>
 
 Don't forget to update your card database right after! (<kbd>Help → Check for Card Updates...</kbd>)
@@ -61,10 +68,9 @@ Remove empty headers when done.
 
 <!-- Complete list of changes (foldable) -->
 <details>
-<summary>📘 <b>Show all changes <code>
-<!-- Count of other changes -->
- 
-</code></b></summary>
+<summary>
+📘 <b>Show all changes</b> (--REPLACE-WITH-COMMIT-COUNT-- commits)
+</summary>
 
 ### User Interface
 ### Under the Hood
