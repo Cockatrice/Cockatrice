@@ -47,8 +47,13 @@ if [[ $no_beta ]]; then
   fi
   body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
-  body="Included commits over previous version:
---REPLACE-WITH-GENERATED-LIST--"
+  body="--REPLACE-WITH-COMMIT-COUNT-- commits have been included over the previous --REPLACE-WITH-PREVIOUS-RELEASE-TYPE--
+
+<details>
+<summary><b>show changes</b></summary>
+
+--REPLACE-WITH-GENERATED-LIST--
+</details>"
 fi
 
 # add git log to release notes
@@ -78,11 +83,15 @@ else
   if [[ $previous ]]; then
     if generated_list="$(git log "$previous..$TAG" --pretty="- %s")"; then
       count="$(git rev-list --count "$previous..$TAG")"
+      [[ $previous =~ $beta_regex ]] && previousreleasetype="beta release" || previousreleasetype="full release"
       echo "adding list of commits to release notes:"
       echo "'$previous' to '$TAG' ($count commits)"
       # --> is the markdown comment escape sequence, emojis are way better
       generated_list="${generated_list//-->/→}"
       body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
+      body="${body//--REPLACE-WITH-COMMIT-COUNT--/$count}"
+      body="${body//--REPLACE-WITH-PREVIOUS-RELEASE-TAG--/$previous}"
+      body="${body//--REPLACE-WITH-PREVIOUS-RELEASE-TYPE--/$previousreleasetype}"
       if [[ $beta_list =~ $whitespace ]]; then
         beta_list="-n there are no betas to delete!"
       else
