@@ -3301,8 +3301,7 @@ void Player::updateCardMenu(const CardItem *card)
 {
     /**
      * Regarding issue https://github.com/Cockatrice/Cockatrice/issues/4284
-     * The best fix is to add the QActions when a card is right clicked on,
-     * so this method is not needed
+     * The best fix is to add the QActions when a card is right clicked on
      */
     // If bad card OR is a spectator (as spectators don't need card menus), return
     if (card == nullptr || (game->isSpectator() && !judge)) {
