@@ -1946,7 +1946,6 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
-    updateCardMenu(card);
     emit logSetCardCounter(this, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
@@ -3295,15 +3294,16 @@ void Player::refreshShortcuts()
 {
     if (shortcutsActive) {
         setShortcutsActive();
-
-        for (const CardItem *cardItem : table->getCards()) {
-            updateCardMenu(cardItem);
-        }
     }
 }
 
 void Player::updateCardMenu(const CardItem *card)
 {
+    /**
+     * Regarding issue https://github.com/Cockatrice/Cockatrice/issues/4284
+     * The best fix is to add the QActions when a card is right clicked on,
+     * so this method is not needed
+     */
     // If bad card OR is a spectator (as spectators don't need card menus), return
     if (card == nullptr || (game->isSpectator() && !judge)) {
         return;
