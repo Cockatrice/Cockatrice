@@ -79,7 +79,7 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice and
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
-# Build [![Linux builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Linux%20(Docker)/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Linux+%28Docker%29%22+branch%3Amaster) [![macOS builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20macOS/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+macOS%22+branch%3Amaster) [![Windows builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Windows/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Windows%22+branch%3Amaster)
+# Build [![Build](https://github.com/Cockatrice/Cockatrice/actions/workflows/ci-builds.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/ci-builds.yml)
 
 **Detailed compiling instructions can be found on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
