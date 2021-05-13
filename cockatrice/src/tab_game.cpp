@@ -163,6 +163,9 @@ void DeckViewContainer::updateSideboardLockButtonText()
     } else {
         sideboardLockButton->setText(tr("Sideboard locked"));
     }
+    // setting text on a button removes its shortcut
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
 void DeckViewContainer::refreshShortcuts()
