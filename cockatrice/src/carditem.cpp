@@ -365,7 +365,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
         updateCardMenu(this);
-        if (cardMenu && !cardMenu->isEmpty() && owner != nullptr) {
+        if (cardMenu && owner != nullptr) {
             owner->updateCardMenu(this);
             cardMenu->exec(event->screenPos());
         }
