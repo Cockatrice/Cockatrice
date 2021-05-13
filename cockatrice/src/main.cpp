@@ -86,13 +86,7 @@ void installNewTranslator()
 
 QString const getUserIDString()
 {
-    QString uid = "0";
-#ifdef Q_OS_WIN
-    uid = QDir::home().dirName();
-#else
-    uid = QString::number(getuid());
-#endif
-    return uid;
+    return QDir::home().dirName();
 }
 
 QString const generateClientID()
