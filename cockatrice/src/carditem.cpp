@@ -80,12 +80,31 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZone *_zone)
 {
     zone = _zone;
+    // If this card is selected then update the menus
+    if (owner) {
+        if (owner->getCardMenu() == cardMenu) {
+            updateCardMenu(this);
+            if (cardMenu && owner != nullptr) {
+                owner->updateCardMenu(this);
+            }
+        }
+    }
 }
 
 void CardItem::retranslateUi()
 {
     moveMenu->setTitle(tr("&Move to"));
-    ptMenu->setTitle(tr("&Power / toughness"));
+    ptMenu->setTitle(tr("&Power / toughness"));    
+    
+    // If this card is selected then update the menus
+    if (owner) {
+        if (owner->getCardMenu() == cardMenu) {
+            updateCardMenu(this);
+            if (cardMenu && owner != nullptr) {
+                owner->updateCardMenu(this);
+            }
+        }
+    }
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -213,6 +232,16 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 
     if (zone)
         zone->reorganizeCards();
+    
+    // If this card is selected then update the menus
+    if (owner) {
+        if (owner->getCardMenu() == cardMenu) {
+            updateCardMenu(this);
+            if (cardMenu && owner != nullptr) {
+                owner->updateCardMenu(this);
+            }
+        }
+    }
 }
 
 void CardItem::resetState()
@@ -439,6 +468,11 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             owner->setCardMenu(0);
             owner->getGame()->setActiveCard(0);
         }
-    }
+        
+        updateCardMenu(this);
+        if (cardMenu && owner != nullptr) {
+            owner->updateCardMenu(this);
+        }
+    }                                                                               
     return QGraphicsItem::itemChange(change, value);
 }
