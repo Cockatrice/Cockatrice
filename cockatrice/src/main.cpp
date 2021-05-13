@@ -52,12 +52,6 @@
 #include <QTranslator>
 #include <QtPlugin>
 
-#ifdef Q_OS_WIN
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
-
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
