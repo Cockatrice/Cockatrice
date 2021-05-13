@@ -364,8 +364,9 @@ void CardItem::playCard(bool faceDown)
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
+        updateCardMenu(this);
         if (cardMenu && !cardMenu->isEmpty() && owner != nullptr) {
-            updateCardMenu(this);
+            owner->updateCardMenu(this);
             cardMenu->exec(event->screenPos());
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
