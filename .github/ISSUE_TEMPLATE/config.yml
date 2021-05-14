@@ -3,6 +3,6 @@ contact_links:
   - name: 💬 Discord Community (Get help with server issues, e.g. Login)
     url: https://discord.gg/3Z9yzmA
     about: Need help with using the client? Want to find some games? Try the Discord server!
-  - name: 🌐 Translations (Help to improve the localization of the app)
+  - name: 🌐 Translations (Help improve the localization of the app)
     url: https://www.transifex.com/cockatrice/cockatrice/
     about: For more information and guidance check the "Translation FAQ" in our GitHub Wiki!
