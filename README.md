@@ -8,7 +8,7 @@
    <a href="#get-involved--">Get Involved</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#translations-">Translations</a> <b>|</b>
-   <a href="#build---">Build</a> <b>|</b>
+   <a href="#build-">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
 </p>
