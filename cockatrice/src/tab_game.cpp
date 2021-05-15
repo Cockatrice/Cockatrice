@@ -1346,7 +1346,6 @@ void TabGame::newCardAdded(AbstractCardItem *card)
     connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
     connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-    connect(card, SIGNAL(updateCardMenu(AbstractCardItem *)), this, SLOT(updateCardMenu(AbstractCardItem *)));
     connect(card, SIGNAL(cardShiftClicked(QString)), this, SLOT(linkCardToChat(QString)));
 }
 
@@ -1408,6 +1407,12 @@ Player *TabGame::getActiveLocalPlayer() const
     }
 
     return nullptr;
+}
+
+void TabGame::setActiveCard(CardItem *card)
+{
+    activeCard = card;
+    updateCardMenu(card);
 }
 
 void TabGame::updateCardMenu(AbstractCardItem *card)

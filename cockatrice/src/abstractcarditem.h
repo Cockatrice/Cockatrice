@@ -36,7 +36,6 @@ signals:
     void hovered(AbstractCardItem *card);
     void showCardInfoPopup(QPoint pos, QString cardName);
     void deleteCardInfoPopup(QString cardName);
-    void updateCardMenu(AbstractCardItem *card);
     void sigPixmapUpdated();
     void cardShiftClicked(QString cardName);
 

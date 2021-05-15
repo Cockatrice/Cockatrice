@@ -80,31 +80,12 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZone *_zone)
 {
     zone = _zone;
-    // If this card is selected then update the menus
-    if (owner) {
-        if (owner->getCardMenu() == cardMenu) {
-            updateCardMenu(this);
-            if (cardMenu && owner != nullptr) {
-                owner->updateCardMenu(this);
-            }
-        }
-    }
 }
 
 void CardItem::retranslateUi()
 {
     moveMenu->setTitle(tr("&Move to"));
     ptMenu->setTitle(tr("&Power / toughness"));
-
-    // If this card is selected then update the menus
-    if (owner) {
-        if (owner->getCardMenu() == cardMenu) {
-            updateCardMenu(this);
-            if (cardMenu && owner != nullptr) {
-                owner->updateCardMenu(this);
-            }
-        }
-    }
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -217,30 +198,24 @@ void CardItem::setPT(const QString &_pt)
 
 void CardItem::setAttachedTo(CardItem *_attachedTo)
 {
-    if (attachedTo)
+    if (attachedTo != nullptr) {
         attachedTo->removeAttachedCard(this);
+    }
 
     gridPoint.setX(-1);
     attachedTo = _attachedTo;
-    if (attachedTo) {
+    if (attachedTo != nullptr) {
         setParentItem(attachedTo->getZone());
         attachedTo->addAttachedCard(this);
-        if (zone != attachedTo->getZone())
+        if (zone != attachedTo->getZone()) {
             attachedTo->getZone()->reorganizeCards();
-    } else
-        setParentItem(zone);
-
-    if (zone)
-        zone->reorganizeCards();
-
-    // If this card is selected then update the menus
-    if (owner) {
-        if (owner->getCardMenu() == cardMenu) {
-            updateCardMenu(this);
-            if (cardMenu && owner != nullptr) {
-                owner->updateCardMenu(this);
-            }
         }
+    } else {
+        setParentItem(zone);
+    }
+
+    if (zone != nullptr) {
+        zone->reorganizeCards();
     }
 }
 
@@ -393,9 +368,7 @@ void CardItem::playCard(bool faceDown)
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
-        updateCardMenu(this);
-        if (cardMenu && owner != nullptr) {
-            owner->updateCardMenu(this);
+        if (cardMenu != nullptr && !cardMenu->isEmpty() && owner != nullptr) {
             cardMenu->exec(event->screenPos());
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
@@ -460,18 +433,13 @@ bool CardItem::animationEvent()
 
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if ((change == ItemSelectedHasChanged) && owner) {
+    if ((change == ItemSelectedHasChanged) && owner != nullptr) {
         if (value == true) {
             owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
         } else if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(0);
-            owner->getGame()->setActiveCard(0);
-        }
-
-        updateCardMenu(this);
-        if (cardMenu && owner != nullptr) {
-            owner->updateCardMenu(this);
+            owner->setCardMenu(nullptr);
+            owner->getGame()->setActiveCard(nullptr);
         }
     }
     return QGraphicsItem::itemChange(change, value);
