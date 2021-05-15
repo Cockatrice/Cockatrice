@@ -177,6 +177,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(personalGroupBox);
     mainLayout->addWidget(pathsGroupBox);
+    mainLayout->addStretch();
 
     setLayout(mainLayout);
 }
@@ -384,6 +385,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(handGroupBox);
     mainLayout->addWidget(tableGroupBox);
+    mainLayout->addStretch();
 
     setLayout(mainLayout);
 }
@@ -491,6 +493,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(notificationsGroupBox);
     mainLayout->addWidget(animationGroupBox);
+    mainLayout->addStretch();
 
     setLayout(mainLayout);
 }
@@ -561,12 +564,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     auto aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
+    aAdd->setToolTip(tr("Add New URL"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAddURL()));
     auto aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    aEdit->setToolTip(tr("Edit URL"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEditURL()));
     auto aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
+    aRemove->setToolTip(tr("Remove URL"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemoveURL()));
 
     auto *messageToolBar = new QToolBar;
@@ -610,6 +616,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpMainLayout = new QVBoxLayout;
     lpMainLayout->addWidget(mpGeneralGroupBox);
     lpMainLayout->addWidget(mpSpoilerGroupBox);
+    lpMainLayout->addStretch();
 
     setLayout(lpMainLayout);
 }
@@ -854,16 +861,15 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    aAdd->setStatusTip(tr("Add New URL"));
-
+    aAdd->setToolTip(tr("Add New Message"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    aEdit->setStatusTip(tr("Edit URL"));
+    aEdit->setToolTip(tr("Edit Message"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    aRemove->setStatusTip(tr("Remove URL"));
+    aRemove->setToolTip(tr("Remove Message"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     auto *messageToolBar = new QToolBar;
@@ -885,6 +891,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     mainLayout->addWidget(messageShortcuts);
     mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(highlightGroupBox);
+    mainLayout->addStretch();
 
     setLayout(mainLayout);
 
@@ -1043,6 +1050,7 @@ SoundSettingsPage::SoundSettingsPage()
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(soundGroupBox);
+    mainLayout->addStretch();
 
     setLayout(mainLayout);
 }
@@ -1237,8 +1245,8 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 #else
     QRect rec = QApplication::desktop()->availableGeometry();
 #endif
-    this->setMinimumSize(rec.width() / 2, rec.height() - 100);
-    this->setBaseSize(rec.width(), rec.height());
+    this->setMaximumSize(rec.width() - 100, rec.height() - 100);
+    this->setMinimumSize(700, 600);
 
     connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
