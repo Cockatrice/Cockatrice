@@ -189,7 +189,6 @@ jobs:
       matrix:
         target:
           - Debug
-          - 10.11_El_Capitan
           - 10.14_Mojave
           - 10.15_Catalina
           - 11.0_Big_Sur
@@ -201,17 +200,9 @@ jobs:
             do_tests: 0 # tests do not work yet on mac
             make_package: false
 
-          - target: 10.11_El_Capitan
-            os: macos-10.13 # runs on HighSierra
-            allow-failure: yes # we don't know if it'll be added
-            xcode: 8.2.1 # should be compatible with macos 10.11.5
-            type: Release
-            do_tests: 0
-            make_package: true
-
           - target: 10.14_Mojave
             os: macos-10.15 # runs on Catalina
-            xcode: 10.3 # should be compatible with macos 10.14.3
+            xcode: 10.3 # allows compatibility with macos 10.14
             type: Release
             do_tests: 0
             make_package: true
@@ -316,7 +307,7 @@ jobs:
           asset_name: ${{steps.package.outputs.name}}
           asset_content_type: application/octet-stream
 
-  windows-build:
+  build-windows:
     strategy:
       fail-fast: false
       matrix:
