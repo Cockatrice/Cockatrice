@@ -86,14 +86,14 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     auto *maxPlayersFilterMinLabel = new QLabel(tr("at &least:"));
     maxPlayersFilterMinSpinBox = new QSpinBox;
-    maxPlayersFilterMinSpinBox->setMinimum(1);
+    maxPlayersFilterMinSpinBox->setMinimum(0);
     maxPlayersFilterMinSpinBox->setMaximum(99);
     maxPlayersFilterMinSpinBox->setValue(gamesProxyModel->getMaxPlayersFilterMin());
     maxPlayersFilterMinLabel->setBuddy(maxPlayersFilterMinSpinBox);
 
     auto *maxPlayersFilterMaxLabel = new QLabel(tr("at &most:"));
     maxPlayersFilterMaxSpinBox = new QSpinBox;
-    maxPlayersFilterMaxSpinBox->setMinimum(1);
+    maxPlayersFilterMaxSpinBox->setMinimum(0);
     maxPlayersFilterMaxSpinBox->setMaximum(99);
     maxPlayersFilterMaxSpinBox->setValue(gamesProxyModel->getMaxPlayersFilterMax());
     maxPlayersFilterMaxLabel->setBuddy(maxPlayersFilterMaxSpinBox);
