@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "room_event.proto";
+
+message Event_RemoveMessages {
+    extend RoomEvent {
+        optional Event_RemoveMessages ext = 1004;
+    }
+    optional string name = 1;
+    optional uint32 amount = 2;
+}

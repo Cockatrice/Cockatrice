@@ -223,6 +223,7 @@ protected slots:
     void externalRoomUserJoined(int roomId, const ServerInfo_User &userInfo);
     void externalRoomUserLeft(int roomId, const QString &userName);
     void externalRoomSay(int roomId, const QString &userName, const QString &message);
+    void externalRoomRemoveMessages(int roomId, const QString &userName, int amount);
     void externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo);
     void
     externalJoinGameCommandReceived(const Command_JoinGame &cmd, int cmdId, int roomId, int serverId, qint64 sessionId);

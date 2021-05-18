@@ -125,6 +125,7 @@ private:
     bool removeAdminFlagFromUser(const QString &user, int flag);
 
     bool isPasswordLongEnough(const int passwordLength);
+    void removeSaidMessages(const QString &userName, int amount);
 
 public:
     AbstractServerSocketInterface(Servatrice *_server,

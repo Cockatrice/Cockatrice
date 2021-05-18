@@ -389,6 +389,19 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
                                        room->getId(), room->getName());
 }
 
+void Server::externalRoomRemoveMessages(int roomId, const QString &userName, int amount)
+{
+    // This function is always called from the main thread via signal/slot.
+    QReadLocker locker(&roomsLock);
+
+    Server_Room *room = rooms.value(roomId);
+    if (room == nullptr) {
+        qDebug() << "externalRoomRemoveMessages: room id=" << roomId << "not found";
+        return;
+    }
+    room->removeSaidMessages(userName, amount);
+}
+
 void Server::externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo)
 {
     // This function is always called from the main thread via signal/slot.
