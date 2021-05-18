@@ -21,6 +21,7 @@ message Command_BanFromServer {
     optional string reason = 4;
     optional string visible_reason = 5;
     optional string clientid = 6;
+    optional uint32 remove_messages = 7;
 }
 
 message Command_GetBanHistory {
@@ -38,6 +39,7 @@ message Command_WarnUser {
     optional string user_name = 1;
     optional string reason = 2;
     optional string clientid = 3;
+    optional uint32 remove_messages = 4;
 }
 
 message Command_GetWarnHistory {

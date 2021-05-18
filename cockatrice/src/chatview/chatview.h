@@ -18,6 +18,17 @@ class QMouseEvent;
 class UserContextMenu;
 class TabGame;
 
+class UserMessagePosition
+{
+public:
+#if (QT_VERSION < QT_VERSION_CHECK(5, 13, 0))
+    UserMessagePosition() = default; // older qt versions require a default constructor to use in containers
+#endif
+    UserMessagePosition(QTextCursor &cursor);
+    int relativePosition;
+    QTextBlock block;
+};
+
 class ChatView : public QTextBrowser
 {
     Q_OBJECT
@@ -36,7 +47,7 @@ private:
     const UserlistProxy *const userlistProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
-    QString userName;
+    QString ownUserName;
     QString mention;
     QTextCharFormat mentionFormat;
     QTextCharFormat highlightFormat;
@@ -48,16 +59,18 @@ private:
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
+    QMap<QString, QVector<UserMessagePosition>> userMessagePositions;
+
     QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     QColor getCustomMentionColor();
     QColor getCustomHighlightColor();
-    void showSystemPopup(QString &sender);
+    void showSystemPopup(const QString &userName);
     bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
     void checkTag(QTextCursor &cursor, QString &message);
-    void checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel);
+    void checkMention(QTextCursor &cursor, QString &message, const QString &userName, UserLevelFlags userLevel);
     void checkWord(QTextCursor &cursor, QString &message);
     QString extractNextWord(QString &message, QString &rest);
 
@@ -82,11 +95,12 @@ public:
                                          QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
-                       QString sender = QString(),
+                       const QString &userName = QString(),
                        UserLevelFlags userLevel = UserLevelFlags(),
                        QString UserPrivLevel = "NONE",
                        bool playerBold = false);
     void clearChat();
+    void redactMessages(const QString &userName, int amount);
 
 protected:
     void enterEvent(QEvent *event);
@@ -101,7 +115,7 @@ signals:
     void deleteCardInfoPopup(QString cardName);
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
-    void showMentionPopup(QString &sender);
+    void showMentionPopup(const QString &userName);
 };
 
 #endif

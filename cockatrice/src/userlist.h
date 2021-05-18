@@ -28,7 +28,7 @@ class BanDialog : public QDialog
     Q_OBJECT
 private:
     QLabel *daysLabel, *hoursLabel, *minutesLabel;
-    QCheckBox *nameBanCheckBox, *ipBanCheckBox, *idBanCheckBox;
+    QCheckBox *nameBanCheckBox, *ipBanCheckBox, *idBanCheckBox, *deleteMessages;
     QLineEdit *nameBanEdit, *ipBanEdit, *idBanEdit;
     QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
     QRadioButton *permanentRadio, *temporaryRadio;
@@ -45,6 +45,7 @@ public:
     int getMinutes() const;
     QString getReason() const;
     QString getVisibleReason() const;
+    int getDeleteMessages() const;
 };
 
 class WarningDialog : public QDialog
@@ -55,6 +56,7 @@ private:
     QLineEdit *nameWarning;
     QComboBox *warningOption;
     QLineEdit *warnClientID;
+    QCheckBox *deleteMessages;
 private slots:
     void okClicked();
 
@@ -63,6 +65,7 @@ public:
     QString getName() const;
     QString getWarnID() const;
     QString getReason() const;
+    int getDeleteMessages() const;
     void addWarningOption(const QString warning);
 };
 

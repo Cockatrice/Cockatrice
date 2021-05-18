@@ -61,6 +61,7 @@
 #include "server_logger.h"
 #include "server_player.h"
 #include "server_response_containers.h"
+#include "server_room.h"
 #include "settingscache.h"
 #include "version_string.h"
 
@@ -837,16 +838,28 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnHistory(const Co
     return Response::RespOk;
 }
 
+void AbstractServerSocketInterface::removeSaidMessages(const QString &userName, int amount)
+{
+    for (auto *room : rooms.values()) {
+        room->removeSaidMessages(userName, amount);
+    }
+}
+
 Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_WarnUser &cmd,
                                                                   ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql())
+    if (!sqlInterface->checkSql()) { // sql database is required, without database there are no moderators anyway
         return Response::RespInternalError;
+    }
 
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString warningReason = QString::fromStdString(cmd.reason()).simplified();
     QString clientID = QString::fromStdString(cmd.clientid()).simplified();
     QString sendingModerator = QString::fromStdString(userInfo->name()).simplified();
+    int amountRemove = cmd.remove_messages();
+    if (amountRemove != 0) {
+        removeSaidMessages(userName, amountRemove);
+    }
 
     if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientID)) {
         servatrice->clientsLock.lockForRead();
@@ -855,7 +868,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
         QList<QString> moderatorList = server->getOnlineModeratorList();
         servatrice->clientsLock.unlock();
 
-        if (user) {
+        if (user != nullptr) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::WARNING);
             event.set_warning_reason(cmd.reason());
@@ -891,6 +904,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     if (userName.isEmpty() && address.isEmpty() && clientID.isEmpty())
         return Response::RespOk;
 
+    int amountRemove = cmd.remove_messages();
+    if (amountRemove != 0) {
+        removeSaidMessages(userName, amountRemove);
+    }
     QString trustedSources = settingsCache->value("server/trusted_sources", "127.0.0.1,::1").toString();
     int minutes = cmd.minutes();
     if (trustedSources.contains(address, Qt::CaseInsensitive))

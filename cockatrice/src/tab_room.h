@@ -30,6 +30,7 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class Event_RemoveMessages;
 class GameSelector;
 class Response;
 class PendingCommand;
@@ -82,6 +83,7 @@ private slots:
     void processJoinRoomEvent(const Event_JoinRoom &event);
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
     void processRoomSayEvent(const Event_RoomSay &event);
+    void processRemoveMessagesEvent(const Event_RemoveMessages &event);
     void refreshShortcuts();
 
 public:
