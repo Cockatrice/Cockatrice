@@ -174,12 +174,8 @@ export class WebClient {
 
   public startPingLoop() {
     this.keepalivecb = setInterval(() => {
-      // console.log('PING->>>START');
       // check if the previous ping got no reply
       if (this.lastPingPending) {
-        // console.log('PING->>>LAST_PING_NO_REPLY');
-        // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-
         this.disconnect();
 
         this.updateStatus(StatusEnum.DISCONNECTED, "Connection timeout");
@@ -187,13 +183,9 @@ export class WebClient {
 
       // stop the ping loop if we"re disconnected
       if (this.status !== StatusEnum.LOGGEDIN) {
-        // console.log('PING->>>NOT_LOGGED_IN');
-        // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-
         this.endPingLoop();
         return;
       }
-
 
       // send a ping
       this.lastPingPending = true;
@@ -203,10 +195,7 @@ export class WebClient {
         ".Command_Ping.ext" : ping
       });
 
-      // console.log('PING->>>PING');
       this.sendSessionCommand(command, () => {
-        // console.log('PING->>>PONG');
-        // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
 
         this.lastPingPending = false;
       });
