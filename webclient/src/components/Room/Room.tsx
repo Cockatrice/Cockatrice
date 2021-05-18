@@ -5,9 +5,9 @@ import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
 import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 
-import { RoomsStateMessages, RoomsStateRooms, RoomsSelectors } from "store";
-import { RoomsService } from "websocket";
+import { RoomsService } from "api";
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard} from "components";
+import { RoomsStateMessages, RoomsStateRooms, RoomsSelectors } from "store";
 
 
 

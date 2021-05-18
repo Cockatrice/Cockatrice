@@ -11,7 +11,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
 
-import { RoomsService } from "websocket";
+import { RoomsService } from "api";
 import { RouteEnum } from "types";
 
 import "./Rooms.css";

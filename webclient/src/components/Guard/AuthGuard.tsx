@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { ServerSelectors } from "store";
 import { RouteEnum } from "types";
 
-import { AuthenticationService } from "websocket";
+import { AuthenticationService } from "api";
 
 class AuthGuard extends Component<AuthGuardProps> {
   render() {

@@ -7,7 +7,7 @@ import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 
 import { UserDisplay, VirtualList, AuthGuard } from "components";
-import { AuthenticationService, SessionService } from "websocket";
+import { AuthenticationService, SessionService } from "api";
 import { ServerSelectors } from "store";
 import { User } from 'types';
 

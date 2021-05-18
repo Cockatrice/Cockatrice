@@ -6,7 +6,7 @@ import * as _ from "lodash";
 
 import { ServerDispatch, ServerSelectors, ServerStateLogs } from "store";
 
-import { ModeratorService } from "websocket";
+import { ModeratorService } from "api";
 
 import { AuthGuard, ModGuard} from "components";
 import LogResults from "./LogResults";
