@@ -3,10 +3,10 @@ import { webClient } from "websocket";
 
 export default class AuthenticationService {
   static connect(options) {
-    webClient.services.session.connectServer(options);
+    webClient.persistence.session.connectServer(options);
   }
   static disconnect() {
-    webClient.services.session.disconnectServer();
+    webClient.persistence.session.disconnectServer();
   }
 
   static isConnected(state) {

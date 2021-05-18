@@ -1,15 +1,15 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
+import { withRouter /*, RouteComponentProps */, generatePath } from "react-router-dom";
+
 import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 
 import { RoomsService } from "api";
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard} from "components";
-import { RoomsStateMessages, RoomsStateRooms, RoomsSelectors } from "store";
-
-
+import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors } from "store";
+import { RouteEnum } from "types";
 
 import Games from "./Games";
 import Messages from "./Messages";
@@ -19,6 +19,17 @@ import "./Room.css";
 
 // @TODO (3)
 class Room extends Component<any> {
+  componentDidUpdate() {
+    const { joined, match, history } = this.props;
+    let { roomId } = match.params;
+
+    roomId = parseInt(roomId, 0);
+
+    if (!joined.find(({roomId: id}) => id === roomId)) {
+      history.push(generatePath(RouteEnum.SERVER));
+    }
+  }
+
   constructor(props) {
     super(props);
     this.handleRoomSay = this.handleRoomSay.bind(this);
@@ -32,7 +43,7 @@ class Room extends Component<any> {
   }
 
   render() {
-    const { match, rooms} = this.props;
+    const { match, rooms } = this.props;
     const { roomId } = match.params;
     const room = rooms[roomId];
 
@@ -89,11 +100,13 @@ class Room extends Component<any> {
 interface RoomProps {
   messages: RoomsStateMessages;
   rooms: RoomsStateRooms;
+  joined: JoinedRooms;
 }
 
 const mapStateToProps = state => ({
   messages: RoomsSelectors.getMessages(state),
-  rooms: RoomsSelectors.getRooms(state)
+  rooms: RoomsSelectors.getRooms(state),
+  joined: RoomsSelectors.getJoinedRooms(state),
 });
 
 export default withRouter(connect(mapStateToProps)(Room));
