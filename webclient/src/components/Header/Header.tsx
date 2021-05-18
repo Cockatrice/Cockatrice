@@ -6,11 +6,9 @@ import Chip from "@material-ui/core/Chip";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as _ from "lodash";
 
+import { AuthenticationService } from "api";
 import {  RoomsSelectors, ServerSelectors } from "store";
-import { Room, User } from "types";
-
-import { AuthenticationService } from "../../websocket";
-import { RouteEnum } from "../../types";
+import { Room, RouteEnum, User } from "types";
 
 import "./Header.css";
 import logo from "./logo.png";

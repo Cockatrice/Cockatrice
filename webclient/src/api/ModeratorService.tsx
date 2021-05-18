@@ -1,4 +1,4 @@
-import { webClient } from "..";
+import { webClient } from "websocket";
 
 export default class ModeratorService {
   static viewLogHistory(filters) {

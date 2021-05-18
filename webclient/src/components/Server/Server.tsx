@@ -9,7 +9,7 @@ import Paper from "@material-ui/core/Paper";
 
 import { RoomsSelectors, ServerSelectors } from "store";
 
-import { AuthenticationService } from "websocket";
+import { AuthenticationService } from "api";
 
 import { ThreePaneLayout, UserDisplay, VirtualList } from "components";
 import { ConnectForm, RegisterForm } from "forms";

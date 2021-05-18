@@ -6,12 +6,9 @@ import { NavLink, generatePath } from "react-router-dom";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
-import { SessionService } from "../../websocket";
-import { ServerSelectors } from "../../store";
-
-import { RouteEnum } from "../../types";
-
-import { User } from "types";
+import { SessionService } from "api";
+import { ServerSelectors } from "store";
+import { RouteEnum, User } from "types";
 
 import "./UserDisplay.css";
 
@@ -93,8 +90,7 @@ class UserDisplay extends Component<UserDisplayProps, UserDisplayState> {
     const isABuddy = this.isABuddy();
     const isIgnored = this.isIgnored();
 
-
-    console.log('user', name, !!isABuddy, !!isIgnored);
+    // console.log('user', name, !!isABuddy, !!isIgnored);
 
     return (
       <div className="user-display">
