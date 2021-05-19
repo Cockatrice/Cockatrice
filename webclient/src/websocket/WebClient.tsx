@@ -5,7 +5,7 @@ import { StatusEnum } from "types";
 import * as roomEvents from "./events/RoomEvents";
 import * as sessionEvents from "./events/SessionEvents";
   
-import { RoomService, SessionService } from "./services";
+import { RoomService, SessionService } from "./persistence";
 import { RoomCommand, SessionCommands } from "./commands";
 
 import ProtoFiles from "./ProtoFiles";
@@ -18,7 +18,7 @@ interface ApplicationCommands {
   session: SessionCommands;
 }
 
-interface ApplicationServices {
+interface ApplicationPersistence {
   room: RoomService;
   session: SessionService;
 }
@@ -32,7 +32,7 @@ export class WebClient {
   private pendingCommands = {};
 
   public commands: ApplicationCommands;
-  public services: ApplicationServices;
+  public persistence: ApplicationPersistence;
 
   public protocolVersion = 14;
   public pb;
@@ -84,7 +84,7 @@ export class WebClient {
       session: new SessionCommands(this),
     };
 
-    this.services = {
+    this.persistence = {
       room: new RoomService(this),
       session: new SessionService(this),
     };
@@ -93,14 +93,14 @@ export class WebClient {
   }
 
   private clearStores() {
-    this.services.room.clearStore();
-    this.services.session.clearStore();
+    this.persistence.room.clearStore();
+    this.persistence.session.clearStore();
   }
 
   public updateStatus(status, description) {
     console.log(`Status: [${status}]: ${description}`);
     this.status = status;
-    this.services.session.updateStatus(status, description);
+    this.persistence.session.updateStatus(status, description);
 
     if (status === StatusEnum.DISCONNECTED) {
       this.clearStores();
@@ -195,7 +195,10 @@ export class WebClient {
         ".Command_Ping.ext" : ping
       });
 
-      this.sendSessionCommand(command, () => this.lastPingPending = false);
+      this.sendSessionCommand(command, () => {
+
+        this.lastPingPending = false;
+      });
     }, this.options.keepalive);
   }
 

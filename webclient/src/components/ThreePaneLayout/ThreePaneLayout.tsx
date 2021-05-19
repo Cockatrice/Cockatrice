@@ -18,7 +18,10 @@ class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
             }>
               {this.props.top}
             </Grid>
-            <Grid item className="grid-main__bottom">
+            <Grid item className={
+              "grid-main__bottom"
+              + (this.props.fixedHeight ? " fixedHeight" : "")
+            }>
               {this.props.bottom}
             </Grid>
           </Grid>

@@ -3,11 +3,11 @@ export const AddToList = {
   action: ({ listName, userInfo}, webClient) => {
     switch (listName) {
       case 'buddy': {
-        webClient.services.session.addToBuddyList(userInfo);
+        webClient.persistence.session.addToBuddyList(userInfo);
         break;
       }
       case 'ignore': {
-        webClient.services.session.addToIgnoreList(userInfo);
+        webClient.persistence.session.addToIgnoreList(userInfo);
         break;
       }
       default: {

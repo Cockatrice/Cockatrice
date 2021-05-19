@@ -2,14 +2,15 @@
 import { Redirect, Route, Switch } from "react-router-dom";
 
 import { RouteEnum } from "types";
-import { Account } from "containers";
-import { 
+import {
+  Account,
   Decks, 
   Game, 
   Player, 
   Room, 
   Server, 
-  Logs } from "components";
+  Logs
+} from "containers";
 
 const Routes = () => (
   <div className="AppShell-routes overflow-scroll">

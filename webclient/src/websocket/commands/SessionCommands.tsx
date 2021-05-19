@@ -33,9 +33,9 @@ export default class SessionCommands {
         case this.webClient.pb.Response.ResponseCode.RespOk:
           const { buddyList, ignoreList, userInfo } = resp;
 
-          this.webClient.services.session.updateBuddyList(buddyList);
-          this.webClient.services.session.updateIgnoreList(ignoreList);
-          this.webClient.services.session.updateUser(userInfo);
+          this.webClient.persistence.session.updateBuddyList(buddyList);
+          this.webClient.persistence.session.updateIgnoreList(ignoreList);
+          this.webClient.persistence.session.updateUser(userInfo);
 
           this.webClient.commands.session.listUsers();
           this.webClient.commands.session.listRooms();
@@ -97,7 +97,7 @@ export default class SessionCommands {
       if (response) {
         switch (responseCode) {
           case this.webClient.pb.Response.ResponseCode.RespOk:
-            this.webClient.services.session.updateUsers(response.userList);
+            this.webClient.persistence.session.updateUsers(response.userList);
             break;
           default:
             console.log(`Failed to fetch Server Rooms [${responseCode}] : `, raw);
@@ -135,7 +135,7 @@ export default class SessionCommands {
         case this.webClient.pb.Response.ResponseCode.RespOk:
           const { roomInfo } = raw[".Response_JoinRoom.ext"];
 
-          this.webClient.services.room.joinRoom(roomInfo);
+          this.webClient.persistence.room.joinRoom(roomInfo);
           this.webClient.debug(() => console.log("Join Room: ", roomInfo.name));
           return;
         case this.webClient.pb.Response.ResponseCode.RespNameNotFound:
@@ -217,7 +217,7 @@ export default class SessionCommands {
           const { logMessage } = raw[".Response_ViewLogHistory.ext"];
 
           console.log("Response_ViewLogHistory: ", logMessage)
-          this.webClient.services.session.viewLogs(logMessage)
+          this.webClient.persistence.session.viewLogs(logMessage)
 
           this.webClient.debug(() => console.log("View Log History: ", logMessage));
           return;

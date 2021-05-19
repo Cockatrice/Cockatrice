@@ -6,7 +6,7 @@ import Chip from "@material-ui/core/Chip";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as _ from "lodash";
 
-import { AuthenticationService } from "api";
+import { AuthenticationService, RoomsService } from "api";
 import {  RoomsSelectors, ServerSelectors } from "store";
 import { Room, RouteEnum, User } from "types";
 
@@ -23,6 +23,7 @@ class Header extends Component<HeaderProps> {
       this.props.history.push(generatePath(RouteEnum.ROOM, { roomId }));
     }
   }
+
   render() {
     const { joinedRooms, server, state, user } = this.props;
 
@@ -82,21 +83,27 @@ class Header extends Component<HeaderProps> {
   }
 }
 
-const Rooms = props => (
-  <div className="temp-subnav__rooms">
+const Rooms = props => {
+
+  const onLeaveRoom = (event, roomId) => {
+    event.preventDefault();
+    RoomsService.leaveRoom(roomId);
+  };
+
+  return <div className="temp-subnav__rooms">
     <span>Rooms: </span>
     {
       _.reduce(props.rooms, (rooms, { name, roomId}) => {
         rooms.push(
           <NavLink to={generatePath(RouteEnum.ROOM, { roomId })} className="temp-chip" key={roomId}>
-            <Chip label={name} color="primary" />
+            <Chip label={name} color="primary" onDelete={(event) => onLeaveRoom(event, roomId)} />
           </NavLink>
         );
         return rooms;
       }, [])
     }
   </div>
-)
+};
 
 interface HeaderProps {
   state: number;

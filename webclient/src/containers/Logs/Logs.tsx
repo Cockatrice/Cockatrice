@@ -4,14 +4,12 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import * as _ from "lodash";
 
+import { ModeratorService } from "api";
+import { AuthGuard, ModGuard} from "components";
+import { SearchForm } from "forms";
 import { ServerDispatch, ServerSelectors, ServerStateLogs } from "store";
 
-import { ModeratorService } from "api";
-
-import { AuthGuard, ModGuard} from "components";
 import LogResults from "./LogResults";
-import { SearchForm } from "forms";
-
 import "./Logs.css";
 
 class Logs extends Component<LogsTypes> {
