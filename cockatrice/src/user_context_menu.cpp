@@ -253,6 +253,10 @@ void UserContextMenu::banUser_dialogFinished()
     cmd.set_reason(dlg->getReason().toStdString());
     cmd.set_visible_reason(dlg->getVisibleReason().toStdString());
     cmd.set_clientid(dlg->getBanId().toStdString());
+    int removeAmount = dlg->getDeleteMessages();
+    if (removeAmount != 0) {
+        cmd.set_remove_messages(removeAmount);
+    }
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
@@ -268,6 +272,10 @@ void UserContextMenu::warnUser_dialogFinished()
     cmd.set_user_name(dlg->getName().toStdString());
     cmd.set_reason(dlg->getReason().toStdString());
     cmd.set_clientid(dlg->getWarnID().toStdString());
+    int removeAmount = dlg->getDeleteMessages();
+    if (removeAmount != 0) {
+        cmd.set_remove_messages(removeAmount);
+    }
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
