@@ -14,7 +14,9 @@ export default class AuthenticationService {
   }
 
   static isModerator(user) {
-    return user.userLevel >= webClient.pb.ServerInfo_User.UserLevelFlag.IsModerator;
+    const moderatorLevel = webClient.pb.ServerInfo_User.UserLevelFlag.IsModerator;
+    // @TODO tell cockatrice not to do this so shittily
+    return (user.userLevel & moderatorLevel) === moderatorLevel;
   }
 
   static isAdmin() {

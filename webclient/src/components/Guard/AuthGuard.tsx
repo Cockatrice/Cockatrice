@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 
@@ -7,12 +7,10 @@ import { RouteEnum } from "types";
 
 import { AuthenticationService } from "api";
 
-class AuthGuard extends Component<AuthGuardProps> {
-  render() {
-    return !AuthenticationService.isConnected(this.props.state)
-      ? <Redirect from="*" to={RouteEnum.SERVER} />
-      : "";
-  }
+const AuthGuard = ({ state }: AuthGuardProps) => {
+  return !AuthenticationService.isConnected(state)
+    ? <Redirect from="*" to={RouteEnum.SERVER} />
+    : <div></div>;
 };
 
 interface AuthGuardProps {
