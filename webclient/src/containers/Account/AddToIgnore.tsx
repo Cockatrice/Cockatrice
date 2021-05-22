@@ -13,7 +13,7 @@ const AddToIgnore = ({ handleSubmit }) => (
 );
 
 const propsMap = {
-  form: FormKey.ADD_TO_BUDDIES,
+  form: FormKey.ADD_TO_IGNORE,
 };
 
 export default connect()(reduxForm(propsMap)(AddToIgnore));
