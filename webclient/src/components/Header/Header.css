@@ -6,15 +6,18 @@
   align-items: center;
 }
 
+.Header__logo a {
+  line-height: 1;
+}
+
 .Header__logo img {
-  height: 40px;
+  height: 32px;
 }
 
 .Header-content {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 5px;
   color: white;
 }
 
@@ -24,12 +27,12 @@
 
 .Header-server__indicator {
   display: inline-block;
-  height: 16px;
-  width: 16px;
+  height: 12px;
+  width: 12px;
   background: red;
-  border: 2px solid;
+  border: 1px solid;
   border-radius: 50%;
-  margin-left: 15px;
+  margin-left: 10px;
 }
 
 .Header-nav {

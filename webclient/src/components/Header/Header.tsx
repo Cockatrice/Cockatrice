@@ -98,7 +98,7 @@ class Header extends Component<HeaderProps> {
                       aria-haspopup="true"
                       onClick={this.handleMenuClick}
                     >
-                      <MenuRoundedIcon fontSize="large" />
+                      <MenuRoundedIcon />
                     </IconButton>
                     <Menu
                       id="long-menu"
@@ -108,7 +108,7 @@ class Header extends Component<HeaderProps> {
                       onClose={this.handleMenuClose}
                       PaperProps={{
                         style: {
-                          marginTop: '53px',
+                          marginTop: '32px',
                           width: '20ch',
                         },
                       }}
@@ -148,19 +148,21 @@ const Rooms = props => {
     RoomsService.leaveRoom(roomId);
   };
 
-  return <div className="temp-subnav__rooms">
-    <span>Rooms: </span>
-    {
-      _.reduce(props.rooms, (rooms, { name, roomId}) => {
-        rooms.push(
-          <NavLink to={generatePath(RouteEnum.ROOM, { roomId })} className="temp-chip" key={roomId}>
-            <Chip label={name} color="primary" onDelete={(event) => onLeaveRoom(event, roomId)} />
-          </NavLink>
-        );
-        return rooms;
-      }, [])
-    }
-  </div>
+  return props.rooms.length > 1 && (
+    <div className="temp-subnav__rooms">
+      <span>Rooms: </span>
+      {
+        _.reduce(props.rooms, (rooms, { name, roomId}) => {
+          rooms.push(
+            <NavLink to={generatePath(RouteEnum.ROOM, { roomId })} className="temp-chip" key={roomId}>
+              <Chip label={name} color="primary" onDelete={(event) => onLeaveRoom(event, roomId)} />
+            </NavLink>
+          );
+          return rooms;
+        }, [])
+      }
+    </div>
+  );
 };
 
 interface HeaderProps {
