@@ -3,7 +3,11 @@ import { connect } from "react-redux";
 import { NavLink, withRouter, generatePath } from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
 import Chip from "@material-ui/core/Chip";
+import IconButton from "@material-ui/core/IconButton";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import Toolbar from "@material-ui/core/Toolbar";
+import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
 import { AuthenticationService, RoomsService } from "api";
@@ -14,6 +18,24 @@ import "./Header.css";
 import logo from "./logo.png";
 
 class Header extends Component<HeaderProps> {
+  state: HeaderState;
+  options: string[] = [
+    'Decks',
+    'Replays',
+  ];
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      anchorEl: null,
+    };
+
+    this.handleMenuClick = this.handleMenuClick.bind(this);
+    this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
+    this.handleMenuClose = this.handleMenuClose.bind(this);
+  }
+
   componentDidUpdate(prevProps) {
     const currentRooms = this.props.joinedRooms;
     const previousRooms = prevProps.joinedRooms;
@@ -24,8 +46,30 @@ class Header extends Component<HeaderProps> {
     }
   }
 
+  handleMenuClick({ target }) {
+    this.setState({ anchorEl: target });
+  }
+
+  handleMenuItemClick(option: string) {
+    const route = RouteEnum[option.toUpperCase()];
+    this.props.history.push(generatePath(route));
+
+    this.handleMenuClose();
+  }
+
+  handleMenuClose() {
+    this.setState({ anchorEl: null });
+  }
+
   render() {
     const { joinedRooms, server, state, user } = this.props;
+    const anchorEl = this.state.anchorEl;
+    const options = [ ...this.options ];
+
+    if (user && AuthenticationService.isModerator(user)) {
+      options.push('Administration');
+      options.push('Logs');
+    }
 
     return (
       <div>
@@ -39,20 +83,6 @@ class Header extends Component<HeaderProps> {
               <div className="Header-content">
                 <nav className="Header-nav">
                   <ul className="Header-nav__items">
-                    {
-                      AuthenticationService.isModerator(user) && (
-                        <li className="Header-nav__item">
-                          <NavLink to={RouteEnum.LOGS}>
-                            <button>Logs</button>
-                          </NavLink>
-                        </li>
-                      )
-                    }
-                    <li className="Header-nav__item">
-                      <NavLink to={RouteEnum.SERVER} className="plain-link">
-                        Server ({server})
-                      </NavLink>
-                    </li>
                     <NavLink to={RouteEnum.ACCOUNT} className="plain-link">
                       <div className="Header-account">
                         <span className="Header-account__name">
@@ -61,6 +91,35 @@ class Header extends Component<HeaderProps> {
                         <span className="Header-account__indicator"></span>
                       </div>
                     </NavLink>
+                    <div className="Header-nav__menu">
+                      <IconButton
+                        aria-label="more"
+                        aria-controls="long-menu"
+                        aria-haspopup="true"
+                        onClick={this.handleMenuClick}
+                      >
+                        <MenuRoundedIcon fontSize="large" />
+                      </IconButton>
+                      <Menu
+                        id="long-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={!!anchorEl}
+                        onClose={this.handleMenuClose}
+                        PaperProps={{
+                          style: {
+                            marginTop: '53px',
+                            width: '20ch',
+                          },
+                        }}
+                      >
+                        {options.map((option) => (
+                          <MenuItem key={option} onClick={() => this.handleMenuItemClick(option)}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Menu>
+                    </div>
                   </ul>
                 </nav>
               </div>
@@ -113,11 +172,15 @@ interface HeaderProps {
   history: any;
 }
 
+interface HeaderState {
+  anchorEl: Element;
+}
+
 const mapStateToProps = state => ({
   state: ServerSelectors.getState(state),
   server: ServerSelectors.getName(state),
   user: ServerSelectors.getUser(state),
-  joinedRooms: RoomsSelectors.getJoinedRooms(state)
+  joinedRooms: RoomsSelectors.getJoinedRooms(state),
 });
 
 export default withRouter(connect(mapStateToProps)(Header));
