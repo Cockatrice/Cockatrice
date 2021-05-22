@@ -1,7 +1,6 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 import * as _ from "lodash";
 
 import { ModeratorService } from "api";
@@ -96,4 +95,14 @@ const mapStateToProps = state => ({
   logs: ServerSelectors.getLogs(state)
 });
 
-export default withRouter(connect(mapStateToProps)(Logs));
+export default connect(mapStateToProps)(Logs);
+
+
+
+
+
+
+
+
+
+
