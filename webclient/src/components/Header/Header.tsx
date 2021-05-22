@@ -20,6 +20,7 @@ import logo from "./logo.png";
 class Header extends Component<HeaderProps> {
   state: HeaderState;
   options: string[] = [
+    'Account',
     'Decks',
     'Replays',
   ];
@@ -64,11 +65,14 @@ class Header extends Component<HeaderProps> {
   render() {
     const { joinedRooms, server, state, user } = this.props;
     const anchorEl = this.state.anchorEl;
-    const options = [ ...this.options ];
+    let options = [ ...this.options ];
 
     if (user && AuthenticationService.isModerator(user)) {
-      options.push('Administration');
-      options.push('Logs');
+      options = [
+        ...options,
+        'Administration',
+        'Logs'
+      ];
     }
 
     return (
@@ -76,51 +80,46 @@ class Header extends Component<HeaderProps> {
         {/*<header className="Header">*/}
         <AppBar position="static">
           <Toolbar variant="dense">
-            <NavLink to={RouteEnum.SERVER} className="Header__logo">
-              <img src={logo} alt="logo" />
-            </NavLink>
+            <div className="Header__logo">
+              <NavLink to={RouteEnum.SERVER}>
+                <img src={logo} alt="logo" />
+              </NavLink>
+              { AuthenticationService.isConnected(state) && (
+                <span className="Header-server__indicator"></span>
+              ) }
+            </div>
             { AuthenticationService.isConnected(state) && (
               <div className="Header-content">
                 <nav className="Header-nav">
-                  <ul className="Header-nav__items">
-                    <NavLink to={RouteEnum.ACCOUNT} className="plain-link">
-                      <div className="Header-account">
-                        <span className="Header-account__name">
-                          {user.name}
-                        </span>
-                        <span className="Header-account__indicator"></span>
-                      </div>
-                    </NavLink>
-                    <div className="Header-nav__menu">
-                      <IconButton
-                        aria-label="more"
-                        aria-controls="long-menu"
-                        aria-haspopup="true"
-                        onClick={this.handleMenuClick}
-                      >
-                        <MenuRoundedIcon fontSize="large" />
-                      </IconButton>
-                      <Menu
-                        id="long-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={!!anchorEl}
-                        onClose={this.handleMenuClose}
-                        PaperProps={{
-                          style: {
-                            marginTop: '53px',
-                            width: '20ch',
-                          },
-                        }}
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option} onClick={() => this.handleMenuItemClick(option)}>
-                            {option}
-                          </MenuItem>
-                        ))}
-                      </Menu>
-                    </div>
-                  </ul>
+                  <div className="Header-nav__menu">
+                    <IconButton
+                      aria-label="more"
+                      aria-controls="long-menu"
+                      aria-haspopup="true"
+                      onClick={this.handleMenuClick}
+                    >
+                      <MenuRoundedIcon fontSize="large" />
+                    </IconButton>
+                    <Menu
+                      id="long-menu"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={!!anchorEl}
+                      onClose={this.handleMenuClose}
+                      PaperProps={{
+                        style: {
+                          marginTop: '53px',
+                          width: '20ch',
+                        },
+                      }}
+                    >
+                      {options.map((option) => (
+                        <MenuItem key={option} onClick={() => this.handleMenuItemClick(option)}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </div>
                 </nav>
               </div>
             ) }
