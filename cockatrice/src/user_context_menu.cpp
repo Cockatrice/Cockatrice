@@ -1,6 +1,7 @@
 #include "user_context_menu.h"
 
 #include "abstractclient.h"
+#include "chatview/chatview.h"
 #include "gameselector.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/commands.pb.h"
@@ -286,7 +287,15 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                                       bool online,
                                       int playerId)
 {
-    showContextMenu(pos, userName, userLevel, online, playerId, QString());
+    showContextMenu(pos, userName, userLevel, online, playerId, QString(), nullptr);
+}
+
+void UserContextMenu::showContextMenu(const QPoint &pos,
+                                      const QString &userName,
+                                      UserLevelFlags userLevel,
+                                      ChatView *chatView)
+{
+    showContextMenu(pos, userName, userLevel, true, -1, QString(), chatView);
 }
 
 void UserContextMenu::showContextMenu(const QPoint &pos,
@@ -294,9 +303,10 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                                       UserLevelFlags userLevel,
                                       bool online,
                                       int playerId,
-                                      const QString &deckHash)
+                                      const QString &deckHash,
+                                      ChatView *chatView)
 {
-    QAction *aCopyToClipBoard;
+    QAction *aCopyToClipBoard, *aRemoveMessages;
     aUserName->setText(userName);
 
     QMenu *menu = new QMenu(static_cast<QWidget *>(parent()));
@@ -311,14 +321,20 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     menu->addAction(aChat);
     if (userLevel.testFlag(ServerInfo_User::IsRegistered) && tabSupervisor->isOwnUserRegistered()) {
         menu->addSeparator();
-        if (tabSupervisor->isUserBuddy(userName))
+        if (tabSupervisor->isUserBuddy(userName)) {
             menu->addAction(aRemoveFromBuddyList);
-        else
+        } else {
             menu->addAction(aAddToBuddyList);
-        if (tabSupervisor->isUserIgnored(userName))
+        }
+        if (tabSupervisor->isUserIgnored(userName)) {
             menu->addAction(aRemoveFromIgnoreList);
-        else
+        } else {
             menu->addAction(aAddToIgnoreList);
+        }
+        if (chatView != nullptr) {
+            aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
+            menu->addAction(aRemoveMessages);
+        }
     }
     if (game && (game->isHost() || !tabSupervisor->getAdminLocked())) {
         menu->addSeparator();
@@ -368,7 +384,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aDemoteFromMod->setEnabled(anotherUser);
 
     QAction *actionClicked = menu->exec(pos);
-    if (actionClicked == aDetails) {
+    if (actionClicked == nullptr) {
+    } else if (actionClicked == aDetails) {
         UserInfoBox *infoWidget =
             new UserInfoBox(client, false, static_cast<QWidget *>(parent()),
                             Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
@@ -464,6 +481,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);
+    } else if (actionClicked == aRemoveMessages) {
+        chatView->redactMessages(userName, -1);
     }
 
     delete menu;

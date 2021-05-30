@@ -5,14 +5,16 @@
 
 #include <QObject>
 
-class QAction;
-class TabSupervisor;
-class TabGame;
-class QPoint;
-class CommandContainer;
-class Response;
 class AbstractClient;
+class ChatView;
+class CommandContainer;
+class QAction;
+class QMenu;
+class QPoint;
+class Response;
 class ServerInfo_User;
+class TabGame;
+class TabSupervisor;
 
 class UserContextMenu : public QObject
 {
@@ -54,12 +56,14 @@ public:
                          UserLevelFlags userLevel,
                          bool online = true,
                          int playerId = -1);
+    void showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, ChatView *chatView);
     void showContextMenu(const QPoint &pos,
                          const QString &userName,
                          UserLevelFlags userLevel,
                          bool online,
                          int playerId,
-                         const QString &deckHash);
+                         const QString &deckHash,
+                         ChatView *chatView = nullptr);
 };
 
 #endif

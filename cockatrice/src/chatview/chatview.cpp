@@ -574,7 +574,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                 switch (event->button()) {
                     case Qt::RightButton: {
                         UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
-                        userContextMenu->showContextMenu(event->globalPos(), userName, userLevel);
+                        userContextMenu->showContextMenu(event->globalPos(), userName, userLevel, this);
                         break;
                     }
                     case Qt::LeftButton: {
