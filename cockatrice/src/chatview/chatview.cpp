@@ -12,9 +12,16 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QTextDocumentFragment>
 #include <QTextEdit>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
+
+UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
+{
+    block = cursor.block();
+    relativePosition = cursor.position() - block.position();
+}
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
@@ -43,8 +50,8 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor,
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
-    userName = userlistProxy->getOwnUsername();
-    mention = "@" + userName;
+    ownUserName = userlistProxy->getOwnUsername();
+    mention = "@" + ownUserName;
 
     mentionFormat.setFontWeight(QFont::Bold);
 
@@ -68,7 +75,7 @@ QTextCursor ChatView::prepareBlock(bool same)
 {
     lastSender.clear();
 
-    QTextCursor cursor(document()->lastBlock());
+    QTextCursor cursor(document());
     cursor.movePosition(QTextCursor::End);
     if (same) {
         cursor.insertHtml("<br>");
@@ -145,11 +152,12 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
 void ChatView::appendMessage(QString message,
                              RoomMessageTypeFlags messageType,
-                             QString sender,
+                             const QString &userName,
                              UserLevelFlags userLevel,
                              QString UserPrivLevel,
                              bool playerBold)
 {
+    QString sender = userName;
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     bool sameSender = (sender == lastSender) && !lastSender.isEmpty();
     QTextCursor cursor = prepareBlock(sameSender);
@@ -168,7 +176,7 @@ void ChatView::appendMessage(QString message,
     // nickname
     if (sender.toLower() != "servatrice") {
         QTextCharFormat senderFormat;
-        if (sender == userName) {
+        if (sender == ownUserName) {
             senderFormat.setForeground(QBrush(getCustomMentionColor()));
             senderFormat.setFontWeight(QFont::Bold);
         } else {
@@ -189,9 +197,13 @@ void ChatView::appendMessage(QString message,
                 cursor.insertText(" ");
             }
             cursor.setCharFormat(senderFormat);
-            if (!sender.isEmpty())
+            if (!sender.isEmpty()) {
                 sender.append(": ");
+            }
             cursor.insertText(sender);
+            if (!sender.isEmpty()) {
+                userMessagePositions[userName].append(cursor);
+            }
         }
     }
 
@@ -316,7 +328,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
         const ServerInfo_User *onlineUser = userlistProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
         if (onlineUser) // Is there a user online named this?
         {
-            if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
+            if (ownUserName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
             {
                 // You have received a valid mention!!
                 soundEngine->playSound("chat_mention");
@@ -472,6 +484,28 @@ void ChatView::clearChat()
 {
     document()->clear();
     lastSender = "";
+}
+
+void ChatView::redactMessages(const QString &userName, int amount)
+{
+    auto &messagePositions = userMessagePositions[userName];
+    bool removedLastMessage = false;
+    QTextCursor cursor(document());
+    for (; !messagePositions.isEmpty() && amount != 0; --amount) {
+        auto position = messagePositions.takeLast();   // go backwards from last message
+        cursor.setPosition(position.block.position()); // move to start of block, then continue to start of message
+        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, position.relativePosition);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor); // select until end of block
+        cursor.removeSelectedText();
+        // if the cursor is at the end of the text it is possible to add text to this block still
+        removedLastMessage |= cursor.atEnd();
+        // we will readd this position later
+    }
+    if (removedLastMessage) {
+        cursor.movePosition(QTextCursor::End);
+        messagePositions.append(cursor);
+        // note that this message might stay empty, this is not harmful as it will simply remove nothing the next time
+    }
 }
 
 void ChatView::enterEvent(QEvent * /*event*/)

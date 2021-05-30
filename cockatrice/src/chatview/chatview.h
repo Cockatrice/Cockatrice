@@ -18,6 +18,14 @@ class QMouseEvent;
 class UserContextMenu;
 class TabGame;
 
+class UserMessagePosition
+{
+public:
+    UserMessagePosition(QTextCursor &cursor);
+    int relativePosition;
+    QTextBlock block;
+};
+
 class ChatView : public QTextBrowser
 {
     Q_OBJECT
@@ -36,7 +44,7 @@ private:
     const UserlistProxy *const userlistProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
-    QString userName;
+    QString ownUserName;
     QString mention;
     QTextCharFormat mentionFormat;
     QTextCharFormat highlightFormat;
@@ -48,6 +56,8 @@ private:
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
+    QMap<QString, QVector<UserMessagePosition>> userMessagePositions;
+
     QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
@@ -82,11 +92,12 @@ public:
                                          QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
-                       QString sender = QString(),
+                       const QString &userName = QString(),
                        UserLevelFlags userLevel = UserLevelFlags(),
                        QString UserPrivLevel = "NONE",
                        bool playerBold = false);
     void clearChat();
+    void redactMessages(const QString &userName, int amount);
 
 protected:
     void enterEvent(QEvent *event);
