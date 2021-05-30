@@ -67,10 +67,10 @@ private:
     void appendUrlTag(QTextCursor &cursor, QString url);
     QColor getCustomMentionColor();
     QColor getCustomHighlightColor();
-    void showSystemPopup(QString &sender);
+    void showSystemPopup(const QString &userName);
     bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
     void checkTag(QTextCursor &cursor, QString &message);
-    void checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel);
+    void checkMention(QTextCursor &cursor, QString &message, const QString &userName, UserLevelFlags userLevel);
     void checkWord(QTextCursor &cursor, QString &message);
     QString extractNextWord(QString &message, QString &rest);
 
@@ -115,7 +115,7 @@ signals:
     void deleteCardInfoPopup(QString cardName);
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
-    void showMentionPopup(QString &sender);
+    void showMentionPopup(const QString &userName);
 };
 
 #endif
