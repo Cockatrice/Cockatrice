@@ -21,6 +21,9 @@ class TabGame;
 class UserMessagePosition
 {
 public:
+#if (QT_VERSION < QT_VERSION_CHECK(5, 13, 0))
+    UserMessagePosition() = default; // older qt versions require a default constructor to use in containers
+#endif
     UserMessagePosition(QTextCursor &cursor);
     int relativePosition;
     QTextBlock block;
