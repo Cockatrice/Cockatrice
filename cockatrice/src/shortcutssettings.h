@@ -417,7 +417,7 @@ private:
                                             parseSequenceString("Alt+U"),
                                             ShortcutGroup::Playing_Area)},
         {"Player/aFlip", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Turn Card Over"),
-                                     parseSequenceString(""),
+                                     parseSequenceString("Alt+F"),
                                      ShortcutGroup::Playing_Area)},
         {"Player/aPeek", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Peek Card"),
                                      parseSequenceString("Alt+L"),
