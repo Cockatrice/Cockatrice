@@ -271,6 +271,8 @@ jobs:
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
+        env:
+          CMAKE_BUILD_PARALLEL_LEVEL: 3  # mac machines actually have 3 cores
         run: .ci/compile.sh ${{matrix.type}} --server
 
       - name: Test
