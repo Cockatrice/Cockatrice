@@ -1846,7 +1846,7 @@ void Player::eventShuffle(const Event_Shuffle &event)
     }
     for (auto *view : zone->getViews()) {
         if (view != nullptr) {
-            view->setWriteableRevealZone(false);
+            emit view->beingDeleted();
         }
     }
     emit logShuffle(this, zone, event.start(), event.end());
