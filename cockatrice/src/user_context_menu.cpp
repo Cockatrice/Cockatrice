@@ -331,10 +331,10 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         } else {
             menu->addAction(aAddToIgnoreList);
         }
-        if (chatView != nullptr) {
-            aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
-            menu->addAction(aRemoveMessages);
-        }
+    }
+    if (chatView != nullptr) {
+        aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
+        menu->addAction(aRemoveMessages);
     }
     if (game && (game->isHost() || !tabSupervisor->getAdminLocked())) {
         menu->addSeparator();
