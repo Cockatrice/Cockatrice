@@ -97,7 +97,7 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
         new QLabel(tr("Please enter the reason for the ban that will be visible to the banned person."));
     visibleReasonEdit = new QPlainTextEdit;
 
-    deleteMessages = new QCheckBox(tr("Redact all messages from this user from rooms"));
+    deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
 
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
@@ -133,7 +133,7 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
     warningOption = new QComboBox();
     warningOption->addItem("");
 
-    deleteMessages = new QCheckBox(tr("Redact all messages from this user from rooms"));
+    deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
 
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
