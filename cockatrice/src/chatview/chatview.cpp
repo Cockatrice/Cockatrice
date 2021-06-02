@@ -209,13 +209,24 @@ void ChatView::appendMessage(QString message,
             defaultFormat.setForeground(Qt::gray); // FIXME : hardcoded color
             defaultFormat.setFontWeight(QFont::Light);
             defaultFormat.setFontItalic(true);
-            static const QRegularExpression userNameRegex("^\\[[^\\]]*\\]\\s(\\S+):\\s");
+            static const QRegularExpression userNameRegex("^(\\[[^\\]]*\\]\\s)(\\S+):\\s");
             auto match = userNameRegex.match(message);
             if (match.hasMatch()) {
+                cursor.setCharFormat(defaultFormat);
                 UserMessagePosition pos(cursor);
                 pos.relativePosition = match.captured(0).length(); // set message start
-                auto sentBy = match.captured(1);
-                userMessagePositions[sentBy].append(pos);
+                auto before = match.captured(1);
+                auto sentBy = match.captured(2);
+                cursor.insertText(before); // add message timestamp
+                QTextCharFormat senderFormat(defaultFormat);
+                senderFormat.setAnchor(true);
+                // this underscore is important, it is used to add the user level, but in this case the level is
+                // unknown, if the name contains an underscore it would split up the name
+                senderFormat.setAnchorHref("user://_" + sentBy);
+                cursor.setCharFormat(senderFormat);
+                cursor.insertText(sentBy);                   // add username with href so it shows the menu
+                userMessagePositions[sentBy].append(pos);    // save message position
+                message.remove(0, pos.relativePosition - 2); // do not remove semicolon
             }
         } else {
             defaultFormat.setForeground(Qt::darkGreen); // FIXME : hardcoded color
