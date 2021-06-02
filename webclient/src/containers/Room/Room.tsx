@@ -14,6 +14,7 @@ import { RouteEnum } from "types";
 import Games from "./Games";
 import Messages from "./Messages";
 import SayMessage from "./SayMessage";
+import SubNav from './SubNav';
 
 import "./Room.css";
 
@@ -43,7 +44,7 @@ class Room extends Component<any> {
   }
 
   render() {
-    const { match, rooms } = this.props;
+    const { match, rooms, joined } = this.props;
     const { roomId } = match.params;
     const room = rooms[roomId];
 
@@ -53,45 +54,52 @@ class Room extends Component<any> {
     return (
       <div className="room-view">
         <AuthGuard />
-        <ThreePaneLayout
-          fixedHeight
 
-          top={(
-            <Paper className="room-view__games overflow-scroll">
-              <Games room={room} />
-            </Paper>    
-          )}
+        <div className="room-view__nav">
+          <SubNav rooms={joined} />
+        </div>
 
-          bottom={(
-            <div className="room-view__messages">
-              <Paper className="room-view__messages-content overflow-scroll">
-                <ScrollToBottomOnChanges changes={messages} content={(
-                  <Messages messages={messages} />
-                )} />
-              </Paper>
-              <Paper className="room-view__messages-sayMessage">
-                <SayMessage onSubmit={this.handleRoomSay} />
-              </Paper>
-            </div>
-          )}
+        <div className="room-view__main">
+          <ThreePaneLayout
+            fixedHeight
 
-          side={(
-            <Paper className="room-view__side overflow-scroll">
-              <div className="room-view__side-label">
-                Users in this room: {users.length}
+            top={(
+              <Paper className="room-view__games overflow-scroll">
+                <Games room={room} />
+              </Paper>    
+            )}
+
+            bottom={(
+              <div className="room-view__messages">
+                <Paper className="room-view__messages-content overflow-scroll">
+                  <ScrollToBottomOnChanges changes={messages} content={(
+                    <Messages messages={messages} />
+                  )} />
+                </Paper>
+                <Paper className="room-view__messages-sayMessage">
+                  <SayMessage onSubmit={this.handleRoomSay} />
+                </Paper>
               </div>
-              <VirtualList
-                className="room-view__side-list"
-                itemKey={(index, data) => users[index].name }
-                items={ users.map(user => (
-                  <ListItem button className="room-view__side-list__item">
-                    <UserDisplay user={user} />
-                  </ListItem>
-                ) ) }
-              />
-            </Paper>
-          )}
-        />
+            )}
+
+            side={(
+              <Paper className="room-view__side overflow-scroll">
+                <div className="room-view__side-label">
+                  Users in this room: {users.length}
+                </div>
+                <VirtualList
+                  className="room-view__side-list"
+                  itemKey={(index, data) => users[index].name }
+                  items={ users.map(user => (
+                    <ListItem button className="room-view__side-list__item">
+                      <UserDisplay user={user} />
+                    </ListItem>
+                  ) ) }
+                />
+              </Paper>
+            )}
+          />
+        </div>
       </div>
     );
   }

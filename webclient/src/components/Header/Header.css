@@ -38,7 +38,21 @@
 .Header-nav {
   width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+}
+
+.Header-nav__links {
+  width: 100%;
+  display: flex;
+  padding-left: 50px;
+  align-items: center;
+}
+
+.Header-nav__link {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  padding: 5px 10px;
 }
 
 .Header-nav__menu {

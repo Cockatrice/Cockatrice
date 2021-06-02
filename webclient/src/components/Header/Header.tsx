@@ -7,15 +7,23 @@ import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Toolbar from "@material-ui/core/Toolbar";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
 import { AuthenticationService, RoomsService } from "api";
 import {  RoomsSelectors, ServerSelectors } from "store";
-import { Room, RouteEnum, User } from "types";
+import { routeWithParams, Room, RouteEnum, User } from "types";
 
 import "./Header.css";
 import logo from "./logo.png";
+
+enum HeaderMenu {
+  MAIN = 'MAIN',
+  ROOMS = 'ROOMS',
+  GAMES = 'GAMES',
+  DECKS = 'DECKS',
+}
 
 class Header extends Component<HeaderProps> {
   state: HeaderState;
@@ -29,10 +37,10 @@ class Header extends Component<HeaderProps> {
     super(props);
 
     this.state = {
-      anchorEl: null,
+      anchorEls: {},
     };
 
-    this.handleMenuClick = this.handleMenuClick.bind(this);
+    this.handleMenuOpen = this.handleMenuOpen.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
     this.handleMenuClose = this.handleMenuClose.bind(this);
   }
@@ -47,24 +55,32 @@ class Header extends Component<HeaderProps> {
     }
   }
 
-  handleMenuClick({ target }) {
-    this.setState({ anchorEl: target });
+  handleMenuOpen(anchor: HeaderMenu, event) {
+    console.log(event);
+    console.log(anchor, event.target);
+
+    this.setState({
+      anchorEls: { [anchor]: event.target }
+    });
   }
 
-  handleMenuItemClick(option: string) {
+  handleMenuItemClick(anchor: HeaderMenu, option: string) {
     const route = RouteEnum[option.toUpperCase()];
     this.props.history.push(generatePath(route));
 
-    this.handleMenuClose();
+    this.handleMenuClose(anchor);
   }
 
-  handleMenuClose() {
-    this.setState({ anchorEl: null });
+  handleMenuClose(anchor: HeaderMenu) {
+    this.setState({
+      anchorEls: { [anchor]: null }
+    });
   }
 
   render() {
     const { joinedRooms, server, state, user } = this.props;
-    const anchorEl = this.state.anchorEl;
+    const { anchorEls } = this.state;
+
     let options = [ ...this.options ];
 
     if (user && AuthenticationService.isModerator(user)) {
@@ -76,67 +92,91 @@ class Header extends Component<HeaderProps> {
     }
 
     return (
-      <div>
-        {/*<header className="Header">*/}
-        <AppBar position="static">
-          <Toolbar variant="dense">
-            <div className="Header__logo">
-              <NavLink to={RouteEnum.SERVER}>
-                <img src={logo} alt="logo" />
-              </NavLink>
-              { AuthenticationService.isConnected(state) && (
-                <span className="Header-server__indicator"></span>
-              ) }
-            </div>
+      <AppBar className="Header" position="static">
+        <Toolbar variant="dense">
+          <div className="Header__logo">
+            <NavLink to={RouteEnum.SERVER}>
+              <img src={logo} alt="logo" />
+            </NavLink>
             { AuthenticationService.isConnected(state) && (
-              <div className="Header-content">
-                <nav className="Header-nav">
-                  <div className="Header-nav__menu">
-                    <IconButton
-                      aria-label="more"
-                      aria-controls="long-menu"
-                      aria-haspopup="true"
-                      onClick={this.handleMenuClick}
+              <span className="Header-server__indicator"></span>
+            ) }
+          </div>
+          { AuthenticationService.isConnected(state) && (
+            <div className="Header-content">
+              <nav className="Header-nav">
+                <nav className="Header-nav__links">
+                  <div onMouseLeave={(event) => this.handleMenuClose(HeaderMenu.ROOMS) }>
+                    <NavLink
+                      className={ 'Header-nav__link' + ( !joinedRooms.length ? ' disabled-link' : '' ) }
+                      to={ joinedRooms.length ? routeWithParams(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : '' }
                     >
-                      <MenuRoundedIcon />
-                    </IconButton>
+                      Rooms
+                      <ArrowDropDownIcon fontSize="small" onMouseOver={(event) => this.handleMenuOpen(HeaderMenu.ROOMS, event) } />
+                    </NavLink>
                     <Menu
-                      id="long-menu"
-                      anchorEl={anchorEl}
+                      anchorEl={anchorEls[HeaderMenu.ROOMS]}
                       keepMounted
-                      open={!!anchorEl}
-                      onClose={this.handleMenuClose}
+                      open={!!anchorEls[HeaderMenu.ROOMS]}
+                      onClose={() => this.handleMenuClose(HeaderMenu.ROOMS)}
                       PaperProps={{
                         style: {
                           marginTop: '32px',
+                          marginLeft: '-45px',
                           width: '20ch',
                         },
                       }}
                     >
-                      {options.map((option) => (
-                        <MenuItem key={option} onClick={() => this.handleMenuItemClick(option)}>
-                          {option}
+                      {joinedRooms.map(({ name, roomId }) => (
+                        <MenuItem key={roomId} onClick={() => this.handleMenuClose(HeaderMenu.ROOMS)}>
+                          <NavLink to={ routeWithParams(RouteEnum.ROOM, { roomId: roomId }) }>
+                            {name}
+                          </NavLink>
                         </MenuItem>
                       ))}
                     </Menu>
                   </div>
+                  <div>
+                    <NavLink className="Header-nav__link" to={ RouteEnum.GAME }>
+                      Games
+                      <ArrowDropDownIcon fontSize="small" />
+                    </NavLink>
+                  </div>
+                  <div>
+                    <NavLink className="Header-nav__link" to={ RouteEnum.DECKS }>
+                      Decks
+                      <ArrowDropDownIcon fontSize="small" />
+                    </NavLink>
+                  </div>
                 </nav>
-              </div>
-            ) }
-          </Toolbar>
-        </AppBar>
-        <div className="temp-subnav">
-          {
-            !!joinedRooms.length && (
-              <Rooms rooms={joinedRooms} />
-            )
-          }
-          <div className="temp-subnav__games">
-          </div>
-          <div className="temp-subnav__chats">
-          </div>
-        </div>
-      </div>
+                <div className="Header-nav__menu">
+                  <IconButton onClick={(event) => this.handleMenuOpen(HeaderMenu.MAIN, event)}>
+                    <MenuRoundedIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEls[HeaderMenu.MAIN]}
+                    keepMounted
+                    open={!!anchorEls[HeaderMenu.MAIN]}
+                    onClose={() => this.handleMenuClose(HeaderMenu.MAIN)}
+                    PaperProps={{
+                      style: {
+                        marginTop: '32px',
+                        width: '20ch',
+                      },
+                    }}
+                  >
+                    {options.map((option) => (
+                      <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(HeaderMenu.MAIN, option)}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </div>
+              </nav>
+            </div>
+          ) }
+        </Toolbar>
+      </AppBar>
     )
   }
 }
@@ -172,7 +212,9 @@ interface HeaderProps {
 }
 
 interface HeaderState {
-  anchorEl: Element;
+  anchorEls: {
+    [key: string]: Element
+  };
 }
 
 const mapStateToProps = state => ({

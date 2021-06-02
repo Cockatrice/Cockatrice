@@ -1,0 +1,16 @@
+.rooms-subnav {
+	display: flex;
+	align-items: center;
+	height: 46px;
+	padding: 8px;
+}
+
+.chip {
+  margin-left: 5px;
+  text-decoration: none;
+}
+
+
+.chip > div {
+  cursor: inherit;
+}
