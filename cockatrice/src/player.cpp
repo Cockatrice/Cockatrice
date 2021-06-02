@@ -3545,7 +3545,11 @@ void Player::setCardMenu(QMenu *menu)
 
 QMenu *Player::getCardMenu() const
 {
-    return aCardMenu->menu(); // can return nullptr
+    if (aCardMenu != nullptr) {
+        return aCardMenu->menu();
+    } else {
+        return nullptr;
+    }
 }
 
 QString Player::getName() const
