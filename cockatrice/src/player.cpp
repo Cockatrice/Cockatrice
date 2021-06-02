@@ -49,7 +49,6 @@
 #include "pb/event_set_card_counter.pb.h"
 #include "pb/event_set_counter.pb.h"
 #include "pb/event_shuffle.pb.h"
-#include "pb/event_stop_dump_zone.pb.h"
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_zone.pb.h"
@@ -1984,19 +1983,6 @@ void Player::eventDumpZone(const Event_DumpZone &event)
     emit logDumpZone(this, zone, event.number_cards());
 }
 
-void Player::eventStopDumpZone(const Event_StopDumpZone &event)
-{
-    Player *zoneOwner = game->getPlayers().value(event.zone_owner_id(), 0);
-    if (!zoneOwner) {
-        return;
-    }
-    CardZone *zone = zoneOwner->getZones().value(QString::fromStdString(event.zone_name()), 0);
-    if (!zone) {
-        return;
-    }
-    emit logStopDumpZone(this, zone);
-}
-
 void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &context)
 {
     Player *startPlayer = game->getPlayers().value(event.start_player_id());
@@ -2313,9 +2299,6 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
             break;
         case GameEvent::DUMP_ZONE:
             eventDumpZone(event.GetExtension(Event_DumpZone::ext));
-            break;
-        case GameEvent::STOP_DUMP_ZONE:
-            eventStopDumpZone(event.GetExtension(Event_StopDumpZone::ext));
             break;
         case GameEvent::MOVE_CARD:
             eventMoveCard(event.GetExtension(Event_MoveCard::ext), context);

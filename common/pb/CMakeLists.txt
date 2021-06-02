@@ -48,7 +48,6 @@ SET(PROTO_FILES
     command_set_sideboard_lock.proto
     command_shuffle.proto
     commands.proto
-    command_stop_dump_zone.proto
     command_undo_draw.proto
     context_concede.proto
     context_connection_state_changed.proto
@@ -102,7 +101,6 @@ SET(PROTO_FILES
     event_set_card_counter.proto
     event_set_counter.proto
     event_shuffle.proto
-    event_stop_dump_zone.proto
     event_user_joined.proto
     event_user_left.proto
     event_user_message.proto
