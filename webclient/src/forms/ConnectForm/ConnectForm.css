@@ -12,3 +12,7 @@
   display: block;
   margin: 20px auto 0;
 }
+
+.selectKnownHosts-items {
+  margin-bottom: 4px;
+}
