@@ -1099,9 +1099,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespPasswordTooShort;
     }
 
-    QString token;
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country, token,
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country,
                                                    !requireEmailActivation);
 
     if (regSucceeded) {
