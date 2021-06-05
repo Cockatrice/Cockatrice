@@ -14,6 +14,10 @@
   flex-direction: column;
 }
 
+.room-view__main {
+  overflow: hidden;
+}
+
 .room-view__messages-sayMessage {
   width: 100%;
   margin: 10px auto 2px;

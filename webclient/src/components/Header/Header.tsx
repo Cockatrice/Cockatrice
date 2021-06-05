@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { NavLink, withRouter, generatePath } from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
-import Chip from "@material-ui/core/Chip";
 import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -11,34 +10,24 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
-import { AuthenticationService, RoomsService } from "api";
+import { AuthenticationService } from "api";
 import {  RoomsSelectors, ServerSelectors } from "store";
 import { routeWithParams, Room, RouteEnum, User } from "types";
 
 import "./Header.css";
 import logo from "./logo.png";
 
-enum HeaderMenu {
-  MAIN = 'MAIN',
-  ROOMS = 'ROOMS',
-  GAMES = 'GAMES',
-  DECKS = 'DECKS',
-}
-
 class Header extends Component<HeaderProps> {
   state: HeaderState;
   options: string[] = [
     'Account',
-    'Decks',
     'Replays',
   ];
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      anchorEls: {},
-    };
+    this.state = { anchorEl: null };
 
     this.handleMenuOpen = this.handleMenuOpen.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
@@ -55,31 +44,22 @@ class Header extends Component<HeaderProps> {
     }
   }
 
-  handleMenuOpen(anchor: HeaderMenu, event) {
-    console.log(event);
-    console.log(anchor, event.target);
-
-    this.setState({
-      anchorEls: { [anchor]: event.target }
-    });
+  handleMenuOpen(event) {
+    this.setState({ anchorEl: event.target });
   }
 
-  handleMenuItemClick(anchor: HeaderMenu, option: string) {
+  handleMenuItemClick(option: string) {
     const route = RouteEnum[option.toUpperCase()];
     this.props.history.push(generatePath(route));
-
-    this.handleMenuClose(anchor);
   }
 
-  handleMenuClose(anchor: HeaderMenu) {
-    this.setState({
-      anchorEls: { [anchor]: null }
-    });
+  handleMenuClose() {
+    this.setState({ anchorEl: null });
   }
 
   render() {
-    const { joinedRooms, server, state, user } = this.props;
-    const { anchorEls } = this.state;
+    const { joinedRooms, state, user } = this.props;
+    const { anchorEl } = this.state;
 
     let options = [ ...this.options ];
 
@@ -106,58 +86,46 @@ class Header extends Component<HeaderProps> {
             <div className="Header-content">
               <nav className="Header-nav">
                 <nav className="Header-nav__links">
-                  <div onMouseLeave={(event) => this.handleMenuClose(HeaderMenu.ROOMS) }>
+                  <div className="Header-nav__link">
                     <NavLink
-                      className={ 'Header-nav__link' + ( !joinedRooms.length ? ' disabled-link' : '' ) }
-                      to={ joinedRooms.length ? routeWithParams(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : '' }
+                      className="Header-nav__link-btn"
+                      to={ joinedRooms.length ? routeWithParams(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : RouteEnum.SERVER }
                     >
                       Rooms
-                      <ArrowDropDownIcon fontSize="small" onMouseOver={(event) => this.handleMenuOpen(HeaderMenu.ROOMS, event) } />
+                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
                     </NavLink>
-                    <Menu
-                      anchorEl={anchorEls[HeaderMenu.ROOMS]}
-                      keepMounted
-                      open={!!anchorEls[HeaderMenu.ROOMS]}
-                      onClose={() => this.handleMenuClose(HeaderMenu.ROOMS)}
-                      PaperProps={{
-                        style: {
-                          marginTop: '32px',
-                          marginLeft: '-45px',
-                          width: '20ch',
-                        },
-                      }}
-                    >
+                    <div className="Header-nav__link-menu">
                       {joinedRooms.map(({ name, roomId }) => (
-                        <MenuItem key={roomId} onClick={() => this.handleMenuClose(HeaderMenu.ROOMS)}>
-                          <NavLink to={ routeWithParams(RouteEnum.ROOM, { roomId: roomId }) }>
+                        <MenuItem className="Header-nav__link-menu__item" key={roomId}>
+                          <NavLink className="Header-nav__link-menu__btn" to={ routeWithParams(RouteEnum.ROOM, { roomId: roomId }) }>
                             {name}
                           </NavLink>
                         </MenuItem>
                       ))}
-                    </Menu>
+                    </div>
                   </div>
-                  <div>
-                    <NavLink className="Header-nav__link" to={ RouteEnum.GAME }>
+                  <div className="Header-nav__link">
+                    <NavLink className="Header-nav__link-btn" to={ RouteEnum.GAME }>
                       Games
-                      <ArrowDropDownIcon fontSize="small" />
+                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
                     </NavLink>
                   </div>
-                  <div>
-                    <NavLink className="Header-nav__link" to={ RouteEnum.DECKS }>
+                  <div className="Header-nav__link">
+                    <NavLink className="Header-nav__link-btn" to={ RouteEnum.DECKS }>
                       Decks
-                      <ArrowDropDownIcon fontSize="small" />
+                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
                     </NavLink>
                   </div>
                 </nav>
                 <div className="Header-nav__menu">
-                  <IconButton onClick={(event) => this.handleMenuOpen(HeaderMenu.MAIN, event)}>
+                  <IconButton onClick={this.handleMenuOpen}>
                     <MenuRoundedIcon />
                   </IconButton>
                   <Menu
-                    anchorEl={anchorEls[HeaderMenu.MAIN]}
+                    anchorEl={anchorEl}
                     keepMounted
-                    open={!!anchorEls[HeaderMenu.MAIN]}
-                    onClose={() => this.handleMenuClose(HeaderMenu.MAIN)}
+                    open={!!anchorEl}
+                    onClose={() => this.handleMenuClose()}
                     PaperProps={{
                       style: {
                         marginTop: '32px',
@@ -166,7 +134,7 @@ class Header extends Component<HeaderProps> {
                     }}
                   >
                     {options.map((option) => (
-                      <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(HeaderMenu.MAIN, option)}>
+                      <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(option)}>
                         {option}
                       </MenuItem>
                     ))}
@@ -181,28 +149,6 @@ class Header extends Component<HeaderProps> {
   }
 }
 
-const Rooms = props => {
-
-  const onLeaveRoom = (event, roomId) => {
-    event.preventDefault();
-    RoomsService.leaveRoom(roomId);
-  };
-
-  return <div className="temp-subnav__rooms">
-    <span>Rooms: </span>
-    {
-      _.reduce(props.rooms, (rooms, { name, roomId}) => {
-        rooms.push(
-          <NavLink to={generatePath(RouteEnum.ROOM, { roomId })} className="temp-chip" key={roomId}>
-            <Chip label={name} color="primary" onDelete={(event) => onLeaveRoom(event, roomId)} />
-          </NavLink>
-        );
-        return rooms;
-      }, [])
-    }
-  </div>
-};
-
 interface HeaderProps {
   state: number;
   server: string;
@@ -212,9 +158,7 @@ interface HeaderProps {
 }
 
 interface HeaderState {
-  anchorEls: {
-    [key: string]: Element
-  };
+  anchorEl: Element
 }
 
 const mapStateToProps = state => ({

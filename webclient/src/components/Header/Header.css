@@ -49,10 +49,47 @@
 }
 
 .Header-nav__link {
+  position: relative;
+  height: 100%;
+}
+
+.Header-nav__link:hover {
+  background: rgba(0, 0, 0, .125);
+}
+
+.Header-nav__link:hover .Header-nav__link-menu {
+  display: block;
+}
+
+.Header-nav__link-btn {
   display: flex;
+  height: 100%;
+  width: 100%;
   align-items: center;
-  margin-right: 20px;
   padding: 5px 10px;
+}
+
+.Header-nav__link-btn__icon {
+  margin-left: 5px;
+}
+
+.Header-nav__link-menu {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  transform: translateY(100%);
+  min-width: 150px;
+  background: #3f51b5;
+  box-shadow: 1px 1px 2px 0px black;
+}
+
+.Header-nav__link-menu__item {
+  padding: 0 !important;
+}
+
+.Header-nav__link-menu__btn {
+  padding: 6px 16px;
+  width: 100%;
 }
 
 .Header-nav__menu {
