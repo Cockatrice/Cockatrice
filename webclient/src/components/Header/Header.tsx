@@ -12,7 +12,7 @@ import * as _ from "lodash";
 
 import { AuthenticationService } from "api";
 import {  RoomsSelectors, ServerSelectors } from "store";
-import { routeWithParams, Room, RouteEnum, User } from "types";
+import { Room, RouteEnum, User } from "types";
 
 import "./Header.css";
 import logo from "./logo.png";
@@ -89,7 +89,7 @@ class Header extends Component<HeaderProps> {
                   <div className="Header-nav__link">
                     <NavLink
                       className="Header-nav__link-btn"
-                      to={ joinedRooms.length ? routeWithParams(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : RouteEnum.SERVER }
+                      to={ joinedRooms.length ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : RouteEnum.SERVER }
                     >
                       Rooms
                       <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
@@ -97,7 +97,7 @@ class Header extends Component<HeaderProps> {
                     <div className="Header-nav__link-menu">
                       {joinedRooms.map(({ name, roomId }) => (
                         <MenuItem className="Header-nav__link-menu__item" key={roomId}>
-                          <NavLink className="Header-nav__link-menu__btn" to={ routeWithParams(RouteEnum.ROOM, { roomId: roomId }) }>
+                          <NavLink className="Header-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId }) }>
                             {name}
                           </NavLink>
                         </MenuItem>
