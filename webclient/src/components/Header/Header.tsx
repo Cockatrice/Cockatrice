@@ -7,11 +7,12 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Toolbar from "@material-ui/core/Toolbar";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import CloseIcon from '@material-ui/icons/Close';
 import MailOutlineRoundedIcon from '@material-ui/icons/MailOutline';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
-import { AuthenticationService } from "api";
+import { AuthenticationService, RoomsService } from "api";
 import {  RoomsSelectors, ServerSelectors } from "store";
 import { Room, RouteEnum, User } from "types";
 
@@ -33,6 +34,7 @@ class Header extends Component<HeaderProps> {
     this.handleMenuOpen = this.handleMenuOpen.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
     this.handleMenuClose = this.handleMenuClose.bind(this);
+    this.leaveRoom = this.leaveRoom.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -57,6 +59,11 @@ class Header extends Component<HeaderProps> {
   handleMenuClose() {
     this.setState({ anchorEl: null });
   }
+
+  leaveRoom(event, roomId) {
+    event.preventDefault();
+    RoomsService.leaveRoom(roomId);
+  };
 
   render() {
     const { joinedRooms, state, user } = this.props;
@@ -100,6 +107,10 @@ class Header extends Component<HeaderProps> {
                         <MenuItem className="Header-nav__link-menu__item" key={roomId}>
                           <NavLink className="Header-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId }) }>
                             {name}
+
+                            <IconButton size="small" edge="end" onClick={event => this.leaveRoom(event, roomId)}>
+                              <CloseIcon style={{ fontSize: 10, color: 'white' }} />
+                            </IconButton>
                           </NavLink>
                         </MenuItem>
                       ))}
