@@ -67,6 +67,7 @@
   width: 100%;
   align-items: center;
   padding: 5px 10px;
+  font-weight: bold;
 }
 
 .Header-nav__link-btn__icon {
@@ -92,8 +93,16 @@
   width: 100%;
 }
 
-.Header-nav__menu {
-  margin-left: 10px;
+.Header-nav__actions {
+  display: flex;
+}
+
+.Header-nav__action {
+
+}
+
+.Header-nav__action button {
+  color: white;
 }
 
 .temp-subnav__rooms {

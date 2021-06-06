@@ -14,7 +14,6 @@ import { RouteEnum } from "types";
 import Games from "./Games";
 import Messages from "./Messages";
 import SayMessage from "./SayMessage";
-import SubNav from './SubNav';
 
 import "./Room.css";
 
@@ -44,7 +43,7 @@ class Room extends Component<any> {
   }
 
   render() {
-    const { match, rooms, joined } = this.props;
+    const { match, rooms } = this.props;
     const { roomId } = match.params;
     const room = rooms[roomId];
 
@@ -54,10 +53,6 @@ class Room extends Component<any> {
     return (
       <div className="room-view">
         <AuthGuard />
-
-        <div className="room-view__nav">
-          <SubNav rooms={joined} />
-        </div>
 
         <div className="room-view__main">
           <ThreePaneLayout

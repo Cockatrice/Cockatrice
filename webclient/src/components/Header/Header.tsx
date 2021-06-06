@@ -7,6 +7,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Toolbar from "@material-ui/core/Toolbar";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import MailOutlineRoundedIcon from '@material-ui/icons/MailOutline';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
@@ -117,28 +118,35 @@ class Header extends Component<HeaderProps> {
                     </NavLink>
                   </div>
                 </nav>
-                <div className="Header-nav__menu">
-                  <IconButton onClick={this.handleMenuOpen}>
-                    <MenuRoundedIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={!!anchorEl}
-                    onClose={() => this.handleMenuClose()}
-                    PaperProps={{
-                      style: {
-                        marginTop: '32px',
-                        width: '20ch',
-                      },
-                    }}
-                  >
-                    {options.map((option) => (
-                      <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(option)}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Menu>
+                <div className="Header-nav__actions">
+                  <div className="Header-nav__action">
+                    <IconButton>
+                      <MailOutlineRoundedIcon style={{ color: 'inherit' }} />
+                    </IconButton>
+                  </div>
+                  <div className="Header-nav__action">
+                    <IconButton onClick={this.handleMenuOpen}>
+                      <MenuRoundedIcon style={{ color: 'inherit' }} />
+                    </IconButton>
+                    <Menu
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={!!anchorEl}
+                      onClose={() => this.handleMenuClose()}
+                      PaperProps={{
+                        style: {
+                          marginTop: '32px',
+                          width: '20ch',
+                        },
+                      }}
+                    >
+                      {options.map((option) => (
+                        <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(option)}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </div>
                 </div>
               </nav>
             </div>
