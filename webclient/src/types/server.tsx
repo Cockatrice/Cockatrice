@@ -16,6 +16,16 @@ export enum StatusEnumLabel {
   "Disconnecting" = 99
 }
 
+export enum KnownHost {
+  ROOSTER = 'Rooster',
+  TETRARCH = 'Tetrarch',
+}
+
+export const KnownHosts = {
+  [KnownHost.ROOSTER]: { port: 443, host: 'server.cockatrice.us', },
+  [KnownHost.TETRARCH]:  { port: 443, host: 'mtg.tetrarch.co/servatrice'},
+}
+
 export const getStatusEnumLabel = (statusEnum: number) => {
   if (StatusEnumLabel[statusEnum] !== undefined) {
     return StatusEnumLabel[statusEnum];
