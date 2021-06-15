@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { NavLink, withRouter, generatePath } from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
-import Chip from "@material-ui/core/Chip";
 import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Toolbar from "@material-ui/core/Toolbar";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import CloseIcon from '@material-ui/icons/Close';
+import MailOutlineRoundedIcon from '@material-ui/icons/MailOutline';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
@@ -21,20 +23,18 @@ class Header extends Component<HeaderProps> {
   state: HeaderState;
   options: string[] = [
     'Account',
-    'Decks',
     'Replays',
   ];
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      anchorEl: null,
-    };
+    this.state = { anchorEl: null };
 
-    this.handleMenuClick = this.handleMenuClick.bind(this);
+    this.handleMenuOpen = this.handleMenuOpen.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
     this.handleMenuClose = this.handleMenuClose.bind(this);
+    this.leaveRoom = this.leaveRoom.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -47,24 +47,28 @@ class Header extends Component<HeaderProps> {
     }
   }
 
-  handleMenuClick({ target }) {
-    this.setState({ anchorEl: target });
+  handleMenuOpen(event) {
+    this.setState({ anchorEl: event.target });
   }
 
   handleMenuItemClick(option: string) {
     const route = RouteEnum[option.toUpperCase()];
     this.props.history.push(generatePath(route));
-
-    this.handleMenuClose();
   }
 
   handleMenuClose() {
     this.setState({ anchorEl: null });
   }
 
+  leaveRoom(event, roomId) {
+    event.preventDefault();
+    RoomsService.leaveRoom(roomId);
+  };
+
   render() {
-    const { joinedRooms, server, state, user } = this.props;
-    const anchorEl = this.state.anchorEl;
+    const { joinedRooms, state, user } = this.props;
+    const { anchorEl } = this.state;
+
     let options = [ ...this.options ];
 
     if (user && AuthenticationService.isModerator(user)) {
@@ -76,36 +80,70 @@ class Header extends Component<HeaderProps> {
     }
 
     return (
-      <div>
-        {/*<header className="Header">*/}
-        <AppBar position="static">
-          <Toolbar variant="dense">
-            <div className="Header__logo">
-              <NavLink to={RouteEnum.SERVER}>
-                <img src={logo} alt="logo" />
-              </NavLink>
-              { AuthenticationService.isConnected(state) && (
-                <span className="Header-server__indicator"></span>
-              ) }
-            </div>
+      <AppBar className="Header" position="static">
+        <Toolbar variant="dense">
+          <div className="Header__logo">
+            <NavLink to={RouteEnum.SERVER}>
+              <img src={logo} alt="logo" />
+            </NavLink>
             { AuthenticationService.isConnected(state) && (
-              <div className="Header-content">
-                <nav className="Header-nav">
-                  <div className="Header-nav__menu">
-                    <IconButton
-                      aria-label="more"
-                      aria-controls="long-menu"
-                      aria-haspopup="true"
-                      onClick={this.handleMenuClick}
+              <span className="Header-server__indicator"></span>
+            ) }
+          </div>
+          { AuthenticationService.isConnected(state) && (
+            <div className="Header-content">
+              <nav className="Header-nav">
+                <nav className="Header-nav__links">
+                  <div className="Header-nav__link">
+                    <NavLink
+                      className="Header-nav__link-btn"
+                      to={ joinedRooms.length ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : RouteEnum.SERVER }
                     >
-                      <MenuRoundedIcon />
+                      Rooms
+                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                    </NavLink>
+                    <div className="Header-nav__link-menu">
+                      {joinedRooms.map(({ name, roomId }) => (
+                        <MenuItem className="Header-nav__link-menu__item" key={roomId}>
+                          <NavLink className="Header-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId }) }>
+                            {name}
+
+                            <IconButton size="small" edge="end" onClick={event => this.leaveRoom(event, roomId)}>
+                              <CloseIcon style={{ fontSize: 10, color: 'white' }} />
+                            </IconButton>
+                          </NavLink>
+                        </MenuItem>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="Header-nav__link">
+                    <NavLink className="Header-nav__link-btn" to={ RouteEnum.GAME }>
+                      Games
+                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                    </NavLink>
+                  </div>
+                  <div className="Header-nav__link">
+                    <NavLink className="Header-nav__link-btn" to={ RouteEnum.DECKS }>
+                      Decks
+                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                    </NavLink>
+                  </div>
+                </nav>
+                <div className="Header-nav__actions">
+                  <div className="Header-nav__action">
+                    <IconButton>
+                      <MailOutlineRoundedIcon style={{ color: 'inherit' }} />
+                    </IconButton>
+                  </div>
+                  <div className="Header-nav__action">
+                    <IconButton onClick={this.handleMenuOpen}>
+                      <MenuRoundedIcon style={{ color: 'inherit' }} />
                     </IconButton>
                     <Menu
-                      id="long-menu"
                       anchorEl={anchorEl}
                       keepMounted
                       open={!!anchorEl}
-                      onClose={this.handleMenuClose}
+                      onClose={() => this.handleMenuClose()}
                       PaperProps={{
                         style: {
                           marginTop: '32px',
@@ -114,54 +152,21 @@ class Header extends Component<HeaderProps> {
                       }}
                     >
                       {options.map((option) => (
-                        <MenuItem key={option} onClick={() => this.handleMenuItemClick(option)}>
+                        <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(option)}>
                           {option}
                         </MenuItem>
                       ))}
                     </Menu>
                   </div>
-                </nav>
-              </div>
-            ) }
-          </Toolbar>
-        </AppBar>
-        <div className="temp-subnav">
-          {
-            !!joinedRooms.length && (
-              <Rooms rooms={joinedRooms} />
-            )
-          }
-          <div className="temp-subnav__games">
-          </div>
-          <div className="temp-subnav__chats">
-          </div>
-        </div>
-      </div>
+                </div>
+              </nav>
+            </div>
+          ) }
+        </Toolbar>
+      </AppBar>
     )
   }
 }
-
-const Rooms = props => {
-
-  const onLeaveRoom = (event, roomId) => {
-    event.preventDefault();
-    RoomsService.leaveRoom(roomId);
-  };
-
-  return <div className="temp-subnav__rooms">
-    <span>Rooms: </span>
-    {
-      _.reduce(props.rooms, (rooms, { name, roomId}) => {
-        rooms.push(
-          <NavLink to={generatePath(RouteEnum.ROOM, { roomId })} className="temp-chip" key={roomId}>
-            <Chip label={name} color="primary" onDelete={(event) => onLeaveRoom(event, roomId)} />
-          </NavLink>
-        );
-        return rooms;
-      }, [])
-    }
-  </div>
-};
 
 interface HeaderProps {
   state: number;
@@ -172,7 +177,7 @@ interface HeaderProps {
 }
 
 interface HeaderState {
-  anchorEl: Element;
+  anchorEl: Element
 }
 
 const mapStateToProps = state => ({

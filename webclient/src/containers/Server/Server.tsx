@@ -95,7 +95,9 @@ const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
       )}
 
       bottom={(
-        <Paper className="serverMessage overflow-scroll" dangerouslySetInnerHTML={{ __html: message }} />
+        <Paper className="serverMessage overflow-scroll">
+          <div className="serverMessage__content" dangerouslySetInnerHTML={{ __html: message }} />
+        </Paper>
       )}
 
       side={(

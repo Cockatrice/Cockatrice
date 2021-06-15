@@ -53,45 +53,48 @@ class Room extends Component<any> {
     return (
       <div className="room-view">
         <AuthGuard />
-        <ThreePaneLayout
-          fixedHeight
 
-          top={(
-            <Paper className="room-view__games overflow-scroll">
-              <Games room={room} />
-            </Paper>    
-          )}
+        <div className="room-view__main">
+          <ThreePaneLayout
+            fixedHeight
 
-          bottom={(
-            <div className="room-view__messages">
-              <Paper className="room-view__messages-content overflow-scroll">
-                <ScrollToBottomOnChanges changes={messages} content={(
-                  <Messages messages={messages} />
-                )} />
-              </Paper>
-              <Paper className="room-view__messages-sayMessage">
-                <SayMessage onSubmit={this.handleRoomSay} />
-              </Paper>
-            </div>
-          )}
+            top={(
+              <Paper className="room-view__games overflow-scroll">
+                <Games room={room} />
+              </Paper>    
+            )}
 
-          side={(
-            <Paper className="room-view__side overflow-scroll">
-              <div className="room-view__side-label">
-                Users in this room: {users.length}
+            bottom={(
+              <div className="room-view__messages">
+                <Paper className="room-view__messages-content overflow-scroll">
+                  <ScrollToBottomOnChanges changes={messages} content={(
+                    <Messages messages={messages} />
+                  )} />
+                </Paper>
+                <Paper className="room-view__messages-sayMessage">
+                  <SayMessage onSubmit={this.handleRoomSay} />
+                </Paper>
               </div>
-              <VirtualList
-                className="room-view__side-list"
-                itemKey={(index, data) => users[index].name }
-                items={ users.map(user => (
-                  <ListItem button className="room-view__side-list__item">
-                    <UserDisplay user={user} />
-                  </ListItem>
-                ) ) }
-              />
-            </Paper>
-          )}
-        />
+            )}
+
+            side={(
+              <Paper className="room-view__side overflow-scroll">
+                <div className="room-view__side-label">
+                  Users in this room: {users.length}
+                </div>
+                <VirtualList
+                  className="room-view__side-list"
+                  itemKey={(index, data) => users[index].name }
+                  items={ users.map(user => (
+                    <ListItem button className="room-view__side-list__item">
+                      <UserDisplay user={user} />
+                    </ListItem>
+                  ) ) }
+                />
+              </Paper>
+            )}
+          />
+        </div>
       </div>
     );
   }
