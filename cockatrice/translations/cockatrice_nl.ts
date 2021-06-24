@@ -594,7 +594,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="../src/dlg_settings.cpp" line="698"/>
         <source>Do not close settings until manual update is complete</source>
-        <translation type="unfinished"/>
+        <translation>Sluit de instellingen niet af voordat de handmatige update is voltooid</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="699"/>
@@ -669,17 +669,17 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="../src/tab_game.cpp" line="146"/>
         <source>Ready to start</source>
-        <translation type="unfinished"/>
+        <translation>Gereed voor start</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="161"/>
         <source>Sideboard unlocked</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard ontgrendeld</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="163"/>
         <source>Sideboard locked</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard vergrendeld</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="258"/>
@@ -1245,7 +1245,7 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="29"/>
         <source>Hide &apos;&amp;ignored user&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Verberg spellen door genegeerde gebruikers</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="34"/>
@@ -1998,7 +1998,7 @@ Mogelijk moet je zelf van source bouwen.</translation>
     <message>
         <location filename="../src/gameselector.cpp" line="304"/>
         <source>Games shown: %1 / %2</source>
-        <translation type="unfinished"/>
+        <translation>Spellen weergegeven: %1 / %2</translation>
     </message>
 </context>
 <context>
@@ -3101,12 +3101,12 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="441"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1 schudt zijn of haar deck en raapt een nieuwe hand van %2 kaart.</numerusform><numerusform>%1 schudt zijn of haar deck en raapt een nieuwe hand van %2 kaarten.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="446"/>
         <source>%1 shuffles their deck and draws a new hand.</source>
-        <translation type="unfinished"/>
+        <translation>%1 schudt zijn of haar deck en trekt een nieuwe hand.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="482"/>
@@ -3123,17 +3123,17 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="538"/>
         <source>%1 reversed turn order, now it&apos;s %2.</source>
-        <translation type="unfinished"/>
+        <translation>%1 keert de beurtvolgorde om, deze is nu %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="540"/>
         <source>reversed</source>
-        <translation type="unfinished"/>
+        <translation>omgekeerd</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="540"/>
         <source>normal</source>
-        <translation type="unfinished"/>
+        <translation>normaal</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="578"/>
@@ -3660,62 +3660,62 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="../src/phase.cpp" line="17"/>
         <source>Unknown Phase</source>
-        <translation type="unfinished"/>
+        <translation>Onbekende fase</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="19"/>
         <source>Untap</source>
-        <translation type="unfinished"/>
+        <translation>Untap</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="20"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>Upkeep</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="21"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>Rapen</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="22"/>
         <source>First Main</source>
-        <translation type="unfinished"/>
+        <translation>Eerste Hoofdfase</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="23"/>
         <source>Beginning of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Begin Gevecht</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="24"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>Aanvallers Aangeven</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="25"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>Verdedigers Aangeven</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="26"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>Gevecht Schade</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="27"/>
         <source>End of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Einde Gevecht</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="28"/>
         <source>Second Main</source>
-        <translation type="unfinished"/>
+        <translation>Tweede Hoofdfase</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="29"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>Einde/Opruimen</translation>
     </message>
 </context>
 <context>
@@ -3934,7 +3934,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="../src/player.cpp" line="694"/>
         <source>Play top card</source>
-        <translation type="unfinished"/>
+        <translation>Speel bovenste kaart</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="695"/>
@@ -4169,12 +4169,12 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="../src/player.cpp" line="1027"/>
         <source>Draw hand</source>
-        <translation type="unfinished"/>
+        <translation>Trek hand</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1027"/>
         <source>0 and lower are in comparison to current hand size</source>
-        <translation type="unfinished"/>
+        <translation>0 en lager zijn in vergelijking met de huidige handgrootte</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1246"/>
@@ -4389,7 +4389,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="../src/deck_loader.cpp" line="12"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
-        <translation type="unfinished"/>
+        <translation>Gebruikelijke formaten voor decks (*.cod *.dec *.dek *.txt *.mwDeck)</translation>
     </message>
 </context>
 <context>
@@ -5270,7 +5270,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="515"/>
         <source>Reverse turn order</source>
-        <translation type="unfinished"/>
+        <translation>Keer beurtvolgorde om</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="518"/>
@@ -5310,7 +5310,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="538"/>
         <source>&amp;Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Focus Chat</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="541"/>
@@ -5770,12 +5770,12 @@ Hoe meer informatie u inbrengt, hoe specifieker uw resultaten zullen zijn.</tran
     <message>
         <location filename="../src/tab_supervisor.cpp" line="573"/>
         <source>Click to view</source>
-        <translation type="unfinished"/>
+        <translation>Klik om weer te geven</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="601"/>
         <source>Your buddy %1 has signed on!</source>
-        <translation type="unfinished"/>
+        <translation>Je maatje %1 heeft in gelogd!</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="637"/>
@@ -5887,42 +5887,42 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="../src/translatecountername.cpp" line="4"/>
         <source>Life</source>
-        <translation type="unfinished"/>
+        <translation>Leven</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="5"/>
         <source>White</source>
-        <translation type="unfinished"/>
+        <translation>Wit</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="6"/>
         <source>Blue</source>
-        <translation type="unfinished"/>
+        <translation>Blauw</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="7"/>
         <source>Black</source>
-        <translation type="unfinished"/>
+        <translation>Zwart</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="8"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Rood</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="9"/>
         <source>Green</source>
-        <translation type="unfinished"/>
+        <translation>Groen</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="10"/>
         <source>Colorless</source>
-        <translation type="unfinished"/>
+        <translation>Kleurloos</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="11"/>
         <source>Other</source>
-        <translation type="unfinished"/>
+        <translation>Overig</translation>
     </message>
 </context>
 <context>
@@ -6050,7 +6050,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="../src/user_context_menu.cpp" line="298"/>
         <source>Copy hash to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copieer hash naar klembord</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="194"/>

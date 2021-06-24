@@ -45,13 +45,17 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     connect(stopDownload, SIGNAL(clicked()), this, SLOT(cancelDownload()));
     connect(ok, SIGNAL(clicked()), this, SLOT(closeDialog()));
 
-    QVBoxLayout *parentLayout = new QVBoxLayout(this);
+    auto *parentLayout = new QVBoxLayout(this);
     parentLayout->addWidget(descriptionLabel);
     parentLayout->addWidget(statusLabel);
     parentLayout->addWidget(progress);
     parentLayout->addWidget(buttonBox);
 
     setLayout(parentLayout);
+    setWindowTitle(tr("Check for Client Updates"));
+
+    setFixedHeight(this->sizeHint().height());
+    setFixedWidth(this->sizeHint().width());
 
     // Check for SSL (this probably isn't necessary)
     if (!QSslSocket::supportsSsl()) {
@@ -140,7 +144,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         return;
     }
 
-    publishDate = release->getPublishDate().toString(Qt::DefaultLocaleLongDate);
+    publishDate = release->getPublishDate().toString(QLocale().dateFormat(QLocale::LongFormat));
     if (isCompatible) {
         int reply;
         reply = QMessageBox::question(
@@ -190,19 +194,19 @@ void DlgUpdate::enableOkButton(bool enable)
     ok->setEnabled(enable);
 }
 
-void DlgUpdate::setLabel(QString newText)
+void DlgUpdate::setLabel(const QString &newText)
 {
     statusLabel->setText(newText);
 }
 
-void DlgUpdate::updateCheckError(QString errorString)
+void DlgUpdate::updateCheckError(const QString &errorString)
 {
     setLabel(tr("Error"));
     QMessageBox::critical(this, tr("Update Error"),
                           tr("An error occurred while checking for updates:") + QString(" ") + errorString);
 }
 
-void DlgUpdate::downloadError(QString errorString)
+void DlgUpdate::downloadError(const QString &errorString)
 {
     setLabel(tr("Error"));
     enableUpdateButton(true);
@@ -210,7 +214,7 @@ void DlgUpdate::downloadError(QString errorString)
                           tr("An error occurred while downloading an update:") + QString(" ") + errorString);
 }
 
-void DlgUpdate::downloadSuccessful(QUrl filepath)
+void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 {
     setLabel(tr("Installing..."));
     // Try to open the installer. If it opens, quit Cockatrice

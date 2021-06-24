@@ -7,11 +7,27 @@ assignees: ''
 
 ---
 
-<b>System Information:</b>
-  <!-- Go to "Help → View Debug Log" and copy all lines above the separation here! -->
+<!--                   READ THIS BEFORE POSTING
+Go to "Help → View Debug Log" in Cockatrice and copy all information at the
+top (above the separation line) below "System Information" in this ticket!
+If you can't start Cockatrice to access these details, make
+sure to post your OS and the file name of the setup binary instead. -->
 
-  <!-- If you can't install Cockatrice to access that information, make
-       sure to include your OS and the app version from the setup file here -->
+**System Information:**
+
+
 _______________________________________________________________________________________
 
-  <!-- Explain your issue in detail here! -->
+<!-- Explain your issue in detail here! Please attach screenshots if possible. -->
+
+
+
+
+_______________________________________________________________________________________
+
+<!-- Describe the sequence of actions needed to experience the bug -->
+
+**Steps to reproduce:**
+ - Do A
+ - Do B
+ - Do C ...

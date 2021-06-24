@@ -492,7 +492,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reEmpty("^\\s*$");
     const QRegularExpression reComment("[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
     const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpression reSBComment("sideboard", QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpression reSBComment("^sideboard\\b.*$", QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpression reDeckComment("^((main)?deck(list)?|mainboard)\\b",
+                                           QRegularExpression::CaseInsensitiveOption);
 
     // simplified matches
     const QRegularExpression reMultiplier("^[xX\\(\\[]*(\\d+)[xX\\*\\)\\]]* ?(.+)");
@@ -562,6 +564,16 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         }
     }
     comments.chop(1); // remove last newline
+
+    // discard empty lines
+    while (index < max_line && inputs.at(index).contains(reEmpty)) {
+        ++index;
+    }
+
+    // discard line if it starts with deck or mainboard, all cards until the sideboard starts are in the mainboard
+    if (inputs.at(index).contains(reDeckComment)) {
+        ++index;
+    }
 
     // parse decklist
     for (; index < max_line; ++index) {

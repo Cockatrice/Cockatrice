@@ -201,14 +201,13 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
                                                 const QString &password,
                                                 const QString &emailAddress,
                                                 const QString &country,
-                                                QString &token,
                                                 bool active)
 {
     if (!checkSql())
         return false;
 
     QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
-    token = active ? QString() : PasswordHasher::generateActivationToken();
+    QString token = active ? QString() : PasswordHasher::generateActivationToken();
 
     QSqlQuery *query =
         prepareQuery("insert into {prefix}_users "

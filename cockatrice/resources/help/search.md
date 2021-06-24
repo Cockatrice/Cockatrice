@@ -49,7 +49,7 @@ The search bar recognizes a set of special commands similar to some other card d
 <dd>[e:lea,leb](#e:lea,leb) <small>(Cards that appear in Alpha or Beta)</small></dd>
 <dd><a href="#e:lea,leb -(e:lea e:leb)">e:lea,leb -(e:lea e:leb)</a> <small>(Cards that appear in Alpha or Beta but not in both editions)</small></dd>
 
-<dt>Inverse:</dt>
+<dt>Negate:</dt>
 <dd>[c:wu -c:m](#c:wu -c:m) <small>(Any card that is white or blue, but not multicolored)</small></dd>
 
 <dt>Branching:</dt>

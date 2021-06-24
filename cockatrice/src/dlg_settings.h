@@ -79,10 +79,12 @@ class AppearanceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void themeBoxChanged(int index);
+    void openThemeLocation();
 
 private:
     QLabel themeLabel;
     QComboBox themeBox;
+    QPushButton openThemeButton;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
     QCheckBox displayCardNamesCheckBox;
@@ -106,7 +108,7 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
 {
     Q_OBJECT
 private slots:
-    void setSpecNotificationEnabled(int);
+    void setNotificationEnabled(int);
 
 private:
     QCheckBox notificationsEnabledCheckBox;

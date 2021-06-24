@@ -65,9 +65,10 @@ void CardInfoWidget::setCard(CardInfoPtr card)
 
 void CardInfoWidget::setCard(const QString &cardName)
 {
-    setCard(db->getCardBySimpleName(cardName));
-    if (!info)
+    setCard(db->guessCard(cardName));
+    if (info == nullptr) {
         text->setInvalidCardName(cardName);
+    }
 }
 
 void CardInfoWidget::setCard(AbstractCardItem *card)

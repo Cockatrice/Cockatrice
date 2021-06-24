@@ -18,7 +18,7 @@ CardZone::CardZone(Player *_p,
                    bool _contentsKnown,
                    QGraphicsItem *parent,
                    bool _isView)
-    : AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), view(NULL), menu(NULL),
+    : AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), views{}, menu(nullptr),
       doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable), isView(_isView)
 {
     if (!isView)
@@ -28,7 +28,11 @@ CardZone::CardZone(Player *_p,
 CardZone::~CardZone()
 {
     qDebug() << "CardZone destructor: " << name;
-    delete view;
+    for (auto *view : views) {
+        if (view != nullptr) {
+            view->deleteLater();
+        }
+    }
     clearContents();
 }
 
@@ -120,9 +124,11 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 {
-    if (view)
-        if ((x <= view->getCards().size()) || (view->getNumberCards() == -1))
+    for (auto *view : views) {
+        if ((x <= view->getCards().size()) || (view->getNumberCards() == -1)) {
             view->addCard(new CardItem(player, card->getName(), card->getId()), reorganize, x, y);
+        }
+    }
 
     card->setZone(this);
     addCardImpl(card, x, y);
@@ -168,8 +174,9 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 
     CardItem *c = cards.takeAt(position);
 
-    if (view)
+    for (auto *view : views) {
         view->removeCard(position);
+    }
 
     c->setId(cardId);
 

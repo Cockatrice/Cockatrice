@@ -113,7 +113,7 @@ protected:
     void initializePage() override;
     bool validatePage() override;
     void readSetsFromByteArray(QByteArray data);
-    void downloadSetsFile(QUrl url);
+    void downloadSetsFile(const QUrl &url);
 
 private:
     QRadioButton *urlRadioButton;

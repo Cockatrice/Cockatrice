@@ -5775,7 +5775,7 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="../src/tab_supervisor.cpp" line="573"/>
         <source>Click to view</source>
-        <translation type="unfinished"/>
+        <translation>Clique para visualizar</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="601"/>
@@ -6809,7 +6809,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="209"/>
         <source>Print Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Imprimir Deck...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="212"/>

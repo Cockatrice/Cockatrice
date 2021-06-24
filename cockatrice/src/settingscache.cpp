@@ -60,11 +60,6 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setHostName(legacySetting.value("hostname").toString());
-    servers().setPort(legacySetting.value("port").toString());
-    servers().setPlayerName(legacySetting.value("playername").toString());
-    servers().setPassword(legacySetting.value("password").toString());
-    servers().setSavePassword(legacySetting.value("save_password").toInt());
     servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
     servers().setFPHostName(legacySetting.value("fphostname").toString());
     servers().setFPPort(legacySetting.value("fpport").toString());
@@ -95,7 +90,8 @@ void SettingsCache::translateLegacySettings()
 
     // Game filters
     legacySetting.beginGroup("filter_games");
-    gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowFullGames(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowGamesThatStarted(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
     gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
@@ -196,6 +192,7 @@ SettingsCache::SettingsCache()
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
+    themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
     // this has never been exposed as an user-configurable setting
     if (picsPath.endsWith("/")) {
@@ -283,6 +280,7 @@ SettingsCache::SettingsCache()
     spectatorsNeedPassword = settings->value("game/spectatorsneedpassword", false).toBool();
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
+    createGameAsSpectator = settings->value("game/creategameasspectator", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
@@ -384,6 +382,13 @@ void SettingsCache::setReplaysPath(const QString &_replaysPath)
 {
     replaysPath = _replaysPath;
     settings->setValue("paths/replays", replaysPath);
+}
+
+void SettingsCache::setThemesPath(const QString &_themesPath)
+{
+    themesPath = _themesPath;
+    settings->setValue("paths/themes", themesPath);
+    emit themeChanged();
 }
 
 void SettingsCache::setCustomCardDatabasePath(const QString &_customCardDatabasePath)
@@ -937,6 +942,12 @@ void SettingsCache::setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEv
 {
     spectatorsCanSeeEverything = _spectatorsCanSeeEverything;
     settings->setValue("game/spectatorscanseeeverything", spectatorsCanSeeEverything);
+}
+
+void SettingsCache::setCreateGameAsSpectator(const bool _createGameAsSpectator)
+{
+    createGameAsSpectator = _createGameAsSpectator;
+    settings->setValue("game/creategameasspectator", createGameAsSpectator);
 }
 
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)

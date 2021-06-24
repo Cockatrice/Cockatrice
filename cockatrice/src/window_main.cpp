@@ -25,6 +25,7 @@
 #include "dlg_forgotpasswordchallenge.h"
 #include "dlg_forgotpasswordrequest.h"
 #include "dlg_forgotpasswordreset.h"
+#include "dlg_manage_sets.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_tip_of_the_day.h"
@@ -44,7 +45,6 @@
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "version_string.h"
-#include "window_sets.h"
 
 #include <QAction>
 #include <QApplication>
@@ -146,12 +146,14 @@ void MainWindow::statusChanged(ClientStatus _status)
             aConnect->setEnabled(true);
             aRegister->setEnabled(true);
             aDisconnect->setEnabled(false);
+            aForgotPassword->setEnabled(true);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aRegister->setEnabled(false);
             aDisconnect->setEnabled(true);
+            aForgotPassword->setEnabled(false);
             break;
         case StatusConnecting:
         case StatusRegistering:
@@ -219,6 +221,7 @@ void MainWindow::actSinglePlayer()
 
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
+    aForgotPassword->setEnabled(false);
     aSinglePlayer->setEnabled(false);
 
     localServer = new LocalServer(this);
@@ -269,6 +272,7 @@ void MainWindow::localGameEnded()
 
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
+    aForgotPassword->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 
@@ -628,6 +632,7 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
+    aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -672,6 +677,8 @@ void MainWindow::createActions()
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
+    aForgotPassword = new QAction(this);
+    connect(aForgotPassword, SIGNAL(triggered()), this, SLOT(actForgotPasswordRequest()));
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
@@ -739,6 +746,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
+    cockatriceMenu->addAction(aForgotPassword);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
@@ -769,8 +777,8 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), cardUpdateProcess(nullptr),
-      logviewDialog(nullptr)
+    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
+      cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
     connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
@@ -1003,6 +1011,10 @@ void MainWindow::showWindowIfHidden()
 
 void MainWindow::cardDatabaseLoadingFailed()
 {
+    if (askedForDbUpdater) {
+        return;
+    }
+    askedForDbUpdater = true;
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Card database"));
     msgBox.setIcon(QMessageBox::Question);
@@ -1109,15 +1121,32 @@ void MainWindow::actCheckCardUpdates()
 
     if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
+    } else { // try and find the directory oracle is stored in the build directory
+        QDir findLocalDir(dir);
+        findLocalDir.cdUp();
+        findLocalDir.cd(getCardUpdaterBinaryName());
+        if (findLocalDir.exists(binaryName)) {
+            dir = findLocalDir;
+            updaterCmd = dir.absoluteFilePath(binaryName);
+        }
     }
 
     if (updaterCmd.isEmpty()) {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
+        exitCardDatabaseUpdate();
         return;
     }
 
     cardUpdateProcess->start(updaterCmd, QStringList());
+}
+
+void MainWindow::exitCardDatabaseUpdate()
+{
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = nullptr;
+
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1145,18 +1174,13 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-
+    exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 {
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    exitCardDatabaseUpdate();
 }
 
 void MainWindow::actCheckServerUpdates()
@@ -1297,7 +1321,7 @@ void MainWindow::actForgotPasswordRequest()
 void MainWindow::forgotPasswordSuccess()
 {
     QMessageBox::information(
-        this, tr("Forgot Password"),
+        this, tr("Reset Password"),
         tr("Your password has been reset successfully, you can now log in using the new credentials."));
     SettingsCache::instance().servers().setFPHostName("");
     SettingsCache::instance().servers().setFPPort("");
@@ -1307,7 +1331,7 @@ void MainWindow::forgotPasswordSuccess()
 void MainWindow::forgotPasswordError()
 {
     QMessageBox::warning(
-        this, tr("Forgot Password"),
+        this, tr("Reset Password"),
         tr("Failed to reset user account password, please contact the server operator to reset your password."));
     SettingsCache::instance().servers().setFPHostName("");
     SettingsCache::instance().servers().setFPPort("");
@@ -1316,7 +1340,7 @@ void MainWindow::forgotPasswordError()
 
 void MainWindow::promptForgotPasswordReset()
 {
-    QMessageBox::information(this, tr("Forgot Password"),
+    QMessageBox::information(this, tr("Reset Password"),
                              tr("Activation request received, please check your email for an activation token."));
     DlgForgotPasswordReset dlg(this);
     if (dlg.exec()) {

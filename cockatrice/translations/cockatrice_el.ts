@@ -12,12 +12,12 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="198"/>
         <source>Set counter</source>
-        <translation type="unfinished"/>
+        <translation>Ρύθμιση μετρητή</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="199"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation type="unfinished"/>
+        <translation>Νέα τιμή για τον μετρητή &apos;%1&apos;</translation>
     </message>
 </context>
 <context>

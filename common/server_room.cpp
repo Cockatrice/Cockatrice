@@ -243,8 +243,8 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
     // server->roomsMutex is always locked.
 
     QReadLocker roomGamesLocker(&gamesLock);
-    Server_Game *g = games.value(cmd.game_id());
-    if (!g) {
+    Server_Game *game = games.value(cmd.game_id());
+    if (!game) {
         if (externalGames.contains(cmd.game_id())) {
             CommandContainer cont;
             cont.set_cmd_id(rc.getCmdId());
@@ -256,16 +256,18 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
                                              userInterface->getUserInfo()->session_id(), id);
 
             return Response::RespNothing;
-        } else
+        } else {
             return Response::RespNameNotFound;
+        }
     }
 
-    QMutexLocker gameLocker(&g->gameMutex);
+    QMutexLocker gameLocker(&game->gameMutex);
 
-    Response::ResponseCode result = g->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()),
-                                                 cmd.spectator(), cmd.override_restrictions(), cmd.join_as_judge());
+    Response::ResponseCode result =
+        game->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(),
+                        cmd.override_restrictions(), cmd.join_as_judge());
     if (result == Response::RespOk)
-        g->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
+        game->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
 
     return result;
 }

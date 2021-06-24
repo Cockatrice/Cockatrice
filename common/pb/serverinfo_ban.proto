@@ -3,10 +3,10 @@ syntax = "proto2";
  * Historical ban information stored in the ban table
  */
 message ServerInfo_Ban {
-    required string admin_id = 1; // id of the staff member placing the ban
-    required string admin_name = 2; // name of the staff member placing the ban
-    required string ban_time = 3; // start time of the ban
-    required string ban_length = 4; // amount of time in minutes the ban is for
-    optional string ban_reason = 5;  // reason seen only by moderation staff
+    required string admin_id = 1;       // id of the staff member placing the ban
+    required string admin_name = 2;     // name of the staff member placing the ban
+    required string ban_time = 3;       // start time of the ban
+    required string ban_length = 4;     // amount of time in minutes the ban is for
+    optional string ban_reason = 5;     // reason seen only by moderation staff
     optional string visible_reason = 6; // reason shown to the user
 }

@@ -5,9 +5,9 @@
 #include "pb/serverinfo_playerproperties.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pixmapgenerator.h"
+#include "tab_account.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
-#include "tab_userlists.h"
 #include "user_context_menu.h"
 #include "userlist.h"
 

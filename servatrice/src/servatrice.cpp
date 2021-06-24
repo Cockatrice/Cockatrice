@@ -285,16 +285,16 @@ bool Servatrice::initServer()
         }
     }
 
-    qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
+    qDebug() << "Reset password enabled: " << getEnableForgotPassword();
     if (getEnableForgotPassword()) {
-        qDebug() << "Forgot password token life (in minutes): " << getForgotPasswordTokenLife();
-        qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
+        qDebug() << "Reset password token life (in minutes): " << getForgotPasswordTokenLife();
+        qDebug() << "Reset password challenge on: " << getEnableForgotPasswordChallenge();
     }
 
     qDebug() << "Auditing enabled: " << getEnableAudit();
     if (getEnableAudit()) {
         qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
-        qDebug() << "Audit forgot password attepts enabled: " << getEnableForgotPasswordAudit();
+        qDebug() << "Audit reset password attepts enabled: " << getEnableForgotPasswordAudit();
     }
 
     if (getDBTypeString() == "mysql") {
@@ -960,12 +960,12 @@ int Servatrice::getMaxGamesPerUser() const
 
 int Servatrice::getCommandCountingInterval() const
 {
-    return settingsCache->value("game/command_counting_interval", 10).toInt();
+    return settingsCache->value("security/command_counting_interval", 10).toInt();
 }
 
 int Servatrice::getMaxCommandCountPerInterval() const
 {
-    return settingsCache->value("game/max_command_count_per_interval", 20).toInt();
+    return settingsCache->value("security/max_command_count_per_interval", 20).toInt();
 }
 
 int Servatrice::getServerStatusUpdateTime() const

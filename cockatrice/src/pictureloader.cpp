@@ -17,6 +17,7 @@
 #include <QNetworkRequest>
 #include <QPainter>
 #include <QPixmapCache>
+#include <QRegularExpression>
 #include <QSet>
 #include <QSvgRenderer>
 #include <QThread>
@@ -195,8 +196,11 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
         QString thisPath(it.next());
         QFileInfo thisFileInfo(thisPath);
 
-        if (thisFileInfo.isFile() && thisFileInfo.baseName() == correctedCardname)
+        if (thisFileInfo.isFile() &&
+            (thisFileInfo.fileName() == correctedCardname || thisFileInfo.completeBaseName() == correctedCardname ||
+             thisFileInfo.baseName() == correctedCardname)) {
             picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
+        }
     }
 
     if (!setName.isEmpty()) {
@@ -241,6 +245,10 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
        for downloading images.  If information is requested by the template that is
        not populated for this specific card/set combination, an empty string is returned.*/
 
+    static const QRegularExpression rxCardProp("!prop:([^!]+)!");
+    static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
+    static const QRegularExpression rxSetProp("!set:([^!]+)!");
+
     QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
 
@@ -252,18 +260,39 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
     transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
 
     // card properties
-    QRegExp rxCardProp("!prop:([^!]+)!");
-    int pos = 0;
-    while ((pos = rxCardProp.indexIn(transformedUrl, pos)) != -1) {
-        QString propertyName = rxCardProp.cap(1);
-        pos += rxCardProp.matchedLength();
-        QString propertyValue = card->getProperty(propertyName);
+    auto matches = rxCardProp.globalMatch(transformedUrl);
+    while (matches.hasNext()) {
+        auto match = matches.next();
+        QString propertyName = match.captured(1);
+        auto fillMatch = rxFillWith.match(propertyName);
+        QString fillPropertyName;
+        QString fillWith;
+        if (fillMatch.hasMatch()) {
+            fillPropertyName = fillMatch.captured(1);
+            fillWith = fillMatch.captured(2);
+        } else {
+            fillPropertyName = propertyName;
+            fillWith = QString();
+        }
+        QString propertyValue = card->getProperty(fillPropertyName);
         if (propertyValue.isEmpty()) {
             qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                     << "]: Requested property (" << propertyName << ") for Url template (" << urlTemplate
+                     << "]: Requested property (" << fillPropertyName << ") for Url template (" << urlTemplate
                      << ") is not available";
             return QString();
         } else {
+            if (!fillWith.isEmpty()) {
+                int fillLength = fillWith.length();
+                int propLength = propertyValue.length();
+                if (fillLength < propLength) {
+                    qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
+                             << "]: Requested property (" << fillPropertyName << ") for Url template (" << urlTemplate
+                             << ") is longer than fill specification (" << fillWith << ")";
+                    return QString();
+                } else {
+                    propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
+                }
+            }
             transformMap["!prop:" + propertyName + "!"] = propertyValue;
         }
     }
@@ -274,18 +303,39 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
         transformMap["!setname!"] = set->getLongName();
         transformMap["!setname_lower!"] = set->getLongName().toLower();
 
-        QRegExp rxSetProp("!set:([^!]+)!");
-        pos = 0; // Defined above
-        while ((pos = rxSetProp.indexIn(transformedUrl, pos)) != -1) {
-            QString propertyName = rxSetProp.cap(1);
-            pos += rxSetProp.matchedLength();
-            QString propertyValue = card->getSetProperty(set->getShortName(), propertyName);
+        auto matches = rxSetProp.globalMatch(transformedUrl);
+        while (matches.hasNext()) {
+            auto match = matches.next();
+            QString propertyName = match.captured(1);
+            auto fillMatch = rxFillWith.match(propertyName);
+            QString fillPropertyName;
+            QString fillWith;
+            if (fillMatch.hasMatch()) {
+                fillPropertyName = fillMatch.captured(1);
+                fillWith = fillMatch.captured(2);
+            } else {
+                fillPropertyName = propertyName;
+                fillWith = QString();
+            }
+            QString propertyValue = card->getSetProperty(set->getShortName(), fillPropertyName);
             if (propertyValue.isEmpty()) {
                 qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                         << "]: Requested set property (" << propertyName << ") for Url template (" << urlTemplate
+                         << "]: Requested set property (" << fillPropertyName << ") for Url template (" << urlTemplate
                          << ") is not available";
                 return QString();
             } else {
+                if (!fillWith.isEmpty()) {
+                    int fillLength = fillWith.length();
+                    int propLength = propertyValue.length();
+                    if (fillLength < propLength) {
+                        qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
+                                 << "]: Requested set property (" << fillPropertyName << ") for Url template ("
+                                 << urlTemplate << ") is longer than fill specification (" << fillWith << ")";
+                        return QString();
+                    } else {
+                        propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
+                    }
+                }
                 transformMap["!set:" + propertyName + "!"] = propertyValue;
             }
         }
@@ -405,10 +455,9 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setDevice(reply);
-    QString extension = "." + imgReader.format(); // the format is determined
-                                                  // prior to reading the
-                                                  // QImageReader data
-    // into a QImage object, as that wipes the QImageReader buffer
+    // the format is determined prior to reading the QImageReader data into a QImage object, as that wipes the
+    // QImageReader buffer
+    QString extension = "." + imgReader.format();
     if (extension == ".jpeg") {
         extension = ".jpg";
     }

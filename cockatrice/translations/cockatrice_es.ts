@@ -3690,17 +3690,17 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/phase.cpp" line="24"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>Declarar atacantes</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="25"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>Declarar bloqueadores</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="26"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>Daño de combate</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="27"/>
@@ -3715,7 +3715,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/phase.cpp" line="29"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>Paso Final/Limpieza</translation>
     </message>
 </context>
 <context>
@@ -3826,7 +3826,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
         <location filename="../src/player.cpp" line="673"/>
         <location filename="../src/player.cpp" line="780"/>
         <source>&amp;Exile</source>
-        <translation>&amp;Exilio</translation>
+        <translation>&amp;Exiliar</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="663"/>
@@ -3934,7 +3934,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="694"/>
         <source>Play top card</source>
-        <translation type="unfinished"/>
+        <translation>Jugar la carta superior</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="695"/>
@@ -4389,7 +4389,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/deck_loader.cpp" line="12"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
-        <translation type="unfinished"/>
+        <translation>Formatos de mazo comunes (*.cod *.dec *.dek *.txt *.mwDeck)</translation>
     </message>
 </context>
 <context>
@@ -5311,7 +5311,7 @@ Por favor, introduce un nombre:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="538"/>
         <source>&amp;Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Resaltar chat</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="541"/>
@@ -5771,12 +5771,12 @@ Cuando más información introduzcas, más específicos serán los resultados.</
     <message>
         <location filename="../src/tab_supervisor.cpp" line="573"/>
         <source>Click to view</source>
-        <translation type="unfinished"/>
+        <translation>Click para ver</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="601"/>
         <source>Your buddy %1 has signed on!</source>
-        <translation type="unfinished"/>
+        <translation>Tu amigo %1 se ha conectado!</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="637"/>
@@ -6048,7 +6048,7 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/user_context_menu.cpp" line="298"/>
         <source>Copy hash to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copiar al portapapeles</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="194"/>
@@ -6299,17 +6299,17 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/dlg_settings.cpp" line="441"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
-        <translation type="unfinished"/>
+        <translation>Usar menus flotantes, permitir click derecho para anclar menus en la pantalla</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="442"/>
         <source>Notifications settings</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes de notificaciones</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="445"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
-        <translation type="unfinished"/>
+        <translation>Recibir una notificación  en la barra de tareas cuando alguien de tu lista de amigos se conecte</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="446"/>
@@ -6672,52 +6672,52 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/shortcutssettings.h" line="44"/>
         <source>Card Counters</source>
-        <translation type="unfinished"/>
+        <translation>Contadores de carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="46"/>
         <source>Player Counters</source>
-        <translation type="unfinished"/>
+        <translation>Contadores de jugador</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="54"/>
         <source>Move Selected Card</source>
-        <translation type="unfinished"/>
+        <translation>Mover la carta seleccionada</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="58"/>
         <source>Move Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Mover la carta superior</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="60"/>
         <source>Move Bottom Card</source>
-        <translation type="unfinished"/>
+        <translation>Mover la carta inferior</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="66"/>
         <source>Chat Room</source>
-        <translation type="unfinished"/>
+        <translation>Sala de chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="68"/>
         <source>Game Window</source>
-        <translation type="unfinished"/>
+        <translation>Ventana de juego</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="70"/>
         <source>Load Deck from Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Cargar deck desde el portapapeles</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="140"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Buscar actualizaciones de cartas ...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="143"/>
         <source>Connect...</source>
-        <translation type="unfinished"/>
+        <translation>Conectar...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="157"/>
@@ -6727,425 +6727,425 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/shortcutssettings.h" line="160"/>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="163"/>
         <source>Start a Local Game...</source>
-        <translation type="unfinished"/>
+        <translation>Empezar una partida local...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="166"/>
         <source>Watch Replay...</source>
-        <translation type="unfinished"/>
+        <translation>Ver repetición...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="169"/>
         <source>Analyze Deck</source>
-        <translation type="unfinished"/>
+        <translation>Analizar mazo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="172"/>
         <source>Clear All Filters</source>
-        <translation type="unfinished"/>
+        <translation>Eliminar filtros</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="175"/>
         <source>Clear Selected Filter</source>
-        <translation type="unfinished"/>
+        <translation>Eleminar filtro seleccionado</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="180"/>
         <source>Remove Card</source>
-        <translation type="unfinished"/>
+        <translation>Quitar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="183"/>
         <source>Manage Sets...</source>
-        <translation type="unfinished"/>
+        <translation>Administrar ediciones</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="186"/>
         <source>Edit Custom Tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Editar fichas personalizadas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="189"/>
         <source>Export Deck</source>
-        <translation type="unfinished"/>
+        <translation>Exportar mazo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="192"/>
         <source>Add Card</source>
-        <translation type="unfinished"/>
+        <translation>Añadir carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="195"/>
         <source>Load Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Cargar mazo...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="199"/>
         <source>Load Deck from Clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Cargar mazo desde el portapapeles</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="202"/>
         <source>New Deck</source>
-        <translation type="unfinished"/>
+        <translation>Nuevo mazo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="206"/>
         <source>Open Custom Pictures Folder</source>
-        <translation type="unfinished"/>
+        <translation>Abrir carpeta de imágenes personalizadas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="209"/>
         <source>Print Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Imprimir mazo...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="212"/>
         <source>Delete Card</source>
-        <translation type="unfinished"/>
+        <translation>Borrar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="215"/>
         <location filename="../src/shortcutssettings.h" line="555"/>
         <source>Reset Layout</source>
-        <translation type="unfinished"/>
+        <translation>Restablecer disposición</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="218"/>
         <source>Save Deck</source>
-        <translation type="unfinished"/>
+        <translation>Guardar mazo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="221"/>
         <source>Save Deck as...</source>
-        <translation type="unfinished"/>
+        <translation>Guarda mazo como...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="225"/>
         <source>Save Deck to Clipboard, Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Guarda mazo al portapapeles, Comentado</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="229"/>
         <source>Save Deck to Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Guardar mazo al portapapeles</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="232"/>
         <source>Load Local Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Cargar mazo local...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="235"/>
         <source>Load Remote Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Carga mazo remoto...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="238"/>
         <source>Set Ready to Start</source>
-        <translation type="unfinished"/>
+        <translation>Marcar listo para empezar</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="242"/>
         <source>Toggle Sideboard Lock</source>
-        <translation type="unfinished"/>
+        <translation>Permitir bloqueo de banquillo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="245"/>
         <location filename="../src/shortcutssettings.h" line="317"/>
         <source>Add Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Añadir contador verde</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="248"/>
         <location filename="../src/shortcutssettings.h" line="320"/>
         <source>Remove Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar un contador verde</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="251"/>
         <location filename="../src/shortcutssettings.h" line="323"/>
         <source>Set Green Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores verdes...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="254"/>
         <source>Add Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Añadir contador amarillo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="257"/>
         <source>Remove Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar un contador amarillo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="260"/>
         <source>Set Yellow Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores amarillos...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="263"/>
         <location filename="../src/shortcutssettings.h" line="308"/>
         <source>Add Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Agregar contador rojo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="266"/>
         <location filename="../src/shortcutssettings.h" line="311"/>
         <source>Remove Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar un contador rojo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="269"/>
         <location filename="../src/shortcutssettings.h" line="314"/>
         <source>Set Red Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores rojos...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="272"/>
         <source>Add Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Añadir contador de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="275"/>
         <source>Remove Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar un contador de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="278"/>
         <source>Set Life Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores de vida...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="281"/>
         <source>Add White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Agregar contador blanco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="284"/>
         <source>Remove White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar un contador blanco...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="287"/>
         <source>Set White Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores blancos...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="290"/>
         <source>Add Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Agregar contador azul</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="293"/>
         <source>Remove Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar un contador azul...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="296"/>
         <source>Set Blue Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores azules...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="299"/>
         <source>Add Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Agregar contador negro</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="302"/>
         <source>Remove Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Quitar contador negro</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="305"/>
         <source>Set Black Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores negros...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="326"/>
         <source>Add Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Agregar contador incoloro</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="329"/>
         <source>Remove Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar contador incoloro</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="332"/>
         <source>Set Colorless Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores incoloros...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="335"/>
         <source>Add Storm Counter</source>
-        <translation type="unfinished"/>
+        <translation>Agregar contador de tormenta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="338"/>
         <source>Remove Storm Counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirar contador de tormenta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="341"/>
         <source>Set Storm Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer contadores de tormenta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="344"/>
         <source>Add Power (+1/+0)</source>
-        <translation type="unfinished"/>
+        <translation>Agregar fuerza (+1/+0)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="347"/>
         <source>Remove Power (-1/-0)</source>
-        <translation type="unfinished"/>
+        <translation>Reducir fuerza (-1/-0)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="350"/>
         <source>Move Toughness to Power (+1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Pasar de resistencia a fuerza (+1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="353"/>
         <source>Add Toughness (+0/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Agregar resistencia (+0/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="356"/>
         <source>Remove Toughness (-0/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Reducir resistencia (-0/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="359"/>
         <source>Move Power to Toughness (-1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Pasar de fuerza a resistencia (-1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="362"/>
         <source>Add Power and Toughness (+1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Agregar fuerza y resistencia (+1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="365"/>
         <source>Remove Power and Toughness (-1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Reducir fuerza y resistencia (-1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="368"/>
         <source>Set Power and Toughness...</source>
-        <translation type="unfinished"/>
+        <translation>Establecer fuerza y resistencia...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="371"/>
         <source>Reset Power and Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Restablecer fuerza y resistencia</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="381"/>
         <source>First Main Phase</source>
-        <translation type="unfinished"/>
+        <translation>Primera fase principal</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="384"/>
         <source>Start Combat</source>
-        <translation type="unfinished"/>
+        <translation>Comenzar combate</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="393"/>
         <source>End Combat</source>
-        <translation type="unfinished"/>
+        <translation>Terminar combate</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="396"/>
         <source>Second Main Phase</source>
-        <translation type="unfinished"/>
+        <translation>Segunda fase principal</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="401"/>
         <source>Next Phase</source>
-        <translation type="unfinished"/>
+        <translation>Próxima fase</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="404"/>
         <source>Next Phase Action</source>
-        <translation type="unfinished"/>
+        <translation>Próxima fase de acción</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="407"/>
         <source>Next Turn</source>
-        <translation type="unfinished"/>
+        <translation>Próximo turno</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="413"/>
         <source>Untap All</source>
-        <translation type="unfinished"/>
+        <translation>Enderezar todas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="416"/>
         <source>Toggle Untap</source>
-        <translation type="unfinished"/>
+        <translation>Alternar enderezamiento</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="419"/>
         <source>Turn Card Over</source>
-        <translation type="unfinished"/>
+        <translation>Girar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="422"/>
         <source>Peek Card</source>
-        <translation type="unfinished"/>
+        <translation>Mirar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="425"/>
         <source>Play Card</source>
-        <translation type="unfinished"/>
+        <translation>Jugar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="428"/>
         <source>Attach Card...</source>
-        <translation type="unfinished"/>
+        <translation>Anexar carta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="431"/>
         <source>Unattach Card</source>
-        <translation type="unfinished"/>
+        <translation>Desanexar carta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="434"/>
         <source>Clone Card</source>
-        <translation type="unfinished"/>
+        <translation>Clonar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="437"/>
         <source>Create Token...</source>
-        <translation type="unfinished"/>
+        <translation>Crear ficha...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="440"/>
         <source>Create All Related Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Crear todas las fichas relacionadas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="443"/>
         <source>Create Another Token</source>
-        <translation type="unfinished"/>
+        <translation>Crear otra ficha</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="446"/>
         <source>Set Annotation...</source>
-        <translation type="unfinished"/>
+        <translation>Escribir anotación...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="449"/>
         <location filename="../src/shortcutssettings.h" line="502"/>
         <source>Bottom of Library</source>
-        <translation type="unfinished"/>
+        <translation>Parte inferior de la biblioteca</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="459"/>
@@ -7156,113 +7156,113 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/shortcutssettings.h" line="460"/>
         <source>Top of Library</source>
-        <translation type="unfinished"/>
+        <translation>Parte superior de la biblioteca</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="463"/>
         <location filename="../src/shortcutssettings.h" line="489"/>
         <source>Battlefield, Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Campo de batalla, boca abajo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="466"/>
         <source>Battlefield</source>
-        <translation type="unfinished"/>
+        <translation>Campo de batalla</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="480"/>
         <source>Top Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Carta de la parte superior de la biblioteca</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="483"/>
         <source>Close Recent View</source>
-        <translation type="unfinished"/>
+        <translation>Cerrar vista reciente</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="486"/>
         <source>Stack</source>
-        <translation type="unfinished"/>
+        <translation>Apilar</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="494"/>
         <source>Graveyard (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Cementerio (Multiple)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="499"/>
         <source>Exile (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Exiliar (Multiple)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="508"/>
         <source>Draw Arrow...</source>
-        <translation type="unfinished"/>
+        <translation>Dibujar flecha</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="511"/>
         <source>Remove Local Arrows</source>
-        <translation type="unfinished"/>
+        <translation>Eliminar flechas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="514"/>
         <source>Leave Game</source>
-        <translation type="unfinished"/>
+        <translation>Abandonar partida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="519"/>
         <source>Roll Dice...</source>
-        <translation type="unfinished"/>
+        <translation>Lanzar dado...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="522"/>
         <source>Shuffle Library</source>
-        <translation type="unfinished"/>
+        <translation>Barajar biblioteca</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="528"/>
         <source>Draw a Card</source>
-        <translation type="unfinished"/>
+        <translation>Robar una carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="531"/>
         <source>Draw Multiple Cards...</source>
-        <translation type="unfinished"/>
+        <translation>Robar múltiples cartas...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="534"/>
         <source>Undo Draw</source>
-        <translation type="unfinished"/>
+        <translation>Deshacer último robo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="537"/>
         <source>Always Reveal Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar siempre la carta superior</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="540"/>
         <source>Rotate View Clockwise</source>
-        <translation type="unfinished"/>
+        <translation>Rotar vista en sentido horario</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="543"/>
         <source>Rotate View Counterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Rotar vista en sentido antihorario</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="546"/>
         <source>Unfocus Text Box</source>
-        <translation type="unfinished"/>
+        <translation>No resaltar la caja de texto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="549"/>
         <source>Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>Resaltar el chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="552"/>
         <source>Clear Chat</source>
-        <translation type="unfinished"/>
+        <translation>Borrar chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="56"/>

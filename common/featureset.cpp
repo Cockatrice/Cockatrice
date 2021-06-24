@@ -26,8 +26,8 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &featureList)
     featureList.insert("forgot_password", false);
     featureList.insert("websocket", false);
     // These are temp to force users onto a newer client
-    featureList.insert("2.6.1_min_version", false);
     featureList.insert("2.7.0_min_version", false);
+    featureList.insert("2.8.0_min_version", false);
 }
 
 void FeatureSet::enableRequiredFeature(QMap<QString, bool> &featureList, QString featureName)

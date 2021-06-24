@@ -97,10 +97,10 @@ private:
     QTcpSocket *socket;
     QWebSocket *websocket;
     QString lastHostname;
-    int lastPort;
+    unsigned int lastPort;
 
-    QString getSrvClientID(QString _hostname);
-    bool newMissingFeatureFound(QString _serversMissingFeatures);
+    QString getSrvClientID(const QString &_hostname);
+    bool newMissingFeatureFound(const QString &_serversMissingFeatures);
     void clearNewClientFeatures();
     void connectToHost(const QString &hostname, unsigned int port);
 

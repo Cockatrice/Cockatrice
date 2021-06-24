@@ -21,7 +21,7 @@ protected:
     Player *player;
     QString name;
     CardList cards;
-    ZoneViewZone *view;
+    QList<ZoneViewZone *> views;
     QMenu *menu;
     QAction *doubleClickAction;
     bool hasCardAttr;
@@ -98,13 +98,9 @@ public:
     // takeCard() finds a card by position and removes it from the zone and from all of its views.
     virtual CardItem *takeCard(int position, int cardId, bool canResize = true);
     void removeCard(CardItem *card);
-    ZoneViewZone *getView() const
+    QList<ZoneViewZone *> &getViews()
     {
-        return view;
-    }
-    void setView(ZoneViewZone *_view)
-    {
-        view = _view;
+        return views;
     }
     virtual void reorganizeCards() = 0;
     virtual QPointF closestGridPoint(const QPointF &point);

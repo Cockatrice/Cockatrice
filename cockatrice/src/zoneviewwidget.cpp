@@ -3,7 +3,6 @@
 #include "carditem.h"
 #include "gamescene.h"
 #include "pb/command_shuffle.pb.h"
-#include "pb/command_stop_dump_zone.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include "zoneviewzone.h"
@@ -200,12 +199,6 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
     disconnect(zone, SIGNAL(beingDeleted()), this, 0);
-    if (zone->getNumberCards() != -2) {
-        Command_StopDumpZone cmd;
-        cmd.set_player_id(player->getId());
-        cmd.set_zone_name(zone->getName().toStdString());
-        player->sendGameCommand(cmd);
-    }
     if (shuffleCheckBox.isChecked())
         player->sendGameCommand(Command_Shuffle());
     emit closePressed(this);

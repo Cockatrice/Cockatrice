@@ -669,17 +669,17 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="146"/>
         <source>Ready to start</source>
-        <translation type="unfinished"/>
+        <translation>Pronto ad iniziare</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="161"/>
         <source>Sideboard unlocked</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard sbloccata</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="163"/>
         <source>Sideboard locked</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard bloccata</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="258"/>
@@ -1999,7 +1999,7 @@ Potresti dover creare dal codice sorgente da solo.</translation>
     <message>
         <location filename="../src/gameselector.cpp" line="304"/>
         <source>Games shown: %1 / %2</source>
-        <translation type="unfinished"/>
+        <translation>Partite mostrate: %1 / %2</translation>
     </message>
 </context>
 <context>
@@ -3663,62 +3663,62 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/phase.cpp" line="17"/>
         <source>Unknown Phase</source>
-        <translation type="unfinished"/>
+        <translation>Fase sconosciuta</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="19"/>
         <source>Untap</source>
-        <translation type="unfinished"/>
+        <translation>Stappa</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="20"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>Mantenimento</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="21"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>Pesca</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="22"/>
         <source>First Main</source>
-        <translation type="unfinished"/>
+        <translation>Prima fase principale</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="23"/>
         <source>Beginning of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Inizio combattimento</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="24"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>Dichiarazione attaccanti</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="25"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>Dichiarazione bloccanti</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="26"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>Danno da combattimento</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="27"/>
         <source>End of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Fine combattimento</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="28"/>
         <source>Second Main</source>
-        <translation type="unfinished"/>
+        <translation>Seconda fase principale</translation>
     </message>
     <message>
         <location filename="../src/phase.cpp" line="29"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>Fine/Cancellazione</translation>
     </message>
 </context>
 <context>
@@ -3937,7 +3937,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/player.cpp" line="694"/>
         <source>Play top card</source>
-        <translation type="unfinished"/>
+        <translation>Gioca la prima carta</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="695"/>
@@ -4392,7 +4392,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/deck_loader.cpp" line="12"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
-        <translation type="unfinished"/>
+        <translation>Formati di mazzo comuni (*.cod *.dec *.dek *.txt *.mwDeck)</translation>
     </message>
 </context>
 <context>
@@ -5774,12 +5774,12 @@ Più informazioni inserisci, più specifici saranno i risultati.</translation>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="573"/>
         <source>Click to view</source>
-        <translation type="unfinished"/>
+        <translation>Clicca per visualizzare</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="601"/>
         <source>Your buddy %1 has signed on!</source>
-        <translation type="unfinished"/>
+        <translation>Il tuo amico %1 si è collegato</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="637"/>
@@ -5891,42 +5891,42 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/translatecountername.cpp" line="4"/>
         <source>Life</source>
-        <translation type="unfinished"/>
+        <translation>Vita</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="5"/>
         <source>White</source>
-        <translation type="unfinished"/>
+        <translation>Bianco</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="6"/>
         <source>Blue</source>
-        <translation type="unfinished"/>
+        <translation>Blu</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="7"/>
         <source>Black</source>
-        <translation type="unfinished"/>
+        <translation>Nero</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="8"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Rosso</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="9"/>
         <source>Green</source>
-        <translation type="unfinished"/>
+        <translation>Verde</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="10"/>
         <source>Colorless</source>
-        <translation type="unfinished"/>
+        <translation>Incolore</translation>
     </message>
     <message>
         <location filename="../src/translatecountername.cpp" line="11"/>
         <source>Other</source>
-        <translation type="unfinished"/>
+        <translation>Altro</translation>
     </message>
 </context>
 <context>
@@ -6054,7 +6054,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/user_context_menu.cpp" line="298"/>
         <source>Copy hash to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copia hash nella clipboard</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="194"/>
@@ -6310,7 +6310,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/dlg_settings.cpp" line="442"/>
         <source>Notifications settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni notifiche</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="445"/>
@@ -6688,82 +6688,82 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="54"/>
         <source>Move Selected Card</source>
-        <translation type="unfinished"/>
+        <translation>Muovi la carta selezionata</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="58"/>
         <source>Move Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Muovi la prima carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="60"/>
         <source>Move Bottom Card</source>
-        <translation type="unfinished"/>
+        <translation>Muovi l&apos;ultima carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="66"/>
         <source>Chat Room</source>
-        <translation type="unfinished"/>
+        <translation>Chat Room</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="68"/>
         <source>Game Window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra di Gioco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="70"/>
         <source>Load Deck from Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Carica mazzo dalla clipboard</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="140"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Controlla per aggiornamenti carte...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="143"/>
         <source>Connect...</source>
-        <translation type="unfinished"/>
+        <translation>Connetti...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="157"/>
         <source>Register...</source>
-        <translation type="unfinished"/>
+        <translation>Registrati...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="160"/>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="163"/>
         <source>Start a Local Game...</source>
-        <translation type="unfinished"/>
+        <translation>Inizia una partita in locale...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="166"/>
         <source>Watch Replay...</source>
-        <translation type="unfinished"/>
+        <translation>Guarda Replay...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="169"/>
         <source>Analyze Deck</source>
-        <translation type="unfinished"/>
+        <translation>Analizza mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="172"/>
         <source>Clear All Filters</source>
-        <translation type="unfinished"/>
+        <translation>Elimina tutti i filtri</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="175"/>
         <source>Clear Selected Filter</source>
-        <translation type="unfinished"/>
+        <translation>Elimina il filtro selezionato</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="180"/>
         <source>Remove Card</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="183"/>
@@ -6773,22 +6773,22 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="186"/>
         <source>Edit Custom Tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Modifica pedine personalizzate</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="189"/>
         <source>Export Deck</source>
-        <translation type="unfinished"/>
+        <translation>Esporta mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="192"/>
         <source>Add Card</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="195"/>
         <source>Load Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Carica mazzo...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="199"/>
@@ -6798,7 +6798,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="202"/>
         <source>New Deck</source>
-        <translation type="unfinished"/>
+        <translation>Nuovo mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="206"/>
@@ -6808,12 +6808,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="209"/>
         <source>Print Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Stampa mazzo...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="212"/>
         <source>Delete Card</source>
-        <translation type="unfinished"/>
+        <translation>Elimina carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="215"/>
@@ -6824,12 +6824,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="218"/>
         <source>Save Deck</source>
-        <translation type="unfinished"/>
+        <translation>Salva mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="221"/>
         <source>Save Deck as...</source>
-        <translation type="unfinished"/>
+        <translation>Salva mazzo con nome</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="225"/>
@@ -6945,7 +6945,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="290"/>
         <source>Add Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Contatore Blu</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="293"/>
@@ -7055,27 +7055,27 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="381"/>
         <source>First Main Phase</source>
-        <translation type="unfinished"/>
+        <translation>Prima Fase Principale</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="384"/>
         <source>Start Combat</source>
-        <translation type="unfinished"/>
+        <translation>Inizio Combattimento</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="393"/>
         <source>End Combat</source>
-        <translation type="unfinished"/>
+        <translation>Fine Combattimento</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="396"/>
         <source>Second Main Phase</source>
-        <translation type="unfinished"/>
+        <translation>Seconda Fase Principale</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="401"/>
         <source>Next Phase</source>
-        <translation type="unfinished"/>
+        <translation>Fase Successiva</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="404"/>
@@ -7085,12 +7085,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="407"/>
         <source>Next Turn</source>
-        <translation type="unfinished"/>
+        <translation>Turno Successivo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="413"/>
         <source>Untap All</source>
-        <translation type="unfinished"/>
+        <translation>Stappa Tutto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="416"/>
@@ -7110,7 +7110,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="425"/>
         <source>Play Card</source>
-        <translation type="unfinished"/>
+        <translation>Gioca Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="428"/>
@@ -7125,7 +7125,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="434"/>
         <source>Clone Card</source>
-        <translation type="unfinished"/>
+        <translation>Clona Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="437"/>
@@ -7188,7 +7188,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="486"/>
         <source>Stack</source>
-        <translation type="unfinished"/>
+        <translation>Pila</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="494"/>
@@ -7213,22 +7213,22 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="514"/>
         <source>Leave Game</source>
-        <translation type="unfinished"/>
+        <translation>Abbandona Partita</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="519"/>
         <source>Roll Dice...</source>
-        <translation type="unfinished"/>
+        <translation>Tira un Dado...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="522"/>
         <source>Shuffle Library</source>
-        <translation type="unfinished"/>
+        <translation>Mischia il Mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="528"/>
         <source>Draw a Card</source>
-        <translation type="unfinished"/>
+        <translation>Pesca una Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="531"/>

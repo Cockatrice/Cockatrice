@@ -18,9 +18,15 @@
 #include <QMenu>
 #include <QPainter>
 
-CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
-    : AbstractCardItem(_name, _owner, _cardid, parent), zone(0), revealedCard(_revealedCard), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
+CardItem::CardItem(Player *_owner,
+                   const QString &_name,
+                   int _cardid,
+                   bool _revealedCard,
+                   QGraphicsItem *parent,
+                   CardZone *_zone,
+                   bool updateMenu)
+    : AbstractCardItem(_name, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
+      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
@@ -29,7 +35,9 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
     moveMenu = new QMenu;
 
     retranslateUi();
-    emit updateCardMenu(this);
+    if (updateMenu) { // avoid updating card menu too often
+        emit updateCardMenu(this);
+    }
 }
 
 CardItem::~CardItem()
@@ -48,22 +56,22 @@ CardItem::~CardItem()
 
 void CardItem::prepareDelete()
 {
-    if (owner) {
+    if (owner != nullptr) {
         if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(0);
-            owner->getGame()->setActiveCard(0);
+            owner->setCardMenu(nullptr);
+            owner->getGame()->setActiveCard(nullptr);
         }
-        owner = 0;
+        owner = nullptr;
     }
 
     while (!attachedCards.isEmpty()) {
-        attachedCards.first()->setZone(0); // so that it won't try to call reorganizeCards()
-        attachedCards.first()->setAttachedTo(0);
+        attachedCards.first()->setZone(nullptr); // so that it won't try to call reorganizeCards()
+        attachedCards.first()->setAttachedTo(nullptr);
     }
 
-    if (attachedTo) {
+    if (attachedTo != nullptr) {
         attachedTo->removeAttachedCard(this);
-        attachedTo = 0;
+        attachedTo = nullptr;
     }
 }
 
@@ -265,9 +273,10 @@ CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPoin
 
 void CardItem::deleteDragItem()
 {
-    if (dragItem)
+    if (dragItem) {
         dragItem->deleteLater();
-    dragItem = NULL;
+    }
+    dragItem = nullptr;
 }
 
 void CardItem::drawArrow(const QColor &arrowColor)
@@ -362,7 +371,7 @@ void CardItem::playCard(bool faceDown)
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
-        if (cardMenu && !cardMenu->isEmpty() && owner) {
+        if (cardMenu && !cardMenu->isEmpty() && owner != nullptr) {
             owner->updateCardMenu(this);
             cardMenu->exec(event->screenPos());
         }
@@ -370,7 +379,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                (!SettingsCache::instance().getDoubleClickToPlay())) {
         bool hideCard = false;
         if (zone && zone->getIsView()) {
-            ZoneViewZone *view = static_cast<ZoneViewZone *>(zone);
+            auto *view = static_cast<ZoneViewZone *>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 hideCard = true;
         }
@@ -381,7 +390,9 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    setCursor(Qt::OpenHandCursor);
+    if (owner != nullptr) { // cards without owner will be deleted
+        setCursor(Qt::OpenHandCursor);
+    }
     AbstractCardItem::mouseReleaseEvent(event);
 }
 

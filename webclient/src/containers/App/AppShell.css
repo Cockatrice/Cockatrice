@@ -1,0 +1,10 @@
+.AppShell,
+.AppShell-routes {
+  height: 100%;
+}
+
+.AppShell {
+  display: flex;
+  flex-direction: column;
+   min-width: 768px;
+}

@@ -69,7 +69,11 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
       spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0),
       secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()),
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+      gameMutex()
+#else
       gameMutex(QMutex::Recursive)
+#endif
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -93,9 +97,9 @@ Server_Game::~Server_Game()
 
     gameClosed = true;
     sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext())
-        playerIterator.next().value()->prepareDestroy();
+    for (Server_Player *player : players.values()) {
+        player->prepareDestroy();
+    }
     players.clear();
 
     room->removeGame(this);
@@ -131,9 +135,9 @@ void Server_Game::storeGameInformation()
     for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
         gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
 
-    QSetIterator<QString> playerIterator(allPlayersEver);
-    while (playerIterator.hasNext())
-        replayMatchInfo->add_player_names(playerIterator.next().toStdString());
+    for (auto playerName : allPlayersEver) {
+        replayMatchInfo->add_player_names(playerName.toStdString());
+    }
 
     for (int i = 0; i < replayList.size(); ++i) {
         ServerInfo_Replay *replayInfo = replayMatchInfo->add_replay_list();
@@ -142,23 +146,21 @@ void Server_Game::storeGameInformation()
         replayInfo->set_duration(replayList[i]->duration_seconds());
     }
 
-    QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
-    QSetIterator<QString> allUsersIterator(allUsersInGame);
-
     SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(replayEvent);
     Server *server = room->getServer();
     server->clientsLock.lockForRead();
-    while (allUsersIterator.hasNext()) {
-        Server_AbstractUserInterface *userHandler = server->findUser(allUsersIterator.next());
+    for (auto userName : allPlayersEver + allSpectatorsEver) {
+        Server_AbstractUserInterface *userHandler = server->findUser(userName);
         if (userHandler && server->getStoreReplaysEnabled())
             userHandler->sendProtocolItem(*sessionEvent);
     }
     server->clientsLock.unlock();
     delete sessionEvent;
 
-    if (server->getStoreReplaysEnabled())
+    if (server->getStoreReplaysEnabled()) {
         server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver,
                                                              allSpectatorsEver, replayList);
+    }
 }
 
 void Server_Game::pingClockTimeout()
@@ -169,26 +171,30 @@ void Server_Game::pingClockTimeout()
     GameEventStorage ges;
     ges.setGameEventContext(Context_PingChanged());
 
-    QList<ServerInfo_PlayerPing *> pingList;
-    QMapIterator<int, Server_Player *> playerIterator(players);
     bool allPlayersInactive = true;
     int playerCount = 0;
-    while (playerIterator.hasNext()) {
-        Server_Player *player = playerIterator.next().value();
-        if (!player->getSpectator())
+    for (auto *player : players) {
+        if (player == nullptr)
+            continue;
+
+        if (!player->getSpectator()) {
             ++playerCount;
+        }
 
-        const int oldPingTime = player->getPingTime();
-        player->playerMutex.lock();
+        int oldPingTime = player->getPingTime();
         int newPingTime;
-        if (player->getUserInterface())
-            newPingTime = player->getUserInterface()->getLastCommandTime();
-        else
-            newPingTime = -1;
-        player->playerMutex.unlock();
+        {
+            QMutexLocker playerMutexLocker(&player->playerMutex);
+            if (player->getUserInterface()) {
+                newPingTime = player->getUserInterface()->getLastCommandTime();
+            } else {
+                newPingTime = -1;
+            }
+        }
 
-        if ((newPingTime != -1) && !player->getSpectator())
+        if ((newPingTime != -1) && (!player->getSpectator() || player->getPlayerId() == hostId)) {
             allPlayersInactive = false;
+        }
 
         if ((abs(oldPingTime - newPingTime) > 1) || ((newPingTime == -1) && (oldPingTime != -1)) ||
             ((newPingTime != -1) && (oldPingTime == -1))) {
@@ -203,21 +209,23 @@ void Server_Game::pingClockTimeout()
 
     const int maxTime = room->getServer()->getMaxGameInactivityTime();
     if (allPlayersInactive) {
-        if (((++inactivityCounter >= maxTime) && (maxTime > 0)) || (playerCount < maxPlayers))
+        if (((maxTime > 0) && (++inactivityCounter >= maxTime)) || (playerCount < maxPlayers)) {
             deleteLater();
-    } else
+        }
+    } else {
         inactivityCounter = 0;
+    }
 }
 
 int Server_Game::getPlayerCount() const
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
     int result = 0;
-    while (playerIterator.hasNext())
-        if (!playerIterator.next().value()->getSpectator())
+    for (Server_Player *player : players.values()) {
+        if (!player->getSpectator())
             ++result;
+    }
     return result;
 }
 
@@ -225,11 +233,11 @@ int Server_Game::getSpectatorCount() const
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
     int result = 0;
-    while (playerIterator.hasNext())
-        if (playerIterator.next().value()->getSpectator())
+    for (Server_Player *player : players.values()) {
+        if (player->getSpectator())
             ++result;
+    }
     return result;
 }
 
@@ -246,9 +254,9 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
     } else
         event->set_game_started(false);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext())
-        playerIterator.next().value()->getInfo(event->add_player_list(), playerWhosAsking, omniscient, withUserInfo);
+    for (Server_Player *otherPlayer : players.values()) {
+        otherPlayer->getInfo(event->add_player_list(), playerWhosAsking, omniscient, withUserInfo);
+    }
 }
 
 void Server_Game::sendGameStateToPlayers()
@@ -273,9 +281,7 @@ void Server_Game::sendGameStateToPlayers()
         createGameStateChangedEvent(&spectatorEvent, 0, false, false);
 
     // send game state info to clients according to their role in the game
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext()) {
-        Server_Player *player = playerIterator.next().value();
+    for (Server_Player *player : players.values()) {
         GameEventContainer *gec;
         if (player->getSpectator())
             gec = prepareGameEvent(spectatorEvent, -1);
@@ -297,23 +303,17 @@ void Server_Game::doStartGameIfReady()
 
     if (getPlayerCount() < maxPlayers)
         return;
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
-        if (!p->getReadyStart() && !p->getSpectator())
+    for (Server_Player *player : players.values()) {
+        if (!player->getReadyStart() && !player->getSpectator())
             return;
     }
-    playerIterator.toFront();
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
-        if (!p->getSpectator())
-            p->setupZones();
+    for (Server_Player *player : players.values()) {
+        if (!player->getSpectator())
+            player->setupZones();
     }
 
     gameStarted = true;
-    playerIterator.toFront();
-    while (playerIterator.hasNext()) {
-        Server_Player *player = playerIterator.next().value();
+    for (Server_Player *player : players.values()) {
         player->setConceded(false);
         player->setReadyStart(false);
     }
@@ -363,11 +363,9 @@ void Server_Game::stopGameIfFinished()
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
     int playing = 0;
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
-        if (!p->getConceded() && !p->getSpectator())
+    for (Server_Player *player : players.values()) {
+        if (!player->getConceded() && !player->getSpectator())
             ++playing;
     }
     if (playing > 1)
@@ -375,11 +373,9 @@ void Server_Game::stopGameIfFinished()
 
     gameStarted = false;
 
-    playerIterator.toFront();
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
-        p->clearZones();
-        p->setConceded(false);
+    for (Server_Player *player : players.values()) {
+        player->clearZones();
+        player->setConceded(false);
     }
 
     sendGameStateToPlayers();
@@ -400,11 +396,9 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                                               bool asJudge)
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
-    {
-        QMapIterator<int, Server_Player *> playerIterator(players);
-        while (playerIterator.hasNext())
-            if (playerIterator.next().value()->getUserInfo()->name() == user->name())
-                return Response::RespContextError;
+    for (Server_Player *player : players.values()) {
+        if (player->getUserInfo()->name() == user->name())
+            return Response::RespContextError;
     }
 
     if (asJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
@@ -437,10 +431,10 @@ bool Server_Game::containsUser(const QString &userName) const
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext())
-        if (playerIterator.next().value()->getUserInfo()->name() == userName.toStdString())
+    for (Server_Player *player : players.values()) {
+        if (player->getUserInfo()->name() == userName.toStdString())
             return true;
+    }
     return false;
 }
 
@@ -462,14 +456,18 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
     sendGameEventContainer(prepareGameEvent(joinEvent, -1));
 
     const QString playerName = QString::fromStdString(newPlayer->getUserInfo()->name());
-    if (spectator)
-        allSpectatorsEver.insert(playerName);
-    else
-        allPlayersEver.insert(playerName);
     players.insert(newPlayer->getPlayerId(), newPlayer);
-    if (newPlayer->getUserInfo()->name() == creatorInfo->name()) {
-        hostId = newPlayer->getPlayerId();
-        sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+    if (spectator) {
+        allSpectatorsEver.insert(playerName);
+    } else {
+        allPlayersEver.insert(playerName);
+
+        // if the original creator of the game joins, give them host status back
+        // FIXME: transferring host to spectators has side effects
+        if (newPlayer->getUserInfo()->name() == creatorInfo->name()) {
+            hostId = newPlayer->getPlayerId();
+            sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+        }
     }
 
     if (broadcastUpdate) {
@@ -509,26 +507,24 @@ void Server_Game::removePlayer(Server_Player *player, Event_Leave::LeaveReason r
     bool spectator = player->getSpectator();
     player->prepareDestroy();
 
-    if (!getPlayerCount()) {
-        gameClosed = true;
-        deleteLater();
-        return;
-    } else if (!spectator) {
-        if (playerHost) {
-            int newHostId = -1;
-            QMapIterator<int, Server_Player *> playerIterator(players);
-            while (playerIterator.hasNext()) {
-                Server_Player *p = playerIterator.next().value();
-                if (!p->getSpectator()) {
-                    newHostId = p->getPlayerId();
-                    break;
-                }
-            }
-            if (newHostId != -1) {
-                hostId = newHostId;
-                sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+    if (playerHost) {
+        int newHostId = -1;
+        for (Server_Player *otherPlayer : players.values()) {
+            if (!otherPlayer->getSpectator()) {
+                newHostId = otherPlayer->getPlayerId();
+                break;
             }
         }
+        if (newHostId != -1) {
+            hostId = newHostId;
+            sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+        } else {
+            gameClosed = true;
+            deleteLater();
+            return;
+        }
+    }
+    if (!spectator) {
         stopGameIfFinished();
         if (gameStarted && playerActive)
             nextTurn();
@@ -549,10 +545,8 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
     // Remove all arrows of other players pointing to the player being removed or to one of his cards.
     // Also remove all arrows starting at one of his cards. This is necessary since players can create
     // arrows that start at another person's cards.
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
-        QList<Server_Arrow *> arrows = p->getArrows().values();
+    for (Server_Player *otherPlayer : players.values()) {
+        QList<Server_Arrow *> arrows = otherPlayer->getArrows().values();
         QList<Server_Arrow *> toDelete;
         for (int i = 0; i < arrows.size(); ++i) {
             Server_Arrow *a = arrows[i];
@@ -570,9 +564,9 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
         for (int i = 0; i < toDelete.size(); ++i) {
             Event_DeleteArrow event;
             event.set_arrow_id(toDelete[i]->getId());
-            ges.enqueueGameEvent(event, p->getPlayerId());
+            ges.enqueueGameEvent(event, otherPlayer->getPlayerId());
 
-            p->deleteArrow(toDelete[i]->getId());
+            otherPlayer->deleteArrow(toDelete[i]->getId());
         }
     }
 }
@@ -581,16 +575,20 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
-    while (zoneIterator.hasNext()) {
-        Server_CardZone *zone = zoneIterator.next().value();
-        for (int i = 0; i < zone->getCards().size(); ++i) {
-            Server_Card *card = zone->getCards().at(i);
-
+    for (auto zone : player->getZones()) {
+        for (auto card : zone->getCards()) {
             // Make a copy of the list because the original one gets modified during the loop
             QList<Server_Card *> attachedCards = card->getAttachedCards();
-            for (int i = 0; i < attachedCards.size(); ++i)
-                attachedCards[i]->getZone()->getPlayer()->unattachCard(ges, attachedCards[i]);
+            for (Server_Card *attachedCard : attachedCards) {
+                auto otherPlayer = attachedCard->getZone()->getPlayer();
+                // do not modify the current player's zone!
+                // this would cause the current card iterator to be invalidated!
+                // we only have to return cards owned by other players
+                // because the current player is leaving the game anyway
+                if (otherPlayer != player) {
+                    otherPlayer->unattachCard(ges, attachedCard);
+                }
+            }
         }
     }
 }
@@ -629,9 +627,7 @@ void Server_Game::setActivePhase(int _activePhase)
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext()) {
-        Server_Player *player = playerIterator.next().value();
+    for (Server_Player *player : players.values()) {
         QList<Server_Arrow *> toDelete = player->getArrows().values();
         for (int i = 0; i < toDelete.size(); ++i) {
             Server_Arrow *a = toDelete[i];
@@ -701,10 +697,9 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     event2.set_active_player_id(activePlayer);
     event2.set_active_phase(activePhase);
 
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext())
-        playerIterator.next().value()->getInfo(event2.add_player_list(), player,
-                                               player->getSpectator() && spectatorsSeeEverything, true);
+    for (Server_Player *player : players.values()) {
+        player->getInfo(event2.add_player_list(), player, player->getSpectator() && spectatorsSeeEverything, true);
+    }
 
     rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
 }
@@ -716,14 +711,12 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
     QMutexLocker locker(&gameMutex);
 
     cont->set_game_id(gameId);
-    QMapIterator<int, Server_Player *> playerIterator(players);
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
+    for (Server_Player *player : players.values()) {
         const bool playerPrivate =
-            (p->getPlayerId() == privatePlayerId) || (p->getSpectator() && spectatorsSeeEverything);
+            (player->getPlayerId() == privatePlayerId) || (player->getSpectator() && spectatorsSeeEverything);
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
-            p->sendGameEvent(*cont);
+            player->sendGameEvent(*cont);
     }
     if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
         cont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
@@ -756,11 +749,12 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
 
     result.set_room_id(room->getId());
     result.set_game_id(gameId);
-    if (gameClosed)
+    if (gameClosed) {
         result.set_closed(true);
-    else {
-        for (int i = 0; i < gameTypes.size(); ++i)
-            result.add_game_types(gameTypes[i]);
+    } else {
+        for (auto type : gameTypes) {
+            result.add_game_types(type);
+        }
 
         result.set_max_players(getMaxPlayers());
         result.set_description(getDescription().toStdString());

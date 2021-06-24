@@ -1,0 +1,28 @@
+name: Clangify
+
+on:
+  pull_request:
+    branches:
+    - master
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 20 # should be enough to find merge base
+
+    - name: Install clang-format
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends clang-format
+
+    - name: Run clangify
+      shell: bash
+      run: ./.ci/lint.sh

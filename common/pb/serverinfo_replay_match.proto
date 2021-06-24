@@ -3,7 +3,7 @@ import "serverinfo_replay.proto";
 
 message ServerInfo_ReplayMatch {
     repeated ServerInfo_Replay replay_list = 1;
-    
+
     optional sint32 game_id = 2 [default = -1];
     optional string room_name = 3;
     optional uint32 time_started = 4;

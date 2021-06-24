@@ -66,7 +66,7 @@ private:
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath,
+    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
@@ -124,6 +124,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
+    bool createGameAsSpectator;
     int keepalive;
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
@@ -155,6 +156,10 @@ public:
     QString getReplaysPath() const
     {
         return replaysPath;
+    }
+    QString getThemesPath() const
+    {
+        return themesPath;
     }
     QString getPicsPath() const
     {
@@ -394,6 +399,10 @@ public:
     {
         return spectatorsCanSeeEverything;
     }
+    bool getCreateGameAsSpectator() const
+    {
+        return createGameAsSpectator;
+    }
     bool getRememberGameSettings() const
     {
         return rememberGameSettings;
@@ -474,6 +483,7 @@ public slots:
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
+    void setThemesPath(const QString &_themesPath);
     void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
     void setPicsPath(const QString &_picsPath);
     void setCardDatabasePath(const QString &_cardDatabasePath);
@@ -525,6 +535,7 @@ public slots:
     void setSpectatorsNeedPassword(const bool _spectatorsNeedPassword);
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
+    void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
     void setNotifyAboutNewVersion(int _notifyaboutnewversion);

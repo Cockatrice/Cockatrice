@@ -42,6 +42,7 @@ public slots:
     void containerProcessingDone();
     void containerProcessingStarted(const GameEventContext &context);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
+    void logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
     void logConcede(Player *player);
     void logUnconcede(Player *player);
@@ -92,7 +93,6 @@ public slots:
     void logShuffle(Player *player, CardZone *zone, int start, int end);
     void
     logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
-    void logStopDumpZone(Player *player, CardZone *zone);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
     void setContextJudgeName(QString player);

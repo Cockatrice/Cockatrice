@@ -8,9 +8,9 @@
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
+#include "tab_account.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
-#include "tab_userlists.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -74,18 +74,16 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
-    if (showFilters && gameListProxyModel->areFilterParametersSetToDefaults()) {
-        clearFilterButton->setEnabled(false);
-    } else {
-        clearFilterButton->setEnabled(true);
-    }
+    bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
+    clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 
     if (room) {
         createButton = new QPushButton;
         connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
-    } else
-        createButton = 0;
+    } else {
+        createButton = nullptr;
+    }
     joinButton = new QPushButton;
     spectateButton = new QPushButton;
 
@@ -154,13 +152,19 @@ void GameSelector::actSetFilter()
         return;
 
     gameListProxyModel->setShowBuddiesOnlyGames(dlg.getShowBuddiesOnlyGames());
-    gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
+    gameListProxyModel->setShowFullGames(dlg.getShowFullGames());
+    gameListProxyModel->setShowGamesThatStarted(dlg.getShowGamesThatStarted());
     gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
     gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
     gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
+    gameListProxyModel->setMaxGameAge(dlg.getMaxGameAge());
+    gameListProxyModel->setShowOnlyIfSpectatorsCanWatch(dlg.getShowOnlyIfSpectatorsCanWatch());
+    gameListProxyModel->setShowSpectatorPasswordProtected(dlg.getShowSpectatorPasswordProtected());
+    gameListProxyModel->setShowOnlyIfSpectatorsCanChat(dlg.getShowOnlyIfSpectatorsCanChat());
+    gameListProxyModel->setShowOnlyIfSpectatorsCanSeeHands(dlg.getShowOnlyIfSpectatorsCanSeeHands());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());

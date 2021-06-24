@@ -25,3 +25,7 @@ IndentCaseLabels: true
 PointerAlignment: Right
 SortIncludes: true
 IncludeBlocks: Regroup
+---
+Language: Proto
+AllowShortFunctionsOnASingleLine: None
+SpacesInContainerLiterals: false

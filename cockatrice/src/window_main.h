@@ -116,23 +116,23 @@ private:
     void createTrayIcon();
     void createTrayActions();
     int getNextCustomSetPrefix(QDir dataDir);
-    // TODO: add a preference item to choose updater name for other games
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";
     };
+    void exitCardDatabaseUpdate();
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog, *closeAction;
+        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *closeAction;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
     RemoteClient *client;
     QThread *clientThread;
     LocalServer *localServer;
-    bool bHasActivated;
+    bool bHasActivated, askedForDbUpdater;
     QMessageBox serverShutdownMessageBox;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;

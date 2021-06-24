@@ -3,6 +3,5 @@ import "game_commands.proto";
 message Command_ReverseTurn {
     extend GameCommand {
         optional Command_ReverseTurn ext = 1034;
-	}
+    }
 }
-

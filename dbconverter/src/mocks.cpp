@@ -96,6 +96,9 @@ void SettingsCache::setDeckPath(const QString &/* _deckPath */)
 void SettingsCache::setReplaysPath(const QString &/* _replaysPath */)
 {
 }
+void SettingsCache::setThemesPath(const QString &/* _themesPath */)
+{
+}
 void SettingsCache::setPicsPath(const QString &/* _picsPath */)
 {
 }
@@ -240,6 +243,9 @@ void SettingsCache::setSpectatorsCanTalk(const bool /* _spectatorsCanTalk */)
 {
 }
 void SettingsCache::setSpectatorsCanSeeEverything(const bool /* _spectatorsCanSeeEverything */)
+{
+}
+void SettingsCache::setCreateGameAsSpectator(const bool /* _createGameAsSpectator */)
 {
 }
 void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings */)

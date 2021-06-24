@@ -1,0 +1,127 @@
+.Header {
+}
+
+.Header__logo {
+  display: flex;
+  align-items: center;
+}
+
+.Header__logo a {
+  line-height: 1;
+}
+
+.Header__logo img {
+  height: 32px;
+}
+
+.Header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: white;
+}
+
+.Header-serverDetails {
+  font-size: 12px;
+}
+
+.Header-server__indicator {
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  background: red;
+  border: 1px solid;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.Header-nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.Header-nav__links {
+  width: 100%;
+  display: flex;
+  padding-left: 50px;
+  align-items: center;
+}
+
+.Header-nav__link {
+  position: relative;
+  height: 100%;
+}
+
+.Header-nav__link:hover {
+  background: rgba(0, 0, 0, .125);
+}
+
+.Header-nav__link:hover .Header-nav__link-menu {
+  display: block;
+}
+
+.Header-nav__link-btn {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  padding: 5px 10px;
+  font-weight: bold;
+}
+
+.Header-nav__link-btn__icon {
+  margin-left: 5px;
+}
+
+.Header-nav__link-menu {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  transform: translateY(100%);
+  min-width: 150px;
+  background: #3f51b5;
+  box-shadow: 1px 1px 2px 0px black;
+}
+
+.Header-nav__link-menu__item {
+  padding: 0 !important;
+}
+
+.Header-nav__link-menu__btn {
+  padding: 6px 16px;
+  width: 100%;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+}
+
+.Header-nav__actions {
+  display: flex;
+}
+
+.Header-nav__action {
+
+}
+
+.Header-nav__action button {
+  color: white;
+}
+
+.temp-subnav__rooms {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  padding: 5px;
+}
+
+.temp-chip {
+  margin-left: 5px;
+  text-decoration: none;
+}
+
+
+.temp-chip > div {
+  cursor: inherit;
+}
+

@@ -160,14 +160,17 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // NOTE: attributes but be read before readElementText()
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                    CardInfoPerSet setInfo(internalAddSet(setName));
-                    for (QXmlStreamAttribute attr : attrs) {
-                        QString attrName = attr.name().toString();
-                        if (attrName == "picURL")
-                            attrName = "picurl";
-                        setInfo.setProperty(attrName, attr.value().toString());
+                    auto set = internalAddSet(setName);
+                    if (set->getEnabled()) {
+                        CardInfoPerSet setInfo(set);
+                        for (QXmlStreamAttribute attr : attrs) {
+                            QString attrName = attr.name().toString();
+                            if (attrName == "picURL")
+                                attrName = "picurl";
+                            setInfo.setProperty(attrName, attr.value().toString());
+                        }
+                        sets.insert(setName, setInfo);
                     }
-                    sets.insert(setName, setInfo);
                     // relatd cards
                 } else if (xml.name() == "related" || xml.name() == "reverse-related") {
                     bool attach = false;

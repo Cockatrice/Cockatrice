@@ -1,0 +1,49 @@
+.account {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  padding: 5px;
+}
+
+.account-column {
+  display: flex;
+  flex-direction: column;
+  width: 33%;
+}
+
+
+.account-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+}
+
+.account-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+
+.account-details__actions {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.account-details p {
+  margin-bottom: 10px;
+}
+
+.account-details button {
+  margin-top: 10px;
+  font-size: 10px;
+}
+
+.account-details img {
+  width: 100%;
+  margin-bottom: 20px;
+}

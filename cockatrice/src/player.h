@@ -18,52 +18,51 @@ namespace protobuf
 class Message;
 }
 } // namespace google
-class CardDatabase;
-class DeckLoader;
-class QMenu;
-class QAction;
-class ZoneViewZone;
-class TabGame;
-class AbstractCounter;
 class AbstractCardItem;
-class CardItem;
-class ArrowTarget;
+class AbstractCounter;
 class ArrowItem;
+class ArrowTarget;
+class CardDatabase;
+class CardItem;
 class CardZone;
-class StackZone;
-class TableZone;
-class HandZone;
-class PlayerTarget;
-class ServerInfo_User;
-class ServerInfo_Player;
-class ServerInfo_Arrow;
-class ServerInfo_Counter;
 class CommandContainer;
+class Command_MoveCard;
+class DeckLoader;
+class Event_AttachCard;
+class Event_ChangeZoneProperties;
+class Event_CreateArrow;
+class Event_CreateCounter;
+class Event_CreateToken;
+class Event_DelCounter;
+class Event_DeleteArrow;
+class Event_DestroyCard;
+class Event_DrawCards;
+class Event_DumpZone;
+class Event_FlipCard;
+class Event_GameSay;
+class Event_MoveCard;
+class Event_RevealCards;
+class Event_RollDie;
+class Event_SetCardAttr;
+class Event_SetCardCounter;
+class Event_SetCounter;
+class Event_Shuffle;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
-// class Event_ConnectionStateChanged;
-class Event_GameSay;
-class Event_Shuffle;
-class Event_RollDie;
-class Event_CreateArrow;
-class Event_DeleteArrow;
-class Event_CreateToken;
-class Event_SetCardAttr;
-class Event_SetCardCounter;
-class Event_CreateCounter;
-class Event_SetCounter;
-class Event_DelCounter;
-class Event_DumpZone;
-class Event_StopDumpZone;
-class Event_MoveCard;
-class Event_FlipCard;
-class Event_DestroyCard;
-class Event_AttachCard;
-class Event_DrawCards;
-class Event_RevealCards;
-class Event_ChangeZoneProperties;
+class HandZone;
 class PendingCommand;
+class PlayerTarget;
+class QAction;
+class QMenu;
+class ServerInfo_Arrow;
+class ServerInfo_Counter;
+class ServerInfo_Player;
+class ServerInfo_User;
+class StackZone;
+class TabGame;
+class TableZone;
+class ZoneViewZone;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
@@ -73,6 +72,7 @@ class PlayerArea : public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 private:
     QRectF bRect;
+    int playerZoneId;
 private slots:
     void updateBg();
 
@@ -94,6 +94,12 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(qreal width, qreal height);
+
+    void setPlayerZoneId(int _playerZoneId);
+    int getPlayerZoneId() const
+    {
+        return playerZoneId;
+    }
 };
 
 class Player : public QObject, public QGraphicsItem
@@ -128,7 +134,6 @@ signals:
     void logSetPT(Player *player, CardItem *card, QString newPT);
     void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
-    void logStopDumpZone(Player *player, CardZone *zone);
     void logRevealCards(Player *player,
                         CardZone *zone,
                         int cardId,
@@ -137,6 +142,7 @@ signals:
                         bool faceDown,
                         int amount);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
+    void logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal);
 
     void sizeChanged();
     void playerCountChanged();
@@ -157,12 +163,21 @@ public slots:
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
     void actMoveTopCardToBottom();
+    void actDrawBottomCard();
+    void actDrawBottomCards();
+    void actMoveBottomCardToPlay();
+    void actMoveBottomCardToPlayFaceDown();
     void actMoveBottomCardToGrave();
+    void actMoveBottomCardToExile();
+    void actMoveBottomCardsToGrave();
+    void actMoveBottomCardsToExile();
+    void actMoveBottomCardToTop();
 
     void actViewLibrary();
     void actViewHand();
     void actViewTopCards();
     void actAlwaysRevealTopCard();
+    void actAlwaysLookAtTopCard();
     void actViewGraveyard();
     void actRevealRandomGraveyardCard();
     void actViewRfg();
@@ -208,17 +223,20 @@ private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
         *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
-    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *rfgMenu, *playerMenu;
+    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
+        *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
-        *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard, *aMoveTopCardToExile,
-        *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg,
-        *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlay,
+        *aAlwaysRevealTopCard, *aAlwaysLookAtTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard,
+        *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard,
+        *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlay,
         *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu,
-        *aMoveBottomCardToGrave;
+        *aMoveBottomToPlay, *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard,
+        *aMoveBottomCardToExile, *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard,
+        *aDrawBottomCards;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
@@ -227,8 +245,12 @@ private:
         *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
-    int defaultNumberTopCards;
-    int defaultNumberTopCardsToPlaceBelow;
+    int defaultNumberTopCards = 1;
+    int defaultNumberTopCardsToPlaceBelow = 1;
+    int defaultNumberBottomCards = 1;
+    int defaultNumberDieRoll = 20;
+    static constexpr int minDieRoll = 2;
+    static constexpr int maxDieRoll = 1000000;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
     int lastTokenTableRow;
@@ -288,7 +310,6 @@ private:
     void eventSetCounter(const Event_SetCounter &event);
     void eventDelCounter(const Event_DelCounter &event);
     void eventDumpZone(const Event_DumpZone &event);
-    void eventStopDumpZone(const Event_StopDumpZone &event);
     void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);
     void eventFlipCard(const Event_FlipCard &event);
     void eventDestroyCard(const Event_DestroyCard &event);
@@ -296,6 +317,8 @@ private:
     void eventDrawCards(const Event_DrawCards &event);
     void eventRevealCards(const Event_RevealCards &event);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
+    void cmdSetTopCard(Command_MoveCard &cmd);
+    void cmdSetBottomCard(Command_MoveCard &cmd);
 
     QVariantList parsePT(const QString &pt);
 

@@ -11,14 +11,15 @@ cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with 
 include=("common" \
 "cockatrice/src" \
 "oracle/src" \
-"servatrice/src")
+"servatrice/src" \
+"tests")
 exclude=("servatrice/src/smtp" \
 "common/sfmt" \
 "common/lib" \
 "oracle/src/zip" \
 "oracle/src/lzma" \
 "oracle/src/qt-json")
-exts=("cpp" "h")
+exts=("cpp" "h" "proto")
 cf_cmd="clang-format"
 branch="origin/master"
 

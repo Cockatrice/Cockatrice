@@ -155,7 +155,7 @@ public:
     }
     virtual int getMaxGamesPerUser() const
     {
-        return 0;
+        return -1;
     }
     virtual int getCommandCountingInterval() const
     {

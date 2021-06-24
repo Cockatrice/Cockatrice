@@ -6,15 +6,7 @@
 # like the installation path, compilation flags etc..
 
 # Cmake 3.1 is required to enable C++11 support correctly
-cmake_minimum_required(VERSION 3.1)
-
-if(POLICY CMP0064)
-    cmake_policy(SET CMP0064 NEW)
-endif()
-
-if(POLICY CMP0071)
-    cmake_policy(SET CMP0071 NEW)
-endif()
+cmake_minimum_required(VERSION 3.10)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -35,9 +27,26 @@ if(USE_CCACHE)
     endif()
 endif()
 
+if(WIN32)
+    # Use vcpkg toolchain on Windows
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        CACHE STRING "Vcpkg toolchain file")
+    # Qt path set by user or env var
+    if (QTDIR OR DEFINED ENV{QTDIR} OR DEFINED ENV{QTDIR32} OR DEFINED ENV{QTDIR64})
+    else()
+        set(QTDIR "" CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)")
+        message(WARNING "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)")
+    endif()
+endif()
+
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-PROJECT("Cockatrice" VERSION 2.7.6)
+PROJECT("Cockatrice" VERSION 2.8.1)
+
+# Set release name if not provided via env/cmake var
+if(NOT DEFINED GIT_TAG_RELEASENAME)
+    set(GIT_TAG_RELEASENAME "Prismatic Bridge")
+endif()
 
 # Use c++11 for all targets
 set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
@@ -49,7 +58,6 @@ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 # Search path for cmake modules
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-# Retrieve git version hash
 include(getversion)
 
 # Create a header and a cpp file containing the version hash
@@ -92,7 +100,7 @@ if(UNIX)
         endif()
     endif()
 elseif(WIN32)
-    set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
+    set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
 # Treat warnings as errors (Debug builds only)
@@ -100,10 +108,8 @@ option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 
 # Define proper compilation flags
 IF(MSVC)
-    # Visual Studio:
-    # Maximum optimization
-    # Disable warning C4251
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251")
+    # Visual Studio: Maximum optimization, disable warning C4251
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 ")
     # Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
@@ -128,7 +134,11 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
 ELSE()
     # other: osx/llvm, bsd/llvm
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    if(WARNING_AS_ERROR)
+      set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror")
+    else()
+      set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
+    endif()
 ENDIF()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
@@ -139,8 +149,21 @@ ENDIF()
 FIND_PACKAGE(Threads REQUIRED)
 
 # Find Qt5
-OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(_lib_suffix 64)
+else()
+    set(_lib_suffix 32)
+endif()
+
+if(DEFINED QTDIR${_lib_suffix})
+    list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
+elseif(DEFINED QTDIR)
+    list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
+elseif(DEFINED ENV{QTDIR${_lib_suffix}})
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
+elseif(DEFINED ENV{QTDIR})
+    list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
+endif()
 
 FIND_PACKAGE(Qt5Core 5.5.0 REQUIRED)
 
@@ -161,12 +184,18 @@ ELSE()
     MESSAGE(FATAL_ERROR "No Qt5 found!")
 ENDIF()
 
+# Check for translation updates
+OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
+MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+
 set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
 FIND_PACKAGE(Protobuf REQUIRED)
 IF(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-  MESSAGE(FATAL_ERROR "No protoc command found!")
+    MESSAGE(FATAL_ERROR "No protoc command found!")
+ELSE()
+    MESSAGE(STATUS "Protoc version ${Protobuf_VERSION} found!")
 ENDIF()
 
 #Find OpenSSL
@@ -215,7 +244,7 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-    if("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+    if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
         set(TRICE_IS_64_BIT 1)
     else()
         set(TRICE_IS_64_BIT 0)
@@ -258,7 +287,7 @@ if(WITH_ORACLE)
 endif()
 
 # Compile dbconverter (default on)
-option(WITH_DBCONVERTER "build oracle" ON)
+option(WITH_DBCONVERTER "build dbconverter" ON)
 if(WITH_DBCONVERTER)
     add_subdirectory(dbconverter)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Dbconverter;Dbconverter;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})

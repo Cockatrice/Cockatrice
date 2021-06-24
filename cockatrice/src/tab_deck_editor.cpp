@@ -26,8 +26,6 @@
 #include <QDir>
 #include <QDockWidget>
 #include <QFileDialog>
-#include <QGroupBox>
-#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -89,6 +87,8 @@ void TabDeckEditor::createDeckDock()
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
+    commentsEdit->setAcceptRichText(false);
+    commentsEdit->setMinimumHeight(nameEdit->minimumSizeHint().height());
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
@@ -139,15 +139,15 @@ void TabDeckEditor::createDeckDock()
     lowerLayout->addWidget(deckView, 1, 0, 1, 5);
 
     // Create widgets for both layouts to make splitter work correctly
-    QWidget *topWidget = new QWidget;
+    auto *topWidget = new QWidget;
     topWidget->setLayout(upperLayout);
-    QWidget *bottomWidget = new QWidget;
+    auto *bottomWidget = new QWidget;
     bottomWidget->setLayout(lowerLayout);
 
     auto *split = new QSplitter;
     split->setObjectName("deckSplitter");
     split->setOrientation(Qt::Vertical);
-    split->setChildrenCollapsible(false);
+    split->setChildrenCollapsible(true);
     split->addWidget(topWidget);
     split->addWidget(bottomWidget);
     split->setStretchFactor(0, 1);
@@ -164,7 +164,7 @@ void TabDeckEditor::createDeckDock()
     deckDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     deckDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                           QDockWidget::DockWidgetMovable);
-    QWidget *deckDockContents = new QWidget();
+    auto *deckDockContents = new QWidget();
     deckDockContents->setObjectName("deckDockContents");
     deckDockContents->setLayout(rightFrame);
     deckDock->setWidget(deckDockContents);
@@ -188,7 +188,7 @@ void TabDeckEditor::createCardInfoDock()
     cardInfoDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     cardInfoDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                               QDockWidget::DockWidgetMovable);
-    QWidget *cardInfoDockContents = new QWidget();
+    auto *cardInfoDockContents = new QWidget();
     cardInfoDockContents->setObjectName("cardInfoDockContents");
     cardInfoDockContents->setLayout(cardInfoFrame);
     cardInfoDock->setWidget(cardInfoDockContents);
@@ -250,7 +250,7 @@ void TabDeckEditor::createFiltersDock()
 
     filterDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                             QDockWidget::DockWidgetMovable);
-    QWidget *filterDockContents = new QWidget(this);
+    auto *filterDockContents = new QWidget(this);
     filterDockContents->setObjectName("filterDockContents");
     filterDockContents->setLayout(filterFrame);
     filterDock->setWidget(filterDockContents);
@@ -476,7 +476,7 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
         relatedMenu->setDisabled(true);
     } else {
         for (const CardRelation *rel : relatedCards) {
-            QString relatedCardName = rel->getName();
+            const QString &relatedCardName = rel->getName();
             QAction *relatedCard = relatedMenu->addAction(relatedCardName);
             connect(relatedCard, &QAction::triggered, cardInfo,
                     [this, relatedCardName] { cardInfo->setCard(relatedCardName); });
@@ -875,7 +875,7 @@ void TabDeckEditor::actSaveDeckToClipboardRaw()
 
 void TabDeckEditor::actPrintDeck()
 {
-    QPrintPreviewDialog *dlg = new QPrintPreviewDialog(this);
+    auto *dlg = new QPrintPreviewDialog(this);
     connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckModel, SLOT(printDeckList(QPrinter *)));
     dlg->exec();
 }
@@ -933,8 +933,9 @@ void TabDeckEditor::actClearFilterAll()
 void TabDeckEditor::actClearFilterOne()
 {
     QModelIndexList selIndexes = filterView->selectionModel()->selectedIndexes();
-    foreach (QModelIndex idx, selIndexes)
+    for (QModelIndex idx : selIndexes) {
         filterModel->removeRow(idx.row(), idx.parent());
+    }
 }
 
 void TabDeckEditor::recursiveExpand(const QModelIndex &index)
@@ -1249,7 +1250,7 @@ void TabDeckEditor::showSearchSyntaxHelp()
                .replace(QRegularExpression("^(##)(.*)", opts), "<h2>\\2</h2>")
                .replace(QRegularExpression("^(#)(.*)", opts), "<h1>\\2</h1>")
                .replace(QRegularExpression("^------*", opts), "<hr />")
-               .replace(QRegularExpression("\\[([^\[]+)\\]\\(([^\\)]+)\\)", opts), "<a href=\'\\2\'>\\1</a>");
+               .replace(QRegularExpression(R"(\[([^[]+)\]\(([^\)]+)\))", opts), R"(<a href='\2'>\1</a>)");
 
     auto browser = new QTextBrowser;
     browser->setParent(this, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint |
@@ -1262,6 +1263,6 @@ void TabDeckEditor::showSearchSyntaxHelp()
     browser->document()->setDefaultStyleSheet(sheet);
 
     browser->setHtml(text);
-    connect(browser, &QTextBrowser::anchorClicked, [=](QUrl link) { searchEdit->setText(link.fragment()); });
+    connect(browser, &QTextBrowser::anchorClicked, [=](const QUrl &link) { searchEdit->setText(link.fragment()); });
     browser->show();
 }

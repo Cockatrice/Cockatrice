@@ -62,6 +62,10 @@ int main(int argc, char *argv[])
 
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    // set name of the app desktop file; used by wayland to load the window icon
+    QGuiApplication::setDesktopFileName("oracle");
+#endif
 
     wizard.show();
 

@@ -5,10 +5,10 @@
 <p align='center'>
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
-   <a href="#get-involved-">Get Involved</a> <b>|</b>
+   <a href="#get-involved--">Get Involved</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#translations-">Translations</a> <b>|</b>
-   <a href="#build---">Build</a> <b>|</b>
+   <a href="#build-">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
 </p>
@@ -29,21 +29,21 @@ Cockatrice is an open-source, multiplatform program for playing tabletop card ga
 
 # Download [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
 
-Downloads are available for full releases and the current beta version in development.<br>
-Full releases are checkpoints featuring major feature or UI enhancements - we recommend to use those. There is no strict schedule for new full releases.
+Downloads are available for full releases and the current beta version in development. There is no strict release schedule for either of them.
 
-The beta release contains the most recently added features and bugfixes, but can be unstable. They are released as we feel need.
-
-- Latest `stable` release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![DL Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
+- Latest `stable` release: [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![DL Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
+  - Stable versions are checkpoints featuring major feature and UI enhancements.
+  - **Recommended for most users!**
 
 - Latest `beta` release: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) [![DL Count on Latest Pre-Release](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
-   - Beta versions may be unstable and contain bugs.
+   - Beta versions include the most recently added features and bugfixes, but can be unstable.
    - To be a Cockatrice Beta Tester, use this version. Find more information [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)!
+   
 
+# Get Involved [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA) [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice)](https://gitter.im/Cockatrice/Cockatrice)
 
-# Get Involved [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
-
-[Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
+Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with the project or fellow users of the app. The Cockatrice developers are also available on [Gitter](https://gitter.im/Cockatrice/Cockatrice). Come here to talk about the application, features, or just to hang out.<br>
+For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
 To contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
 We maintain two tags for contributors to find issues to work on:
@@ -67,7 +67,7 @@ Cockatrice uses the [Google Developer Documentation Style Guide](https://develop
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
-# Translations [![Cockatrice on Transiflex](https://tx-assets.scdn5.secure.raxcdn.com/static/charts/images/tx-logo-micro.c5603f91c780.png)](https://www.transifex.com/projects/p/cockatrice/)
+# Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://www.transifex.com/projects/p/cockatrice/)
 
 Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
 
@@ -78,9 +78,9 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice and
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
-# Build [![Travis Build Status - master](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice) [![Appveyor Build Status - master](https://ci.appveyor.com/api/projects/status/oauxf5a0sj689rcg/branch/master?svg=true)](https://ci.appveyor.com/project/ZeldaZach/cockatrice/branch/master) <!-- link to zachs appveyor not correct yet -->
+# Build [![CI Builds](https://github.com/Cockatrice/Cockatrice/actions/workflows/ci-builds.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/ci-builds.yml?query=branch%3Amaster+event%3Apush)
 
-**Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
+**Detailed compiling instructions can be found on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies: *(for minimum requirements search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)
@@ -125,7 +125,6 @@ The following flags can be passed to `cmake`:
 `Oracle` fetches card data<br>
 `Servatrice` is the server<br>
 
-
 **Servatrice Docker container**
 
 You can run an instance of Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker) and the Cockatrice Dockerfile.<br>
@@ -159,6 +158,7 @@ docker-compose up       # Setup and run both the MySQL server and Servatrice.
 A out of box working docker-compose file has been added to help setup in Windows.
 
 Docker in Windows requires additional steps in form of using Docker Desktop to allow resource sharing from the drive the volumes are mapped from, as well as potential workarounds needed to get file sharing working in Windows. This [StackOverflow discussion sheds some light on it](https://stackoverflow.com/questions/42203488/settings-to-windows-firewall-to-allow-docker-for-windows-to-share-drive)
+
 
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
 

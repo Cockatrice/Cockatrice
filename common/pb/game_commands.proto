@@ -26,7 +26,7 @@ message GameCommand {
         NEXT_TURN = 1022;
         SET_ACTIVE_PHASE = 1023;
         DUMP_ZONE = 1024;
-        STOP_DUMP_ZONE = 1025;
+        STOP_DUMP_ZONE = 1025; // deprecated
         REVEAL_CARDS = 1026;
         MOVE_CARD = 1027;
         SET_SIDEBOARD_PLAN = 1028;

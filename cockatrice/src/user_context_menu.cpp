@@ -12,9 +12,9 @@
 #include "pb/response_warn_list.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
+#include "tab_account.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
-#include "tab_userlists.h"
 #include "userinfobox.h"
 #include "userlist.h"
 
@@ -66,7 +66,7 @@ void UserContextMenu::retranslateUi()
     aBanHistory->setText(tr("View user's &ban history"));
     aPromoteToMod->setText(tr("&Promote user to moderator"));
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
-    aPromoteToJudge->setText(tr("Promote user to &juge"));
+    aPromoteToJudge->setText(tr("Promote user to &judge"));
     aDemoteFromJudge->setText(tr("Demote user from judge"));
 }
 

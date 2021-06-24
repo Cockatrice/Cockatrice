@@ -25,21 +25,23 @@ message Response {
         RespAccessDenied = 20;
         RespUsernameInvalid = 21;
         RespRegistrationRequired = 22;
-        RespRegistrationAccepted = 23; // Server agrees to process client's registration request
-        RespUserAlreadyExists = 24; // Client attempted to register a name which is already registered
+        RespRegistrationAccepted = 23;    // Server agrees to process client's registration request
+        RespUserAlreadyExists = 24;       // Client attempted to register a name which is already registered
         RespEmailRequiredToRegister = 25; // Server requires email to register accounts but client did not provide one
-        RespTooManyRequests = 26; // Server refused to complete command because client has sent too many too quickly
+        RespTooManyRequests = 26;  // Server refused to complete command because client has sent too many too quickly
         RespPasswordTooShort = 27; // Server requires a decent password
-        RespAccountNotActivated = 28; // Client attempted to log into a registered username but the account hasn't been activated
+        RespAccountNotActivated =
+            28; // Client attempted to log into a registered username but the account hasn't been activated
         RespRegistrationDisabled = 29; // Server does not allow clients to register
-        RespRegistrationFailed = 30; // Server accepted a reg request but failed to perform the registration
-        RespActivationAccepted = 31; // Server accepted a reg user activation token
-        RespActivationFailed = 32; // Server didn't accept a reg user activation token
-        RespRegistrationAcceptedNeedsActivation = 33; // Server accepted cient registration, but it will need token activation
+        RespRegistrationFailed = 30;   // Server accepted a reg request but failed to perform the registration
+        RespActivationAccepted = 31;   // Server accepted a reg user activation token
+        RespActivationFailed = 32;     // Server didn't accept a reg user activation token
+        RespRegistrationAcceptedNeedsActivation =
+            33;                    // Server accepted cient registration, but it will need token activation
         RespClientIdRequired = 34; // Server requires client to generate and send its client id before allowing access
         RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
-        RespServerFull = 36; // Server user limit reached
-        RespEmailBlackListed = 37; // Server has blacklisted the email address provided for registration
+        RespServerFull = 36;           // Server user limit reached
+        RespEmailBlackListed = 37;     // Server has blacklisted the email address provided for registration
     }
     enum ResponseType {
         JOIN_ROOM = 1000;
@@ -64,6 +66,6 @@ message Response {
     }
     required uint64 cmd_id = 1;
     optional ResponseCode response_code = 2;
-    
+
     extensions 100 to max;
 }
