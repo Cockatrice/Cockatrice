@@ -555,10 +555,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 
     QString receiver = QString::fromStdString(cmd.user_name());
     Server_AbstractUserInterface *userInterface = server->findUser(receiver);
-    if (!userInterface)
+    if (!userInterface) {
         return Response::RespNameNotFound;
-    if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
+    }
+    if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name()))) {
         return Response::RespInIgnoreList;
+    }
+    if (!addSaidMessageSize(cmd.message().size())) {
+        return Response::RespChatFlood;
+    }
 
     Event_UserMessage event;
     event.set_sender_name(userInfo->name());
