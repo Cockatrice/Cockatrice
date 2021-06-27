@@ -129,6 +129,7 @@ public:
     {
         return timeRunning - lastDataReceived;
     }
+    bool addSaidMessageSize(int size);
     void processCommandContainer(const CommandContainer &cont);
 
     void sendProtocolItem(const Response &item);
