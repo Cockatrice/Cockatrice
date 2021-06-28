@@ -945,6 +945,9 @@ Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/
         }
     }
 
+    if (!userInterface->addSaidMessageSize(cmd.message().size())) {
+        return Response::RespChatFlood;
+    }
     Event_GameSay event;
     event.set_message(cmd.message());
     ges.enqueueGameEvent(event, playerId);

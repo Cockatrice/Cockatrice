@@ -38,6 +38,7 @@ public:
     }
 
     virtual int getLastCommandTime() const = 0;
+    virtual bool addSaidMessageSize(int size) = 0;
 
     void playerRemovedFromGame(Server_Game *game);
     void playerAddedToGame(int gameId, int roomId, int playerId);
