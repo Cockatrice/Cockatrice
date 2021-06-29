@@ -23,7 +23,7 @@ SetQuery <- ('e'/'set') [:] FlexStringValue
 OracleQuery <- 'o' [:] RegexString
 
 
-CMCQuery <- 'cmc' ws? NumericExpression
+CMCQuery <- ('cmc'/'mv') ws? NumericExpression
 PowerQuery <- [Pp] 'ow' 'er'? ws? NumericExpression
 ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
 RarityQuery <- [rR] ':' RegexString

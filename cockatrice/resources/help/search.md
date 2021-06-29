@@ -33,7 +33,8 @@ The search bar recognizes a set of special commands similar to some other card d
 <dt><u>Pow</u>er, <u>Tou</u>ghness, <u>C</u>onverted <u>M</u>ana <u>C</u>ost:</dt>
 <dd>[tou:1](#tou:1) <small>(Any card with a toughness of 1)</small></dd>
 <dd>[pow>=8](#pow>=8) <small>(Any card with a power greater than or equal to 8)</small></dd>
-<dd>[cmc=7](#cmc=7) <small>(Any card with a converted mana cost equal to 7)</small></dd>
+<dd>[cmc=7](#cmc=7) <small>(Any card with a mana value equal to 7)</small></dd>
+<dd>[mv=7](#mv=7) <small>(Any card with a mana value equal to 7)</small></dd>
 
 <dt><u>R</u>arity:</dt>
 <dd>[r:mythic](#r:mythic) <small>(Any card that has the mythic-rare rarity)</small></dd>
