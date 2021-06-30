@@ -128,7 +128,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     QString tmp = settings->value(configEntry).toString();
     // if the config settings is empty or refers to a not-existing folder,
     // ensure that the defaut path exists and return it
-    if (!QDir(tmp).exists() || tmp.isEmpty()) {
+    if (tmp.isEmpty() || !QDir(tmp).exists()) {
         if (!QDir().mkpath(defaultPath))
             qDebug() << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
@@ -156,7 +156,6 @@ SettingsCache::SettingsCache()
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
-    QString dataPath = getDataPath();
     QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
@@ -190,21 +189,7 @@ SettingsCache::SettingsCache()
         seenTips.append(tipNumber.toInt());
     }
 
-    deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
-    replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
-    themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
-    picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
-    // this has never been exposed as an user-configurable setting
-    if (picsPath.endsWith("/")) {
-        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
-    } else {
-        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
-    }
-    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
-
-    cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
-    tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
-    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoiler.xml");
+    loadPaths();
 
     themeName = settings->value("theme/name").toString();
 
@@ -395,6 +380,7 @@ void SettingsCache::setCustomCardDatabasePath(const QString &_customCardDatabase
 {
     customCardDatabasePath = _customCardDatabasePath;
     settings->setValue("paths/customsets", customCardDatabasePath);
+    emit cardDatabasePathChanged();
 }
 
 void SettingsCache::setPicsPath(const QString &_picsPath)
@@ -985,6 +971,41 @@ void SettingsCache::setMaxFontSize(int _max)
 {
     maxFontSize = _max;
     settings->setValue("game/maxfontsize", maxFontSize);
+}
+
+void SettingsCache::loadPaths()
+{
+    QString dataPath = getDataPath();
+    deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
+    replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
+    themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
+    picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
+    // this has never been exposed as an user-configurable setting
+    if (picsPath.endsWith("/")) {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
+    } else {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    }
+    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
+
+    cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
+    tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
+    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoiler.xml");
+}
+
+void SettingsCache::resetPaths()
+{
+    QStringList databasePaths{customCardDatabasePath, cardDatabasePath, spoilerDatabasePath, tokenDatabasePath};
+    QString picsPath_ = picsPath;
+    settings->remove("paths"); // removes all keys in paths/*
+    loadPaths();
+    if (databasePaths !=
+        QStringList{customCardDatabasePath, cardDatabasePath, spoilerDatabasePath, tokenDatabasePath}) {
+        emit cardDatabasePathChanged();
+    }
+    if (picsPath_ != picsPath) {
+        emit picsPathChanged();
+    }
 }
 
 SettingsCache &SettingsCache::instance()

@@ -43,7 +43,8 @@
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-    QString setLanguage = SettingsCache::instance().getLang();
+    SettingsCache &settings = SettingsCache::instance();
+    QString setLanguage = settings.getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
@@ -54,34 +55,34 @@ GeneralSettingsPage::GeneralSettingsPage()
     }
 
     // updates
-    QList<ReleaseChannel *> channels = SettingsCache::instance().getUpdateReleaseChannels();
+    QList<ReleaseChannel *> channels = settings.getUpdateReleaseChannels();
     foreach (ReleaseChannel *chan, channels) {
         updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
     }
-    updateReleaseChannelBox.setCurrentIndex(SettingsCache::instance().getUpdateReleaseChannel()->getIndex());
+    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
 
-    updateNotificationCheckBox.setChecked(SettingsCache::instance().getNotifyAboutUpdates());
-    newVersionOracleCheckBox.setChecked(SettingsCache::instance().getNotifyAboutNewVersion());
+    updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
+    newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
 
     // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
     // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
     pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
     pixmapCacheEdit.setSingleStep(64);
-    pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
+    pixmapCacheEdit.setValue(settings.getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
 
-    showTipsOnStartup.setChecked(SettingsCache::instance().getShowTipsOnStartup());
+    showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &SettingsCache::instance(),
+    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setPixmapCacheSize(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings,
             SLOT(setUpdateReleaseChannel(int)));
-    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &settings,
             SLOT(setNotifyAboutUpdate(int)));
-    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &settings,
             SLOT(setNotifyAboutNewVersion(int)));
-    connect(&showTipsOnStartup, SIGNAL(clicked(bool)), &SettingsCache::instance(), SLOT(setShowTipsOnStartup(bool)));
+    connect(&showTipsOnStartup, SIGNAL(clicked(bool)), &settings, SLOT(setShowTipsOnStartup(bool)));
 
     auto *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -97,37 +98,38 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
 
-    deckPathEdit = new QLineEdit(SettingsCache::instance().getDeckPath());
+    deckPathEdit = new QLineEdit(settings.getDeckPath());
     deckPathEdit->setReadOnly(true);
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 
-    replaysPathEdit = new QLineEdit(SettingsCache::instance().getReplaysPath());
+    replaysPathEdit = new QLineEdit(settings.getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     QPushButton *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, SIGNAL(clicked()), this, SLOT(replaysPathButtonClicked()));
 
-    picsPathEdit = new QLineEdit(SettingsCache::instance().getPicsPath());
+    picsPathEdit = new QLineEdit(settings.getPicsPath());
     picsPathEdit->setReadOnly(true);
     QPushButton *picsPathButton = new QPushButton("...");
     connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
 
-    cardDatabasePathEdit = new QLineEdit(SettingsCache::instance().getCardDatabasePath());
+    cardDatabasePathEdit = new QLineEdit(settings.getCardDatabasePath());
     cardDatabasePathEdit->setReadOnly(true);
     QPushButton *cardDatabasePathButton = new QPushButton("...");
     connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
 
-    customCardDatabasePathEdit = new QLineEdit(SettingsCache::instance().getCustomCardDatabasePath());
+    customCardDatabasePathEdit = new QLineEdit(settings.getCustomCardDatabasePath());
     customCardDatabasePathEdit->setReadOnly(true);
     QPushButton *customCardDatabasePathButton = new QPushButton("...");
     connect(customCardDatabasePathButton, SIGNAL(clicked()), this, SLOT(customCardDatabaseButtonClicked()));
 
-    tokenDatabasePathEdit = new QLineEdit(SettingsCache::instance().getTokenDatabasePath());
+    tokenDatabasePathEdit = new QLineEdit(settings.getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
 
-    if (SettingsCache::instance().getIsPortableBuild()) {
+    bool isPortable = settings.getIsPortableBuild();
+    if (isPortable) {
         deckPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
         picsPathEdit->setEnabled(false);
@@ -139,8 +141,13 @@ GeneralSettingsPage::GeneralSettingsPage()
         replaysPathButton->setVisible(false);
         picsPathButton->setVisible(false);
         cardDatabasePathButton->setVisible(false);
-        customCardDatabasePathEdit->setVisible(false);
+        customCardDatabasePathButton->setVisible(false);
         tokenDatabasePathButton->setVisible(false);
+    } else {
+        resetAllPathsButton = new QPushButton(tr("Reset all paths"));
+        connect(resetAllPathsButton, SIGNAL(clicked()), this, SLOT(resetAllPathsClicked()));
+        allPathsResetLabel = new QLabel(tr("All paths have been reset"));
+        allPathsResetLabel->setVisible(false);
     }
 
     auto *pathsGrid = new QGridLayout;
@@ -162,6 +169,10 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(&tokenDatabasePathLabel, 5, 0);
     pathsGrid->addWidget(tokenDatabasePathEdit, 5, 1);
     pathsGrid->addWidget(tokenDatabasePathButton, 5, 2);
+    if (!isPortable) {
+        pathsGrid->addWidget(resetAllPathsButton, 6, 0);
+        pathsGrid->addWidget(allPathsResetLabel, 6, 1);
+    }
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
 
@@ -249,6 +260,19 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 
     tokenDatabasePathEdit->setText(path);
     SettingsCache::instance().setTokenDatabasePath(path);
+}
+
+void GeneralSettingsPage::resetAllPathsClicked()
+{
+    SettingsCache &settings = SettingsCache::instance();
+    settings.resetPaths();
+    deckPathEdit->setText(settings.getDeckPath());
+    replaysPathEdit->setText(settings.getReplaysPath());
+    picsPathEdit->setText(settings.getPicsPath());
+    cardDatabasePathEdit->setText(settings.getCardDatabasePath());
+    customCardDatabasePathEdit->setText(settings.getCustomCardDatabasePath());
+    tokenDatabasePathEdit->setText(settings.getTokenDatabasePath());
+    allPathsResetLabel->setVisible(true);
 }
 
 void GeneralSettingsPage::languageBoxChanged(int index)

@@ -129,6 +129,7 @@ private:
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
+    void loadPaths();
     bool rememberGameSettings;
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
@@ -473,6 +474,8 @@ public:
     }
 
     static SettingsCache &instance();
+    void resetPaths();
+
 public slots:
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
