@@ -342,12 +342,14 @@ int AbstractServerSocketInterface::getDeckPathId(const QString &path)
     return getDeckPathId(0, path.split("/"));
 }
 
-bool AbstractServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder)
+bool AbstractServerSocketInterface::deckListHelper(int folderId, int userId, ServerInfo_DeckStorage_Folder *folder)
 {
+    int offset = (userInfo->id() != userId) ? globalDeckOffset : 0;
+
     QSqlQuery *query = sqlInterface->prepareQuery(
         "select id, name from {prefix}_decklist_folders where id_parent = :id_parent and id_user = :id_user");
     query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userInfo->id());
+    query->bindValue(":id_user", userId);
     if (!sqlInterface->execSqlQuery(query))
         return false;
 
@@ -357,23 +359,23 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId, ServerInfo_Deck
 
     foreach (int key, results.keys()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(key);
+        newItem->set_id(key + offset);
         newItem->set_name(results.value(key).toStdString());
 
-        if (!deckListHelper(newItem->id(), newItem->mutable_folder()))
+        if (!deckListHelper(key, userId, newItem->mutable_folder()))
             return false;
     }
 
     query = sqlInterface->prepareQuery("select id, name, upload_time from {prefix}_decklist_files where id_folder = "
                                        ":id_folder and id_user = :id_user");
     query->bindValue(":id_folder", folderId);
-    query->bindValue(":id_user", userInfo->id());
+    query->bindValue(":id_user", userId);
     if (!sqlInterface->execSqlQuery(query))
         return false;
 
     while (query->next()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query->value(0).toInt());
+        newItem->set_id(query->value(0).toInt() + offset);
         newItem->set_name(query->value(1).toString().toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
@@ -397,7 +399,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckList(const Command_
     Response_DeckList *re = new Response_DeckList;
     ServerInfo_DeckStorage_Folder *root = re->mutable_root();
 
-    if (!deckListHelper(0, root))
+    int globalID = servatrice->getGlobalDecksID();
+    if ((globalID != -1) && ((globalID != userInfo->id())))
+        if (!deckListHelper(0, globalID, root))
+            return Response::RespContextError;
+
+    if (!deckListHelper(0, userInfo->id(), root))
         return Response::RespContextError;
 
     rc.setResponseExtension(re);

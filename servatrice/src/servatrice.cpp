@@ -808,6 +808,11 @@ bool Servatrice::getClientIDRequiredEnabled() const
     return settingsCache->value("server/requireclientid", 0).toBool();
 }
 
+int Servatrice::getGlobalDecksID() const
+{
+    return settingsCache->value("server/globaldecksid", -1).toInt();
+}
+
 bool Servatrice::getRegOnlyServerEnabled() const
 {
     return settingsCache->value("authentication/regonly", 0).toBool();

@@ -27,6 +27,8 @@
 #include <QTcpSocket>
 #include <QWebSocket>
 
+static const int globalDeckOffset = 10000000;
+
 class Servatrice;
 class Servatrice_DatabaseInterface;
 class DeckList;
@@ -82,7 +84,7 @@ private:
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     int getDeckPathId(int basePathId, QStringList path);
     int getDeckPathId(const QString &path);
-    bool deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder);
+    bool deckListHelper(int folderId, int userId, ServerInfo_DeckStorage_Folder *folder);
     Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
     void deckDelDirHelper(int basePathId);

@@ -85,6 +85,9 @@ officialwarnings="Flamming,Spamming,Causing Drama,Abusive Language"
 ; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
 idleclienttimeout=3600
 
+; You can define one user whose decks will be available to all users. This is useful for hosting events and distributing preconstructed decks to all users. By default this is unset. This will be matched against the id field in cockatrice_users.
+; globaldecksid=1
+
 [authentication]
 
 ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:
