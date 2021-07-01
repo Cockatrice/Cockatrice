@@ -97,6 +97,8 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
         new QLabel(tr("Please enter the reason for the ban that will be visible to the banned person."));
     visibleReasonEdit = new QPlainTextEdit;
 
+    deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
+
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
@@ -115,6 +117,7 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
     vbox->addWidget(reasonEdit);
     vbox->addWidget(visibleReasonLabel);
     vbox->addWidget(visibleReasonEdit);
+    vbox->addWidget(deleteMessages);
     vbox->addLayout(buttonLayout);
 
     setLayout(vbox);
@@ -129,6 +132,8 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
     warnClientID = new QLineEdit(clientID);
     warningOption = new QComboBox();
     warningOption->addItem("");
+
+    deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
 
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
@@ -145,6 +150,7 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
     vbox->addWidget(descriptionLabel);
     vbox->addWidget(nameWarning);
     vbox->addWidget(warningOption);
+    vbox->addWidget(deleteMessages);
     vbox->addLayout(buttonLayout);
     setLayout(vbox);
     setWindowTitle(tr("Warn user for misconduct"));
@@ -180,6 +186,11 @@ QString WarningDialog::getWarnID() const
 QString WarningDialog::getReason() const
 {
     return warningOption->currentText().simplified();
+}
+
+int WarningDialog::getDeleteMessages() const
+{
+    return deleteMessages->isChecked() ? -1 : 0;
 }
 
 void WarningDialog::addWarningOption(const QString warning)
@@ -260,6 +271,11 @@ QString BanDialog::getReason() const
 QString BanDialog::getVisibleReason() const
 {
     return visibleReasonEdit->toPlainText();
+}
+
+int BanDialog::getDeleteMessages() const
+{
+    return deleteMessages->isChecked() ? -1 : 0;
 }
 
 UserListItemDelegate::UserListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)

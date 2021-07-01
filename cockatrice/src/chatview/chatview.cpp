@@ -12,9 +12,16 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QTextDocumentFragment>
 #include <QTextEdit>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
+
+UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
+{
+    block = cursor.block();
+    relativePosition = cursor.position() - block.position();
+}
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
@@ -43,8 +50,8 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor,
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
-    userName = userlistProxy->getOwnUsername();
-    mention = "@" + userName;
+    ownUserName = userlistProxy->getOwnUsername();
+    mention = "@" + ownUserName;
 
     mentionFormat.setFontWeight(QFont::Bold);
 
@@ -68,7 +75,7 @@ QTextCursor ChatView::prepareBlock(bool same)
 {
     lastSender.clear();
 
-    QTextCursor cursor(document()->lastBlock());
+    QTextCursor cursor(document());
     cursor.movePosition(QTextCursor::End);
     if (same) {
         cursor.insertHtml("<br>");
@@ -145,76 +152,86 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
 void ChatView::appendMessage(QString message,
                              RoomMessageTypeFlags messageType,
-                             QString sender,
+                             const QString &userName,
                              UserLevelFlags userLevel,
                              QString UserPrivLevel,
                              bool playerBold)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
-    bool sameSender = (sender == lastSender) && !lastSender.isEmpty();
+    // messageType should be Event_RoomSay::UserMessage though we don't actually check
+    bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
+    bool sameSender = isUserMessage && userName == lastSender;
     QTextCursor cursor = prepareBlock(sameSender);
-    lastSender = sender;
+    lastSender = userName;
 
     // timestamp
-    if (showTimestamps && (!sameSender || sender.toLower() == "servatrice") && !sender.isEmpty()) {
+    if (showTimestamps && ((!sameSender && isUserMessage) || userName.toLower() == "servatrice")) {
         QTextCharFormat timeFormat;
         timeFormat.setForeground(serverMessageColor);
-        if (sender.isEmpty())
-            timeFormat.setFontWeight(QFont::Bold);
+        timeFormat.setFontWeight(QFont::Bold);
         cursor.setCharFormat(timeFormat);
         cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
     }
 
     // nickname
-    if (sender.toLower() != "servatrice") {
+    if (isUserMessage) {
         QTextCharFormat senderFormat;
-        if (sender == userName) {
+        if (userName == ownUserName) {
             senderFormat.setForeground(QBrush(getCustomMentionColor()));
             senderFormat.setFontWeight(QFont::Bold);
         } else {
             senderFormat.setForeground(QBrush(otherUserColor));
-            if (playerBold)
+            if (playerBold) {
                 senderFormat.setFontWeight(QFont::Bold);
+            }
         }
         senderFormat.setAnchor(true);
-        senderFormat.setAnchorHref("user://" + QString::number(userLevel) + "_" + sender);
+        senderFormat.setAnchorHref("user://" + QString::number(userLevel) + "_" + userName);
         if (sameSender) {
             cursor.insertText("    ");
         } else {
-            if (!sender.isEmpty()) {
-                const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-                bool isBuddy = userlistProxy->isUserBuddy(sender);
-                cursor.insertImage(
-                    UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, UserPrivLevel).toImage());
-                cursor.insertText(" ");
-            }
+            const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
+            bool isBuddy = userlistProxy->isUserBuddy(userName);
+            cursor.insertImage(
+                UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, UserPrivLevel).toImage());
+            cursor.insertText(" ");
             cursor.setCharFormat(senderFormat);
-            if (!sender.isEmpty())
-                sender.append(": ");
-            cursor.insertText(sender);
+            cursor.insertText(userName);
+            cursor.insertText(": ");
+            userMessagePositions[userName].append(cursor);
         }
     }
 
     // use different color for server messages
     defaultFormat = QTextCharFormat();
-    if (sender.isEmpty()) {
-        switch (messageType) {
-            case Event_RoomSay::Welcome:
-                defaultFormat.setForeground(Qt::darkGreen);
-                defaultFormat.setFontWeight(QFont::Bold);
-                break;
-            case Event_RoomSay::ChatHistory:
-                defaultFormat.setForeground(Qt::gray);
-                defaultFormat.setFontWeight(QFont::Light);
-                defaultFormat.setFontItalic(true);
-                break;
-            default:
-                defaultFormat.setForeground(Qt::darkGreen);
-                defaultFormat.setFontWeight(QFont::Bold);
+    if (!isUserMessage) {
+        if (messageType == Event_RoomSay::ChatHistory) {
+            defaultFormat.setForeground(Qt::gray); // FIXME : hardcoded color
+            defaultFormat.setFontWeight(QFont::Light);
+            defaultFormat.setFontItalic(true);
+            static const QRegularExpression userNameRegex("^(\\[[^\\]]*\\]\\s)(\\S+):\\s");
+            auto match = userNameRegex.match(message);
+            if (match.hasMatch()) {
+                cursor.setCharFormat(defaultFormat);
+                UserMessagePosition pos(cursor);
+                pos.relativePosition = match.captured(0).length(); // set message start
+                auto before = match.captured(1);
+                auto sentBy = match.captured(2);
+                cursor.insertText(before); // add message timestamp
+                QTextCharFormat senderFormat(defaultFormat);
+                senderFormat.setAnchor(true);
+                // this underscore is important, it is used to add the user level, but in this case the level is
+                // unknown, if the name contains an underscore it would split up the name
+                senderFormat.setAnchorHref("user://_" + sentBy);
+                cursor.setCharFormat(senderFormat);
+                cursor.insertText(sentBy);                   // add username with href so it shows the menu
+                userMessagePositions[sentBy].append(pos);    // save message position
+                message.remove(0, pos.relativePosition - 2); // do not remove semicolon
+            }
+        } else {
+            defaultFormat.setForeground(Qt::darkGreen); // FIXME : hardcoded color
+            defaultFormat.setFontWeight(QFont::Bold);
         }
-    } else if (sender.toLower() == "servatrice") {
-        defaultFormat.setForeground(Qt::darkGreen);
-        defaultFormat.setFontWeight(QFont::Bold);
     }
     cursor.setCharFormat(defaultFormat);
 
@@ -234,7 +251,7 @@ void ChatView::appendMessage(QString message,
                 break;
             case '@':
                 if (mentionEnabled) {
-                    checkMention(cursor, message, sender, userLevel);
+                    checkMention(cursor, message, userName, userLevel);
                 } else {
                     cursor.insertText(c, defaultFormat);
                     message = message.mid(1);
@@ -304,7 +321,7 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
     checkWord(cursor, message);
 }
 
-void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel)
+void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString &userName, UserLevelFlags userLevel)
 {
     const QRegExp notALetterOrNumber = QRegExp("[^a-zA-Z0-9]");
 
@@ -316,7 +333,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
         const ServerInfo_User *onlineUser = userlistProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
         if (onlineUser) // Is there a user online named this?
         {
-            if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
+            if (ownUserName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
             {
                 // You have received a valid mention!!
                 soundEngine->playSound("chat_mention");
@@ -325,7 +342,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
                                                                                                  : QBrush(Qt::black));
                 cursor.insertText(mention, mentionFormat);
                 message = message.mid(mention.size());
-                showSystemPopup(sender);
+                showSystemPopup(userName);
             } else {
                 QString correctUserName = QString::fromStdString(onlineUser->name());
                 mentionFormatOtherUser.setAnchorHref("user://" + QString::number(onlineUser->user_level()) + "_" +
@@ -347,7 +364,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
                                                                                              : QBrush(Qt::black));
             cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);
             message = message.mid(fullMentionUpToSpaceOrEnd.size() + 1);
-            showSystemPopup(sender);
+            showSystemPopup(userName);
 
             cursor.setCharFormat(defaultFormat);
             return;
@@ -445,12 +462,11 @@ void ChatView::actMessageClicked()
     emit messageClickedSignal();
 }
 
-void ChatView::showSystemPopup(QString &sender)
+void ChatView::showSystemPopup(const QString &userName)
 {
     QApplication::alert(this);
     if (SettingsCache::instance().getShowMentionPopup()) {
-        QString ref = sender.left(sender.length() - 2);
-        emit showMentionPopup(ref);
+        emit showMentionPopup(userName);
     }
 }
 
@@ -472,6 +488,28 @@ void ChatView::clearChat()
 {
     document()->clear();
     lastSender = "";
+}
+
+void ChatView::redactMessages(const QString &userName, int amount)
+{
+    auto &messagePositions = userMessagePositions[userName];
+    bool removedLastMessage = false;
+    QTextCursor cursor(document());
+    for (; !messagePositions.isEmpty() && amount != 0; --amount) {
+        auto position = messagePositions.takeLast();   // go backwards from last message
+        cursor.setPosition(position.block.position()); // move to start of block, then continue to start of message
+        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, position.relativePosition);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor); // select until end of block
+        cursor.removeSelectedText();
+        // if the cursor is at the end of the text it is possible to add text to this block still
+        removedLastMessage |= cursor.atEnd();
+        // we will readd this position later
+    }
+    if (removedLastMessage) {
+        cursor.movePosition(QTextCursor::End);
+        messagePositions.append(cursor);
+        // note that this message might stay empty, this is not harmful as it will simply remove nothing the next time
+    }
 }
 
 void ChatView::enterEvent(QEvent * /*event*/)
@@ -540,7 +578,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                 switch (event->button()) {
                     case Qt::RightButton: {
                         UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
-                        userContextMenu->showContextMenu(event->globalPos(), userName, userLevel);
+                        userContextMenu->showContextMenu(event->globalPos(), userName, userLevel, this);
                         break;
                     }
                     case Qt::LeftButton: {

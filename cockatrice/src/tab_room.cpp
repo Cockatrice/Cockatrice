@@ -9,6 +9,7 @@
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_list_games.pb.h"
+#include "pb/event_remove_messages.pb.h"
 #include "pb/event_room_say.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_room.pb.h"
@@ -49,7 +50,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
 
-    chatView = new ChatView(tabSupervisor, tabSupervisor, 0, true);
+    chatView = new ChatView(tabSupervisor, tabSupervisor, nullptr, true, this);
     connect(chatView, SIGNAL(showMentionPopup(QString &)), this, SLOT(actShowMentionPopup(QString &)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -310,6 +311,13 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 
     chatView->appendMessage(message, event.message_type(), senderName, userLevel, userPrivLevel, true);
     emit userEvent(false);
+}
+
+void TabRoom::processRemoveMessagesEvent(const Event_RemoveMessages &event)
+{
+    QString userName = QString::fromStdString(event.name());
+    int amount = event.amount();
+    chatView->redactMessages(userName, amount);
 }
 
 void TabRoom::refreshShortcuts()

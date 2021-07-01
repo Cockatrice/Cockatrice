@@ -91,6 +91,7 @@ SET(PROTO_FILES
     event_reverse_turn.proto
     event_roll_die.proto
     event_room_say.proto
+    event_remove_messages.proto
     event_server_complete_list.proto
     event_server_identification.proto
     event_server_message.proto
