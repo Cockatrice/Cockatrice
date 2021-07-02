@@ -1945,7 +1945,6 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
-    updateCardMenu(card);
     emit logSetCardCounter(this, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
@@ -2014,7 +2013,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
         x = 0;
     }
     CardItem *card = startZone->takeCard(position, event.card_id(), startZone != targetZone);
-    if (!card) {
+    if (card == nullptr) {
         return;
     }
     if (startZone != targetZone) {
@@ -2080,6 +2079,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
             i->delArrow();
         }
     }
+    updateCardMenu(card);
 }
 
 void Player::eventFlipCard(const Event_FlipCard &event)
@@ -2094,6 +2094,7 @@ void Player::eventFlipCard(const Event_FlipCard &event)
     }
     emit logFlipCard(this, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
+    updateCardMenu(card);
 }
 
 void Player::eventDestroyCard(const Event_DestroyCard &event)
@@ -2111,7 +2112,7 @@ void Player::eventDestroyCard(const Event_DestroyCard &event)
     QList<CardItem *> attachedCards = card->getAttachedCards();
     // This list is always empty except for buggy server implementations.
     for (auto &attachedCard : attachedCards) {
-        attachedCard->setAttachedTo(0);
+        attachedCard->setAttachedTo(nullptr);
     }
 
     emit logDestroyCard(this, card->getName());
@@ -2162,6 +2163,7 @@ void Player::eventAttachCard(const Event_AttachCard &event)
     } else {
         emit logUnattachCard(this, startCard->getName());
     }
+    updateCardMenu(startCard);
 }
 
 void Player::eventDrawCards(const Event_DrawCards &event)
@@ -3278,17 +3280,14 @@ void Player::refreshShortcuts()
 {
     if (shortcutsActive) {
         setShortcutsActive();
-
-        for (const CardItem *cardItem : table->getCards()) {
-            updateCardMenu(cardItem);
-        }
     }
 }
 
 void Player::updateCardMenu(const CardItem *card)
 {
     // If bad card OR is a spectator (as spectators don't need card menus), return
-    if (card == nullptr || (game->isSpectator() && !judge)) {
+    // only update the menu if the card is actually selected
+    if (card == nullptr || (game->isSpectator() && !judge) || game->getActiveCard() != card) {
         return;
     }
 
@@ -3521,7 +3520,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
 void Player::setCardMenu(QMenu *menu)
 {
-    if (aCardMenu) {
+    if (aCardMenu != nullptr) {
         aCardMenu->setEnabled(menu != nullptr);
         aCardMenu->setMenu(menu);
     }
@@ -3529,10 +3528,11 @@ void Player::setCardMenu(QMenu *menu)
 
 QMenu *Player::getCardMenu() const
 {
-    if (aCardMenu) {
+    if (aCardMenu != nullptr) {
         return aCardMenu->menu();
+    } else {
+        return nullptr;
     }
-    return nullptr;
 }
 
 QString Player::getName() const

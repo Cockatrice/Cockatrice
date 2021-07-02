@@ -53,8 +53,7 @@ public:
              int _cardid = -1,
              bool revealedCard = false,
              QGraphicsItem *parent = nullptr,
-             CardZone *_zone = nullptr,
-             bool updateMenu = false);
+             CardZone *_zone = nullptr);
     ~CardItem();
     void retranslateUi();
     CardZone *getZone() const

@@ -272,7 +272,6 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 {
     facedown = _facedown;
     update();
-    emit updateCardMenu(this);
 }
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
