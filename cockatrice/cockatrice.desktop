@@ -3,6 +3,11 @@
 Version=1.0
 Type=Application
 Name=Cockatrice
-Exec=cockatrice
 Icon=cockatrice
+Exec=cockatrice
+Terminal=false
+Type=Application
+Keywords=mtg;magic;cockatrice;cor;cod;
+MimeType=application/cod;application/cor;x-scheme-handle/cockatrice;
 Categories=Game;CardGame;
+Comment=

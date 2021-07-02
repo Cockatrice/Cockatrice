@@ -47,7 +47,7 @@ public:
     {
         return passwordEdit->text();
     }
-
+    
 public slots:
     void downloadThePublicServers();
 

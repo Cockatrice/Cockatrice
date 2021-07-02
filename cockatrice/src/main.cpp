@@ -21,11 +21,13 @@
 #include "main.h"
 
 #include "QtNetwork/QNetworkInterface"
+#include "applicationinstancemanager.h"
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "featureset.h"
 #include "logger.h"
 #include "pixmapgenerator.h"
+#include "qtlocalpeer/qtlocalpeer.h"
 #include "rng_sfmt.h"
 #include "settingscache.h"
 #include "soundengine.h"
@@ -41,10 +43,12 @@
 #include <QDir>
 #include <QFile>
 #include <QLibraryInfo>
+#include <QList>
 #include <QLocale>
 #include <QSystemTrayIcon>
 #include <QTextCodec>
 #include <QTextStream>
+#include <QThread>
 #include <QTranslator>
 #include <QtPlugin>
 
@@ -74,6 +78,11 @@ void installNewTranslator()
     qDebug() << "Language changed:" << lang;
 }
 
+QString const getUserIDString()
+{
+    return QDir::home().dirName();
+}
+
 QString const generateClientID()
 {
     QString macList;
@@ -88,92 +97,167 @@ QString const generateClientID()
 
 int main(int argc, char *argv[])
 {
+    // Start trice client
     QApplication app(argc, argv);
 
-    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+    qDebug("Starting instance manager");
 
-    qInstallMessageHandler(CockatriceLogger);
+    // Create an instance manager
+    const QString appId = QLatin1String("cockatrice-") + getUserIDString() + '-' + VERSION_STRING;
+    ApplicationInstanceManager *m_instanceManager = new ApplicationInstanceManager(appId, &app);
+
+    // Check if session zero. If it is then open all of the inputs in this tab.
+    // If there are no arguments then open in a new tab
+    bool openInNewClient = m_instanceManager->isFirstInstance() || argc == 0;
+    QList<QString *> replays;
+    QList<QString *> decks;
+    
+    QRegularExpression deckOrReplayRegex(".*\\.co(d|r)");
+    QRegularExpression deckRegex(".*\\.cod");
+    
+    // Check for args. argv[0] is the command.
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
+            QString currentArg = QString(argv[i]);
+            qDebug() << "Processing arg '" << currentArg << "'";
+            
+            if (deckOrReplayRegex.match(currentArg).hasMatch()) {
+                bool isDeckFile = deckRegex.match(currentArg).hasMatch();
+                
+                QString path = "";
+                if (!QString(argv[i]).contains('/')) {
+                    path = QDir::currentPath() + "/";
+                }
+                
+                if (isDeckFile) {
+                    qDebug() << "Deck detected " << currentArg;
+                    decks.append(new QString(path + currentArg));
+                } else {
+                    qDebug() << "Replay detected " << currentArg;
+                    replays.append(new QString(path + currentArg));
+                }
+            }
+        }
+
+        // Send deck and replay requests. The first instance should then open them
+        if (!openInNewClient) {
+            qDebug("Sending deck replay handles");
+
+            for (QString *deck : decks) {
+                m_instanceManager->sendMessage("deck:" + *deck, 100);
+                delete deck;
+            }
+
+            for (QString *replay : replays) {
+                m_instanceManager->sendMessage("replay:" + *replay, 100);
+                delete replay;
+            }
+        }
+    }
+
+    if (!openInNewClient) {
+        qDebug("Opening in an another instance.");
+    } else {
+        qDebug("Opening in a new instance.");
+        QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+
+        qInstallMessageHandler(CockatriceLogger);
+
 #ifdef Q_OS_WIN
-    app.addLibraryPath(app.applicationDirPath() + "/plugins");
+        app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
 
-    // These values are only used by the settings loader/saver
-    // Wrong or outdated values are kept to not break things
-    QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice.de");
-    QCoreApplication::setApplicationName("Cockatrice");
-    QCoreApplication::setApplicationVersion(VERSION_STRING);
+        // These values are only used by the settings loader/saver
+        // Wrong or outdated values are kept to not break things
+        QCoreApplication::setOrganizationName("Cockatrice");
+        QCoreApplication::setOrganizationDomain("cockatrice.de");
+        QCoreApplication::setApplicationName("Cockatrice");
+        QCoreApplication::setApplicationVersion(VERSION_STRING);
 
 #ifdef Q_OS_MAC
-    qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
+        qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
 #ifdef Q_OS_MAC
-    translationPath = qApp->applicationDirPath() + "/../Resources/translations";
+        translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
-    translationPath = qApp->applicationDirPath() + "/translations";
+        translationPath = qApp->applicationDirPath() + "/translations";
 #else // linux
-    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+        translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Cockatrice");
-    parser.addHelpOption();
-    parser.addVersionOption();
+        QCommandLineParser parser;
+        parser.setApplicationDescription("Cockatrice");
+        parser.addHelpOption();
+        parser.addVersionOption();
 
-    parser.addOptions(
-        {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
-         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
+        parser.addOptions(
+            {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
+             {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
 
-    parser.process(app);
+        parser.process(app);
 
-    if (parser.isSet("debug-output")) {
-        Logger::getInstance().logToFile(true);
-    }
+        if (parser.isSet("debug-output")) {
+            Logger::getInstance().logToFile(true);
+        }
 
-    rng = new RNG_SFMT;
-    themeManager = new ThemeManager;
-    soundEngine = new SoundEngine;
-    db = new CardDatabase;
+        rng = new RNG_SFMT;
+        themeManager = new ThemeManager;
+        soundEngine = new SoundEngine;
+        db = new CardDatabase;
 
-    qtTranslator = new QTranslator;
-    translator = new QTranslator;
-    installNewTranslator();
+        qtTranslator = new QTranslator;
+        translator = new QTranslator;
+        installNewTranslator();
 
-    QLocale::setDefault(QLocale::English);
+        QLocale::setDefault(QLocale::English);
+        qDebug("main(): starting main program");
 
-    qDebug("main(): starting main program");
+        MainWindow ui(m_instanceManager);
+        qDebug("main(): MainWindow constructor finished");
 
-    MainWindow ui;
-    if (parser.isSet("connect")) {
-        ui.setConnectTo(parser.value("connect"));
-    }
-    qDebug("main(): MainWindow constructor finished");
-
-    ui.setWindowIcon(QPixmap("theme:cockatrice"));
+        ui.setWindowIcon(QPixmap("theme:cockatrice"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-    // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("cockatrice");
+        // set name of the app desktop file; used by wayland to load the window icon
+        QGuiApplication::setDesktopFileName("cockatrice");
 #endif
 
-    SettingsCache::instance().setClientID(generateClientID());
+        SettingsCache::instance().setClientID(generateClientID());
 
-    // If spoiler mode is enabled, we will download the spoilers
-    // then reload the DB. otherwise just reload the DB
-    SpoilerBackgroundUpdater spoilerBackgroundUpdater;
+        // If spoiler mode is enabled, we will download the spoilers
+        // then reload the DB. otherwise just reload the DB
+        SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
-    ui.show();
-    qDebug("main(): ui.show() finished");
+        ui.show();
+        qDebug("main(): ui.show() finished");
 
-    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
-    app.exec();
+        for (QString *deck : decks) {
+            ui.processInterProcessCommunication("deck:" + *deck, nullptr);
+            delete deck;
+        }
 
-    qDebug("Event loop finished, terminating...");
-    delete db;
-    delete rng;
-    PingPixmapGenerator::clear();
-    CountryPixmapGenerator::clear();
-    UserLevelPixmapGenerator::clear();
+        for (QString *replay : replays) {
+            ui.processInterProcessCommunication("replay:" + *replay, nullptr);
+            delete replay;
+        }
+        qDebug("main(): Passed file/xScheme handles to ui");
+
+        if (parser.isSet("connect")) {
+            ui.setConnectTo(parser.value("connect"));
+        }
+
+        app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+        app.exec();
+
+        qDebug("Event loop finished, terminating...");
+        delete db;
+        delete rng;
+        PingPixmapGenerator::clear();
+        CountryPixmapGenerator::clear();
+        UserLevelPixmapGenerator::clear();
+    }
+
+    delete m_instanceManager;
 
     return 0;
 }

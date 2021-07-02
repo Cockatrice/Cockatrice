@@ -30,6 +30,7 @@
 #include <QSystemTrayIcon>
 #include <QtNetwork>
 
+class ApplicationInstanceManager;
 class DlgConnect;
 class DlgViewLog;
 class GameReplay;
@@ -49,6 +50,7 @@ class MainWindow : public QMainWindow
 public slots:
     void actCheckCardUpdates();
     void actCheckServerUpdates();
+    void processInterProcessCommunication(const QString &msg, QObject *socket);
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -140,9 +142,10 @@ private:
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
+    ApplicationInstanceManager *instanceManager;
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(ApplicationInstanceManager *instanceManager, QWidget *parent = nullptr);
     void setConnectTo(QString url)
     {
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
