@@ -47,7 +47,6 @@ class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
 class Event_Shuffle;
-class Event_StopDumpZone;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
@@ -135,7 +134,6 @@ signals:
     void logSetPT(Player *player, CardItem *card, QString newPT);
     void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
-    void logStopDumpZone(Player *player, CardZone *zone);
     void logRevealCards(Player *player,
                         CardZone *zone,
                         int cardId,
@@ -312,7 +310,6 @@ private:
     void eventSetCounter(const Event_SetCounter &event);
     void eventDelCounter(const Event_DelCounter &event);
     void eventDumpZone(const Event_DumpZone &event);
-    void eventStopDumpZone(const Event_StopDumpZone &event);
     void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);
     void eventFlipCard(const Event_FlipCard &event);
     void eventDestroyCard(const Event_DestroyCard &event);

@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { ServerSelectors } from "store";
 import { User } from "types";
 
-import { AuthenticationService } from "websocket";
+import { AuthenticationService } from "api";
 import { RouteEnum } from "types";
 
 class ModGuard extends Component<ModGuardProps> {

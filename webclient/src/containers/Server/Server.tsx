@@ -9,7 +9,7 @@ import Paper from "@material-ui/core/Paper";
 
 import { RoomsSelectors, ServerSelectors } from "store";
 
-import { AuthenticationService } from "websocket";
+import { AuthenticationService } from "api";
 
 import { ThreePaneLayout, UserDisplay, VirtualList } from "components";
 import { ConnectForm, RegisterForm } from "forms";
@@ -95,7 +95,9 @@ const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
       )}
 
       bottom={(
-        <Paper className="serverMessage overflow-scroll" dangerouslySetInnerHTML={{ __html: message }} />
+        <Paper className="serverMessage overflow-scroll">
+          <div className="serverMessage__content" dangerouslySetInnerHTML={{ __html: message }} />
+        </Paper>
       )}
 
       side={(

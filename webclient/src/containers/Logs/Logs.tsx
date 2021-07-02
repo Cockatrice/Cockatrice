@@ -1,17 +1,14 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 import * as _ from "lodash";
 
+import { ModeratorService } from "api";
+import { AuthGuard, ModGuard} from "components";
+import { SearchForm } from "forms";
 import { ServerDispatch, ServerSelectors, ServerStateLogs } from "store";
 
-import { ModeratorService } from "websocket";
-
-import { AuthGuard, ModGuard} from "components";
 import LogResults from "./LogResults";
-import { SearchForm } from "forms";
-
 import "./Logs.css";
 
 class Logs extends Component<LogsTypes> {
@@ -98,4 +95,14 @@ const mapStateToProps = state => ({
   logs: ServerSelectors.getLogs(state)
 });
 
-export default withRouter(connect(mapStateToProps)(Logs));
+export default connect(mapStateToProps)(Logs);
+
+
+
+
+
+
+
+
+
+

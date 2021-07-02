@@ -19,6 +19,10 @@ export default class RoomService {
     RoomsDispatch.joinRoom(roomInfo);
   }
 
+  leaveRoom(roomId) {
+    RoomsDispatch.leaveRoom(roomId);
+  }
+
   updateRooms(rooms) {
     RoomsDispatch.updateRooms(rooms);
   }

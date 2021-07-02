@@ -34,7 +34,6 @@
 #include "pb/command_set_sideboard_lock.pb.h"
 #include "pb/command_set_sideboard_plan.pb.h"
 #include "pb/command_shuffle.pb.h"
-#include "pb/command_stop_dump_zone.pb.h"
 #include "pb/command_undo_draw.pb.h"
 #include "pb/context_concede.pb.h"
 #include "pb/context_connection_state_changed.pb.h"
@@ -65,7 +64,6 @@
 #include "pb/event_set_card_counter.pb.h"
 #include "pb/event_set_counter.pb.h"
 #include "pb/event_shuffle.pb.h"
-#include "pb/event_stop_dump_zone.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_dump_zone.pb.h"
@@ -947,6 +945,9 @@ Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/
         }
     }
 
+    if (!userInterface->addSaidMessageSize(cmd.message().size())) {
+        return Response::RespChatFlood;
+    }
     Event_GameSay event;
     event.set_message(cmd.message());
     ges.enqueueGameEvent(event, playerId);
@@ -1831,36 +1832,6 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
 }
 
 Response::ResponseCode
-Server_Player::cmdStopDumpZone(const Command_StopDumpZone &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
-{
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-    if (conceded) {
-        return Response::RespContextError;
-    }
-
-    Server_Player *otherPlayer = game->getPlayers().value(cmd.player_id());
-    if (!otherPlayer) {
-        return Response::RespNameNotFound;
-    }
-    Server_CardZone *zone = otherPlayer->getZones().value(QString::fromStdString(cmd.zone_name()));
-    if (!zone) {
-        return Response::RespNameNotFound;
-    }
-
-    if (zone->getType() == ServerInfo_Zone::HiddenZone) {
-        zone->setCardsBeingLookedAt(0);
-
-        Event_StopDumpZone event;
-        event.set_zone_owner_id(cmd.player_id());
-        event.set_zone_name(zone->getName().toStdString());
-        ges.enqueueGameEvent(event, playerId);
-    }
-    return Response::RespOk;
-}
-
-Response::ResponseCode
 Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator) {
@@ -2114,9 +2085,6 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
             break;
         case GameCommand::DUMP_ZONE:
             return cmdDumpZone(command.GetExtension(Command_DumpZone::ext), rc, ges);
-            break;
-        case GameCommand::STOP_DUMP_ZONE:
-            return cmdStopDumpZone(command.GetExtension(Command_StopDumpZone::ext), rc, ges);
             break;
         case GameCommand::REVEAL_CARDS:
             return cmdRevealCards(command.GetExtension(Command_RevealCards::ext), rc, ges);

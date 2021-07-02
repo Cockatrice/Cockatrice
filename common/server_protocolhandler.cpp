@@ -555,10 +555,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 
     QString receiver = QString::fromStdString(cmd.user_name());
     Server_AbstractUserInterface *userInterface = server->findUser(receiver);
-    if (!userInterface)
+    if (!userInterface) {
         return Response::RespNameNotFound;
-    if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name())))
+    }
+    if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name()))) {
         return Response::RespInIgnoreList;
+    }
+    if (!addSaidMessageSize(cmd.message().size())) {
+        return Response::RespChatFlood;
+    }
 
     Event_UserMessage event;
     event.set_sender_name(userInfo->name());
@@ -719,32 +724,41 @@ Server_ProtocolHandler::cmdLeaveRoom(const Command_LeaveRoom & /*cmd*/, Server_R
     return Response::RespOk;
 }
 
+bool Server_ProtocolHandler::addSaidMessageSize(int size)
+{
+    if (server->getMessageCountingInterval() <= 0) {
+        return true;
+    }
+
+    int totalSize = 0, totalCount = 0;
+    if (messageSizeOverTime.isEmpty()) {
+        messageSizeOverTime.prepend(0);
+    }
+
+    messageSizeOverTime[0] += size;
+    for (int messageSize : messageSizeOverTime) {
+        totalSize += messageSize;
+    }
+
+    if (messageCountOverTime.isEmpty()) {
+        messageCountOverTime.prepend(0);
+    }
+
+    messageCountOverTime[0] += 1;
+    for (int messageCount : messageCountOverTime) {
+        totalCount += messageCount;
+    }
+
+    return totalSize <= server->getMaxMessageSizePerInterval() && totalCount <= server->getMaxMessageCountPerInterval();
+}
+
 Response::ResponseCode
 Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer & /*rc*/)
 {
     QString msg = QString::fromStdString(cmd.message());
 
-    if (server->getMessageCountingInterval() > 0) {
-        int totalSize = 0, totalCount = 0;
-        if (messageSizeOverTime.isEmpty())
-            messageSizeOverTime.prepend(0);
-        messageSizeOverTime[0] += msg.size();
-        for (int i = 0; i < messageSizeOverTime.size(); ++i)
-            totalSize += messageSizeOverTime[i];
-
-        if (messageCountOverTime.isEmpty())
-            messageCountOverTime.prepend(0);
-        ++messageCountOverTime[0];
-        for (int i = 0; i < messageCountOverTime.size(); ++i) {
-            totalCount += messageCountOverTime[i];
-        }
-
-        int maxMessageSizePerInterval = server->getMaxMessageSizePerInterval();
-        int maxMessageCountPerInterval = server->getMaxMessageCountPerInterval();
-        if ((maxMessageSizePerInterval > 0 && totalSize > maxMessageSizePerInterval) ||
-            (maxMessageCountPerInterval > 0 && totalCount > maxMessageCountPerInterval)) {
-            return Response::RespChatFlood;
-        }
+    if (!addSaidMessageSize(msg.size())) {
+        return Response::RespChatFlood;
     }
     msg.replace(QChar('\n'), QChar(' '));
 

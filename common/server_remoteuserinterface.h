@@ -15,6 +15,10 @@ public:
     {
         return 0;
     }
+    bool addSaidMessageSize(int /*size*/)
+    {
+        return true;
+    }
 
     void sendProtocolItem(const Response &item);
     void sendProtocolItem(const SessionEvent &item);

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Form, reduxForm } from "redux-form"
 
 import { InputAction } from 'components';
+import { FormKey } from 'types';
 
 const AddToBuddies = ({ handleSubmit }) => (
   <Form onSubmit={handleSubmit}>
@@ -12,7 +13,7 @@ const AddToBuddies = ({ handleSubmit }) => (
 );
 
 const propsMap = {
-  form: "addToBuddies"
+  form: FormKey.ADD_TO_BUDDIES
 };
 
 export default connect()(reduxForm(propsMap)(AddToBuddies));

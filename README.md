@@ -8,7 +8,7 @@
    <a href="#get-involved--">Get Involved</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#translations-">Translations</a> <b>|</b>
-   <a href="#build---">Build</a> <b>|</b>
+   <a href="#build-">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
 </p>
@@ -39,7 +39,6 @@ Downloads are available for full releases and the current beta version in develo
    - Beta versions include the most recently added features and bugfixes, but can be unstable.
    - To be a Cockatrice Beta Tester, use this version. Find more information [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)!
    
-
 
 # Get Involved [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA) [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice)](https://gitter.im/Cockatrice/Cockatrice)
 
@@ -79,7 +78,7 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice and
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
-# Build [![Linux builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Linux%20(Docker)/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Linux+%28Docker%29%22+branch%3Amaster) [![macOS builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20macOS/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+macOS%22+branch%3Amaster) [![Windows builds - master](https://github.com/Cockatrice/Cockatrice/workflows/Build%20on%20Windows/badge.svg?branch=master)](https://github.com/Cockatrice/Cockatrice/actions?query=workflow%3A%22Build+on+Windows%22+branch%3Amaster)
+# Build [![CI Builds](https://github.com/Cockatrice/Cockatrice/actions/workflows/ci-builds.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/ci-builds.yml?query=branch%3Amaster+event%3Apush)
 
 **Detailed compiling instructions can be found on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
@@ -125,7 +124,6 @@ The following flags can be passed to `cmake`:
 `Cockatrice` is the game client<br>
 `Oracle` fetches card data<br>
 `Servatrice` is the server<br>
-
 
 **Servatrice Docker container**
 

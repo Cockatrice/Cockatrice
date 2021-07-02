@@ -69,7 +69,11 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
       spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0),
       secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()),
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+      gameMutex()
+#else
       gameMutex(QMutex::Recursive)
+#endif
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -571,13 +575,19 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 {
     QMutexLocker locker(&gameMutex);
 
-    QMapIterator<QString, Server_CardZone *> zoneIterator(player->getZones());
-    for (Server_CardZone *zone : player->getZones()) {
-        for (Server_Card *card : zone->getCards()) {
+    for (auto zone : player->getZones()) {
+        for (auto card : zone->getCards()) {
             // Make a copy of the list because the original one gets modified during the loop
             QList<Server_Card *> attachedCards = card->getAttachedCards();
             for (Server_Card *attachedCard : attachedCards) {
-                attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
+                auto otherPlayer = attachedCard->getZone()->getPlayer();
+                // do not modify the current player's zone!
+                // this would cause the current card iterator to be invalidated!
+                // we only have to return cards owned by other players
+                // because the current player is leaving the game anyway
+                if (otherPlayer != player) {
+                    otherPlayer->unattachCard(ges, attachedCard);
+                }
             }
         }
     }

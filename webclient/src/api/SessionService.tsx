@@ -1,4 +1,4 @@
-import { webClient } from "..";
+import { webClient } from "websocket";
 
 export default class SessionService {
   static addToBuddyList(userName) {

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Form, reduxForm } from "redux-form"
 
 import { InputAction } from 'components';
+import { FormKey } from 'types';
 
 const AddToIgnore = ({ handleSubmit }) => (
   <Form onSubmit={handleSubmit}>
@@ -12,7 +13,7 @@ const AddToIgnore = ({ handleSubmit }) => (
 );
 
 const propsMap = {
-  form: "addToIgnore"
+  form: FormKey.ADD_TO_IGNORE,
 };
 
 export default connect()(reduxForm(propsMap)(AddToIgnore));

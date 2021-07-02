@@ -163,6 +163,9 @@ void DeckViewContainer::updateSideboardLockButtonText()
     } else {
         sideboardLockButton->setText(tr("Sideboard locked"));
     }
+    // setting text on a button removes its shortcut
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
 void DeckViewContainer::refreshShortcuts()
@@ -1412,12 +1415,15 @@ Player *TabGame::getActiveLocalPlayer() const
 
 void TabGame::updateCardMenu(AbstractCardItem *card)
 {
-    Player *p;
-    if ((clients.size() > 1) || !players.contains(localPlayerId))
-        p = card->getOwner();
-    else
-        p = players.value(localPlayerId);
-    p->updateCardMenu(static_cast<CardItem *>(card));
+    Player *player;
+    if ((clients.size() > 1) || !players.contains(localPlayerId)) {
+        player = card->getOwner();
+    } else {
+        player = players.value(localPlayerId);
+    }
+    if (player != nullptr) {
+        player->updateCardMenu(static_cast<CardItem *>(card));
+    }
 }
 
 void TabGame::createMenuItems()

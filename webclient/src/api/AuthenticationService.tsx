@@ -3,10 +3,10 @@ import { webClient } from "websocket";
 
 export default class AuthenticationService {
   static connect(options) {
-    webClient.services.session.connectServer(options);
+    webClient.persistence.session.connectServer(options);
   }
   static disconnect() {
-    webClient.services.session.disconnectServer();
+    webClient.persistence.session.disconnectServer();
   }
 
   static isConnected(state) {
@@ -14,7 +14,9 @@ export default class AuthenticationService {
   }
 
   static isModerator(user) {
-    return user.userLevel >= webClient.pb.ServerInfo_User.UserLevelFlag.IsModerator;
+    const moderatorLevel = webClient.pb.ServerInfo_User.UserLevelFlag.IsModerator;
+    // @TODO tell cockatrice not to do this so shittily
+    return (user.userLevel & moderatorLevel) === moderatorLevel;
   }
 
   static isAdmin() {

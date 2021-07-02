@@ -22,12 +22,15 @@
   flex-shrink: 0;
 }
 
-.three-pane-layout .grid-main__top.fixedHeight {
-  height: 50%;
-}
-
 .three-pane-layout .grid-main__bottom {
   height: 100%;
   width: 100%;
   flex-shrink: 1;
+  overflow: hidden;
+}
+
+.three-pane-layout .grid-main__top.fixedHeight,
+.three-pane-layout .grid-main__bottom.fixedHeight {
+  height: 50%;
+  overflow: visible;
 }

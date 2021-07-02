@@ -57,7 +57,7 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     int sys_min = QSysInfo::productVersion().split(".")[1].toInt();
     int rel_maj = match.captured(1).toInt();
     int rel_min = match.captured(2).toInt();
-    return rel_maj < sys_maj || (rel_maj == sys_maj && rel_min <= rel_min);
+    return rel_maj < sys_maj || (rel_maj == sys_maj && rel_min <= sys_min);
 }
 #elif defined(Q_OS_WIN)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)

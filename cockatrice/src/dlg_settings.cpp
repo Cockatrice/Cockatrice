@@ -411,7 +411,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     notificationsEnabledCheckBox.setChecked(SettingsCache::instance().getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setNotificationsEnabled(int)));
-    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
+    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setNotificationEnabled(int)));
 
     specNotificationsEnabledCheckBox.setChecked(SettingsCache::instance().getSpectatorNotificationsEnabled());
     specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
@@ -473,9 +473,14 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     setLayout(mainLayout);
 }
 
-void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i)
+void UserInterfaceSettingsPage::setNotificationEnabled(int i)
 {
     specNotificationsEnabledCheckBox.setEnabled(i != 0);
+    buddyConnectNotificationsEnabledCheckBox.setEnabled(i != 0);
+    if (i == 0) {
+        specNotificationsEnabledCheckBox.setChecked(false);
+        buddyConnectNotificationsEnabledCheckBox.setChecked(false);
+    }
 }
 
 void UserInterfaceSettingsPage::retranslateUi()
