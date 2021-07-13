@@ -13,3 +13,5 @@ export { default as ScrollToBottomOnChanges } from './ScrollToBottomOnChanges/Sc
 export { default as AuthGuard } from './Guard/AuthGuard';
 export { default as ModGuard} from './Guard/ModGuard';
 
+// Dialogs
+export { default as CardImportDialog} from './CardImportDialog/CardImportDialog';
