@@ -22,7 +22,7 @@ export enum KnownHost {
 }
 
 export const KnownHosts = {
-  [KnownHost.ROOSTER]: { port: 443, host: 'server.cockatrice.us', },
+  [KnownHost.ROOSTER]: { port: 4748, host: 'server.cockatrice.us', },
   [KnownHost.TETRARCH]:  { port: 443, host: 'mtg.tetrarch.co/servatrice'},
 }
 

@@ -31,8 +31,12 @@ export default class RoomService {
     const game = gameList[0];
 
     if (!game.gameType) {
-      const { gametypeMap } = RoomsSelectors.getRoom(store.getState(), roomId);
-      NormalizeService.normalizeGameObject(game, gametypeMap);
+      const room = RoomsSelectors.getRoom(store.getState(), roomId);
+
+      if (room) {
+        const { gametypeMap } = room;
+        NormalizeService.normalizeGameObject(game, gametypeMap);
+      }
     }
 
     RoomsDispatch.updateGames(roomId, gameList);
