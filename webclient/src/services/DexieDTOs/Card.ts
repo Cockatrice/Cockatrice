@@ -4,7 +4,7 @@ import { dexieService } from '../DexieService';
 
 export class CardDTO extends Card {
   save() {
-    dexieService.cards.put(this);
+    return dexieService.cards.put(this);
   }
 
   static get(name) {

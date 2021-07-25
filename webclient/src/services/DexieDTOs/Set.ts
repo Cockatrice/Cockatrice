@@ -4,7 +4,7 @@ import { dexieService } from '../DexieService';
 
 export class SetDTO extends Set {
   save() {
-    dexieService.sets.put(this);
+    return dexieService.sets.put(this);
   }
 
   static get(name) {

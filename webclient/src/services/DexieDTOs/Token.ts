@@ -4,7 +4,7 @@ import { dexieService } from '../DexieService';
 
 export class TokenDTO extends Token {
   save() {
-    dexieService.tokens.put(this);
+    return dexieService.tokens.put(this);
   }
 
   static get(name) {
