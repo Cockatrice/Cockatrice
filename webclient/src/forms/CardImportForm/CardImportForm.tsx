@@ -34,7 +34,6 @@ const CardImportForm = (props) => {
   const handleCardDownload = ({ cardDownloadUrl }) => {
     cardImporterService.importCards(cardDownloadUrl)
       .then(({ cards, sets }) => {
-        console.log(sets);
         setImportedCards(cards);
         setImportedSets(sets);
 

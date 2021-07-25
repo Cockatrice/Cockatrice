@@ -9,9 +9,10 @@ class CardImporterService {
           .map(key => json.data[key])
           .sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
 
-        const sets = sortedSets.map(({ cards, ...set}) => ({
+        const sets = sortedSets.map(({ cards, tokens, ...set}) => ({
           ...set,
           cards: cards.map(({ name }) => name),
+          tokens: tokens.map(({ name }) => name),
         }));
 
         const unsortedCards = sortedSets.reduce((acc, set) => {
