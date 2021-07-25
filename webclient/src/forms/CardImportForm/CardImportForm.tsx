@@ -1,27 +1,36 @@
 // eslint-disable-next-line
-import React, { useState } from "react";
-import { connect } from "react-redux";
-import { Form, Field, reduxForm} from "redux-form"
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { Form, Field, reduxForm} from 'redux-form'
 
-import Button from "@material-ui/core/Button";
+import Button from '@material-ui/core/Button';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { InputField, ScrollToBottomOnChanges, VirtualList } from "components";
+import { InputField, ScrollToBottomOnChanges, VirtualList } from 'components';
 import { cardImporterService, CardDTO, SetDTO, TokenDTO } from 'services';
 import { FormKey } from 'types';
 
-import "./CardImportForm.css";
+import './CardImportForm.css';
 
 const CardImportForm = (props) => {
   const { handleSubmit, onSubmit:onClose } = props;
 
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [importedCards, setImportedCards] = React.useState([]);
-  const [importedSets, setImportedSets] = React.useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+  const [importedCards, setImportedCards] = useState([]);
+  const [importedSets, setImportedSets] = useState([]);
+  const [error, setError] = useState(null);
 
-  const steps = ['Source selection', 'Sets imported', 'Import tokens', 'Finished'];
+  useEffect(() => {
+    if (loading) {
+      setError(null);
+    }
+  }, [loading])
+
+  const steps = ['Imports sets', 'Save sets', 'Import tokens', 'Finished'];
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -32,6 +41,8 @@ const CardImportForm = (props) => {
   };
 
   const handleCardDownload = ({ cardDownloadUrl }) => {
+    setLoading(true);
+
     cardImporterService.importCards(cardDownloadUrl)
       .then(({ cards, sets }) => {
         setImportedCards(cards);
@@ -39,74 +50,114 @@ const CardImportForm = (props) => {
 
         handleNext();
       })
-      .catch(e => {
-        // TODO: render error in UI
-        console.log(e);
-      });
+      .catch(({ message }) => setError(message))
+      .finally(() => setLoading(false));
   }
 
   const handleCardSave = async () => {
-    await CardDTO.bulkAdd(importedCards);
-    await SetDTO.bulkAdd(importedSets);
+    setLoading(true);
 
-    handleNext();
+    try {
+      await CardDTO.bulkAdd(importedCards);
+      await SetDTO.bulkAdd(importedSets);
+
+      handleNext();
+    } catch(e) {
+      console.error(e);
+      setError('Failed to save cards');
+    }
+
+    setLoading(false);
   }
 
   const handleTokenDownload = ({ tokenDownloadUrl }) => {
+    setLoading(true);
+
     cardImporterService.importTokens(tokenDownloadUrl)
       .then(async tokens => {
         await TokenDTO.bulkAdd(tokens);
         handleNext();
       })
-      .catch(e => {
-        // TODO: render error in UI
-        console.log(e);
-      });
+      .catch(({ message }) => setError(message))
+      .finally(() => setLoading(false));
   }
 
   const BackButton = () => (
-    <Button onClick={handleBack}>Go Back</Button>
+    <Button onClick={handleBack} disabled={loading}>Go Back</Button>
   );
+
+  const ErrorMessage = () => {
+    return error && (
+      <div className='error'>{error}</div>
+    );
+  }
 
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
       case 0: return (
-        <Form className="cardImportForm" onSubmit={handleSubmit(handleCardDownload)}>
-          <div className="cardImportForm-item">
-            <Field label="Download URL" name="cardDownloadUrl" component={InputField} />
+        <Form className='cardImportForm' onSubmit={handleSubmit(handleCardDownload)}>
+          <div className='cardImportForm-item'>
+            <Field label='Download URL' name='cardDownloadUrl' component={InputField} />
           </div>
 
-          <Button color="primary" type="submit">Import</Button>
+          <div className='cardImportForm-actions'>
+            <Button color='primary' type='submit' disabled={loading}>
+              Import
+            </Button>
+          </div>
+
+          <div className='cardImportForm-error'>
+            <ErrorMessage />
+          </div>
         </Form>
       );
 
       case 1: return (
-        <div>
-          <div>
+        <div className='cardImportForm'>
+          <div className='cardImportForm-content'>
             <CardsImported cards={importedCards} sets={importedSets} />
           </div>
-          <BackButton />
-          <Button color="primary" onClick={handleCardSave}>Save</Button>
+
+          <div className='cardImportForm-actions'>
+            <BackButton />
+            <Button color='primary' onClick={handleCardSave} disabled={loading}>
+              Save
+            </Button>
+          </div>
+
+          <div className='cardImportForm-error'>
+            <ErrorMessage />
+          </div>
         </div>
       );
 
       case 2: return (
-        <Form className="cardImportForm" onSubmit={handleSubmit(handleTokenDownload)}>
-          <div className="cardImportForm-item">
-            <Field label="Download URL" name="tokenDownloadUrl" component={InputField} />
+        <Form className='cardImportForm' onSubmit={handleSubmit(handleTokenDownload)}>
+          <div className='cardImportForm-content'>
+            <Field label='Download URL' name='tokenDownloadUrl' component={InputField} />
           </div>
 
-          <BackButton />
-          <Button color="primary" type="submit">Import</Button>
+          <div className='cardImportForm-actions'>
+            <BackButton />
+            <Button color='primary' type='submit' disabled={loading}>
+              Import
+            </Button>
+          </div>
+
+          <div className='cardImportForm-error'>
+            <ErrorMessage />
+          </div>
         </Form>
       );
 
       case 3: return (
-        <div>
-          <div>Finished!</div>
+        <div className='cardImportForm'>
+          <div className='cardImportForm-content done'>Finished!</div>
 
-          <BackButton />
-          <Button color="primary" onClick={onClose}>Done</Button>
+          <div className='cardImportForm-actions'>
+            <BackButton />
+            <Button color='primary' onClick={onClose}>Done</Button>
+          </div>
         </div>
       );
     }
@@ -122,7 +173,15 @@ const CardImportForm = (props) => {
         ))}
       </Stepper>
 
-      <div>{ getStepContent(activeStep) }</div>
+      <div>
+        { getStepContent(activeStep) }
+      </div>
+
+      { loading && (
+        <div className='loading'>
+          <CircularProgress size={60} />
+        </div>
+      ) }
     </div>
   );
 }
@@ -141,7 +200,7 @@ const CardsImported = ({ cards, sets }) => {
   ];
 
   return (
-    <div className="card-import-list">
+    <div className='card-import-list'>
       <ScrollToBottomOnChanges changes={sets} content={(
         <VirtualList
           itemKey={(index) => index }
