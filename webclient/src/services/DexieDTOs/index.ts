@@ -1,3 +1,3 @@
-export * from './Card';
-export * from './Set';
-export * from './Token';
+export * from './CardDTO';
+export * from './SetDTO';
+export * from './TokenDTO';
