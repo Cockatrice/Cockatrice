@@ -82,16 +82,6 @@ const CardImportForm = (props) => {
       .finally(() => setLoading(false));
   }
 
-  const BackButton = () => (
-    <Button onClick={handleBack} disabled={loading}>Go Back</Button>
-  );
-
-  const ErrorMessage = () => {
-    return error && (
-      <div className='error'>{error}</div>
-    );
-  }
-
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
       case 0: return (
@@ -107,7 +97,7 @@ const CardImportForm = (props) => {
           </div>
 
           <div className='cardImportForm-error'>
-            <ErrorMessage />
+            <ErrorMessage error={error} />
           </div>
         </Form>
       );
@@ -119,14 +109,14 @@ const CardImportForm = (props) => {
           </div>
 
           <div className='cardImportForm-actions'>
-            <BackButton />
+            <BackButton click={handleBack} disabled={loading} />
             <Button color='primary' onClick={handleCardSave} disabled={loading}>
               Save
             </Button>
           </div>
 
           <div className='cardImportForm-error'>
-            <ErrorMessage />
+            <ErrorMessage error={error} />
           </div>
         </div>
       );
@@ -138,14 +128,14 @@ const CardImportForm = (props) => {
           </div>
 
           <div className='cardImportForm-actions'>
-            <BackButton />
+            <BackButton click={handleBack} disabled={loading} />
             <Button color='primary' type='submit' disabled={loading}>
               Import
             </Button>
           </div>
 
           <div className='cardImportForm-error'>
-            <ErrorMessage />
+            <ErrorMessage error={error} />
           </div>
         </Form>
       );
@@ -155,7 +145,7 @@ const CardImportForm = (props) => {
           <div className='cardImportForm-content done'>Finished!</div>
 
           <div className='cardImportForm-actions'>
-            <BackButton />
+            <BackButton click={handleBack} disabled={loading} />
             <Button color='primary' onClick={onClose}>Done</Button>
           </div>
         </div>
@@ -183,6 +173,16 @@ const CardImportForm = (props) => {
         </div>
       ) }
     </div>
+  );
+}
+
+const BackButton = ({ click, disabled }) => (
+  <Button onClick={click} disabled={disabled}>Go Back</Button>
+);
+
+const ErrorMessage = ({ error }) => {
+  return error && (
+    <div className='error'>{error}</div>
   );
 }
 
