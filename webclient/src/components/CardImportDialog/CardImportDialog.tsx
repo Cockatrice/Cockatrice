@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import Button from '@material-ui/core/Button';
+import React from "react";
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
@@ -29,7 +27,7 @@ const CardImportDialog = ({ classes, handleClose, isOpen }: any) => {
         ) : null}
       </DialogTitle>
       <DialogContent>
-        <CardImportForm></CardImportForm>
+        <CardImportForm onSubmit={handleOnClose}></CardImportForm>
       </DialogContent>
     </Dialog>
   );

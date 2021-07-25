@@ -18,7 +18,8 @@
     "react-window": "^1.8.5",
     "redux": "^4.0.4",
     "redux-form": "^8.2.6",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "typescript": "^4.3.5"
   },
   "scripts": {
     "postinstall": "echo 'Copying shared files...' && ./copy_shared_files.sh",
@@ -57,7 +58,6 @@
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "@types/react-window": "^1.8.2",
     "@types/redux": "^3.6.0",
-    "@types/redux-form": "^8.2.0",
-    "typescript": "3.6.4"
+    "@types/redux-form": "^8.2.0"
   }
 }
