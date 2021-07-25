@@ -44,7 +44,32 @@ class CardImporterService {
 
   private parseXmlAttributes(dom: Element) {
     return Array.from(dom.children).reduce((attributes, child) => {
-      attributes[child.tagName] = child.children.length ? this.parseXmlAttributes(child) : child.innerHTML;
+      const value = child.children.length ? this.parseXmlAttributes(child) : child.innerHTML;
+
+      let parsedAttributes = { value };
+
+      if (child.attributes.length) {
+        const childAttributes = Array.from(child.attributes).reduce((acc, { name, value }) => {
+          acc[name] = value;
+          return acc;
+        }, {});
+
+        parsedAttributes = {
+          ...parsedAttributes,
+          ...childAttributes,
+        };
+      }
+
+      if (attributes[child.tagName]) {
+        if (Array.isArray(attributes[child.tagName])) {
+          attributes[child.tagName].push(parsedAttributes)
+        } else {
+          attributes[child.tagName] = [ parsedAttributes ];
+        }
+      } else {
+        attributes[child.tagName] = parsedAttributes;
+      }
+
       return attributes;
     }, {});
   }
