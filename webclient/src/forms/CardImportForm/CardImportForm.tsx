@@ -9,7 +9,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { InputField, ScrollToBottomOnChanges, VirtualList } from 'components';
+import { InputField, VirtualList } from 'components';
 import { cardImporterService, CardDTO, SetDTO, TokenDTO } from 'services';
 import { FormKey } from 'types';
 
@@ -25,9 +25,7 @@ const CardImportForm = (props) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (loading) {
-      setError(null);
-    }
+    if (loading) { setError(null); }
   }, [loading])
 
   const steps = ['Imports sets', 'Save sets', 'Import tokens', 'Finished'];
@@ -188,26 +186,26 @@ const ErrorMessage = ({ error }) => {
 
 const CardsImported = ({ cards, sets }) => {
   const items = [
-    ...sets.map(set => (
-      <div>{set.name}: {set.cards.length} cards imported</div>
-    ) ),
-
     (
       <div>
         <strong>Import finished: {cards.length} cards.</strong>
       </div>
-    )
+    ),
+
+    ( <div className='spacer' /> ),
+
+    ...sets.map(set => (
+      <div>{set.name}: {set.cards.length} cards imported</div>
+    ) )
   ];
 
   return (
     <div className='card-import-list'>
-      <ScrollToBottomOnChanges changes={sets} content={(
-        <VirtualList
-          itemKey={(index) => index }
-          items={items}
-          size={15}
-        />
-      )} />
+      <VirtualList
+        itemKey={(index) => index }
+        items={items}
+        size={15}
+      />
     </div>
   );
 };
