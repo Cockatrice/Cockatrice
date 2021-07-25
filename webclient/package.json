@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
+    "dexie": "^3.0.3",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "prop-types": "^15.7.2",

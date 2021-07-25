@@ -8,8 +8,8 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 
-import { InputField } from "components";
-import { cardImporterService } from 'services';
+import { InputField, ScrollToBottomOnChanges, VirtualList } from "components";
+import { cardImporterService, CardDTO, SetDTO, TokenDTO } from 'services';
 import { FormKey } from 'types';
 
 import "./CardImportForm.css";
@@ -18,8 +18,8 @@ const CardImportForm = (props) => {
   const { handleSubmit, onSubmit:onClose } = props;
 
   const [activeStep, setActiveStep] = React.useState(0);
-  const [importedCards, setImportedCards] = React.useState({});
-  const [importedSets, setImportedSets] = React.useState({});
+  const [importedCards, setImportedCards] = React.useState([]);
+  const [importedSets, setImportedSets] = React.useState([]);
 
   const steps = ['Source selection', 'Sets imported', 'Import tokens', 'Finished'];
 
@@ -32,12 +32,9 @@ const CardImportForm = (props) => {
   };
 
   const handleCardDownload = ({ cardDownloadUrl }) => {
-    console.log('onSubmit', cardDownloadUrl);
-
     cardImporterService.importCards(cardDownloadUrl)
       .then(({ cards, sets }) => {
-        console.log('cards', cards);
-        console.log('sets', sets);
+        console.log(sets);
         setImportedCards(cards);
         setImportedSets(sets);
 
@@ -49,18 +46,17 @@ const CardImportForm = (props) => {
       });
   }
 
-  const handleCardSave = () => {
-    console.log('onCardSave');
+  const handleCardSave = async () => {
+    await CardDTO.bulkAdd(importedCards);
+    await SetDTO.bulkAdd(importedSets);
 
     handleNext();
   }
 
   const handleTokenDownload = ({ tokenDownloadUrl }) => {
-    console.log('onSubmit', tokenDownloadUrl);
-
     cardImporterService.importTokens(tokenDownloadUrl)
-      .then(tokens => {
-        console.log('tokens', tokens);
+      .then(async tokens => {
+        await TokenDTO.bulkAdd(tokens);
         handleNext();
       })
       .catch(e => {
@@ -88,10 +84,9 @@ const CardImportForm = (props) => {
       case 1: return (
         <div>
           <div>
-            <div>{Object.keys(importedSets).length} sets found!</div>
-            <div>{Object.keys(importedCards).length} cards found!</div>
+            <CardsImported cards={importedCards} sets={importedSets} />
           </div>
-          <BackButton></BackButton>
+          <BackButton />
           <Button color="primary" onClick={handleCardSave}>Save</Button>
         </div>
       );
@@ -102,7 +97,7 @@ const CardImportForm = (props) => {
             <Field label="Download URL" name="tokenDownloadUrl" component={InputField} />
           </div>
 
-          <BackButton></BackButton>
+          <BackButton />
           <Button color="primary" type="submit">Import</Button>
         </Form>
       );
@@ -111,7 +106,7 @@ const CardImportForm = (props) => {
         <div>
           <div>Finished!</div>
 
-          <BackButton></BackButton>
+          <BackButton />
           <Button color="primary" onClick={onClose}>Done</Button>
         </div>
       );
@@ -132,6 +127,32 @@ const CardImportForm = (props) => {
     </div>
   );
 }
+
+const CardsImported = ({ cards, sets }) => {
+  const items = [
+    ...sets.map(set => (
+      <div>{set.name}: {set.cards.length} cards imported</div>
+    ) ),
+
+    (
+      <div>
+        <strong>Import finished: {cards.length} cards.</strong>
+      </div>
+    )
+  ];
+
+  return (
+    <div className="card-import-list">
+      <ScrollToBottomOnChanges changes={sets} content={(
+        <VirtualList
+          itemKey={(index) => index }
+          items={items}
+          size={15}
+        />
+      )} />
+    </div>
+  );
+};
 
 const propsMap = {
   form: FormKey.CARD_IMPORT,
