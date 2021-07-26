@@ -9,7 +9,7 @@ import CardCallout from './CardCallout';
 import './Message.css';
 
 // eslint-disable-next-line
-const urlRegex = /((?:https?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/g;
+const urlRegex = /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/g;
 const nameRegex = /(^[^: ]+):/;
 const mentionRegex = /(@[^ ]+)/g;
 const cardCalloutsRegex = /(\[\[[^\]]+\]\])/g;
@@ -42,13 +42,9 @@ const ParsedMessage = ({ message }) => {
     setMessageChunks(messageChunks);
   }, [message]);
 
-
   return (
     <div>
-      {
-        name && ( <strong><PlayerLink name={name} />:</strong> )
-      }
-
+      { name && ( <strong><PlayerLink name={name} />:</strong> ) }
       { messageChunks }
     </div>
   );
@@ -62,7 +58,8 @@ const PlayerLink = ({ name, label = name }) => (
 
 function parseChunks(chunk, index) {
   if (chunk.match(cardCalloutsRegex)) {
-    return ( <CardCallout name={chunk.replace(calloutsRegex, '')} key={index}></CardCallout> );
+    const name = chunk.replace(calloutsRegex, '').trim();
+    return ( <CardCallout name={name} key={index}></CardCallout> );
   }
 
   if (chunk.match(urlRegex)) {
@@ -96,7 +93,6 @@ function parseMentionChunk(chunk) {
 
       if (mention) {
         const name = mention[0].slice(1, mention[0].length);
-
         return ( <PlayerLink name={name} label={mention} key={index} /> );
       }
 
