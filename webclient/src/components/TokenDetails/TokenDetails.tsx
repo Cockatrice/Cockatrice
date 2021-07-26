@@ -30,7 +30,7 @@ const TokenDetails = ({ token }: TokenProps) => {
           (!props?.pt?.value) ? null : (
             <div className='tokenDetails-attribute'>
               <span className='tokenDetails-attribute__label'>P/T:</span>
-              <span className='tokenDetails-attribute__value'>{props?.pt.value}</span>
+              <span className='tokenDetails-attribute__value'>{props.pt.value}</span>
             </div>
           )
         }
@@ -39,7 +39,7 @@ const TokenDetails = ({ token }: TokenProps) => {
           !props?.colors?.value ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Color(s):</span>
-              <span className='cardDetails-attribute__value'>{props?.colors.value}</span>
+              <span className='cardDetails-attribute__value'>{props.colors.value}</span>
             </div>
           )
         }
@@ -48,7 +48,7 @@ const TokenDetails = ({ token }: TokenProps) => {
           !props?.maintype?.value ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Main Type:</span>
-              <span className='cardDetails-attribute__value'>{props?.maintype.value}</span>
+              <span className='cardDetails-attribute__value'>{props.maintype.value}</span>
             </div>
           )
         }
@@ -57,7 +57,7 @@ const TokenDetails = ({ token }: TokenProps) => {
           !props?.type?.value ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Type:</span>
-              <span className='cardDetails-attribute__value'>{props?.type.value}</span>
+              <span className='cardDetails-attribute__value'>{props.type.value}</span>
             </div>
           )
         }
@@ -67,7 +67,7 @@ const TokenDetails = ({ token }: TokenProps) => {
         !token?.text?.value ? null : (
           <div className='tokenDetails-text'>
             <div className='tokenDetails-text__current'>
-              {token?.text.value}
+              {token.text.value}
             </div>
           </div>
         )
