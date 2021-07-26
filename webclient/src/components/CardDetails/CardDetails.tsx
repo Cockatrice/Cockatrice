@@ -21,86 +21,86 @@ const CardDetails = ({ card }: CardProps) => {
       <div className='cardDetails-attributes'>
         <div className='cardDetails-attribute'>
           <span className='cardDetails-attribute__label'>Name:</span>
-          <span className='cardDetails-attribute__value'>{card.name}</span>
+          <span className='cardDetails-attribute__value'>{card?.name}</span>
         </div>
 
         {
-          (!card.power && !card.toughness) ? null : (
+          (!card?.power && !card?.toughness) ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>P/T:</span>
-              <span className='cardDetails-attribute__value'>{card.power || 0}/{card.toughness || 0}</span>
+              <span className='cardDetails-attribute__value'>{card?.power || 0}/{card?.toughness || 0}</span>
             </div>
           )
         }
 
         {
-          !card.manaCost ? null : (
+          !card?.manaCost ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Cost:</span>
-              <span className='cardDetails-attribute__value'>{card.manaCost.replace(/\{|\}/g, '')}</span>
+              <span className='cardDetails-attribute__value'>{card?.manaCost.replace(/\{|\}/g, '')}</span>
             </div>
           )
         }
 
         {
-          !card.convertedManaCost ? null : (
+          !card?.convertedManaCost ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>CMC:</span>
-              <span className='cardDetails-attribute__value'>{card.convertedManaCost}</span>
+              <span className='cardDetails-attribute__value'>{card?.convertedManaCost}</span>
             </div>
           )
         }
 
         {
-          !card.colorIdentity?.length ? null : (
+          !card?.colorIdentity?.length ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Identity:</span>
-              <span className='cardDetails-attribute__value'>{card.colorIdentity.join('')}</span>
+              <span className='cardDetails-attribute__value'>{card?.colorIdentity.join('')}</span>
             </div>
           )
         }
 
         {
-          !card.colors?.length ? null : (
+          !card?.colors?.length ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Color(s):</span>
-              <span className='cardDetails-attribute__value'>{card.colors.join('')}</span>
+              <span className='cardDetails-attribute__value'>{card?.colors.join('')}</span>
             </div>
           )
         }
 
         {
-          !card.types?.length ? null : (
+          !card?.types?.length ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Main Type:</span>
-              <span className='cardDetails-attribute__value'>{card.types.join(', ')}</span>
+              <span className='cardDetails-attribute__value'>{card?.types.join(', ')}</span>
             </div>
           )
         }
 
         {
-          !card.type ? null : (
+          !card?.type ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Type:</span>
-              <span className='cardDetails-attribute__value'>{card.type}</span>
+              <span className='cardDetails-attribute__value'>{card?.type}</span>
             </div>
           )
         }
 
         {
-          !card.side ? null : (
+          !card?.side ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Side:</span>
-              <span className='cardDetails-attribute__value'>{card.side}</span>
+              <span className='cardDetails-attribute__value'>{card?.side}</span>
             </div>
           )
         }
 
         {
-          !card.layout ? null : (
+          !card?.layout ? null : (
             <div className='cardDetails-attribute'>
               <span className='cardDetails-attribute__label'>Layout:</span>
-              <span className='cardDetails-attribute__value'>{card.layout}</span>
+              <span className='cardDetails-attribute__value'>{card?.layout}</span>
             </div>
           )
         }
@@ -108,11 +108,11 @@ const CardDetails = ({ card }: CardProps) => {
 
       <div className='cardDetails-text'>
         <div className='cardDetails-text__current'>
-          {card.text?.trim()}
+          {card?.text?.trim()}
         </div>
 
         <div className='cardDetails-text__flavor'>
-          {card.flavorText?.trim()}
+          {card?.flavorText?.trim()}
         </div>
       </div>
     </div>
