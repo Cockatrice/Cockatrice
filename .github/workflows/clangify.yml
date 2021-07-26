@@ -1,4 +1,4 @@
-name: Clangify
+name: Code Style (C++) 
 
 on:
   pull_request:
@@ -6,9 +6,10 @@ on:
     - master
     paths-ignore:
       - '**.md'
+      - 'webclient/**'
 
 jobs:
-  linter:
+  clang-format:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,4 +26,4 @@ jobs:
 
     - name: Run clangify
       shell: bash
-      run: ./.ci/lint.sh
+      run: ./.ci/lint_cpp.sh
