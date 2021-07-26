@@ -11,7 +11,7 @@ import './Message.css';
 // eslint-disable-next-line
 const urlRegex = /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/g;
 const nameRegex = /(^[^:\s]+):/;
-const mentionRegex = /(@[^\s]+)/g;
+const mentionRegex = /(@[^\s@]+)/g;
 const cardCalloutsRegex = /(\[\[[^\]]+\]\])/g;
 const calloutsRegex = /(\[\[|\]\])/g;
 
