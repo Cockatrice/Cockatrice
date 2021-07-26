@@ -1,12 +1,17 @@
 // eslint-disable-next-line
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { NavLink, generatePath } from "react-router-dom";
+
+import { RouteEnum } from 'types';
+
 import CardCallout from './CardCallout';
 import './Message.css';
 
 // eslint-disable-next-line
 const urlRegex = /((?:https?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/g;
-const nameRegex = /^[^:]+:/;
+const nameRegex = /(^[^: ]+)/g;
+const mentionRegex = /(@[^ ]+)/g;
 const cardCalloutsRegex = /(\[\[[^\]]+\]\])/g;
 const calloutsRegex = /(\[\[|\]\])/g;
 
@@ -27,11 +32,22 @@ const ParsedMessage = ({ message }) => {
     .filter(chunk => !!chunk)
     .map(parseChunks);
 
-  return <div>
-    <strong>{name}</strong>
-    { messageChunks }
-  </div>
+  return (
+    <div>
+      {
+        name && ( <strong><PlayerLink name={name[0]} /></strong> )
+      }
+
+      { messageChunks }
+    </div>
+  );
 };
+
+const PlayerLink = ({ name, label = name }) => (
+  <NavLink className="link" to={generatePath(RouteEnum.PLAYER, { name })}>
+    {label}
+  </NavLink>
+);
 
 function parseChunks(chunk, index) {
   if (chunk.match(cardCalloutsRegex)) {
@@ -40,6 +56,10 @@ function parseChunks(chunk, index) {
 
   if (chunk.match(urlRegex)) {
     return parseUrlChunk(chunk);
+  }
+
+  if (chunk.match(mentionRegex)) {
+    return parseMentionChunk(chunk);
   }
 
   return chunk;
@@ -54,6 +74,22 @@ function parseUrlChunk(chunk) {
       }
 
       return urlChunk;
+    });
+}
+
+function parseMentionChunk(chunk) {
+  return chunk.split(mentionRegex)
+    .filter(mentionChunk => !!mentionChunk)
+    .map((mentionChunk, index) => {
+      const mention = mentionChunk.match(mentionRegex);
+
+      if (mention) {
+        const name = mention[0].slice(1, mention[0].length);
+
+        return ( <PlayerLink name={name} label={mention} key={index} /> );
+      }
+
+      return mentionChunk;
     });
 }
 
