@@ -1,9 +1,4 @@
 .callout {
-	font-weight: bold;
-	color: green;
-}
-
-.callout-card {
-	width: calc(300px * .716);
-	height: 300px;
+  font-weight: bold;
+  color: green;
 }

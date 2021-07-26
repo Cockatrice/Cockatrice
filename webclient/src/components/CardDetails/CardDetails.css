@@ -1,0 +1,45 @@
+.cardDetails {
+  padding: 10px;
+  width: calc(400px * .716);
+  font-size: 10px;
+}
+
+.cardDetails-card {
+  height: 400px;
+  margin: 0 auto;
+}
+
+.cardDetails-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.cardDetails-attributes {
+  margin: 10px 0;
+}
+
+.cardDetails-attribute__label {
+  text-transform: uppercase;
+  font-size: 10px;
+  margin-right: 10px;
+}
+
+.cardDetails-attribute__value {
+  text-align: right;
+}
+
+.cardDetails-text {
+  font-size: 12px;
+  padding: 5px;
+  background: rgba(0, 0, 0, .15);
+  white-space: pre-line;
+}
+
+.cardDetails-text__flavor {
+  font-style: italic;
+}
+
+.cardDetails-text__current:not(:empty) + .cardDetails-text__flavor {
+  margin-top: 10px;
+}

@@ -5,17 +5,15 @@ import { CardDTO } from 'services';
 
 import './Card.css';
 
-const Card = ({ name }) => {
-  const [card, setCard] = useState(null);
+interface CardProps {
+  card: CardDTO;
+}
 
-  useMemo(() => {
-    CardDTO.get(name).then(card => setCard(card));
-  }, [name]);
-
-  const src = `https://api.scryfall.com/cards/multiverse/${card?.identifiers?.multiverseId}?format=image`;
+const Card = ({ card }: CardProps) => {
+  const src = `https://api.scryfall.com/cards/multiverse/${card.identifiers?.multiverseId}?format=image`;
 
   return card && (
-    <img className="card" src={src} alt={card?.name || name} />
+    <img className="card" src={src} alt={card.name} />
   );
 }
 

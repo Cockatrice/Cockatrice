@@ -7,7 +7,17 @@ export class Card {
   convertedManaCost: number;
   edhrecRank: number;
   flavorText: string;
-  identifiers: string[];
+  identifiers: {
+    cardKingdomId: string;
+    mcmId: string;
+    mcmMetaId: string;
+    mtgjsonV4Id: string;
+    multiverseId: string;
+    scryfallId: string;
+    scryfallIllustrationId: string;
+    scryfallOracleId: string;
+    tcgplayerProductId: string;
+  };
   isOnlineOnly: boolean;
   layout: string;
   legalities: {
@@ -37,6 +47,7 @@ export class Card {
   	date: string;
   	text: string;
   }[];
+  side: string;
   setCode: string;
   subtypes: string[];
   supertypes: string[];

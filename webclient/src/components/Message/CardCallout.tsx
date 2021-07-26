@@ -5,7 +5,7 @@ import Popover from '@material-ui/core/Popover';
 
 import { CardDTO } from 'services';
 
-import Card from '../Card/Card';
+import CardDetails from '../CardDetails/CardDetails';
 
 import './CardCallout.css';
 
@@ -64,7 +64,7 @@ const CardCallout = ({ name }) => {
             }}
           >
             <div className="callout-card">
-              <Card name={name} />
+              <CardDetails card={card} />
             </div>
           </Popover>
         )
