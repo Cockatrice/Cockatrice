@@ -1696,11 +1696,16 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     }
     socket = (QWebSocket *)_socket;
     socket->setParent(this);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    // https://bugreports.qt.io/browse/QTBUG-70693
+    socket->setMaxAllowedIncomingMessageSize(1500000); // 1.5MB
+#endif
+
     address = socket->peerAddress();
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0) {
-#if QT_VERSION >= 0x050600
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
         if (socket->request().hasRawHeader(websocketIPHeader)) {
             QString header(socket->request().rawHeader(websocketIPHeader));
             QHostAddress parsed(header);
