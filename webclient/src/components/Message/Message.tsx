@@ -10,7 +10,7 @@ import './Message.css';
 
 // eslint-disable-next-line
 const urlRegex = /((?:https?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/g;
-const nameRegex = /(^[^: ]+)/g;
+const nameRegex = /(^[^: ]+):/;
 const mentionRegex = /(@[^ ]+)/g;
 const cardCalloutsRegex = /(\[\[[^\]]+\]\])/g;
 const calloutsRegex = /(\[\[|\]\])/g;
@@ -24,18 +24,29 @@ const Message = ({ message: { message, messageType, timeOf, timeReceived } }) =>
 );
 
 const ParsedMessage = ({ message }) => {
-  const name = message.match(nameRegex);
-  message = message.replace(nameRegex, '');
+  const [messageChunks, setMessageChunks] = useState(null);
+  const [name, setName] = useState(null);
 
-  const messageChunks = message
-    .split(cardCalloutsRegex)
-    .filter(chunk => !!chunk)
-    .map(parseChunks);
+  useMemo(() => {
+    const name = message.match(nameRegex);
+
+    const messageChunks = message.replace(nameRegex, '')
+      .split(cardCalloutsRegex)
+      .filter(chunk => !!chunk)
+      .map(parseChunks);
+
+    if (name) {
+      setName(name[1]);
+    }
+
+    setMessageChunks(messageChunks);
+  }, [message]);
+
 
   return (
     <div>
       {
-        name && ( <strong><PlayerLink name={name[0]} /></strong> )
+        name && ( <strong><PlayerLink name={name} />:</strong> )
       }
 
       { messageChunks }
