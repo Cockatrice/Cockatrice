@@ -3,9 +3,10 @@ import React, { useMemo, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Popover from '@material-ui/core/Popover';
 
-import { CardDTO } from 'services';
+import { CardDTO, TokenDTO } from 'services';
 
 import CardDetails from '../CardDetails/CardDetails';
+import TokenDetails from '../TokenDetails/TokenDetails';
 
 import './CardCallout.css';
 
@@ -20,11 +21,20 @@ const useStyles = makeStyles(theme => ({
 
 const CardCallout = ({ name }) => {
   const classes = useStyles();
-  const [card, setCard] = useState(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [card, setCard] = useState<CardDTO>(null);
+  const [token, setToken] = useState<TokenDTO>(null);
+  const [anchorEl, setAnchorEl] = useState<Element>(null);
 
-  useMemo(() => {
-    CardDTO.get(name).then(card => setCard(card));
+  useMemo(async () => {
+    const card = await CardDTO.get(name);
+    if (card) {
+      return setCard(card)
+    }
+
+    const token = await TokenDTO.get(name);
+    if (token) {
+      return setToken(token);
+    }
   }, [name]);
 
   const handlePopoverOpen = (event) => {
@@ -42,10 +52,10 @@ const CardCallout = ({ name }) => {
       <span 
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
-      >{card?.name || name}</span>
+      >{card?.name || token?.name?.value || name}</span>
 
       {
-        card && (
+        (card || token) && (
           <Popover
             open={open}
             anchorEl={anchorEl}
@@ -64,7 +74,8 @@ const CardCallout = ({ name }) => {
             }}
           >
             <div className="callout-card">
-              <CardDetails card={card} />
+              { card && ( <CardDetails card={card} /> ) }
+              { token && ( <TokenDetails token={token} /> ) }
             </div>
           </Popover>
         )

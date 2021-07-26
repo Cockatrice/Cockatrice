@@ -10,10 +10,10 @@ interface CardProps {
 }
 
 const Card = ({ card }: CardProps) => {
-  const src = `https://api.scryfall.com/cards/multiverse/${card.identifiers?.multiverseId}?format=image`;
+  const src = `https://api.scryfall.com/cards/multiverse/${card?.identifiers?.multiverseId}?format=image`;
 
   return card && (
-    <img className="card" src={src} alt={card.name} />
+    <img className="card" src={src} alt={card?.name} />
   );
 }
 

@@ -72,10 +72,22 @@ export class Set {
 }
 
 export class Token {
-  name: object;
-  prop: object;
-  'reverse-related': object;
-  set: object;
-  tablerow: object;
-  text: object;
+  name: { value: string };
+  prop: {
+    value: {
+      cmc: { value: string; };
+      colors: { value: string; };
+      maintype: { value: string; };
+      pt: { value: string; };
+      type: { value: string; };
+    };
+  };
+  related:  { value: string; }[];
+  'reverse-related':  { value: string; }[];
+  set: {
+    value: string;
+    picURL: string;
+  }[];
+  tablerow: { value: string; };
+  text: { value: string; };
 }
