@@ -30,10 +30,9 @@ The search bar recognizes a set of special commands similar to some other card d
 <dd>[c:c](#c:c) <small>(Any colorless card)</small></dd>
 <dd>[ci:w](#ci:w) <small>(Any card that has white in it's color identity)</small></dd>
 
-<dt><u>Pow</u>er, <u>Tou</u>ghness, <u>C</u>onverted <u>M</u>ana <u>C</u>ost:</dt>
+<dt><u>Pow</u>er, <u>Tou</u>ghness, <u>M</u>ana <u>V</u>alue:</dt>
 <dd>[tou:1](#tou:1) <small>(Any card with a toughness of 1)</small></dd>
 <dd>[pow>=8](#pow>=8) <small>(Any card with a power greater than or equal to 8)</small></dd>
-<dd>[cmc=7](#cmc=7) <small>(Any card with a mana value equal to 7)</small></dd>
 <dd>[mv=7](#mv=7) <small>(Any card with a mana value equal to 7)</small></dd>
 
 <dt><u>R</u>arity:</dt>
