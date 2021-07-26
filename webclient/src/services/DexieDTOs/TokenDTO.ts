@@ -8,7 +8,7 @@ export class TokenDTO extends Token {
   }
 
   static get(name) {
-    return dexieService.tokens.where('name.value').equals(name).first();
+    return dexieService.tokens.where('name.value').equalsIgnoreCase(name).first();
   }
 
   static bulkAdd(tokens: TokenDTO[]): Promise<any> {

@@ -1,31 +1,20 @@
 // eslint-disable-next-line
 import React from "react";
 
+import { Message } from 'components';
+
 import "./Messages.css";
 
 const Messages = ({ messages }) => (
   <div className="messages">
     {
-      messages && messages.map(({ message, messageType, timeOf, timeReceived }) => (
-        <div className="message" key={timeReceived}>
-          <div className="message__detail">{ParsedMessage(message)}</div>
+      messages && messages.map((message, index) => (
+        <div className="message-wrapper" key={message.timeReceived}>
+          <Message message={message} />
         </div>
       ) )
     }
   </div>
 );
-
-const ParsedMessage = (message) => {
-  const name = message.match("^[^:]+:");
-
-  if (name && name.length) {
-    message = message.slice(name[0].length, message.length);
-  }
-
-  return <div>
-    <strong>{name}</strong>
-    {message}
-  </div>
-};
 
 export default Messages;

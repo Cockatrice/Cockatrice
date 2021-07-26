@@ -2,6 +2,7 @@
 export { default as Header } from './Header/Header';
 export { default as InputField } from './InputField/InputField';
 export { default as InputAction } from './InputAction/InputAction';
+export { default as Message } from './Message/Message';
 export { default as VirtualList } from './VirtualList/VirtualList';
 export { default as UserDisplay} from './UserDisplay/UserDisplay';
 export { default as ThreePaneLayout }  from './ThreePaneLayout/ThreePaneLayout';

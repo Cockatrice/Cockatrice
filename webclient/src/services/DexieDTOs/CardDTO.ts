@@ -8,7 +8,7 @@ export class CardDTO extends Card {
   }
 
   static get(name) {
-    return dexieService.cards.where('name').equals(name).first();
+    return dexieService.cards.where('name').equalsIgnoreCase(name).first();
   }
 
   static bulkAdd(cards: CardDTO[]): Promise<any> {
