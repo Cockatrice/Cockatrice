@@ -78,7 +78,7 @@ function parseUrlChunk(chunk) {
     .filter(urlChunk => !!urlChunk)
     .map((urlChunk, index) => {
       if (urlChunk.match(urlRegex)) {
-        return ( <a className='link' href={urlChunk} key={index} target='_blank'rel='noopener noreferrer'>{urlChunk}</a> );
+        return ( <a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a> );
       }
 
       return urlChunk;
