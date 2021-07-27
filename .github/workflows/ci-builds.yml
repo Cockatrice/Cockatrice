@@ -195,7 +195,7 @@ jobs:
         include:
           - target: Debug # tests only
             os: macos-latest
-            xcode: 11.7
+            xcode: 12.1
             type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
