@@ -209,17 +209,18 @@ jobs:
 
           - target: 10.15_Catalina
             os: macos-10.15
-            xcode: 11.7
+            xcode: 12.1
             type: Release
             do_tests: 0
             make_package: true
 
           - target: 11.0_Big_Sur
             os: macos-11.0
-            xcode: 12.2
+            xcode: 12.5
             type: Release
             do_tests: 0
             make_package: true
+            allow-failure: yes # macOS 11 Big Sur is in "preview" access only and may not run reliably
 
     name: macOS ${{matrix.target}}
 
