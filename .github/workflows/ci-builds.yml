@@ -220,7 +220,6 @@ jobs:
             type: Release
             do_tests: 0
             make_package: true
-            allow-failure: yes # macOS 11 Big Sur is in "preview" access only and may not run reliably
 
     name: macOS ${{matrix.target}}
 
