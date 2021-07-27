@@ -28,7 +28,7 @@ inline static const QString getNicePropertyName(QString key)
     if (key == CardType)
         return QCoreApplication::translate("Mtg", "Card Type");
     if (key == ConvertedManaCost)
-        return QCoreApplication::translate("Mtg", "Converted Mana Cost");
+        return QCoreApplication::translate("Mtg", "Mana Value");
     if (key == Colors)
         return QCoreApplication::translate("Mtg", "Color(s)");
     if (key == Loyalty)
