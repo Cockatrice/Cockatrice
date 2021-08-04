@@ -360,7 +360,6 @@ jobs:
           cached: ${{steps.cache-qt.outputs.cache-hit}}
           version: ${{env.QT_VERSION}}
           arch: win${{matrix.arch}}_${{env.QT_ARCH}}
-          setup-python: false
 
       - name: Restore or setup vcpkg
         uses: lukka/run-vcpkg@v6
