@@ -1,0 +1,20 @@
+﻿{
+  "configurations": [
+    {
+      "name": "ReleaseSetup",
+      "generator": "Visual Studio 16 2019 Win64",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64" ],
+      "buildRoot": "C:/Cockatrice/build",
+      "installRoot": "${projectDir}\\build\\install\\${name}",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "QTDIR",
+          "value": "C:/Qt/5.12.11/msvc2017_64",
+          "type": "STRING"
+        }
+      ]
+    }
+  ]
+}
