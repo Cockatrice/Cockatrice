@@ -333,7 +333,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      QT_VERSION: '5.12.9'
+      QT_VERSION: '5.12.11'
       QT_ARCH: msvc2017${{matrix.append}}
       CMAKE_GENERATOR: 'Visual Studio 16 2019'
 
@@ -360,6 +360,7 @@ jobs:
           cached: ${{steps.cache-qt.outputs.cache-hit}}
           version: ${{env.QT_VERSION}}
           arch: win${{matrix.arch}}_${{env.QT_ARCH}}
+          setup-python: false
 
       - name: Restore or setup vcpkg
         uses: lukka/run-vcpkg@v6
