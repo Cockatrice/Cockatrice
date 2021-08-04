@@ -333,8 +333,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      QT_VERSION: '5.12.11'
-      QT_ARCH: msvc2017${{matrix.append}}
+      QT_VERSION: '5.15.2'
+      QT_ARCH: msvc2019${{matrix.append}}
       CMAKE_GENERATOR: 'Visual Studio 16 2019'
 
     steps:
