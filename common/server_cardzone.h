@@ -37,7 +37,7 @@ class Server_CardZone
 private:
     Server_Player *player;
     QString name;
-    bool has_coords;
+    bool has_coords; // having coords means this zone has x and y coordinates
     ServerInfo_Zone::ZoneType type;
     int cardsBeingLookedAt;
     QSet<int> playersWithWritePermission;
@@ -59,6 +59,7 @@ public:
         return cards;
     }
     int removeCard(Server_Card *card);
+    int removeCard(Server_Card *card, bool &wasLookedAt);
     Server_Card *getCard(int id, int *position = nullptr, bool remove = false);
 
     int getCardsBeingLookedAt() const
@@ -69,6 +70,7 @@ public:
     {
         cardsBeingLookedAt = _cardsBeingLookedAt;
     }
+    bool isCardAtPosLookedAt(int pos) const;
     bool hasCoords() const
     {
         return has_coords;
