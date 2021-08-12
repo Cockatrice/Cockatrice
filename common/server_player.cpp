@@ -523,7 +523,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             eventOthers.set_face_down(faceDown);
 
             Event_MoveCard eventPrivate(eventOthers);
-            if (targetzone->getType() != ServerInfo_Zone::HiddenZone || sourceBeingLookedAt) {
+            if (targetzone->getType() != ServerInfo_Zone::HiddenZone ||
+                (startzone->getType() == ServerInfo_Zone::HiddenZone && sourceBeingLookedAt)) {
                 eventPrivate.set_card_id(oldCardId);
                 eventPrivate.set_new_card_id(card->getId());
             } else {
