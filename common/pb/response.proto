@@ -37,11 +37,12 @@ message Response {
         RespActivationAccepted = 31;   // Server accepted a reg user activation token
         RespActivationFailed = 32;     // Server didn't accept a reg user activation token
         RespRegistrationAcceptedNeedsActivation =
-            33;                    // Server accepted cient registration, but it will need token activation
+            33;                    // Server accepted client registration, but it will need token activation
         RespClientIdRequired = 34; // Server requires client to generate and send its client id before allowing access
         RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
         RespServerFull = 36;           // Server user limit reached
         RespEmailBlackListed = 37;     // Server has blacklisted the email address provided for registration
+        RespEmailNotWhiteListed = 38;  // Server has not whitelisted the email address provided for registration
     }
     enum ResponseType {
         JOIN_ROOM = 1000;

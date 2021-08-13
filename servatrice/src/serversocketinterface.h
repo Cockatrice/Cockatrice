@@ -125,6 +125,7 @@ private:
     bool removeAdminFlagFromUser(const QString &user, int flag);
 
     bool isPasswordLongEnough(const int passwordLength);
+    static QString parseEmailAddress(const std::string &stdEmailAddress);
 
 public:
     AbstractServerSocketInterface(Servatrice *_server,
