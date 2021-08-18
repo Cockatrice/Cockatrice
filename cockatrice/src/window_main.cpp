@@ -516,7 +516,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             break;
         case Response::RespEmailNotWhiteListed:
             QMessageBox::critical(this, tr("Registration denied"),
-                                  tr("The email address provider used during registration has not been blacklisted for "
+                                  tr("The email address provider used during registration has not been approved for "
                                      "use on this server."));
             break;
         case Response::RespTooManyRequests:
