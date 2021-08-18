@@ -1052,7 +1052,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                                          QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
                                          "Email used is not whitelisted", false);
         }
-        return Response::RespEmailNotWhiteListed;
+        auto *re = new Response_Register;
+        re->set_denied_reason_str(
+            "The email address provider used during registration has not been approved for use on this server.");
+        rc.setResponseExtension(re);
+        return Response::RespEmailBlackListed;
     }
 
     // If a blacklist exists, ensure the email address domain is NOT in the blacklist
