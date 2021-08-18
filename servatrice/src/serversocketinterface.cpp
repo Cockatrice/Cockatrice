@@ -920,14 +920,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     }
 
     if (userName.isEmpty() && address.isEmpty() && (!clientID.isEmpty())) {
-        QSqlQuery *query = sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
-        query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
-        sqlInterface->execSqlQuery(query);
-        if (!sqlInterface->execSqlQuery(query)) {
+        QSqlQuery *clientIdQuery =
+            sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
+        clientIdQuery->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
+        sqlInterface->execSqlQuery(clientIdQuery);
+        if (!sqlInterface->execSqlQuery(clientIdQuery)) {
             qDebug("ClientID username ban lookup failed: SQL Error");
         } else {
-            while (query->next()) {
-                userName = query->value(0).toString();
+            while (clientIdQuery->next()) {
+                userName = clientIdQuery->value(0).toString();
                 AbstractServerSocketInterface *user =
                     static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
                 if (user && !userList.contains(user))
@@ -977,7 +978,8 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
     QString emailAddress = QString::fromStdString(stdEmailAddress);
 
     // https://www.regular-expressions.info/email.html
-    static const QRegularExpression emailRegex(r"^([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,})$", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression emailRegex(R"(^([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,})$)",
+                                               QRegularExpression::CaseInsensitiveOption);
     const auto match = emailRegex.match(emailAddress);
 
     if (emailAddress.isEmpty() || !match.hasMatch()) {
@@ -987,17 +989,19 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
     const QString capturedEmailAddressDomain = match.captured(2);
 
     // Trim out dots and pluses from Google/Gmail domains
-    if (capturedEmailAddressDomain.contains("gmail.com", Qt::CaseInsensitive) ||
-        capturedEmailAddressDomain.contains("googlemail.com", Qt::CaseInsensitive)) {
+    if (capturedEmailAddressDomain.toLower() == "gmail.com" ||
+        capturedEmailAddressDomain.toLower() == "googlemail.com") {
         QString capturedEmailUser = match.captured(1);
 
         // Remove all content after first plus sign (as unnecessary with gmail)
+        // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
         const int firstPlusSign = capturedEmailUser.indexOf("+");
         if (firstPlusSign != -1) {
             capturedEmailUser = capturedEmailUser.left(firstPlusSign);
         }
 
         // Remove all periods (as unnecessary with gmail)
+        // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
         capturedEmailUser.replace(".", "");
 
         emailAddress = capturedEmailUser + "@" + capturedEmailAddressDomain;
