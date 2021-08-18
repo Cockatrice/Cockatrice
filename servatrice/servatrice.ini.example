@@ -164,7 +164,7 @@ minpasswordlength = 6
 ; Example: "10minutemail.com,gmail.com"
 ;emailproviderblacklist=""
 
-; You can require users to only use certain mail domains for registration. This setting is a
+; You can require users to only use certain email domains for registration. This setting is a
 ; comma-separated list of email provider domains that you have explicitly audited and require
 ; the use of in order to create an account. Comparison's are explicit, so you must specify the
 ; domain in completion, such as gmail.com and hotmail.com. Email whitelist is checked before
