@@ -978,7 +978,7 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
 
     // https://www.regular-expressions.info/email.html
     static const QRegularExpression emailRegex(r"^([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,})$", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpressionMatch match = rx.match(emailAddress);
+    const auto match = emailRegex.match(emailAddress);
 
     if (emailAddress.isEmpty() || !match.hasMatch()) {
         return QString();
