@@ -231,6 +231,7 @@ public:
         return dbPrefix;
     }
     QString getEmailBlackList() const;
+    QString getEmailWhiteList() const;
     AuthenticationMethod getAuthenticationMethod() const
     {
         return authenticationMethod;

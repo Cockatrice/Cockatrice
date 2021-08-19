@@ -67,6 +67,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress>
+#include <QRegularExpression>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
@@ -919,14 +920,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     }
 
     if (userName.isEmpty() && address.isEmpty() && (!clientID.isEmpty())) {
-        QSqlQuery *query = sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
-        query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
-        sqlInterface->execSqlQuery(query);
-        if (!sqlInterface->execSqlQuery(query)) {
+        QSqlQuery *clientIdQuery =
+            sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
+        clientIdQuery->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
+        sqlInterface->execSqlQuery(clientIdQuery);
+        if (!sqlInterface->execSqlQuery(clientIdQuery)) {
             qDebug("ClientID username ban lookup failed: SQL Error");
         } else {
-            while (query->next()) {
-                userName = query->value(0).toString();
+            while (clientIdQuery->next()) {
+                userName = clientIdQuery->value(0).toString();
                 AbstractServerSocketInterface *user =
                     static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
                 if (user && !userList.contains(user))
@@ -971,6 +973,43 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     return Response::RespOk;
 }
 
+QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdEmailAddress)
+{
+    QString emailAddress = QString::fromStdString(stdEmailAddress);
+
+    // https://www.regular-expressions.info/email.html
+    static const QRegularExpression emailRegex(R"(^([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,})$)",
+                                               QRegularExpression::CaseInsensitiveOption);
+    const auto match = emailRegex.match(emailAddress);
+
+    if (emailAddress.isEmpty() || !match.hasMatch()) {
+        return QString();
+    }
+
+    const QString capturedEmailAddressDomain = match.captured(2);
+
+    // Trim out dots and pluses from Google/Gmail domains
+    if (capturedEmailAddressDomain.toLower() == "gmail.com" ||
+        capturedEmailAddressDomain.toLower() == "googlemail.com") {
+        QString capturedEmailUser = match.captured(1);
+
+        // Remove all content after first plus sign (as unnecessary with gmail)
+        // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
+        const int firstPlusSign = capturedEmailUser.indexOf("+");
+        if (firstPlusSign != -1) {
+            capturedEmailUser = capturedEmailUser.left(firstPlusSign);
+        }
+
+        // Remove all periods (as unnecessary with gmail)
+        // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
+        capturedEmailUser.replace(".", "");
+
+        emailAddress = capturedEmailUser + "@" + capturedEmailAddressDomain;
+    }
+
+    return emailAddress;
+}
+
 Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd,
                                                                          ResponseContainer &rc)
 {
@@ -988,34 +1027,46 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespRegistrationDisabled;
     }
 
-    QString emailBlackList = servatrice->getEmailBlackList();
-    QString emailAddress = QString::fromStdString(cmd.email());
+    const QString emailBlackList = servatrice->getEmailBlackList();
+    const QString emailWhiteList = servatrice->getEmailWhiteList();
+    const QString emailAddress = parseEmailAddress(cmd.email());
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-    QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
+    const QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
+    const QStringList emailWhiteListFilters = emailWhiteList.split(",", Qt::SkipEmptyParts);
 #else
-    QStringList emailBlackListFilters = emailBlackList.split(",", QString::SkipEmptyParts);
+    const QStringList emailBlackListFilters = emailBlackList.split(",", QString::SkipEmptyParts);
+    const QStringList emailWhiteListFilters = emailWhiteList.split(",", QString::SkipEmptyParts);
 #endif
 
-    // verify that users email/provider is not blacklisted
-    if (!emailBlackList.trimmed().isEmpty()) {
-        foreach (QString blackListEmailAddress, emailBlackListFilters) {
-            if (emailAddress.contains(blackListEmailAddress, Qt::CaseInsensitive)) {
-                if (servatrice->getEnableRegistrationAudit())
-                    sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(),
-                                                 this->getAddress(),
-                                                 QString::fromStdString(cmd.clientid()).simplified(),
-                                                 "REGISTER_ACCOUNT", "Email used is blacklisted", false);
-
-                return Response::RespEmailBlackListed;
-            }
-        }
+    bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
+    if (requireEmailForRegistration && emailAddress.isEmpty()) {
+        return Response::RespEmailRequiredToRegister;
     }
 
-    bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
-    if (requireEmailForRegistration) {
-        QRegExp rx("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b");
-        if (emailAddress.isEmpty() || !rx.exactMatch(emailAddress))
-            return Response::RespEmailRequiredToRegister;
+    const auto emailAddressDomain = emailAddress.split("@").at(1);
+
+    // If a whitelist exists, ensure the email address domain IS in the whitelist
+    if (!emailWhiteListFilters.isEmpty() && !emailWhiteListFilters.contains(emailAddressDomain, Qt::CaseInsensitive)) {
+        if (servatrice->getEnableRegistrationAudit()) {
+            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
+                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
+                                         "Email used is not whitelisted", false);
+        }
+        auto *re = new Response_Register;
+        re->set_denied_reason_str(
+            "The email address provider used during registration has not been approved for use on this server.");
+        rc.setResponseExtension(re);
+        return Response::RespEmailBlackListed;
+    }
+
+    // If a blacklist exists, ensure the email address domain is NOT in the blacklist
+    if (!emailBlackListFilters.isEmpty() && emailBlackListFilters.contains(emailAddressDomain, Qt::CaseInsensitive)) {
+        if (servatrice->getEnableRegistrationAudit())
+            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
+                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
+                                         "Email used is blacklisted", false);
+
+        return Response::RespEmailBlackListed;
     }
 
     // TODO: Move this method outside of the db interface
@@ -1128,7 +1179,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
             return Response::RespRegistrationAccepted;
         }
     } else {
-
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
                                          QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",

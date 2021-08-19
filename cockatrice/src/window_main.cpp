@@ -510,9 +510,11 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
                                   tr("It's mandatory to specify a valid email address when registering."));
             break;
         case Response::RespEmailBlackListed:
-            QMessageBox::critical(
-                this, tr("Registration denied"),
-                tr("The email address provider used during registration has been blacklisted for use on this server."));
+            if (reasonStr.isEmpty()) {
+                reasonStr =
+                    "The email address provider used during registration has been blocked from use on this server.";
+            }
+            QMessageBox::critical(this, tr("Registration denied"), reasonStr);
             break;
         case Response::RespTooManyRequests:
             QMessageBox::critical(
