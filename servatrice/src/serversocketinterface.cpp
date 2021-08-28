@@ -983,14 +983,19 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
     const auto match = emailRegex.match(emailAddress);
 
     if (emailAddress.isEmpty() || !match.hasMatch()) {
-        return QString();
+        return {};
     }
 
-    const QString capturedEmailAddressDomain = match.captured(2);
+    QString capturedEmailAddressDomain = match.captured(2);
+
+    // Replace googlemail.com with gmail.com, as is standard nowadays
+    // https://www.gmass.co/blog/domains-gmail-com-googlemail-com-and-google-com/
+    if (capturedEmailAddressDomain.toLower() == "googlemail.com") {
+        capturedEmailAddressDomain = "gmail.com";
+    }
 
     // Trim out dots and pluses from Google/Gmail domains
-    if (capturedEmailAddressDomain.toLower() == "gmail.com" ||
-        capturedEmailAddressDomain.toLower() == "googlemail.com") {
+    if (capturedEmailAddressDomain.toLower() == "gmail.com") {
         QString capturedEmailUser = match.captured(1);
 
         // Remove all content after first plus sign (as unnecessary with gmail)
