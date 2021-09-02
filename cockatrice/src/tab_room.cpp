@@ -253,6 +253,9 @@ void TabRoom::processRoomEvent(const RoomEvent &event)
         case RoomEvent::ROOM_SAY:
             processRoomSayEvent(event.GetExtension(Event_RoomSay::ext));
             break;
+        case RoomEvent::REMOVE_MESSAGES:
+            processRemoveMessagesEvent(event.GetExtension(Event_RemoveMessages::ext));
+            break;
         default:;
     }
 }
