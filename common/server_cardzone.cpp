@@ -44,6 +44,8 @@ Server_CardZone::~Server_CardZone()
 
 void Server_CardZone::shuffle(int start, int end)
 {
+    cardsBeingLookedAt = 0;
+
     // Size 0 or 1 decks are sorted
     if (cards.size() < 2)
         return;
@@ -122,10 +124,21 @@ void Server_CardZone::insertCardIntoCoordMap(Server_Card *card, int x, int y)
 
 int Server_CardZone::removeCard(Server_Card *card)
 {
+    bool wasLookedAt;
+    return removeCard(card, wasLookedAt);
+}
+
+int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt)
+{
     int index = cards.indexOf(card);
+    wasLookedAt = isCardAtPosLookedAt(index);
+    if (wasLookedAt && cardsBeingLookedAt > 0) {
+        cardsBeingLookedAt -= 1;
+    }
     cards.removeAt(index);
-    if (has_coords)
+    if (has_coords) {
         removeCardFromCoordMap(card, card->getX(), card->getY());
+    }
     card->setZone(nullptr);
 
     return index;
@@ -159,6 +172,11 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
         }
         return tmp;
     }
+}
+
+bool Server_CardZone::isCardAtPosLookedAt(int pos) const
+{
+    return type == ServerInfo_Zone::HiddenZone && (cardsBeingLookedAt == -1 || cardsBeingLookedAt > pos);
 }
 
 int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const
@@ -274,10 +292,11 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
         insertCardIntoCoordMap(card, x, y);
     } else {
         card->setCoords(0, 0);
-        if (x == -1)
+        if (x == -1) {
             cards.append(card);
-        else
+        } else {
             cards.insert(x, card);
+        }
     }
     card->setZone(this);
 }
@@ -291,6 +310,7 @@ void Server_CardZone::clear()
     freePilesMap.clear();
     freeSpaceMap.clear();
     playersWithWritePermission.clear();
+    cardsBeingLookedAt = 0;
 }
 
 void Server_CardZone::addWritePermission(int playerId)
