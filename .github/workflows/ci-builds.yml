@@ -333,8 +333,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      QT_VERSION: '5.12.9'
-      QT_ARCH: msvc2017${{matrix.append}}
+      QT_VERSION: '5.15.2'
+      QT_ARCH: msvc2019${{matrix.append}}
       CMAKE_GENERATOR: 'Visual Studio 16 2019'
 
     steps:
@@ -374,7 +374,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          export QTDIR="${{runner.workspace}}/Qt/$QT_VERSION/$QT_ARCH"
+          export QTDIR="${{runner.workspace}}/Qt/${{env.QT_VERSION}}/${{env.QT_ARCH}}"
           cmake .. -G "${{env.CMAKE_GENERATOR}}" -A "${{matrix.cmake}}" -DCMAKE_BUILD_TYPE="Release" -DWITH_SERVER=1 -DTEST=1
 
       - name: Build Cockatrice ${{matrix.arch}}-bit
