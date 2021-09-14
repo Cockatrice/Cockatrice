@@ -599,8 +599,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     createCardInfoDock();
     createFiltersDock();
 
-    restartLayout();
-
     this->installEventFilter(this);
 
     retranslateUi();
