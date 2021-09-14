@@ -132,6 +132,7 @@ public:
                                                   Server_AbstractUserInterface *userInterface);
 
     void say(const QString &userName, const QString &s, bool sendToIsl = true);
+    void removeSaidMessages(const QString &userName, int amount, bool sendToIsl = true);
 
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);

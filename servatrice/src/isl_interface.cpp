@@ -6,6 +6,7 @@
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_list_games.pb.h"
+#include "pb/event_remove_messages.pb.h"
 #include "pb/event_room_say.pb.h"
 #include "pb/event_server_complete_list.pb.h"
 #include "pb/event_user_joined.pb.h"
@@ -348,6 +349,11 @@ void IslInterface::roomEvent_ListGames(int roomId, const Event_ListGames &event)
     }
 }
 
+void IslInterface::roomEvent_RemoveMessages(int roomId, const Event_RemoveMessages &event)
+{
+    emit externalRoomRemoveMessages(roomId, QString::fromStdString(event.name()), event.amount());
+}
+
 void IslInterface::roomCommand_JoinGame(const Command_JoinGame &cmd, int cmdId, int roomId, qint64 sessionId)
 {
     emit joinGameCommandReceived(cmd, cmdId, roomId, serverId, sessionId);
@@ -408,6 +414,9 @@ void IslInterface::processRoomEvent(const RoomEvent &event)
             break;
         case RoomEvent::LIST_GAMES:
             roomEvent_ListGames(event.room_id(), event.GetExtension(Event_ListGames::ext));
+            break;
+        case RoomEvent::REMOVE_MESSAGES:
+            roomEvent_RemoveMessages(event.room_id(), event.GetExtension(Event_RemoveMessages::ext));
             break;
         default:;
     }

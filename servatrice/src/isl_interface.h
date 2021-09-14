@@ -22,6 +22,7 @@ class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
 class Event_ListGames;
+class Event_RemoveMessages;
 class Command_JoinGame;
 
 class IslInterface : public QObject
@@ -40,6 +41,7 @@ signals:
     void externalRoomUserLeft(int roomId, QString userName);
     void externalRoomSay(int roomId, QString userName, QString message);
     void externalRoomGameListChanged(int roomId, ServerInfo_Game gameInfo);
+    void externalRoomRemoveMessages(int roomId, QString userName, int amount);
     void joinGameCommandReceived(const Command_JoinGame &cmd, int cmdId, int roomId, int serverId, qint64 sessionId);
     void gameCommandContainerReceived(const CommandContainer &cont, int playerId, int serverId, qint64 sessionId);
     void responseReceived(const Response &resp, qint64 sessionId);
@@ -68,6 +70,7 @@ private:
     void roomEvent_UserLeft(int roomId, const Event_LeaveRoom &event);
     void roomEvent_Say(int roomId, const Event_RoomSay &event);
     void roomEvent_ListGames(int roomId, const Event_ListGames &event);
+    void roomEvent_RemoveMessages(int roomId, const Event_RemoveMessages &event);
 
     void roomCommand_JoinGame(const Command_JoinGame &cmd, int cmdId, int roomId, qint64 sessionId);
 

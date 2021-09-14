@@ -126,6 +126,7 @@ private:
 
     bool isPasswordLongEnough(const int passwordLength);
     static QString parseEmailAddress(const std::string &stdEmailAddress);
+    void removeSaidMessages(const QString &userName, int amount);
 
 public:
     AbstractServerSocketInterface(Servatrice *_server,
