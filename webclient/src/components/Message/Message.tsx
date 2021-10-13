@@ -3,17 +3,17 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { NavLink, generatePath } from "react-router-dom";
 
-import { RouteEnum } from 'types';
+import {
+  RouteEnum,
+  URL_REGEX,
+  MESSAGE_SENDER_REGEX,
+  MENTION_REGEX,
+  CARD_CALLOUT_REGEX,
+  CALLOUT_BOUNDARY_REGEX,
+} from 'types';
 
 import CardCallout from './CardCallout';
 import './Message.css';
-
-// eslint-disable-next-line
-const urlRegex = /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))/g;
-const nameRegex = /(^[^:\s]+):/;
-const mentionRegex = /(@[^\s@]+)/g;
-const cardCalloutsRegex = /(\[\[[^\]]+\]\])/g;
-const calloutsRegex = /(\[\[|\]\])/g;
 
 const Message = ({ message: { message, messageType, timeOf, timeReceived } }) => (
   <div className='message'>
@@ -28,18 +28,13 @@ const ParsedMessage = ({ message }) => {
   const [name, setName] = useState(null);
 
   useMemo(() => {
-    const name = message.match(nameRegex);
-
-    const messageChunks = message.replace(nameRegex, '')
-      .split(cardCalloutsRegex)
-      .filter(chunk => !!chunk)
-      .map(parseChunks);
+    const name = message.match(MESSAGE_SENDER_REGEX);
 
     if (name) {
       setName(name[1]);
     }
 
-    setMessageChunks(messageChunks);
+    setMessageChunks(parseMessage(message));
   }, [message]);
 
   return (
@@ -56,17 +51,24 @@ const PlayerLink = ({ name, label = name }) => (
   </NavLink>
 );
 
+function parseMessage(message) {
+  return message.replace(MESSAGE_SENDER_REGEX, '')
+    .split(CARD_CALLOUT_REGEX)
+    .filter(chunk => !!chunk)
+    .map(parseChunks);
+}
+
 function parseChunks(chunk, index) {
-  if (chunk.match(cardCalloutsRegex)) {
-    const name = chunk.replace(calloutsRegex, '').trim();
+  if (chunk.match(CARD_CALLOUT_REGEX)) {
+    const name = chunk.replace(CALLOUT_BOUNDARY_REGEX, '').trim();
     return ( <CardCallout name={name} key={index}></CardCallout> );
   }
 
-  if (chunk.match(urlRegex)) {
+  if (chunk.match(URL_REGEX)) {
     return parseUrlChunk(chunk);
   }
 
-  if (chunk.match(mentionRegex)) {
+  if (chunk.match(MENTION_REGEX)) {
     return parseMentionChunk(chunk);
   }
 
@@ -74,10 +76,10 @@ function parseChunks(chunk, index) {
 }
 
 function parseUrlChunk(chunk) {
-  return chunk.split(urlRegex)
+  return chunk.split(URL_REGEX)
     .filter(urlChunk => !!urlChunk)
     .map((urlChunk, index) => {
-      if (urlChunk.match(urlRegex)) {
+      if (urlChunk.match(URL_REGEX)) {
         return ( <a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a> );
       }
 
@@ -86,13 +88,13 @@ function parseUrlChunk(chunk) {
 }
 
 function parseMentionChunk(chunk) {
-  return chunk.split(mentionRegex)
+  return chunk.split(MENTION_REGEX)
     .filter(mentionChunk => !!mentionChunk)
     .map((mentionChunk, index) => {
-      const mention = mentionChunk.match(mentionRegex);
+      const mention = mentionChunk.match(MENTION_REGEX);
 
       if (mention) {
-        const name = mention[0].slice(1, mention[0].length);
+        const name = mention[0].substr(1);
         return ( <PlayerLink name={name} label={mention} key={index} /> );
       }
 

@@ -11,7 +11,7 @@ import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, Aut
 import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors } from "store";
 import { RouteEnum } from "types";
 
-import Games from "./Games";
+import OpenGames from "./OpenGames";
 import Messages from "./Messages";
 import SayMessage from "./SayMessage";
 
@@ -60,7 +60,7 @@ class Room extends Component<any> {
 
             top={(
               <Paper className="room-view__games overflow-scroll">
-                <Games room={room} />
+                <OpenGames room={room} />
               </Paper>    
             )}
 
