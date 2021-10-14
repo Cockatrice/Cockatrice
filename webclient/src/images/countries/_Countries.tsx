@@ -247,7 +247,7 @@ import za from "./za.svg";
 import zm from "./zm.svg";
 import zw from "./zw.svg";
 
-const Countries = [
+const Countries = {
   ad,
   ae,
   af,
@@ -496,6 +496,6 @@ const Countries = [
   za,
   zm,
   zw,
-];
+};
 
 export default Countries;
