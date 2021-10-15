@@ -212,7 +212,7 @@ export class WebClient {
 
     const { host, port } = this.options;
 
-    this.socket = new WebSocket("ws://" + host + ":" + port);
+    this.socket = new WebSocket("wss://" + host + ":" + port);
     this.socket.binaryType = "arraybuffer"; // We are talking binary
 
     this.socket.onopen = () => {
