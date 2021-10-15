@@ -19,6 +19,8 @@ import { Room, RouteEnum, User } from "types";
 import "./Header.css";
 import logo from "./logo.png";
 
+import CardImportDialog from '../CardImportDialog/CardImportDialog';
+
 class Header extends Component<HeaderProps> {
   state: HeaderState;
   options: string[] = [
@@ -29,12 +31,17 @@ class Header extends Component<HeaderProps> {
   constructor(props) {
     super(props);
 
-    this.state = { anchorEl: null };
+    this.state = {
+      anchorEl: null,
+      showCardImportDialog: false,
+    };
 
     this.handleMenuOpen = this.handleMenuOpen.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
     this.handleMenuClose = this.handleMenuClose.bind(this);
     this.leaveRoom = this.leaveRoom.bind(this);
+    this.openImportCardWizard = this.openImportCardWizard.bind(this);
+    this.closeImportCardWizard = this.closeImportCardWizard.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -65,9 +72,18 @@ class Header extends Component<HeaderProps> {
     RoomsService.leaveRoom(roomId);
   };
 
+  openImportCardWizard() {
+    this.setState({ showCardImportDialog: true });
+    this.handleMenuClose();
+  }
+
+  closeImportCardWizard() {
+    this.setState({ showCardImportDialog: false });
+  }
+
   render() {
     const { joinedRooms, state, user } = this.props;
-    const { anchorEl } = this.state;
+    const { anchorEl, showCardImportDialog } = this.state;
 
     let options = [ ...this.options ];
 
@@ -156,6 +172,10 @@ class Header extends Component<HeaderProps> {
                           {option}
                         </MenuItem>
                       ))}
+
+                      <MenuItem key='Import Cards' onClick={(event) => this.openImportCardWizard()}>
+                        Import Cards
+                      </MenuItem>
                     </Menu>
                   </div>
                 </div>
@@ -163,6 +183,11 @@ class Header extends Component<HeaderProps> {
             </div>
           ) }
         </Toolbar>
+        
+        <CardImportDialog
+          isOpen={showCardImportDialog}
+          handleClose={this.closeImportCardWizard}
+        ></CardImportDialog>
       </AppBar>
     )
   }
@@ -177,7 +202,8 @@ interface HeaderProps {
 }
 
 interface HeaderState {
-  anchorEl: Element
+  anchorEl: Element;
+  showCardImportDialog: boolean;
 }
 
 const mapStateToProps = state => ({

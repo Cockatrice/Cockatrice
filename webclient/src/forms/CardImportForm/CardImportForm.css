@@ -1,0 +1,35 @@
+.cardImportForm {
+  width: 550px;
+}
+
+.cardImportForm-content.done {
+  font-size: 32px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardImportForm-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.cardImportForm-error {
+  color: red;
+}
+
+.card-import-list {
+  height: 300px;
+  line-height: 1;
+  border: 1px solid lightgrey;
+  padding: 10px;
+}
+
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

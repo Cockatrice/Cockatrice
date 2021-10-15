@@ -1,0 +1,46 @@
+.tokenDetails {
+  padding: 10px;
+  width: calc(400px * .716);
+  font-size: 10px;
+}
+
+.tokenDetails-token {
+  height: 400px;
+  margin: 0 auto;
+}
+
+.tokenDetails-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.tokenDetails-attributes {
+  margin-top: 10px;
+}
+
+.tokenDetails-attribute__label {
+  text-transform: uppercase;
+  font-size: 10px;
+  margin-right: 10px;
+}
+
+.tokenDetails-attribute__value {
+  text-align: right;
+}
+
+.tokenDetails-text {
+  font-size: 12px;
+  margin-top: 10px;
+  padding: 5px;
+  background: rgba(0, 0, 0, .15);
+  white-space: pre-line;
+}
+
+.tokenDetails-text__flavor {
+  font-style: italic;
+}
+
+.tokenDetails-text__current:not(:empty) + .tokenDetails-text__flavor {
+  margin-top: 10px;
+}
