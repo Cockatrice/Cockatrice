@@ -217,7 +217,7 @@ const propsMap = {
 
 const mapStateToProps = () => ({
   initialValues: {
-    cardDownloadUrl: 'https://www.mtgjson.com/api/v5/AllPrintings.json',
+    cardDownloadUrl: 'https://www.mtgjson.com/api/v5/AllPrintings.json.xz',
     tokenDownloadUrl: 'https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml'
   },
 });
