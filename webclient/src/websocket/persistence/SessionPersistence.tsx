@@ -1,5 +1,5 @@
 import { ServerDispatch } from "store";
-import { StatusEnum } from "types";
+import { Log, StatusEnum, User } from "types";
 
 import { sanitizeHtml } from "websocket/utils";
 import NormalizeService from "../utils/NormalizeService";
@@ -9,7 +9,7 @@ export class SessionPersistence {
     ServerDispatch.clearStore();
   }
 
-  static connectionClosed(reason) {
+  static connectionClosed(reason: number) {
     ServerDispatch.connectionClosed(reason);
   }
 
@@ -17,11 +17,11 @@ export class SessionPersistence {
     ServerDispatch.updateBuddyList(buddyList);
   }
 
-  static addToBuddyList(user) {
+  static addToBuddyList(user: User) {
     ServerDispatch.addToBuddyList(user);
   }
 
-  static removeFromBuddyList(userName) {
+  static removeFromBuddyList(userName: string) {
     ServerDispatch.removeFromBuddyList(userName);
   }
 
@@ -29,47 +29,47 @@ export class SessionPersistence {
     ServerDispatch.updateIgnoreList(ignoreList);
   }
 
-  static addToIgnoreList(user) {
+  static addToIgnoreList(user: User) {
     ServerDispatch.addToIgnoreList(user);
   }
 
-  static removeFromIgnoreList(userName) {
+  static removeFromIgnoreList(userName: string) {
     ServerDispatch.removeFromIgnoreList(userName);
   }
 
-  static updateInfo(name, version) {
+  static updateInfo(name: string, version: string) {
     ServerDispatch.updateInfo(name, version);
   }
 
-  static updateStatus(state, description) {
+  static updateStatus(state: number, description: string) {
     ServerDispatch.updateStatus(state, description);
 
     if (state === StatusEnum.DISCONNECTED) {
-      this.connectionClosed({ reason: description });
+      this.connectionClosed(state);
     }
   }
 
-  static updateUser(user) {
+  static updateUser(user: User) {
     ServerDispatch.updateUser(user);
   }
 
-  static updateUsers(users) {
+  static updateUsers(users: User[]) {
     ServerDispatch.updateUsers(users);
   }
 
-  static userJoined(user) {
+  static userJoined(user: User) {
     ServerDispatch.userJoined(user);
   }
 
-  static userLeft(userId) {
-    ServerDispatch.userLeft(userId);
+  static userLeft(userName: string) {
+    ServerDispatch.userLeft(userName);
   }
 
-  static viewLogs(logs) {
+  static viewLogs(logs: Log[]) {
     ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
   }
 
-  static serverMessage(message) {
+  static serverMessage(message: string) {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
 }

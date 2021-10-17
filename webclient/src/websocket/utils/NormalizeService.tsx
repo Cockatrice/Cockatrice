@@ -1,6 +1,8 @@
+import { Game, GametypeMap, Log, LogGroups, Message, Room } from 'types';
+
 export default class NormalizeService {
   // Flatten room gameTypes into map object
-  static normalizeRoomInfo(roomInfo) {
+  static normalizeRoomInfo(roomInfo: Room): void {
     roomInfo.gametypeMap = {};
 
     const { gametypeList, gametypeMap, gameList } = roomInfo;
@@ -15,7 +17,7 @@ export default class NormalizeService {
 
   // Flatten gameTypes[] into gameType field
   // Default sortable values ("" || 0 || -1)
-  static normalizeGameObject(game, gametypeMap) {
+  static normalizeGameObject(game: Game, gametypeMap: GametypeMap): void {
     const { gameTypes, description } = game;
     const hasType = gameTypes && gameTypes.length;
     game.gameType = hasType ? gametypeMap[gameTypes[0]] : "";
@@ -24,17 +26,17 @@ export default class NormalizeService {
   }
   
   // Flatten logs[] into object mapped by targetType (room, game, chat)
-  static normalizeLogs(logs) {
+  static normalizeLogs(logs: Log[]): LogGroups {
     return logs.reduce((obj, log) => {
       const { targetType } = log;
       obj[targetType] = obj[targetType] || [];
       obj[targetType].push(log);
       return obj;
-    }, {});
+    }, {} as LogGroups);
   }
 
   // messages sent by current user dont have their username prepended
-  static normalizeUserMessage(message) {
+  static normalizeUserMessage(message: Message): void {
     const { name } = message;
 
     if (name) {

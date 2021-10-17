@@ -1,12 +1,11 @@
-import * as _ from "lodash";
-
-import { StatusEnum } from "types";
+import { Room, StatusEnum, User } from "types";
 
 import { SessionCommands } from "../commands";
 import { RoomPersistence, SessionPersistence } from '../persistence';
+import { ProtobufEvents } from '../services/ProtobufService';
 import webClient from '../WebClient';
 
-export const SessionEvents: { [event: string]: Function } = {
+export const SessionEvents: ProtobufEvents = {
   ".Event_AddToList.ext": addToList,
   ".Event_ConnectionClosed.ext": connectionClosed,
   ".Event_ListRooms.ext": listRooms,
@@ -21,7 +20,7 @@ export const SessionEvents: { [event: string]: Function } = {
   ".Event_UserMessage.ext": userMessage,
 }
 
-function addToList({ listName, userInfo}) {
+function addToList({ listName, userInfo}: AddToListData) {
   switch (listName) {
     case 'buddy': {
       SessionPersistence.addToBuddyList(userInfo);
@@ -37,46 +36,50 @@ function addToList({ listName, userInfo}) {
   }
 }
 
-function connectionClosed({ reason }) {
+function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
   let message = "";
 
   // @TODO (5)
-  switch(reason) {
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USER_LIMIT_REACHED:
-      message = "The server has reached its maximum user capacity";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.TOO_MANY_CONNECTIONS:
-      message = "There are too many concurrent connections from your address";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.BANNED:
-      message = "You are banned";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.DEMOTED:
-      message = "You were demoted";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.SERVER_SHUTDOWN:
-      message = "Scheduled server shutdown";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USERNAMEINVALID:
-      message = "Invalid username";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.LOGGEDINELSEWERE:
-      message = "You have been logged out due to logging in at another location";
-      break;
-    case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.OTHER:
-    default:
-      message = "Unknown reason";
-      break;
+  if (reasonStr) {
+    message = reasonStr;
+  } else {
+    switch(reason) {
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USER_LIMIT_REACHED:
+        message = "The server has reached its maximum user capacity";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.TOO_MANY_CONNECTIONS:
+        message = "There are too many concurrent connections from your address";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.BANNED:
+        message = "You are banned";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.DEMOTED:
+        message = "You were demoted";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.SERVER_SHUTDOWN:
+        message = "Scheduled server shutdown";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USERNAMEINVALID:
+        message = "Invalid username";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.LOGGEDINELSEWERE:
+        message = "You have been logged out due to logging in at another location";
+        break;
+      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.OTHER:
+      default:
+        message = "Unknown reason";
+        break;
+    }
   }
 
   webClient.socket.updateStatus(StatusEnum.DISCONNECTED, message);
 }
 
-function listRooms({ roomList }) {
+function listRooms({ roomList }: ListRoomsData) {
   RoomPersistence.updateRooms(roomList);
 
   if (webClient.options.autojoinrooms) {
-    _.each(roomList, ({ autoJoin, roomId }) => {
+    roomList.forEach(({ autoJoin, roomId }) => {
       if (autoJoin) {
         SessionCommands.joinRoom(roomId);
       }
@@ -92,7 +95,7 @@ function playerPropertiesChanges(payload) {
   // console.info("Event_PlayerPropertiesChanges", payload);
 }
 
-function removeFromList({ listName, userName }) {
+function removeFromList({ listName, userName }: RemoveFromListData) {
   switch (listName) {
     case 'buddy': {
       SessionPersistence.removeFromBuddyList(userName);
@@ -108,7 +111,7 @@ function removeFromList({ listName, userName }) {
   }
 }
 
-function serverIdentification(info, _raw) {
+function serverIdentification(info: ServerIdentificationData) {
   const { serverName, serverVersion, protocolVersion } = info;
 
   if (protocolVersion !== webClient.protocolVersion) {
@@ -123,7 +126,7 @@ function serverIdentification(info, _raw) {
   SessionCommands.login();
 }
 
-function serverMessage({ message }) {
+function serverMessage({ message }: ServerMessageData) {
   SessionPersistence.serverMessage(message);
 }
 
@@ -131,14 +134,56 @@ function serverShutdown(payload) {
   // console.info("Event_ServerShutdown", payload);
 }
 
-function userJoined({ userInfo }) {
+function userJoined({ userInfo }: UserJoinedData) {
   SessionPersistence.userJoined(userInfo);
 }
 
-function userLeft({ name }) {
+function userLeft({ name }: UserLeftData) {
   SessionPersistence.userLeft(name);
 }
 
 function userMessage(payload) {
   // console.info("Event_UserMessage", payload);
+}
+
+interface SessionEvent {
+  sessionEvent: {}
+}
+
+interface AddToListData {
+  listName: string;
+  userInfo: User;
+}
+
+interface ConnectionClosedData {
+  endTime: number;
+  reason: number;
+  reasonStr: string;
+}
+
+interface ListRoomsData {
+  roomList: Room[];
+}
+
+interface RemoveFromListData {
+  listName: string;
+  userName: string;
+}
+
+interface ServerIdentificationData {
+  protocolVersion: number;
+  serverName: string;
+  serverVersion: string;
+}
+
+interface ServerMessageData {
+  message: string;
+}
+
+interface UserJoinedData {
+  userInfo: User;
+}
+
+interface UserLeftData {
+  name: string;
 }

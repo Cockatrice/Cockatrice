@@ -120,7 +120,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc);
   }
 
-  static joinRoom(roomId: string) {
+  static joinRoom(roomId: number) {
     const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({
       "roomId" : roomId
     });
@@ -160,19 +160,19 @@ export class SessionCommands {
     });
   }
 
-  static addToBuddyList(userName) {
+  static addToBuddyList(userName: string) {
     this.addToList('buddy', userName);
   }
 
-  static removeFromBuddyList(userName) {
+  static removeFromBuddyList(userName: string) {
     this.removeFromList('buddy', userName);
   }
 
-  static addToIgnoreList(userName) {
+  static addToIgnoreList(userName: string) {
     this.addToList('ignore', userName);
   }
 
-  static removeFromIgnoreList(userName) {
+  static removeFromIgnoreList(userName: string) {
     this.removeFromList('ignore', userName);
   }
 

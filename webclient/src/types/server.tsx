@@ -49,3 +49,9 @@ export interface Log {
   targetType: string;
   time: string;
 }
+
+export interface LogGroups {
+  room: Log[];
+  game: Log[];
+  chat: Log[];
+}

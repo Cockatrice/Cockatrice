@@ -1,12 +1,12 @@
 export interface User {
   accountageSecs: number;
-  avatarBmp: Uint8Array;
-  country: string;
-  gender: number;
   name: string;
   privlevel: UserAccessLevel;
-  realName: string;
   userLevel: UserPrivLevel;
+  gender?: number;
+  realName?: string;
+  country?: string;
+  avatarBmp?: Uint8Array;
 }
 
 export enum UserAccessLevel {

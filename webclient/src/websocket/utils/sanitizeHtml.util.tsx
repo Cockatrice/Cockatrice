@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-export function sanitizeHtml(msg) {
+export function sanitizeHtml(msg: string): string {
   const $div = $("<div>").html(msg);
   const whitelist = {
     tags: "br,a,img,center,b,font",
@@ -16,13 +16,13 @@ export function sanitizeHtml(msg) {
   return $div.html();
 }
 
-function enforceTagWhitelist($el, tags) {
+function enforceTagWhitelist($el: JQuery<HTMLElement>, tags: string): void {
   $el.find("*").not(tags).each(function() {
     $(this).replaceWith(this.innerHTML);
   });
 }
 
-function enforceAttrWhitelist($el, attrs) {
+function enforceAttrWhitelist($el: JQuery<HTMLElement>, attrs: string[]): void {
   $el.find("*").each(function() {
     var attributes = this.attributes;
     var i = attributes.length;
@@ -34,7 +34,7 @@ function enforceAttrWhitelist($el, attrs) {
   });
 }
 
-function enforceHrefWhitelist($el, hrefs) {
+function enforceHrefWhitelist($el: JQuery<HTMLElement>, hrefs: string[]): void {
   $el.find("[href]").each(function() {
     const $_el = $(this);
     const  attributeValue = $_el.attr("href");

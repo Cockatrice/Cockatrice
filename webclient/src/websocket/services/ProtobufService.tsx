@@ -5,12 +5,16 @@ import { WebClient } from "../WebClient";
 
 import { RoomEvents, SessionEvents } from '../events';
 
+export interface ProtobufEvents {
+  [event: string]: Function;
+}
+
 export class ProtobufService {
   static PB_FILE_DIR = `${process.env.PUBLIC_URL}/pb`;
 
   public controller;
   private cmdId = 0;
-  private pendingCommands = {};
+  private pendingCommands: { [cmdId: string]: Function } = {};
 
   private webClient: WebClient;
 
@@ -25,7 +29,7 @@ export class ProtobufService {
     this.pendingCommands = {};
   }
 
-  public sendRoomCommand(roomId, roomCmd, callback?) {
+  public sendRoomCommand(roomId: number, roomCmd: number, callback?: Function) {
     const cmd = this.controller.CommandContainer.create({
       "roomId" : roomId,
       "roomCommand" : [ roomCmd ]
@@ -34,7 +38,7 @@ export class ProtobufService {
     this.sendCommand(cmd, raw => callback && callback(raw));
   }
 
-  public sendSessionCommand(sesCmd, callback?) {
+  public sendSessionCommand(sesCmd: number, callback?: Function) {
     const cmd = this.controller.CommandContainer.create({
       "sessionCommand" : [ sesCmd ]
     });
@@ -42,7 +46,7 @@ export class ProtobufService {
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
-  public sendModeratorCommand(modCmd, callback?) {
+  public sendModeratorCommand(modCmd: number, callback?: Function) {
     const cmd = this.controller.CommandContainer.create({
       "moderatorCommand" : [ modCmd ]
     });
@@ -50,10 +54,10 @@ export class ProtobufService {
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
-  public sendCommand(cmd, callback) {
+  public sendCommand(cmd: number, callback: Function) {
     this.cmdId++;
-    cmd["cmdId"] = this.cmdId;
 
+    cmd["cmdId"] = this.cmdId;
     this.pendingCommands[this.cmdId] = callback;
 
     if (this.webClient.socket.checkReadyState(WebSocket.OPEN)) {
@@ -87,7 +91,7 @@ export class ProtobufService {
     }
   }
 
-  private processServerResponse(response) {
+  private processServerResponse(response: any) {
     const { cmdId } = response;
 
     if (this.pendingCommands[cmdId]) {
@@ -96,15 +100,15 @@ export class ProtobufService {
     }
   }
 
-  private processRoomEvent(response, raw) {
+  private processRoomEvent(response: any, raw: any) {
     this.processEvent(response, RoomEvents, raw);
   }
 
-  private processSessionEvent(response, raw) {
+  private processSessionEvent(response: any, raw: any) {
     this.processEvent(response, SessionEvents, raw);
   }
 
-  private processEvent(response, events, raw) {
+  private processEvent(response: any, events: ProtobufEvents, raw: any) {
     for (const event in events) {
       const payload = response[event];
 

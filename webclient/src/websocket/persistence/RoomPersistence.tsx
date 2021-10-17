@@ -1,4 +1,5 @@
 import { store, RoomsDispatch, RoomsSelectors } from "store";
+import { Game, Message, Room, User } from 'types';
 import NormalizeService from "../utils/NormalizeService";
 
 export class RoomPersistence {
@@ -6,20 +7,20 @@ export class RoomPersistence {
     RoomsDispatch.clearStore();
   }
 
-  static joinRoom(roomInfo) {
+  static joinRoom(roomInfo: Room) {
     NormalizeService.normalizeRoomInfo(roomInfo);
     RoomsDispatch.joinRoom(roomInfo);
   }
 
-  static leaveRoom(roomId) {
+  static leaveRoom(roomId: number) {
     RoomsDispatch.leaveRoom(roomId);
   }
 
-  static updateRooms(rooms) {
+  static updateRooms(rooms: Room[]) {
     RoomsDispatch.updateRooms(rooms);
   }
 
-  static updateGames(roomId, gameList) {
+  static updateGames(roomId: number, gameList: Game[]) {
     const game = gameList[0];
 
     if (!game.gameType) {
@@ -34,17 +35,17 @@ export class RoomPersistence {
     RoomsDispatch.updateGames(roomId, gameList);
   }
 
-  static addMessage(roomId, message) {
+  static addMessage(roomId: number, message: Message) {
     NormalizeService.normalizeUserMessage(message);
 
     RoomsDispatch.addMessage(roomId, message);
   }
 
-  static userJoined(roomId, user) {
+  static userJoined(roomId: number, user: User) {
     RoomsDispatch.userJoined(roomId, user);
   }
 
-  static userLeft(roomId, name) {
+  static userLeft(roomId: number, name: string) {
     RoomsDispatch.userLeft(roomId, name);
   }
 }
