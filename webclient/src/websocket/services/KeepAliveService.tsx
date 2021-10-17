@@ -1,7 +1,5 @@
 import { Subject } from "rxjs";
 
-import { StatusEnum } from "types";
-
 import { WebSocketService } from "./WebSocketService";
 
 export class KeepAliveService {

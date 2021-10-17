@@ -88,14 +88,12 @@ export class ProtobufService {
   }
 
   private processServerResponse(response) {
-    const cmdId = response.cmdId;
+    const { cmdId } = response;
 
-    if (!this.pendingCommands.hasOwnProperty(cmdId)) {
-      return;
+    if (this.pendingCommands[cmdId]) {
+      this.pendingCommands[cmdId](response);
+      delete this.pendingCommands[cmdId];
     }
-
-    this.pendingCommands[cmdId](response);
-    delete this.pendingCommands[cmdId];
   }
 
   private processRoomEvent(response, raw) {
@@ -107,11 +105,11 @@ export class ProtobufService {
   }
 
   private processEvent(response, events, raw) {
-    for (const key in events) {
-      const payload = response[key];
+    for (const event in events) {
+      const payload = response[event];
 
       if (payload) {
-        events[key](payload, raw);
+        events[event](payload, raw);
         return;
       }
     }

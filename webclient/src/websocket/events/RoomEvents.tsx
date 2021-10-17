@@ -1,6 +1,6 @@
 import { RoomPersistence } from '../persistence/RoomPersistence';
 
-export const RoomEvents = {
+export const RoomEvents: { [event: string]: Function } = {
   ".Event_JoinRoom.ext": joinRoom,
   ".Event_LeaveRoom.ext": leaveRoom,
   ".Event_ListGames.ext": listGames,

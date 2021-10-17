@@ -6,7 +6,7 @@ import { SessionCommands } from "../commands";
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
 
-export const SessionEvents = {
+export const SessionEvents: { [event: string]: Function } = {
   ".Event_AddToList.ext": addToList,
   ".Event_ConnectionClosed.ext": connectionClosed,
   ".Event_ListRooms.ext": listRooms,
