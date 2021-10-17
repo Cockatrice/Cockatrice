@@ -1,3 +1,8 @@
+export interface ServerStatus {
+  status: StatusEnum;
+  description: string;
+}
+
 export enum StatusEnum {
   DISCONNECTED  =  0,
   CONNECTING    =  1,
@@ -43,4 +48,10 @@ export interface Log {
   targetName: string;
   targetType: string;
   time: string;
+}
+
+export interface LogGroups {
+  room: Log[];
+  game: Log[];
+  chat: Log[];
 }

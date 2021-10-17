@@ -4,9 +4,6 @@ export const Actions = {
   clearStore: () => ({
     type: Types.CLEAR_STORE
   }),
-  connectServer: () => ({
-    type: Types.CONNECT_SERVER
-  }),
   connectionClosed: reason => ({
     type: Types.CONNECTION_CLOSED,
     reason

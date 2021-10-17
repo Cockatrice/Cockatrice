@@ -1,103 +1,106 @@
+import { ServerConnectParams } from "store";
 import { StatusEnum } from "types";
 
-import { WebClient } from "../WebClient"; 
+import { RoomPersistence, SessionPersistence } from '../persistence';
+import webClient from "../WebClient";
 import { guid } from "../utils";
 
-export default class SessionCommands {
-  private webClient: WebClient;
-
-  constructor(webClient) {
-    this.webClient = webClient;
+export class SessionCommands {
+  static connect(options: ServerConnectParams) {
+    webClient.socket.updateStatus(StatusEnum.CONNECTING, "Connecting...");
+    webClient.connect(options);
   }
 
-  login() {
+  static disconnect() {
+    webClient.socket.updateStatus(StatusEnum.DISCONNECTING, "Disconnecting...");
+    webClient.socket.disconnect();
+  }
+
+  static login() {
     const loginConfig = {
-      ...this.webClient.clientConfig,
-      "userName" : this.webClient.options.user,
-      "password" : this.webClient.options.pass,
+      ...webClient.clientConfig,
+      "userName" : webClient.options.user,
+      "password" : webClient.options.pass,
       "clientid" : guid()
     };
 
-    const CmdLogin = this.webClient.pb.Command_Login.create(loginConfig);
+    const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
 
-    const command = this.webClient.pb.SessionCommand.create({
+    const command = webClient.protobuf.controller.SessionCommand.create({
       ".Command_Login.ext" : CmdLogin
     });
 
-    this.webClient.sendSessionCommand(command, raw => {
+    webClient.protobuf.sendSessionCommand(command, raw => {
       const resp = raw[".Response_Login.ext"];
 
-      this.webClient.debug(() =>  console.log(".Response_Login.ext", resp));
-
       switch(raw.responseCode) {
-        case this.webClient.pb.Response.ResponseCode.RespOk:
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
           const { buddyList, ignoreList, userInfo } = resp;
 
-          this.webClient.persistence.session.updateBuddyList(buddyList);
-          this.webClient.persistence.session.updateIgnoreList(ignoreList);
-          this.webClient.persistence.session.updateUser(userInfo);
+          SessionPersistence.updateBuddyList(buddyList);
+          SessionPersistence.updateIgnoreList(ignoreList);
+          SessionPersistence.updateUser(userInfo);
 
-          this.webClient.commands.session.listUsers();
-          this.webClient.commands.session.listRooms();
+          SessionCommands.listUsers();
+          SessionCommands.listRooms();
 
-          this.webClient.updateStatus(StatusEnum.LOGGEDIN, "Logged in.");
-          this.webClient.startPingLoop();
+          webClient.socket.updateStatus(StatusEnum.LOGGEDIN, "Logged in.");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespClientUpdateRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing features");
+        case webClient.protobuf.controller.Response.ResponseCode.RespClientUpdateRequired:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing features");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespWrongPassword:
-        case this.webClient.pb.Response.ResponseCode.RespUsernameInvalid:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
+        case webClient.protobuf.controller.Response.ResponseCode.RespWrongPassword:
+        case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespWouldOverwriteOldSession:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: duplicated user session");
+        case webClient.protobuf.controller.Response.ResponseCode.RespWouldOverwriteOldSession:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: duplicated user session");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespUserIsBanned:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: banned user");
+        case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: banned user");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespRegistrationRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: registration required");
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: registration required");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespClientIdRequired:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing client ID");
+        case webClient.protobuf.controller.Response.ResponseCode.RespClientIdRequired:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing client ID");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespContextError:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: server error");
+        case webClient.protobuf.controller.Response.ResponseCode.RespContextError:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: server error");
           break;
 
-        case this.webClient.pb.Response.ResponseCode.RespAccountNotActivated:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: account not activated");
+        case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: account not activated");
           break;
 
         default:
-          this.webClient.updateStatus(StatusEnum.DISCONNECTED, "Login failed: unknown error " + raw.responseCode);
+          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: unknown error " + raw.responseCode);
       }
     });
   }
 
-  listUsers() {
-    const CmdListUsers = this.webClient.pb.Command_ListUsers.create();
+  static listUsers() {
+    const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();
 
-    const sc = this.webClient.pb.SessionCommand.create({
+    const sc = webClient.protobuf.controller.SessionCommand.create({
       ".Command_ListUsers.ext" : CmdListUsers
     });
 
-    this.webClient.sendSessionCommand(sc, raw => {
+    webClient.protobuf.sendSessionCommand(sc, raw => {
       const { responseCode } = raw;
       const response = raw[".Response_ListUsers.ext"];
 
       if (response) {
         switch (responseCode) {
-          case this.webClient.pb.Response.ResponseCode.RespOk:
-            this.webClient.persistence.session.updateUsers(response.userList);
+          case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+            SessionPersistence.updateUsers(response.userList);
             break;
           default:
             console.log(`Failed to fetch Server Rooms [${responseCode}] : `, raw);
@@ -107,44 +110,43 @@ export default class SessionCommands {
     });
   }
 
-  listRooms() {
-    const CmdListRooms = this.webClient.pb.Command_ListRooms.create();
+  static listRooms() {
+    const CmdListRooms = webClient.protobuf.controller.Command_ListRooms.create();
 
-    const sc = this.webClient.pb.SessionCommand.create({
+    const sc = webClient.protobuf.controller.SessionCommand.create({
       ".Command_ListRooms.ext" : CmdListRooms
     });
 
-    this.webClient.sendSessionCommand(sc);
+    webClient.protobuf.sendSessionCommand(sc);
   }
 
-  joinRoom(roomId: string) {
-    const CmdJoinRoom = this.webClient.pb.Command_JoinRoom.create({
+  static joinRoom(roomId: number) {
+    const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({
       "roomId" : roomId
     });
 
-    const sc = this.webClient.pb.SessionCommand.create({
+    const sc = webClient.protobuf.controller.SessionCommand.create({
       ".Command_JoinRoom.ext" : CmdJoinRoom
     });
 
-    this.webClient.sendSessionCommand(sc, (raw) => {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
       const { responseCode } = raw;
 
       let error;
 
       switch(responseCode) {
-        case this.webClient.pb.Response.ResponseCode.RespOk:
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
           const { roomInfo } = raw[".Response_JoinRoom.ext"];
 
-          this.webClient.persistence.room.joinRoom(roomInfo);
-          this.webClient.debug(() => console.log("Join Room: ", roomInfo.name));
+          RoomPersistence.joinRoom(roomInfo);
           return;
-        case this.webClient.pb.Response.ResponseCode.RespNameNotFound:
+        case webClient.protobuf.controller.Response.ResponseCode.RespNameNotFound:
           error = "Failed to join the room: it doesn\"t exist on the server.";
           break;
-        case this.webClient.pb.Response.ResponseCode.RespContextError:
+        case webClient.protobuf.controller.Response.ResponseCode.RespContextError:
           error = "The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.";
           break;
-        case this.webClient.pb.Response.ResponseCode.RespUserLevelTooLow:
+        case webClient.protobuf.controller.Response.ResponseCode.RespUserLevelTooLow:
           error = "You do not have the required permission to join this room.";
           break;
         default:
@@ -158,68 +160,64 @@ export default class SessionCommands {
     });
   }
 
-  addToBuddyList(userName) {
+  static addToBuddyList(userName: string) {
     this.addToList('buddy', userName);
   }
 
-  removeFromBuddyList(userName) {
+  static removeFromBuddyList(userName: string) {
     this.removeFromList('buddy', userName);
   }
 
-  addToIgnoreList(userName) {
+  static addToIgnoreList(userName: string) {
     this.addToList('ignore', userName);
   }
 
-  removeFromIgnoreList(userName) {
+  static removeFromIgnoreList(userName: string) {
     this.removeFromList('ignore', userName);
   }
 
-  addToList(list: string, userName: string) {
-    const CmdAddToList = this.webClient.pb.Command_AddToList.create({ list, userName });
+  static addToList(list: string, userName: string) {
+    const CmdAddToList = webClient.protobuf.controller.Command_AddToList.create({ list, userName });
 
-    const sc = this.webClient.pb.SessionCommand.create({
+    const sc = webClient.protobuf.controller.SessionCommand.create({
       ".Command_AddToList.ext" : CmdAddToList
     });
 
-    this.webClient.sendSessionCommand(sc, ({ responseCode }) => {
+    webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
       // @TODO: filter responseCode, pop snackbar for error
-      this.webClient.debug(() => console.log('Added to List Response: ', responseCode));
     });
   }
 
-  removeFromList(list: string, userName: string) {
-    const CmdRemoveFromList = this.webClient.pb.Command_RemoveFromList.create({ list, userName });
+  static removeFromList(list: string, userName: string) {
+    const CmdRemoveFromList = webClient.protobuf.controller.Command_RemoveFromList.create({ list, userName });
 
-    const sc = this.webClient.pb.SessionCommand.create({
+    const sc = webClient.protobuf.controller.SessionCommand.create({
       ".Command_RemoveFromList.ext" : CmdRemoveFromList
     });
 
-    this.webClient.sendSessionCommand(sc, ({ responseCode }) => {
+    webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
       // @TODO: filter responseCode, pop snackbar for error
-      this.webClient.debug(() => console.log('Removed from List Response: ', responseCode));
     });
   }
 
-  viewLogHistory(filters) {
-    const CmdViewLogHistory = this.webClient.pb.Command_ViewLogHistory.create(filters);
+  static viewLogHistory(filters) {
+    const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
 
-    const sc = this.webClient.pb.ModeratorCommand.create({
+    const sc = webClient.protobuf.controller.ModeratorCommand.create({
       ".Command_ViewLogHistory.ext" : CmdViewLogHistory
     });
 
-    this.webClient.sendModeratorCommand(sc, (raw) => {
+    webClient.protobuf.sendModeratorCommand(sc, (raw) => {
       const { responseCode } = raw;
 
       let error;
 
       switch(responseCode) {
-        case this.webClient.pb.Response.ResponseCode.RespOk:
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
           const { logMessage } = raw[".Response_ViewLogHistory.ext"];
 
           console.log("Response_ViewLogHistory: ", logMessage)
-          this.webClient.persistence.session.viewLogs(logMessage)
-
-          this.webClient.debug(() => console.log("View Log History: ", logMessage));
+          SessionPersistence.viewLogs(logMessage)
           return;
         default:
           error = "Failed to retrieve log history.";

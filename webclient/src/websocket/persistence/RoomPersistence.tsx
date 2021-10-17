@@ -1,33 +1,26 @@
 import { store, RoomsDispatch, RoomsSelectors } from "store";
-import { WebClient } from "../WebClient"; 
+import { Game, Message, Room, User } from 'types';
+import NormalizeService from "../utils/NormalizeService";
 
-import { NormalizeService } from "websocket";
-
-export default class RoomService {
-  webClient: WebClient;
-
-  constructor(webClient) {
-    this.webClient = webClient;
-  }
-
-  clearStore() {
+export class RoomPersistence {
+  static clearStore() {
     RoomsDispatch.clearStore();
   }
 
-  joinRoom(roomInfo) {
+  static joinRoom(roomInfo: Room) {
     NormalizeService.normalizeRoomInfo(roomInfo);
     RoomsDispatch.joinRoom(roomInfo);
   }
 
-  leaveRoom(roomId) {
+  static leaveRoom(roomId: number) {
     RoomsDispatch.leaveRoom(roomId);
   }
 
-  updateRooms(rooms) {
+  static updateRooms(rooms: Room[]) {
     RoomsDispatch.updateRooms(rooms);
   }
 
-  updateGames(roomId, gameList) {
+  static updateGames(roomId: number, gameList: Game[]) {
     const game = gameList[0];
 
     if (!game.gameType) {
@@ -42,17 +35,17 @@ export default class RoomService {
     RoomsDispatch.updateGames(roomId, gameList);
   }
 
-  addMessage(roomId, message) {
+  static addMessage(roomId: number, message: Message) {
     NormalizeService.normalizeUserMessage(message);
 
     RoomsDispatch.addMessage(roomId, message);
   }
 
-  userJoined(roomId, user) {
+  static userJoined(roomId: number, user: User) {
     RoomsDispatch.userJoined(roomId, user);
   }
 
-  userLeft(roomId, name) {
+  static userLeft(roomId: number, name: string) {
     RoomsDispatch.userLeft(roomId, name);
   }
 }

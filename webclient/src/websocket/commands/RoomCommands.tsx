@@ -1,48 +1,42 @@
 import * as _ from 'lodash';
 
-import { WebClient } from "../WebClient"; 
+import { RoomPersistence } from '../persistence';
+import webClient from "../WebClient";
 
-export default class RoomCommands {
-  private webClient: WebClient;
-
-  constructor(webClient) {
-    this.webClient = webClient;
-  }
-
-  roomSay(roomId, message) {
+export class RoomCommands {
+  static roomSay(roomId: number, message: string) {
     const trimmed = _.trim(message);
     
     if (!trimmed) return;
 
-    var CmdRoomSay = this.webClient.pb.Command_RoomSay.create({
+    var CmdRoomSay = webClient.protobuf.controller.Command_RoomSay.create({
       "message" : trimmed
     });
 
-    var rc = this.webClient.pb.RoomCommand.create({
+    var rc = webClient.protobuf.controller.RoomCommand.create({
       ".Command_RoomSay.ext" : CmdRoomSay
     });
 
-    this.webClient.sendRoomCommand(roomId, rc);
+    webClient.protobuf.sendRoomCommand(roomId, rc);
   }
 
-  leaveRoom(roomId) {
-    var CmdLeaveRoom = this.webClient.pb.Command_LeaveRoom.create();
+  static leaveRoom(roomId: number) {
+    var CmdLeaveRoom = webClient.protobuf.controller.Command_LeaveRoom.create();
 
-    var rc = this.webClient.pb.RoomCommand.create({
+    var rc = webClient.protobuf.controller.RoomCommand.create({
       ".Command_LeaveRoom.ext" : CmdLeaveRoom
     });
 
-    this.webClient.sendRoomCommand(roomId, rc, (raw) => {
+    webClient.protobuf.sendRoomCommand(roomId, rc, (raw) => {
       const { responseCode } = raw;
 
       switch (responseCode) {
-        case this.webClient.pb.Response.ResponseCode.RespOk:
-          this.webClient.persistence.room.leaveRoom(roomId);
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+          RoomPersistence.leaveRoom(roomId);
           break;
         default:
           console.log(`Failed to leave Room ${roomId} [${responseCode}] : `, raw);
       }
     });
-
   }
 }
