@@ -1,15 +1,15 @@
-import { webClient } from "websocket";
+import { RoomCommands, SessionCommands } from "websocket";
 
 export default class RoomsService {
   static joinRoom(roomId) {
-    webClient.commands.session.joinRoom(roomId);
+    SessionCommands.joinRoom(roomId);
   }
 
   static leaveRoom(roomId) {
-    webClient.commands.room.leaveRoom(roomId);
+    RoomCommands.leaveRoom(roomId);
   }
 
   static roomSay(roomId, message) {
-    webClient.commands.room.roomSay(roomId, message);
+    RoomCommands.roomSay(roomId, message);
   }
 }

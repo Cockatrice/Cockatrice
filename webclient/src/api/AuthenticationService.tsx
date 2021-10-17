@@ -1,12 +1,13 @@
+import { ServerConnectParams } from "store";
 import { StatusEnum } from "types";
-import { webClient } from "websocket";
+import { webClient, SessionCommands } from "websocket";
 
 export default class AuthenticationService {
-  static connect(options) {
-    webClient.persistence.session.connectServer(options);
+  static connect(options: ServerConnectParams) {
+    SessionCommands.connect(options);
   }
   static disconnect() {
-    webClient.persistence.session.disconnectServer();
+    SessionCommands.disconnect();
   }
 
   static isConnected(state) {
@@ -14,7 +15,7 @@ export default class AuthenticationService {
   }
 
   static isModerator(user) {
-    const moderatorLevel = webClient.pb.ServerInfo_User.UserLevelFlag.IsModerator;
+    const moderatorLevel = webClient.protobuf.controller.ServerInfo_User.UserLevelFlag.IsModerator;
     // @TODO tell cockatrice not to do this so shittily
     return (user.userLevel & moderatorLevel) === moderatorLevel;
   }

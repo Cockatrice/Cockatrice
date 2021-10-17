@@ -1,3 +1,8 @@
+export interface ServerStatus {
+  status: StatusEnum;
+  description: string;
+}
+
 export enum StatusEnum {
   DISCONNECTED  =  0,
   CONNECTING    =  1,

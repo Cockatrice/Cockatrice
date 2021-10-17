@@ -1,33 +1,25 @@
 import { store, RoomsDispatch, RoomsSelectors } from "store";
-import { WebClient } from "../WebClient"; 
+import NormalizeService from "../utils/NormalizeService";
 
-import { NormalizeService } from "websocket";
-
-export default class RoomService {
-  webClient: WebClient;
-
-  constructor(webClient) {
-    this.webClient = webClient;
-  }
-
-  clearStore() {
+export class RoomPersistence {
+  static clearStore() {
     RoomsDispatch.clearStore();
   }
 
-  joinRoom(roomInfo) {
+  static joinRoom(roomInfo) {
     NormalizeService.normalizeRoomInfo(roomInfo);
     RoomsDispatch.joinRoom(roomInfo);
   }
 
-  leaveRoom(roomId) {
+  static leaveRoom(roomId) {
     RoomsDispatch.leaveRoom(roomId);
   }
 
-  updateRooms(rooms) {
+  static updateRooms(rooms) {
     RoomsDispatch.updateRooms(rooms);
   }
 
-  updateGames(roomId, gameList) {
+  static updateGames(roomId, gameList) {
     const game = gameList[0];
 
     if (!game.gameType) {
@@ -42,17 +34,17 @@ export default class RoomService {
     RoomsDispatch.updateGames(roomId, gameList);
   }
 
-  addMessage(roomId, message) {
+  static addMessage(roomId, message) {
     NormalizeService.normalizeUserMessage(message);
 
     RoomsDispatch.addMessage(roomId, message);
   }
 
-  userJoined(roomId, user) {
+  static userJoined(roomId, user) {
     RoomsDispatch.userJoined(roomId, user);
   }
 
-  userLeft(roomId, name) {
+  static userLeft(roomId, name) {
     RoomsDispatch.userLeft(roomId, name);
   }
 }

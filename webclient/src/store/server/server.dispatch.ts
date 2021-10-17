@@ -6,9 +6,6 @@ export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
-  connectServer: () => {
-    store.dispatch(Actions.connectServer());
-  },
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
   },
