@@ -2,7 +2,7 @@ import { RoomPersistence } from '../persistence';
 import webClient from "../WebClient";
 
 export class RoomCommands {
-  static roomSay(roomId: number, message: string) {
+  static roomSay(roomId: number, message: string): void {
     const trimmed = message.trim();
     
     if (!trimmed) return;
@@ -18,7 +18,7 @@ export class RoomCommands {
     webClient.protobuf.sendRoomCommand(roomId, rc);
   }
 
-  static leaveRoom(roomId: number) {
+  static leaveRoom(roomId: number): void {
     var CmdLeaveRoom = webClient.protobuf.controller.Command_LeaveRoom.create();
 
     var rc = webClient.protobuf.controller.RoomCommand.create({

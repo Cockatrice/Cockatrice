@@ -30,20 +30,20 @@ function roomSay(message: Message, { roomEvent }: RoomEvent) {
   RoomPersistence.addMessage(roomId, message);
 }
 
-interface RoomEvent {
+export interface RoomEvent {
   roomEvent: {
     roomId: number;
   }
 }
 
-interface JoinRoomData {
+export interface JoinRoomData {
   userInfo: User;
 }
 
-interface LeaveRoomData {
+export interface LeaveRoomData {
   name: string;
 }
 
-interface ListGamesData {
+export interface ListGamesData {
   gameList: Game[];
 }
