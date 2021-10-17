@@ -57,6 +57,14 @@ export class WebClient {
     this.socket.connect(this.options);
   }
 
+  public disconnect() {
+    this.socket.disconnect();
+  }
+
+  public updateStatus(status: StatusEnum, description: string) {
+    this.socket.updateStatus(status, description);
+  }
+
   public handleStatusChange({ status, description }: ServerStatus) {
     SessionPersistence.updateStatus(status, description);
 

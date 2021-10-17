@@ -121,7 +121,7 @@ export class ProtobufService {
 
   private loadProtobufFiles() {
     const files = ProtoFiles.map(file => `${ProtobufService.PB_FILE_DIR}/${file}`);
-    
+
     this.controller = new protobuf.Root();
     this.controller.load(files, { keepCase: false }, (err, root) => {
       if (err) {
