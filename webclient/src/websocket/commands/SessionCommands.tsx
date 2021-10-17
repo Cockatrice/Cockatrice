@@ -7,12 +7,12 @@ import { guid } from "../utils";
 
 export class SessionCommands {
   static connect(options: ServerConnectParams) {
-    webClient.socket.updateStatus(StatusEnum.CONNECTING, "Connecting...");
+    SessionCommands.updateStatus(StatusEnum.CONNECTING, "Connecting...");
     webClient.connect(options);
   }
 
   static disconnect() {
-    webClient.socket.updateStatus(StatusEnum.DISCONNECTING, "Disconnecting...");
+    SessionCommands.updateStatus(StatusEnum.DISCONNECTING, "Disconnecting...");
     webClient.socket.disconnect();
   }
 
@@ -44,44 +44,44 @@ export class SessionCommands {
           SessionCommands.listUsers();
           SessionCommands.listRooms();
 
-          webClient.socket.updateStatus(StatusEnum.LOGGEDIN, "Logged in.");
+          SessionCommands.updateStatus(StatusEnum.LOGGEDIN, "Logged in.");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespClientUpdateRequired:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing features");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing features");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespWrongPassword:
         case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespWouldOverwriteOldSession:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: duplicated user session");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: duplicated user session");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: banned user");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: banned user");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: registration required");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: registration required");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespClientIdRequired:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing client ID");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: missing client ID");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespContextError:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: server error");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: server error");
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: account not activated");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: account not activated");
           break;
 
         default:
-          webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Login failed: unknown error " + raw.responseCode);
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: unknown error " + raw.responseCode);
       }
     });
   }
@@ -228,5 +228,9 @@ export class SessionCommands {
         console.error(responseCode, error);
       }
     });
+  }
+
+  static updateStatus(status: StatusEnum, description: string) {
+    webClient.socket.updateStatus(status, description);
   }
 }

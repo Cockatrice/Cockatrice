@@ -72,7 +72,7 @@ function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
     }
   }
 
-  webClient.socket.updateStatus(StatusEnum.DISCONNECTED, message);
+  SessionCommands.updateStatus(StatusEnum.DISCONNECTED, message);
 }
 
 function listRooms({ roomList }: ListRoomsData) {
@@ -116,13 +116,13 @@ function serverIdentification(info: ServerIdentificationData) {
 
   if (protocolVersion !== webClient.protocolVersion) {
     SessionCommands.disconnect();
-    webClient.socket.updateStatus(StatusEnum.DISCONNECTED, "Protocol version mismatch: " + protocolVersion);
+    SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Protocol version mismatch: " + protocolVersion);
     return;
   }
 
   webClient.resetConnectionvars();
-  webClient.socket.updateStatus(StatusEnum.LOGGINGIN, "Logging in...");
   SessionPersistence.updateInfo(serverName, serverVersion);
+  SessionCommands.updateStatus(StatusEnum.LOGGINGIN, "Logging in...");
   SessionCommands.login();
 }
 
