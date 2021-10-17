@@ -24,7 +24,7 @@ export class KeepAliveService {
       }
 
       // stop the ping loop if we"re disconnected
-      if (this.socket.checkReadyState(StatusEnum.LOGGEDIN)) {
+      if (!this.socket.checkReadyState(StatusEnum.LOGGEDIN)) {
         this.endPingLoop();
         return;
       }
