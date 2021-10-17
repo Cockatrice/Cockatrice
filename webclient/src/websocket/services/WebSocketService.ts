@@ -35,7 +35,7 @@ export class WebSocketService {
     });
   }
 
-  public connect(options: WebSocketOptions, protocol: string = 'wss'): void {
+  public connect(options: WebSocketOptions, protocol: string = 'ws'): void {
     const { host, port, keepalive } = options;
     this.keepalive = keepalive;
 
