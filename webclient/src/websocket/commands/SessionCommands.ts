@@ -13,7 +13,7 @@ export class SessionCommands {
 
   static disconnect() {
     SessionCommands.updateStatus(StatusEnum.DISCONNECTING, "Disconnecting...");
-    webClient.socket.disconnect();
+    webClient.disconnect();
   }
 
   static login() {

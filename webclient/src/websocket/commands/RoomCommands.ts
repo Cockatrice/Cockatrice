@@ -1,11 +1,9 @@
-import * as _ from 'lodash';
-
 import { RoomPersistence } from '../persistence';
 import webClient from "../WebClient";
 
 export class RoomCommands {
   static roomSay(roomId: number, message: string) {
-    const trimmed = _.trim(message);
+    const trimmed = message.trim();
     
     if (!trimmed) return;
 
