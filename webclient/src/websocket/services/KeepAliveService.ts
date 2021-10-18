@@ -35,9 +35,6 @@ export class KeepAliveService {
   public endPingLoop() {
     clearInterval(this.keepalivecb);
     this.keepalivecb = null;
-  }
-
-  public resetPingFlag() {
     this.lastPingPending = false;
   }
 }

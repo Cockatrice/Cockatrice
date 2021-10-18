@@ -6,17 +6,17 @@ import webClient from '../WebClient';
 import { guid } from '../utils';
 
 export class SessionCommands {
-  static connect(options: ServerConnectParams) {
+  static connect(options: ServerConnectParams): void {
     SessionCommands.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
     webClient.connect(options);
   }
 
-  static disconnect() {
+  static disconnect(): void {
     SessionCommands.updateStatus(StatusEnum.DISCONNECTING, 'Disconnecting...');
     webClient.disconnect();
   }
 
-  static login() {
+  static login(): void {
     const loginConfig = {
       ...webClient.clientConfig,
       userName: webClient.options.user,
@@ -86,7 +86,7 @@ export class SessionCommands {
     });
   }
 
-  static listUsers() {
+  static listUsers(): void {
     const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
@@ -110,7 +110,7 @@ export class SessionCommands {
     });
   }
 
-  static listRooms() {
+  static listRooms(): void {
     const CmdListRooms = webClient.protobuf.controller.Command_ListRooms.create();
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
@@ -120,7 +120,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc);
   }
 
-  static joinRoom(roomId: number) {
+  static joinRoom(roomId: number): void {
     const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({ roomId });
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
@@ -158,23 +158,23 @@ export class SessionCommands {
     });
   }
 
-  static addToBuddyList(userName: string) {
+  static addToBuddyList(userName: string): void {
     this.addToList('buddy', userName);
   }
 
-  static removeFromBuddyList(userName: string) {
+  static removeFromBuddyList(userName: string): void {
     this.removeFromList('buddy', userName);
   }
 
-  static addToIgnoreList(userName: string) {
+  static addToIgnoreList(userName: string): void {
     this.addToList('ignore', userName);
   }
 
-  static removeFromIgnoreList(userName: string) {
+  static removeFromIgnoreList(userName: string): void {
     this.removeFromList('ignore', userName);
   }
 
-  static addToList(list: string, userName: string) {
+  static addToList(list: string, userName: string): void {
     const CmdAddToList = webClient.protobuf.controller.Command_AddToList.create({ list, userName });
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
@@ -186,7 +186,7 @@ export class SessionCommands {
     });
   }
 
-  static removeFromList(list: string, userName: string) {
+  static removeFromList(list: string, userName: string): void {
     const CmdRemoveFromList = webClient.protobuf.controller.Command_RemoveFromList.create({ list, userName });
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
@@ -198,7 +198,7 @@ export class SessionCommands {
     });
   }
 
-  static viewLogHistory(filters) {
+  static viewLogHistory(filters): void {
     const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
 
     const sc = webClient.protobuf.controller.ModeratorCommand.create({
@@ -226,7 +226,7 @@ export class SessionCommands {
     });
   }
 
-  static updateStatus(status: StatusEnum, description: string) {
+  static updateStatus(status: StatusEnum, description: string): void {
     webClient.updateStatus(status, description);
   }
 }

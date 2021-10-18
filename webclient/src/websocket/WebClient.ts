@@ -69,14 +69,13 @@ export class WebClient {
     SessionPersistence.updateStatus(status, description);
 
     if (status === StatusEnum.DISCONNECTED) {
-      this.resetConnectionvars();
+      this.protobuf.resetCommands();
       this.clearStores();
     }
   }
 
-  public resetConnectionvars() {
-    this.protobuf.resetCommands();
-    this.socket.keepAliveService.resetPingFlag();
+  public keepAlive(pingReceived: Function) {
+    this.protobuf.sendKeepAliveCommand(pingReceived);
   }
 
   private clearStores() {

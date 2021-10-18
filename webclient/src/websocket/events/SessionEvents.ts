@@ -1,23 +1,23 @@
-import { Room, StatusEnum, User } from "types";
+import { Room, StatusEnum, User } from 'types';
 
-import { SessionCommands } from "../commands";
+import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import { ProtobufEvents } from '../services/ProtobufService';
 import webClient from '../WebClient';
 
 export const SessionEvents: ProtobufEvents = {
-  ".Event_AddToList.ext": addToList,
-  ".Event_ConnectionClosed.ext": connectionClosed,
-  ".Event_ListRooms.ext": listRooms,
-  ".Event_NotifyUser.ext": notifyUser,
-  ".Event_PlayerPropertiesChanges.ext": playerPropertiesChanges,
-  ".Event_RemoveFromList.ext": removeFromList,
-  ".Event_ServerIdentification.ext": serverIdentification,
-  ".Event_ServerMessage.ext": serverMessage,
-  ".Event_ServerShutdown.ext": serverShutdown,
-  ".Event_UserJoined.ext": userJoined,
-  ".Event_UserLeft.ext": userLeft,
-  ".Event_UserMessage.ext": userMessage,
+  '.Event_AddToList.ext': addToList,
+  '.Event_ConnectionClosed.ext': connectionClosed,
+  '.Event_ListRooms.ext': listRooms,
+  '.Event_NotifyUser.ext': notifyUser,
+  '.Event_PlayerPropertiesChanges.ext': playerPropertiesChanges,
+  '.Event_RemoveFromList.ext': removeFromList,
+  '.Event_ServerIdentification.ext': serverIdentification,
+  '.Event_ServerMessage.ext': serverMessage,
+  '.Event_ServerShutdown.ext': serverShutdown,
+  '.Event_UserJoined.ext': userJoined,
+  '.Event_UserLeft.ext': userLeft,
+  '.Event_UserMessage.ext': userMessage,
 }
 
 function addToList({ listName, userInfo}: AddToListData) {
@@ -31,13 +31,13 @@ function addToList({ listName, userInfo}: AddToListData) {
       break;
     }
     default: {
-      console.log('Attempted to add to unknown list: ', listName);
+      console.log(`Attempted to add to unknown list: ${listName}`);
     }
   }
 }
 
 function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
-  let message = "";
+  let message = '';
 
   // @TODO (5)
   if (reasonStr) {
@@ -45,29 +45,29 @@ function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
   } else {
     switch(reason) {
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USER_LIMIT_REACHED:
-        message = "The server has reached its maximum user capacity";
+        message = 'The server has reached its maximum user capacity';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.TOO_MANY_CONNECTIONS:
-        message = "There are too many concurrent connections from your address";
+        message = 'There are too many concurrent connections from your address';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.BANNED:
-        message = "You are banned";
+        message = 'You are banned';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.DEMOTED:
-        message = "You were demoted";
+        message = 'You were demoted';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.SERVER_SHUTDOWN:
-        message = "Scheduled server shutdown";
+        message = 'Scheduled server shutdown';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USERNAMEINVALID:
-        message = "Invalid username";
+        message = 'Invalid username';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.LOGGEDINELSEWERE:
-        message = "You have been logged out due to logging in at another location";
+        message = 'You have been logged out due to logging in at another location';
         break;
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.OTHER:
       default:
-        message = "Unknown reason";
+        message = 'Unknown reason';
         break;
     }
   }
@@ -88,11 +88,11 @@ function listRooms({ roomList }: ListRoomsData) {
 }
 
 function notifyUser(payload) {
-  // console.info("Event_NotifyUser", payload);
+  // console.info('Event_NotifyUser', payload);
 }
 
 function playerPropertiesChanges(payload) {
-  // console.info("Event_PlayerPropertiesChanges", payload);
+  // console.info('Event_PlayerPropertiesChanges', payload);
 }
 
 function removeFromList({ listName, userName }: RemoveFromListData) {
@@ -106,7 +106,7 @@ function removeFromList({ listName, userName }: RemoveFromListData) {
       break;
     }
     default: {
-      console.log('Attempted to remove from unknown list: ', listName);
+      console.log(`Attempted to remove from unknown list: ${listName}`);
     }
   }
 }
@@ -116,13 +116,12 @@ function serverIdentification(info: ServerIdentificationData) {
 
   if (protocolVersion !== webClient.protocolVersion) {
     SessionCommands.disconnect();
-    SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Protocol version mismatch: " + protocolVersion);
+    SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
     return;
   }
 
-  webClient.resetConnectionvars();
   SessionPersistence.updateInfo(serverName, serverVersion);
-  SessionCommands.updateStatus(StatusEnum.LOGGINGIN, "Logging in...");
+  SessionCommands.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
   SessionCommands.login();
 }
 
@@ -131,7 +130,7 @@ function serverMessage({ message }: ServerMessageData) {
 }
 
 function serverShutdown(payload) {
-  // console.info("Event_ServerShutdown", payload);
+  // console.info('Event_ServerShutdown', payload);
 }
 
 function userJoined({ userInfo }: UserJoinedData) {
@@ -143,47 +142,47 @@ function userLeft({ name }: UserLeftData) {
 }
 
 function userMessage(payload) {
-  // console.info("Event_UserMessage", payload);
+  // console.info('Event_UserMessage', payload);
 }
 
-interface SessionEvent {
+export interface SessionEvent {
   sessionEvent: {}
 }
 
-interface AddToListData {
+export interface AddToListData {
   listName: string;
   userInfo: User;
 }
 
-interface ConnectionClosedData {
+export interface ConnectionClosedData {
   endTime: number;
   reason: number;
   reasonStr: string;
 }
 
-interface ListRoomsData {
+export interface ListRoomsData {
   roomList: Room[];
 }
 
-interface RemoveFromListData {
+export interface RemoveFromListData {
   listName: string;
   userName: string;
 }
 
-interface ServerIdentificationData {
+export interface ServerIdentificationData {
   protocolVersion: number;
   serverName: string;
   serverVersion: string;
 }
 
-interface ServerMessageData {
+export interface ServerMessageData {
   message: string;
 }
 
-interface UserJoinedData {
+export interface UserJoinedData {
   userInfo: User;
 }
 
-interface UserLeftData {
+export interface UserLeftData {
   name: string;
 }

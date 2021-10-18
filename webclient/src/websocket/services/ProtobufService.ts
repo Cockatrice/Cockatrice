@@ -65,6 +65,14 @@ export class ProtobufService {
     }
   }
 
+  public sendKeepAliveCommand(pingReceived: Function) {
+    const command = this.controller.SessionCommand.create({
+      ".Command_Ping.ext" : this.controller.Command_Ping.create()
+    });
+
+    this.sendSessionCommand(command, pingReceived);
+  }
+
   public handleMessageEvent({ data }: MessageEvent): void {
     try {
       const uint8msg = new Uint8Array(data);
