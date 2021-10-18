@@ -36,6 +36,10 @@ export class WebSocketService {
   }
 
   public connect(options: WebSocketOptions, protocol: string = 'wss'): void {
+    if (window.location.hostname === 'localhost') {
+      protocol = 'ws';
+    }
+
     const { host, port, keepalive } = options;
     this.keepalive = keepalive;
 
