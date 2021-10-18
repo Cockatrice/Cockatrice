@@ -120,7 +120,6 @@ function serverIdentification(info: ServerIdentificationData) {
     return;
   }
 
-  webClient.resetConnectionvars();
   SessionPersistence.updateInfo(serverName, serverVersion);
   SessionCommands.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
   SessionCommands.login();

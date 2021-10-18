@@ -278,7 +278,6 @@ describe('SessionEvents', () => {
 
   describe('.Event_ServerIdentification.ext', () => {
     it('update status/info and login', () => {
-      spyOn(webClient, 'resetConnectionvars');
       spyOn(SessionPersistence, 'updateInfo');
       spyOn(SessionCommands, 'login');
 
@@ -291,7 +290,6 @@ describe('SessionEvents', () => {
 
       SessionEvents['.Event_ServerIdentification.ext'](data);
 
-      expect(webClient.resetConnectionvars).toHaveBeenCalled();
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGINGIN, 'Logging in...');
       expect(SessionCommands.login).toHaveBeenCalled();

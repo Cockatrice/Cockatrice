@@ -17,7 +17,7 @@ export interface WebSocketOptions {
 export class WebSocketService {
   private socket: WebSocket;
   private webClient: WebClient;
-  public keepAliveService: KeepAliveService;
+  private keepAliveService: KeepAliveService;
 
   public message$: Subject<MessageEvent> = new Subject();
   public statusChange$: Subject<ServerStatus> = new Subject();
@@ -49,7 +49,7 @@ export class WebSocketService {
   }
 
   public checkReadyState(state: number): boolean {
-    return this.socket.readyState === state;
+    return this.socket?.readyState === state;
   }
 
   public send(message): void {
