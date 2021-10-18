@@ -74,6 +74,10 @@ export class WebClient {
     }
   }
 
+  public keepAlive(pingReceived: Function) {
+    this.protobuf.sendKeepAliveCommand(pingReceived);
+  }
+
   private clearStores() {
     RoomPersistence.clearStore();
     SessionPersistence.clearStore();

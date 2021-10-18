@@ -35,7 +35,7 @@ export class WebSocketService {
     });
   }
 
-  public connect(options: WebSocketOptions, protocol: string = 'wss'): void {
+  public connect(options: WebSocketOptions, protocol: string = 'ws'): void {
     const { host, port, keepalive } = options;
     this.keepalive = keepalive;
 
@@ -69,13 +69,7 @@ export class WebSocketService {
       this.updateStatus(StatusEnum.CONNECTED, "Connected");
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: Function) => {
-        const command = this.webClient.protobuf.controller.SessionCommand.create({
-          ".Command_Ping.ext" : this.webClient.protobuf.controller.Command_Ping.create()
-        });
-
-        this.webClient.protobuf.sendSessionCommand(command, () => {
-          pingReceived();
-        });
+        this.webClient.keepAlive(pingReceived);
       });
     };
 
