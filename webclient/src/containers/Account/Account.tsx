@@ -76,7 +76,7 @@ class Account extends Component<AccountProps> {
           <Paper className="account-details" style={{margin: "0 0 5px 0"}}>
             <img src={url} alt={name} />
             <p><strong>{name}</strong></p>
-            <p>Location: ({country.toUpperCase()})</p>
+            <p>Location: ({country?.toUpperCase()})</p>
             <p>User Level: {userLevel}</p>
             <p>Account Age: {accountageSecs}</p>
             <p>Real Name: {realName}</p>

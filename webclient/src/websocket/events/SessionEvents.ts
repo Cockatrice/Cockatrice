@@ -1,9 +1,10 @@
-import { Room, StatusEnum, User } from 'types';
+import {Room, StatusEnum, User} from 'types';
 
-import { SessionCommands } from '../commands';
-import { RoomPersistence, SessionPersistence } from '../persistence';
-import { ProtobufEvents } from '../services/ProtobufService';
-import webClient from '../WebClient';
+import {SessionCommands} from '../commands';
+import {RoomPersistence, SessionPersistence} from '../persistence';
+import {ProtobufEvents} from '../services/ProtobufService';
+import webClient, {WebClient} from '../WebClient';
+import {WebSocketConnectReason} from "../services/WebSocketService";
 
 export const SessionEvents: ProtobufEvents = {
   '.Event_AddToList.ext': addToList,
@@ -120,9 +121,24 @@ function serverIdentification(info: ServerIdentificationData) {
     return;
   }
 
+  switch (webClient.options.reason) {
+    case WebSocketConnectReason.CONNECT:
+      SessionCommands.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
+      SessionCommands.login();
+      break;
+    case WebSocketConnectReason.REGISTER:
+      SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering...');
+      SessionCommands.register();
+      break;
+    case WebSocketConnectReason.RECOVER_PASSWORD:
+      console.log('ServerIdentificationData.recoverPassword');
+      break;
+    default:
+      console.error("Undefined type", webClient.options.reason);
+      break;
+  }
+
   SessionPersistence.updateInfo(serverName, serverVersion);
-  SessionCommands.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
-  SessionCommands.login();
 }
 
 function serverMessage({ message }: ServerMessageData) {

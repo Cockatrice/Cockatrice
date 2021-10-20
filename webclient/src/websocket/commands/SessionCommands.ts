@@ -1,14 +1,30 @@
-import { ServerConnectParams } from 'store';
-import { StatusEnum } from 'types';
+import {StatusEnum} from 'types';
 
-import { RoomPersistence, SessionPersistence } from '../persistence';
+import {RoomPersistence, SessionPersistence} from '../persistence';
 import webClient from '../WebClient';
-import { guid } from '../utils';
+import {guid} from '../utils';
+import {WebSocketConnectReason, WebSocketOptions} from "../services/WebSocketService";
+import {ServerRegisterParams} from "../../store";
+import NormalizeService from "../utils/NormalizeService";
 
 export class SessionCommands {
-  static connect(options: ServerConnectParams): void {
-    SessionCommands.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
-    webClient.connect(options);
+  static connect(options: WebSocketOptions, reason: WebSocketConnectReason): void {
+    switch (reason) {
+      case WebSocketConnectReason.CONNECT:
+        SessionCommands.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
+        break;
+      case WebSocketConnectReason.REGISTER:
+        SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering...');
+        break;
+      case WebSocketConnectReason.RECOVER_PASSWORD:
+        SessionCommands.updateStatus(StatusEnum.RECOVERING_PASSWORD, 'Recovering Password...');
+        break;
+      default:
+        console.error('Connection Failed', reason);
+        break;
+    }
+
+    webClient.connect({ ...options, reason });
   }
 
   static disconnect(): void {
@@ -78,6 +94,7 @@ export class SessionCommands {
 
         case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
+          SessionPersistence.accountAwaitingActivation();
           break;
 
         default:
@@ -85,6 +102,74 @@ export class SessionCommands {
       }
     });
   }
+
+  static register(): void {
+    const options = webClient.options as unknown as ServerRegisterParams;
+
+    const registerConfig = {
+      ...webClient.clientConfig,
+      userName: options.user,
+      password: options.pass,
+      email: options.email,
+      country: options.country,
+      realName: options.realName,
+      clientid: guid()
+    };
+
+    const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
+
+    const sc = webClient.protobuf.controller.SessionCommand.create({
+      '.Command_Register.ext' : CmdRegister
+    });
+
+    webClient.protobuf.sendSessionCommand(sc, raw => {
+      let error;
+
+      switch (raw.responseCode) {
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted:
+          SessionCommands.login();
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation:
+          SessionCommands.updateStatus(StatusEnum.REGISTERED, "Registration Successful");
+          SessionPersistence.accountAwaitingActivation();
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled:
+          error = 'Registration is currently disabled';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespUserAlreadyExists:
+          error = 'There is already an existing user with this username';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespEmailRequiredToRegister:
+          error = 'A valid email address is required to register';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespEmailBlackListed:
+          error = 'The email address provider used has been blocked from use';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespTooManyRequests:
+          error = 'This email address already has the maximum number of accounts you can register';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort:
+          error = 'Your password was too short';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
+          error = NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime);
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
+          console.error("ResponseCode.RespUsernameInvalid", raw.reasonStr);
+          error = 'Invalid username';
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed:
+        default:
+          console.error("ResponseCode Type", raw.responseCode);
+          error = 'Registration failed due to a server issue';
+          break;
+      }
+
+      if (error) {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Registration Failed: ${error}`);
+      }
+    });
+  };
 
   static listUsers(): void {
     const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();

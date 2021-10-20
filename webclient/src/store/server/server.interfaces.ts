@@ -7,6 +7,21 @@ export interface ServerConnectParams {
   pass: string;
 }
 
+export interface ServerRegisterParams {
+  host: string;
+  port: string;
+  user: string;
+  pass: string;
+  passAgain: string;
+  email: string;
+  country: string;
+  realName: string;
+}
+
+export interface ServerRegisterWithActivationParams extends ServerRegisterParams {
+  activationCode: string;
+}
+
 export interface ServerState {
   buddyList: User[];
   ignoreList: User[];

@@ -1,10 +1,9 @@
-import { ServerConnectParams } from "store";
-import { ServerStatus, StatusEnum } from "types";
+import {ServerStatus, StatusEnum} from "types";
 
-import { ProtobufService } from './services/ProtobufService';
-import { WebSocketService, WebSocketOptions } from "./services/WebSocketService";
+import {ProtobufService} from './services/ProtobufService';
+import {WebSocketOptions, WebSocketService} from "./services/WebSocketService";
 
-import { RoomPersistence, SessionPersistence } from './persistence';
+import {RoomPersistence, SessionPersistence} from './persistence';
 
 export class WebClient {
   public socket = new WebSocketService(this);
@@ -37,7 +36,8 @@ export class WebClient {
     user: "",
     pass: "",
     autojoinrooms: true,
-    keepalive: 5000
+    keepalive: 5000,
+    reason: null
   };
 
   constructor() {
@@ -52,8 +52,8 @@ export class WebClient {
     console.log(this);
   }
 
-  public connect(options: ServerConnectParams) {
-    this.options = { ...this.options, ...options };
+  public connect(options: WebSocketOptions) {
+    this.options = {...this.options, ...options};
     this.socket.connect(this.options);
   }
 

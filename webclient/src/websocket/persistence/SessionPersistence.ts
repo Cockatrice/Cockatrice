@@ -72,4 +72,8 @@ export class SessionPersistence {
   static serverMessage(message: string) {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
+
+  static accountAwaitingActivation() {
+    console.log("Open Modal for Activation Code input");
+  }
 }

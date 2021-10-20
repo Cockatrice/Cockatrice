@@ -12,6 +12,13 @@ export interface WebSocketOptions {
   pass: string;
   autojoinrooms: boolean;
   keepalive: number;
+  reason: WebSocketConnectReason;
+}
+
+export enum WebSocketConnectReason {
+  CONNECT,
+  REGISTER,
+  RECOVER_PASSWORD,
 }
 
 export class WebSocketService {

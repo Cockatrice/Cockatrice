@@ -43,4 +43,21 @@ export default class NormalizeService {
       message.message = `${name}: ${message.message}`;
     }
   }
+
+  // Banned reason string is not being exposed by the server
+  static normalizeBannedUserError(reasonStr: string, endTime: number): string {
+    let error;
+
+    if (endTime) {
+      error = 'You are banned until ' + new Date(endTime).toString();
+    } else {
+      error = 'You are permanently banned';
+    }
+
+    if (reasonStr) {
+      error += '\n\n' + reasonStr;
+    }
+
+    return error;
+  }
 }

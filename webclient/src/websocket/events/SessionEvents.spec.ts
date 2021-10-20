@@ -277,7 +277,7 @@ describe('SessionEvents', () => {
   });
 
   describe('.Event_ServerIdentification.ext', () => {
-    it('update status/info and login', () => {
+    xit('update status/info and login', () => {
       spyOn(SessionPersistence, 'updateInfo');
       spyOn(SessionCommands, 'login');
 

@@ -1,9 +1,10 @@
-import { StatusEnum } from 'types';
+import {StatusEnum} from 'types';
 
-import { SessionCommands } from './SessionCommands';
+import {SessionCommands} from './SessionCommands';
 
-import { RoomPersistence, SessionPersistence } from '../persistence';
+import {RoomPersistence, SessionPersistence} from '../persistence';
 import webClient from '../WebClient';
+import {WebSocketConnectReason} from "../services/WebSocketService";
 
 describe('SessionCommands', () => {
   const roomId = 1;
@@ -24,20 +25,20 @@ describe('SessionCommands', () => {
   describe('connect', () => {
     it('should call SessionCommands.updateStatus and webClient.connect', () => {
       spyOn(webClient, 'connect');
-      const options = {
+      const options: any = {
         host: 'host',
         port: 'port',
         user: 'user',
         pass: 'pass',
       };
 
-      SessionCommands.connect(options);
+      SessionCommands.connect(options, WebSocketConnectReason.CONNECT);
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTING, 'Connecting...');
       
       expect(webClient.connect).toHaveBeenCalled();
-      expect(webClient.connect).toHaveBeenCalledWith(options);
+      expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.CONNECT });
     });
   });
 
