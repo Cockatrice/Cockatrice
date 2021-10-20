@@ -17,9 +17,9 @@ export const materialTheme = createMuiTheme({
   palette: {
     primary: {
       main: '#7033DB',
-      // light: '',
-      // dark: '',
-      // contrastText: '',
+      light: 'rgba(112, 51, 219, .3)',
+      dark: '#401C7F',
+      contrastText: '#FFFFFF',
     },
     // secondary: {
     //   main: '',
