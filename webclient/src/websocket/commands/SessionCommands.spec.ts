@@ -5,6 +5,7 @@ import {SessionCommands} from './SessionCommands';
 import {RoomPersistence, SessionPersistence} from '../persistence';
 import webClient from '../WebClient';
 import {WebSocketConnectReason} from "../services/WebSocketService";
+import {AccountActivationParams, ServerRegisterParams} from "../../store";
 
 describe('SessionCommands', () => {
   const roomId = 1;
@@ -22,23 +23,49 @@ describe('SessionCommands', () => {
     webClient.protobuf.controller.SessionCommand = { create: args => args };
   });
 
+
   describe('connect', () => {
-    it('should call SessionCommands.updateStatus and webClient.connect', () => {
+    let options;
+
+    beforeEach(() => {
       spyOn(webClient, 'connect');
-      const options: any = {
+      options = {
         host: 'host',
         port: 'port',
         user: 'user',
         pass: 'pass',
       };
+    });
 
+    it('should call SessionCommands.updateStatus and webClient.connect when logging in', () => {
       SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTING, 'Connecting...');
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTING, expect.any(String));
       
       expect(webClient.connect).toHaveBeenCalled();
       expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.LOGIN });
+    });
+
+    it('should call SessionCommands.updateStatus and webClient.connect when registering', () => {
+      SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
+
+      expect(SessionCommands.updateStatus).toHaveBeenCalled();
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.REGISTERING, expect.any(String));
+
+      expect(webClient.connect).toHaveBeenCalled();
+      expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.REGISTER });
+    });
+
+
+    it('should call SessionCommands.updateStatus and webClient.connect when activating account', () => {
+      SessionCommands.connect(options, WebSocketConnectReason.ACTIVATE_ACCOUNT);
+
+      expect(SessionCommands.updateStatus).toHaveBeenCalled();
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.ACTIVATING_ACCOUNT, expect.any(String));
+
+      expect(webClient.connect).toHaveBeenCalled();
+      expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.ACTIVATE_ACCOUNT });
     });
   });
 
@@ -212,6 +239,160 @@ describe('SessionCommands', () => {
         SessionCommands.login();
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, `Login failed: unknown error: ${response.responseCode}`);
+      });
+    });
+  });
+
+  describe('register', () => {
+    beforeEach(() => {
+      webClient.protobuf.controller.Command_Register = { create: args => args };
+      webClient.options = {
+        ...webClient.options,
+        user: 'user',
+        pass: 'pass',
+        email: 'email@example.com',
+        country: 'us',
+        realName: 'realName',
+        clientid: 'abcdefg'
+      } as any;
+    });
+
+    it('should call protobuf controller methods and sendCommand', () => {
+      SessionCommands.register();
+
+      const options = webClient.options as unknown as ServerRegisterParams;
+
+      expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
+      expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
+        '.Command_Register.ext': {
+          ...webClient.clientConfig,
+          userName: options.user,
+          password: options.pass,
+          email: options.email,
+          country: options.country,
+          realName: options.realName,
+          clientid: jasmine.any(String)
+        }
+      }, jasmine.any(Function));
+    });
+
+    describe('response', () => {
+      const RespRegistrationAccepted = 'RespRegistrationAccepted';
+      const respKey = '.Response_Register.ext';
+      let response;
+
+      beforeEach(() => {
+        response = {
+          responseCode: RespRegistrationAccepted,
+          [respKey]: {
+            reasonStr: "",
+            endTime: 10000000
+          }
+        };
+
+        webClient.protobuf.controller.Response = { ResponseCode: { RespRegistrationAccepted }};
+
+        sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
+      })
+
+      it("should login user if registration accepted without email verification", () => {
+        spyOn(SessionCommands, 'login');
+        spyOn(SessionPersistence, 'accountAwaitingActivation');
+
+        SessionCommands.register();
+
+        expect(SessionCommands.login).toHaveBeenCalled();
+        expect(SessionPersistence.accountAwaitingActivation).not.toHaveBeenCalled();
+      });
+
+      it("should prompt user if registration accepted with email verification", () => {
+        const RespRegistrationAcceptedNeedsActivation = 'RespRegistrationAcceptedNeedsActivation';
+        response.responseCode = RespRegistrationAcceptedNeedsActivation;
+        webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation = RespRegistrationAcceptedNeedsActivation;
+
+        spyOn(SessionCommands, 'login');
+        spyOn(SessionPersistence, 'accountAwaitingActivation');
+
+        SessionCommands.register();
+
+        expect(SessionCommands.login).not.toHaveBeenCalled();
+        expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
+      });
+
+      it("should disconnect user if registration fails due to registration being disabled", () => {
+        const RespRegistrationDisabled = 'RespRegistrationDisabled';
+        response.responseCode = RespRegistrationDisabled;
+        webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled = RespRegistrationDisabled;
+
+        SessionCommands.register();
+
+        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, expect.any(String));
+      });
+    });
+  });
+
+  describe('activateAccount', () => {
+    beforeEach(() => {
+      webClient.protobuf.controller.Command_Activate = { create: args => args };
+      webClient.options = {
+        ...webClient.options,
+        user: 'user',
+        activationCode: 'token',
+        clientid: 'abcdefg'
+      } as any;
+    });
+
+    it('should call protobuf controller methods and sendCommand', () => {
+      SessionCommands.activateAccount();
+
+      const options = webClient.options as unknown as AccountActivationParams;
+
+      expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
+        '.Command_Activate.ext': {
+          ...webClient.clientConfig,
+          userName: options.user,
+          token: options.activationCode,
+          clientid: jasmine.any(String)
+        }
+      }, jasmine.any(Function));
+    });
+
+    describe('response', () => {
+      const RespActivationAccepted = 'RespActivationAccepted';
+      const respKey = '.Response_Activate.ext';
+      let response;
+
+      beforeEach(() => {
+        response = {
+          responseCode: RespActivationAccepted,
+          [respKey]: {
+
+          }
+        };
+
+        webClient.protobuf.controller.Response = { ResponseCode: { RespActivationAccepted }};
+
+        sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
+        spyOn(SessionCommands, 'login');
+        spyOn(SessionPersistence, 'accountActivationFailed');
+      });
+
+      it('should activate user and login if correct activation token used', () => {
+        SessionCommands.activateAccount();
+
+        expect(SessionCommands.login).toHaveBeenCalled();
+        expect(SessionPersistence.accountActivationFailed).not.toHaveBeenCalled();
+      });
+
+      it('should disconnect user if activation failed for any reason', () => {
+        const RespActivationFailed = 'RespActivationFailed';
+        response.responseCode = RespActivationFailed;
+        webClient.protobuf.controller.Response.ResponseCode.RespActivationFailed = RespActivationFailed;
+
+        SessionCommands.activateAccount();
+
+        expect(SessionCommands.login).not.toHaveBeenCalled();
+        expect(SessionPersistence.accountActivationFailed).toHaveBeenCalled();
       });
     });
   });

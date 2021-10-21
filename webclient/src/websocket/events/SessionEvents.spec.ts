@@ -1,21 +1,21 @@
-import { StatusEnum } from "types";
+import {StatusEnum} from "types";
 
 import {
-  SessionEvents,
-  SessionEvent,
   AddToListData,
   ConnectionClosedData,
   ListRoomsData,
   RemoveFromListData,
   ServerIdentificationData,
   ServerMessageData,
+  SessionEvents,
   UserJoinedData,
   UserLeftData,
 } from './SessionEvents';
 
-import { SessionCommands } from "../commands";
-import { RoomPersistence, SessionPersistence } from '../persistence';
+import {SessionCommands} from "../commands";
+import {RoomPersistence, SessionPersistence} from '../persistence';
 import webClient from '../WebClient';
+import {WebSocketConnectReason} from "../services/WebSocketService";
 
 describe('SessionEvents', () => {
   const roomId = 1;
@@ -277,22 +277,53 @@ describe('SessionEvents', () => {
   });
 
   describe('.Event_ServerIdentification.ext', () => {
-    xit('update status/info and login', () => {
-      spyOn(SessionPersistence, 'updateInfo');
-      spyOn(SessionCommands, 'login');
+    let data: ServerIdentificationData;
 
+    beforeEach(() => {
       webClient.protocolVersion = 0;
-      const data: ServerIdentificationData = {
+      data = {
         serverName: 'serverName',
         serverVersion: 'serverVersion',
         protocolVersion: 0,
       };
 
+      spyOn(SessionPersistence, 'updateInfo');
+    });
+
+    it('update status/info and login', () => {
+      spyOn(SessionCommands, 'login');
+
+      webClient.options.reason = WebSocketConnectReason.LOGIN;
+
       SessionEvents['.Event_ServerIdentification.ext'](data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGINGIN, 'Logging in...');
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGINGIN, expect.any(String));
       expect(SessionCommands.login).toHaveBeenCalled();
+    });
+
+    it('should update stat/info and register', () => {
+      spyOn(SessionCommands, 'register');
+
+      webClient.options.reason = WebSocketConnectReason.REGISTER;
+
+      SessionEvents['.Event_ServerIdentification.ext'](data);
+
+      expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.REGISTERING, expect.any(String));
+      expect(SessionCommands.register).toHaveBeenCalled();
+    });
+
+    it('should update stat/info and activate account', () => {
+      spyOn(SessionCommands, 'activateAccount');
+
+      webClient.options.reason = WebSocketConnectReason.ACTIVATE_ACCOUNT;
+
+      SessionEvents['.Event_ServerIdentification.ext'](data);
+
+      expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.ACTIVATING_ACCOUNT, expect.any(String));
+      expect(SessionCommands.activateAccount).toHaveBeenCalled();
     });
 
     it('should disconnect if protocolVersion mismatched', () => {
