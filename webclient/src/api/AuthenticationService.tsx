@@ -11,7 +11,7 @@ export default class AuthenticationService {
     SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
   }
 
-  static registerWithActivationCode(options: WebSocketOptions): void {
+  static activateAccount(options: WebSocketOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.ACTIVATE_ACCOUNT);
   }
 
