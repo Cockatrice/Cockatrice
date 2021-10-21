@@ -25,7 +25,6 @@ class Server extends Component<ServerProps, ServerState> {
     this.showDescription = this.showDescription.bind(this);
     this.showRegisterForm = this.showRegisterForm.bind(this);
     this.hideRegisterForm = this.hideRegisterForm.bind(this);
-    this.onRegister = this.onRegister.bind(this);
 
     this.state = {
       register: false
@@ -47,10 +46,6 @@ class Server extends Component<ServerProps, ServerState> {
     this.setState({register: false});
   }
 
-  onRegister(fields) {
-    console.log("register", fields);
-  }
-
   render() {
     const { message, rooms, joinedRooms, history, state, description, users } = this.props;
     const { register } = this.state;
@@ -66,7 +61,7 @@ class Server extends Component<ServerProps, ServerState> {
                     <Paper className="server-connect__form">
                       {
                         register
-                          ? ( <Register connect={this.hideRegisterForm} onRegister={this.onRegister} /> )
+                          ? ( <Register connect={this.hideRegisterForm} /> )
                           : ( <Connect register={this.showRegisterForm} /> )
                       }
                     </Paper>
@@ -106,7 +101,7 @@ const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
             Users connected to server: {users.length}
           </div>
           <VirtualList
-            itemKey={(index, data) => users[index].name }
+            itemKey={(index) => users[index].name }
             items={ users.map(user => (
               <ListItem button dense>
                 <UserDisplay user={user} />
@@ -122,13 +117,13 @@ const ServerRooms = ({ rooms, joinedRooms, history, message, users}) => (
 const Connect = ({register}) => (
   <div className="form-wrapper">
     <ConnectForm onSubmit={AuthenticationService.connect} />
-    {/*{<Button variant="outlined" onClick={register}>Register</Button>}*/}
+    <Button variant="outlined" onClick={register}>Register</Button>
   </div>
 );
 
-const Register = ({ onRegister, connect }) => (
+const Register = ({ connect }) => (
   <div className="form-wrapper">
-    <RegisterForm onSubmit={event => onRegister(event)} />
+    <RegisterForm onSubmit={AuthenticationService.register} />
     <Button variant="outlined" onClick={connect}>Connect</Button>
   </div>
 );

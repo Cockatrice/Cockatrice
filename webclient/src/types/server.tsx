@@ -4,20 +4,30 @@ export interface ServerStatus {
 }
 
 export enum StatusEnum {
-  DISCONNECTED  =  0,
-  CONNECTING    =  1,
-  CONNECTED     =  2,
-  LOGGINGIN     =  3,
-  LOGGEDIN      =  4,
+  DISCONNECTED,
+  CONNECTING,
+  CONNECTED,
+  LOGGINGIN,
+  LOGGEDIN,
+  REGISTERING,
+  REGISTERED,
+  ACTIVATING_ACCOUNT,
+  ACCOUNT_ACTIVATED,
+  RECOVERING_PASSWORD,
   DISCONNECTING =  99
 }
 
 export enum StatusEnumLabel {
-  "Disconnected" = 0,
-  "Connecting" = 1,
-  "Connected" = 2,
-  "Loggingin" = 3,
-  "Loggedin" = 4,
+  "Disconnected",
+  "Connecting" ,
+  "Connected" ,
+  "Loggingin",
+  "Loggedin",
+  "Registering",
+  "Registered",
+  "ActivatingAccount",
+  "AccountActivated",
+  "RecoveringPassword",
   "Disconnecting" = 99
 }
 

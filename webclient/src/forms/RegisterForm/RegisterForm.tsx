@@ -19,10 +19,10 @@ const RegisterForm = ({ handleSubmit }) => (
       <Field label="Port" name="port" component={InputField} />
     </div>
     <div className="registerForm-item">
-      <Field label="Player Name" name="userName" component={InputField} />
+      <Field label="Player Name" name="user" component={InputField} />
     </div>
     <div className="registerForm-item">
-      <Field label="Password" name="password" type="password" component={InputField} />
+      <Field label="Password" name="pass" type="password" component={InputField} />
     </div>
     <div className="registerForm-item">
       <Field label="Password (again)" name="passwordConfirm" type="password" component={InputField} />

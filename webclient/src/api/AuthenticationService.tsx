@@ -1,10 +1,18 @@
-import { ServerConnectParams } from "store";
-import { StatusEnum, User} from "types";
-import { webClient, SessionCommands } from "websocket";
+import {StatusEnum, User} from "types";
+import {SessionCommands, webClient} from "websocket";
+import {WebSocketConnectReason, WebSocketOptions} from "../websocket/services/WebSocketService";
 
 export default class AuthenticationService {
-  static connect(options: ServerConnectParams): void {
-    SessionCommands.connect(options);
+  static connect(options: WebSocketOptions): void {
+    SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
+  }
+
+  static register(options: WebSocketOptions): void {
+    SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
+  }
+
+  static activateAccount(options: WebSocketOptions): void {
+    SessionCommands.connect(options, WebSocketConnectReason.ACTIVATE_ACCOUNT);
   }
 
   static disconnect(): void {
