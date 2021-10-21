@@ -35,10 +35,10 @@ export class WebClient {
     port: "",
     user: "",
     pass: "",
-    autojoinrooms: true,
-    keepalive: 5000,
     clientid: null,
-    reason: null
+    reason: null,
+    autojoinrooms: true,
+    keepalive: 5000
   };
 
   constructor() {

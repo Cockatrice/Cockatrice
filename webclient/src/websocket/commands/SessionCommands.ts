@@ -116,7 +116,7 @@ export class SessionCommands {
       email: options.email,
       country: options.country,
       realName: options.realName,
-      clientid: guid()
+      clientid: 'webatrice'
     };
 
     const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);

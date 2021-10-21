@@ -278,9 +278,11 @@ describe('SessionEvents', () => {
 
   describe('.Event_ServerIdentification.ext', () => {
     let data: ServerIdentificationData;
+    let event;
 
     beforeEach(() => {
       webClient.protocolVersion = 0;
+      event = SessionEvents['.Event_ServerIdentification.ext'];
       data = {
         serverName: 'serverName',
         serverVersion: 'serverVersion',
@@ -295,7 +297,7 @@ describe('SessionEvents', () => {
 
       webClient.options.reason = WebSocketConnectReason.LOGIN;
 
-      SessionEvents['.Event_ServerIdentification.ext'](data);
+      event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGINGIN, expect.any(String));
@@ -307,7 +309,7 @@ describe('SessionEvents', () => {
 
       webClient.options.reason = WebSocketConnectReason.REGISTER;
 
-      SessionEvents['.Event_ServerIdentification.ext'](data);
+      event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.REGISTERING, expect.any(String));
@@ -319,7 +321,7 @@ describe('SessionEvents', () => {
 
       webClient.options.reason = WebSocketConnectReason.ACTIVATE_ACCOUNT;
 
-      SessionEvents['.Event_ServerIdentification.ext'](data);
+      event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.ACTIVATING_ACCOUNT, expect.any(String));
@@ -337,7 +339,7 @@ describe('SessionEvents', () => {
         protocolVersion: 1,
       };
 
-      SessionEvents['.Event_ServerIdentification.ext'](data);
+      event(data);
 
       expect(SessionCommands.disconnect).toHaveBeenCalled();
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${data.protocolVersion}`);
