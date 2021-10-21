@@ -4,11 +4,15 @@ import {WebSocketConnectReason, WebSocketOptions} from "../websocket/services/We
 
 export default class AuthenticationService {
   static connect(options: WebSocketOptions): void {
-    SessionCommands.connect(options, WebSocketConnectReason.CONNECT);
+    SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
   }
 
   static register(options: WebSocketOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
+  }
+
+  static registerWithActivationCode(options: WebSocketOptions): void {
+    SessionCommands.connect(options, WebSocketConnectReason.ACTIVATE_ACCOUNT);
   }
 
   static disconnect(): void {

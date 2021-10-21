@@ -37,6 +37,7 @@ export class WebClient {
     pass: "",
     autojoinrooms: true,
     keepalive: 5000,
+    clientid: null,
     reason: null
   };
 

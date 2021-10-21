@@ -4,17 +4,20 @@ import {RoomPersistence, SessionPersistence} from '../persistence';
 import webClient from '../WebClient';
 import {guid} from '../utils';
 import {WebSocketConnectReason, WebSocketOptions} from "../services/WebSocketService";
-import {ServerRegisterParams} from "../../store";
+import {ServerRegisterParams, AccountActivationParams} from "../../store";
 import NormalizeService from "../utils/NormalizeService";
 
 export class SessionCommands {
   static connect(options: WebSocketOptions, reason: WebSocketConnectReason): void {
     switch (reason) {
-      case WebSocketConnectReason.CONNECT:
+      case WebSocketConnectReason.LOGIN:
         SessionCommands.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
         break;
       case WebSocketConnectReason.REGISTER:
         SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering...');
+        break;
+      case WebSocketConnectReason.ACTIVATE_ACCOUNT:
+        SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering with activation code...');
         break;
       case WebSocketConnectReason.RECOVER_PASSWORD:
         SessionCommands.updateStatus(StatusEnum.RECOVERING_PASSWORD, 'Recovering Password...');
@@ -170,6 +173,34 @@ export class SessionCommands {
       }
     });
   };
+
+  static activateAccount(): void {
+    const options = webClient.options as unknown as AccountActivationParams;
+
+    const accountActivationConfig = {
+      ...webClient.clientConfig,
+      userName: options.user,
+      clientid: options.clientid,
+      token: options.activationCode
+    };
+
+    const CmdActivate = webClient.protobuf.controller.Command_Activate.create(accountActivationConfig);
+
+    const sc = webClient.protobuf.controller.SessionCommand.create({
+      '.Command_Activate.ext': CmdActivate
+    });
+
+    webClient.protobuf.sendSessionCommand(sc, raw => {
+        if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
+          SessionCommands.updateStatus(StatusEnum.ACCOUNT_ACTIVATED, 'Account Activation Successful');
+          SessionCommands.login();
+        } else {
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');
+          SessionPersistence.accountActivationFailed();
+        }
+    });
+
+  }
 
   static listUsers(): void {
     const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();

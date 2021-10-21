@@ -18,8 +18,9 @@ export interface ServerRegisterParams {
   realName: string;
 }
 
-export interface ServerRegisterWithActivationParams extends ServerRegisterParams {
+export interface AccountActivationParams extends ServerRegisterParams {
   activationCode: string;
+  clientid: string;
 }
 
 export interface ServerState {

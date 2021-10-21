@@ -3,7 +3,7 @@ import {Room, StatusEnum, User} from 'types';
 import {SessionCommands} from '../commands';
 import {RoomPersistence, SessionPersistence} from '../persistence';
 import {ProtobufEvents} from '../services/ProtobufService';
-import webClient, {WebClient} from '../WebClient';
+import webClient from '../WebClient';
 import {WebSocketConnectReason} from "../services/WebSocketService";
 
 export const SessionEvents: ProtobufEvents = {
@@ -122,13 +122,17 @@ function serverIdentification(info: ServerIdentificationData) {
   }
 
   switch (webClient.options.reason) {
-    case WebSocketConnectReason.CONNECT:
+    case WebSocketConnectReason.LOGIN:
       SessionCommands.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
       SessionCommands.login();
       break;
     case WebSocketConnectReason.REGISTER:
       SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering...');
       SessionCommands.register();
+      break;
+    case WebSocketConnectReason.ACTIVATE_ACCOUNT:
+      SessionCommands.updateStatus(StatusEnum.ACTIVATING_ACCOUNT, 'Activating account...');
+      SessionCommands.activateAccount();
       break;
     case WebSocketConnectReason.RECOVER_PASSWORD:
       console.log('ServerIdentificationData.recoverPassword');

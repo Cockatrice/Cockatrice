@@ -11,6 +11,8 @@ export enum StatusEnum {
   LOGGEDIN,
   REGISTERING,
   REGISTERED,
+  ACTIVATING_ACCOUNT,
+  ACCOUNT_ACTIVATED,
   RECOVERING_PASSWORD,
   DISCONNECTING =  99
 }
@@ -23,6 +25,8 @@ export enum StatusEnumLabel {
   "Loggedin",
   "Registering",
   "Registered",
+  "ActivatingAccount",
+  "AccountActivated",
   "RecoveringPassword",
   "Disconnecting" = 99
 }

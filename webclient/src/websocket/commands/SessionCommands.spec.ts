@@ -32,13 +32,13 @@ describe('SessionCommands', () => {
         pass: 'pass',
       };
 
-      SessionCommands.connect(options, WebSocketConnectReason.CONNECT);
+      SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTING, 'Connecting...');
       
       expect(webClient.connect).toHaveBeenCalled();
-      expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.CONNECT });
+      expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.LOGIN });
     });
   });
 
