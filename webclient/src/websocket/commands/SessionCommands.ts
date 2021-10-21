@@ -17,7 +17,7 @@ export class SessionCommands {
         SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering...');
         break;
       case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-        SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering with activation code...');
+        SessionCommands.updateStatus(StatusEnum.ACTIVATING_ACCOUNT, 'Activating Account...');
         break;
       case WebSocketConnectReason.RECOVER_PASSWORD:
         SessionCommands.updateStatus(StatusEnum.RECOVERING_PASSWORD, 'Recovering Password...');
