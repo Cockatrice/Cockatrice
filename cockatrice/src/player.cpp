@@ -2984,7 +2984,7 @@ void Player::actResetPT()
         }
     }
 
-    if (!commandList.empty()){
+    if (!commandList.empty()) {
         game->sendGameCommand(prepareGameCommand(commandList), playerid);
     }
 }
