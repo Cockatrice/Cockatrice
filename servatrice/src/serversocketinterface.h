@@ -109,6 +109,10 @@ private:
     Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/);
     Response::ResponseCode cmdAdjustMod(const Command_AdjustMod &cmd, ResponseContainer & /*rc*/);
     Response::ResponseCode cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc);
+    Response::ResponseCode continuePasswordRequest(const QString &userName,
+                                                   const QString &clientId,
+                                                   ResponseContainer &rc,
+                                                   bool challenged = false);
     Response::ResponseCode cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                       ResponseContainer &rc);

@@ -1320,32 +1320,47 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd,
                                                                                ResponseContainer &rc)
 {
-    qDebug() << "Received reset password request from user: " << QString::fromStdString(cmd.user_name());
+    const QString userName = QString::fromStdString(cmd.user_name());
+    const QString clientId = QString::fromStdString(cmd.clientid());
+
+    qDebug() << "Received reset password request from user: " << userName;
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST",
-                                         "Server functionality disabled", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "Server functionality disabled", false);
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->userExists(QString::fromStdString(cmd.user_name()))) {
+    if (servatrice->getEnableForgotPasswordChallenge()) {
+        Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+        re->set_challenge_email(true);
+        rc.setResponseExtension(re);
+        return Response::RespOk;
+    }
+
+    if (!sqlInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST",
-                                         "User does not exist", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "User does not exist", false);
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
+    return continuePasswordRequest(userName, clientId, rc);
+}
+
+Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(const QString &userName,
+                                                                              const QString &clientId,
+                                                                              ResponseContainer &rc,
+                                                                              bool challenged)
+{
+    if (sqlInterface->doesForgotPasswordExist(userName)) {
 
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST",
-                                         "Request already exists", true);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "Request already exists", true);
 
         Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
         re->set_challenge_email(false);
@@ -1355,43 +1370,33 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     QString banReason;
     int banTimeRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), QString::fromStdString(cmd.user_name()),
-                                        QString::fromStdString(cmd.clientid()), banReason, banTimeRemaining)) {
+    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banTimeRemaining)) {
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST",
-                                         "User is banned", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "User is banned", false);
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (servatrice->getEnableForgotPasswordChallenge()) {
-        if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST",
-                                         "Request does not exist, challenge requested", true);
-
-        Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
-        re->set_challenge_email(true);
-        rc.setResponseExtension(re);
-        return Response::RespOk;
-    } else {
-        if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
-
-            if (servatrice->getEnableForgotPasswordAudit())
-                sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                             QString::fromStdString(cmd.clientid()).simplified(),
-                                             "PASSWORD_RESET_REQUEST",
-                                             "Request does not exist, challenge not requested", true);
-
-            Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
-            re->set_challenge_email(false);
-            rc.setResponseExtension(re);
-            return Response::RespOk;
+    if (!sqlInterface->addForgotPassword(userName)) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "Failed to create password reset", false);
         }
+        return Response::RespFunctionNotAllowed;
     }
 
-    return Response::RespFunctionNotAllowed;
+    if (servatrice->getEnableForgotPasswordAudit()) {
+        QString details =
+            challenged ? "Request does not exist, challenge passed" : "Request does not exist, challenge not requested";
+        sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                     "PASSWORD_RESET_REQUEST", details, true);
+    }
+
+    Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+    re->set_challenge_email(false);
+    rc.setResponseExtension(re);
+    return Response::RespOk;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd,
@@ -1437,36 +1442,42 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                           ResponseContainer &rc)
 {
-    Q_UNUSED(rc);
-    qDebug() << "Received reset password challenge from user: " << QString::fromStdString(cmd.user_name());
+    const QString userName = QString::fromStdString(cmd.user_name());
+    const QString clientId = QString::fromStdString(cmd.clientid());
 
-    if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
-        if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(),
-                                         "PASSWORD_RESET_CHALLANGE", "Request does not exist for user", false);
+    qDebug() << "Received reset password challenge from user: " << userName;
 
-        return Response::RespOk;
+    if (!servatrice->getEnableForgotPasswordChallenge()) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_CHALLENGE", "Feature not enabled", false);
+        }
+        return Response::RespFunctionNotAllowed;
     }
 
-    if (sqlInterface->validateTableColumnStringData("{prefix}_users", "email", QString::fromStdString(cmd.user_name()),
-                                                    QString::fromStdString(cmd.email()))) {
-        if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(),
-                                         "PASSWORD_RESET_CHALLANGE", "", true);
+    if (!sqlInterface->userExists(userName)) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_CHALLENGE", "User does not exist", false);
+        }
+        return Response::RespFunctionNotAllowed;
+    }
 
-        if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
-            return Response::RespOk;
-    } else {
-        if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(),
-                                         "PASSWORD_RESET_CHALLANGE", "Failed to answer email challenge question",
+    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName,
+                                                     QString::fromStdString(cmd.email()))) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
                                          false);
+        }
+        return Response::RespFunctionNotAllowed;
     }
 
-    return Response::RespFunctionNotAllowed;
+    if (servatrice->getEnableForgotPasswordAudit()) {
+        sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                     "PASSWORD_RESET_CHALLENGE", "", true);
+    }
+    return continuePasswordRequest(userName, clientId, rc, true);
 }
 
 // ADMIN FUNCTIONS.
