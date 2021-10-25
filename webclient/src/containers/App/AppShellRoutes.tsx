@@ -9,6 +9,7 @@ import {
   Player, 
   Room, 
   Server, 
+  Login,
   Logs
 } from "containers";
 
@@ -22,7 +23,8 @@ const Routes = () => (
       <Route path={RouteEnum.PLAYER} render={() => <Player />} />
       {<Route path={RouteEnum.ROOM} render={() => <Room />} />}
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
-      <Redirect from="/" to={RouteEnum.SERVER} />
+      <Route path={RouteEnum.LOGIN} render={() => <Login />} />
+      <Redirect from="/" to={RouteEnum.LOGIN} />
     </Switch>
   </div>
 );
