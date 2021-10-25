@@ -9,7 +9,7 @@ import { AuthenticationService } from "api";
 
 const AuthGuard = ({ state }: AuthGuardProps) => {
   return !AuthenticationService.isConnected(state)
-    ? <Redirect from="*" to={RouteEnum.SERVER} />
+    ? <Redirect from="*" to={RouteEnum.LOGIN} />
     : <div></div>;
 };
 

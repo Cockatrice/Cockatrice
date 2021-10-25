@@ -1,0 +1,20 @@
+.inputField {
+  position: relative;
+}
+
+.inputField-validation {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(-50%);
+  font-weight: bold;
+}
+
+.inputField-error {
+  display: flex;
+  align-items: center;
+}
+
+.inputField-error svg {
+  margin-left: 4px;
+}

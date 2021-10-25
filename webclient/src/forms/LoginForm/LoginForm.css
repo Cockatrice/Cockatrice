@@ -1,0 +1,20 @@
+.loginForm {
+  width: 100%;
+}
+
+.loginForm-item {
+  margin-bottom: 20px;
+}
+
+.loginForm-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.loginForm-submit {
+  width: 100%;
+}

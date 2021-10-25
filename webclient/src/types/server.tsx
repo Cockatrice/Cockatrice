@@ -31,6 +31,48 @@ export enum StatusEnumLabel {
   "Disconnecting" = 99
 }
 
+export class Host {
+  id?: number;
+  name: string;
+  host: string;
+  port: string;
+  localHost?: string;
+  localPort?: string;
+  editable: boolean;
+}
+
+export const DefaultHosts: Host[] = [
+  {
+    name: 'Rooster',
+    host: 'server.cockatrice.us/servatrice',
+    port: '4748',
+    localHost: 'server.cockatrice.us',
+    editable: false,
+  },
+  {
+    name: 'Tetrarch',
+    host: 'mtg.tetrarch.co/servatrice',
+    port: '4748',
+    editable: false,
+  },
+];
+
+export const getHostPort = (host: Host): { host: string, port: string } => {
+  const isLocal = window.location.hostname === 'localhost';
+
+  if (!host) {
+    return {
+      host: '',
+      port: ''
+    };
+  }
+
+  return {
+    host: !isLocal ? host.host : host.localHost || host.host,
+    port: !isLocal ? host.port : host.localPort || host.port,
+  }
+};
+
 export enum KnownHost {
   ROOSTER = 'Rooster',
   TETRARCH = 'Tetrarch',

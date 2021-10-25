@@ -7,7 +7,7 @@ import { InputAction } from 'components';
 
 const SayMessage = ({ handleSubmit }) => (
   <Form onSubmit={handleSubmit}>
-    <InputAction action="Say" label="Chat" name="message" />
+    <InputAction action="Send" label="Chat" name="message" />
   </Form>
 );
 
