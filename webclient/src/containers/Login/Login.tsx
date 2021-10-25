@@ -24,7 +24,6 @@ const Login = ({ state, description }: LoginProps) => {
 
   const createAccount = () => {
     console.log('Login.createAccount->ServerDispatch.openForgotPasswordDialog');
-    // ServerDispatch.openCreateAccountDialog();
   };
 
   return (

@@ -16,7 +16,6 @@ const LoginForm = (props) => {
 
   const forgotPassword = () => {
     console.log('LoginForm.forgotPassword->ServerDispatch.openForgotPasswordDialog');
-    // ServerDispatch.openForgotPasswordDialog();
   };
 
   return (
