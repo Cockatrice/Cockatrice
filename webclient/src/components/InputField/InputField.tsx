@@ -23,7 +23,7 @@ const InputField = ({ input, label, name, autoComplete, type, meta: { touched, e
     ) }
 
     <TextField
-      className="rounded tall"
+      className="rounded"
       variant="outlined"
       margin="dense"
       fullWidth={true}

@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { AuthenticationService } from "api";
 import { LoginForm } from "forms";
-import { RouteEnum, StatusEnum } from "types";
+import { RouteEnum } from "types";
 import { /* ServerDispatch, */ ServerSelectors } from "store";
 
 import "./Login.css";
@@ -23,7 +23,7 @@ const Login = ({ state, description }: LoginProps) => {
   }
 
   const createAccount = () => {
-    console.log('Login.createAccount->ServerDispatch.openForgotPasswordDialog');
+    console.log('Login.createAccount->openForgotPasswordDialog');
   };
 
   return (

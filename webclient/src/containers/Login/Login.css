@@ -20,6 +20,7 @@
 .login-content__header {
   font-family: Teko, sans-serif;
   font-size: 34px;
+  font-weight: bold;
   display: flex;
   align-items: center;
 }

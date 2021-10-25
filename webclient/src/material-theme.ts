@@ -1,6 +1,51 @@
 import { createMuiTheme } from '@material-ui/core';
 
+const palette = {
+  background: {
+    default: 'dimgrey',
+    paper: '#FFFFFF',
+  },
+  primary: {
+    main: '#7033DB',
+    light: 'rgba(112, 51, 219, .3)',
+    dark: '#401C7F',
+    contrastText: '#FFFFFF',
+  },
+  // secondary: {
+  //   main: '',
+  //   light: '',
+  //   dark: '',
+  //   contrastText: '',
+  // },
+  // error: {
+  //   main: '',
+  //   light: '',
+  //   dark: '',
+  //   contrastText: '',
+  // },
+  // warning: {
+  //   main: '',
+  //   light: '',
+  //   dark: '',
+  //   contrastText: '',
+  // },
+  // info: {
+  //   main: '',
+  //   light: '',
+  //   dark: '',
+  //   contrastText: '',
+  // },
+  success: {
+    main: '#6CDF39',
+    light: '#6CDF39',
+    // dark: '',
+    // contrastText: '',
+  },
+};
+
 export const materialTheme = createMuiTheme({
+  palette,
+
   overrides: {
   //   MuiCssBaseline: {
   //     '@global': {
@@ -21,6 +66,53 @@ export const materialTheme = createMuiTheme({
         },
       },
     },
+
+    MuiList: {
+      root: {
+        padding: '8px',
+
+        '&.MuiList-padding': {
+          paddingBottom: '4px',
+        },
+
+        '& .MuiButton-root': {
+          width: '100%',
+        },
+
+        '& > .MuiButtonBase-root': {
+          padding: '8px 16px',
+          marginBottom: '4px',
+          borderRadius: 0,
+          justifyContent: 'space-between',
+        },
+
+        '& .MuiButtonBase-root.Mui-selected, & .MuiButtonBase-root.Mui-selected:hover, & .MuiButtonBase-root:hover': {
+          background: palette.primary.light
+        },
+
+        [[
+          '& .MuiButtonBase-root.Mui-selected',
+          '& .MuiButtonBase-root.Mui-selected:hover',
+          '& .MuiButtonBase-root:hover'
+        ].join(', ')]: {
+          background: palette.primary.light
+        },
+      },
+    },
+
+    MuiListItem: {
+      root: {
+      },
+    },
+
+    MuiInputBase: {
+      formControl: {
+        '& .MuiSelect-root svg': {
+          display: 'none',
+        },
+      },
+    },
+
     MuiOutlinedInput: {
       root: {
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -32,52 +124,9 @@ export const materialTheme = createMuiTheme({
         },
 
         '.tall &': {
-          'height': '40px',
+          height: '40px',
         },
       },
-    },
-  },
-
-  palette: {
-    background: {
-      default: 'dimgrey',
-      paper: '#FFFFFF',
-    },
-    primary: {
-      main: '#7033DB',
-      light: 'rgba(112, 51, 219, .3)',
-      dark: '#401C7F',
-      contrastText: '#FFFFFF',
-    },
-    // secondary: {
-    //   main: '',
-    //   light: '',
-    //   dark: '',
-    //   contrastText: '',
-    // },
-    // error: {
-    //   main: '',
-    //   light: '',
-    //   dark: '',
-    //   contrastText: '',
-    // },
-    // warning: {
-    //   main: '',
-    //   light: '',
-    //   dark: '',
-    //   contrastText: '',
-    // },
-    // info: {
-    //   main: '',
-    //   light: '',
-    //   dark: '',
-    //   contrastText: '',
-    // },
-    success: {
-      main: '#6CDF39',
-      light: '#6CDF39',
-      // dark: '',
-      // contrastText: '',
     },
   },
 

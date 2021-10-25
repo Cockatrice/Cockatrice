@@ -1,22 +1,27 @@
 // eslint-disable-next-line
 import React from "react";
 import { connect } from "react-redux";
-import { Form, Field, reduxForm} from "redux-form"
+import { Form, Field, reduxForm, change } from "redux-form"
 
 import Button from "@material-ui/core/Button";
 
-import { InputField } from "components";
+import { InputField, KnownHosts } from "components";
 // import { ServerDispatch } from "store";
 import { FormKey } from 'types';
 
 import "./LoginForm.css";
 
 const LoginForm = (props) => {
-  const { handleSubmit } = props;
+  const { dispatch, handleSubmit } = props;
 
   const forgotPassword = () => {
-    console.log('LoginForm.forgotPassword->ServerDispatch.openForgotPasswordDialog');
+    console.log('LoginForm.forgotPassword->openForgotPasswordDialog');
   };
+
+  const onHostChange = ({ host, port }) => {
+    dispatch(change(FormKey.LOGIN, 'host', host));
+    dispatch(change(FormKey.LOGIN, 'port', port));
+  }
 
   return (
     <Form className="loginForm" onSubmit={handleSubmit}>
@@ -32,10 +37,7 @@ const LoginForm = (props) => {
           <Button color="primary" onClick={forgotPassword}>Forgot Password</Button>
         </div>
         <div className="loginForm-item">
-          <Field label="Host" name="host" component={InputField} />
-        </div>
-        <div className="loginForm-item">
-          <Field label="Port" name="port" component={InputField} />
+          <KnownHosts onChange={onHostChange} />
         </div>
       </div>
       <Button className="loginForm-submit rounded tall" color="primary" variant="contained" type="submit">
@@ -63,8 +65,8 @@ const mapStateToProps = () => ({
   initialValues: {
     // host: "mtg.tetrarch.co/servatrice",
     // port: "443"
-    host: "server.cockatrice.us",
-    port: "4748"
+    // host: "server.cockatrice.us",
+    // port: "4748"
   }
 });
 
