@@ -14,6 +14,7 @@ import { /* ServerDispatch, */ ServerSelectors } from "store";
 
 import "./Login.css";
 import logo from "images/logo.png";
+/*import loginGraphic from "images/login-graphic.png"*/
 
 const Login = ({ state, description }: LoginProps) => {
   const isConnected = AuthenticationService.isConnected(state);
@@ -61,9 +62,21 @@ const Login = ({ state, description }: LoginProps) => {
               </Typography>
             </div>
           </div>
-
           <ThemedLoginDescription className="login-content__description">
-            description
+            <div className="login-content__description-graphics">
+              <div className="topLeft login-content__description-square" />
+              <div className="topRight login-content__description-square" />
+              <div className="bottomRight login-content__description-square" />
+              <div className="bottomLeft login-content__description-square" />
+              <div className="topBar login-content__description-bar" />
+              <div className="bottomBar login-content__description-bar" />
+            </div>
+            <div className="login-content__description-wrapper">
+              { /*<img src={loginGraphic} className="login-content__description-image"/>*/}
+              <div className="login-content__description-placeholder"/>
+              <p className="login-content__description-subtitle1">Play multiplayer card games online.</p>
+              <p className="login-content__description-subtitle2">Cross-platform virtual tabletop for multiplayer card games. Forever free.</p>
+            </div>
           </ThemedLoginDescription>
         </ThemedLoginContent>
       </div>
