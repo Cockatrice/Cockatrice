@@ -7,28 +7,9 @@ export enum StatusEnum {
   DISCONNECTED,
   CONNECTING,
   CONNECTED,
-  LOGGINGIN,
-  LOGGEDIN,
-  REGISTERING,
-  REGISTERED,
-  ACTIVATING_ACCOUNT,
-  ACCOUNT_ACTIVATED,
-  RECOVERING_PASSWORD,
+  LOGGING_IN,
+  LOGGED_IN,
   DISCONNECTING =  99
-}
-
-export enum StatusEnumLabel {
-  "Disconnected",
-  "Connecting" ,
-  "Connected" ,
-  "Loggingin",
-  "Loggedin",
-  "Registering",
-  "Registered",
-  "ActivatingAccount",
-  "AccountActivated",
-  "RecoveringPassword",
-  "Disconnecting" = 99
 }
 
 export class Host {
@@ -82,14 +63,6 @@ export const KnownHosts = {
   [KnownHost.ROOSTER]: { port: 4748, host: 'server.cockatrice.us', },
   [KnownHost.TETRARCH]:  { port: 443, host: 'mtg.tetrarch.co/servatrice'},
 }
-
-export const getStatusEnumLabel = (statusEnum: number) => {
-  if (StatusEnumLabel[statusEnum] !== undefined) {
-    return StatusEnumLabel[statusEnum];
-  }
-
-  return "Unknown";
-};
 
 export interface Log {
   message: string;

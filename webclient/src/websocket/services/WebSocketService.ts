@@ -20,7 +20,9 @@ export enum WebSocketConnectReason {
   LOGIN,
   REGISTER,
   ACTIVATE_ACCOUNT,
-  RECOVER_PASSWORD,
+  PASSWORD_RESET_REQUEST,
+  PASSWORD_RESET_CHALLENGE,
+  PASSWORD_RESET
 }
 
 export class WebSocketService {

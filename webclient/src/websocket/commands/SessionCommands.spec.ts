@@ -51,7 +51,6 @@ describe('SessionCommands', () => {
       SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.REGISTERING, expect.any(String));
 
       expect(webClient.connect).toHaveBeenCalled();
       expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.REGISTER });
@@ -62,7 +61,6 @@ describe('SessionCommands', () => {
       SessionCommands.connect(options, WebSocketConnectReason.ACTIVATE_ACCOUNT);
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.ACTIVATING_ACCOUNT, expect.any(String));
 
       expect(webClient.connect).toHaveBeenCalled();
       expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.ACTIVATE_ACCOUNT });
@@ -138,7 +136,7 @@ describe('SessionCommands', () => {
 
         expect(SessionCommands.listUsers).toHaveBeenCalled();
         expect(SessionCommands.listRooms).toHaveBeenCalled();
-        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGEDIN, 'Logged in.');
+        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGED_IN, 'Logged in.');
       });
 
       it('RespClientUpdateRequired should update status', () => {

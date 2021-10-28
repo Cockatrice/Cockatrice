@@ -38,7 +38,7 @@ function addToList({ listName, userInfo}: AddToListData) {
 }
 
 function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
-  let message = '';
+  let message;
 
   // @TODO (5)
   if (reasonStr) {
@@ -116,26 +116,30 @@ function serverIdentification(info: ServerIdentificationData) {
   const { serverName, serverVersion, protocolVersion } = info;
 
   if (protocolVersion !== webClient.protocolVersion) {
-    SessionCommands.disconnect();
     SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
+    SessionCommands.disconnect();
     return;
   }
 
   switch (webClient.options.reason) {
     case WebSocketConnectReason.LOGIN:
-      SessionCommands.updateStatus(StatusEnum.LOGGINGIN, 'Logging in...');
+      SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
       SessionCommands.login();
       break;
     case WebSocketConnectReason.REGISTER:
-      SessionCommands.updateStatus(StatusEnum.REGISTERING, 'Registering...');
       SessionCommands.register();
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-      SessionCommands.updateStatus(StatusEnum.ACTIVATING_ACCOUNT, 'Activating account...');
       SessionCommands.activateAccount();
       break;
-    case WebSocketConnectReason.RECOVER_PASSWORD:
-      console.log('ServerIdentificationData.recoverPassword');
+    case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
+      SessionCommands.resetPasswordRequest();
+      break;
+    case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
+      SessionCommands.resetPasswordChallenge();
+      break;
+    case WebSocketConnectReason.PASSWORD_RESET:
+      SessionCommands.resetPassword();
       break;
     default:
       console.error("Undefined type", webClient.options.reason);
