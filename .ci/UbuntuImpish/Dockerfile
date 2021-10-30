@@ -1,4 +1,4 @@
-FROM ubuntu:groovy
+FROM ubuntu:hirsute
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -17,7 +17,6 @@ RUN apt-get update && \
         libqt5svg5-dev \
         libqt5websockets5-dev \
         protobuf-compiler \
-        qt5-default \
         qtmultimedia5-dev \
         qttools5-dev \
         qttools5-dev-tools \
