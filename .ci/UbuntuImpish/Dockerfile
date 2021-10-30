@@ -9,6 +9,7 @@ RUN apt-get update && \
         file \
         g++ \
         git \
+        googletest \
         liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
