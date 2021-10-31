@@ -29,7 +29,7 @@ if(NOT GTEST_FOUND)
     # Add the gtest include directory, since gtest
     # doesn't add that dependency to its gtest target
     target_include_directories(gtest INTERFACE
-            "${CMAKE_BINARY_DIR}/gtest-src/include" )
+            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/gtest-src/include>" )
 
     SET(GTEST_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/gtest-src/include")
     SET(GTEST_BOTH_LIBRARIES gtest)

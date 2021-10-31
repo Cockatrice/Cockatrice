@@ -82,10 +82,10 @@ jobs:
       matrix:
         # these names correspond to the files in .ci/$distro
         include:
-          - distro: UbuntuHirsute
+          - distro: UbuntuImpish
             package: DEB
 
-          - distro: UbuntuGroovy
+          - distro: UbuntuHirsute
             package: DEB
             test: skip
 
