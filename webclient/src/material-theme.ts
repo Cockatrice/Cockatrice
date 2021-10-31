@@ -2,7 +2,7 @@ import { createMuiTheme } from '@material-ui/core';
 
 const palette = {
   background: {
-    default: 'dimgrey',
+    default: 'rgb(35, 35, 35)',
     paper: '#FFFFFF',
   },
   primary: {
@@ -86,15 +86,15 @@ export const materialTheme = createMuiTheme({
           justifyContent: 'space-between',
         },
 
-        '& .MuiButtonBase-root.Mui-selected, & .MuiButtonBase-root.Mui-selected:hover, & .MuiButtonBase-root:hover': {
-          background: palette.primary.light
+        '& .MuiButtonBase-root.Mui-selected': {
+          background: 'none',
+          fontWeight: 'bold',
         },
 
-        [[
-          '& .MuiButtonBase-root.Mui-selected',
-          '& .MuiButtonBase-root.Mui-selected:hover',
-          '& .MuiButtonBase-root:hover'
-        ].join(', ')]: {
+        [
+          '& .MuiButtonBase-root:hover,' +
+          '& .MuiButtonBase-root.Mui-selected:hover'
+        ]: {
           background: palette.primary.light
         },
       },
@@ -132,6 +132,7 @@ export const materialTheme = createMuiTheme({
 
   typography: {
     fontSize: 12,
+    fontFamily: 'Open Sans, sans-serif',
 
     h1: {
       fontSize: 28,

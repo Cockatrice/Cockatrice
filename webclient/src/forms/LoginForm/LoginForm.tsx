@@ -27,13 +27,13 @@ const LoginForm = (props) => {
     <Form className="loginForm" onSubmit={handleSubmit}>
       <div className="loginForm-items">
         <div className="loginForm-item">
-          <Field label="User" name="user" component={InputField} autoComplete="username" />
+          <Field label="Username" name="user" component={InputField} autoComplete="username" />
         </div>
         <div className="loginForm-item">
-          <Field label="Pass" name="pass" type="password" component={InputField} autoComplete="current-password" />
+          <Field label="Password" name="pass" type="password" component={InputField} autoComplete="current-password" />
         </div>
         <div className="loginForm-actions">
-          <span>Auto Connect</span>
+          <span>Remember Me</span>
           <Button color="primary" onClick={forgotPassword}>Forgot Password</Button>
         </div>
         <div className="loginForm-item">

@@ -6,6 +6,8 @@ import Hidden from "@material-ui/core/Hidden";
 
 import "./ThreePaneLayout.css";
 
+// @DEPRECATED
+// This component sucks balls, dont use it. It will be removed sooner than later.
 class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
   render() {
     return (

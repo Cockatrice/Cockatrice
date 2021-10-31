@@ -11,32 +11,28 @@
 
 .login-content {
   width: 100%;
-  max-width: 1000px;
+  max-width: 500px;
   display: flex;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .login-content__header {
-  font-family: Teko, sans-serif;
+  font-family: 'Teko', sans-serif;
   font-size: 34px;
   font-weight: bold;
   display: flex;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .login-content__header img {
   height: 60px;
   margin-right: 15px;
-  margin-bottom: 20px;
-}
-
-.login-content__form,
-.login-content__description {
-  width: 50%;
 }
 
 .login-content__form {
+  width: 100%;
   padding: 50px 50px 33px;
 }
 
@@ -49,8 +45,8 @@
 }
 
 .login-content__description {
+  display: none;
   position: relative;
-  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -67,14 +63,54 @@
   align-items: center;
 }
 
-.login-content__description-image {
-  width: 100%; 
-}
-.login-content__description-placeholder {
+.login-content__description-cards {
   width: 100%;
-  height: 207px;
-  border: 1px solid;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
 }
+
+.login-content__description-cards__card {
+  position: relative;
+  width: 34%;
+  padding-bottom: 46%;
+  border-radius: 8px;
+  box-shadow: 0 5px 10px 2px rgba(0,0,0,0.20);
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.login-content__description-cards__card-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.login-content__description-cards__card img {
+  width: 70%;
+  border-radius: 50%;
+  margin: 21% 0 9%;
+}
+
+.login-content__description-cards__card.leftCard {
+  transform: rotate(-12deg);
+}
+
+.login-content__description-cards__card.rightCard {
+  transform: rotate(12deg);
+}
+
+.login-content__description-cards__card.topCard {
+  width: 44%;
+  padding-bottom: 59%;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .login-content__description-subtitle1 {
   margin: 40px 0 20px;
   font-size: 28px;
@@ -91,8 +127,7 @@
 }
 .login-content__description-bar {
   position: absolute;
-  opacity: .2;
-  background-color: #401C7F;
+  opacity: .1;
   border-radius: 8px;
 }
 
@@ -159,4 +194,5 @@
   text-align: center;
   margin: 20px 0;
   padding: 20px;
+  font-weight: bold;
 }
