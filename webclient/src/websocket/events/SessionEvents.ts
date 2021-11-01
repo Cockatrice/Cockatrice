@@ -142,7 +142,8 @@ function serverIdentification(info: ServerIdentificationData) {
       SessionCommands.resetPassword();
       break;
     default:
-      console.error("Undefined type", webClient.options.reason);
+      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Unknown Connection Reason: " + webClient.options.reason);
+      SessionCommands.disconnect();
       break;
   }
 

@@ -25,8 +25,8 @@ export class SessionCommands {
         SessionCommands.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
         break;
       default:
-        console.error('Connection Failed', reason);
-        break;
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Attempt: ' + reason);
+        return;
     }
 
     webClient.connect({ ...options, reason });
@@ -206,7 +206,6 @@ export class SessionCommands {
           SessionPersistence.accountActivationFailed();
         }
     });
-
   }
 
   static resetPasswordRequest(): void {
