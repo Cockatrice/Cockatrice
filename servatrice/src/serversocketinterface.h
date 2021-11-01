@@ -137,7 +137,7 @@ public:
                                   Servatrice_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
     ~AbstractServerSocketInterface(){};
-    bool initSession();
+    bool initSession(const QString &passwordSalt);
 
     virtual QHostAddress getPeerAddress() const = 0;
     virtual QString getAddress() const = 0;
@@ -198,7 +198,7 @@ class WebsocketServerSocketInterface : public AbstractServerSocketInterface
 public:
     WebsocketServerSocketInterface(Servatrice *_server,
                                    Servatrice_DatabaseInterface *_databaseInterface,
-                                   QObject *parent = 0);
+                                   QObject *parent = nullptr);
     ~WebsocketServerSocketInterface();
 
     QHostAddress getPeerAddress() const
@@ -217,6 +217,7 @@ public:
 private:
     QWebSocket *socket;
     QHostAddress address;
+    QString passwordSalt;
 
 protected:
     void writeToSocket(QByteArray &data)
