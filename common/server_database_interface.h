@@ -35,6 +35,10 @@ public:
     {
         return false;
     }
+    virtual QString getUserSalt(const QString & /* user */)
+    {
+        return {};
+    }
     virtual QMap<QString, ServerInfo_User> getBuddyList(const QString & /* name */)
     {
         return QMap<QString, ServerInfo_User>();

@@ -20,6 +20,7 @@
 #include <QList>
 #include <QThread>
 #include <QTimer>
+#include <QUrlQuery>
 #include <QWebSocket>
 
 static const unsigned int protocolVersion = 14;
@@ -362,11 +363,22 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     }
 }
 
-void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
+void RemoteClient::connectToHost(const QString &hostname, unsigned int port, const QString &username)
 {
     usingWebSocket = port == 443 || port == 80 || port == 4748 || port == 8080;
     if (usingWebSocket) {
-        QUrl url(QString("%1://%2:%3/servatrice").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
+        const QString connectionString = "%1://%2:%3/servatrice";
+        const QString connectionProtocol = port == 443 ? "wss" : "ws";
+        const QString connectionUrl = connectionString.arg(connectionProtocol).arg(hostname).arg(port);
+
+        QUrl url(connectionUrl);
+        if (!username.isEmpty()) {
+            QUrlQuery urlQuery;
+            urlQuery.addQueryItem("username", username);
+
+            url.setQuery(urlQuery);
+        }
+
         websocket->open(url);
     } else {
         socket->connectToHost(hostname, static_cast<quint16>(port));
@@ -385,7 +397,7 @@ void RemoteClient::doConnectToServer(const QString &hostname,
     lastHostname = hostname;
     lastPort = port;
 
-    connectToHost(hostname, port);
+    connectToHost(hostname, port, userName);
     setStatus(StatusConnecting);
 }
 

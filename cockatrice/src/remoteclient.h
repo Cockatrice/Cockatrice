@@ -102,7 +102,7 @@ private:
     QString getSrvClientID(const QString &_hostname);
     bool newMissingFeatureFound(const QString &_serversMissingFeatures);
     void clearNewClientFeatures();
-    void connectToHost(const QString &hostname, unsigned int port);
+    void connectToHost(const QString &hostname, unsigned int port, const QString &username = "");
 
 protected slots:
     void sendCommandContainer(const CommandContainer &cont) override;

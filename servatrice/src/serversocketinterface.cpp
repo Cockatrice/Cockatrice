@@ -72,6 +72,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
+#include <QUrlQuery>
 #include <iostream>
 #include <string>
 
@@ -89,12 +90,15 @@ AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server
     connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
 }
 
-bool AbstractServerSocketInterface::initSession()
+bool AbstractServerSocketInterface::initSession(const QString &passwordSalt)
 {
     Event_ServerIdentification identEvent;
     identEvent.set_server_name(servatrice->getServerName().toStdString());
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
+    if (!passwordSalt.isEmpty()) {
+        identEvent.set_password_salt(passwordSalt.toStdString());
+    }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
@@ -1734,7 +1738,7 @@ void TcpServerSocketInterface::readClient()
 
 bool TcpServerSocketInterface::initTcpSession()
 {
-    if (!initSession())
+    if (!initSession({}))
         return false;
 
     // limit the number of websocket users based on configuration settings
@@ -1761,7 +1765,7 @@ bool TcpServerSocketInterface::initTcpSession()
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
                                                                Servatrice_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
-    : AbstractServerSocketInterface(_server, _databaseInterface, parent)
+    : AbstractServerSocketInterface(_server, _databaseInterface, parent), passwordSalt("")
 {
 }
 
@@ -1785,6 +1789,16 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 #endif
 
     address = socket->peerAddress();
+
+    const QUrl url = socket->requestUrl();
+    if (url.hasQuery()) {
+        const QUrlQuery urlQuery(url.query());
+
+        if (urlQuery.hasQueryItem("username")) {
+            const auto username = urlQuery.queryItemValue("username");
+            passwordSalt = servatrice->getDatabaseInterface()->getUserSalt(username);
+        }
+    }
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0) {
@@ -1820,7 +1834,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
 bool WebsocketServerSocketInterface::initWebsocketSession()
 {
-    if (!initSession())
+    if (!initSession(passwordSalt))
         return false;
 
     // limit the number of websocket users based on configuration settings
