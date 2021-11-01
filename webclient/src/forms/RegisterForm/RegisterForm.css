@@ -1,14 +1,21 @@
 .registerForm {
   width: 100%;
-  padding: 20px;
 }
 
-.registerForm-item {
-  display: flex;
-  flex-direction: column;
+.registerForm-submit {
+    width: 100%;
+    /*padding is off, something in material-theme is causing it*/
 }
 
-.registerForm-submit.MuiButton-root {
-  display: block;
-  margin: 20px auto 0;
+.row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.column {
+    width: 48%;
+    flex: 0 1 auto;
+    align-self: auto;
 }
