@@ -3,4 +3,4 @@
 # Except gitignore
 !.gitignore
 
-!_Countries.tsx
+!_Countries.ts

@@ -2,21 +2,58 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { styled } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
 import { AuthenticationService } from "api";
 import { LoginForm } from "forms";
+import { Images } from "images";
 import { RouteEnum } from "types";
 import { /* ServerDispatch, */ ServerSelectors } from "store";
 
 import "./Login.css";
-import logo from "images/logo.png";
-/*import loginGraphic from "images/login-graphic.png"*/
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    '& .login-content__header': {
+      color: theme.palette.success.light
+    },
+
+    '& .login-content__description': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.primary.contrastText,
+    },
+
+    '& .login-content__description-bar': {
+      backgroundColor: theme.palette.primary.dark,
+    },
+
+    '& .login-content__description-cards__card': {
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.primary.main,
+    },
+
+    [theme.breakpoints.up('lg')]: {
+      '& .login-content': {
+        maxWidth: '1000px',
+      },
+
+      '& .login-content__form': {
+        width: '50%',
+      },
+
+      '& .login-content__description': {
+        width: '50%',
+        display: 'flex',
+      },
+    },
+  },
+}));
 
 const Login = ({ state, description }: LoginProps) => {
+  const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
   const showDescription = () => {
@@ -28,16 +65,16 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   return (
-    <div className="login overflow-scroll">
+    <div className={'login overflow-scroll ' + classes.root}>
       { isConnected && <Redirect from="*" to={RouteEnum.SERVER} />}
 
       <div className="login__wrapper">
-        <ThemedLoginContent className="login-content">
+        <Paper className="login-content">
           <div className="login-content__form">
-            <ThemedLoginHeader className="login-content__header">
-              <img src={logo} alt="logo" />
+            <div className="login-content__header">
+              <img src={Images.Logo} alt="logo" />
               <span>COCKATRICE</span>
-            </ThemedLoginHeader>
+            </div>
             <Typography variant="h1">Login</Typography>
             <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
             <div className="login-form">
@@ -58,11 +95,11 @@ const Login = ({ state, description }: LoginProps) => {
                 <Button color="primary" onClick={createAccount}>Create an account</Button>
               </div>
               <Typography variant="subtitle2" className="login-footer__copyright">
-                Cockatrice is an open source project @{ new Date().getUTCFullYear() }
+                Cockatrice is an open source project. { new Date().getUTCFullYear() }
               </Typography>
             </div>
           </div>
-          <ThemedLoginDescription className="login-content__description">
+          <div className="login-content__description">
             <div className="login-content__description-graphics">
               <div className="topLeft login-content__description-square" />
               <div className="topRight login-content__description-square" />
@@ -72,30 +109,36 @@ const Login = ({ state, description }: LoginProps) => {
               <div className="bottomBar login-content__description-bar" />
             </div>
             <div className="login-content__description-wrapper">
+              <div className="login-content__description-cards">
+                <div className="login-content__description-cards__card leftCard">
+                  <div className="login-content__description-cards__card-wrapper">
+                    <img src={Images.Faces.face1} alt='Stock Player' />
+                    <span>1mrlee</span>
+                  </div>
+                </div>
+                <div className="login-content__description-cards__card rightCard">
+                  <div className="login-content__description-cards__card-wrapper">
+                    <img src={Images.Faces.face2} alt='Stock Player' />
+                    <span>CyberX</span>
+                  </div>
+                </div>
+                <div className="login-content__description-cards__card topCard">
+                  <div className="login-content__description-cards__card-wrapper">
+                    <img src={Images.Faces.face3} alt='Stock Player' />
+                    <span>Gamer69</span>
+                  </div>
+                </div>
+              </div>
               { /*<img src={loginGraphic} className="login-content__description-image"/>*/}
-              <div className="login-content__description-placeholder"/>
               <p className="login-content__description-subtitle1">Play multiplayer card games online.</p>
               <p className="login-content__description-subtitle2">Cross-platform virtual tabletop for multiplayer card games. Forever free.</p>
             </div>
-          </ThemedLoginDescription>
-        </ThemedLoginContent>
+          </div>
+        </Paper>
       </div>
     </div>
   );
 }
-
-const ThemedLoginContent = styled('div')(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper
-}));
-
-const ThemedLoginDescription = styled('div')(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-}));
-
-const ThemedLoginHeader = styled('div')(({ theme }) => ({
-  color: theme.palette.success.light
-}));
 
 interface LoginProps {
   state: number;

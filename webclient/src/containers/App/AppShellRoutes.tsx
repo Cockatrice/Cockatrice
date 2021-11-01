@@ -24,7 +24,8 @@ const Routes = () => (
       {<Route path={RouteEnum.ROOM} render={() => <Room />} />}
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
       <Route path={RouteEnum.LOGIN} render={() => <Login />} />
-      <Redirect from="/" to={RouteEnum.LOGIN} />
+
+      <Redirect from="*" to={RouteEnum.LOGIN} />
     </Switch>
   </div>
 );

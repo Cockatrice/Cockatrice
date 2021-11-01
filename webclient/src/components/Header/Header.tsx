@@ -13,11 +13,11 @@ import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from "lodash";
 
 import { AuthenticationService, RoomsService } from "api";
+import { Images } from 'images';
 import {  RoomsSelectors, ServerSelectors } from "store";
 import { Room, RouteEnum, User } from "types";
 
 import "./Header.css";
-import logo from "./logo.png";
 
 import CardImportDialog from '../CardImportDialog/CardImportDialog';
 
@@ -100,7 +100,7 @@ class Header extends Component<HeaderProps> {
         <Toolbar variant="dense">
           <div className="Header__logo">
             <NavLink to={RouteEnum.SERVER}>
-              <img src={logo} alt="logo" />
+              <img src={Images.Logo} alt="logo" />
             </NavLink>
             { AuthenticationService.isConnected(state) && (
               <span className="Header-server__indicator"></span>

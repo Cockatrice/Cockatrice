@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
+import Check from '@material-ui/icons/Check';
 import EditRoundedIcon from '@material-ui/icons/Edit';
 
 import { HostDTO } from 'services';
@@ -64,10 +65,16 @@ const KnownHosts = ({ onChange }) => {
         {
           state.hosts.map((host, index) => (
             <MenuItem className='KnownHosts-item' value={index} key={index}>
-              <span>{host.name} ({ getHostPort(state.hosts[index]).host }:{getHostPort(state.hosts[index]).port})</span>
-              <IconButton size='small' color='primary' disabled={!host.editable} onClick={() => editKnownHost(index)}>
-                <EditRoundedIcon fontSize='small' />
-              </IconButton>
+              <div className='KnownHosts-item__label'>
+                <Check />
+                <span>{host.name} ({ getHostPort(state.hosts[index]).host }:{getHostPort(state.hosts[index]).port})</span>
+              </div>
+
+              { host.editable && (
+                <IconButton size='small' color='primary' onClick={() => editKnownHost(index)}>
+                  <EditRoundedIcon fontSize='small' />
+                </IconButton>
+              ) }
             </MenuItem>
           ))
         }

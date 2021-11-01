@@ -8,7 +8,7 @@ import Paper from "@material-ui/core/Paper";
 
 import { RoomsSelectors, ServerSelectors } from "store";
 
-import { ThreePaneLayout, UserDisplay, VirtualList } from "components";
+import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from "components";
 import { Room, User } from "types";
 import Rooms from './Rooms';
 
@@ -20,6 +20,8 @@ class Server extends Component<ServerProps, ServerState> {
 
     return (
       <div className="server-rooms">
+        <AuthGuard />
+
         <ThreePaneLayout
           top={(
             <Paper className="serverRoomWrapper overflow-scroll">
