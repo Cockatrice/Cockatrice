@@ -18,6 +18,20 @@ export interface ServerRegisterParams {
   realName: string;
 }
 
+export interface ForgotPasswordParams {
+  user: string;
+  clientid: string;
+}
+
+export interface ForgotPasswordChallengeParams extends ForgotPasswordParams {
+  email: string;
+}
+
+export interface ForgotPasswordResetParams extends ForgotPasswordParams {
+  token: string;
+  newPassword: string;
+}
+
 export interface AccountActivationParams extends ServerRegisterParams {
   activationCode: string;
   clientid: string;

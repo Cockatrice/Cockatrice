@@ -300,7 +300,7 @@ describe('SessionEvents', () => {
       event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGINGIN, expect.any(String));
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGING_IN, expect.any(String));
       expect(SessionCommands.login).toHaveBeenCalled();
     });
 
@@ -312,7 +312,6 @@ describe('SessionEvents', () => {
       event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.REGISTERING, expect.any(String));
       expect(SessionCommands.register).toHaveBeenCalled();
     });
 
@@ -324,7 +323,6 @@ describe('SessionEvents', () => {
       event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.ACTIVATING_ACCOUNT, expect.any(String));
       expect(SessionCommands.activateAccount).toHaveBeenCalled();
     });
 

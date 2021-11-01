@@ -80,4 +80,21 @@ export class SessionPersistence {
   static accountActivationFailed() {
     console.log("Account activation failed, show an action here");
   }
+
+  static resetPasswordChallenge() {
+    console.log("Open Modal asking for Email address associated with account");
+  }
+
+  static resetPassword() {
+    console.log("Open Modal asking for reset token & new password");
+
+  }
+
+  static resetPasswordSuccess() {
+    console.log("User password successfully changed Alert!");
+  }
+
+  static resetPasswordFailed() {
+    console.log("Open Alert telling user their password request failed for some reason");
+  }
 }

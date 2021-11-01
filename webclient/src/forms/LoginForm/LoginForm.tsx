@@ -15,7 +15,7 @@ const LoginForm = (props) => {
   const { dispatch, handleSubmit } = props;
 
   const forgotPassword = () => {
-    console.log('LoginForm.forgotPassword->openForgotPasswordDialog');
+    console.log("Show recover password dialog, then AuthService.forgotPasswordRequest");
   };
 
   const onHostChange = ({ host, port }) => {
