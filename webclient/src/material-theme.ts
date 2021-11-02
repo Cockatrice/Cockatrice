@@ -67,6 +67,23 @@ export const materialTheme = createTheme({
       },
     },
 
+    MuiCheckbox: {
+      root: {
+        '& .MuiSvgIcon-root': {
+          width: '.75em',
+          height: '.75em',
+        },
+      },
+    },
+
+    MuiFormControlLabel: {
+      label: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: palette.primary.main,
+      },
+    },
+
     MuiList: {
       root: {
         padding: '8px',

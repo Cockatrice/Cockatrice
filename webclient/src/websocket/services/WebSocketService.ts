@@ -1,29 +1,9 @@
 import { Subject } from 'rxjs';
 
-import { ServerStatus, StatusEnum } from 'types';
+import { ServerStatus, StatusEnum, WebSocketOptions } from "types";
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
-
-export interface WebSocketOptions {
-  host: string;
-  port: string;
-  user: string;
-  pass: string;
-  autojoinrooms: boolean;
-  keepalive: number;
-  clientid: string;
-  reason: WebSocketConnectReason;
-}
-
-export enum WebSocketConnectReason {
-  LOGIN,
-  REGISTER,
-  ACTIVATE_ACCOUNT,
-  PASSWORD_RESET_REQUEST,
-  PASSWORD_RESET_CHALLENGE,
-  PASSWORD_RESET
-}
 
 export class WebSocketService {
   private socket: WebSocket;

@@ -7,11 +7,12 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-import { AuthenticationService } from 'api';
-import { LoginForm } from 'forms';
-import { Images } from 'images';
-import { RouteEnum } from 'types';
-import { ServerSelectors } from 'store';
+import { AuthenticationService } from "api";
+import { LoginForm } from "forms";
+import { Images } from "images";
+import { HostDTO, SettingDTO } from 'services';
+import { RouteEnum, WebSocketOptions, getHostPort, APP_USER } from "types";
+import { ServerSelectors } from "store";
 
 import './Login.css';
 
@@ -56,13 +57,47 @@ const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
-  const showDescription = () => {
+  function showDescription() {
     return !isConnected && description?.length;
   };
 
-  const createAccount = () => {
+  function createAccount() {
     console.log('Login.createAccount->openForgotPasswordDialog');
-  };
+  }
+
+  function onSubmit(hostForm) {
+    const { user, pass, selectedHost } = hostForm;
+    const { host, port } = getHostPort(selectedHost);
+    const options = { user, pass, host, port };
+
+    updateAutoConnectSetting(hostForm);
+    updateHost(hostForm);
+
+    AuthenticationService.login(options as WebSocketOptions);
+  }
+
+  function updateAutoConnectSetting({ autoConnect }) {
+    SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
+      setting.autoConnect = autoConnect;
+      setting.save();
+    });
+  }
+
+  function updateHost({ selectedHost, user, pass, remember}) {
+    HostDTO.get(selectedHost.id).then(_host => {
+      if (remember) {
+        _host.user = user;
+        _host.pass = pass;
+      } else {
+        delete _host.user;
+        delete _host.pass;
+      }
+
+      _host.remember = remember;
+
+      _host.save();
+    });
+  }
 
   return (
     <div className={'login overflow-scroll ' + classes.root}>
@@ -78,7 +113,7 @@ const Login = ({ state, description }: LoginProps) => {
             <Typography variant="h1">Login</Typography>
             <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
             <div className="login-form">
-              <LoginForm onSubmit={AuthenticationService.connect} />
+              <LoginForm onSubmit={onSubmit} />
             </div>
 
             {

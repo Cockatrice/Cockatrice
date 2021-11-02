@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm, change } from 'redux-form'
+import { Form, Field, reduxForm } from 'redux-form'
 
 import Button from '@material-ui/core/Button';
 
@@ -13,15 +13,11 @@ import './RegisterForm.css';
 const RegisterForm = (props) => {
   const { dispatch, handleSubmit } = props;
 
-  const onHostChange = ({ host, port }) => {
-    dispatch(change(FormKey.REGISTER, 'host', host));
-    dispatch(change(FormKey.REGISTER, 'port', port));
-  }
   return (
     <Form className="registerForm row" onSubmit={handleSubmit} autoComplete="off">
       <div className="leftRegisterForm column" >
         <div className="registerForm-item">
-          <KnownHosts onChange={onHostChange} />
+          <Field name="selectedHost" component={KnownHosts} />
           { /* Padding is off */ }
         </div>
         <div className="registerForm-item">

@@ -1,9 +1,8 @@
-import { StatusEnum } from 'types';
+import {StatusEnum, WebSocketConnectReason, WebSocketOptions} from 'types';
 
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
 import { guid, hashPassword } from '../utils';
-import { WebSocketConnectReason, WebSocketOptions } from '../services/WebSocketService';
 import {
   AccountActivationParams,
   ForgotPasswordChallengeParams,

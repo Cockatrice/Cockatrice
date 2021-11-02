@@ -1,7 +1,7 @@
-import { ServerStatus, StatusEnum } from 'types';
+import {ServerStatus, StatusEnum, WebSocketOptions} from "types";
 
-import { ProtobufService } from './services/ProtobufService';
-import { WebSocketOptions, WebSocketService } from './services/WebSocketService';
+import {ProtobufService} from './services/ProtobufService';
+import {WebSocketService} from "./services/WebSocketService";
 
 import { RoomPersistence, SessionPersistence } from './persistence';
 

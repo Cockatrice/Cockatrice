@@ -16,7 +16,4 @@ export { default as RegistrationDialog } from './RegistrationDialog/Registration
 
 // Guards
 export { default as AuthGuard } from './Guard/AuthGuard';
-export { default as ModGuard } from './Guard/ModGuard';
-
-// Dialogs
-export { default as CardImportDialog } from './CardImportDialog/CardImportDialog';
+export { default as ModGuard} from './Guard/ModGuard';

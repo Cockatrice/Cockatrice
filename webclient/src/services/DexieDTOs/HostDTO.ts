@@ -8,19 +8,19 @@ export class HostDTO extends Host {
     return dexieService.hosts.put(this);
   }
 
-  static add(host: HostDTO): Promise<IndexableType> {
+  static async add(host: HostDTO): Promise<IndexableType> {
     return dexieService.hosts.add(host);
   }
 
-  static get(id): Promise<HostDTO> {
+  static async get(id: number): Promise<HostDTO> {
     return dexieService.hosts.where('id').equals(id).first();
   }
 
-  static getAll(): Promise<HostDTO[]> {
+  static async getAll(): Promise<HostDTO[]> {
     return dexieService.hosts.toArray();
   }
 
-  static bulkAdd(hosts: Host[]): Promise<IndexableType> {
+  static async bulkAdd(hosts: Host[]): Promise<IndexableType> {
     return dexieService.hosts.bulkAdd(hosts);
   }
 };
