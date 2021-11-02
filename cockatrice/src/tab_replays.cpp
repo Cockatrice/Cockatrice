@@ -197,7 +197,7 @@ void TabReplays::actDownload()
 
     if (!curRight) {
         QMessageBox::information(this, tr("Downloading Replays"),
-                                 tr("You cannot download replay folders at this time"));
+                                 tr("Folder download is not yet supported. Please download replays individually."));
         return;
     }
 
