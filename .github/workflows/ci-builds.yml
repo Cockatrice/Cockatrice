@@ -105,7 +105,6 @@ jobs:
 
           - distro: Fedora35
             package: RPM
-            allow-failure: yes
 
           - distro: Fedora34
             package: RPM
