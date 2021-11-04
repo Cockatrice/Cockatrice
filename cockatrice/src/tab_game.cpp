@@ -1420,6 +1420,9 @@ void TabGame::setActiveCard(CardItem *card)
 
 void TabGame::updateCardMenu(AbstractCardItem *card)
 {
+    if (card == nullptr) {
+        return;
+    }
     Player *player;
     if ((clients.size() > 1) || !players.contains(localPlayerId)) {
         player = card->getOwner();
