@@ -6,8 +6,10 @@ add_subdirectory(pb)
 
 SET(common_SOURCES
     decklist.cpp
+    expression.cpp
     featureset.cpp
     get_pb_extension.cpp
+    passwordhasher.cpp
     rng_abstract.cpp
     rng_sfmt.cpp
     server.cpp
@@ -17,8 +19,8 @@ SET(common_SOURCES
     server_card.cpp
     server_cardzone.cpp
     server_counter.cpp
-    server_game.cpp
     server_database_interface.cpp
+    server_game.cpp
     server_player.cpp
     server_protocolhandler.cpp
     server_remoteuserinterface.cpp
@@ -26,7 +28,6 @@ SET(common_SOURCES
     server_room.cpp
     serverinfo_user_container.cpp
     sfmt/SFMT.c
-    expression.cpp
 )
 
 set(ORACLE_LIBS)
