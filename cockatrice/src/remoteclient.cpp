@@ -176,7 +176,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+    if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
         // TODO store and log in using stored hashed password
         doRequestPasswordSalt(); // log in using password salt
     } else {
@@ -243,9 +243,18 @@ void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /
 
 void RemoteClient::passwordSaltResponse(const Response &response)
 {
-    const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
-    QString salt = QString::fromStdString(resp.password_salt());
-    doLogin(salt);
+    if (response.response_code() == Response::RespOk) {
+        const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
+        QString salt = QString::fromStdString(resp.password_salt());
+        if (salt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
+            password = "";    // the password will not be used
+            doLogin();
+        } else {
+            doLogin(salt);
+        }
+    } else if (response.response_code() != Response::RespNotConnected) {
+        emit loginError(response.response_code(), {}, 0, {});
+    }
 }
 
 void RemoteClient::loginResponse(const Response &response)
