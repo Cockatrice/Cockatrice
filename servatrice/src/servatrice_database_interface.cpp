@@ -1,11 +1,11 @@
 #include "servatrice_database_interface.h"
 
 #include "decklist.h"
+#include "passwordhasher.h"
 #include "pb/game_replay.pb.h"
 #include "servatrice.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
-#include "src/passwordhasher.h"
 
 #include <QChar>
 #include <QDateTime>

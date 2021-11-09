@@ -115,6 +115,7 @@ SET(PROTO_FILES
     moderator_commands.proto
     move_card_to_zone.proto
     response_activate.proto
+    response_adjust_mod.proto
     response_ban_history.proto
     response_deck_download.proto
     response_deck_list.proto
@@ -126,13 +127,13 @@ SET(PROTO_FILES
     response_join_room.proto
     response_list_users.proto
     response_login.proto
+    response_password_salt.proto
     response_register.proto
     response_replay_download.proto
     response_replay_list.proto
-    response_adjust_mod.proto
+    response_viewlog_history.proto
     response_warn_history.proto
     response_warn_list.proto
-    response_viewlog_history.proto
     response.proto
     room_commands.proto
     room_event.proto

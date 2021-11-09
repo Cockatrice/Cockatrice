@@ -18,13 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "passwordhasher.h"
 #include "rng_sfmt.h"
 #include "servatrice.h"
 #include "server_logger.h"
 #include "settingscache.h"
 #include "signalhandler.h"
 #include "smtpclient.h"
-#include "src/passwordhasher.h"
 #include "version_string.h"
 
 #include <QCommandLineParser>

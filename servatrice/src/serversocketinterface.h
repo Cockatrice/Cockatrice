@@ -116,6 +116,7 @@ private:
     Response::ResponseCode cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                       ResponseContainer &rc);
+    Response::ResponseCode cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc);
     Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
     Response::ResponseCode
     processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
@@ -137,7 +138,7 @@ public:
                                   Servatrice_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
     ~AbstractServerSocketInterface(){};
-    bool initSession(const QString &passwordSalt);
+    bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;
     virtual QString getAddress() const = 0;

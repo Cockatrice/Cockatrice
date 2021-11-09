@@ -440,7 +440,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cm
 
 Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, ResponseContainer &rc)
 {
-
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();

@@ -45,6 +45,7 @@
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_upload.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"
+#include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/response_replay_list.pb.h"
@@ -72,7 +73,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
-#include <QUrlQuery>
 #include <iostream>
 #include <string>
 
@@ -90,15 +90,12 @@ AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server
     connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
 }
 
-bool AbstractServerSocketInterface::initSession(const QString &passwordSalt)
+bool AbstractServerSocketInterface::initSession()
 {
     Event_ServerIdentification identEvent;
     identEvent.set_server_name(servatrice->getServerName().toStdString());
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
-    if (!passwordSalt.isEmpty()) {
-        identEvent.set_password_salt(passwordSalt.toStdString());
-    }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
@@ -197,6 +194,9 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
+        case SessionCommand::REQUEST_PASSWORD_SALT:
+            return cmdRequestPasswordSalt(cmd.GetExtension(Command_RequestPasswordSalt::ext), rc);
+            break;
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1484,6 +1484,19 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     return continuePasswordRequest(userName, clientId, rc, true);
 }
 
+Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc)
+{
+    const QString userName = QString::fromStdString(cmd.user_name());
+    QString passwordSalt = sqlInterface->getUserSalt(userName);
+    if(passwordSalt.isEmpty()) {
+        return Response::RespInternalError;
+    }
+    auto *re = new Response_PasswordSalt;
+    re->set_password_salt(passwordSalt.toStdString());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.
 
@@ -1738,7 +1751,7 @@ void TcpServerSocketInterface::readClient()
 
 bool TcpServerSocketInterface::initTcpSession()
 {
-    if (!initSession({}))
+    if (!initSession())
         return false;
 
     // limit the number of websocket users based on configuration settings
@@ -1790,16 +1803,6 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     address = socket->peerAddress();
 
-    const QUrl url = socket->requestUrl();
-    if (url.hasQuery()) {
-        const QUrlQuery urlQuery(url.query());
-
-        if (urlQuery.hasQueryItem("username")) {
-            const auto username = urlQuery.queryItemValue("username");
-            passwordSalt = servatrice->getDatabaseInterface()->getUserSalt(username);
-        }
-    }
-
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
@@ -1834,7 +1837,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
 bool WebsocketServerSocketInterface::initWebsocketSession()
 {
-    if (!initSession(passwordSalt))
+    if (!initSession())
         return false;
 
     // limit the number of websocket users based on configuration settings
