@@ -15,6 +15,7 @@ QMap<QString, bool> FeatureSet::getDefaultFeatureList()
 
 void FeatureSet::initalizeFeatureList(QMap<QString, bool> &featureList)
 {
+    // default features [name], [is required to connect]
     featureList.insert("client_id", false);
     featureList.insert("client_ver", false);
     featureList.insert("feature_set", false);
@@ -25,10 +26,10 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &featureList)
     featureList.insert("idle_client", false);
     featureList.insert("forgot_password", false);
     featureList.insert("websocket", false);
+    featureList.insert("hashed_password_login", false);
     // These are temp to force users onto a newer client
     featureList.insert("2.7.0_min_version", false);
     featureList.insert("2.8.0_min_version", false);
-    featureList.insert("hashed_password_login", true);
 }
 
 void FeatureSet::enableRequiredFeature(QMap<QString, bool> &featureList, QString featureName)
