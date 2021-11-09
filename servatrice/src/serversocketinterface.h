@@ -218,7 +218,6 @@ public:
 private:
     QWebSocket *socket;
     QHostAddress address;
-    QString passwordSalt;
 
 protected:
     void writeToSocket(QByteArray &data)

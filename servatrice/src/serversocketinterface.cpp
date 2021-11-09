@@ -1787,7 +1787,7 @@ bool TcpServerSocketInterface::initTcpSession()
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
                                                                Servatrice_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
-    : AbstractServerSocketInterface(_server, _databaseInterface, parent), passwordSalt("")
+    : AbstractServerSocketInterface(_server, _databaseInterface, parent)
 {
 }
 
