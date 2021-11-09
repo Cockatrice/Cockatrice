@@ -27,6 +27,7 @@ message SessionCommand {
         FORGOT_PASSWORD_REQUEST = 1021;
         FORGOT_PASSWORD_RESET = 1022;
         FORGOT_PASSWORD_CHALLENGE = 1023;
+        REQUEST_PASSWORD_SALT = 1024;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;
@@ -193,9 +194,9 @@ message Command_ForgotPasswordChallenge {
     optional string email = 3;
 }
 
-message Command_PasswordSalt {
+message Command_RequestPasswordSalt {
     extend SessionCommand {
-        optional Command_PasswordSalt ext = 1024;
+        optional Command_RequestPasswordSalt ext = 1024;
     }
     required string user_name = 1;
 }
