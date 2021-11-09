@@ -1493,7 +1493,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
     const QString userName = QString::fromStdString(cmd.user_name());
     QString passwordSalt = sqlInterface->getUserSalt(userName);
     if (passwordSalt.isEmpty()) {
-        return Response::RespInternalError;
+        if (server->getRegOnlyServerEnabled()) {
+            return Response::RespRegistrationRequired;
+        } else {
+            // user does not exist but is allowed to log in unregistered without password
+            return Response::RespOk;
+        }
     }
     auto *re = new Response_PasswordSalt;
     re->set_password_salt(passwordSalt.toStdString());
