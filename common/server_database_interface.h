@@ -18,7 +18,8 @@ public:
                                                    const QString &password,
                                                    const QString &clientId,
                                                    QString &reasonStr,
-                                                   int &secondsLeft) = 0;
+                                                   int &secondsLeft,
+                                                   bool passwordNeedsHash) = 0;
     virtual bool checkUserIsBanned(const QString & /* ipAddress */,
                                    const QString & /* userName */,
                                    const QString & /* clientId */,

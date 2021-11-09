@@ -32,7 +32,8 @@ public:
                                            const QString &password,
                                            const QString &clientId,
                                            QString &reasonStr,
-                                           int &secondsLeft);
+                                           int &secondsLeft,
+                                           bool passwordNeedsHash);
     int getNextGameId()
     {
         return localServer->getNextLocalGameId();

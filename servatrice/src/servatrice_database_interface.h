@@ -35,7 +35,8 @@ protected:
                                            const QString &password,
                                            const QString &clientId,
                                            QString &reasonStr,
-                                           int &secondsLeft);
+                                           int &banSecondsLeft,
+                                           bool passwordNeedsHash);
 
 public slots:
     void initDatabase(const QSqlDatabase &_sqlDatabase);

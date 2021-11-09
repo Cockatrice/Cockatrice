@@ -443,17 +443,29 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
-
-    if (userInfo != 0)
+    QString password;
+    bool needsHash = false;
+    if (cmd.has_password()) {
+        password = QString::fromStdString(cmd.password());
+        needsHash = true;
+    } else if (cmd.has_hashed_password()) {
+        password = QString::fromStdString(cmd.hashed_password());
+    } else {
         return Response::RespContextError;
+    }
+
+    if (userInfo != 0) {
+        return Response::RespContextError;
+    }
 
     // check client feature set against server feature set
     FeatureSet features;
     QMap<QString, bool> receivedClientFeatures;
     QMap<QString, bool> missingClientFeatures;
 
-    for (int i = 0; i < cmd.clientfeatures().size(); ++i)
+    for (int i = 0; i < cmd.clientfeatures().size(); ++i) {
         receivedClientFeatures.insert(QString::fromStdString(cmd.clientfeatures(i)).simplified(), false);
+    }
 
     missingClientFeatures =
         features.identifyMissingFeatures(receivedClientFeatures, server->getServerRequiredFeatureList());
@@ -463,8 +475,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             Response_Login *re = new Response_Login;
             re->set_denied_reason_str("Client upgrade required");
             QMap<QString, bool>::iterator i;
-            for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i)
+            for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i) {
                 re->add_missing_features(i.key().toStdString().c_str());
+            }
             rc.setResponseExtension(re);
             return Response::RespClientUpdateRequired;
         }
@@ -473,8 +486,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString reasonStr;
     int banSecondsLeft = 0;
     QString connectionType = getConnectionType();
-    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr,
-                                                 banSecondsLeft, clientId, clientVersion, connectionType);
+    AuthenticationResult res = server->loginUser(this, userName, password, needsHash, reasonStr, banSecondsLeft,
+                                                 clientId, clientVersion, connectionType);
     switch (res) {
         case UserIsBanned: {
             Response_Login *re = new Response_Login;

@@ -62,6 +62,7 @@ public:
     AuthenticationResult loginUser(Server_ProtocolHandler *session,
                                    QString &name,
                                    const QString &password,
+                                   bool passwordNeedsHash,
                                    QString &reason,
                                    int &secondsLeft,
                                    QString &clientid,

@@ -96,7 +96,9 @@ bool AbstractServerSocketInterface::initSession()
     identEvent.set_server_name(servatrice->getServerName().toStdString());
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
-    identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+    if (servatrice->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
+        identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+    }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
@@ -1485,11 +1487,12 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     return continuePasswordRequest(userName, clientId, rc, true);
 }
 
-Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc)
+Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd,
+                                                                             ResponseContainer &rc)
 {
     const QString userName = QString::fromStdString(cmd.user_name());
     QString passwordSalt = sqlInterface->getUserSalt(userName);
-    if(passwordSalt.isEmpty()) {
+    if (passwordSalt.isEmpty()) {
         return Response::RespInternalError;
     }
     auto *re = new Response_PasswordSalt;

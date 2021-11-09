@@ -287,7 +287,8 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                                                                      const QString &password,
                                                                      const QString &clientId,
                                                                      QString &reasonStr,
-                                                                     int &banSecondsLeft)
+                                                                     int &banSecondsLeft,
+                                                                     bool passwordNeedsHash)
 {
     switch (server->getAuthenticationMethod()) {
         case Servatrice::AuthenticationNone:
@@ -324,7 +325,13 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     qDebug("Login denied: user not active");
                     return UserIsInactive;
                 }
-                if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
+                QString hashedPassword;
+                if (passwordNeedsHash) {
+                    hashedPassword = PasswordHasher::computeHash(password, correctPassword.left(16));
+                } else {
+                    hashedPassword = password;
+                }
+                if (correctPassword == hashedPassword) {
                     qDebug("Login accepted: password right");
                     return PasswordRight;
                 } else {
