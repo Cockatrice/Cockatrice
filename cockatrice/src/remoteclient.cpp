@@ -1,11 +1,12 @@
 #include "remoteclient.h"
 
 #include "main.h"
-#include "pb/commands.pb.h"
+#include "passwordhasher.h"
 #include "pb/event_server_identification.pb.h"
 #include "pb/response_activate.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"
 #include "pb/response_login.pb.h"
+#include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/session_commands.pb.h"
@@ -175,21 +176,23 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (getStatus() == StatusGettingPasswordSalt) {
-        doLogin();
+    if (event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+        // TODO store and log in using stored hashed password
+        doRequestPasswordSalt(); // log in using password salt
     } else {
+        // TODO add setting for client to reject unhashed logins
         doLogin();
     }
 }
 
 void RemoteClient::doRequestPasswordSalt()
 {
-    Command_Login cmdLogin;
-    cmdLogin.set_user_name(userName.toStdString());
-    cmdLogin.set_request_password_salt(true);
+    setStatus(StatusGettingPasswordSalt);
+    Command_RequestPasswordSalt cmdRqSalt;
+    cmdRqSalt.set_user_name(userName.toStdString());
 
-    PendingCommand *pend = prepareSessionCommand(cmdLogin);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
+    PendingCommand *pend = prepareSessionCommand(cmdRqSalt);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(passwordSaltResponse(Response)));
     sendCommand(pend);
 }
 
@@ -222,11 +225,6 @@ void RemoteClient::doLogin()
 
 void RemoteClient::doLogin(const QString &passwordSalt)
 {
-    if (passwordSalt.isEmpty()) {
-        // throw error
-        return;
-    }
-
     setStatus(StatusLoggingIn);
     Command_Login cmdLogin = generateCommandLogin();
 
@@ -241,6 +239,13 @@ void RemoteClient::doLogin(const QString &passwordSalt)
 void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
 {
     doDisconnectFromServer();
+}
+
+void RemoteClient::passwordSaltResponse(const Response &response)
+{
+    const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
+    QString salt = QString::fromStdString(resp.password_salt());
+    doLogin(salt);
 }
 
 void RemoteClient::loginResponse(const Response &response)

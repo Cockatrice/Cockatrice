@@ -2,6 +2,7 @@
 #define REMOTECLIENT_H
 
 #include "abstractclient.h"
+#include "pb/commands.pb.h"
 
 #include <QTcpSocket>
 #include <QWebSocket>
@@ -55,6 +56,7 @@ private slots:
     void ping();
     void processServerIdentificationEvent(const Event_ServerIdentification &event);
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
+    void passwordSaltResponse(const Response &response);
     void loginResponse(const Response &response);
     void registerResponse(const Response &response);
     void activateResponse(const Response &response);
@@ -71,6 +73,7 @@ private slots:
     void doRequestPasswordSalt();
     void doLogin();
     void doLogin(const QString &passwordSalt);
+    Command_Login generateCommandLogin();
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
     void doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
