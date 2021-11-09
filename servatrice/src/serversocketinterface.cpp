@@ -96,6 +96,7 @@ bool AbstractServerSocketInterface::initSession()
     identEvent.set_server_name(servatrice->getServerName().toStdString());
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
+    identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
