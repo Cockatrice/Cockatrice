@@ -20,9 +20,7 @@
 #include <QList>
 #include <QThread>
 #include <QTimer>
-#include <QUrlQuery>
 #include <QWebSocket>
-#include <src/passwordhasher.h>
 
 static const unsigned int protocolVersion = 14;
 
@@ -405,22 +403,11 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     }
 }
 
-void RemoteClient::connectToHost(const QString &hostname, unsigned int port, const QString &username)
+void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
 {
     usingWebSocket = port == 443 || port == 80 || port == 4748 || port == 8080;
     if (usingWebSocket) {
-        const QString connectionString = "%1://%2:%3/servatrice";
-        const QString connectionProtocol = port == 443 ? "wss" : "ws";
-        const QString connectionUrl = connectionString.arg(connectionProtocol).arg(hostname).arg(port);
-
-        QUrl url(connectionUrl);
-        if (!username.isEmpty()) {
-            QUrlQuery urlQuery;
-            urlQuery.addQueryItem("username", username);
-
-            url.setQuery(urlQuery);
-        }
-
+        QUrl url(QString("%1://%2:%3/servatrice").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
         websocket->open(url);
     } else {
         socket->connectToHost(hostname, static_cast<quint16>(port));
@@ -439,7 +426,7 @@ void RemoteClient::doConnectToServer(const QString &hostname,
     lastHostname = hostname;
     lastPort = port;
 
-    connectToHost(hostname, port, userName);
+    connectToHost(hostname, port);
     setStatus(StatusConnecting);
 }
 

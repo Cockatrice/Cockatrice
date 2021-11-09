@@ -5,7 +5,6 @@
 
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <pb/session_commands.pb.h>
 
 class QTimer;
 
@@ -105,9 +104,7 @@ private:
     QString getSrvClientID(const QString &_hostname);
     bool newMissingFeatureFound(const QString &_serversMissingFeatures);
     void clearNewClientFeatures();
-    void connectToHost(const QString &hostname, unsigned int port, const QString &username = "");
-
-    Command_Login generateCommandLogin();
+    void connectToHost(const QString &hostname, unsigned int port);
 
 protected slots:
     void sendCommandContainer(const CommandContainer &cont) override;
