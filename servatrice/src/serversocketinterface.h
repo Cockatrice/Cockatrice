@@ -116,6 +116,7 @@ private:
     Response::ResponseCode cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                       ResponseContainer &rc);
+    Response::ResponseCode cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc);
     Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
     Response::ResponseCode
     processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
@@ -198,7 +199,7 @@ class WebsocketServerSocketInterface : public AbstractServerSocketInterface
 public:
     WebsocketServerSocketInterface(Servatrice *_server,
                                    Servatrice_DatabaseInterface *_databaseInterface,
-                                   QObject *parent = 0);
+                                   QObject *parent = nullptr);
     ~WebsocketServerSocketInterface();
 
     QHostAddress getPeerAddress() const

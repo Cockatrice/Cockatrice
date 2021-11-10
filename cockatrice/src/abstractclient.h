@@ -40,6 +40,7 @@ enum ClientStatus
     StatusRequestingForgotPassword,
     StatusSubmitForgotPasswordReset,
     StatusSubmitForgotPasswordChallenge,
+    StatusGettingPasswordSalt,
 };
 
 class AbstractClient : public QObject

@@ -1,11 +1,12 @@
 #include "remoteclient.h"
 
 #include "main.h"
-#include "pb/commands.pb.h"
+#include "passwordhasher.h"
 #include "pb/event_server_identification.pb.h"
 #include "pb/response_activate.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"
 #include "pb/response_login.pb.h"
+#include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/session_commands.pb.h"
@@ -175,15 +176,30 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    doLogin();
+    if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+        // TODO store and log in using stored hashed password
+        doRequestPasswordSalt(); // log in using password salt
+    } else {
+        // TODO add setting for client to reject unhashed logins
+        doLogin();
+    }
 }
 
-void RemoteClient::doLogin()
+void RemoteClient::doRequestPasswordSalt()
 {
-    setStatus(StatusLoggingIn);
+    setStatus(StatusGettingPasswordSalt);
+    Command_RequestPasswordSalt cmdRqSalt;
+    cmdRqSalt.set_user_name(userName.toStdString());
+
+    PendingCommand *pend = prepareSessionCommand(cmdRqSalt);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(passwordSaltResponse(Response)));
+    sendCommand(pend);
+}
+
+Command_Login RemoteClient::generateCommandLogin()
+{
     Command_Login cmdLogin;
     cmdLogin.set_user_name(userName.toStdString());
-    cmdLogin.set_password(password.toStdString());
     cmdLogin.set_clientid(getSrvClientID(lastHostname).toStdString());
     cmdLogin.set_clientver(VERSION_STRING);
 
@@ -192,6 +208,29 @@ void RemoteClient::doLogin()
         for (i = clientFeatures.begin(); i != clientFeatures.end(); ++i)
             cmdLogin.add_clientfeatures(i.key().toStdString().c_str());
     }
+
+    return cmdLogin;
+}
+
+void RemoteClient::doLogin()
+{
+    setStatus(StatusLoggingIn);
+    Command_Login cmdLogin = generateCommandLogin();
+    cmdLogin.set_password(password.toStdString());
+
+    PendingCommand *pend = prepareSessionCommand(cmdLogin);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
+    sendCommand(pend);
+}
+
+void RemoteClient::doLogin(const QString &passwordSalt)
+{
+    setStatus(StatusLoggingIn);
+    Command_Login cmdLogin = generateCommandLogin();
+
+    const auto hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
+    cmdLogin.set_hashed_password(hashedPassword.toStdString());
+
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
     sendCommand(pend);
@@ -200,6 +239,22 @@ void RemoteClient::doLogin()
 void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
 {
     doDisconnectFromServer();
+}
+
+void RemoteClient::passwordSaltResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
+        QString salt = QString::fromStdString(resp.password_salt());
+        if (salt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
+            password = "";    // the password will not be used
+            doLogin();
+        } else {
+            doLogin(salt);
+        }
+    } else if (response.response_code() != Response::RespNotConnected) {
+        emit loginError(response.response_code(), {}, 0, {});
+    }
 }
 
 void RemoteClient::loginResponse(const Response &response)

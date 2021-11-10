@@ -287,7 +287,8 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                                                                      const QString &password,
                                                                      const QString &clientId,
                                                                      QString &reasonStr,
-                                                                     int &banSecondsLeft)
+                                                                     int &banSecondsLeft,
+                                                                     bool passwordNeedsHash)
 {
     switch (server->getAuthenticationMethod()) {
         case Servatrice::AuthenticationNone:
@@ -324,7 +325,13 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     qDebug("Login denied: user not active");
                     return UserIsInactive;
                 }
-                if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
+                QString hashedPassword;
+                if (passwordNeedsHash) {
+                    hashedPassword = PasswordHasher::computeHash(password, correctPassword.left(16));
+                } else {
+                    hashedPassword = password;
+                }
+                if (correctPassword == hashedPassword) {
                     qDebug("Login accepted: password right");
                     return PasswordRight;
                 } else {
@@ -488,6 +495,28 @@ bool Servatrice_DatabaseInterface::userExists(const QString &user)
         return query->next();
     }
     return false;
+}
+
+QString Servatrice_DatabaseInterface::getUserSalt(const QString &user)
+{
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
+        checkSql();
+
+        QSqlQuery *query =
+            prepareQuery("SELECT SUBSTRING(password_sha512, 1, 16) FROM {prefix}_users WHERE name = :name");
+
+        query->bindValue(":name", user);
+        if (!execSqlQuery(query)) {
+            return {};
+        }
+
+        if (!query->next()) {
+            return {};
+        }
+
+        return query->value(0).toString();
+    }
+    return {};
 }
 
 int Servatrice_DatabaseInterface::getUserIdInDB(const QString &name)

@@ -79,6 +79,7 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                                        QString &name,
                                        const QString &password,
+                                       bool passwordNeedsHash,
                                        QString &reasonStr,
                                        int &secondsLeft,
                                        QString &clientid,
@@ -99,8 +100,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
 
-    AuthenticationResult authState =
-        databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
+    AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr,
+                                                                          secondsLeft, passwordNeedsHash);
     if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid ||
         authState == UserIsInactive)
         return authState;

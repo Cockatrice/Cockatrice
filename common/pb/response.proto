@@ -61,6 +61,7 @@ message Response {
         WARN_LIST = 1014;
         VIEW_LOG = 1015;
         FORGOT_PASSWORD_REQUEST = 1016;
+        PASSWORD_SALT = 1017;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }

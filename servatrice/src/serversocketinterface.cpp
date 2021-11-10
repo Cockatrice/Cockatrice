@@ -45,6 +45,7 @@
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_upload.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"
+#include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/response_replay_list.pb.h"
@@ -95,6 +96,9 @@ bool AbstractServerSocketInterface::initSession()
     identEvent.set_server_name(servatrice->getServerName().toStdString());
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
+    if (servatrice->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
+        identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+    }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
@@ -193,6 +197,9 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
+        case SessionCommand::REQUEST_PASSWORD_SALT:
+            return cmdRequestPasswordSalt(cmd.GetExtension(Command_RequestPasswordSalt::ext), rc);
+            break;
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1478,6 +1485,25 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
                                      "PASSWORD_RESET_CHALLENGE", "", true);
     }
     return continuePasswordRequest(userName, clientId, rc, true);
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd,
+                                                                             ResponseContainer &rc)
+{
+    const QString userName = QString::fromStdString(cmd.user_name());
+    QString passwordSalt = sqlInterface->getUserSalt(userName);
+    if (passwordSalt.isEmpty()) {
+        if (server->getRegOnlyServerEnabled()) {
+            return Response::RespRegistrationRequired;
+        } else {
+            // user does not exist but is allowed to log in unregistered without password
+            return Response::RespOk;
+        }
+    }
+    auto *re = new Response_PasswordSalt;
+    re->set_password_salt(passwordSalt.toStdString());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
 }
 
 // ADMIN FUNCTIONS.

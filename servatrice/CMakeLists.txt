@@ -6,7 +6,6 @@ PROJECT(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 
 SET(servatrice_SOURCES
     src/main.cpp
-    src/passwordhasher.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
     src/servatrice_database_interface.cpp

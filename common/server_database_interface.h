@@ -18,7 +18,8 @@ public:
                                                    const QString &password,
                                                    const QString &clientId,
                                                    QString &reasonStr,
-                                                   int &secondsLeft) = 0;
+                                                   int &secondsLeft,
+                                                   bool passwordNeedsHash) = 0;
     virtual bool checkUserIsBanned(const QString & /* ipAddress */,
                                    const QString & /* userName */,
                                    const QString & /* clientId */,
@@ -34,6 +35,10 @@ public:
     virtual bool userExists(const QString & /* user */)
     {
         return false;
+    }
+    virtual QString getUserSalt(const QString & /* user */)
+    {
+        return {};
     }
     virtual QMap<QString, ServerInfo_User> getBuddyList(const QString & /* name */)
     {

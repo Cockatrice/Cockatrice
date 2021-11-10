@@ -35,7 +35,8 @@ protected:
                                            const QString &password,
                                            const QString &clientId,
                                            QString &reasonStr,
-                                           int &secondsLeft);
+                                           int &banSecondsLeft,
+                                           bool passwordNeedsHash);
 
 public slots:
     void initDatabase(const QSqlDatabase &_sqlDatabase);
@@ -59,6 +60,7 @@ public:
 
     bool activeUserExists(const QString &user);
     bool userExists(const QString &user);
+    QString getUserSalt(const QString &user);
     int getUserIdInDB(const QString &name);
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name);

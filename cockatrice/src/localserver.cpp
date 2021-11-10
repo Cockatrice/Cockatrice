@@ -42,7 +42,8 @@ AuthenticationResult LocalServer_DatabaseInterface::checkUserPassword(Server_Pro
                                                                       const QString & /* password */,
                                                                       const QString & /* clientId */,
                                                                       QString & /* reasonStr */,
-                                                                      int & /* secondsLeft */)
+                                                                      int & /* banSecondsLeft */,
+                                                                      bool /* passwordNeedsHash */)
 {
     return UnknownUser;
 }
