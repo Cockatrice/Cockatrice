@@ -6,6 +6,7 @@
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/styles": "^4.11.4",
+    "crypto-js": "^4.1.1",
     "dexie": "^3.0.3",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",

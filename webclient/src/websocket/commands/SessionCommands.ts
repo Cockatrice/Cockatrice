@@ -2,13 +2,13 @@ import {StatusEnum} from 'types';
 
 import {RoomPersistence, SessionPersistence} from '../persistence';
 import webClient from '../WebClient';
-import {guid} from '../utils';
+import {guid, hashPassword} from '../utils';
 import {WebSocketConnectReason, WebSocketOptions} from "../services/WebSocketService";
 import {
   AccountActivationParams,
   ForgotPasswordChallengeParams,
   ForgotPasswordParams,
-  ForgotPasswordResetParams,
+  ForgotPasswordResetParams, RequestPasswordSaltParams,
   ServerRegisterParams
 } from "../../store";
 import NormalizeService from "../utils/NormalizeService";
@@ -36,13 +36,18 @@ export class SessionCommands {
     webClient.disconnect();
   }
 
-  static login(): void {
-    const loginConfig = {
+  static login(passwordSalt?: string): void {
+    const loginConfig: any = {
       ...webClient.clientConfig,
       userName: webClient.options.user,
-      password: webClient.options.pass,
       clientid: guid()
     };
+
+    if (passwordSalt) {
+      loginConfig.hashedPassword = hashPassword(passwordSalt, webClient.options.pass);
+    } else {
+      loginConfig.password = webClient.options.pass;
+    }
 
     const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
 
@@ -107,6 +112,31 @@ export class SessionCommands {
       }
 
       SessionCommands.disconnect();
+    });
+  }
+
+  static requestPasswordSalt(): void {
+    const options = webClient.options as unknown as RequestPasswordSaltParams;
+
+    const registerConfig = {
+      ...webClient.clientConfig,
+      userName: options.user,
+    };
+
+    const CmdRequestPasswordSalt = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
+
+    const sc = webClient.protobuf.controller.SessionCommand.create({
+      ".Command_RequestPasswordSalt.ext" : CmdRequestPasswordSalt
+    });
+
+    webClient.protobuf.sendSessionCommand(sc, raw => {
+      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+        const passwordSalt = raw[".Response_PasswordSalt.ext"].passwordSalt;
+        SessionCommands.login(passwordSalt);
+      } else if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired) {
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: Registration Required");
+          SessionCommands.disconnect();
+      }
     });
   }
 

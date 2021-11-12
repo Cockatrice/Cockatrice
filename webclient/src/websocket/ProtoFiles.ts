@@ -121,6 +121,7 @@ const ProtoFiles = [
   "response_join_room.proto",
   "response_list_users.proto",
   "response_login.proto",
+  "response_password_salt.proto",
   "response_register.proto",
   "response_replay_download.proto",
   "response_replay_list.proto",

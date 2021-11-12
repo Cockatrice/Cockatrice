@@ -113,7 +113,7 @@ function removeFromList({ listName, userName }: RemoveFromListData) {
 }
 
 function serverIdentification(info: ServerIdentificationData) {
-  const { serverName, serverVersion, protocolVersion } = info;
+  const { serverName, serverVersion, protocolVersion, serverOptions } = info;
 
   if (protocolVersion !== webClient.protocolVersion) {
     SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
@@ -124,7 +124,11 @@ function serverIdentification(info: ServerIdentificationData) {
   switch (webClient.options.reason) {
     case WebSocketConnectReason.LOGIN:
       SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
-      SessionCommands.login();
+      if (serverOptions & webClient.protobuf.controller.Event_ServerIdentification.ServerOptions.SupportsPasswordHash) {
+        SessionCommands.requestPasswordSalt();
+      } else {
+        SessionCommands.login();
+      }
       break;
     case WebSocketConnectReason.REGISTER:
       SessionCommands.register();
@@ -198,6 +202,7 @@ export interface ServerIdentificationData {
   protocolVersion: number;
   serverName: string;
   serverVersion: string;
+  serverOptions: number;
 }
 
 export interface ServerMessageData {

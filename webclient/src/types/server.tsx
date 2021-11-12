@@ -31,6 +31,13 @@ export const DefaultHosts: Host[] = [
     editable: false,
   },
   {
+    name: 'Rooster Beta',
+    host: 'beta.cockatrice.us/servatrice',
+    port: '4748',
+    localHost: 'beta.cockatrice.us',
+    editable: false,
+  },
+  {
     name: 'Tetrarch',
     host: 'mtg.tetrarch.co/servatrice',
     port: '4748',
