@@ -7,29 +7,38 @@ import Button from '@material-ui/core/Button';
 
 import { AuthenticationService } from 'api';
 import { CheckboxField, InputField, KnownHosts } from 'components';
-import { SettingDTO } from 'services';
-// import { ServerSelectors } from 'store';
+import { HostDTO, SettingDTO } from 'services';
 import { FormKey, APP_USER } from 'types';
 
 import './LoginForm.css';
-
 
 const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps) => {
   const [autoConnect, setAutoConnect] = useState(false);
 
   useEffect(() => {
     SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
-      setTimeout(() => {
-        if (!userSetting) {
-          new SettingDTO(APP_USER).save();
-        } else if (userSetting.autoConnect) {
-          setAutoConnect(userSetting.autoConnect);
+      if (!userSetting) {
+        new SettingDTO(APP_USER).save();
+        return;
+      }
 
-          if (!AuthenticationService.connectionAttemptMade()) {
-            dispatch(submit);
-          }
+      if (userSetting.autoConnect) {
+        setAutoConnect(userSetting.autoConnect);
+
+        if (!AuthenticationService.connectionAttemptMade()) {
+          HostDTO.getAll().then(hosts => {
+            let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
+
+            if (lastSelectedHost?.remember) {
+              dispatch(change(form, 'selectedHost', lastSelectedHost));
+              dispatch(change(form, 'user', lastSelectedHost.user));
+              dispatch(change(form, 'pass', lastSelectedHost.pass));
+              dispatch(change(form, 'remember', lastSelectedHost.remember));
+              dispatch(submit);
+            }
+          });
         }
-      }, 100);
+      }
     });
   }, [dispatch, form, submit]);
 
@@ -60,7 +69,7 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
     }
   }
 
-  const onHostChange = async host => {
+  const onHostChange = host => {
     dispatch(change(form, 'user', host.user));
     dispatch(change(form, 'pass', host.pass));
     dispatch(change(form, 'remember', host.remember));

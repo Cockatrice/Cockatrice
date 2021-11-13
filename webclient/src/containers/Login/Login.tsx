@@ -66,7 +66,6 @@ const Login = ({ state, description }: LoginProps) => {
   }
 
   const onSubmit = useCallback((hostForm) => {
-    console.log('Login.onSubmit.useCallback');
     const { user, pass, selectedHost } = hostForm;
     const { host, port } = getHostPort(selectedHost);
     const options = { user, pass, host, port };
@@ -77,18 +76,18 @@ const Login = ({ state, description }: LoginProps) => {
   }, []);
 
   function updateHost({ selectedHost, user, pass, remember}) {
-    HostDTO.get(selectedHost.id).then(_host => {
+    HostDTO.get(selectedHost.id).then(hostDTO => {
       if (remember) {
-        _host.user = user;
-        _host.pass = pass;
+        hostDTO.user = user;
+        hostDTO.pass = pass;
       } else {
-        delete _host.user;
-        delete _host.pass;
+        delete hostDTO.user;
+        delete hostDTO.pass;
       }
 
-      _host.remember = remember;
+      hostDTO.remember = remember;
 
-      _host.save();
+      hostDTO.save();
     });
   }
 

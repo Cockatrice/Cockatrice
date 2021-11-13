@@ -11,8 +11,8 @@ import { RegisterForm } from 'forms';
 import './RegistrationDialog.css';
 
 const RegistrationDialog = ({ classes, handleClose, isOpen }: any) => {
-  const handleOnClose = (form) => {
-    handleClose(form);
+  const handleOnClose = () => {
+    handleClose();
   }
 
   return (

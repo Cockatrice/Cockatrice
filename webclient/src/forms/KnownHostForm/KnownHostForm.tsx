@@ -3,8 +3,6 @@ import React from "react";
 import { connect } from "react-redux";
 import { Form, Field } from 'react-final-form'
 
-// look into react-final-form
-
 import Button from "@material-ui/core/Button";
 import AnchorLink from '@material-ui/core/Link';
 
