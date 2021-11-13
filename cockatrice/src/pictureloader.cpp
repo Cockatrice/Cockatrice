@@ -6,6 +6,7 @@
 #include "thememanager.h"
 
 #include <QApplication>
+#include <QScreen>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
@@ -572,7 +573,10 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     // load the image and create a copy of the correct size
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
-        pixmap = bigPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QScreen * screen = qApp->primaryScreen();
+        int dpr = screen->devicePixelRatio();
+        pixmap = bigPixmap.scaled(size * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        pixmap.setDevicePixelRatio(dpr);
         QPixmapCache::insert(sizeKey, pixmap);
         return;
     }
