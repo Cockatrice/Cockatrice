@@ -1,6 +1,6 @@
-import { Subject } from "rxjs";
+import { Subject } from 'rxjs';
 
-import { WebSocketService } from "./WebSocketService";
+import { WebSocketService } from './WebSocketService';
 
 export class KeepAliveService {
   private socket: WebSocketService;

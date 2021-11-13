@@ -20,11 +20,11 @@ export default class NormalizeService {
   static normalizeGameObject(game: Game, gametypeMap: GametypeMap): void {
     const { gameTypes, description } = game;
     const hasType = gameTypes && gameTypes.length;
-    game.gameType = hasType ? gametypeMap[gameTypes[0]] : "";
+    game.gameType = hasType ? gametypeMap[gameTypes[0]] : '';
 
-    game.description = description || "";
+    game.description = description || '';
   }
-  
+
   // Flatten logs[] into object mapped by targetType (room, game, chat)
   static normalizeLogs(logs: Log[]): LogGroups {
     return logs.reduce((obj, log) => {

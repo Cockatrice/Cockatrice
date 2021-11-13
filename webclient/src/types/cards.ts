@@ -44,8 +44,8 @@ export class Card {
   printings: string[];
   rarity: string;
   rulings: {
-  	date: string;
-  	text: string;
+    date: string;
+    text: string;
   }[];
   side: string;
   setCode: string;
@@ -82,8 +82,8 @@ export class Token {
       type: { value: string; };
     };
   };
-  related:  { value: string; }[];
-  'reverse-related':  { value: string; }[];
+  related: { value: string; }[];
+  'reverse-related': { value: string; }[];
   set: {
     value: string;
     picURL: string;

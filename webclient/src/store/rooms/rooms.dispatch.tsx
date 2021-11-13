@@ -1,6 +1,6 @@
 import { reset } from 'redux-form';
-import { Actions } from "./rooms.actions";
-import { store } from "store";
+import { Actions } from './rooms.actions';
+import { store } from 'store';
 
 // const history = useHistory();
 
@@ -8,7 +8,7 @@ export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
-  
+
   updateRooms: rooms => {
     store.dispatch(Actions.updateRooms(rooms));
   },
@@ -26,7 +26,7 @@ export const Dispatch = {
     if (message.name) {
       store.dispatch(reset('sayMessage'));
     }
-    
+
     store.dispatch(Actions.addMessage(roomId, message));
   },
 

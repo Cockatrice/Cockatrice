@@ -1,20 +1,20 @@
 // eslint-disable-next-line
 import React from "react";
-import { generatePath } from "react-router-dom";
-import * as _ from "lodash";
+import { generatePath } from 'react-router-dom';
+import * as _ from 'lodash';
 
-import Button from "@material-ui/core/Button";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
+import Button from '@material-ui/core/Button';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 
-import { RoomsService } from "api";
-import { RouteEnum } from "types";
+import { RoomsService } from 'api';
+import { RouteEnum } from 'types';
 
-import "./Rooms.css";
+import './Rooms.css';
 
 const Rooms = ({ rooms, joinedRooms, history }) => {
   function onClick(roomId) {

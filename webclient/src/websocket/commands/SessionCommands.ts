@@ -1,9 +1,9 @@
-import {StatusEnum} from 'types';
+import { StatusEnum } from 'types';
 
-import {RoomPersistence, SessionPersistence} from '../persistence';
+import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
-import {guid, hashPassword} from '../utils';
-import {WebSocketConnectReason, WebSocketOptions} from "../services/WebSocketService";
+import { guid, hashPassword } from '../utils';
+import { WebSocketConnectReason, WebSocketOptions } from '../services/WebSocketService';
 import {
   AccountActivationParams,
   ForgotPasswordChallengeParams,
@@ -11,8 +11,8 @@ import {
   ForgotPasswordResetParams,
   RequestPasswordSaltParams,
   ServerRegisterParams
-} from "../../store";
-import NormalizeService from "../utils/NormalizeService";
+} from '../../store';
+import NormalizeService from '../utils/NormalizeService';
 
 export class SessionCommands {
   static connect(options: WebSocketOptions, reason: WebSocketConnectReason): void {
@@ -53,7 +53,7 @@ export class SessionCommands {
     const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
 
     const command = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_Login.ext' : CmdLogin
+      '.Command_Login.ext': CmdLogin
     });
 
     webClient.protobuf.sendSessionCommand(command, raw => {
@@ -73,7 +73,7 @@ export class SessionCommands {
         return;
       }
 
-      switch(raw.responseCode) {
+      switch (raw.responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespClientUpdateRequired:
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing features');
           break;
@@ -127,23 +127,23 @@ export class SessionCommands {
     const CmdRequestPasswordSalt = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      ".Command_RequestPasswordSalt.ext" : CmdRequestPasswordSalt
+      '.Command_RequestPasswordSalt.ext': CmdRequestPasswordSalt
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       switch (raw.responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespOk:
-          const passwordSalt = raw[".Response_PasswordSalt.ext"].passwordSalt;
+          const passwordSalt = raw['.Response_PasswordSalt.ext'].passwordSalt;
           SessionCommands.login(passwordSalt);
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
           SessionCommands.disconnect();
           break;
 
         default:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: Unknown Reason");
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
           SessionCommands.disconnect();
           break;
       }
@@ -166,7 +166,7 @@ export class SessionCommands {
     const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_Register.ext' : CmdRegister
+      '.Command_Register.ext': CmdRegister
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
@@ -203,12 +203,12 @@ export class SessionCommands {
           error = NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime);
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
-          console.error("ResponseCode.RespUsernameInvalid", raw.reasonStr);
+          console.error('ResponseCode.RespUsernameInvalid', raw.reasonStr);
           error = 'Invalid username';
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed:
         default:
-          console.error("ResponseCode Type", raw.responseCode);
+          console.error('ResponseCode Type', raw.responseCode);
           error = 'Registration failed due to a server issue';
           break;
       }
@@ -238,13 +238,13 @@ export class SessionCommands {
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
-        if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
-          SessionCommands.login();
-        } else {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');
-          SessionCommands.disconnect();
-          SessionPersistence.accountActivationFailed();
-        }
+      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
+        SessionCommands.login();
+      } else {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');
+        SessionCommands.disconnect();
+        SessionPersistence.accountActivationFailed();
+      }
     });
   }
 
@@ -260,12 +260,12 @@ export class SessionCommands {
     const CmdForgotPasswordRequest = webClient.protobuf.controller.Command_ForgotPasswordRequest.create(forgotPasswordConfig);
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ForgotPasswordRequest.ext' : CmdForgotPasswordRequest
+      '.Command_ForgotPasswordRequest.ext': CmdForgotPasswordRequest
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
-        const resp = raw[".Response_ForgotPasswordRequest.ext"];
+        const resp = raw['.Response_ForgotPasswordRequest.ext'];
 
         if (resp.challengeEmail) {
           SessionPersistence.resetPasswordChallenge();
@@ -293,7 +293,7 @@ export class SessionCommands {
     const CmdForgotPasswordChallenge = webClient.protobuf.controller.Command_ForgotPasswordChallenge.create(forgotPasswordChallengeConfig);
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ForgotPasswordChallenge.ext' : CmdForgotPasswordChallenge
+      '.Command_ForgotPasswordChallenge.ext': CmdForgotPasswordChallenge
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
@@ -321,7 +321,7 @@ export class SessionCommands {
     const CmdForgotPasswordReset = webClient.protobuf.controller.Command_ForgotPasswordReset.create(forgotPasswordResetConfig);
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ForgotPasswordReset.ext' : CmdForgotPasswordReset
+      '.Command_ForgotPasswordReset.ext': CmdForgotPasswordReset
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
@@ -339,7 +339,7 @@ export class SessionCommands {
     const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ListUsers.ext' : CmdListUsers
+      '.Command_ListUsers.ext': CmdListUsers
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
@@ -363,7 +363,7 @@ export class SessionCommands {
     const CmdListRooms = webClient.protobuf.controller.Command_ListRooms.create();
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ListRooms.ext' : CmdListRooms
+      '.Command_ListRooms.ext': CmdListRooms
     });
 
     webClient.protobuf.sendSessionCommand(sc);
@@ -373,7 +373,7 @@ export class SessionCommands {
     const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({ roomId });
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_JoinRoom.ext' : CmdJoinRoom
+      '.Command_JoinRoom.ext': CmdJoinRoom
     });
 
     webClient.protobuf.sendSessionCommand(sc, (raw) => {
@@ -381,7 +381,7 @@ export class SessionCommands {
 
       let error;
 
-      switch(responseCode) {
+      switch (responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespOk:
           const { roomInfo } = raw['.Response_JoinRoom.ext'];
 
@@ -400,7 +400,7 @@ export class SessionCommands {
           error = 'Failed to join the room due to an unknown error.';
           break;
       }
-      
+
       if (error) {
         console.error(responseCode, error);
       }
@@ -427,7 +427,7 @@ export class SessionCommands {
     const CmdAddToList = webClient.protobuf.controller.Command_AddToList.create({ list, userName });
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_AddToList.ext' : CmdAddToList
+      '.Command_AddToList.ext': CmdAddToList
     });
 
     webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
@@ -439,7 +439,7 @@ export class SessionCommands {
     const CmdRemoveFromList = webClient.protobuf.controller.Command_RemoveFromList.create({ list, userName });
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_RemoveFromList.ext' : CmdRemoveFromList
+      '.Command_RemoveFromList.ext': CmdRemoveFromList
     });
 
     webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
@@ -451,7 +451,7 @@ export class SessionCommands {
     const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
 
     const sc = webClient.protobuf.controller.ModeratorCommand.create({
-      '.Command_ViewLogHistory.ext' : CmdViewLogHistory
+      '.Command_ViewLogHistory.ext': CmdViewLogHistory
     });
 
     webClient.protobuf.sendModeratorCommand(sc, (raw) => {
@@ -459,7 +459,7 @@ export class SessionCommands {
 
       let error;
 
-      switch(responseCode) {
+      switch (responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespOk:
           const { logMessage } = raw['.Response_ViewLogHistory.ext'];
           SessionPersistence.viewLogs(logMessage)
@@ -468,7 +468,7 @@ export class SessionCommands {
           error = 'Failed to retrieve log history.';
           break;
       }
-      
+
       if (error) {
         console.error(responseCode, error);
       }

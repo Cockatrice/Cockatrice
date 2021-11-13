@@ -1,15 +1,15 @@
 // eslint-disable-next-line
 import React, { useState } from "react";
-import { connect } from "react-redux";
-import { Form, Field, reduxForm, change} from "redux-form"
+import { connect } from 'react-redux';
+import { Form, Field, reduxForm, change } from 'redux-form'
 
-import Button from "@material-ui/core/Button";
+import Button from '@material-ui/core/Button';
 
-import { InputField } from "components";
+import { InputField } from 'components';
 import { FormKey, KnownHost, KnownHosts } from 'types';
 
-import "./ConnectForm.css";
-import { Select, MenuItem } from "@material-ui/core";
+import './ConnectForm.css';
+import { Select, MenuItem } from '@material-ui/core';
 
 const ConnectForm = (props) => {
   const { handleSubmit, dispatch } = props;
@@ -17,23 +17,23 @@ const ConnectForm = (props) => {
 
   const handleChange = (event) => {
     setKnownHosts(event.target.value);
-    dispatch(change(FormKey.CONNECT,'host', KnownHosts[event.target.value].host));
-    dispatch(change(FormKey.CONNECT,'port', KnownHosts[event.target.value].port))
+    dispatch(change(FormKey.CONNECT, 'host', KnownHosts[event.target.value].host));
+    dispatch(change(FormKey.CONNECT, 'port', KnownHosts[event.target.value].port))
   };
 
   return (
     <Form className="connectForm" onSubmit={handleSubmit}>
       <div className="connectForm-item">
         <Select
-              labelId="selectedKnownHosts-label"
-              id="selectedKnownHosts-label"
-              className="selectKnownHosts-items"
-              value={knownHosts}
-              fullWidth={true}
-              onChange={handleChange}
-            >
-            <MenuItem value={KnownHost.ROOSTER}>{KnownHost.ROOSTER}</MenuItem>
-            <MenuItem value={KnownHost.TETRARCH}>{KnownHost.TETRARCH}</MenuItem>
+          labelId="selectedKnownHosts-label"
+          id="selectedKnownHosts-label"
+          className="selectKnownHosts-items"
+          value={knownHosts}
+          fullWidth={true}
+          onChange={handleChange}
+        >
+          <MenuItem value={KnownHost.ROOSTER}>{KnownHost.ROOSTER}</MenuItem>
+          <MenuItem value={KnownHost.TETRARCH}>{KnownHost.TETRARCH}</MenuItem>
         </Select>
       </div>
       <div className="connectForm-item">
@@ -53,7 +53,7 @@ const ConnectForm = (props) => {
       </Button>
     </Form>
   );
-}
+};
 
 const propsMap = {
   form: FormKey.CONNECT
@@ -63,8 +63,8 @@ const mapStateToProps = () => ({
   initialValues: {
     // host: "mtg.tetrarch.co/servatrice",
     // port: "443"
-    host: "server.cockatrice.us",
-    port: "4748"
+    host: 'server.cockatrice.us',
+    port: '4748'
   }
 });
 

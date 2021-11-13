@@ -18,7 +18,7 @@ class CardImporterService {
             .map(key => json.data[key])
             .sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
 
-          const sets = sortedSets.map(({ cards, tokens, ...set}) => ({
+          const sets = sortedSets.map(({ cards, tokens, ...set }) => ({
             ...set,
             cards: cards.map(({ name }) => name),
             tokens: tokens.map(({ name }) => name),
@@ -54,7 +54,7 @@ class CardImporterService {
       .then((xmlString) => {
         try {
           const parser = new DOMParser();
-          const dom = parser.parseFromString(xmlString, "application/xml");
+          const dom = parser.parseFromString(xmlString, 'application/xml');
 
           const tokens = Array.from(dom.querySelectorAll('card')).map(
             (tokenElement) => this.parseXmlAttributes(tokenElement)
@@ -90,7 +90,7 @@ class CardImporterService {
         if (Array.isArray(attributes[child.tagName])) {
           attributes[child.tagName].push(parsedAttributes)
         } else {
-          attributes[child.tagName] = [ parsedAttributes ];
+          attributes[child.tagName] = [parsedAttributes];
         }
       } else {
         attributes[child.tagName] = parsedAttributes;

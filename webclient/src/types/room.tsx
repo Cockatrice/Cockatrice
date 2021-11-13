@@ -1,4 +1,4 @@
-import { User } from "./user";
+import { User } from './user';
 
 export interface Room {
   autoJoin: boolean
@@ -19,5 +19,5 @@ export interface Room {
 export interface GametypeMap { [index: number]: string }
 
 export enum RoomAccessLevel {
-  "none"
+  'none'
 }

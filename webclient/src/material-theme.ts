@@ -91,10 +91,7 @@ export const materialTheme = createMuiTheme({
           fontWeight: 'bold',
         },
 
-        [
-          '& .MuiButtonBase-root:hover,' +
-          '& .MuiButtonBase-root.Mui-selected:hover'
-        ]: {
+        ['& .MuiButtonBase-root:hover, & .MuiButtonBase-root.Mui-selected:hover']: {
           background: palette.primary.light
         },
       },

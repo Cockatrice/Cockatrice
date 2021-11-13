@@ -3,10 +3,10 @@ import { RoomPersistence } from '../persistence/RoomPersistence';
 import { ProtobufEvents } from '../services/ProtobufService';
 
 export const RoomEvents: ProtobufEvents = {
-  ".Event_JoinRoom.ext": joinRoom,
-  ".Event_LeaveRoom.ext": leaveRoom,
-  ".Event_ListGames.ext": listGames,
-  ".Event_RoomSay.ext": roomSay,
+  '.Event_JoinRoom.ext': joinRoom,
+  '.Event_LeaveRoom.ext': leaveRoom,
+  '.Event_ListGames.ext': listGames,
+  '.Event_RoomSay.ext': roomSay,
 };
 
 function joinRoom({ userInfo }: JoinRoomData, { roomEvent }: RoomEvent) {

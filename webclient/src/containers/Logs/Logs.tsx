@@ -1,15 +1,15 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import * as _ from "lodash";
+import { connect } from 'react-redux';
+import * as _ from 'lodash';
 
-import { ModeratorService } from "api";
-import { AuthGuard, ModGuard} from "components";
-import { SearchForm } from "forms";
-import { ServerDispatch, ServerSelectors, ServerStateLogs } from "store";
+import { ModeratorService } from 'api';
+import { AuthGuard, ModGuard } from 'components';
+import { SearchForm } from 'forms';
+import { ServerDispatch, ServerSelectors, ServerStateLogs } from 'store';
 
-import LogResults from "./LogResults";
-import "./Logs.css";
+import LogResults from './LogResults';
+import './Logs.css';
 
 class Logs extends Component<LogsTypes> {
   MAXIMUM_RESULTS = 1000;
@@ -26,7 +26,7 @@ class Logs extends Component<LogsTypes> {
 
   onSubmit(fields) {
     const trimmedFields: any = this.trimFields(fields);
-    
+
     const { userName, ipAddress, gameName, gameId, message, logLocation } = trimmedFields;
 
     const required = _.filter({
@@ -48,7 +48,7 @@ class Logs extends Component<LogsTypes> {
 
   private trimFields(fields) {
     return _.reduce(fields, (obj, field, key) => {
-      if (typeof field === "string") {
+      if (typeof field === 'string') {
         const trimmed = _.trim(field);
 
         if (!!trimmed) {
@@ -74,7 +74,7 @@ class Logs extends Component<LogsTypes> {
       <div className="moderator-logs overflow-scroll">
         <AuthGuard />
         <ModGuard />
-        
+
         <div className="moderator-logs__form">
           <SearchForm onSubmit={this.onSubmit} />
         </div>
@@ -82,7 +82,7 @@ class Logs extends Component<LogsTypes> {
         <div className="moderator-logs__results">
           <LogResults logs={this.props.logs} />
         </div>
-      </div>  
+      </div>
     )
   }
 }

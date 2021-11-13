@@ -1,8 +1,8 @@
-import { ServerDispatch } from "store";
-import { Log, StatusEnum, User } from "types";
+import { ServerDispatch } from 'store';
+import { Log, StatusEnum, User } from 'types';
 
-import { sanitizeHtml } from "websocket/utils";
-import NormalizeService from "../utils/NormalizeService";
+import { sanitizeHtml } from 'websocket/utils';
+import NormalizeService from '../utils/NormalizeService';
 
 export class SessionPersistence {
   static clearStore() {
@@ -74,27 +74,27 @@ export class SessionPersistence {
   }
 
   static accountAwaitingActivation() {
-    console.log("Open Modal for Activation Code input");
+    console.log('Open Modal for Activation Code input');
   }
 
   static accountActivationFailed() {
-    console.log("Account activation failed, show an action here");
+    console.log('Account activation failed, show an action here');
   }
 
   static resetPasswordChallenge() {
-    console.log("Open Modal asking for Email address associated with account");
+    console.log('Open Modal asking for Email address associated with account');
   }
 
   static resetPassword() {
-    console.log("Open Modal asking for reset token & new password");
+    console.log('Open Modal asking for reset token & new password');
 
   }
 
   static resetPasswordSuccess() {
-    console.log("User password successfully changed Alert!");
+    console.log('User password successfully changed Alert!');
   }
 
   static resetPasswordFailed() {
-    console.log("Open Alert telling user their password request failed for some reason");
+    console.log('Open Alert telling user their password request failed for some reason');
   }
 }

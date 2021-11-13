@@ -1,9 +1,9 @@
-import { SortDirection, StatusEnum, UserSortField } from "types";
+import { SortDirection, StatusEnum, UserSortField } from 'types';
 
-import { SortUtil } from "../common";
+import { SortUtil } from '../common';
 
-import { ServerState } from "./server.interfaces"
-import { Types } from "./server.types";
+import { ServerState } from './server.interfaces'
+import { Types } from './server.types';
 
 const initialState: ServerState = {
   buddyList: [],
@@ -32,7 +32,7 @@ const initialState: ServerState = {
 };
 
 export const serverReducer = (state = initialState, action: any) => {
-  switch(action.type) {
+  switch (action.type) {
     case Types.CLEAR_STORE: {
       return {
         ...initialState,
@@ -67,7 +67,7 @@ export const serverReducer = (state = initialState, action: any) => {
       const { user } = action;
       const { sortUsersBy } = state;
 
-      const buddyList = [ ...state.buddyList ];
+      const buddyList = [...state.buddyList];
 
       buddyList.push(user);
       SortUtil.sortUsersByField(buddyList, sortUsersBy);
@@ -103,7 +103,7 @@ export const serverReducer = (state = initialState, action: any) => {
       const { user } = action;
       const { sortUsersBy } = state;
 
-      const ignoreList = [ ...state.ignoreList ];
+      const ignoreList = [...state.ignoreList];
 
       ignoreList.push(user);
       SortUtil.sortUsersByField(ignoreList, sortUsersBy);
@@ -116,7 +116,7 @@ export const serverReducer = (state = initialState, action: any) => {
     case Types.REMOVE_FROM_IGNORE_LIST: {
       const { userName } = action;
       const ignoreList = state.ignoreList.filter(user => user.name !== userName);
-      
+
       return {
         ...state,
         ignoreList
@@ -125,7 +125,7 @@ export const serverReducer = (state = initialState, action: any) => {
     case Types.UPDATE_INFO: {
       const { name, version } = action.info;
       const { info } = state;
-      
+
       return {
         ...state,
         info: { ...info, name, version }
@@ -151,7 +151,7 @@ export const serverReducer = (state = initialState, action: any) => {
       }
     }
     case Types.UPDATE_USERS: {
-      const users = [ ...action.users ];
+      const users = [...action.users];
       const { sortUsersBy } = state;
 
 
@@ -174,7 +174,7 @@ export const serverReducer = (state = initialState, action: any) => {
 
       return {
         ...state,
-        users 
+        users
       };
     }
     case Types.USER_LEFT: {

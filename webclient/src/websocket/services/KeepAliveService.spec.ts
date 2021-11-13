@@ -1,5 +1,5 @@
 import { KeepAliveService } from './KeepAliveService';
-import { WebSocketService } from "./WebSocketService";
+import { WebSocketService } from './WebSocketService';
 
 import webClient from '../WebClient';
 

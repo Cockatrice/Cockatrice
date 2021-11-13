@@ -1,21 +1,21 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import { withRouter /*, RouteComponentProps */, generatePath } from "react-router-dom";
+import { connect } from 'react-redux';
+import { withRouter, generatePath } from 'react-router-dom';
 
-import ListItem from "@material-ui/core/ListItem";
-import Paper from "@material-ui/core/Paper";
+import ListItem from '@material-ui/core/ListItem';
+import Paper from '@material-ui/core/Paper';
 
-import { RoomsService } from "api";
-import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard} from "components";
-import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors } from "store";
-import { RouteEnum } from "types";
+import { RoomsService } from 'api';
+import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
+import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors } from 'store';
+import { RouteEnum } from 'types';
 
-import OpenGames from "./OpenGames";
-import Messages from "./Messages";
-import SayMessage from "./SayMessage";
+import OpenGames from './OpenGames';
+import Messages from './Messages';
+import SayMessage from './SayMessage';
 
-import "./Room.css";
+import './Room.css';
 
 // @TODO (3)
 class Room extends Component<any> {
@@ -25,7 +25,7 @@ class Room extends Component<any> {
 
     roomId = parseInt(roomId, 0);
 
-    if (!joined.find(({roomId: id}) => id === roomId)) {
+    if (!joined.find(({ roomId: id }) => id === roomId)) {
       history.push(generatePath(RouteEnum.SERVER));
     }
   }
@@ -61,7 +61,7 @@ class Room extends Component<any> {
             top={(
               <Paper className="room-view__games overflow-scroll">
                 <OpenGames room={room} />
-              </Paper>    
+              </Paper>
             )}
 
             bottom={(
@@ -89,7 +89,7 @@ class Room extends Component<any> {
                     <ListItem button className="room-view__side-list__item">
                       <UserDisplay user={user} />
                     </ListItem>
-                  ) ) }
+                  )) }
                 />
               </Paper>
             )}

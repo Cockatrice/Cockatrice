@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 
-import { AuthGuard } from "components";
+import { AuthGuard } from 'components';
 
 class Player extends Component {
   render() {
