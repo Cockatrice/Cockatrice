@@ -1,8 +1,8 @@
 import { Subject } from 'rxjs';
 
-import { ServerStatus, StatusEnum } from "types";
+import { ServerStatus, StatusEnum } from 'types';
 
-import { KeepAliveService } from "./KeepAliveService";
+import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
 
 export interface WebSocketOptions {
@@ -42,7 +42,7 @@ export class WebSocketService {
     this.keepAliveService = new KeepAliveService(this);
     this.keepAliveService.disconnected$.subscribe(() => {
       this.disconnect();
-      this.updateStatus(StatusEnum.DISCONNECTED, "Connection timeout");
+      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
     });
   }
 
@@ -73,15 +73,15 @@ export class WebSocketService {
 
   public updateStatus(status: StatusEnum, description: string): void {
     this.status = status;
-    this.statusChange$.next({status, description});
+    this.statusChange$.next({ status, description });
   }
 
   private createWebSocket(url: string): WebSocket {
     const socket = new WebSocket(url);
-    socket.binaryType = "arraybuffer"; // We are talking binary
+    socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-      this.updateStatus(StatusEnum.CONNECTED, "Connected");
+      this.updateStatus(StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: Function) => {
         this.webClient.keepAlive(pingReceived);
@@ -91,14 +91,14 @@ export class WebSocketService {
     socket.onclose = () => {
       // dont overwrite failure messages
       if (this.status !== StatusEnum.DISCONNECTED) {
-        this.updateStatus(StatusEnum.DISCONNECTED, "Connection Closed");
+        this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
       }
 
       this.keepAliveService.endPingLoop();
     };
 
     socket.onerror = () => {
-      this.updateStatus(StatusEnum.DISCONNECTED, "Connection Failed");
+      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
     };
 
     socket.onmessage = (event: MessageEvent) => {

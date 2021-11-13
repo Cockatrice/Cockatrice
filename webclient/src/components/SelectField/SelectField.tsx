@@ -1,14 +1,14 @@
-import React from "react";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
+import React from 'react';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 
 import './SelectField.css';
 
 const SelectField = ({ input, label, options, value }) => {
-  const id = label + "-select-field";
-  const labelId = id + "-label";
+  const id = label + '-select-field';
+  const labelId = id + '-label';
 
   return (
     <FormControl variant="outlined" margin="dense" className="select-field">
@@ -19,10 +19,10 @@ const SelectField = ({ input, label, options, value }) => {
         value={value}
         { ...input }
       >{
-        options.map((option, index) => (
-          <MenuItem value={index} key={index}> { option } </MenuItem>
-        ))
-      }</Select>
+          options.map((option, index) => (
+            <MenuItem value={index} key={index}> { option } </MenuItem>
+          ))
+        }</Select>
     </FormControl>
   );
 };

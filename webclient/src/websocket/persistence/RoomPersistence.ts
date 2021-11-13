@@ -1,6 +1,6 @@
-import { store, RoomsDispatch, RoomsSelectors } from "store";
+import { store, RoomsDispatch, RoomsSelectors } from 'store';
 import { Game, Message, Room, User } from 'types';
-import NormalizeService from "../utils/NormalizeService";
+import NormalizeService from '../utils/NormalizeService';
 
 export class RoomPersistence {
   static clearStore() {

@@ -1,4 +1,4 @@
-import {StatusEnum} from "types";
+import { StatusEnum } from 'types';
 
 import {
   AddToListData,
@@ -12,10 +12,10 @@ import {
   UserLeftData,
 } from './SessionEvents';
 
-import {SessionCommands} from "../commands";
-import {RoomPersistence, SessionPersistence} from '../persistence';
+import { SessionCommands } from '../commands';
+import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
-import {WebSocketConnectReason} from "../services/WebSocketService";
+import { WebSocketConnectReason } from '../services/WebSocketService';
 
 describe('SessionEvents', () => {
   const roomId = 1;
@@ -340,7 +340,10 @@ describe('SessionEvents', () => {
       event(data);
 
       expect(SessionCommands.disconnect).toHaveBeenCalled();
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${data.protocolVersion}`);
+      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(
+        StatusEnum.DISCONNECTED,
+        `Protocol version mismatch: ${data.protocolVersion}`
+      );
       expect(SessionCommands.login).not.toHaveBeenCalled();
     });
   });
@@ -361,7 +364,7 @@ describe('SessionEvents', () => {
   describe('.Event_UserJoined.ext', () => {
     it('should call SessionPersistence.userJoined', () => {
       spyOn(SessionPersistence, 'userJoined');
-      const data: UserJoinedData = { userInfo: {} as any  };
+      const data: UserJoinedData = { userInfo: {} as any };
 
       SessionEvents['.Event_UserJoined.ext'](data);
 
@@ -374,7 +377,7 @@ describe('SessionEvents', () => {
   describe('.Event_UserLeft.ext', () => {
     it('should call SessionPersistence.userLeft', () => {
       spyOn(SessionPersistence, 'userLeft');
-      const data: UserLeftData = { name: ''  };
+      const data: UserLeftData = { name: '' };
 
       SessionEvents['.Event_UserLeft.ext'](data);
 

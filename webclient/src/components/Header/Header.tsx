@@ -1,23 +1,23 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { NavLink, withRouter, generatePath } from "react-router-dom";
-import AppBar from "@material-ui/core/AppBar";
-import IconButton from "@material-ui/core/IconButton";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import Toolbar from "@material-ui/core/Toolbar";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { NavLink, withRouter, generatePath } from 'react-router-dom';
+import AppBar from '@material-ui/core/AppBar';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Toolbar from '@material-ui/core/Toolbar';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import CloseIcon from '@material-ui/icons/Close';
 import MailOutlineRoundedIcon from '@material-ui/icons/MailOutline';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
-import { AuthenticationService, RoomsService } from "api";
+import { AuthenticationService, RoomsService } from 'api';
 import { Images } from 'images';
-import {  RoomsSelectors, ServerSelectors } from "store";
-import { Room, RouteEnum, User } from "types";
+import { RoomsSelectors, ServerSelectors } from 'store';
+import { Room, RouteEnum, User } from 'types';
 
-import "./Header.css";
+import './Header.css';
 
 import CardImportDialog from '../CardImportDialog/CardImportDialog';
 
@@ -85,7 +85,7 @@ class Header extends Component<HeaderProps> {
     const { joinedRooms, state, user } = this.props;
     const { anchorEl, showCardImportDialog } = this.state;
 
-    let options = [ ...this.options ];
+    let options = [...this.options];
 
     if (user && AuthenticationService.isModerator(user)) {
       options = [
@@ -183,7 +183,7 @@ class Header extends Component<HeaderProps> {
             </div>
           ) }
         </Toolbar>
-        
+
         <CardImportDialog
           isOpen={showCardImportDialog}
           handleClose={this.closeImportCardWizard}

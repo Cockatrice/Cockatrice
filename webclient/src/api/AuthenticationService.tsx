@@ -1,6 +1,6 @@
-import {StatusEnum, User} from "types";
-import {SessionCommands, webClient} from "websocket";
-import {WebSocketConnectReason, WebSocketOptions} from "../websocket/services/WebSocketService";
+import { StatusEnum, User } from 'types';
+import { SessionCommands, webClient } from 'websocket';
+import { WebSocketConnectReason, WebSocketOptions } from '../websocket/services/WebSocketService';
 
 export default class AuthenticationService {
   static connect(options: WebSocketOptions): void {

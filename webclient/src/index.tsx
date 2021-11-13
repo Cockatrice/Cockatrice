@@ -1,11 +1,11 @@
 import { ThemeProvider } from '@material-ui/styles';
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
 
 import { materialTheme } from './material-theme';
 
-import { AppShell } from "containers";
+import { AppShell } from 'containers';
 
 const appWithMaterialTheme = () => (
   <ThemeProvider theme={materialTheme}>
@@ -13,4 +13,4 @@ const appWithMaterialTheme = () => (
   </ThemeProvider>
 );
 
-ReactDOM.render(appWithMaterialTheme(), document.getElementById("root"));
+ReactDOM.render(appWithMaterialTheme(), document.getElementById('root'));

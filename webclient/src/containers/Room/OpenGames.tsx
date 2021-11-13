@@ -1,53 +1,53 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import * as _ from "lodash";
+import { connect } from 'react-redux';
+import * as _ from 'lodash';
 
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Tooltip from "@material-ui/core/Tooltip";
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // import { RoomsService } from "AppShell/common/services";
 
-import { SortUtil, RoomsDispatch, RoomsSelectors } from "store";
-import { UserDisplay } from "components";
+import { SortUtil, RoomsDispatch, RoomsSelectors } from 'store';
+import { UserDisplay } from 'components';
 
-import "./OpenGames.css";
+import './OpenGames.css';
 
 // @TODO run interval to update timeSinceCreated
 class OpenGames extends Component<OpenGamesProps> {
   private headerCells = [
     {
-      label: "Age",
-      field: "startTime"
+      label: 'Age',
+      field: 'startTime'
     },
     {
-      label: "Description",
-      field: "description"
+      label: 'Description',
+      field: 'description'
     },
     {
-      label: "Creator",
-      field: "creatorInfo.name"
+      label: 'Creator',
+      field: 'creatorInfo.name'
     },
     {
-      label: "Type",
-      field: "gameType"
+      label: 'Type',
+      field: 'gameType'
     },
     {
-      label: "Restrictions",
+      label: 'Restrictions',
       // field: "?"
     },
     {
-      label: "Players",
+      label: 'Players',
       // field: ["maxPlayers", "playerCount"]
     },
     {
-      label: "Spectators",
-      field: "spectatorsCount"
+      label: 'Spectators',
+      field: 'spectatorsCount'
     },
   ];
 

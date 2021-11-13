@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React from "react";
-import { connect } from "react-redux";
-import { Form, reduxForm } from "redux-form"
+import { connect } from 'react-redux';
+import { Form, reduxForm } from 'redux-form'
 
 import { InputAction } from 'components';
 import { FormKey } from 'types';

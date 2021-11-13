@@ -1,10 +1,10 @@
-import {Room, StatusEnum, User} from 'types';
+import { Room, StatusEnum, User } from 'types';
 
-import {SessionCommands} from '../commands';
-import {RoomPersistence, SessionPersistence} from '../persistence';
-import {ProtobufEvents} from '../services/ProtobufService';
+import { SessionCommands } from '../commands';
+import { RoomPersistence, SessionPersistence } from '../persistence';
+import { ProtobufEvents } from '../services/ProtobufService';
 import webClient from '../WebClient';
-import {WebSocketConnectReason} from "../services/WebSocketService";
+import { WebSocketConnectReason } from '../services/WebSocketService';
 
 export const SessionEvents: ProtobufEvents = {
   '.Event_AddToList.ext': addToList,
@@ -21,7 +21,7 @@ export const SessionEvents: ProtobufEvents = {
   '.Event_UserMessage.ext': userMessage,
 }
 
-function addToList({ listName, userInfo}: AddToListData) {
+function addToList({ listName, userInfo }: AddToListData) {
   switch (listName) {
     case 'buddy': {
       SessionPersistence.addToBuddyList(userInfo);
@@ -44,7 +44,7 @@ function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
   if (reasonStr) {
     message = reasonStr;
   } else {
-    switch(reason) {
+    switch (reason) {
       case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USER_LIMIT_REACHED:
         message = 'The server has reached its maximum user capacity';
         break;
@@ -147,7 +147,7 @@ function serverIdentification(info: ServerIdentificationData) {
       SessionCommands.resetPassword();
       break;
     default:
-      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Unknown Connection Reason: " + webClient.options.reason);
+      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + webClient.options.reason);
       SessionCommands.disconnect();
       break;
   }

@@ -1,18 +1,18 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
-import ListItem from "@material-ui/core/ListItem";
-import Paper from "@material-ui/core/Paper";
+import ListItem from '@material-ui/core/ListItem';
+import Paper from '@material-ui/core/Paper';
 
-import { RoomsSelectors, ServerSelectors } from "store";
+import { RoomsSelectors, ServerSelectors } from 'store';
 
-import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from "components";
-import { Room, User } from "types";
+import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from 'components';
+import { Room, User } from 'types';
 import Rooms from './Rooms';
 
-import "./Server.css";
+import './Server.css';
 
 class Server extends Component<ServerProps, ServerState> {
   render() {
@@ -46,7 +46,7 @@ class Server extends Component<ServerProps, ServerState> {
                   <ListItem button dense>
                     <UserDisplay user={user} />
                   </ListItem>
-                ) ) }
+                )) }
               />
             </Paper>
           )}

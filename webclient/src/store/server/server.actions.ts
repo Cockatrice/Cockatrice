@@ -1,4 +1,4 @@
-import { Types } from "./server.types";
+import { Types } from './server.types';
 
 export const Actions = {
   clearStore: () => ({

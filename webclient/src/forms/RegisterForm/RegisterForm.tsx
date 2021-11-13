@@ -5,7 +5,7 @@ import { Form, Field, reduxForm, change } from 'redux-form'
 
 import Button from '@material-ui/core/Button';
 
-import { InputField, KnownHosts  } from 'components';
+import { InputField, KnownHosts } from 'components';
 import { FormKey } from 'types';
 
 import './RegisterForm.css';
@@ -51,7 +51,7 @@ const RegisterForm = (props) => {
 
     </Form >
   );
-}
+};
 
 const propsMap = {
   form: FormKey.REGISTER,
@@ -59,7 +59,7 @@ const propsMap = {
 
 const mapStateToProps = () => ({
   initialValues: {
-    
+
   }
 });
 

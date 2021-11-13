@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
-import TextField from "@material-ui/core/TextField";
+import TextField from '@material-ui/core/TextField';
 import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
 
 import './InputField.css';
@@ -10,14 +10,14 @@ const InputField = ({ input, label, name, autoComplete, type, meta: { touched, e
     { touched && (
       <div className="inputField-validation">
         {
-          ( error &&
+          (error &&
             <ThemedFieldError className="inputField-error">
               {error}
               <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
             </ThemedFieldError>
           ) ||
 
-          ( warning && <ThemedFieldWarning className="inputField-warning">{warning}</ThemedFieldWarning> )
+          (warning && <ThemedFieldWarning className="inputField-warning">{warning}</ThemedFieldWarning>)
         }
       </div>
     ) }
