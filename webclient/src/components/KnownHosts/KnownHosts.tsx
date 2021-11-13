@@ -98,7 +98,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
     HostDTO.delete(id);
   };
 
-  const handleDialogSubmit = async ({id, name, host, port}) => {
+  const handleDialogSubmit = async ({ id, name, host, port }) => {
     if (id) {
       const hostDTO = await HostDTO.get(id);
       hostDTO.name = name;
@@ -116,7 +116,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
 
       setHostsState(s => ({
         ...s,
-        hosts: [ ...s.hosts, newHost ],
+        hosts: [...s.hosts, newHost],
         selectedHost: id,
       }));
     }
@@ -148,14 +148,14 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
         { touched && (
           <div className="KnownHosts-validation">
             {
-              ( error &&
+              (error &&
                 <div className="KnownHosts-error">
                   {error}
                   <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
                 </div>
               ) ||
 
-              ( warning && <div className="KnownHosts-warning">{warning}</div> )
+              (warning && <div className="KnownHosts-warning">{warning}</div>)
             }
           </div>
         ) }

@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import TextField from "@material-ui/core/TextField";
+import TextField from '@material-ui/core/TextField';
 import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
 
 import './InputField.css';
@@ -21,18 +21,18 @@ const InputField = ({ input, label, name, autoComplete, type, meta: { touched, e
   const classes = useStyles();
 
   return (
-    <div className={"InputField " + classes.root}>
+    <div className={'InputField ' + classes.root}>
       { touched && (
         <div className="InputField-validation">
           {
-            ( error &&
+            (error &&
               <div className="InputField-error">
                 {error}
                 <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
               </div>
             ) ||
 
-            ( warning && <div className="InputField-warning">{warning}</div> )
+            (warning && <div className="InputField-warning">{warning}</div>)
           }
         </div>
       ) }

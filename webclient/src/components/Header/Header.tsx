@@ -12,7 +12,7 @@ import MailOutlineRoundedIcon from '@material-ui/icons/MailOutline';
 import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from 'lodash';
 
-import { AuthenticationService, RoomsService } from "api";
+import { AuthenticationService, RoomsService } from 'api';
 import { CardImportDialog } from 'dialogs';
 import { Images } from 'images';
 import { RoomsSelectors, ServerSelectors } from 'store';

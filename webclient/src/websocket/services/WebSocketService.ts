@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 
-import { ServerStatus, StatusEnum, WebSocketOptions } from "types";
+import { ServerStatus, StatusEnum, WebSocketOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';

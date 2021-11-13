@@ -31,12 +31,12 @@
     "postinstall": "run-script-os",
     "postinstall:windows": "powershell .\\copy_shared_files.ps1",
     "postinstall:default": "./copy_shared_files.sh",
-    "start": "react-scripts start",
+    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint ./**/*.{ts,tsx}",
-    "lint:fix": "eslint ./**/*.{ts,tsx}  --fix"
+    "lint": "eslint './**/*.{ts,tsx}'",
+    "lint:fix": "eslint './**/*.{ts,tsx}' --fix"
   },
   "eslintConfig": {
     "extends": "react-app"

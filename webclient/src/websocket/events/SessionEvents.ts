@@ -1,4 +1,4 @@
-import {Room, StatusEnum, User, WebSocketConnectReason} from 'types';
+import { Room, StatusEnum, User, WebSocketConnectReason } from 'types';
 
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';

@@ -1,4 +1,4 @@
-import {StatusEnum, WebSocketConnectReason, WebSocketOptions} from 'types';
+import { StatusEnum, WebSocketConnectReason, WebSocketOptions } from 'types';
 
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';

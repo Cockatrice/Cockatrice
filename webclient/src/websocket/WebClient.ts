@@ -1,7 +1,7 @@
-import {ServerStatus, StatusEnum, WebSocketOptions} from "types";
+import { ServerStatus, StatusEnum, WebSocketOptions } from 'types';
 
-import {ProtobufService} from './services/ProtobufService';
-import {WebSocketService} from "./services/WebSocketService";
+import { ProtobufService } from './services/ProtobufService';
+import { WebSocketService } from './services/WebSocketService';
 
 import { RoomPersistence, SessionPersistence } from './persistence';
 
@@ -57,7 +57,7 @@ export class WebClient {
 
   public connect(options: WebSocketOptions) {
     this.connectionAttemptMade = true;
-    this.options = {...this.options, ...options};
+    this.options = { ...this.options, ...options };
     this.socket.connect(this.options);
   }
 
