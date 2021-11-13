@@ -23,6 +23,10 @@ export class HostDTO extends Host {
   static bulkAdd(hosts: Host[]): Promise<IndexableType> {
     return dexieService.hosts.bulkAdd(hosts);
   }
+
+  static delete(id: string): Promise<void> {
+    return dexieService.hosts.delete(id);
+  }
 };
 
 dexieService.hosts.mapToClass(HostDTO);

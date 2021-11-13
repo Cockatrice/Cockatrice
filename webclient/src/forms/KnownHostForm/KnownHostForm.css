@@ -12,7 +12,10 @@
   width: 100%;
 }
 
-.KnownHostForm-help {
-  text-align: right;
-  margin: 15px 0 10px;
+.KnownHostForm-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0 10px;
+  color: red;
 }

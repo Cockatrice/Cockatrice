@@ -50,9 +50,9 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
       await HostDTO.bulkAdd(DefaultHosts);
       loadKnownHosts();
     } else {
-      let selectedHost = hosts.findIndex(({ lastSelected }) => lastSelected);
-      selectedHost = selectedHost === -1 ? 0 : selectedHost;
-      setHostsState(s => ({ ...s, hosts, selectedHost }));
+      const selectedHost = hosts.find(({ lastSelected }) => lastSelected);
+      const selectedHostId = selectedHost?.id || hosts[0].id;
+      setHostsState(s => ({ ...s, hosts, selectedHost: selectedHostId }));
     }
   }, []);
 
@@ -62,10 +62,11 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
 
   useEffect(() => {
     const { hosts, selectedHost } = hostsState;
+    const host = hosts.find(({ id }) => id === selectedHost);
 
-    if (hosts.length && hosts[selectedHost]) {
-      updateLastSelectedHost(hosts[selectedHost].id).then(() => {
-        onChange(hosts[selectedHost]);
+    if (host) {
+      updateLastSelectedHost(host.id).then(() => {
+        onChange(host);
       });
     }
   }, [hostsState, onChange]);
@@ -86,6 +87,17 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
     setDialogState(s => ({ ...s, open: false }));
   }
 
+  const handleDialogRemove = async ({ id }) => {
+    setHostsState(s => ({
+      ...s,
+      hosts: s.hosts.filter(host => host.id !== id),
+      selectedHost: s.selectedHost === id ? s.hosts[0].id : s.selectedHost,
+    }));
+
+    closeKnownHostDialog();
+    HostDTO.delete(id);
+  };
+
   const handleDialogSubmit = async ({id, name, host, port}) => {
     if (id) {
       const hostDTO = await HostDTO.get(id);
@@ -100,12 +112,12 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
       }));
     } else {
       const newHost = { name, host, port, editable: true };
-      await HostDTO.add(newHost);
+      const id = await HostDTO.add(newHost) as number;
 
       setHostsState(s => ({
         ...s,
         hosts: [ ...s.hosts, newHost ],
-        selectedHost: s.hosts.length,
+        selectedHost: id,
       }));
     }
 
@@ -166,7 +178,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
 
           {
             hostsState.hosts.map((host, index) => (
-              <MenuItem className='KnownHosts-item' value={index} key={index}>
+              <MenuItem className='KnownHosts-item' value={host.id} key={index}>
                 <div className='KnownHosts-item__label'>
                   <Check />
                   <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>
@@ -188,6 +200,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
       <KnownHostDialog
         isOpen={dialogState.open}
         host={dialogState.edit}
+        onRemove={handleDialogRemove}
         onSubmit={handleDialogSubmit}
         handleClose={closeKnownHostDialog}
       />

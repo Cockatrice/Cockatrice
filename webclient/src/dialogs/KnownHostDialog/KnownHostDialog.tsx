@@ -10,7 +10,7 @@ import { KnownHostForm } from 'forms';
 
 import './KnownHostDialog.css';
 
-const KnownHostDialog = ({ classes, handleClose, onSubmit, isOpen, host }: any) => {
+const KnownHostDialog = ({ classes, handleClose, onRemove, onSubmit, isOpen, host }: any) => {
   const handleOnClose = () => {
     if (handleClose) {
       handleClose();
@@ -32,7 +32,7 @@ const KnownHostDialog = ({ classes, handleClose, onSubmit, isOpen, host }: any) 
         <Typography variant='subtitle1'>
           Adding a new host allows you to connect to different servers. Enter the details below to your host list.
         </Typography>
-        <KnownHostForm onSubmit={onSubmit} host={host}></KnownHostForm>
+        <KnownHostForm onRemove={onRemove} onSubmit={onSubmit} host={host}></KnownHostForm>
       </DialogContent>
     </Dialog>
   );

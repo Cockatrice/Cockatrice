@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import { Form, Field } from 'react-final-form'
 
@@ -10,8 +10,8 @@ import { InputField } from "components";
 
 import "./KnownHostForm.css";
 
-function KnownHostForm(props) {
-  const { host, onSubmit } = props;
+function KnownHostForm({ host, onRemove, onSubmit }) {
+  const [ confirmDelete, setConfirmDelete ] = useState(false);
 
   return (
     <Form
@@ -58,8 +58,15 @@ function KnownHostForm(props) {
             {host ? 'Save Changes' : 'Add Host' }
           </Button>
 
-          <div className="KnownHostForm-help">
-            <AnchorLink href='https://github.com/Cockatrice/Cockatrice/wiki' target='_blank'>Need help adding a new host?</AnchorLink>
+          <div className="KnownHostForm-actions">
+            <div  className="KnownHostForm-actions__delete">
+              { host && (
+                 <Button color="inherit" onClick={() => !confirmDelete ? setConfirmDelete(true) : onRemove(host)}>
+                  { !confirmDelete ? 'Delete' : 'Are you sure?' }
+                </Button>
+              ) }
+            </div>
+            <AnchorLink href='https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers' target='_blank'>Need help adding a new host?</AnchorLink>
           </div>
         </form>
       ) }
