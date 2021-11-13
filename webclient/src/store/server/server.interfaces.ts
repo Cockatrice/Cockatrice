@@ -68,3 +68,7 @@ export interface ServerStateLogs {
 export interface ServerStateSortUsersBy extends SortBy {
   field: UserSortField
 }
+
+export interface RequestPasswordSaltParams {
+  user: string;
+}
