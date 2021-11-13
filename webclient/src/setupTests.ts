@@ -1,4 +1,4 @@
-import protobuf from "protobufjs";
+import protobuf from 'protobufjs';
 
 class MockProtobufRoot {
   load() {}

@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm} from 'redux-form'
+import { Form, Field, reduxForm } from 'redux-form'
 
 import Button from '@material-ui/core/Button';
 import Stepper from '@material-ui/core/Stepper';
@@ -16,7 +16,7 @@ import { FormKey } from 'types';
 import './CardImportForm.css';
 
 const CardImportForm = (props) => {
-  const { handleSubmit, onSubmit:onClose } = props;
+  const { handleSubmit, onSubmit: onClose } = props;
 
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -25,7 +25,9 @@ const CardImportForm = (props) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (loading) { setError(null); }
+    if (loading) {
+      setError(null);
+    }
   }, [loading])
 
   const steps = ['Imports sets', 'Save sets', 'Import tokens', 'Finished'];
@@ -50,7 +52,7 @@ const CardImportForm = (props) => {
       })
       .catch(({ message }) => setError(message))
       .finally(() => setLoading(false));
-  }
+  };
 
   const handleCardSave = async () => {
     setLoading(true);
@@ -60,13 +62,13 @@ const CardImportForm = (props) => {
       await SetDTO.bulkAdd(importedSets);
 
       handleNext();
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       setError('Failed to save cards');
     }
 
     setLoading(false);
-  }
+  };
 
   const handleTokenDownload = ({ tokenDownloadUrl }) => {
     setLoading(true);
@@ -78,7 +80,7 @@ const CardImportForm = (props) => {
       })
       .catch(({ message }) => setError(message))
       .finally(() => setLoading(false));
-  }
+  };
 
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
@@ -172,7 +174,7 @@ const CardImportForm = (props) => {
       ) }
     </div>
   );
-}
+};
 
 const BackButton = ({ click, disabled }) => (
   <Button onClick={click} disabled={disabled}>Go Back</Button>
@@ -182,7 +184,7 @@ const ErrorMessage = ({ error }) => {
   return error && (
     <div className='error'>{error}</div>
   );
-}
+};
 
 const CardsImported = ({ cards, sets }) => {
   const items = [
@@ -192,11 +194,11 @@ const CardsImported = ({ cards, sets }) => {
       </div>
     ),
 
-    ( <div className='spacer' /> ),
+    (<div className='spacer' />),
 
     ...sets.map(set => (
       <div>{set.name}: {set.cards.length} cards imported</div>
-    ) )
+    ))
   ];
 
   return (

@@ -1,7 +1,7 @@
-import protobuf from "protobufjs";
+import protobuf from 'protobufjs';
 
-import ProtoFiles from "../ProtoFiles";
-import { WebClient } from "../WebClient";
+import ProtoFiles from '../ProtoFiles';
+import { WebClient } from '../WebClient';
 
 import { RoomEvents, SessionEvents } from '../events';
 
@@ -31,8 +31,8 @@ export class ProtobufService {
 
   public sendRoomCommand(roomId: number, roomCmd: number, callback?: Function) {
     const cmd = this.controller.CommandContainer.create({
-      "roomId" : roomId,
-      "roomCommand" : [ roomCmd ]
+      'roomId': roomId,
+      'roomCommand': [roomCmd]
     });
 
     this.sendCommand(cmd, raw => callback && callback(raw));
@@ -40,7 +40,7 @@ export class ProtobufService {
 
   public sendSessionCommand(sesCmd: number, callback?: Function) {
     const cmd = this.controller.CommandContainer.create({
-      "sessionCommand" : [ sesCmd ]
+      'sessionCommand': [sesCmd]
     });
 
     this.sendCommand(cmd, (raw) => callback && callback(raw));
@@ -48,7 +48,7 @@ export class ProtobufService {
 
   public sendModeratorCommand(modCmd: number, callback?: Function) {
     const cmd = this.controller.CommandContainer.create({
-      "moderatorCommand" : [ modCmd ]
+      'moderatorCommand': [modCmd]
     });
 
     this.sendCommand(cmd, (raw) => callback && callback(raw));
@@ -57,7 +57,7 @@ export class ProtobufService {
   public sendCommand(cmd: number, callback: Function) {
     this.cmdId++;
 
-    cmd["cmdId"] = this.cmdId;
+    cmd['cmdId'] = this.cmdId;
     this.pendingCommands[this.cmdId] = callback;
 
     if (this.webClient.socket.checkReadyState(WebSocket.OPEN)) {
@@ -67,7 +67,7 @@ export class ProtobufService {
 
   public sendKeepAliveCommand(pingReceived: Function) {
     const command = this.controller.SessionCommand.create({
-      ".Command_Ping.ext" : this.controller.Command_Ping.create()
+      '.Command_Ping.ext': this.controller.Command_Ping.create()
     });
 
     this.sendSessionCommand(command, pingReceived);
@@ -90,12 +90,12 @@ export class ProtobufService {
             this.processSessionEvent(msg.sessionEvent, msg);
             break;
           case this.controller.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
-            // @TODO
+          // @TODO
             break;
         }
       }
     } catch (err) {
-      console.error("Processing failed:", err);
+      console.error('Processing failed:', err);
     }
   }
 

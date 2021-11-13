@@ -1,16 +1,16 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
-import { connect } from "react-redux";
-import { Form, Field, reduxForm } from "redux-form"
+import { connect } from 'react-redux';
+import { Form, Field, reduxForm } from 'redux-form'
 
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import Paper from "@material-ui/core/Paper";
+import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
 
-import { InputField, CheckboxField } from "components";
-import { FormKey } from "types";
+import { InputField, CheckboxField } from 'components';
+import { FormKey } from 'types';
 
-import "./SearchForm.css";
+import './SearchForm.css';
 
 const SearchForm = ({ handleSubmit }) => (
   <Paper className="log-search">
@@ -35,7 +35,7 @@ const SearchForm = ({ handleSubmit }) => (
         <Field label="Rooms" name="logLocation.room" component={CheckboxField} />
         <Field label="Games" name="logLocation.game" component={CheckboxField} />
         <Field label="Chats" name="logLocation.chat" component={CheckboxField} />
-     </div>
+      </div>
       <Divider />
       <div className="log-search__form-item">
         <span>Date Range: Coming Soon</span>
@@ -57,7 +57,7 @@ const propsMap = {
 };
 
 const mapStateToProps = () => ({
-  
+
 });
 
 export default connect(mapStateToProps)(reduxForm(propsMap)(SearchForm));

@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { NavLink, generatePath } from "react-router-dom";
+import { NavLink, generatePath } from 'react-router-dom';
 
 import {
   RouteEnum,
@@ -39,7 +39,7 @@ const ParsedMessage = ({ message }) => {
 
   return (
     <div>
-      { name && ( <strong><PlayerLink name={name} />:</strong> ) }
+      { name && (<strong><PlayerLink name={name} />:</strong>) }
       { messageChunks }
     </div>
   );
@@ -61,7 +61,7 @@ function parseMessage(message) {
 function parseChunks(chunk, index) {
   if (chunk.match(CARD_CALLOUT_REGEX)) {
     const name = chunk.replace(CALLOUT_BOUNDARY_REGEX, '').trim();
-    return ( <CardCallout name={name} key={index}></CardCallout> );
+    return (<CardCallout name={name} key={index}></CardCallout>);
   }
 
   if (chunk.match(URL_REGEX)) {
@@ -80,7 +80,7 @@ function parseUrlChunk(chunk) {
     .filter(urlChunk => !!urlChunk)
     .map((urlChunk, index) => {
       if (urlChunk.match(URL_REGEX)) {
-        return ( <a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a> );
+        return (<a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a>);
       }
 
       return urlChunk;
@@ -95,7 +95,7 @@ function parseMentionChunk(chunk) {
 
       if (mention) {
         const name = mention[0].substr(1);
-        return ( <PlayerLink name={name} label={mention} key={index} /> );
+        return (<PlayerLink name={name} label={mention} key={index} />);
       }
 
       return mentionChunk;

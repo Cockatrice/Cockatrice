@@ -1,28 +1,30 @@
 import { RoomPersistence } from '../persistence';
-import webClient from "../WebClient";
+import webClient from '../WebClient';
 
 export class RoomCommands {
   static roomSay(roomId: number, message: string): void {
     const trimmed = message.trim();
-    
-    if (!trimmed) return;
 
-    var CmdRoomSay = webClient.protobuf.controller.Command_RoomSay.create({
-      "message" : trimmed
+    if (!trimmed) {
+      return;
+    }
+
+    const CmdRoomSay = webClient.protobuf.controller.Command_RoomSay.create({
+      'message': trimmed
     });
 
-    var rc = webClient.protobuf.controller.RoomCommand.create({
-      ".Command_RoomSay.ext" : CmdRoomSay
+    const rc = webClient.protobuf.controller.RoomCommand.create({
+      '.Command_RoomSay.ext': CmdRoomSay
     });
 
     webClient.protobuf.sendRoomCommand(roomId, rc);
   }
 
   static leaveRoom(roomId: number): void {
-    var CmdLeaveRoom = webClient.protobuf.controller.Command_LeaveRoom.create();
+    const CmdLeaveRoom = webClient.protobuf.controller.Command_LeaveRoom.create();
 
-    var rc = webClient.protobuf.controller.RoomCommand.create({
-      ".Command_LeaveRoom.ext" : CmdLeaveRoom
+    const rc = webClient.protobuf.controller.RoomCommand.create({
+      '.Command_LeaveRoom.ext': CmdLeaveRoom
     });
 
     webClient.protobuf.sendRoomCommand(roomId, rc, (raw) => {

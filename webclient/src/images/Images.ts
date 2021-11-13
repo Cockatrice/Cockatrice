@@ -1,5 +1,5 @@
-import { Countries } from "./countries/_Countries";
-import { Faces } from "./faces/_Faces";
+import { Countries } from './countries/_Countries';
+import { Faces } from './faces/_Faces';
 import Logo from './logo.png';
 
 export class Images {

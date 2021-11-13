@@ -1,19 +1,19 @@
 // eslint-disable-next-line
 import React from "react";
-import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-import { AuthenticationService } from "api";
-import { LoginForm } from "forms";
-import { Images } from "images";
-import { RouteEnum } from "types";
-import { /* ServerDispatch, */ ServerSelectors } from "store";
+import { AuthenticationService } from 'api';
+import { LoginForm } from 'forms';
+import { Images } from 'images';
+import { RouteEnum } from 'types';
+import { ServerSelectors } from 'store';
 
-import "./Login.css";
+import './Login.css';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -58,7 +58,7 @@ const Login = ({ state, description }: LoginProps) => {
 
   const showDescription = () => {
     return !isConnected && description?.length;
-  }
+  };
 
   const createAccount = () => {
     console.log('Login.createAccount->openForgotPasswordDialog');
@@ -131,7 +131,9 @@ const Login = ({ state, description }: LoginProps) => {
               </div>
               { /*<img src={loginGraphic} className="login-content__description-image"/>*/}
               <p className="login-content__description-subtitle1">Play multiplayer card games online.</p>
-              <p className="login-content__description-subtitle2">Cross-platform virtual tabletop for multiplayer card games. Forever free.</p>
+              <p className="login-content__description-subtitle2">
+                Cross-platform virtual tabletop for multiplayer card games. Forever free.
+              </p>
             </div>
           </div>
         </Paper>

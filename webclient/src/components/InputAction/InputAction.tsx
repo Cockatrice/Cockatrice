@@ -1,11 +1,11 @@
 // eslint-disable-next-line
 import React from "react";
-import { Field } from "redux-form"
-import Button from "@material-ui/core/Button";
+import { Field } from 'redux-form'
+import Button from '@material-ui/core/Button';
 
 import { InputField } from 'components';
 
-import "./InputAction.css";
+import './InputAction.css';
 
 const InputAction = ({ action, label, name }) => (
   <div className="input-action">

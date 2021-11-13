@@ -49,7 +49,7 @@ const CardCallout = ({ name }) => {
 
   return (
     <span className='callout'>
-      <span 
+      <span
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
       >{card?.name || token?.name?.value || name}</span>
@@ -74,8 +74,8 @@ const CardCallout = ({ name }) => {
             }}
           >
             <div className="callout-card">
-              { card && ( <CardDetails card={card} /> ) }
-              { token && ( <TokenDetails token={token} /> ) }
+              { card && (<CardDetails card={card} />) }
+              { token && (<TokenDetails token={token} />) }
             </div>
           </Popover>
         )

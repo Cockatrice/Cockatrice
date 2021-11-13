@@ -1,10 +1,10 @@
-import { Types } from "./rooms.types";
+import { Types } from './rooms.types';
 
 export const Actions = {
   clearStore: () => ({
     type: Types.CLEAR_STORE
   }),
-  
+
   updateRooms: rooms => ({
     type: Types.UPDATE_ROOMS,
     rooms

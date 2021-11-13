@@ -3,7 +3,7 @@ import React from "react";
 
 import { Message } from 'components';
 
-import "./Messages.css";
+import './Messages.css';
 
 const Messages = ({ messages }) => (
   <div className="messages">
@@ -12,7 +12,7 @@ const Messages = ({ messages }) => (
         <div className="message-wrapper" key={message.timeReceived}>
           <Message message={message} />
         </div>
-      ) )
+      ))
     }
   </div>
 );

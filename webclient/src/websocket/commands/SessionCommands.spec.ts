@@ -1,11 +1,11 @@
-import {StatusEnum} from 'types';
+import { StatusEnum } from 'types';
 
-import {SessionCommands} from './SessionCommands';
+import { SessionCommands } from './SessionCommands';
 
-import {RoomPersistence, SessionPersistence} from '../persistence';
+import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
-import {WebSocketConnectReason} from "../services/WebSocketService";
-import {AccountActivationParams, ServerRegisterParams} from "../../store";
+import { WebSocketConnectReason } from '../services/WebSocketService';
+import { AccountActivationParams, ServerRegisterParams } from '../../store';
 
 describe('SessionCommands', () => {
   const roomId = 1;
@@ -42,7 +42,7 @@ describe('SessionCommands', () => {
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTING, expect.any(String));
-      
+
       expect(webClient.connect).toHaveBeenCalled();
       expect(webClient.connect).toHaveBeenCalledWith({ ...options, reason: WebSocketConnectReason.LOGIN });
     });
@@ -75,7 +75,7 @@ describe('SessionCommands', () => {
 
       expect(SessionCommands.updateStatus).toHaveBeenCalled();
       expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTING, 'Disconnecting...');
-      
+
       expect(webClient.disconnect).toHaveBeenCalled();
     });
   });
@@ -226,7 +226,10 @@ describe('SessionCommands', () => {
 
         SessionCommands.login();
 
-        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
+        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(
+          StatusEnum.DISCONNECTED,
+          'Login failed: account not activated'
+        );
       });
 
       it('all other responseCodes should update status', () => {
@@ -236,7 +239,10 @@ describe('SessionCommands', () => {
 
         SessionCommands.login();
 
-        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, `Login failed: unknown error: ${response.responseCode}`);
+        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(
+          StatusEnum.DISCONNECTED,
+          `Login failed: unknown error: ${response.responseCode}`
+        );
       });
     });
   });
@@ -283,17 +289,17 @@ describe('SessionCommands', () => {
         response = {
           responseCode: RespRegistrationAccepted,
           [respKey]: {
-            reasonStr: "",
+            reasonStr: '',
             endTime: 10000000
           }
         };
 
-        webClient.protobuf.controller.Response = { ResponseCode: { RespRegistrationAccepted }};
+        webClient.protobuf.controller.Response = { ResponseCode: { RespRegistrationAccepted } };
 
         sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
       })
 
-      it("should login user if registration accepted without email verification", () => {
+      it('should login user if registration accepted without email verification', () => {
         spyOn(SessionCommands, 'login');
         spyOn(SessionPersistence, 'accountAwaitingActivation');
 
@@ -303,10 +309,11 @@ describe('SessionCommands', () => {
         expect(SessionPersistence.accountAwaitingActivation).not.toHaveBeenCalled();
       });
 
-      it("should prompt user if registration accepted with email verification", () => {
+      it('should prompt user if registration accepted with email verification', () => {
         const RespRegistrationAcceptedNeedsActivation = 'RespRegistrationAcceptedNeedsActivation';
         response.responseCode = RespRegistrationAcceptedNeedsActivation;
-        webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation = RespRegistrationAcceptedNeedsActivation;
+        webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation =
+            RespRegistrationAcceptedNeedsActivation;
 
         spyOn(SessionCommands, 'login');
         spyOn(SessionPersistence, 'accountAwaitingActivation');
@@ -317,7 +324,7 @@ describe('SessionCommands', () => {
         expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
       });
 
-      it("should disconnect user if registration fails due to registration being disabled", () => {
+      it('should disconnect user if registration fails due to registration being disabled', () => {
         const RespRegistrationDisabled = 'RespRegistrationDisabled';
         response.responseCode = RespRegistrationDisabled;
         webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled = RespRegistrationDisabled;
@@ -368,7 +375,7 @@ describe('SessionCommands', () => {
           }
         };
 
-        webClient.protobuf.controller.Response = { ResponseCode: { RespActivationAccepted }};
+        webClient.protobuf.controller.Response = { ResponseCode: { RespActivationAccepted } };
 
         sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
         spyOn(SessionCommands, 'login');
@@ -497,7 +504,10 @@ describe('SessionCommands', () => {
 
         SessionCommands.joinRoom(roomId);
 
-        expect(console.error).toHaveBeenCalledWith(RespContextError, 'The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.');
+        expect(console.error).toHaveBeenCalledWith(
+          RespContextError,
+          'The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.'
+        );
       });
 
       it('RespUserLevelTooLow should console error', () => {
@@ -572,7 +582,7 @@ describe('SessionCommands', () => {
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
-      const addToList = { list: 'list', userName: 'userName'};
+      const addToList = { list: 'list', userName: 'userName' };
       SessionCommands.addToList(addToList.list, addToList.userName);
 
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
@@ -588,7 +598,7 @@ describe('SessionCommands', () => {
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
-      const removeFromList = { list: 'list', userName: 'userName'};
+      const removeFromList = { list: 'list', userName: 'userName' };
       SessionCommands.removeFromList(removeFromList.list, removeFromList.userName);
 
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();

@@ -10,16 +10,16 @@ export interface User {
 }
 
 export enum UserAccessLevel {
-  "NONE"
+  'NONE'
 }
 
 export enum UserPrivLevel {
-  "unknown 1",
-  "unknown 2",
-  "unknown 3",
-  "unknown 4"
+  'unknown 1',
+  'unknown 2',
+  'unknown 3',
+  'unknown 4'
 }
 
 export enum UserSortField {
-  NAME = "name"
+  NAME = 'name'
 }

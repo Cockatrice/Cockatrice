@@ -1,20 +1,20 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { connect } from 'react-redux';
 
-import Button from "@material-ui/core/Button";
-import ListItem from "@material-ui/core/ListItem";
-import Paper from "@material-ui/core/Paper";
+import Button from '@material-ui/core/Button';
+import ListItem from '@material-ui/core/ListItem';
+import Paper from '@material-ui/core/Paper';
 
-import { UserDisplay, VirtualList, AuthGuard } from "components";
-import { AuthenticationService, SessionService } from "api";
-import { ServerSelectors } from "store";
+import { UserDisplay, VirtualList, AuthGuard } from 'components';
+import { AuthenticationService, SessionService } from 'api';
+import { ServerSelectors } from 'store';
 import { User } from 'types';
 
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';
 
-import "./Account.css";
+import './Account.css';
 
 class Account extends Component<AccountProps> {
   handleAddToBuddies({ userName }) {
@@ -31,7 +31,7 @@ class Account extends Component<AccountProps> {
     const { buddyList, ignoreList, serverName, serverVersion, user } = this.props;
     const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user;
 
-    var url = URL.createObjectURL(new Blob([avatarBmp], {'type': 'image/png'}));
+    let url = URL.createObjectURL(new Blob([avatarBmp], { 'type': 'image/png' }));
 
     return (
       <div className="account">
@@ -47,9 +47,9 @@ class Account extends Component<AccountProps> {
                 <ListItem button dense>
                   <UserDisplay user={user} />
                 </ListItem>
-              ) ) }
+              )) }
             />
-            <div className="" style={{borderTop: "1px solid"}}>
+            <div className="" style={{ borderTop: '1px solid' }}>
               <AddToBuddies onSubmit={this.handleAddToBuddies} />
             </div>
           </Paper>
@@ -65,15 +65,15 @@ class Account extends Component<AccountProps> {
                 <ListItem button dense>
                   <UserDisplay user={user} />
                 </ListItem>
-              ) ) }
+              )) }
             />
-            <div className="" style={{borderTop: "1px solid"}}>
+            <div className="" style={{ borderTop: '1px solid' }}>
               <AddToIgnore onSubmit={this.handleAddToIgnore} />
             </div>
           </Paper>
         </div>
         <div className="account-column overflow-scroll">
-          <Paper className="account-details" style={{margin: "0 0 5px 0"}}>
+          <Paper className="account-details" style={{ margin: '0 0 5px 0' }}>
             <img src={url} alt={name} />
             <p><strong>{name}</strong></p>
             <p>Location: ({country?.toUpperCase()})</p>
@@ -92,7 +92,7 @@ class Account extends Component<AccountProps> {
             <Button color="primary" variant="contained" onClick={() => AuthenticationService.disconnect()}>Disconnect</Button>
           </Paper>
         </div>
-      </div>  
+      </div>
     )
   }
 }

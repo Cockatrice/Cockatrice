@@ -9,7 +9,7 @@ export enum StatusEnum {
   CONNECTED,
   LOGGING_IN,
   LOGGED_IN,
-  DISCONNECTING =  99
+  DISCONNECTING = 99
 }
 
 export class Host {
@@ -68,7 +68,7 @@ export enum KnownHost {
 
 export const KnownHosts = {
   [KnownHost.ROOSTER]: { port: 4748, host: 'server.cockatrice.us', },
-  [KnownHost.TETRARCH]:  { port: 443, host: 'mtg.tetrarch.co/servatrice'},
+  [KnownHost.TETRARCH]: { port: 443, host: 'mtg.tetrarch.co/servatrice' },
 }
 
 export interface Log {

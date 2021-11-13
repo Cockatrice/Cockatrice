@@ -1,9 +1,9 @@
-import {ServerStatus, StatusEnum} from "types";
+import { ServerStatus, StatusEnum } from 'types';
 
-import {ProtobufService} from './services/ProtobufService';
-import {WebSocketOptions, WebSocketService} from "./services/WebSocketService";
+import { ProtobufService } from './services/ProtobufService';
+import { WebSocketOptions, WebSocketService } from './services/WebSocketService';
 
-import {RoomPersistence, SessionPersistence} from './persistence';
+import { RoomPersistence, SessionPersistence } from './persistence';
 
 export class WebClient {
   public socket = new WebSocketService(this);
@@ -11,30 +11,30 @@ export class WebClient {
 
   public protocolVersion = 14;
   public clientConfig = {
-    "clientver" : "webclient-1.0 (2019-10-31)",
-    "clientfeatures" : [
-      "client_id",
-      "client_ver",
-      "feature_set",
-      "room_chat_history",
-      "client_warnings",
+    'clientver': 'webclient-1.0 (2019-10-31)',
+    'clientfeatures': [
+      'client_id',
+      'client_ver',
+      'feature_set',
+      'room_chat_history',
+      'client_warnings',
       /* unimplemented features */
-      "forgot_password",
-      "idle_client",
-      "mod_log_lookup",
-      "user_ban_history",
+      'forgot_password',
+      'idle_client',
+      'mod_log_lookup',
+      'user_ban_history',
       // satisfy server reqs for POC
-      "websocket",
-      "2.7.0_min_version",
-      "2.8.0_min_version"
+      'websocket',
+      '2.7.0_min_version',
+      '2.8.0_min_version'
     ]
   };
 
   public options: WebSocketOptions = {
-    host: "",
-    port: "",
-    user: "",
-    pass: "",
+    host: '',
+    port: '',
+    user: '',
+    pass: '',
     clientid: null,
     reason: null,
     autojoinrooms: true,
@@ -54,7 +54,7 @@ export class WebClient {
   }
 
   public connect(options: WebSocketOptions) {
-    this.options = {...this.options, ...options};
+    this.options = { ...this.options, ...options };
     this.socket.connect(this.options);
   }
 

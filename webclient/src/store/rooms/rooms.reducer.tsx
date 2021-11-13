@@ -1,11 +1,11 @@
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
-import { GameSortField, UserSortField, SortDirection } from "types";
+import { GameSortField, UserSortField, SortDirection } from 'types';
 
-import { SortUtil } from "../common";
+import { SortUtil } from '../common';
 
-import { RoomsState } from "./rooms.interfaces"
-import { MAX_ROOM_MESSAGES, Types } from "./rooms.types";
+import { RoomsState } from './rooms.interfaces'
+import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
 
 const initialState: RoomsState = {
   rooms: {},
@@ -22,7 +22,7 @@ const initialState: RoomsState = {
 };
 
 export const roomsReducer = (state = initialState, action: any) => {
-  switch(action.type) {
+  switch (action.type) {
     case Types.CLEAR_STORE: {
       return {
         ...initialState
@@ -37,7 +37,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       _.each(action.rooms, (room, order) => {
         const { roomId } = room;
         const existing = rooms[roomId] || {};
-        
+
         const update = { ...room };
         delete update.gameList;
         delete update.gametypeList;
@@ -113,7 +113,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       const { roomId, message } = action;
       const { messages } = state;
 
-      let roomMessages = [ ...(messages[roomId] || []) ];
+      let roomMessages = [...(messages[roomId] || [])];
 
       if (roomMessages.length === MAX_ROOM_MESSAGES) {
         roomMessages.shift();
@@ -150,7 +150,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       }, {});
 
       const gameUpdates = room.gameList
-        // filter out closed games and remove from update map
+      // filter out closed games and remove from update map
         .filter(game => {
           const gameUpdate = toUpdate[game.gameId];
           const closedGame = gameUpdate && gameUpdate.closed;
@@ -181,7 +181,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         _.each(toUpdate, game => gameUpdates.push(game));
       }
 
-      const gameList = [ ...gameUpdates ];
+      const gameList = [...gameUpdates];
 
       SortUtil.sortByField(gameList, sortGamesBy);
 
@@ -216,7 +216,7 @@ export const roomsReducer = (state = initialState, action: any) => {
           [roomId]: {
             ...room,
             userList
-          } 
+          }
         }
       };
     }
@@ -225,7 +225,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       const { rooms } = state;
 
       const room = { ...rooms[roomId] };
-      const userList = room.userList.filter(user =>  user.name !== name);
+      const userList = room.userList.filter(user => user.name !== name);
 
       return {
         ...state,
@@ -234,7 +234,7 @@ export const roomsReducer = (state = initialState, action: any) => {
           [roomId]: {
             ...room,
             userList
-          } 
+          }
         }
       };
     }
@@ -242,7 +242,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       const { field, order, roomId } = action;
       const { rooms } = state;
 
-      const gameList = [ ...rooms[roomId].gameList ];
+      const gameList = [...rooms[roomId].gameList];
 
       const sortGamesBy = {
         field, order

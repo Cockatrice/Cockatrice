@@ -1,21 +1,21 @@
 // eslint-disable-next-line
 import React from "react";
-import { connect } from "react-redux";
-import { Form, Field, reduxForm, change } from "redux-form"
+import { connect } from 'react-redux';
+import { Form, Field, reduxForm, change } from 'redux-form'
 
-import Button from "@material-ui/core/Button";
+import Button from '@material-ui/core/Button';
 
-import { InputField, KnownHosts } from "components";
+import { InputField, KnownHosts } from 'components';
 // import { ServerDispatch } from "store";
 import { FormKey } from 'types';
 
-import "./LoginForm.css";
+import './LoginForm.css';
 
 const LoginForm = (props) => {
   const { dispatch, handleSubmit } = props;
 
   const forgotPassword = () => {
-    console.log("Show recover password dialog, then AuthService.forgotPasswordRequest");
+    console.log('Show recover password dialog, then AuthService.forgotPasswordRequest');
   };
 
   const onHostChange = ({ host, port }) => {
@@ -45,17 +45,25 @@ const LoginForm = (props) => {
       </Button>
     </Form>
   );
-}
+};
 
 const propsMap = {
   form: FormKey.LOGIN,
   validate: values => {
     const errors: any = {};
 
-    if (!values.user) errors.user = 'Required';
-    if (!values.pass) errors.pass = 'Required';
-    if (!values.host) errors.host = 'Required';
-    if (!values.port) errors.port = 'Required';
+    if (!values.user) {
+      errors.user = 'Required';
+    }
+    if (!values.pass) {
+      errors.pass = 'Required';
+    }
+    if (!values.host) {
+      errors.host = 'Required';
+    }
+    if (!values.port) {
+      errors.port = 'Required';
+    }
 
     return errors;
   }
