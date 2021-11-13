@@ -26,7 +26,7 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "postinstall": "echo 'Copying shared files...' && ./copy_shared_files.ps1",
+    "postinstall": "echo 'Copying shared files...' && ./copy_shared_files.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
