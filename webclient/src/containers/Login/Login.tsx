@@ -1,7 +1,7 @@
 // eslint-disable-next-line
-import React from "react";
-import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import React, { useCallback } from "react";
+import { connect } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
@@ -10,8 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import { AuthenticationService } from "api";
 import { LoginForm } from "forms";
 import { Images } from "images";
-import { HostDTO, SettingDTO } from 'services';
-import { RouteEnum, WebSocketOptions, getHostPort, APP_USER } from "types";
+import { HostDTO } from 'services';
+import { RouteEnum, WebSocketOptions, getHostPort } from "types";
 import { ServerSelectors } from "store";
 
 import './Login.css';
@@ -65,23 +65,16 @@ const Login = ({ state, description }: LoginProps) => {
     console.log('Login.createAccount->openForgotPasswordDialog');
   }
 
-  function onSubmit(hostForm) {
+  const onSubmit = useCallback((hostForm) => {
+    console.log('Login.onSubmit.useCallback');
     const { user, pass, selectedHost } = hostForm;
     const { host, port } = getHostPort(selectedHost);
     const options = { user, pass, host, port };
 
-    updateAutoConnectSetting(hostForm);
     updateHost(hostForm);
 
     AuthenticationService.login(options as WebSocketOptions);
-  }
-
-  function updateAutoConnectSetting({ autoConnect }) {
-    SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
-      setting.autoConnect = autoConnect;
-      setting.save();
-    });
-  }
+  }, []);
 
   function updateHost({ selectedHost, user, pass, remember}) {
     HostDTO.get(selectedHost.id).then(_host => {

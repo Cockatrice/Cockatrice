@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Select, MenuItem } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -7,9 +7,11 @@ import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles } from '@material-ui/core/styles';
 import Check from '@material-ui/icons/Check';
+import AddIcon from '@material-ui/icons/Add';
 import EditRoundedIcon from '@material-ui/icons/Edit';
 import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
 
+import { KnownHostDialog } from 'dialogs';
 import { HostDTO } from 'services';
 import { DefaultHosts, getHostPort } from 'types';
 
@@ -28,49 +30,86 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) => {
-  // this feels messy
   const classes = useStyles();
 
-  const [state, setState] = useState({
+  const [hostsState, setHostsState] = useState({
     hosts: [],
     selectedHost: 0,
   });
 
-  useEffect(() => {
-    console.log('mount');
-    HostDTO.getAll().then(async hosts => {
-      console.log('setState');
-      if (hosts?.length) {
-        let selectedHost = hosts.findIndex(({ lastSelected }) => lastSelected);
-        selectedHost = selectedHost === -1 ? 0 : selectedHost;
-        setState(s => ({ ...s, hosts, selectedHost }));
-      } else {
-        setState(s => ({ ...s, hosts: DefaultHosts }));
-        await HostDTO.bulkAdd(DefaultHosts);
-      }
-    });
+  const [dialogState, setDialogState] = useState({
+    open: false,
+    edit: null,
+  });
+
+  const loadKnownHosts = useCallback(async () => {
+    const hosts = await HostDTO.getAll();
+
+    if (!hosts?.length) {
+      // @TODO: find a better pattern to seeding default data in indexedDB
+      await HostDTO.bulkAdd(DefaultHosts);
+      loadKnownHosts();
+    } else {
+      let selectedHost = hosts.findIndex(({ lastSelected }) => lastSelected);
+      selectedHost = selectedHost === -1 ? 0 : selectedHost;
+      setHostsState(s => ({ ...s, hosts, selectedHost }));
+    }
   }, []);
 
   useEffect(() => {
-    console.log('state changed', state);
-    if (state.hosts.length && state.hosts[state.selectedHost]) {
-      updateLastSelectedHost(state.hosts[state.selectedHost].id).then(() => {
-        console.log('updateLastSelectedHost');
-        onChange(state.hosts[state.selectedHost]);
+    loadKnownHosts();
+  }, [loadKnownHosts]);
+
+  useEffect(() => {
+    const { hosts, selectedHost } = hostsState;
+
+    if (hosts.length && hosts[selectedHost]) {
+      updateLastSelectedHost(hosts[selectedHost].id).then(() => {
+        onChange(hosts[selectedHost]);
       });
     }
-  }, [state, onChange]);
+  }, [hostsState, onChange]);
 
   const selectHost = (selectedHost) => {
-    setState(s => ({ ...s, selectedHost }));
+    setHostsState(s => ({ ...s, selectedHost }));
   };
 
-  const addKnownHost = () => {
-    console.log('KnownHosts->addKnownHost');
+  const openAddKnownHostDialog = () => {
+    setDialogState(s => ({ ...s, open: true, edit: null }));
   };
 
-  const editKnownHost = (hostIndex) => {
-    console.log('KnownHosts->editKnownHost: ', state.hosts[hostIndex]);
+  const openEditKnownHostDialog = (host: HostDTO) => {
+    setDialogState(s => ({ ...s, open: true, edit: host }));
+  };
+
+  const closeKnownHostDialog = () => {
+    setDialogState(s => ({ ...s, open: false }));
+  }
+
+  const handleDialogSubmit = async ({id, name, host, port}) => {
+    if (id) {
+      const hostDTO = await HostDTO.get(id);
+      hostDTO.name = name;
+      hostDTO.host = host;
+      hostDTO.port = port;
+      await hostDTO.save();
+
+      setHostsState(s => ({
+        ...s,
+        hosts: s.hosts.map(h => h.id === id ? hostDTO : h),
+      }));
+    } else {
+      const newHost = { name, host, port, editable: true };
+      await HostDTO.add(newHost);
+
+      setHostsState(s => ({
+        ...s,
+        hosts: [ ...s.hosts, newHost ],
+        selectedHost: s.hosts.length,
+      }));
+    }
+
+    closeKnownHostDialog();
   };
 
   const updateLastSelectedHost = (hostId): Promise<any[]> => {
@@ -79,7 +118,9 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
         if (host.id === hostId) {
           host.lastSelected = true;
           return await host.save();
-        } else if (host.lastSelected) {
+        }
+
+        if (host.lastSelected) {
           host.lastSelected = false;
           return await host.save();
         }
@@ -90,53 +131,67 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
   };
 
   return (
-    <FormControl variant='outlined' className={'KnownHosts ' + classes.root}>
-      { touched && (
-        <div className="KnownHosts-validation">
+    <div>
+      <FormControl variant='outlined' className={'KnownHosts ' + classes.root}>
+        { touched && (
+          <div className="KnownHosts-validation">
+            {
+              ( error &&
+                <div className="KnownHosts-error">
+                  {error}
+                  <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
+                </div>
+              ) ||
+
+              ( warning && <div className="KnownHosts-warning">{warning}</div> )
+            }
+          </div>
+        ) }
+
+        <InputLabel id='KnownHosts-select'>Host</InputLabel>
+        <Select
+          id='KnownHosts-select'
+          labelId='KnownHosts-label'
+          label='Host'
+          margin='dense'
+          name='host'
+          value={hostsState.selectedHost}
+          fullWidth={true}
+          onChange={e => selectHost(e.target.value)}
+        >
+          <Button value={hostsState.selectedHost} onClick={openAddKnownHostDialog}>
+            <span>Add new host</span>
+            <AddIcon fontSize='small' color='primary' />
+          </Button>
+
           {
-            ( error &&
-              <div className="KnownHosts-error">
-                {error}
-                <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
-              </div>
-            ) ||
+            hostsState.hosts.map((host, index) => (
+              <MenuItem className='KnownHosts-item' value={index} key={index}>
+                <div className='KnownHosts-item__label'>
+                  <Check />
+                  <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>
+                </div>
 
-            ( warning && <div className="KnownHosts-warning">{warning}</div> )
+                { host.editable && (
+                  <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={(e) => {
+                    openEditKnownHostDialog(hostsState.hosts[index]);
+                  }}>
+                    <EditRoundedIcon fontSize='small' />
+                  </IconButton>
+                ) }
+              </MenuItem>
+            ))
           }
-        </div>
-      ) }
+        </Select>
+      </FormControl>
 
-      <InputLabel id='KnownHosts-select'>Host</InputLabel>
-      <Select
-        id='KnownHosts-select'
-        labelId='KnownHosts-label'
-        label='Host'
-        margin='dense'
-        name='host'
-        value={state.selectedHost}
-        fullWidth={true}
-        onChange={e => selectHost(e.target.value)}
-      >
-        <Button value={state.selectedHost} onClick={addKnownHost}>Add</Button>
-
-        {
-          state.hosts.map((host, index) => (
-            <MenuItem className='KnownHosts-item' value={index} key={index}>
-              <div className='KnownHosts-item__label'>
-                <Check />
-                <span>{host.name} ({ getHostPort(state.hosts[index]).host }:{getHostPort(state.hosts[index]).port})</span>
-              </div>
-
-              { host.editable && (
-                <IconButton size='small' color='primary' onClick={() => editKnownHost(index)}>
-                  <EditRoundedIcon fontSize='small' />
-                </IconButton>
-              ) }
-            </MenuItem>
-          ))
-        }
-      </Select>
-    </FormControl>
+      <KnownHostDialog
+        isOpen={dialogState.open}
+        host={dialogState.edit}
+        onSubmit={handleDialogSubmit}
+        handleClose={closeKnownHostDialog}
+      />
+    </div>
   )
 };
 

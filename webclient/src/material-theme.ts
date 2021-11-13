@@ -84,6 +84,12 @@ export const materialTheme = createTheme({
       },
     },
 
+    MuiLink: {
+      root: {
+        fontWeight: 'bold',
+      },
+    },
+
     MuiList: {
       root: {
         padding: '8px',
@@ -152,7 +158,10 @@ export const materialTheme = createTheme({
       fontSize: 28,
       fontWeight: 'bold',
     },
-    // h2: {},
+    h2: {
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
     // h3: {},
     // h4: {},
     // h5: {},

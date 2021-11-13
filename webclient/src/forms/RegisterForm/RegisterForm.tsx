@@ -11,7 +11,7 @@ import { FormKey } from 'types';
 import './RegisterForm.css';
 
 const RegisterForm = (props) => {
-  const { dispatch, handleSubmit } = props;
+  const { handleSubmit } = props;
 
   return (
     <Form className="registerForm row" onSubmit={handleSubmit} autoComplete="off">

@@ -8,7 +8,7 @@ export class HostDTO extends Host {
     return dexieService.hosts.put(this);
   }
 
-  static async add(host: HostDTO): Promise<IndexableType> {
+  static async add(host: Host): Promise<IndexableType> {
     return dexieService.hosts.add(host);
   }
 

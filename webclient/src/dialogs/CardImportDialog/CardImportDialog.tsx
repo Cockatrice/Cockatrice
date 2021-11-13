@@ -18,7 +18,7 @@ const CardImportDialog = ({ classes, handleClose, isOpen }: any) => {
   return (
     <Dialog onClose={handleOnClose} open={isOpen}>
       <DialogTitle disableTypography className="dialog-title">
-        <Typography variant="h6">Import Cards</Typography>
+        <Typography variant="h2">Import Cards</Typography>
 
         {handleOnClose ? (
           <IconButton onClick={handleOnClose}>

@@ -43,4 +43,8 @@ export default class AuthenticationService {
   static isAdmin() {
 
   }
+
+  static connectionAttemptMade() {
+    return webClient.connectionAttemptMade;
+  }
 }

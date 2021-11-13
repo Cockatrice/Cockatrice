@@ -1,0 +1,14 @@
+.KnownHostDialog {
+
+}
+
+.KnownHostDialog .MuiDialog-paper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.dialog-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -64,7 +64,7 @@ export const DefaultHosts: Host[] = [
   {
     name: 'Tetrarch',
     host: 'mtg.tetrarch.co/servatrice',
-    port: '4748',
+    port: '443',
     editable: false,
   },
 ];

@@ -41,6 +41,8 @@ export class WebClient {
     keepalive: 5000
   };
 
+  public connectionAttemptMade = false;
+
   constructor() {
     this.socket.message$.subscribe((message: MessageEvent) => {
       this.protobuf.handleMessageEvent(message);
@@ -54,7 +56,8 @@ export class WebClient {
   }
 
   public connect(options: WebSocketOptions) {
-    this.options = { ...this.options, ...options };
+    this.connectionAttemptMade = true;
+    this.options = {...this.options, ...options};
     this.socket.connect(this.options);
   }
 
