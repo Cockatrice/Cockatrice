@@ -124,6 +124,7 @@ function serverIdentification(info: ServerIdentificationData) {
   switch (webClient.options.reason) {
     case WebSocketConnectReason.LOGIN:
       SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
+      // Intentional use of Bitwise operator b/c of how Servatrice Enums work
       if (serverOptions & webClient.protobuf.controller.Event_ServerIdentification.ServerOptions.SupportsPasswordHash) {
         SessionCommands.requestPasswordSalt();
       } else {

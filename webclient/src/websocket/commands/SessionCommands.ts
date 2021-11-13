@@ -8,7 +8,8 @@ import {
   AccountActivationParams,
   ForgotPasswordChallengeParams,
   ForgotPasswordParams,
-  ForgotPasswordResetParams, RequestPasswordSaltParams,
+  ForgotPasswordResetParams,
+  RequestPasswordSaltParams,
   ServerRegisterParams
 } from "../../store";
 import NormalizeService from "../utils/NormalizeService";
@@ -130,12 +131,21 @@ export class SessionCommands {
     });
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
-        const passwordSalt = raw[".Response_PasswordSalt.ext"].passwordSalt;
-        SessionCommands.login(passwordSalt);
-      } else if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired) {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: Registration Required");
+      switch (raw.responseCode) {
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+          const passwordSalt = raw[".Response_PasswordSalt.ext"].passwordSalt;
+          SessionCommands.login(passwordSalt);
+          break;
+
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: incorrect username or password");
           SessionCommands.disconnect();
+          break;
+
+        default:
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, "Login failed: Unknown Reason");
+          SessionCommands.disconnect();
+          break;
       }
     });
   }
