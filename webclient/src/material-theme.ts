@@ -1,4 +1,4 @@
-import { createMuiTheme } from '@material-ui/core';
+import { createTheme } from '@material-ui/core/styles';
 
 const palette = {
   background: {
@@ -43,7 +43,7 @@ const palette = {
   },
 };
 
-export const materialTheme = createMuiTheme({
+export const materialTheme = createTheme({
   palette,
 
   overrides: {
