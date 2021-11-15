@@ -5,16 +5,14 @@ on:
     branches:
       - master
     paths:
-      - '.github/workflows/**'
+      - '.github/workflows/web-*.yml'
       - 'webclient/**'
       - '!**.md'
-    tags:
-      - '*'
   pull_request:
     branches:
       - master
     paths:
-      - '.github/workflows/**'
+      - '.github/workflows/web-*.yml'
       - 'webclient/**'
       - '!**.md'
 
@@ -32,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - 12
           - 14
+          - 16
 
     steps:
       - name: Checkout
