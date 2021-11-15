@@ -7,11 +7,15 @@ on:
     paths:
       - '.github/workflows/**'
       - 'webclient/**'
-      - !'**.md'
+      - '!**.md'
 
 jobs:
   ESLint:
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: webclient
 
     steps:
     - name: Checkout
@@ -19,11 +23,12 @@ jobs:
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
-        with:
-          cache: 'npm'
+      with:
+        cache: 'npm'
+        cache-dependency-path: 'webclient/package-lock.json'
 
     - name: Install ESLint
-       run: npm install --ignore-scripts
+      run: npm install --ignore-scripts
 
     - name: Run ESLint
       run: npm run lint
