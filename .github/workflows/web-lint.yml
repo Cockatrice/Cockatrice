@@ -1,0 +1,29 @@
+name: Code Style (TypeScript) 
+
+on:
+  pull_request:
+    branches:
+    - master
+    paths:
+      - '.github/workflows/**'
+      - 'webclient/**'
+      - !'**.md'
+
+jobs:
+  ESLint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+        with:
+          cache: 'npm'
+
+    - name: Install ESLint
+       run: npm install --ignore-scripts
+
+    - name: Run ESLint
+      run: npm run lint
