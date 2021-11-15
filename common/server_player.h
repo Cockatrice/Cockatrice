@@ -175,8 +175,8 @@ public:
                                     Server_CardZone *startzone,
                                     const QList<const CardToMove *> &_cards,
                                     Server_CardZone *targetzone,
-                                    int xCoord,
-                                    int yCoord,
+                                    int x,
+                                    int y,
                                     bool fixFreeSpaces = true,
                                     bool undoingDraw = false);
     void unattachCard(GameEventStorage &ges, Server_Card *card);
