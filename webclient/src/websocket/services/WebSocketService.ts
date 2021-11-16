@@ -10,6 +10,8 @@ export interface WebSocketOptions {
   port: string;
   user: string;
   pass: string;
+  newPassword: string;
+  email: string;
   autojoinrooms: boolean;
   keepalive: number;
   clientid: string;

@@ -35,6 +35,8 @@ export class WebClient {
     port: '',
     user: '',
     pass: '',
+    newPassword: '',
+    email: '',
     clientid: null,
     reason: null,
     autojoinrooms: true,

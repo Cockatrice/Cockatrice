@@ -86,8 +86,7 @@ export class SessionPersistence {
   }
 
   static resetPassword() {
-    console.log('Open Modal asking for reset token & new password');
-
+    ServerDispatch.resetPassword();
   }
 
   static resetPasswordSuccess() {

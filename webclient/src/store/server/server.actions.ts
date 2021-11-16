@@ -66,5 +66,8 @@ export const Actions = {
   }),
   clearLogs: () => ({
     type: Types.CLEAR_LOGS
+  }),
+  resetPassword: () => ({
+    type: Types.RESET_PASSWORD
   })
 }
