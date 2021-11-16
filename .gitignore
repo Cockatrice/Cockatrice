@@ -10,3 +10,4 @@ cmake-build-debug/
 preferences
 compile_commands.json
 .vs/
+.vscode/
