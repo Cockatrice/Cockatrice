@@ -18,7 +18,7 @@ on:
 
 jobs:
   build-web:
-    name: Webclient
+    name: React (Node ${{matrix.node_version}})
 
     runs-on: ubuntu-latest
 
@@ -30,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - 14
-          - 16
+          - 12
+          - LTS/*
 
     steps:
       - name: Checkout
