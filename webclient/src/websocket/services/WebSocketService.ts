@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 
-import { ServerStatus, StatusEnum, WebSocketOptions } from 'types';
+import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
@@ -26,7 +26,7 @@ export class WebSocketService {
     });
   }
 
-  public connect(options: WebSocketOptions, protocol: string = 'wss'): void {
+  public connect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
     if (window.location.hostname === 'localhost') {
       protocol = 'ws';
     }

@@ -1,4 +1,4 @@
-import { ServerStatus, StatusEnum, WebSocketOptions } from 'types';
+import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
@@ -30,11 +30,12 @@ export class WebClient {
     ]
   };
 
-  public options: WebSocketOptions = {
+  public options: WebSocketConnectOptions = {
     host: '',
     port: '',
-    user: '',
-    pass: '',
+    userName: '',
+    password: '',
+    hashedPassword: '',
     clientid: null,
     reason: null,
     autojoinrooms: true,
@@ -55,7 +56,7 @@ export class WebClient {
     console.log(this);
   }
 
-  public connect(options: WebSocketOptions) {
+  public connect(options: WebSocketConnectOptions) {
     this.connectionAttemptMade = true;
     this.options = { ...this.options, ...options };
     this.socket.connect(this.options);

@@ -11,7 +11,7 @@ import { AuthenticationService } from 'api';
 import { LoginForm } from 'forms';
 import { Images } from 'images';
 import { HostDTO } from 'services';
-import { RouteEnum, WebSocketOptions, getHostPort } from 'types';
+import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors } from 'store';
 
 import './Login.css';
@@ -66,23 +66,40 @@ const Login = ({ state, description }: LoginProps) => {
   }
 
   const onSubmit = useCallback((hostForm) => {
-    const { user, pass, selectedHost } = hostForm;
+    const {
+      userName,
+      password,
+      selectedHost,
+      selectedHost: { hashedPassword },
+      triggerAutoConnect
+    } = hostForm;
+
+    console.log('hostForm', hostForm);
+
     const { host, port } = getHostPort(selectedHost);
-    const options = { user, pass, host, port };
+    const options = {
+      host,
+      port,
+      userName,
+      password,
+      hashedPassword: !password ? hashedPassword : null,
+      hostId:
+      selectedHost.id,
+    };
 
     updateHost(hostForm);
 
-    AuthenticationService.login(options as WebSocketOptions);
+    AuthenticationService.login(options as WebSocketConnectOptions);
+
   }, []);
 
-  function updateHost({ selectedHost, user, pass, remember }) {
+  function updateHost({ selectedHost, userName, remember }) {
     HostDTO.get(selectedHost.id).then(hostDTO => {
       if (remember) {
-        hostDTO.user = user;
-        hostDTO.pass = pass;
+        hostDTO.userName = userName;
       } else {
-        delete hostDTO.user;
-        delete hostDTO.pass;
+        delete hostDTO.userName;
+        delete hostDTO.hashedPassword;
       }
 
       hostDTO.remember = remember;

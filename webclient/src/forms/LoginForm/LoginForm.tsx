@@ -12,8 +12,12 @@ import { FormKey, APP_USER } from 'types';
 
 import './LoginForm.css';
 
+const PASSWORD_LABEL = 'Password';
+const STORED_PASSWORD_LABEL = '* SAVED *';
+
 const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps) => {
   const [autoConnect, setAutoConnect] = useState(false);
+  const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
 
   useEffect(() => {
     SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
@@ -29,11 +33,13 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
           HostDTO.getAll().then(hosts => {
             let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
 
-            if (lastSelectedHost?.remember) {
+            if (lastSelectedHost?.remember && lastSelectedHost?.hashedPassword) {
+
               dispatch(change(form, 'selectedHost', lastSelectedHost));
-              dispatch(change(form, 'user', lastSelectedHost.user));
-              dispatch(change(form, 'pass', lastSelectedHost.pass));
-              dispatch(change(form, 'remember', lastSelectedHost.remember));
+              dispatch(change(form, 'remember', true));
+              dispatch(change(form, 'userName', lastSelectedHost.userName));
+              dispatch(change(form, 'password', ''));
+              setPasswordLabel(STORED_PASSWORD_LABEL);
               dispatch(submit);
             }
           });
@@ -70,20 +76,38 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
   }
 
   const onHostChange = host => {
-    dispatch(change(form, 'user', host.user));
-    dispatch(change(form, 'pass', host.pass));
+    dispatch(change(form, 'userName', host.userName));
+    dispatch(change(form, 'password', ''));
     dispatch(change(form, 'remember', host.remember));
     setAutoConnect(host.remember && autoConnect);
+
+    if (host.remember && host.hashedPassword) {
+      setPasswordLabel(STORED_PASSWORD_LABEL);
+    } else {
+      setPasswordLabel(PASSWORD_LABEL);
+    }
   }
 
   return (
     <Form className='loginForm' onSubmit={handleSubmit}>
       <div className='loginForm-items'>
         <div className='loginForm-item'>
-          <Field label='Username' name='user' component={InputField} autoComplete='off' />
+          <Field label='Username' name='userName' component={InputField} autoComplete='off' />
         </div>
         <div className='loginForm-item'>
-          <Field label='Password' name='pass' type='password' component={InputField} autoComplete='new-password' />
+          <Field
+            label={passwordLabel}
+            onFocus={() => {
+              setPasswordLabel(PASSWORD_LABEL);
+            }}
+            onBlur={() => {
+              setPasswordLabel(autoConnect ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
+            }}
+            name='password'
+            type='password'
+            component={InputField}
+            autoComplete='new-password'
+          />
         </div>
         <div className='loginForm-actions'>
           {/* @TODO: change label to Save Password when passHash is supported */}

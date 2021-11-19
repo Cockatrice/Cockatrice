@@ -13,7 +13,7 @@ import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
 
 import { KnownHostDialog } from 'dialogs';
 import { HostDTO } from 'services';
-import { DefaultHosts, getHostPort } from 'types';
+import { DefaultHosts, Host, getHostPort } from 'types';
 
 import './KnownHosts.css';
 
@@ -34,7 +34,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
 
   const [hostsState, setHostsState] = useState({
     hosts: [],
-    selectedHost: 0,
+    selectedHost: {} as any,
   });
 
   const [dialogState, setDialogState] = useState({
@@ -50,9 +50,8 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
       await HostDTO.bulkAdd(DefaultHosts);
       loadKnownHosts();
     } else {
-      const selectedHost = hosts.find(({ lastSelected }) => lastSelected);
-      const selectedHostId = selectedHost?.id || hosts[0].id;
-      setHostsState(s => ({ ...s, hosts, selectedHost: selectedHostId }));
+      const selectedHost = hosts.find(({ lastSelected }) => lastSelected) || hosts[0];
+      setHostsState(s => ({ ...s, hosts, selectedHost }));
     }
   }, []);
 
@@ -62,11 +61,10 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
 
   useEffect(() => {
     const { hosts, selectedHost } = hostsState;
-    const host = hosts.find(({ id }) => id === selectedHost);
 
-    if (host) {
-      updateLastSelectedHost(host.id).then(() => {
-        onChange(host);
+    if (selectedHost?.id) {
+      updateLastSelectedHost(selectedHost.id).then(() => {
+        onChange(selectedHost);
       });
     }
   }, [hostsState, onChange]);
@@ -91,7 +89,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
     setHostsState(s => ({
       ...s,
       hosts: s.hosts.filter(host => host.id !== id),
-      selectedHost: s.selectedHost === id ? s.hosts[0].id : s.selectedHost,
+      selectedHost: s.selectedHost.id === id ? s.hosts[0] : s.selectedHost,
     }));
 
     closeKnownHostDialog();
@@ -111,13 +109,13 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
         hosts: s.hosts.map(h => h.id === id ? hostDTO : h),
       }));
     } else {
-      const newHost = { name, host, port, editable: true };
-      const id = await HostDTO.add(newHost) as number;
+      const newHost: Host = { name, host, port, editable: true };
+      newHost.id = await HostDTO.add(newHost) as number;
 
       setHostsState(s => ({
         ...s,
         hosts: [...s.hosts, newHost],
-        selectedHost: id,
+        selectedHost: newHost,
       }));
     }
 
@@ -178,7 +176,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
 
           {
             hostsState.hosts.map((host, index) => (
-              <MenuItem className='KnownHosts-item' value={host.id} key={index}>
+              <MenuItem className='KnownHosts-item' value={host} key={index}>
                 <div className='KnownHosts-item__label'>
                   <Check />
                   <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>

@@ -12,11 +12,13 @@ export enum StatusEnum {
   DISCONNECTING = 99
 }
 
-export interface WebSocketOptions {
+export interface WebSocketConnectOptions {
+  hostId?: number;
   host: string;
   port: string;
-  user: string;
-  pass: string;
+  userName: string;
+  password?: string;
+  hashedPassword?: string;
   autojoinrooms: boolean;
   keepalive: number;
   clientid: string;
@@ -41,8 +43,8 @@ export class Host {
   localPort?: string;
   editable: boolean;
   lastSelected?: boolean;
-  user?: string;
-  pass?: string;
+  userName?: string;
+  hashedPassword?: string;
   remember?: boolean;
 }
 

@@ -3,24 +3,26 @@ import { Log, SortBy, User, UserSortField } from 'types';
 export interface ServerConnectParams {
   host: string;
   port: string;
-  user: string;
-  pass: string;
+  userName: string;
+  password: string;
 }
 
 export interface ServerRegisterParams {
   host: string;
   port: string;
-  user: string;
-  pass: string;
-  passAgain: string;
+  userName: string;
+  password: string;
   email: string;
   country: string;
   realName: string;
 }
 
+export interface RequestPasswordSaltParams {
+  userName: string;
+}
+
 export interface ForgotPasswordParams {
-  user: string;
-  clientid: string;
+  userName: string;
 }
 
 export interface ForgotPasswordChallengeParams extends ForgotPasswordParams {
@@ -33,8 +35,7 @@ export interface ForgotPasswordResetParams extends ForgotPasswordParams {
 }
 
 export interface AccountActivationParams extends ServerRegisterParams {
-  activationCode: string;
-  clientid: string;
+  token: string;
 }
 
 export interface ServerState {
@@ -67,8 +68,4 @@ export interface ServerStateLogs {
 
 export interface ServerStateSortUsersBy extends SortBy {
   field: UserSortField
-}
-
-export interface RequestPasswordSaltParams {
-  user: string;
 }
