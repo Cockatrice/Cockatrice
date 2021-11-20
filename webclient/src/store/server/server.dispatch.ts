@@ -61,5 +61,8 @@ export const Dispatch = {
   },
   serverMessage: message => {
     store.dispatch(Actions.serverMessage(message));
+  },
+  resetPassword: () => {
+    store.dispatch(Actions.resetPassword());
   }
 }

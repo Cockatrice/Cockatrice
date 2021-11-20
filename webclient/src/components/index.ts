@@ -20,3 +20,5 @@ export { default as ModGuard } from './Guard/ModGuard';
 
 // Dialogs
 export { default as CardImportDialog } from './CardImportDialog/CardImportDialog';
+export { default as RequestPasswordResetDialog } from './RequestPasswordResetDialog/RequestPasswordResetDialog';
+export { default as ResetPasswordDialog } from './ResetPasswordDialog/ResetPasswordDialog';
