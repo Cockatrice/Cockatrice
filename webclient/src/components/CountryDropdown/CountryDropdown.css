@@ -1,0 +1,12 @@
+.CountryDropdown {
+  width: 100%;
+}
+
+.CountryDropdown-item {
+  display: flex;
+}
+
+.CountryDropdown-item__image {
+  width: 1.1em;
+  margin-right: 1em;
+}

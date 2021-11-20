@@ -1,5 +1,6 @@
 export * from './cards';
 export * from './constants';
+export * from './countries';
 export * from './game';
 export * from './room';
 export * from './server';

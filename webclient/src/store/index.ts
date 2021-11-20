@@ -6,6 +6,7 @@ export { SortUtil } from './common';
 // Server
 
 export {
+  Types as ServerTypes,
   Selectors as ServerSelectors,
   Dispatch as ServerDispatch } from './server';
 
