@@ -64,5 +64,14 @@ export const Dispatch = {
   },
   resetPassword: () => {
     store.dispatch(Actions.resetPassword());
+  },
+  resetPasswordFailed: () => {
+    store.dispatch(Actions.resetPasswordFailed());
+  },
+  resetPasswordChallenge: () => {
+    store.dispatch(Actions.resetPasswordChallenge());
+  },
+  resetPasswordSuccess: () => {
+    store.dispatch(Actions.resetPasswordSuccess());
   }
 }

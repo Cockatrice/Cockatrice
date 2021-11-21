@@ -268,11 +268,14 @@ export class SessionCommands {
         const resp = raw['.Response_ForgotPasswordRequest.ext'];
 
         if (resp.challengeEmail) {
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Requesting MFA information');
           SessionPersistence.resetPasswordChallenge();
         } else {
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset in progress');
           SessionPersistence.resetPassword();
         }
       } else {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset failed, please try again');
         SessionPersistence.resetPasswordFailed();
       }
 
@@ -298,8 +301,10 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset in progress');
         SessionPersistence.resetPassword();
       } else {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset failed, please try again');
         SessionPersistence.resetPasswordFailed();
       }
 
@@ -326,8 +331,10 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password successfully updated');
         SessionPersistence.resetPasswordSuccess();
       } else {
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password update failed, please try again');
         SessionPersistence.resetPasswordFailed();
       }
 
