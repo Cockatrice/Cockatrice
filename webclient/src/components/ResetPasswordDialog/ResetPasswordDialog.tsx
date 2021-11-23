@@ -27,7 +27,7 @@ const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit }: any) =>
         ) : null}
       </DialogTitle>
       <DialogContent>
-        <ResetPasswordForm onSubmit={onSubmit}></ResetPasswordForm>
+        <ResetPasswordForm onSubmit={onSubmit}/>
       </DialogContent>
     </Dialog>
   );

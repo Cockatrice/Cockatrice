@@ -1,4 +1,4 @@
-/** 
+/**
 File is adapted from https://github.com/Qeepsake/use-redux-effect under MIT License
  * @author Aspect Apps Limited
  * @description
