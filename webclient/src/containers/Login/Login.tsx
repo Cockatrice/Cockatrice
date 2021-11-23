@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, { useState } from "react";
+import React, {useState} from "react";
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,9 +13,9 @@ import { RequestPasswordResetDialog, ResetPasswordDialog } from 'components';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
-import { RouteEnum } from 'types';
+import { RouteEnum, StatusEnum } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
-
+import { SessionCommands } from 'websocket';
 import './Login.css';
 
 const useStyles = makeStyles(theme => ({
@@ -60,13 +60,18 @@ const Login = ({ state, description }: LoginProps) => {
   const isConnected = AuthenticationService.isConnected(state);
 
   const [dialogState, setDialogState] = useState({
-    openRequest: false,
-    openReset: false
+    passwordResetRequestDialog: false,
+    resetPasswordDialog: false
   });
 
   useReduxEffect(() => {
+    closeRequestPasswordResetDialog();
     openResetPasswordDialog();
-  }, ServerTypes.RESET_PASSWORD, []);
+  }, ServerTypes.RESET_PASSWORD_REQUESTED, []);
+
+  useReduxEffect(() => {
+    closeResetPasswordDialog();
+  }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
   const showDescription = () => {
     return !isConnected && description?.length;
@@ -82,30 +87,26 @@ const Login = ({ state, description }: LoginProps) => {
     } else {
       AuthenticationService.resetPasswordRequest({ user, host, port } as any);
     }
-
-    closeRequestPasswordResetDialog();
   };
 
   const handleResetPasswordDialogSubmit = async ({ user, token, newPassword, passwordAgain, host, port }) => {
     AuthenticationService.resetPassword({ user, token, newPassword, host, port } as any);
-
-    closeResetPasswordDialog();
   };
 
   const closeRequestPasswordResetDialog = () => {
-    setDialogState(s => ({ ...s, openRequest: false }));
+    setDialogState(s => ({ ...s, passwordResetRequestDialog: false }));
   }
 
   const openRequestPasswordResetDialog = () => {
-    setDialogState(s => ({ ...s, openRequest: true }));
+    setDialogState(s => ({ ...s, passwordResetRequestDialog: true }));
   }
 
   const closeResetPasswordDialog = () => {
-    setDialogState(s => ({ ...s, openReset: false }));
+    setDialogState(s => ({ ...s, resetPasswordDialog: false }));
   }
 
   const openResetPasswordDialog = () => {
-    setDialogState(s => ({ ...s, openReset: true }));
+    setDialogState(s => ({ ...s, resetPasswordDialog: true }));
   }
 
   return (
@@ -184,13 +185,13 @@ const Login = ({ state, description }: LoginProps) => {
       </div>
 
       <RequestPasswordResetDialog
-        isOpen={dialogState.openRequest}
+        isOpen={dialogState.passwordResetRequestDialog}
         onSubmit={handleRequestPasswordResetDialogSubmit}
         handleClose={closeRequestPasswordResetDialog}
       />
 
       <ResetPasswordDialog
-        isOpen={dialogState.openReset}
+        isOpen={dialogState.resetPasswordDialog}
         onSubmit={handleResetPasswordDialogSubmit}
         handleClose={closeResetPasswordDialog}
       />

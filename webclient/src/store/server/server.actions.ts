@@ -1,3 +1,4 @@
+import { Type } from 'protobufjs';
 import { Types } from './server.types';
 
 export const Actions = {
@@ -68,6 +69,15 @@ export const Actions = {
     type: Types.CLEAR_LOGS
   }),
   resetPassword: () => ({
-    type: Types.RESET_PASSWORD
+    type: Types.RESET_PASSWORD_REQUESTED
+  }),
+  resetPasswordFailed: () => ({
+    type: Types.RESET_PASSWORD_FAILED
+  }),
+  resetPasswordChallenge: () => ({
+    type: Types.RESET_PASSWORD_CHALLENGE
+  }),
+  resetPasswordSuccess: () => ({
+    type: Types.RESET_PASSWORD_SUCCESS
   })
 }

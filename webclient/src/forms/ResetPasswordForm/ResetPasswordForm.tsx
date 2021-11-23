@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React from "react";
+import React, {useState} from "react";
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, change } from 'redux-form'
 
@@ -9,18 +9,31 @@ import { InputField, KnownHosts } from 'components';
 import { FormKey } from 'types';
 
 import './ResetPasswordForm.css';
+import { useReduxEffect } from '../../hooks';
+import { ServerTypes } from '../../store';
 
 const ResetPasswordForm = (props) => {
   const { dispatch, handleSubmit } = props;
+
+  const [errorMessage, setErrorMessage] = useState(false);
+
 
   const onHostChange = ({ host, port }) => {
     dispatch(change(FormKey.RESET_PASSWORD, 'host', host));
     dispatch(change(FormKey.RESET_PASSWORD, 'port', port));
   }
 
+  useReduxEffect(() => {
+    setErrorMessage(true);
+  }, ServerTypes.RESET_PASSWORD_FAILED, []);
+
+
   return (
     <Form className="ResetPasswordForm" onSubmit={handleSubmit}>
       <div className="ResetPasswordForm-items">
+        {errorMessage ? (
+          <div><h3>Password Reset Failed, please try again</h3></div>
+        ) : null}
         <div className="ResetPasswordForm-item">
           <Field label="Username" name="user" component={InputField} autoComplete="username" />
         </div>
