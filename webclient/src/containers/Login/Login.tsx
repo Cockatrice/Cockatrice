@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { AuthenticationService } from 'api';
-import { RequestPasswordResetDialog, ChangePasswordDialog } from 'components';
+import { RequestPasswordResetDialog, ResetPasswordDialog } from 'components';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
@@ -61,16 +61,16 @@ const Login = ({ state, description }: LoginProps) => {
 
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
-    changePasswordDialog: false
+    resetPasswordDialog: false
   });
 
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
-    openChangePasswordDialog();
+    openResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_REQUESTED, []);
 
   useReduxEffect(() => {
-    closeChangePasswordDialog();
+    closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
   const showDescription = () => {
@@ -89,7 +89,7 @@ const Login = ({ state, description }: LoginProps) => {
     }
   };
 
-  const handleChangePasswordDialogSubmit = async ({ user, token, newPassword, passwordAgain, host, port }) => {
+  const handleResetPasswordDialogSubmit = async ({ user, token, newPassword, passwordAgain, host, port }) => {
     AuthenticationService.resetPassword({ user, token, newPassword, host, port } as any);
   };
 
@@ -101,12 +101,12 @@ const Login = ({ state, description }: LoginProps) => {
     setDialogState(s => ({ ...s, passwordResetRequestDialog: true }));
   }
 
-  const closeChangePasswordDialog = () => {
-    setDialogState(s => ({ ...s, changePasswordDialog: false }));
+  const closeResetPasswordDialog = () => {
+    setDialogState(s => ({ ...s, resetPasswordDialog: false }));
   }
 
-  const openChangePasswordDialog = () => {
-    setDialogState(s => ({ ...s, changePasswordDialog: true }));
+  const openResetPasswordDialog = () => {
+    setDialogState(s => ({ ...s, resetPasswordDialog: true }));
   }
 
   return (
@@ -190,10 +190,10 @@ const Login = ({ state, description }: LoginProps) => {
         handleClose={closeRequestPasswordResetDialog}
       />
 
-      <ChangePasswordDialog
-        isOpen={dialogState.changePasswordDialog}
-        onSubmit={handleChangePasswordDialogSubmit}
-        handleClose={closeChangePasswordDialog}
+      <ResetPasswordDialog
+        isOpen={dialogState.resetPasswordDialog}
+        onSubmit={handleResetPasswordDialogSubmit}
+        handleClose={closeResetPasswordDialog}
       />
     </div>
   );

@@ -30,8 +30,13 @@ const RequestPasswordResetForm = (props) => {
     setIsMFA(true);
   }, ServerTypes.RESET_PASSWORD_CHALLENGE, []);
 
+  const onSubmit = (event) => {
+    setErrorMessage(false);
+    handleSubmit(event);
+  }
+
   return (
-    <Form className="RequestPasswordResetForm" onSubmit={handleSubmit}>
+    <Form className="RequestPasswordResetForm" onSubmit={onSubmit}>
       <div className="RequestPasswordResetForm-items">
         {errorMessage ? (
           <div className="RequestPasswordResetForm-Error">Request Password Reset Failed, please try again</div>

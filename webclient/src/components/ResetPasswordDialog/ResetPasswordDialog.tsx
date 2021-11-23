@@ -10,7 +10,7 @@ import { ResetPasswordForm } from 'forms';
 
 import './ResetPasswordDialog.css';
 
-const ChangePasswordDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
+const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
   const handleOnClose = () => {
     handleClose();
   }
@@ -33,4 +33,4 @@ const ChangePasswordDialog = ({ classes, handleClose, isOpen, onSubmit }: any) =
   );
 };
 
-export default ChangePasswordDialog;
+export default ResetPasswordDialog;
