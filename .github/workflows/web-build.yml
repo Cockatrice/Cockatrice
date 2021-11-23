@@ -51,4 +51,5 @@ jobs:
         run: npm test
 
       - name: Build app
+        if: always()
         run: npm run build
