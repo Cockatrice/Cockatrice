@@ -5,10 +5,9 @@ File is adapted from https://github.com/Qeepsake/use-redux-effect under MIT Lice
  */
 
 import { useRef, useEffect, DependencyList } from 'react'
-import { castArray } from 'lodash'
+import { useStore } from 'react-redux'
 import { AnyAction } from 'redux'
-
-import { store } from 'store'
+import { castArray } from 'lodash'
 
 export type ReduxEffect = (action: AnyAction) => void
 
@@ -24,7 +23,8 @@ export function useReduxEffect(
   type: string | string[],
   deps: DependencyList = [],
 ): void {
-  const currentValue = useRef(null)
+  const currentValue = useRef(null);
+  const store = useStore();
 
   const handleChange = (): void => {
     const state = store.getState()

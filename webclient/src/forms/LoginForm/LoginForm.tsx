@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 
 import { AuthenticationService } from 'api';
 import { CheckboxField, InputField, KnownHosts } from 'components';
+import { useAutoConnect } from 'hooks';
 import { HostDTO, SettingDTO } from 'services';
 import { FormKey, APP_USER } from 'types';
 
@@ -17,7 +18,6 @@ const STORED_PASSWORD_LABEL = '* SAVED *';
 
 const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps) => {
   const [host, setHost] = useState(null);
-  const [autoConnect, setAutoConnect] = useState(false);
   const [remember, setRemember] = useState(false);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
   const [hasStoredPassword, useStoredPassword] = useState(false);
@@ -52,8 +52,8 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
   useEffect(() => {
     dispatch(change(form, 'remember', remember));
 
-    if (autoConnect && !remember) {
-      dispatch(change(form, 'autoConnect', false));
+    if (!remember) {
+      setAutoConnect(false);
     }
 
     if (!remember) {
@@ -61,19 +61,6 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
       setPasswordLabel(PASSWORD_LABEL);
     }
   }, [remember, dispatch, form]);
-
-  useEffect(() => {
-    dispatch(change(form, 'autoConnect', autoConnect));
-
-    if (autoConnect && !remember) {
-      dispatch(change(form, 'remember', true));
-    }
-
-    SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
-      setting.autoConnect = autoConnect;
-      setting.save();
-    });
-  }, [autoConnect, dispatch, form]);
 
   useEffect(() => {
     if (!host) {
@@ -89,6 +76,14 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
     useStoredPassword(storedPassword);
     setPasswordLabel(storedPassword ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   }, [host, dispatch, form]);
+
+  const [autoConnect, setAutoConnect] = useAutoConnect(() => {
+    dispatch(change(form, 'autoConnect', autoConnect));
+
+    if (autoConnect && !remember) {
+      setRemember(true);
+    }
+  }, []);
 
   const onRememberChange = event => setRemember(event.target.checked);
   const onAutoConnectChange = event => setAutoConnect(event.target.checked);
