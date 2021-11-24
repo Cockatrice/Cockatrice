@@ -36,6 +36,8 @@ export class WebClient {
     userName: '',
     password: '',
     hashedPassword: '',
+    newPassword: '',
+    email: '',
     clientid: null,
     reason: null,
     autojoinrooms: true,

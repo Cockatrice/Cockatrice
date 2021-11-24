@@ -16,3 +16,7 @@ export { default as ScrollToBottomOnChanges } from './ScrollToBottomOnChanges/Sc
 // Guards
 export { default as AuthGuard } from './Guard/AuthGuard';
 export { default as ModGuard } from './Guard/ModGuard';
+
+// Dialogs
+export { default as RequestPasswordResetDialog } from './RequestPasswordResetDialog/RequestPasswordResetDialog';
+export { default as ResetPasswordDialog } from './ResetPasswordDialog/ResetPasswordDialog';

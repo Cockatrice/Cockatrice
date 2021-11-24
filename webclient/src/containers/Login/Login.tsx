@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, { useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,12 +7,15 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
+
 import { AuthenticationService } from 'api';
+import { RequestPasswordResetDialog, ResetPasswordDialog } from 'components';
 import { LoginForm } from 'forms';
+import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
 import { HostDTO } from 'services';
 import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
-import { ServerSelectors } from 'store';
+import { ServerSelectors, ServerTypes } from 'store';
 
 import './Login.css';
 
@@ -57,7 +60,21 @@ const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
-  function showDescription() {
+  const [dialogState, setDialogState] = useState({
+    passwordResetRequestDialog: false,
+    resetPasswordDialog: false
+  });
+
+  useReduxEffect(() => {
+    closeRequestPasswordResetDialog();
+    openResetPasswordDialog();
+  }, ServerTypes.RESET_PASSWORD_REQUESTED, []);
+
+  useReduxEffect(() => {
+    closeResetPasswordDialog();
+  }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
+
+  const showDescription = () => {
     return !isConnected && description?.length;
   };
 
@@ -106,6 +123,34 @@ const Login = ({ state, description }: LoginProps) => {
 
       hostDTO.save();
     });
+  }
+
+  const handleRequestPasswordResetDialogSubmit = async ({ user, email, host, port }) => {
+    if (email) {
+      AuthenticationService.resetPasswordChallenge({ user, email, host, port } as any);
+    } else {
+      AuthenticationService.resetPasswordRequest({ user, host, port } as any);
+    }
+  };
+
+  const handleResetPasswordDialogSubmit = async ({ user, token, newPassword, passwordAgain, host, port }) => {
+    AuthenticationService.resetPassword({ user, token, newPassword, host, port } as any);
+  };
+
+  const closeRequestPasswordResetDialog = () => {
+    setDialogState(s => ({ ...s, passwordResetRequestDialog: false }));
+  }
+
+  const openRequestPasswordResetDialog = () => {
+    setDialogState(s => ({ ...s, passwordResetRequestDialog: true }));
+  }
+
+  const closeResetPasswordDialog = () => {
+    setDialogState(s => ({ ...s, resetPasswordDialog: false }));
+  }
+
+  const openResetPasswordDialog = () => {
+    setDialogState(s => ({ ...s, resetPasswordDialog: true }));
   }
 
   return (
@@ -182,6 +227,18 @@ const Login = ({ state, description }: LoginProps) => {
           </div>
         </Paper>
       </div>
+
+      <RequestPasswordResetDialog
+        isOpen={dialogState.passwordResetRequestDialog}
+        onSubmit={handleRequestPasswordResetDialogSubmit}
+        handleClose={closeRequestPasswordResetDialog}
+      />
+
+      <ResetPasswordDialog
+        isOpen={dialogState.resetPasswordDialog}
+        onSubmit={handleResetPasswordDialogSubmit}
+        handleClose={closeResetPasswordDialog}
+      />
     </div>
   );
 }

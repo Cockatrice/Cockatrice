@@ -113,7 +113,6 @@ function removeFromList({ listName, userName }: RemoveFromListData) {
 
 function serverIdentification(info: ServerIdentificationData) {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;
-
   if (protocolVersion !== webClient.protocolVersion) {
     SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
     SessionCommands.disconnect();

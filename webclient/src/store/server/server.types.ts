@@ -15,5 +15,9 @@ export const Types = {
   USER_JOINED: '[Server] User Joined',
   USER_LEFT: '[Server] User Left',
   VIEW_LOGS: '[Server] View Logs',
-  CLEAR_LOGS: '[Server] Clear Logs'
+  CLEAR_LOGS: '[Server] Clear Logs',
+  RESET_PASSWORD_REQUESTED: '[Server] Reset Password Requested',
+  RESET_PASSWORD_FAILED: '[Server] Reset Password Failed',
+  RESET_PASSWORD_CHALLENGE: '[Server] Reset Password Challenge',
+  RESET_PASSWORD_SUCCESS: '[Server] Reset Password Success'
 };

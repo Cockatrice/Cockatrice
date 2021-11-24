@@ -82,19 +82,18 @@ export class SessionPersistence {
   }
 
   static resetPasswordChallenge() {
-    console.log('Open Modal asking for Email address associated with account');
+    ServerDispatch.resetPasswordChallenge();
   }
 
   static resetPassword() {
-    console.log('Open Modal asking for reset token & new password');
-
+    ServerDispatch.resetPassword();
   }
 
   static resetPasswordSuccess() {
-    console.log('User password successfully changed Alert!');
+    ServerDispatch.resetPasswordSuccess();
   }
 
   static resetPasswordFailed() {
-    console.log('Open Alert telling user their password request failed for some reason');
+    ServerDispatch.resetPasswordFailed();
   }
 }

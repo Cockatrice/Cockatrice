@@ -31,12 +31,12 @@
     "postinstall": "run-script-os",
     "postinstall:windows": "powershell .\\copy_shared_files.ps1",
     "postinstall:default": "./copy_shared_files.sh",
-    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "start": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint './**/*.{ts,tsx}'",
-    "lint:fix": "eslint './**/*.{ts,tsx}' --fix"
+    "lint": "eslint \"./**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./**/*.{ts,tsx}\" --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -70,6 +70,7 @@
     "@types/redux-form": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
+    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "run-script-os": "^1.1.6"
   }
