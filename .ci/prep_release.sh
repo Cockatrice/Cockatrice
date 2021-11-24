@@ -47,7 +47,9 @@ if [[ $no_beta ]]; then
   fi
   body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
-  body="--REPLACE-WITH-COMMIT-COUNT-- commits have been included over the previous --REPLACE-WITH-PREVIOUS-RELEASE-TYPE--
+  body="⚠️ This is a \`beta\` release containing recent improvements. It may be unstable or contains some bugs as it's less tested.
+
+--REPLACE-WITH-COMMIT-COUNT-- commits have been included over the previous --REPLACE-WITH-PREVIOUS-RELEASE-TYPE--.
 
 <details>
 <summary><b>show changes</b></summary>
