@@ -14,17 +14,17 @@ export enum StatusEnum {
 
 export interface WebSocketConnectOptions {
   hostId?: number;
-  host: string;
-  port: string;
-  userName: string;
+  host?: string;
+  port?: string;
+  userName?: string;
   password?: string;
   hashedPassword?: string;
   newPassword?: string;
   email?: string;
-  autojoinrooms: boolean;
-  keepalive: number;
-  clientid: string;
-  reason: WebSocketConnectReason;
+  autojoinrooms?: boolean;
+  keepalive?: number;
+  clientid?: string;
+  reason?: WebSocketConnectReason;
 }
 
 export enum WebSocketConnectReason {

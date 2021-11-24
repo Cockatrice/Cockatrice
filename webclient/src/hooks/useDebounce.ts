@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { debounce, DebouncedFunc } from "lodash";
+import { useCallback } from 'react';
+import { debounce, DebouncedFunc } from 'lodash';
 
 type UseDebounceType = (...args: any) => any;
 const DEBOUNCE_DELAY = 250;

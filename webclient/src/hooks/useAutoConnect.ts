@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { debounce, DebouncedFunc } from "lodash";
+import { useEffect, useState } from 'react';
+import { debounce, DebouncedFunc } from 'lodash';
 
 import { SettingDTO } from 'services';
 import { APP_USER } from 'types';

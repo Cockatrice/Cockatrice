@@ -60,6 +60,7 @@ const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
+  const [hostIdToRemember, setHostIdToRemember] = useState(null);
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
     resetPasswordDialog: false
@@ -74,6 +75,15 @@ const Login = ({ state, description }: LoginProps) => {
     closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
+  useReduxEffect(({ options: { hashedPassword } }) => {
+    if (hostIdToRemember) {
+      HostDTO.get(hostIdToRemember).then(host => {
+        host.hashedPassword = hashedPassword;
+        host.save();
+      });
+    }
+  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
+
   const showDescription = () => {
     return !isConnected && description?.length;
   };
@@ -82,44 +92,40 @@ const Login = ({ state, description }: LoginProps) => {
     console.log('Login.createAccount->openForgotPasswordDialog');
   }
 
-  const onSubmit = useCallback((hostForm) => {
+  const onSubmit = useCallback((loginForm) => {
     const {
       userName,
       password,
       selectedHost,
-      selectedHost: { hashedPassword },
-      triggerAutoConnect
-    } = hostForm;
+      selectedHost: {
+        id: hostId,
+        hashedPassword
+      },
+      remember
+    } = loginForm;
 
-    console.log('hostForm', hostForm);
-
-    const { host, port } = getHostPort(selectedHost);
-    const options = {
-      host,
-      port,
+    const options: WebSocketConnectOptions = {
+      ...getHostPort(selectedHost),
       userName,
+      hostId,
       password,
-      hashedPassword: !password ? hashedPassword : null,
-      hostId:
-      selectedHost.id,
+      hashedPassword
     };
 
-    updateHost(hostForm);
+    updateHost(loginForm);
+
+    if (remember) {
+      setHostIdToRemember(hostId);
+    }
 
     AuthenticationService.login(options as WebSocketConnectOptions);
-
   }, []);
 
-  function updateHost({ selectedHost, userName, remember }) {
+  function updateHost({ selectedHost, userName, hashedPassword, remember }) {
     HostDTO.get(selectedHost.id).then(hostDTO => {
-      if (remember) {
-        hostDTO.userName = userName;
-      } else {
-        delete hostDTO.userName;
-        delete hostDTO.hashedPassword;
-      }
-
       hostDTO.remember = remember;
+      hostDTO.userName = remember ? userName : null;
+      hostDTO.hashedPassword = remember ? hashedPassword : null;
 
       hostDTO.save();
     });

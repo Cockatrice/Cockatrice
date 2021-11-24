@@ -16,7 +16,6 @@ import NormalizeService from '../utils/NormalizeService';
 
 export class SessionCommands {
   static connect(options: WebSocketConnectOptions, reason: WebSocketConnectReason): void {
-    console.log('connect', options);
     switch (reason) {
       case WebSocketConnectReason.LOGIN:
       case WebSocketConnectReason.REGISTER:
@@ -39,7 +38,6 @@ export class SessionCommands {
   }
 
   static login(passwordSalt?: string): void {
-
     const { userName, password, hashedPassword, hostId } = webClient.options;
 
     const loginConfig: any = {
@@ -54,8 +52,10 @@ export class SessionCommands {
       loginConfig.password = password;
     }
 
-    console.log('loginConfig', loginConfig, webClient.options);
+    SessionCommands.sendLogin(loginConfig);
+  }
 
+  static sendLogin(loginConfig: WebSocketConnectOptions): void {
     const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
 
     const command = webClient.protobuf.controller.SessionCommand.create({
@@ -71,18 +71,12 @@ export class SessionCommands {
         SessionPersistence.updateBuddyList(buddyList);
         SessionPersistence.updateIgnoreList(ignoreList);
         SessionPersistence.updateUser(userInfo);
+        SessionPersistence.loginSuccessful(loginConfig);
 
         SessionCommands.listUsers();
         SessionCommands.listRooms();
 
         SessionCommands.updateStatus(StatusEnum.LOGGED_IN, 'Logged in.');
-
-        if (!hashedPassword) {
-          HostDTO.get(hostId).then(host => {
-            host.hashedPassword = loginConfig.hashedPassword;
-            host.save();
-          });
-        }
 
         return;
       }
@@ -146,20 +140,20 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       switch (raw.responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
           const passwordSalt = raw['.Response_PasswordSalt.ext'].passwordSalt;
           SessionCommands.login(passwordSalt);
           break;
-
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
+        }
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
           SessionCommands.disconnect();
           break;
-
-        default:
+        }
+        default: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
           SessionCommands.disconnect();
-          break;
+        }
       }
     });
   }

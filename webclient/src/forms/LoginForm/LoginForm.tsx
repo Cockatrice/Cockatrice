@@ -16,8 +16,11 @@ const PASSWORD_LABEL = 'Password';
 const STORED_PASSWORD_LABEL = '* SAVED *';
 
 const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps) => {
+  const [host, setHost] = useState(null);
   const [autoConnect, setAutoConnect] = useState(false);
+  const [remember, setRemember] = useState(false);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
+  const [hasStoredPassword, useStoredPassword] = useState(false);
 
   useEffect(() => {
     SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
@@ -34,11 +37,9 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
             let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
 
             if (lastSelectedHost?.remember && lastSelectedHost?.hashedPassword) {
-
               dispatch(change(form, 'selectedHost', lastSelectedHost));
-              dispatch(change(form, 'remember', true));
               dispatch(change(form, 'userName', lastSelectedHost.userName));
-              dispatch(change(form, 'password', ''));
+              dispatch(change(form, 'remember', true));
               setPasswordLabel(STORED_PASSWORD_LABEL);
               dispatch(submit);
             }
@@ -46,47 +47,56 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
         }
       }
     });
-  }, [dispatch, form, submit]);
+  }, [submit, dispatch, form]);
+
+  useEffect(() => {
+    dispatch(change(form, 'remember', remember));
+
+    if (autoConnect && !remember) {
+      dispatch(change(form, 'autoConnect', false));
+    }
+
+    if (!remember) {
+      useStoredPassword(false);
+      setPasswordLabel(PASSWORD_LABEL);
+    }
+  }, [remember, dispatch, form]);
 
   useEffect(() => {
     dispatch(change(form, 'autoConnect', autoConnect));
+
+    if (autoConnect && !remember) {
+      dispatch(change(form, 'remember', true));
+    }
 
     SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
       setting.autoConnect = autoConnect;
       setting.save();
     });
-  }, [dispatch, form, autoConnect]);
+  }, [autoConnect, dispatch, form]);
+
+  useEffect(() => {
+    if (!host) {
+      return
+    }
+
+    dispatch(change(form, 'userName', host.userName));
+    dispatch(change(form, 'password', ''));
+    setRemember(host.remember);
+    setAutoConnect(host.remember && autoConnect);
+
+    const storedPassword = host.remember && host.hashedPassword;
+    useStoredPassword(storedPassword);
+    setPasswordLabel(storedPassword ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
+  }, [host, dispatch, form]);
+
+  const onRememberChange = event => setRemember(event.target.checked);
+  const onAutoConnectChange = event => setAutoConnect(event.target.checked);
+  const onHostChange = h => setHost(h);
 
   const forgotPassword = () => {
     console.log('Show recover password dialog, then AuthService.forgotPasswordRequest');
   };
-
-  const onRememberMeChange = event => {
-    if (autoConnect && !event.target.checked) {
-      setAutoConnect(false);
-    }
-  }
-
-  const onAutoConnectChange = event => {
-    setAutoConnect(event.target.checked);
-
-    if (event.target.checked) {
-      dispatch(change(form, 'remember', true));
-    }
-  }
-
-  const onHostChange = host => {
-    dispatch(change(form, 'userName', host.userName));
-    dispatch(change(form, 'password', ''));
-    dispatch(change(form, 'remember', host.remember));
-    setAutoConnect(host.remember && autoConnect);
-
-    if (host.remember && host.hashedPassword) {
-      setPasswordLabel(STORED_PASSWORD_LABEL);
-    } else {
-      setPasswordLabel(PASSWORD_LABEL);
-    }
-  }
 
   return (
     <Form className='loginForm' onSubmit={handleSubmit}>
@@ -97,12 +107,8 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
         <div className='loginForm-item'>
           <Field
             label={passwordLabel}
-            onFocus={() => {
-              setPasswordLabel(PASSWORD_LABEL);
-            }}
-            onBlur={() => {
-              setPasswordLabel(autoConnect ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
-            }}
+            onFocus={() => setPasswordLabel(PASSWORD_LABEL)}
+            onBlur={() => hasStoredPassword && setPasswordLabel(STORED_PASSWORD_LABEL)}
             name='password'
             type='password'
             component={InputField}
@@ -110,8 +116,7 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
           />
         </div>
         <div className='loginForm-actions'>
-          {/* @TODO: change label to Save Password when passHash is supported */}
-          <Field label='Save Password' name='remember' component={CheckboxField} onChange={onRememberMeChange} />
+          <Field label='Save Password' name='remember' component={CheckboxField} onChange={onRememberChange} />
           <Button color='primary' onClick={forgotPassword}>Forgot Password</Button>
         </div>
         <div className='loginForm-item'>
@@ -136,9 +141,11 @@ const propsMap = {
     if (!values.user) {
       errors.user = 'Required';
     }
-    if (!values.pass) {
-      errors.pass = 'Required';
+
+    if (!values.password && !values.selectedHost?.hashedPassword) {
+      errors.password = 'Required';
     }
+
     if (!values.selectedHost) {
       errors.selectedHost = 'Required';
     }
