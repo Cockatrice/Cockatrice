@@ -38,7 +38,7 @@ export class SessionCommands {
   }
 
   static login(passwordSalt?: string): void {
-    const { userName, password, hashedPassword, hostId } = webClient.options;
+    const { userName, password, hashedPassword } = webClient.options;
 
     const loginConfig: any = {
       ...webClient.clientConfig,

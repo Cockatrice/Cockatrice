@@ -13,7 +13,6 @@ export enum StatusEnum {
 }
 
 export interface WebSocketConnectOptions {
-  hostId?: number;
   host?: string;
   port?: string;
   userName?: string;

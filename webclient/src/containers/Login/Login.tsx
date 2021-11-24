@@ -107,7 +107,6 @@ const Login = ({ state, description }: LoginProps) => {
     const options: WebSocketConnectOptions = {
       ...getHostPort(selectedHost),
       userName,
-      hostId,
       password,
       hashedPassword
     };
