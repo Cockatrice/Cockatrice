@@ -22,6 +22,14 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
   const [hasStoredPassword, useStoredPassword] = useState(false);
 
+  const [autoConnect, setAutoConnect] = useAutoConnect(() => {
+    dispatch(change(form, 'autoConnect', autoConnect));
+
+    if (autoConnect && !remember) {
+      setRemember(true);
+    }
+  }, []);
+
   useEffect(() => {
     SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
       if (!userSetting) {
@@ -84,14 +92,6 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
       setPasswordLabel(PASSWORD_LABEL)
     }
   }, [host, dispatch, form]);
-
-  const [autoConnect, setAutoConnect] = useAutoConnect(() => {
-    dispatch(change(form, 'autoConnect', autoConnect));
-
-    if (autoConnect && !remember) {
-      setRemember(true);
-    }
-  }, []);
 
   const onRememberChange = event => setRemember(event.target.checked);
   const onAutoConnectChange = event => setAutoConnect(event.target.checked);
