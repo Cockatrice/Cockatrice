@@ -59,6 +59,9 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
     if (!remember) {
       useStoredPassword(false);
       setPasswordLabel(PASSWORD_LABEL);
+    } else if (host.hashedPassword) {
+      useStoredPassword(true);
+      setPasswordLabel(STORED_PASSWORD_LABEL);
     }
   }, [remember, dispatch, form]);
 
@@ -69,12 +72,17 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
 
     dispatch(change(form, 'userName', host.userName));
     dispatch(change(form, 'password', ''));
+
     setRemember(host.remember);
     setAutoConnect(host.remember && autoConnect);
 
-    const storedPassword = host.remember && host.hashedPassword;
-    useStoredPassword(storedPassword);
-    setPasswordLabel(storedPassword ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
+    if (host.remember && host.hashedPassword) {
+      useStoredPassword(true);
+      setPasswordLabel(STORED_PASSWORD_LABEL)
+    } else {
+      useStoredPassword(false);
+      setPasswordLabel(PASSWORD_LABEL)
+    }
   }, [host, dispatch, form]);
 
   const [autoConnect, setAutoConnect] = useAutoConnect(() => {
