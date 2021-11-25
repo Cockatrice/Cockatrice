@@ -33,27 +33,18 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
 
   useEffect(() => {
     SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
-      if (!userSetting) {
-        new SettingDTO(APP_USER).save();
-        return;
-      }
+      if (userSetting?.autoConnect && !AuthenticationService.connectionAttemptMade()) {
+        HostDTO.getAll().then(hosts => {
+          let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
 
-      if (userSetting.autoConnect) {
-        setAutoConnect(userSetting.autoConnect);
-
-        if (!AuthenticationService.connectionAttemptMade()) {
-          HostDTO.getAll().then(hosts => {
-            let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
-
-            if (lastSelectedHost?.remember && lastSelectedHost?.hashedPassword) {
-              dispatch(change(form, 'selectedHost', lastSelectedHost));
-              dispatch(change(form, 'userName', lastSelectedHost.userName));
-              dispatch(change(form, 'remember', true));
-              setPasswordLabel(STORED_PASSWORD_LABEL);
-              dispatch(submit);
-            }
-          });
-        }
+          if (lastSelectedHost?.remember && lastSelectedHost?.hashedPassword) {
+            dispatch(change(form, 'selectedHost', lastSelectedHost));
+            dispatch(change(form, 'userName', lastSelectedHost.userName));
+            dispatch(change(form, 'remember', true));
+            setPasswordLabel(STORED_PASSWORD_LABEL);
+            dispatch(submit);
+          }
+        });
       }
     });
   }, [submit, dispatch, form]);

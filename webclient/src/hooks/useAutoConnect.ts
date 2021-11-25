@@ -5,22 +5,34 @@ import { SettingDTO } from 'services';
 import { APP_USER } from 'types';
 
 export function useAutoConnect(callback: Function, deps: any[] = []) {
-  const [autoConnect, setAutoConnect] = useState(null);
+  const [setting, setSetting] = useState(undefined);
+  const [autoConnect, setAutoConnect] = useState(undefined);
 
   useEffect(() => {
     SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
-      setAutoConnect(setting.autoConnect);
+      if (!setting) {
+        setting = new SettingDTO(APP_USER);
+        setting.save();
+      }
+
+      setSetting(setting);
     });
   }, deps);
 
   useEffect(() => {
-    callback(autoConnect);
+    if (setting) {
+      setAutoConnect(setting.autoConnect);
+    }
+  }, [setting]);
 
-    SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
+  useEffect(() => {
+    if (setting) {
       setting.autoConnect = autoConnect;
       setting.save();
-    });
-  }, [autoConnect]);
+
+      callback(autoConnect);
+    }
+  }, [setting, autoConnect]);
 
   return [autoConnect, setAutoConnect];
 }
