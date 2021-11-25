@@ -107,6 +107,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
       setHostsState(s => ({
         ...s,
         hosts: s.hosts.map(h => h.id === id ? hostDTO : h),
+        selectedHost: hostDTO
       }));
     } else {
       const newHost: Host = { name, host, port, editable: true };

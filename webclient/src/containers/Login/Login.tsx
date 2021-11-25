@@ -88,9 +88,9 @@ const Login = ({ state, description }: LoginProps) => {
     return !isConnected && description?.length;
   };
 
-  function createAccount() {
+  const createAccount = () => {
     console.log('Login.createAccount->openForgotPasswordDialog');
-  }
+  };
 
   const onSubmit = useCallback((loginForm) => {
     const {
@@ -123,7 +123,7 @@ const Login = ({ state, description }: LoginProps) => {
     AuthenticationService.login(options as WebSocketConnectOptions);
   }, []);
 
-  function updateHost({ selectedHost, userName, hashedPassword, remember }) {
+  const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
     HostDTO.get(selectedHost.id).then(hostDTO => {
       hostDTO.remember = remember;
       hostDTO.userName = remember ? userName : null;
@@ -131,7 +131,7 @@ const Login = ({ state, description }: LoginProps) => {
 
       hostDTO.save();
     });
-  }
+  };
 
   const handleRequestPasswordResetDialogSubmit = async ({ user, email, host, port }) => {
     if (email) {

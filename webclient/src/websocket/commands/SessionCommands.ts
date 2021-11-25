@@ -42,7 +42,7 @@ export class SessionCommands {
 
     const loginConfig: any = {
       ...webClient.clientConfig,
-      clientid: guid(),
+      clientid: 'webatrice',
       userName,
     };
 
@@ -159,7 +159,7 @@ export class SessionCommands {
 
     const registerConfig = {
       ...webClient.clientConfig,
-      clientid: guid(),
+      clientid: 'webatrice',
       userName,
       password,
       email,
@@ -230,7 +230,7 @@ export class SessionCommands {
 
     const accountActivationConfig = {
       ...webClient.clientConfig,
-      clientid: guid(),
+      clientid: 'webatrice',
       userName,
       token,
     };
@@ -257,7 +257,7 @@ export class SessionCommands {
 
     const forgotPasswordConfig = {
       ...webClient.clientConfig,
-      clientid: guid(),
+      clientid: 'webatrice',
       userName,
     };
 
@@ -292,7 +292,7 @@ export class SessionCommands {
 
     const forgotPasswordChallengeConfig = {
       ...webClient.clientConfig,
-      clientid: guid(),
+      clientid: 'webatrice',
       userName,
       email,
     };
@@ -321,7 +321,7 @@ export class SessionCommands {
 
     const forgotPasswordResetConfig = {
       ...webClient.clientConfig,
-      clientid: guid(),
+      clientid: 'webatrice',
       userName,
       token,
       newPassword,
