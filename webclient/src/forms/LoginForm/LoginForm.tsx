@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, { Component, useCallback, useEffect, useState } from 'react';
+import React, { Component, useCallback, useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, change, FormSubmitHandler } from 'redux-form'
 
@@ -17,6 +17,7 @@ const PASSWORD_LABEL = 'Password';
 const STORED_PASSWORD_LABEL = '* SAVED *';
 
 const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps) => {
+  const password: any = useRef();
   const [host, setHost] = useState(null);
   const [remember, setRemember] = useState(false);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
@@ -110,8 +111,9 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
         <div className='loginForm-item'>
           <Field
             label={passwordLabel}
+            ref={password}
             onFocus={() => setPasswordLabel(PASSWORD_LABEL)}
-            onBlur={() => hasStoredPassword && setPasswordLabel(STORED_PASSWORD_LABEL)}
+            onBlur={() => !password.current.value && hasStoredPassword && setPasswordLabel(STORED_PASSWORD_LABEL)}
             name='password'
             type='password'
             component={InputField}

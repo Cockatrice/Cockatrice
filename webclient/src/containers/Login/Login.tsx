@@ -104,17 +104,20 @@ const Login = ({ state, description }: LoginProps) => {
       remember
     } = loginForm;
 
-    const options: WebSocketConnectOptions = {
-      ...getHostPort(selectedHost),
-      userName,
-      password,
-      hashedPassword
-    };
-
     updateHost(loginForm);
 
     if (remember) {
       setHostIdToRemember(hostId);
+    }
+
+    const options: WebSocketConnectOptions = {
+      ...getHostPort(selectedHost),
+      userName,
+      password
+    };
+
+    if (!password) {
+      options.hashedPassword = hashedPassword;
     }
 
     AuthenticationService.login(options as WebSocketConnectOptions);

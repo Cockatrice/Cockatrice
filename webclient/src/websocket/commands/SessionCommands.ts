@@ -52,10 +52,6 @@ export class SessionCommands {
       loginConfig.password = password;
     }
 
-    SessionCommands.sendLogin(loginConfig);
-  }
-
-  static sendLogin(loginConfig: WebSocketConnectOptions): void {
     const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
 
     const command = webClient.protobuf.controller.SessionCommand.create({
