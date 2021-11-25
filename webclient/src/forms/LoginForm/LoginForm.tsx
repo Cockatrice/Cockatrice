@@ -68,7 +68,7 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
     if (!remember) {
       useStoredPassword(false);
       setPasswordLabel(PASSWORD_LABEL);
-    } else if (host.hashedPassword) {
+    } else if (host?.hashedPassword) {
       useStoredPassword(true);
       setPasswordLabel(STORED_PASSWORD_LABEL);
     }
