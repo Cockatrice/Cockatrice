@@ -4,7 +4,9 @@ import { debounce, DebouncedFunc } from 'lodash';
 import { SettingDTO } from 'services';
 import { APP_USER } from 'types';
 
-export function useAutoConnect(callback: Function, deps: any[] = []) {
+type OnChange = () => void;
+
+export function useAutoConnect(onChange: OnChange) {
   const [setting, setSetting] = useState(undefined);
   const [autoConnect, setAutoConnect] = useState(undefined);
 
@@ -17,7 +19,7 @@ export function useAutoConnect(callback: Function, deps: any[] = []) {
 
       setSetting(setting);
     });
-  }, deps);
+  }, []);
 
   useEffect(() => {
     if (setting) {
@@ -30,7 +32,7 @@ export function useAutoConnect(callback: Function, deps: any[] = []) {
       setting.autoConnect = autoConnect;
       setting.save();
 
-      callback(autoConnect);
+      onChange();
     }
   }, [setting, autoConnect]);
 

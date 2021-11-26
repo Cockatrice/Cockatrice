@@ -27,21 +27,21 @@ export function useReduxEffect(
   const store = useStore();
 
   const handleChange = (): void => {
-    const state = store.getState()
-    const action = state.action
-    const previousValue = currentValue.current
-    currentValue.current = action.count
+    const state = store.getState();
+    const action = state.action;
+    const previousValue = currentValue.current;
+    currentValue.current = action.count;
 
     if (
       previousValue !== action.count &&
       castArray(type).includes(action.type)
     ) {
-      effect(action)
+      effect(action);
     }
   }
 
   useEffect(() => {
-    const unsubscribe = store.subscribe(handleChange)
-    return (): void => unsubscribe()
+    const unsubscribe = store.subscribe(handleChange);
+    return (): void => unsubscribe();
   }, deps)
 }

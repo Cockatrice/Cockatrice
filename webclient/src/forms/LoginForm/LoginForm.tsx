@@ -29,7 +29,7 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
     if (autoConnect && !remember) {
       setRemember(true);
     }
-  }, []);
+  });
 
   useEffect(() => {
     SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
@@ -77,11 +77,13 @@ const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps
     setAutoConnect(host.remember && autoConnect);
 
     if (host.remember && host.hashedPassword) {
+      // TODO: check if this causes a double render (maybe try combined state)
+      // try deriving useStoredPassword
       useStoredPassword(true);
-      setPasswordLabel(STORED_PASSWORD_LABEL)
+      setPasswordLabel(STORED_PASSWORD_LABEL);
     } else {
       useStoredPassword(false);
-      setPasswordLabel(PASSWORD_LABEL)
+      setPasswordLabel(PASSWORD_LABEL);
     }
   }, [host, dispatch, form]);
 
