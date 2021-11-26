@@ -1,10 +1,9 @@
-import { Room, StatusEnum, User } from 'types';
+import { Room, StatusEnum, User, WebSocketConnectReason } from 'types';
 
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import { ProtobufEvents } from '../services/ProtobufService';
 import webClient from '../WebClient';
-import { WebSocketConnectReason } from '../services/WebSocketService';
 
 export const SessionEvents: ProtobufEvents = {
   '.Event_AddToList.ext': addToList,

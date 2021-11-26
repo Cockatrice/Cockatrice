@@ -10,3 +10,4 @@ export * from './routes';
 export * from './sort';
 export * from './forms';
 export * from './message';
+export * from './settings';

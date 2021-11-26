@@ -1,31 +1,9 @@
 import { Subject } from 'rxjs';
 
-import { ServerStatus, StatusEnum } from 'types';
+import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
-
-export interface WebSocketOptions {
-  host: string;
-  port: string;
-  user: string;
-  pass: string;
-  newPassword: string;
-  email: string;
-  autojoinrooms: boolean;
-  keepalive: number;
-  clientid: string;
-  reason: WebSocketConnectReason;
-}
-
-export enum WebSocketConnectReason {
-  LOGIN,
-  REGISTER,
-  ACTIVATE_ACCOUNT,
-  PASSWORD_RESET_REQUEST,
-  PASSWORD_RESET_CHALLENGE,
-  PASSWORD_RESET
-}
 
 export class WebSocketService {
   private socket: WebSocket;
@@ -48,7 +26,7 @@ export class WebSocketService {
     });
   }
 
-  public connect(options: WebSocketOptions, protocol: string = 'wss'): void {
+  public connect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
     if (window.location.hostname === 'localhost') {
       protocol = 'ws';
     }

@@ -6,6 +6,9 @@ export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
+  loginSuccessful: options => {
+    store.dispatch(Actions.loginSuccessful(options));
+  },
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
   },

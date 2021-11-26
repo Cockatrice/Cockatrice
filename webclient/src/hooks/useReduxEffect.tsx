@@ -6,8 +6,8 @@ File is adapted from https://github.com/Qeepsake/use-redux-effect under MIT Lice
 
 import { useRef, useEffect, DependencyList } from 'react'
 import { useStore } from 'react-redux'
-import { castArray } from 'lodash'
 import { AnyAction } from 'redux'
+import { castArray } from 'lodash'
 
 export type ReduxEffect = (action: AnyAction) => void
 
@@ -23,25 +23,25 @@ export function useReduxEffect(
   type: string | string[],
   deps: DependencyList = [],
 ): void {
-  const currentValue = useRef(null)
-  const store = useStore()
+  const currentValue = useRef(null);
+  const store = useStore();
 
   const handleChange = (): void => {
-    const state = store.getState()
-    const action = state.action
-    const previousValue = currentValue.current
-    currentValue.current = action.count
+    const state = store.getState();
+    const action = state.action;
+    const previousValue = currentValue.current;
+    currentValue.current = action.count;
 
     if (
       previousValue !== action.count &&
       castArray(type).includes(action.type)
     ) {
-      effect(action)
+      effect(action);
     }
   }
 
   useEffect(() => {
-    const unsubscribe = store.subscribe(handleChange)
-    return (): void => unsubscribe()
+    const unsubscribe = store.subscribe(handleChange);
+    return (): void => unsubscribe();
   }, deps)
 }

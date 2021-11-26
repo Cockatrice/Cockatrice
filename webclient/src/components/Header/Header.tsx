@@ -13,13 +13,12 @@ import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import * as _ from 'lodash';
 
 import { AuthenticationService, RoomsService } from 'api';
+import { CardImportDialog } from 'dialogs';
 import { Images } from 'images';
 import { RoomsSelectors, ServerSelectors } from 'store';
 import { Room, RouteEnum, User } from 'types';
 
 import './Header.css';
-
-import CardImportDialog from '../CardImportDialog/CardImportDialog';
 
 class Header extends Component<HeaderProps> {
   state: HeaderState;

@@ -1,9 +1,9 @@
-import { StatusEnum } from 'types';
+import { HostDTO } from 'services';
+import { StatusEnum, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
 
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
 import { guid, hashPassword } from '../utils';
-import { WebSocketConnectReason, WebSocketOptions } from '../services/WebSocketService';
 import {
   AccountActivationParams,
   ForgotPasswordChallengeParams,
@@ -15,7 +15,7 @@ import {
 import NormalizeService from '../utils/NormalizeService';
 
 export class SessionCommands {
-  static connect(options: WebSocketOptions, reason: WebSocketConnectReason): void {
+  static connect(options: WebSocketConnectOptions, reason: WebSocketConnectReason): void {
     switch (reason) {
       case WebSocketConnectReason.LOGIN:
       case WebSocketConnectReason.REGISTER:
@@ -38,16 +38,18 @@ export class SessionCommands {
   }
 
   static login(passwordSalt?: string): void {
+    const { userName, password, hashedPassword } = webClient.options;
+
     const loginConfig: any = {
       ...webClient.clientConfig,
-      userName: webClient.options.user,
-      clientid: guid()
+      clientid: 'webatrice',
+      userName,
     };
 
     if (passwordSalt) {
-      loginConfig.hashedPassword = hashPassword(passwordSalt, webClient.options.pass);
+      loginConfig.hashedPassword = hashedPassword || hashPassword(passwordSalt, password);
     } else {
-      loginConfig.password = webClient.options.pass;
+      loginConfig.password = password;
     }
 
     const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
@@ -65,11 +67,13 @@ export class SessionCommands {
         SessionPersistence.updateBuddyList(buddyList);
         SessionPersistence.updateIgnoreList(ignoreList);
         SessionPersistence.updateUser(userInfo);
+        SessionPersistence.loginSuccessful(loginConfig);
 
         SessionCommands.listUsers();
         SessionCommands.listRooms();
 
         SessionCommands.updateStatus(StatusEnum.LOGGED_IN, 'Logged in.');
+
         return;
       }
 
@@ -117,11 +121,11 @@ export class SessionCommands {
   }
 
   static requestPasswordSalt(): void {
-    const options = webClient.options as unknown as RequestPasswordSaltParams;
+    const { userName } = webClient.options as unknown as RequestPasswordSaltParams;
 
     const registerConfig = {
       ...webClient.clientConfig,
-      userName: options.user,
+      userName,
     };
 
     const CmdRequestPasswordSalt = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
@@ -132,35 +136,35 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       switch (raw.responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+        case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
           const passwordSalt = raw['.Response_PasswordSalt.ext'].passwordSalt;
           SessionCommands.login(passwordSalt);
           break;
-
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
+        }
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
           SessionCommands.disconnect();
           break;
-
-        default:
+        }
+        default: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
           SessionCommands.disconnect();
-          break;
+        }
       }
     });
   }
 
   static register(): void {
-    const options = webClient.options as unknown as ServerRegisterParams;
+    const { userName, password, email, country, realName } = webClient.options as unknown as ServerRegisterParams;
 
     const registerConfig = {
       ...webClient.clientConfig,
-      userName: options.user,
-      password: options.pass,
-      email: options.email,
-      country: options.country,
-      realName: options.realName,
-      clientid: 'webatrice'
+      clientid: 'webatrice',
+      userName,
+      password,
+      email,
+      country,
+      realName,
     };
 
     const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
@@ -222,13 +226,13 @@ export class SessionCommands {
   };
 
   static activateAccount(): void {
-    const options = webClient.options as unknown as AccountActivationParams;
+    const { userName, token } = webClient.options as unknown as AccountActivationParams;
 
     const accountActivationConfig = {
       ...webClient.clientConfig,
-      userName: options.user,
-      clientid: options.clientid,
-      token: options.activationCode
+      clientid: 'webatrice',
+      userName,
+      token,
     };
 
     const CmdActivate = webClient.protobuf.controller.Command_Activate.create(accountActivationConfig);
@@ -249,12 +253,12 @@ export class SessionCommands {
   }
 
   static resetPasswordRequest(): void {
-    const options = webClient.options as unknown as ForgotPasswordParams;
+    const { userName } = webClient.options as unknown as ForgotPasswordParams;
 
     const forgotPasswordConfig = {
       ...webClient.clientConfig,
-      userName: options.user,
-      clientid: options.clientid
+      clientid: 'webatrice',
+      userName,
     };
 
     const CmdForgotPasswordRequest = webClient.protobuf.controller.Command_ForgotPasswordRequest.create(forgotPasswordConfig);
@@ -284,13 +288,13 @@ export class SessionCommands {
   }
 
   static resetPasswordChallenge(): void {
-    const options = webClient.options as unknown as ForgotPasswordChallengeParams;
+    const { userName, email } = webClient.options as unknown as ForgotPasswordChallengeParams;
 
     const forgotPasswordChallengeConfig = {
       ...webClient.clientConfig,
-      userName: options.user,
-      clientid: options.clientid,
-      email: options.email
+      clientid: 'webatrice',
+      userName,
+      email,
     };
 
     const CmdForgotPasswordChallenge = webClient.protobuf.controller.Command_ForgotPasswordChallenge.create(forgotPasswordChallengeConfig);
@@ -313,14 +317,14 @@ export class SessionCommands {
   }
 
   static resetPassword(): void {
-    const options = webClient.options as unknown as ForgotPasswordResetParams;
+    const { userName, token, newPassword } = webClient.options as unknown as ForgotPasswordResetParams;
 
     const forgotPasswordResetConfig = {
       ...webClient.clientConfig,
-      userName: options.user,
-      clientid: options.clientid,
-      token: options.token,
-      newPassword: options.newPassword
+      clientid: 'webatrice',
+      userName,
+      token,
+      newPassword,
     };
 
     const CmdForgotPasswordReset = webClient.protobuf.controller.Command_ForgotPasswordReset.create(forgotPasswordResetConfig);

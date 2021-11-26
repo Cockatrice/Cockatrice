@@ -1,5 +1,6 @@
 .KnownHosts {
   width: 100%;
+  position: relative;
 }
 
 .KnownHosts-item__label {
@@ -15,6 +16,27 @@
   font-size: .9em;
 }
 
+.KnownHosts-validation {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(-100%);
+  font-weight: bold;
+}
+
+.KnownHosts-error {
+  display: flex;
+  align-items: center;
+}
+
+.KnownHosts-error svg {
+  margin-left: 4px;
+}
+
 .Mui-selected .KnownHosts-item__label svg {
   display: block;
+}
+
+.MuiSelect-selectMenu .KnownHosts-item__edit {
+  display: none;
 }

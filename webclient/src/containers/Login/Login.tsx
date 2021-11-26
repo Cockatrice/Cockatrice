@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, {useState} from "react";
+import React, { useState, useCallback } from "react";
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,9 +13,10 @@ import { RequestPasswordResetDialog, ResetPasswordDialog } from 'components';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
-import { RouteEnum, StatusEnum } from 'types';
+import { HostDTO } from 'services';
+import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
-import { SessionCommands } from 'websocket';
+
 import './Login.css';
 
 const useStyles = makeStyles(theme => ({
@@ -59,6 +60,7 @@ const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
+  const [hostIdToRemember, setHostIdToRemember] = useState(null);
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
     resetPasswordDialog: false
@@ -73,12 +75,62 @@ const Login = ({ state, description }: LoginProps) => {
     closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
+  useReduxEffect(({ options: { hashedPassword } }) => {
+    if (hostIdToRemember) {
+      HostDTO.get(hostIdToRemember).then(host => {
+        host.hashedPassword = hashedPassword;
+        host.save();
+      });
+    }
+  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
+
   const showDescription = () => {
     return !isConnected && description?.length;
   };
 
   const createAccount = () => {
     console.log('Login.createAccount->openForgotPasswordDialog');
+  };
+
+  const onSubmit = useCallback((loginForm) => {
+    const {
+      userName,
+      password,
+      selectedHost,
+      selectedHost: {
+        id: hostId,
+        hashedPassword
+      },
+      remember
+    } = loginForm;
+
+    updateHost(loginForm);
+
+    if (remember) {
+      setHostIdToRemember(hostId);
+    }
+
+    const options: WebSocketConnectOptions = {
+      ...getHostPort(selectedHost),
+      userName,
+      password
+    };
+
+    if (!password) {
+      options.hashedPassword = hashedPassword;
+    }
+
+    AuthenticationService.login(options as WebSocketConnectOptions);
+  }, []);
+
+  const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
+    HostDTO.get(selectedHost.id).then(hostDTO => {
+      hostDTO.remember = remember;
+      hostDTO.userName = remember ? userName : null;
+      hostDTO.hashedPassword = remember ? hashedPassword : null;
+
+      hostDTO.save();
+    });
   };
 
   const handleRequestPasswordResetDialogSubmit = async ({ user, email, host, port }) => {
@@ -123,7 +175,7 @@ const Login = ({ state, description }: LoginProps) => {
             <Typography variant="h1">Login</Typography>
             <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
             <div className="login-form">
-              <LoginForm onSubmit={AuthenticationService.connect} />
+              <LoginForm onSubmit={onSubmit} />
             </div>
 
             {

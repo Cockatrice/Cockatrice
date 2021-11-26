@@ -11,6 +11,22 @@ const palette = {
     dark: '#401C7F',
     contrastText: '#FFFFFF',
   },
+  grey: {
+    50: '#fafafa',
+    100: '#f5f5f5',
+    200: '#eeeeee',
+    300: '#e0e0e0',
+    400: '#bdbdbd',
+    500: '#9e9e9e',
+    600: '#757575',
+    700: '#616161',
+    800: '#424242',
+    900: '#212121',
+    A100: '#d5d5d5',
+    A200: '#aaaaaa',
+    A400: '#303030',
+    A700: '#616161',
+  },
   // secondary: {
   //   main: '',
   //   light: '',
@@ -64,6 +80,29 @@ export const materialTheme = createTheme({
         '&.tall': {
           'height': '40px',
         },
+      },
+    },
+
+    MuiCheckbox: {
+      root: {
+        '& .MuiSvgIcon-root': {
+          width: '.75em',
+          height: '.75em',
+        },
+      },
+    },
+
+    MuiFormControlLabel: {
+      label: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: palette.primary.main,
+      },
+    },
+
+    MuiLink: {
+      root: {
+        fontWeight: 'bold',
       },
     },
 
@@ -135,7 +174,10 @@ export const materialTheme = createTheme({
       fontSize: 28,
       fontWeight: 'bold',
     },
-    // h2: {},
+    h2: {
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
     // h3: {},
     // h4: {},
     // h5: {},

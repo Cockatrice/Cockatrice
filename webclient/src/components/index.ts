@@ -12,13 +12,11 @@ export { default as ThreePaneLayout } from './ThreePaneLayout/ThreePaneLayout';
 export { default as CheckboxField } from './CheckboxField/CheckboxField';
 export { default as SelectField } from './SelectField/SelectField';
 export { default as ScrollToBottomOnChanges } from './ScrollToBottomOnChanges/ScrollToBottomOnChanges';
-export { default as RegistrationDialog } from './RegistrationDialog/RegistrationDialog';
 
 // Guards
 export { default as AuthGuard } from './Guard/AuthGuard';
 export { default as ModGuard } from './Guard/ModGuard';
 
 // Dialogs
-export { default as CardImportDialog } from './CardImportDialog/CardImportDialog';
 export { default as RequestPasswordResetDialog } from './RequestPasswordResetDialog/RequestPasswordResetDialog';
 export { default as ResetPasswordDialog } from './ResetPasswordDialog/ResetPasswordDialog';

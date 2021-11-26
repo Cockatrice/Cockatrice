@@ -13,15 +13,16 @@ import './RegisterForm.css';
 const RegisterForm = (props) => {
   const { dispatch, handleSubmit } = props;
 
-  const onHostChange = ({ host, port }) => {
+  const onHostChange: any = ({ host, port }) => {
     dispatch(change(FormKey.REGISTER, 'host', host));
     dispatch(change(FormKey.REGISTER, 'port', port));
   }
+
   return (
     <Form className="registerForm row" onSubmit={handleSubmit} autoComplete="off">
       <div className="leftRegisterForm column" >
         <div className="registerForm-item">
-          <KnownHosts onChange={onHostChange} />
+          <Field name="selectedHost" component={KnownHosts} onChange={onHostChange} />
           { /* Padding is off */ }
         </div>
         <div className="registerForm-item">

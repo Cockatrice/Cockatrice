@@ -1,0 +1,26 @@
+.KnownHostDialog {
+
+}
+
+.KnownHostDialog .MuiDialog-paper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.dialog-title__wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid;
+  padding-bottom: 10px;
+}
+
+.dialog-title__label {
+  display: flex;
+  align-items: center;
+}
+
+.dialog-content__subtitle.MuiTypography-root {
+  margin-bottom: 20px;
+}

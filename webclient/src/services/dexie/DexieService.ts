@@ -1,24 +1,16 @@
 import Dexie from 'dexie';
 
-enum Stores {
-  CARDS = 'cards',
-  SETS = 'sets',
-  TOKENS = 'tokens',
-  HOSTS = 'hosts',
-}
-
-const StoreKeyIndexes = {
-  [Stores.CARDS]: 'name',
-  [Stores.SETS]: 'code',
-  [Stores.TOKENS]: 'name.value',
-  [Stores.HOSTS]: '++id,name',
-};
+import { Stores, schemaV1 } from './DexieSchemas/v1.schema';
 
 class DexieService {
   private db: Dexie = new Dexie('Webatrice');
 
   constructor() {
-    this.db.version(1).stores(StoreKeyIndexes);
+    schemaV1(this.db);
+  }
+
+  get settings() {
+    return this.db.table(Stores.SETTINGS);
   }
 
   get cards() {
