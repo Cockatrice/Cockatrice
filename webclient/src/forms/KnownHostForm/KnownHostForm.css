@@ -1,0 +1,21 @@
+.KnownHostForm {
+  width: 100%;
+}
+
+.KnownHostForm-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.KnownHostForm-submit {
+  width: 100%;
+}
+
+.KnownHostForm-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0 10px;
+  color: red;
+}

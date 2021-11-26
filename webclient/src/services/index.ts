@@ -1,2 +1,2 @@
 export * from './CardImporterService';
-export * from './DexieDTOs';
+export * from './dexie';

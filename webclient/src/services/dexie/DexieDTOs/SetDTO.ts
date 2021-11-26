@@ -16,4 +16,4 @@ export class SetDTO extends Set {
   }
 };
 
-dexieService.cards.mapToClass(SetDTO);
+dexieService.sets.mapToClass(SetDTO);

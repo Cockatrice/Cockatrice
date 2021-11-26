@@ -1,9 +1,15 @@
 import { Type } from 'protobufjs';
+import { WebSocketConnectOptions } from 'types';
+
 import { Types } from './server.types';
 
 export const Actions = {
   clearStore: () => ({
     type: Types.CLEAR_STORE
+  }),
+  loginSuccessful: (options: WebSocketConnectOptions) => ({
+    type: Types.LOGIN_SUCCESSFUL,
+    options
   }),
   connectionClosed: reason => ({
     type: Types.CONNECTION_CLOSED,

@@ -1,29 +1,28 @@
-import { StatusEnum, User } from 'types';
+import { StatusEnum, User, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
 import { SessionCommands, webClient } from 'websocket';
-import { WebSocketConnectReason, WebSocketOptions } from '../websocket/services/WebSocketService';
 
 export default class AuthenticationService {
-  static connect(options: WebSocketOptions): void {
+  static login(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
   }
 
-  static register(options: WebSocketOptions): void {
+  static register(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
   }
 
-  static activateAccount(options: WebSocketOptions): void {
+  static activateAccount(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.ACTIVATE_ACCOUNT);
   }
 
-  static resetPasswordRequest(options: WebSocketOptions): void {
+  static resetPasswordRequest(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.PASSWORD_RESET_REQUEST);
   }
 
-  static resetPasswordChallenge(options: WebSocketOptions): void {
+  static resetPasswordChallenge(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.PASSWORD_RESET_CHALLENGE);
   }
 
-  static resetPassword(options: WebSocketOptions): void {
+  static resetPassword(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.PASSWORD_RESET);
   }
 
@@ -43,5 +42,9 @@ export default class AuthenticationService {
 
   static isAdmin() {
 
+  }
+
+  static connectionAttemptMade() {
+    return webClient.connectionAttemptMade;
   }
 }

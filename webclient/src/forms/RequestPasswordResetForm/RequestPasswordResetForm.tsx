@@ -17,7 +17,7 @@ const RequestPasswordResetForm = (props) => {
   const [errorMessage, setErrorMessage] = useState(false);
   const [isMFA, setIsMFA] = useState(false);
 
-  const onHostChange = ({ host, port }) => {
+  const onHostChange: any = ({ host, port }) => {
     dispatch(change(FormKey.RESET_PASSWORD_REQUEST, 'host', host));
     dispatch(change(FormKey.RESET_PASSWORD_REQUEST, 'port', port));
   }
@@ -51,7 +51,7 @@ const RequestPasswordResetForm = (props) => {
           </div>
         ) : null}
         <div className="RequestPasswordResetForm-item">
-          <KnownHosts onChange={onHostChange} />
+          <Field name='selectedHost' component={KnownHosts} onChange={onHostChange} />
         </div>
       </div>
       <Button className="RequestPasswordResetForm-submit rounded tall" color="primary" variant="contained" type="submit">

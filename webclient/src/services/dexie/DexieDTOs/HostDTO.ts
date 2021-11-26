@@ -8,11 +8,11 @@ export class HostDTO extends Host {
     return dexieService.hosts.put(this);
   }
 
-  static add(host: HostDTO): Promise<IndexableType> {
+  static add(host: Host): Promise<IndexableType> {
     return dexieService.hosts.add(host);
   }
 
-  static get(id): Promise<HostDTO> {
+  static get(id: number): Promise<HostDTO> {
     return dexieService.hosts.where('id').equals(id).first();
   }
 
@@ -22,6 +22,10 @@ export class HostDTO extends Host {
 
   static bulkAdd(hosts: Host[]): Promise<IndexableType> {
     return dexieService.hosts.bulkAdd(hosts);
+  }
+
+  static delete(id: string): Promise<void> {
+    return dexieService.hosts.delete(id);
   }
 };
 

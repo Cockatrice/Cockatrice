@@ -1,7 +1,7 @@
-import { ServerStatus, StatusEnum } from 'types';
+import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { ProtobufService } from './services/ProtobufService';
-import { WebSocketOptions, WebSocketService } from './services/WebSocketService';
+import { WebSocketService } from './services/WebSocketService';
 
 import { RoomPersistence, SessionPersistence } from './persistence';
 
@@ -30,11 +30,12 @@ export class WebClient {
     ]
   };
 
-  public options: WebSocketOptions = {
+  public options: WebSocketConnectOptions = {
     host: '',
     port: '',
-    user: '',
-    pass: '',
+    userName: '',
+    password: '',
+    hashedPassword: '',
     newPassword: '',
     email: '',
     clientid: null,
@@ -42,6 +43,8 @@ export class WebClient {
     autojoinrooms: true,
     keepalive: 5000
   };
+
+  public connectionAttemptMade = false;
 
   constructor() {
     this.socket.message$.subscribe((message: MessageEvent) => {
@@ -55,7 +58,8 @@ export class WebClient {
     console.log(this);
   }
 
-  public connect(options: WebSocketOptions) {
+  public connect(options: WebSocketConnectOptions) {
+    this.connectionAttemptMade = true;
     this.options = { ...this.options, ...options };
     this.socket.connect(this.options);
   }

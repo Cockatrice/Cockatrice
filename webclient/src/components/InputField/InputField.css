@@ -1,8 +1,8 @@
-.inputField {
+.InputField {
   position: relative;
 }
 
-.inputField-validation {
+.InputField-validation {
   position: absolute;
   top: 0;
   right: 0;
@@ -10,11 +10,11 @@
   font-weight: bold;
 }
 
-.inputField-error {
+.InputField-error {
   display: flex;
   align-items: center;
 }
 
-.inputField-error svg {
+.InputField-error svg {
   margin-left: 4px;
 }

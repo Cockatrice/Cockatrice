@@ -1,5 +1,5 @@
 import { ServerDispatch } from 'store';
-import { Log, StatusEnum, User } from 'types';
+import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
@@ -7,6 +7,10 @@ import NormalizeService from '../utils/NormalizeService';
 export class SessionPersistence {
   static clearStore() {
     ServerDispatch.clearStore();
+  }
+
+  static loginSuccessful(options: WebSocketConnectOptions) {
+    ServerDispatch.loginSuccessful(options);
   }
 
   static connectionClosed(reason: number) {

@@ -17,13 +17,13 @@ export function sanitizeHtml(msg: string): string {
 }
 
 function enforceTagWhitelist($el: JQuery<HTMLElement>, tags: string): void {
-  $el.find('*').not(tags).each(() => {
+  $el.find('*').not(tags).each(function enforceTag() {
     $(this).replaceWith(this.innerHTML);
   });
 }
 
 function enforceAttrWhitelist($el: JQuery<HTMLElement>, attrs: string[]): void {
-  $el.find('*').each(() => {
+  $el.find('*').each(function enforceAttribute() {
     const attributes = this.attributes;
     let i = attributes.length;
     while (i--) {
@@ -36,7 +36,7 @@ function enforceAttrWhitelist($el: JQuery<HTMLElement>, attrs: string[]): void {
 }
 
 function enforceHrefWhitelist($el: JQuery<HTMLElement>, hrefs: string[]): void {
-  $el.find('[href]').each(() => {
+  $el.find('[href]').each(function enforceHref() {
     const $_el = $(this);
     const attributeValue = $_el.attr('href');
 

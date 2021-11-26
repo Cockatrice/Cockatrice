@@ -12,6 +12,29 @@ export enum StatusEnum {
   DISCONNECTING = 99
 }
 
+export interface WebSocketConnectOptions {
+  host?: string;
+  port?: string;
+  userName?: string;
+  password?: string;
+  hashedPassword?: string;
+  newPassword?: string;
+  email?: string;
+  autojoinrooms?: boolean;
+  keepalive?: number;
+  clientid?: string;
+  reason?: WebSocketConnectReason;
+}
+
+export enum WebSocketConnectReason {
+  LOGIN,
+  REGISTER,
+  ACTIVATE_ACCOUNT,
+  PASSWORD_RESET_REQUEST,
+  PASSWORD_RESET_CHALLENGE,
+  PASSWORD_RESET
+}
+
 export class Host {
   id?: number;
   name: string;
@@ -20,6 +43,10 @@ export class Host {
   localHost?: string;
   localPort?: string;
   editable: boolean;
+  lastSelected?: boolean;
+  userName?: string;
+  hashedPassword?: string;
+  remember?: boolean;
 }
 
 export const DefaultHosts: Host[] = [
@@ -40,7 +67,7 @@ export const DefaultHosts: Host[] = [
   {
     name: 'Tetrarch',
     host: 'mtg.tetrarch.co/servatrice',
-    port: '4748',
+    port: '443',
     editable: false,
   },
 ];

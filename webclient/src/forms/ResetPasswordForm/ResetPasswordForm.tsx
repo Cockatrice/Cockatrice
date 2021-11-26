@@ -18,7 +18,7 @@ const ResetPasswordForm = (props) => {
   const [errorMessage, setErrorMessage] = useState(false);
 
 
-  const onHostChange = ({ host, port }) => {
+  const onHostChange: any = ({ host, port }) => {
     dispatch(change(FormKey.RESET_PASSWORD, 'host', host));
     dispatch(change(FormKey.RESET_PASSWORD, 'port', port));
   }
@@ -47,7 +47,7 @@ const ResetPasswordForm = (props) => {
           <Field label="Password Again" name="passwordAgain" component={InputField} />
         </div>
         <div className="ResetPasswordForm-item">
-          <KnownHosts onChange={onHostChange} />
+          <Field name='selectedHost' component={KnownHosts} onChange={onHostChange} />
         </div>
       </div>
       <Button className="ResetPasswordForm-submit rounded tall" color="primary" variant="contained" type="submit">
