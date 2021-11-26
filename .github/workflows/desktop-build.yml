@@ -195,8 +195,7 @@ jobs:
           - 11_Big_Sur
         include:
           - target: Debug # tests only
-            os: macos-latest
-            # xcode: 12.1 # since os:latest is a rolling target, it can prevent conflicts to not define a specific Xcode version
+            os: macos-latest # since latest is a rolling target, it can prevent conflicts if no specific Xcode version is defined
             type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
