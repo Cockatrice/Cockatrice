@@ -1,4 +1,4 @@
-import { StatusEnum } from 'types';
+import { StatusEnum, WebSocketConnectReason } from 'types';
 
 import {
   AddToListData,
@@ -15,18 +15,17 @@ import {
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
-import { WebSocketConnectReason } from '../services/WebSocketService';
 
 describe('SessionEvents', () => {
   const roomId = 1;
 
   beforeEach(() => {
-    spyOn(SessionCommands, 'updateStatus');
+    jest.spyOn(SessionCommands, 'updateStatus').mockImplementation(() => {});
   });
 
   describe('.Event_AddToList.ext', () => {
     it('should call SessionPersistence.addToBuddyList if buddy listName', () => {
-      spyOn(SessionPersistence, 'addToBuddyList');
+      jest.spyOn(SessionPersistence, 'addToBuddyList').mockImplementation(() => {});
       const data: AddToListData = { listName: 'buddy', userInfo: {} as any };
 
       SessionEvents['.Event_AddToList.ext'](data);
@@ -37,7 +36,7 @@ describe('SessionEvents', () => {
     });
 
     it('should call SessionPersistence.addToIgnoreList if ignore listName', () => {
-      spyOn(SessionPersistence, 'addToIgnoreList');
+      jest.spyOn(SessionPersistence, 'addToIgnoreList').mockImplementation(() => {});
       const data: AddToListData = { listName: 'ignore', userInfo: {} as any };
 
       SessionEvents['.Event_AddToList.ext'](data);
@@ -48,7 +47,7 @@ describe('SessionEvents', () => {
     });
 
     it('should call console.log if unknown listName', () => {
-      spyOn(console, 'log');
+      jest.spyOn(console, 'log').mockImplementation(() => {});
       const data: AddToListData = { listName: 'unknown', userInfo: {} as any };
 
       SessionEvents['.Event_AddToList.ext'](data);
@@ -218,7 +217,7 @@ describe('SessionEvents', () => {
   describe('.Event_ListRooms.ext', () => {
     beforeEach(() => {
       webClient.options.autojoinrooms = false;
-      spyOn(RoomPersistence, 'updateRooms');
+      jest.spyOn(RoomPersistence, 'updateRooms').mockImplementation(() => {});
     });
 
     it('should call RoomPersistence.updateRooms', () => {
@@ -231,7 +230,7 @@ describe('SessionEvents', () => {
 
     it('should call SessionCommands.joinRoom if webClient and room is configured for autojoin', () => {
       webClient.options.autojoinrooms = true;
-      spyOn(SessionCommands, 'joinRoom');
+      jest.spyOn(SessionCommands, 'joinRoom').mockImplementation(() => {});
       const data: ListRoomsData = { roomList: [{ roomId, autoJoin: true } as any, { roomId: 2, autoJoin: false } as any] };
 
       SessionEvents['.Event_ListRooms.ext'](data);
@@ -243,7 +242,7 @@ describe('SessionEvents', () => {
 
   describe('.Event_RemoveFromList.ext', () => {
     it('should call SessionPersistence.removeFromBuddyList if buddy listName', () => {
-      spyOn(SessionPersistence, 'removeFromBuddyList');
+      jest.spyOn(SessionPersistence, 'removeFromBuddyList').mockImplementation(() => {});
       const data: RemoveFromListData = { listName: 'buddy', userName: '' };
 
       SessionEvents['.Event_RemoveFromList.ext'](data);
@@ -254,7 +253,7 @@ describe('SessionEvents', () => {
     });
 
     it('should call SessionPersistence.removeFromIgnoreList if ignore listName', () => {
-      spyOn(SessionPersistence, 'removeFromIgnoreList');
+      jest.spyOn(SessionPersistence, 'removeFromIgnoreList').mockImplementation(() => {});
       const data: RemoveFromListData = { listName: 'ignore', userName: '' };
 
       SessionEvents['.Event_RemoveFromList.ext'](data);
@@ -265,7 +264,7 @@ describe('SessionEvents', () => {
     });
 
     it('should call console.log if unknown listName', () => {
-      spyOn(console, 'log');
+      jest.spyOn(console, 'log').mockImplementation(() => {});
       const data: RemoveFromListData = { listName: 'unknown', userName: '' };
 
       SessionEvents['.Event_RemoveFromList.ext'](data);
@@ -287,13 +286,15 @@ describe('SessionEvents', () => {
         serverName: 'serverName',
         serverVersion: 'serverVersion',
         protocolVersion: 0,
+        serverOptions: 0
       };
 
-      spyOn(SessionPersistence, 'updateInfo');
+      jest.spyOn(SessionPersistence, 'updateInfo').mockImplementation(() => {});
+      webClient.protobuf.controller.Event_ServerIdentification = { ServerOptions: { SupportsPasswordHash: 1 } };
     });
 
     it('update status/info and login', () => {
-      spyOn(SessionCommands, 'login');
+      jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
 
       webClient.options.reason = WebSocketConnectReason.LOGIN;
 
@@ -305,7 +306,7 @@ describe('SessionEvents', () => {
     });
 
     it('should update stat/info and register', () => {
-      spyOn(SessionCommands, 'register');
+      jest.spyOn(SessionCommands, 'register').mockImplementation(() => {});
 
       webClient.options.reason = WebSocketConnectReason.REGISTER;
 
@@ -316,7 +317,7 @@ describe('SessionEvents', () => {
     });
 
     it('should update stat/info and activate account', () => {
-      spyOn(SessionCommands, 'activateAccount');
+      jest.spyOn(SessionCommands, 'activateAccount').mockImplementation(() => {});
 
       webClient.options.reason = WebSocketConnectReason.ACTIVATE_ACCOUNT;
 
@@ -327,14 +328,15 @@ describe('SessionEvents', () => {
     });
 
     it('should disconnect if protocolVersion mismatched', () => {
-      spyOn(SessionCommands, 'login');
-      spyOn(SessionCommands, 'disconnect');
+      jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+      jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
 
       webClient.protocolVersion = 0;
       const data: ServerIdentificationData = {
         serverName: '',
         serverVersion: '',
         protocolVersion: 1,
+        serverOptions: 0
       };
 
       event(data);
@@ -350,7 +352,7 @@ describe('SessionEvents', () => {
 
   describe('.Event_ServerMessage.ext', () => {
     it('should call SessionPersistence.serverMessage', () => {
-      spyOn(SessionPersistence, 'serverMessage');
+      jest.spyOn(SessionPersistence, 'serverMessage').mockImplementation(() => {});
       const data: ServerMessageData = { message: 'message' };
 
       SessionEvents['.Event_ServerMessage.ext'](data);
@@ -363,7 +365,7 @@ describe('SessionEvents', () => {
 
   describe('.Event_UserJoined.ext', () => {
     it('should call SessionPersistence.userJoined', () => {
-      spyOn(SessionPersistence, 'userJoined');
+      jest.spyOn(SessionPersistence, 'userJoined').mockImplementation(() => {});
       const data: UserJoinedData = { userInfo: {} as any };
 
       SessionEvents['.Event_UserJoined.ext'](data);
@@ -376,7 +378,7 @@ describe('SessionEvents', () => {
 
   describe('.Event_UserLeft.ext', () => {
     it('should call SessionPersistence.userLeft', () => {
-      spyOn(SessionPersistence, 'userLeft');
+      jest.spyOn(SessionPersistence, 'userLeft').mockImplementation(() => {});
       const data: UserLeftData = { name: '' };
 
       SessionEvents['.Event_UserLeft.ext'](data);

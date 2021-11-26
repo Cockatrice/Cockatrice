@@ -8,9 +8,13 @@ describe('RoomCommands', () => {
   let sendRoomCommandSpy;
 
   beforeEach(() => {
-    sendRoomCommandSpy = spyOn(webClient.protobuf, 'sendRoomCommand');
+    sendRoomCommandSpy = jest.spyOn(webClient.protobuf, 'sendRoomCommand').mockImplementation(() => {});
 
     webClient.protobuf.controller.RoomCommand = { create: args => args };
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('roomSay', () => {
@@ -50,18 +54,18 @@ describe('RoomCommands', () => {
       expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
         roomId,
         { '.Command_LeaveRoom.ext': {} },
-        jasmine.any(Function)
+        expect.any(Function)
       );
     });
 
     it('should call RoomPersistence.leaveRoom if RespOk', () => {
       const RespOk = 'ok';
       webClient.protobuf.controller.Response = { ResponseCode: { RespOk } };
-      sendRoomCommandSpy.and.callFake((_, __, callback) => {
+      sendRoomCommandSpy.mockImplementation((_, __, callback) => {
         callback({ responseCode: RespOk })
       });
 
-      spyOn(RoomPersistence, 'leaveRoom');
+      jest.spyOn(RoomPersistence, 'leaveRoom').mockImplementation(() => {});
 
       RoomCommands.leaveRoom(roomId);
 

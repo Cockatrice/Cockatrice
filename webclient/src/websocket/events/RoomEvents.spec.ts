@@ -11,7 +11,7 @@ import { RoomPersistence } from '../persistence/RoomPersistence';
 
 describe('RoomEvents', () => {
   it('.Event_JoinRoom.ext should call RoomPersistence.userJoined', () => {
-    spyOn(RoomPersistence, 'userJoined');
+    jest.spyOn(RoomPersistence, 'userJoined').mockImplementation(() => {});
     const data: JoinRoomData = { userInfo: {} as any };
     const event: RoomEvent = { roomEvent: { roomId: 1 } };
 
@@ -24,7 +24,7 @@ describe('RoomEvents', () => {
   });
 
   it('.Event_LeaveRoom.ext should call RoomPersistence.userLeft', () => {
-    spyOn(RoomPersistence, 'userLeft');
+    jest.spyOn(RoomPersistence, 'userLeft').mockImplementation(() => {});
     const data: LeaveRoomData = { name: '' };
     const event: RoomEvent = { roomEvent: { roomId: 1 } };
 
@@ -37,7 +37,7 @@ describe('RoomEvents', () => {
   });
 
   it('.Event_ListGames.ext should call RoomPersistence.updateGames', () => {
-    spyOn(RoomPersistence, 'updateGames');
+    jest.spyOn(RoomPersistence, 'updateGames').mockImplementation(() => {});
     const data: ListGamesData = { gameList: [] };
     const event: RoomEvent = { roomEvent: { roomId: 1 } };
 
@@ -50,7 +50,7 @@ describe('RoomEvents', () => {
   });
 
   it('.Event_RoomSay.ext should call RoomPersistence.addMessage', () => {
-    spyOn(RoomPersistence, 'addMessage');
+    jest.spyOn(RoomPersistence, 'addMessage').mockImplementation(() => {});
     const data: Message = {} as any;
     const event: RoomEvent = { roomEvent: { roomId: 1 } };
 

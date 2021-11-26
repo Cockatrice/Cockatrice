@@ -1,34 +1,37 @@
-import { StatusEnum } from 'types';
+import { StatusEnum, WebSocketConnectReason } from 'types';
 
 import { SessionCommands } from './SessionCommands';
 
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
-import { WebSocketConnectReason } from '../services/WebSocketService';
 import { AccountActivationParams, ServerRegisterParams } from '../../store';
 
 describe('SessionCommands', () => {
   const roomId = 1;
   let sendModeratorCommandSpy;
   let sendSessionCommandSpy;
+  let MockSessionCommands;
 
   beforeEach(() => {
-    spyOn(SessionCommands, 'updateStatus').and.callThrough();
-    spyOn(webClient, 'updateStatus');
-    spyOn(console, 'error');
+    jest.spyOn(SessionCommands, 'updateStatus');
+    jest.spyOn(webClient, 'updateStatus').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    sendModeratorCommandSpy = spyOn(webClient.protobuf, 'sendModeratorCommand');
-    sendSessionCommandSpy = spyOn(webClient.protobuf, 'sendSessionCommand');
+    sendModeratorCommandSpy = jest.spyOn(webClient.protobuf, 'sendModeratorCommand').mockImplementation(() => {});
+    sendSessionCommandSpy = jest.spyOn(webClient.protobuf, 'sendSessionCommand').mockImplementation(() => {});
     webClient.protobuf.controller.ModeratorCommand = { create: args => args };
     webClient.protobuf.controller.SessionCommand = { create: args => args };
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
   describe('connect', () => {
     let options;
 
     beforeEach(() => {
-      spyOn(webClient, 'connect');
+      jest.spyOn(webClient, 'connect').mockImplementation(() => {});
       options = {
         host: 'host',
         port: 'port',
@@ -69,12 +72,9 @@ describe('SessionCommands', () => {
 
   describe('disconnect', () => {
     it('should call SessionCommands.updateStatus and webClient.disconnect', () => {
-      spyOn(webClient, 'disconnect');
+      jest.spyOn(webClient, 'disconnect');
 
       SessionCommands.disconnect();
-
-      expect(SessionCommands.updateStatus).toHaveBeenCalled();
-      expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTING, 'Disconnecting...');
 
       expect(webClient.disconnect).toHaveBeenCalled();
     });
@@ -83,8 +83,8 @@ describe('SessionCommands', () => {
   describe('login', () => {
     beforeEach(() => {
       webClient.protobuf.controller.Command_Login = { create: args => args };
-      webClient.options.user = 'user';
-      webClient.options.pass = 'pass';
+      webClient.options.userName = 'user';
+      webClient.options.password = 'pass';
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
@@ -94,11 +94,11 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_Login.ext': {
           ...webClient.clientConfig,
-          userName: webClient.options.user,
-          password: webClient.options.pass,
-          clientid: jasmine.any(String)
+          userName: webClient.options.userName,
+          password: webClient.options.password,
+          clientid: expect.any(String)
         }
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
 
     describe('response', () => {
@@ -118,15 +118,15 @@ describe('SessionCommands', () => {
 
         webClient.protobuf.controller.Response = { ResponseCode: { RespOk } };
 
-        sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
+        sendSessionCommandSpy.mockImplementation((_, callback) => callback(response));
       });
 
       it('RespOk should update user/state and list users/games', () => {
-        spyOn(SessionPersistence, 'updateBuddyList');
-        spyOn(SessionPersistence, 'updateIgnoreList');
-        spyOn(SessionPersistence, 'updateUser');
-        spyOn(SessionCommands, 'listUsers');
-        spyOn(SessionCommands, 'listRooms');
+        jest.spyOn(SessionPersistence, 'updateBuddyList').mockImplementation(() => {});
+        jest.spyOn(SessionPersistence, 'updateIgnoreList').mockImplementation(() => {});
+        jest.spyOn(SessionPersistence, 'updateUser').mockImplementation(() => {});
+        jest.spyOn(SessionCommands, 'listUsers').mockImplementation(() => {});
+        jest.spyOn(SessionCommands, 'listRooms').mockImplementation(() => {});
 
         SessionCommands.login();
 
@@ -270,14 +270,14 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_Register.ext': {
           ...webClient.clientConfig,
-          userName: options.user,
-          password: options.pass,
+          userName: options.userName,
+          password: options.password,
           email: options.email,
           country: options.country,
           realName: options.realName,
-          clientid: jasmine.any(String)
+          clientid: expect.any(String)
         }
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
 
     describe('response', () => {
@@ -296,12 +296,12 @@ describe('SessionCommands', () => {
 
         webClient.protobuf.controller.Response = { ResponseCode: { RespRegistrationAccepted } };
 
-        sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
+        sendSessionCommandSpy.mockImplementation((_, callback) => callback(response));
       })
 
       it('should login user if registration accepted without email verification', () => {
-        spyOn(SessionCommands, 'login');
-        spyOn(SessionPersistence, 'accountAwaitingActivation');
+        jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+        jest.spyOn(SessionPersistence, 'accountAwaitingActivation').mockImplementation(() => {});
 
         SessionCommands.register();
 
@@ -315,8 +315,8 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation =
             RespRegistrationAcceptedNeedsActivation;
 
-        spyOn(SessionCommands, 'login');
-        spyOn(SessionPersistence, 'accountAwaitingActivation');
+        jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+        jest.spyOn(SessionPersistence, 'accountAwaitingActivation').mockImplementation(() => {});
 
         SessionCommands.register();
 
@@ -355,11 +355,11 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_Activate.ext': {
           ...webClient.clientConfig,
-          userName: options.user,
-          token: options.activationCode,
-          clientid: jasmine.any(String)
+          userName: options.userName,
+          token: options.token,
+          clientid: expect.any(String)
         }
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
 
     describe('response', () => {
@@ -377,9 +377,9 @@ describe('SessionCommands', () => {
 
         webClient.protobuf.controller.Response = { ResponseCode: { RespActivationAccepted } };
 
-        sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
-        spyOn(SessionCommands, 'login');
-        spyOn(SessionPersistence, 'accountActivationFailed');
+        sendSessionCommandSpy.mockImplementation((_, callback) => callback(response));
+        jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+        jest.spyOn(SessionPersistence, 'accountActivationFailed').mockImplementation(() => {});
       });
 
       it('should activate user and login if correct activation token used', () => {
@@ -413,7 +413,7 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_ListUsers.ext': {}
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
 
     it('should call SessionPersistence.updateUsers if RespOk', () => {
@@ -425,8 +425,8 @@ describe('SessionCommands', () => {
       };
 
       webClient.protobuf.controller.Response = { ResponseCode: { RespOk } };
-      sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
-      spyOn(SessionPersistence, 'updateUsers');
+      sendSessionCommandSpy.mockImplementation((_, callback) => callback(response));
+      jest.spyOn(SessionPersistence, 'updateUsers').mockImplementation(() => {});
 
       SessionCommands.listUsers();
 
@@ -460,7 +460,7 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_JoinRoom.ext': { roomId }
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
 
     describe('response', () => {
@@ -476,11 +476,11 @@ describe('SessionCommands', () => {
 
         webClient.protobuf.controller.Response = { ResponseCode: { RespOk } };
 
-        sendSessionCommandSpy.and.callFake((_, callback) => callback(response));
+        sendSessionCommandSpy.mockImplementation((_, callback) => callback(response));
       });
 
       it('RespOk should call RoomPersistence.joinRoom', () => {
-        spyOn(RoomPersistence, 'joinRoom');
+        jest.spyOn(RoomPersistence, 'joinRoom').mockImplementation(() => {});
 
         SessionCommands.joinRoom(roomId);
 
@@ -534,7 +534,7 @@ describe('SessionCommands', () => {
 
   describe('addToBuddyList', () => {
     it('should call SessionCommands.addToList', () => {
-      spyOn(SessionCommands, 'addToList');
+      jest.spyOn(SessionCommands, 'addToList').mockImplementation(() => {});
       const userName = 'userName';
 
       SessionCommands.addToBuddyList(userName);
@@ -545,7 +545,7 @@ describe('SessionCommands', () => {
 
   describe('removeFromBuddyList', () => {
     it('should call SessionCommands.removeFromList', () => {
-      spyOn(SessionCommands, 'removeFromList');
+      jest.spyOn(SessionCommands, 'removeFromList').mockImplementation(() => {});
       const userName = 'userName';
 
       SessionCommands.removeFromBuddyList(userName);
@@ -556,7 +556,7 @@ describe('SessionCommands', () => {
 
   describe('addToIgnoreList', () => {
     it('should call SessionCommands.addToList', () => {
-      spyOn(SessionCommands, 'addToList');
+      jest.spyOn(SessionCommands, 'addToList').mockImplementation(() => {});
       const userName = 'userName';
 
       SessionCommands.addToIgnoreList(userName);
@@ -567,7 +567,7 @@ describe('SessionCommands', () => {
 
   describe('removeFromIgnoreList', () => {
     it('should call SessionCommands.removeFromList', () => {
-      spyOn(SessionCommands, 'removeFromList');
+      jest.spyOn(SessionCommands, 'removeFromList').mockImplementation(() => {});
       const userName = 'userName';
 
       SessionCommands.removeFromIgnoreList(userName);
@@ -588,7 +588,7 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_AddToList.ext': addToList
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
   });
 
@@ -604,7 +604,7 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_RemoveFromList.ext': removeFromList
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
   });
 
@@ -621,7 +621,7 @@ describe('SessionCommands', () => {
       expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith({
         '.Command_ViewLogHistory.ext': filters
-      }, jasmine.any(Function));
+      }, expect.any(Function));
     });
 
     describe('response', () => {
@@ -637,11 +637,11 @@ describe('SessionCommands', () => {
 
         webClient.protobuf.controller.Response = { ResponseCode: { RespOk } };
 
-        sendModeratorCommandSpy.and.callFake((_, callback) => callback(response));
+        sendModeratorCommandSpy.mockImplementation((_, callback) => callback(response));
       });
 
       it('RespOk should call SessionPersistence.viewLogs', () => {
-        spyOn(SessionPersistence, 'viewLogs');
+        jest.spyOn(SessionPersistence, 'viewLogs').mockImplementation(() => {});
 
         SessionCommands.viewLogHistory(filters);
 

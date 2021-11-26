@@ -6,6 +6,9 @@ module.exports = {
     "@typescript-eslint"
   ],
   "ignorePatterns": ["node_modules/*", "build/*", "public/pb/*"],
+  "env": {
+    "jest": true
+  },
   "rules": {
     "array-bracket-spacing": ["error", "never"],
     "arrow-spacing": ["error", {"before": true, "after": true}],

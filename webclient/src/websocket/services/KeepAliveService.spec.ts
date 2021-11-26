@@ -30,8 +30,8 @@ describe('KeepAliveService', () => {
       promise = new Promise(resolve => resolvePing = resolve);
       ping = (done) => promise.then(done);
 
-      checkReadyStateSpy = spyOn(socket, 'checkReadyState');
-      checkReadyStateSpy.and.returnValue(true);
+      checkReadyStateSpy = jest.spyOn(socket, 'checkReadyState');
+      checkReadyStateSpy.mockImplementation(() => true);
 
       service.startPingLoop(interval, ping);
       jest.advanceTimersByTime(interval);
@@ -52,15 +52,15 @@ describe('KeepAliveService', () => {
     });
 
     it('should fire disconnected$ if lastPingPending is still true', () => {
-      spyOn(service.disconnected$, 'next');
+      jest.spyOn(service.disconnected$, 'next').mockImplementation(() => {});
       jest.advanceTimersByTime(interval);
 
       expect(service.disconnected$.next).toHaveBeenCalled();
     });
 
     it('should endPingLoop if socket is not open', () => {
-      spyOn(service, 'endPingLoop');
-      checkReadyStateSpy.and.returnValue(false);
+      jest.spyOn(service, 'endPingLoop').mockImplementation(() => {});
+      checkReadyStateSpy.mockImplementation(() => false);
 
       resolvePing();
       jest.advanceTimersByTime(interval);
