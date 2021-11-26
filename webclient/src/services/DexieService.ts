@@ -13,14 +13,14 @@ const StoreKeyIndexes = {
   [Stores.SETS]: 'code',
   [Stores.SETTINGS]: 'user',
   [Stores.TOKENS]: 'name.value',
-  [Stores.HOSTS]: '++id,name',
+  [Stores.HOSTS]: '++id',
 };
 
 class DexieService {
   private db: Dexie = new Dexie('Webatrice');
 
   constructor() {
-    this.db.version(2).stores(StoreKeyIndexes);
+    this.db.version(1).stores(StoreKeyIndexes);
   }
 
   get settings() {
