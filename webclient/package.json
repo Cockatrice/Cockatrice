@@ -33,10 +33,12 @@
     "postinstall:default": "./copy_shared_files.sh",
     "start": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "cross-env CI=true react-scripts test",
+    "test:watch": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint \"./**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"./**/*.{ts,tsx}\" --fix"
+    "lint:fix": "eslint \"./**/*.{ts,tsx}\" --fix",
+    "golden": "npm run lint && npm run test"
   },
   "eslintConfig": {
     "extends": "react-app"
