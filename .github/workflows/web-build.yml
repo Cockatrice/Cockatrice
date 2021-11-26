@@ -48,7 +48,7 @@ jobs:
         run: npm install
 
       - name: Test app
-        run: npm test
+        run: npm run test
 
       - name: Build app
         if: always()
