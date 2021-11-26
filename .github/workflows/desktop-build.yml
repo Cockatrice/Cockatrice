@@ -210,7 +210,7 @@ jobs:
 
           - target: 10.15_Catalina
             os: macos-10.15
-            xcode: 12.1
+            xcode: 12.1.1
             type: Release
             do_tests: 0
             make_package: true
