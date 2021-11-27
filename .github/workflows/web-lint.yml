@@ -28,7 +28,7 @@ jobs:
         cache-dependency-path: 'webclient/package-lock.json'
 
     - name: Install ESLint
-      run: npm install --ignore-scripts
+      run: npm clean-install --ignore-scripts
 
     - name: Run ESLint
       run: npm run lint
