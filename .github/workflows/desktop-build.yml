@@ -195,7 +195,8 @@ jobs:
           - 11_Big_Sur
         include:
           - target: Debug # tests only
-            os: macos-latest # since latest is a rolling target, it can prevent conflicts if no specific Xcode version is defined
+            os: macos-10.15 # runs on Catalina
+            xcode: 10.3 # allows compatibility with macOS 10.14
             type: Debug
             do_tests: 0 # tests do not work yet on mac
             make_package: false
