@@ -73,7 +73,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
             )}
           </div>
           <Button className='ResetPasswordForm-submit rounded tall' color='primary' variant='contained' type='submit'>
-            Change Password
+            Reset Password
           </Button>
         </form>
       )}
