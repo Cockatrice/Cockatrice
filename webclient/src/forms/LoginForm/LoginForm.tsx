@@ -80,6 +80,13 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
           togglePasswordLabel(useStoredPassword(host.remember));
         }, [host]);
 
+        const onUserNameChange = (userName) => {
+          const fieldChanged = host.userName.toLowerCase() !== values.userName.toLowerCase();
+          if (useStoredPassword(values.remember) && fieldChanged) {
+            setHost(({ hashedPassword, ...s }) => ({ ...s, userName }));
+          }
+        }
+
         const onRememberChange = (checked) => {
           form.change('remember', checked);
 
@@ -105,6 +112,7 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
             <div className='loginForm-items'>
               <div className='loginForm-item'>
                 <Field label='Username' name='userName' component={InputField} autoComplete='off' />
+                <OnChange name="userName">{onUserNameChange}</OnChange>
               </div>
               <div className='loginForm-item'>
                 <Field
