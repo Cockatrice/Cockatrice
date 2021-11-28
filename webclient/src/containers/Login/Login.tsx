@@ -146,7 +146,7 @@ const Login = ({ state, description }: LoginProps) => {
     }
   };
 
-  const handleResetPasswordDialogSubmit = async ({ userName, token, newPassword, passwordAgain, selectedHost }) => {
+  const handleResetPasswordDialogSubmit = async ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = getHostPort(selectedHost);
     AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
   };
