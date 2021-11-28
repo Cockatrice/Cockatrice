@@ -183,11 +183,15 @@ export class SessionCommands {
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation:
           SessionPersistence.accountAwaitingActivation();
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled:
-          SessionPersistence.registrationFailed('Registration is currently disabled');
-          break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUserAlreadyExists:
           SessionPersistence.registrationUserNameError('Username is taken');
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
+          console.error('ResponseCode.RespUsernameInvalid', raw.reasonStr);
+          SessionPersistence.registrationUserNameError('Invalid username');
+          break;
+        case webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort:
+          SessionPersistence.registrationPasswordError('Your password was too short');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespEmailRequiredToRegister:
           SessionPersistence.registrationRequiresEmail();
@@ -198,15 +202,11 @@ export class SessionCommands {
         case webClient.protobuf.controller.Response.ResponseCode.RespTooManyRequests:
           SessionPersistence.registrationEmailError('Max accounts reached for this email');
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort:
-          SessionPersistence.registrationPasswordError('Your password was too short');
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled:
+          SessionPersistence.registrationFailed('Registration is currently disabled');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
           SessionPersistence.registrationFailed(NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime));
-          break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
-          console.error('ResponseCode.RespUsernameInvalid', raw.reasonStr);
-          SessionPersistence.registrationUserNameError('Invalid username');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed:
         default:

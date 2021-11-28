@@ -299,39 +299,300 @@ describe('SessionCommands', () => {
         sendSessionCommandSpy.mockImplementation((_, callback) => callback(response));
       })
 
-      it('should login user if registration accepted without email verification', () => {
-        jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
-        jest.spyOn(SessionPersistence, 'accountAwaitingActivation').mockImplementation(() => {});
+      describe('RespRegistrationAccepted', () => {
+        it('should call SessionCommands.login()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          SessionCommands.register();
 
-        SessionCommands.register();
+          expect(SessionCommands.login).toHaveBeenCalled();
 
-        expect(SessionCommands.login).toHaveBeenCalled();
-        expect(SessionPersistence.accountAwaitingActivation).not.toHaveBeenCalled();
+        })
       });
 
-      it('should prompt user if registration accepted with email verification', () => {
+      describe('RespRegistrationAcceptedNeedsActivation', () => {
         const RespRegistrationAcceptedNeedsActivation = 'RespRegistrationAcceptedNeedsActivation';
-        response.responseCode = RespRegistrationAcceptedNeedsActivation;
-        webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation =
-            RespRegistrationAcceptedNeedsActivation;
 
-        jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
-        jest.spyOn(SessionPersistence, 'accountAwaitingActivation').mockImplementation(() => {});
+        beforeEach(() => {
+          response.responseCode = RespRegistrationAcceptedNeedsActivation;
+          webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation =
+              RespRegistrationAcceptedNeedsActivation;
+        });
 
-        SessionCommands.register();
+        it('should call SessionPersistence.accountAwaitingActivation()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'accountAwaitingActivation').mockImplementation(() => {});
+          SessionCommands.register();
 
-        expect(SessionCommands.login).not.toHaveBeenCalled();
-        expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
       });
 
-      it('should disconnect user if registration fails due to registration being disabled', () => {
+      describe('RespUserAlreadyExists', () => {
+        const RespUserAlreadyExists = 'RespUserAlreadyExists';
+
+        beforeEach(() => {
+          response.responseCode = RespUserAlreadyExists;
+          webClient.protobuf.controller.Response.ResponseCode.RespUserAlreadyExists =
+              RespUserAlreadyExists;
+        });
+
+        it('should call SessionPersistence.registrationUserNameError()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationUserNameError').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationUserNameError).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespUsernameInvalid', () => {
+        const RespUsernameInvalid = 'RespUsernameInvalid';
+
+        beforeEach(() => {
+          response.responseCode = RespUsernameInvalid;
+          webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid =
+              RespUsernameInvalid;
+        });
+
+        it('should call SessionPersistence.registrationUserNameError()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationUserNameError').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationUserNameError).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespPasswordTooShort', () => {
+        const RespPasswordTooShort = 'RespPasswordTooShort';
+
+        beforeEach(() => {
+          response.responseCode = RespPasswordTooShort;
+          webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort =
+              RespPasswordTooShort;
+        });
+
+        it('should call SessionPersistence.registrationPasswordError()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationPasswordError').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationPasswordError).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespEmailRequiredToRegister', () => {
+        const RespEmailRequiredToRegister = 'RespEmailRequiredToRegister';
+
+        beforeEach(() => {
+          response.responseCode = RespEmailRequiredToRegister;
+          webClient.protobuf.controller.Response.ResponseCode.RespEmailRequiredToRegister =
+              RespEmailRequiredToRegister;
+        });
+
+        it('should call SessionPersistence.registrationRequiresEmail()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationRequiresEmail').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationRequiresEmail).toHaveBeenCalled();
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespEmailBlackListed', () => {
+        const RespEmailBlackListed = 'RespEmailBlackListed';
+
+        beforeEach(() => {
+          response.responseCode = RespEmailBlackListed;
+          webClient.protobuf.controller.Response.ResponseCode.RespEmailBlackListed =
+              RespEmailBlackListed;
+        });
+
+        it('should call SessionPersistence.registrationEmailError()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationEmailError').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationEmailError).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespTooManyRequests', () => {
+        const RespTooManyRequests = 'RespTooManyRequests';
+
+        beforeEach(() => {
+          response.responseCode = RespTooManyRequests;
+          webClient.protobuf.controller.Response.ResponseCode.RespTooManyRequests =
+              RespTooManyRequests;
+        });
+
+        it('should call SessionPersistence.registrationEmailError()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationEmailError').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationEmailError).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespRegistrationDisabled', () => {
         const RespRegistrationDisabled = 'RespRegistrationDisabled';
-        response.responseCode = RespRegistrationDisabled;
-        webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled = RespRegistrationDisabled;
 
-        SessionCommands.register();
+        beforeEach(() => {
+          response.responseCode = RespRegistrationDisabled;
+          webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled =
+              RespRegistrationDisabled;
+        });
 
-        expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, expect.any(String));
+        it('should call SessionPersistence.registrationFailed()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespUserIsBanned', () => {
+        const RespUserIsBanned = 'RespUserIsBanned';
+
+        beforeEach(() => {
+          response.responseCode = RespUserIsBanned;
+          webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned =
+              RespUserIsBanned;
+        });
+
+        it('should call SessionPersistence.registrationFailed()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('RespRegistrationFailed', () => {
+        const RespRegistrationFailed = 'RespRegistrationFailed';
+
+        beforeEach(() => {
+          response.responseCode = RespRegistrationFailed;
+          webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed =
+              RespRegistrationFailed;
+        });
+
+        it('should call SessionPersistence.registrationFailed()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
+      });
+
+      describe('UnknownFailureReason', () => {
+        const UnknownFailureReason = 'UnknownFailureReason';
+
+        beforeEach(() => {
+          response.responseCode = UnknownFailureReason;
+          webClient.protobuf.controller.Response.ResponseCode.UnknownFailureReason =
+              UnknownFailureReason;
+        });
+
+        it('should call SessionPersistence.registrationFailed()', () => {
+          jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
+          jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.login).not.toHaveBeenCalled();
+          expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
+        });
+
+        it('should disconnect', () => {
+          jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
+          SessionCommands.register();
+
+          expect(SessionCommands.disconnect).toHaveBeenCalled();
+        });
       });
     });
   });
