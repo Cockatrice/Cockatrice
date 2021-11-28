@@ -13,8 +13,7 @@ import './RequestPasswordResetForm.css';
 import { useReduxEffect } from 'hooks';
 import { ServerTypes } from 'store';
 
-const RequestPasswordResetForm = (props) => {
-  const { onSubmit } = props;
+const RequestPasswordResetForm = ({ onSubmit }) => {
   const [errorMessage, setErrorMessage] = useState(false);
   const [isMFA, setIsMFA] = useState(false);
 

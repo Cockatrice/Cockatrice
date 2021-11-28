@@ -17,9 +17,7 @@ import './LoginForm.css';
 const PASSWORD_LABEL = 'Password';
 const STORED_PASSWORD_LABEL = '* SAVED *';
 
-const LoginForm = (props: LoginFormProps) => {
-  const { onSubmit, onResetPassword } = props;
-
+const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
   const [host, setHost] = useState(null);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
   const [autoConnect, setAutoConnect] = useAutoConnect();
