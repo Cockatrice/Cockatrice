@@ -5,6 +5,7 @@ import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 
 import { InputField, KnownHosts } from 'components';
 import { FormKey } from 'types';
@@ -58,9 +59,6 @@ const RequestPasswordResetForm = ({ onSubmit }) => {
         return (
           <form className="RequestPasswordResetForm" onSubmit={handleSubmit}>
             <div className="RequestPasswordResetForm-items">
-              {errorMessage ? (
-                <div className="RequestPasswordResetForm-Error">Request Password Reset Failed, please try again</div>
-              ) : null}
               <div className="RequestPasswordResetForm-item">
                 <Field label="Username" name="userName" component={InputField} autoComplete="username" disabled={isMFA} />
               </div>
@@ -74,6 +72,11 @@ const RequestPasswordResetForm = ({ onSubmit }) => {
                 <Field name='selectedHost' component={KnownHosts} disabled={isMFA} />
                 <OnChange name="selectedHost">{onHostChange}</OnChange>
               </div>
+              {errorMessage && (
+                <div className="RequestPasswordResetForm-item">
+                  <Typography color="error">Request password reset failed</Typography>
+                </div>
+              )}
             </div>
             <Button className="RequestPasswordResetForm-submit rounded tall" color="primary" variant="contained" type="submit">
               Request Reset Token

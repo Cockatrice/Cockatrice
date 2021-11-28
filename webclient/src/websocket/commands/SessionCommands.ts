@@ -272,14 +272,14 @@ export class SessionCommands {
         const resp = raw['.Response_ForgotPasswordRequest.ext'];
 
         if (resp.challengeEmail) {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Requesting MFA information');
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
           SessionPersistence.resetPasswordChallenge();
         } else {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset in progress');
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
           SessionPersistence.resetPassword();
         }
       } else {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset failed, please try again');
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordFailed();
       }
 
@@ -305,10 +305,10 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset in progress');
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPassword();
       } else {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password reset failed, please try again');
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordFailed();
       }
 
@@ -335,10 +335,10 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password successfully updated');
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordSuccess();
       } else {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Password update failed, please try again');
+        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordFailed();
       }
 
