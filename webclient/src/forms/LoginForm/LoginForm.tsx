@@ -81,7 +81,7 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
         }, [host]);
 
         const onUserNameChange = (userName) => {
-          const fieldChanged = host.userName.toLowerCase() !== values.userName.toLowerCase();
+          const fieldChanged = host.userName?.toLowerCase() !== values.userName?.toLowerCase();
           if (useStoredPassword(values.remember) && fieldChanged) {
             setHost(({ hashedPassword, ...s }) => ({ ...s, userName }));
           }
