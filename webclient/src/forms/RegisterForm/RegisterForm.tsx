@@ -154,7 +154,6 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
 interface RegisterFormProps {
   onSubmit: any;
-  emailRequired?: boolean;
 }
 
 export default RegisterForm;
