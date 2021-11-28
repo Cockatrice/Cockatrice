@@ -10,7 +10,7 @@ import { RequestPasswordResetForm } from 'forms';
 
 import './RequestPasswordResetDialog.css';
 
-const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
+const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit, skipTokenRequest }: any) => {
   const handleOnClose = () => {
     handleClose();
   }
@@ -27,7 +27,7 @@ const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit }: 
         ) : null}
       </DialogTitle>
       <DialogContent>
-        <RequestPasswordResetForm onSubmit={onSubmit}></RequestPasswordResetForm>
+        <RequestPasswordResetForm onSubmit={onSubmit} skipTokenRequest={skipTokenRequest}></RequestPasswordResetForm>
       </DialogContent>
     </Dialog>
   );

@@ -134,7 +134,7 @@ const Login = ({ state, description }: LoginProps) => {
     });
   };
 
-  const handleRequestPasswordResetDialogSubmit = async (form) => {
+  const handleRequestPasswordResetDialogSubmit = (form) => {
     const { userName, email, selectedHost } = form;
     const { host, port } = getHostPort(selectedHost);
 
@@ -146,9 +146,18 @@ const Login = ({ state, description }: LoginProps) => {
     }
   };
 
-  const handleResetPasswordDialogSubmit = async ({ userName, token, newPassword, selectedHost }) => {
+  const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = getHostPort(selectedHost);
     AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
+  };
+
+  const skipTokenRequest = (userName) => {
+    setUserToResetPassword(userName);
+
+    setDialogState(s => ({ ...s,
+      passwordResetRequestDialog: false,
+      resetPasswordDialog: true,
+    }));
   };
 
   const closeRequestPasswordResetDialog = () => {
@@ -246,6 +255,7 @@ const Login = ({ state, description }: LoginProps) => {
         isOpen={dialogState.passwordResetRequestDialog}
         onSubmit={handleRequestPasswordResetDialogSubmit}
         handleClose={closeRequestPasswordResetDialog}
+        skipTokenRequest={skipTokenRequest}
       />
 
       <ResetPasswordDialog

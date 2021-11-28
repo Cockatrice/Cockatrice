@@ -51,7 +51,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
         <form className='ResetPasswordForm' onSubmit={handleSubmit}>
           <div className='ResetPasswordForm-items'>
             <div className='ResetPasswordForm-item'>
-              <Field label='Username' name='userName' component={InputField} autoComplete='username' disabled />
+              <Field label='Username' name='userName' component={InputField} autoComplete='username' disabled={!!userName} />
             </div>
             <div className='ResetPasswordForm-item'>
               <Field label='Token' name='token' component={InputField} />

@@ -14,7 +14,7 @@ import './RequestPasswordResetForm.css';
 import { useReduxEffect } from 'hooks';
 import { ServerTypes } from 'store';
 
-const RequestPasswordResetForm = ({ onSubmit }) => {
+const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
   const [errorMessage, setErrorMessage] = useState(false);
   const [isMFA, setIsMFA] = useState(false);
 
@@ -50,7 +50,6 @@ const RequestPasswordResetForm = ({ onSubmit }) => {
   return (
     <Form onSubmit={handleOnSubmit} validate={validate}>
       {({ handleSubmit, form }) => {
-
         const onHostChange: any = ({ userName }) => {
           form.change('userName', userName);
           setIsMFA(false);
@@ -72,15 +71,23 @@ const RequestPasswordResetForm = ({ onSubmit }) => {
                 <Field name='selectedHost' component={KnownHosts} disabled={isMFA} />
                 <OnChange name="selectedHost">{onHostChange}</OnChange>
               </div>
+
               {errorMessage && (
                 <div className="RequestPasswordResetForm-item">
                   <Typography color="error">Request password reset failed</Typography>
                 </div>
               )}
             </div>
+
             <Button className="RequestPasswordResetForm-submit rounded tall" color="primary" variant="contained" type="submit">
               Request Reset Token
             </Button>
+
+            <div>
+              <Button color="primary" onClick={() => skipTokenRequest(form.getState().values.userName)}>
+                I already have a reset token
+              </Button>
+            </div>
           </form>
         );
       }}
