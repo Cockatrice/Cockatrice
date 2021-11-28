@@ -3,3 +3,8 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.dialog-content {
+  width: 700px;
+  max-width: 100%;
+}

@@ -85,6 +85,26 @@ export class SessionPersistence {
     console.log('Account activation failed, show an action here');
   }
 
+  static registrationRequiresEmail() {
+    ServerDispatch.registrationRequiresEmail();
+  }
+
+  static registrationFailed(error: string) {
+    ServerDispatch.registrationFailed(error);
+  }
+
+  static registrationEmailError(error: string) {
+    ServerDispatch.registrationEmailError(error);
+  }
+
+  static registrationPasswordError(error: string) {
+    ServerDispatch.registrationPasswordError(error);
+  }
+
+  static registrationUserNameError(error: string) {
+    ServerDispatch.registrationUserNameError(error);
+  }
+
   static resetPasswordChallenge() {
     ServerDispatch.resetPasswordChallenge();
   }

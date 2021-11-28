@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { AuthenticationService } from 'api';
-import { RequestPasswordResetDialog, ResetPasswordDialog } from 'dialogs';
+import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog } from 'dialogs';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
@@ -63,7 +63,8 @@ const Login = ({ state, description }: LoginProps) => {
   const [hostIdToRemember, setHostIdToRemember] = useState(null);
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
-    resetPasswordDialog: false
+    resetPasswordDialog: false,
+    registrationDialog: false,
   });
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
@@ -87,10 +88,6 @@ const Login = ({ state, description }: LoginProps) => {
 
   const showDescription = () => {
     return !isConnected && description?.length;
-  };
-
-  const createAccount = () => {
-    console.log('Login.createAccount->openForgotPasswordDialog');
   };
 
   const onSubmitLogin = useCallback((loginForm) => {
@@ -131,6 +128,19 @@ const Login = ({ state, description }: LoginProps) => {
       hostDTO.hashedPassword = remember ? hashedPassword : null;
 
       hostDTO.save();
+    });
+  };
+
+  const handleRegistrationDialogSubmit = (form) => {
+    const { userName, password, email, country, realName, selectedHost } = form;
+
+    AuthenticationService.register({
+      ...getHostPort(selectedHost),
+      userName,
+      password,
+      email,
+      country,
+      realName,
     });
   };
 
@@ -176,6 +186,14 @@ const Login = ({ state, description }: LoginProps) => {
     setDialogState(s => ({ ...s, resetPasswordDialog: true }));
   }
 
+  const closeRegistrationDialog = () => {
+    setDialogState(s => ({ ...s, registrationDialog: false }));
+  }
+
+  const openRegistrationDialog = () => {
+    setDialogState(s => ({ ...s, registrationDialog: true }));
+  }
+
   return (
     <div className={'login overflow-scroll ' + classes.root}>
       { isConnected && <Redirect from="*" to={RouteEnum.SERVER} />}
@@ -204,7 +222,7 @@ const Login = ({ state, description }: LoginProps) => {
             <div className="login-footer">
               <div className="login-footer_register">
                 <span>Not registered yet?</span>
-                <Button color="primary" onClick={createAccount}>Create an account</Button>
+                <Button color="primary" onClick={openRegistrationDialog}>Create an account</Button>
               </div>
               <Typography variant="subtitle2" className="login-footer__copyright">
                 Cockatrice is an open source project. { new Date().getUTCFullYear() }
@@ -250,6 +268,12 @@ const Login = ({ state, description }: LoginProps) => {
           </div>
         </Paper>
       </div>
+
+      <RegistrationDialog
+        isOpen={dialogState.registrationDialog}
+        onSubmit={handleRegistrationDialogSubmit}
+        handleClose={closeRegistrationDialog}
+      />
 
       <RequestPasswordResetDialog
         isOpen={dialogState.passwordResetRequestDialog}

@@ -179,46 +179,39 @@ export class SessionCommands {
         return;
       }
 
-      let error;
-
       switch (raw.responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation:
           SessionPersistence.accountAwaitingActivation();
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled:
-          error = 'Registration is currently disabled';
+          SessionPersistence.registrationFailed('Registration is currently disabled');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUserAlreadyExists:
-          error = 'There is already an existing user with this username';
+          SessionPersistence.registrationUserNameError('Username is taken');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespEmailRequiredToRegister:
-          error = 'A valid email address is required to register';
+          SessionPersistence.registrationRequiresEmail();
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespEmailBlackListed:
-          error = 'The email address provider used has been blocked from use';
+          SessionPersistence.registrationEmailError('This email provider has been blocked');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespTooManyRequests:
-          error = 'This email address already has the maximum number of accounts you can register';
+          SessionPersistence.registrationEmailError('Max accounts reached for this email');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort:
-          error = 'Your password was too short';
+          SessionPersistence.registrationPasswordError('Your password was too short');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
-          error = NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime);
+          SessionPersistence.registrationFailed(NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime));
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
           console.error('ResponseCode.RespUsernameInvalid', raw.reasonStr);
-          error = 'Invalid username';
+          SessionPersistence.registrationUserNameError('Invalid username');
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed:
         default:
-          console.error('ResponseCode Type', raw.responseCode);
-          error = 'Registration failed due to a server issue';
+          SessionPersistence.registrationFailed('Registration failed due to a server issue');
           break;
-      }
-
-      if (error) {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Registration Failed: ${error}`);
       }
 
       SessionCommands.disconnect();

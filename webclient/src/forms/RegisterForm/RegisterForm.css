@@ -1,21 +1,18 @@
-.registerForm {
+.RegisterForm {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.registerForm-submit {
-    width: 100%;
-    /*padding is off, something in material-theme is causing it*/
+.RegisterForm-column {
+  width: 48%;
 }
 
-.row {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
+.RegisterForm-item {
+  margin-bottom: 20px;
 }
 
-.column {
-    width: 48%;
-    flex: 0 1 auto;
-    align-self: auto;
+.RegisterForm-submit {
+  width: 100%;
 }
