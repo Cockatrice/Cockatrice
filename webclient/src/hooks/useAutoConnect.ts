@@ -6,7 +6,7 @@ import { APP_USER } from 'types';
 
 type OnChange = () => void;
 
-export function useAutoConnect(onChange: OnChange) {
+export function useAutoConnect() {
   const [setting, setSetting] = useState(undefined);
   const [autoConnect, setAutoConnect] = useState(undefined);
 
@@ -31,8 +31,6 @@ export function useAutoConnect(onChange: OnChange) {
     if (setting) {
       setting.autoConnect = autoConnect;
       setting.save();
-
-      onChange();
     }
   }, [setting, autoConnect]);
 

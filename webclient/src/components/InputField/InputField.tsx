@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const InputField = ({ input, label, name, autoComplete, type, meta: { touched, error, warning } }) => {
+const InputField = ({ input, meta: { touched, error, warning }, ...args }) => {
   const classes = useStyles();
 
   return (
@@ -38,15 +38,12 @@ const InputField = ({ input, label, name, autoComplete, type, meta: { touched, e
       ) }
 
       <TextField
+        { ...input }
+        { ...args }
         className="rounded"
         variant="outlined"
         margin="dense"
         fullWidth={true}
-        label={label}
-        name={name}
-        type={type}
-        autoComplete={autoComplete}
-        { ...input }
       />
     </div>
   );

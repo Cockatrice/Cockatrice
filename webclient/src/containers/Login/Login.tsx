@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { AuthenticationService } from 'api';
-import { RequestPasswordResetDialog, ResetPasswordDialog } from 'components';
+import { RequestPasswordResetDialog, ResetPasswordDialog } from 'dialogs';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
@@ -65,6 +65,7 @@ const Login = ({ state, description }: LoginProps) => {
     passwordResetRequestDialog: false,
     resetPasswordDialog: false
   });
+  const [userToResetPassword, setUserToResetPassword] = useState(null);
 
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
@@ -92,7 +93,7 @@ const Login = ({ state, description }: LoginProps) => {
     console.log('Login.createAccount->openForgotPasswordDialog');
   };
 
-  const onSubmit = useCallback((loginForm) => {
+  const onSubmitLogin = useCallback((loginForm) => {
     const {
       userName,
       password,
@@ -133,11 +134,15 @@ const Login = ({ state, description }: LoginProps) => {
     });
   };
 
-  const handleRequestPasswordResetDialogSubmit = async ({ user, email, host, port }) => {
+  const handleRequestPasswordResetDialogSubmit = async (form) => {
+    const { userName, email, selectedHost } = form;
+    const { host, port } = getHostPort(selectedHost);
+
     if (email) {
-      AuthenticationService.resetPasswordChallenge({ user, email, host, port } as any);
+      AuthenticationService.resetPasswordChallenge({ userName, email, host, port } as any);
     } else {
-      AuthenticationService.resetPasswordRequest({ user, host, port } as any);
+      setUserToResetPassword(userName);
+      AuthenticationService.resetPasswordRequest({ userName, host, port } as any);
     }
   };
 
@@ -175,7 +180,7 @@ const Login = ({ state, description }: LoginProps) => {
             <Typography variant="h1">Login</Typography>
             <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
             <div className="login-form">
-              <LoginForm onSubmit={onSubmit} />
+              <LoginForm onSubmit={onSubmitLogin} onResetPassword={openRequestPasswordResetDialog} />
             </div>
 
             {
@@ -246,6 +251,7 @@ const Login = ({ state, description }: LoginProps) => {
         isOpen={dialogState.resetPasswordDialog}
         onSubmit={handleResetPasswordDialogSubmit}
         handleClose={closeResetPasswordDialog}
+        userName={userToResetPassword}
       />
     </div>
   );

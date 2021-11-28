@@ -1,7 +1,8 @@
 // eslint-disable-next-line
 import React, { Component, useCallback, useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm, change, FormSubmitHandler } from 'redux-form'
+import { Form, Field, useField } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
 
 import Button from '@material-ui/core/Button';
 
@@ -16,151 +17,136 @@ import './LoginForm.css';
 const PASSWORD_LABEL = 'Password';
 const STORED_PASSWORD_LABEL = '* SAVED *';
 
-const LoginForm: any = ({ dispatch, form, submit, handleSubmit }: LoginFormProps) => {
-  const password: any = useRef();
+const LoginForm = (props: LoginFormProps) => {
+  const { onSubmit, onResetPassword } = props;
+
   const [host, setHost] = useState(null);
-  const [remember, setRemember] = useState(false);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
-  const [hasStoredPassword, useStoredPassword] = useState(false);
+  const [autoConnect, setAutoConnect] = useAutoConnect();
 
-  const [autoConnect, setAutoConnect] = useAutoConnect(() => {
-    dispatch(change(form, 'autoConnect', autoConnect));
-
-    if (autoConnect && !remember) {
-      setRemember(true);
-    }
-  });
-
-  useEffect(() => {
-    SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
-      if (userSetting?.autoConnect && !AuthenticationService.connectionAttemptMade()) {
-        HostDTO.getAll().then(hosts => {
-          let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
-
-          if (lastSelectedHost?.remember && lastSelectedHost?.hashedPassword) {
-            dispatch(change(form, 'selectedHost', lastSelectedHost));
-            dispatch(change(form, 'userName', lastSelectedHost.userName));
-            dispatch(change(form, 'remember', true));
-            setPasswordLabel(STORED_PASSWORD_LABEL);
-            dispatch(submit);
-          }
-        });
-      }
-    });
-  }, [submit, dispatch, form]);
-
-  useEffect(() => {
-    dispatch(change(form, 'remember', remember));
-
-    if (!remember) {
-      setAutoConnect(false);
-    }
-
-    if (!remember) {
-      useStoredPassword(false);
-      setPasswordLabel(PASSWORD_LABEL);
-    } else if (host?.hashedPassword) {
-      useStoredPassword(true);
-      setPasswordLabel(STORED_PASSWORD_LABEL);
-    }
-  }, [remember, dispatch, form]);
-
-  useEffect(() => {
-    if (!host) {
-      return
-    }
-
-    dispatch(change(form, 'userName', host.userName));
-    dispatch(change(form, 'password', ''));
-
-    setRemember(host.remember);
-    setAutoConnect(host.remember && autoConnect);
-
-    if (host.remember && host.hashedPassword) {
-      // TODO: check if this causes a double render (maybe try combined state)
-      // try deriving useStoredPassword
-      useStoredPassword(true);
-      setPasswordLabel(STORED_PASSWORD_LABEL);
-    } else {
-      useStoredPassword(false);
-      setPasswordLabel(PASSWORD_LABEL);
-    }
-  }, [host, dispatch, form]);
-
-  const onRememberChange = event => setRemember(event.target.checked);
-  const onAutoConnectChange = event => setAutoConnect(event.target.checked);
-  const onHostChange = h => setHost(h);
-
-  const forgotPassword = () => {
-    console.log('Show recover password dialog, then AuthService.forgotPasswordRequest');
-  };
-
-  return (
-    <Form className='loginForm' onSubmit={handleSubmit}>
-      <div className='loginForm-items'>
-        <div className='loginForm-item'>
-          <Field label='Username' name='userName' component={InputField} autoComplete='off' />
-        </div>
-        <div className='loginForm-item'>
-          <Field
-            label={passwordLabel}
-            ref={password}
-            onFocus={() => setPasswordLabel(PASSWORD_LABEL)}
-            onBlur={() => !password.current.value && hasStoredPassword && setPasswordLabel(STORED_PASSWORD_LABEL)}
-            name='password'
-            type='password'
-            component={InputField}
-            autoComplete='new-password'
-          />
-        </div>
-        <div className='loginForm-actions'>
-          <Field label='Save Password' name='remember' component={CheckboxField} onChange={onRememberChange} />
-          <Button color='primary' onClick={forgotPassword}>Forgot Password</Button>
-        </div>
-        <div className='loginForm-item'>
-          <Field name='selectedHost' component={KnownHosts} onChange={onHostChange} />
-        </div>
-        <div className='loginForm-actions'>
-          <Field label='Auto Connect' name='autoConnect' component={CheckboxField} onChange={onAutoConnectChange} />
-        </div>
-      </div>
-      <Button className='loginForm-submit rounded tall' color='primary' variant='contained' type='submit'>
-        Login
-      </Button>
-    </Form>
-  );
-};
-
-const propsMap = {
-  form: FormKey.LOGIN,
-  validate: values => {
+  const validate = values => {
     const errors: any = {};
 
-    if (!values.user) {
-      errors.user = 'Required';
+    if (!values.userName) {
+      errors.userName = 'Required';
     }
-
     if (!values.password && !values.selectedHost?.hashedPassword) {
       errors.password = 'Required';
     }
-
     if (!values.selectedHost) {
       errors.selectedHost = 'Required';
     }
 
     return errors;
   }
+
+  const useStoredPassword = (remember) => remember && host.hashedPassword;
+  const togglePasswordLabel = (useStoredLabel) => {
+    setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
+  };
+
+  return (
+    <Form onSubmit={onSubmit} validate={validate}>
+      {({ handleSubmit, form }) => {
+        const { values } = form.getState();
+
+        useEffect(() => {
+          SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
+            if (userSetting?.autoConnect && !AuthenticationService.connectionAttemptMade()) {
+              HostDTO.getAll().then(hosts => {
+                let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
+
+                if (lastSelectedHost?.remember && lastSelectedHost?.hashedPassword) {
+                  togglePasswordLabel(true);
+
+                  form.change('selectedHost', lastSelectedHost);
+                  form.change('userName', lastSelectedHost.userName);
+                  form.change('remember', true);
+                  form.submit();
+                }
+              });
+            }
+          });
+        }, []);
+
+        useEffect(() => {
+          if (!host) {
+            return;
+          }
+
+          form.change('userName', host.userName);
+          form.change('password', '');
+
+          onRememberChange(host.remember);
+          onAutoConnectChange(host.remember && autoConnect);
+          togglePasswordLabel(useStoredPassword(host.remember));
+        }, [host]);
+
+        const onRememberChange = (checked) => {
+          form.change('remember', checked);
+
+          if (!checked && values.autoConnect) {
+            onAutoConnectChange(false);
+          }
+
+          togglePasswordLabel(useStoredPassword(checked));
+        }
+
+        const onAutoConnectChange = (checked) => {
+          setAutoConnect(checked);
+
+          form.change('autoConnect', checked);
+
+          if (checked && !values.remember) {
+            form.change('remember', true);
+          }
+        }
+
+        return (
+          <form className='loginForm' onSubmit={handleSubmit}>
+            <div className='loginForm-items'>
+              <div className='loginForm-item'>
+                <Field label='Username' name='userName' component={InputField} autoComplete='off' />
+              </div>
+              <div className='loginForm-item'>
+                <Field
+                  label={passwordLabel}
+                  onFocus={() => setPasswordLabel(PASSWORD_LABEL)}
+                  onBlur={() => togglePasswordLabel(useStoredPassword(values.remember))}
+                  name='password'
+                  type='password'
+                  component={InputField}
+                  autoComplete='new-password'
+                />
+              </div>
+              <div className='loginForm-actions'>
+                <Field label='Save Password' name='remember' component={CheckboxField} />
+                <OnChange name="remember">{onRememberChange}</OnChange>
+
+                <Button color='primary' onClick={onResetPassword}>Forgot Password</Button>
+              </div>
+              <div className='loginForm-item'>
+                <Field name='selectedHost' component={KnownHosts} />
+                <OnChange name="selectedHost">{setHost}</OnChange>
+              </div>
+              <div className='loginForm-actions'>
+                <Field label='Auto Connect' name='autoConnect' component={CheckboxField} />
+                <OnChange name="autoConnect">{onAutoConnectChange}</OnChange>
+              </div>
+            </div>
+            <Button className='loginForm-submit rounded tall' color='primary' variant='contained' type='submit'>
+              Login
+            </Button>
+          </form>
+        )
+      }}
+    </Form>
+  );
 };
 
 interface LoginFormProps {
-  form: string;
-  dispatch: Function;
-  submit: Function;
-  handleSubmit: FormSubmitHandler;
+  onSubmit: any;
+  onResetPassword: any;
 }
 
-const mapStateToProps = (state) => ({
-
-});
-
-export default connect(mapStateToProps)(reduxForm(propsMap)(LoginForm));
+export default LoginForm;

@@ -10,8 +10,28 @@ import { InputField } from 'components';
 
 import './KnownHostForm.css';
 
-function KnownHostForm({ host, onRemove, onSubmit }) {
+const KnownHostForm = ({ host, onRemove, onSubmit }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const validate = values => {
+    const errors: any = {};
+
+    if (!values.name) {
+      errors.name = 'Required'
+    }
+
+    if (!values.host) {
+      errors.host = 'Required'
+    }
+
+    if (!values.port) {
+      errors.port = 'Required'
+    }
+
+    if (Object.keys(errors).length) {
+      return errors;
+    }
+  };
 
   return (
     <Form
@@ -22,25 +42,7 @@ function KnownHostForm({ host, onRemove, onSubmit }) {
         port: host?.port,
       }}
       onSubmit={onSubmit}
-      validate={values => {
-        const errors: any = {};
-
-        if (!values.name) {
-          errors.name = 'Required'
-        }
-
-        if (!values.host) {
-          errors.host = 'Required'
-        }
-
-        if (!values.port) {
-          errors.port = 'Required'
-        }
-
-        if (Object.keys(errors).length) {
-          return errors;
-        }
-      }}
+      validate={validate}
     >
       {({ handleSubmit }) => (
         <form className="KnownHostForm" onSubmit={handleSubmit}>
@@ -74,7 +76,7 @@ function KnownHostForm({ host, onRemove, onSubmit }) {
       ) }
     </Form>
   );
-}
+};
 
 const mapStateToProps = () => ({
 

@@ -1,7 +1,7 @@
 // eslint-disable-next-line
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm, change } from 'redux-form'
+import { Form, Field } from 'react-final-form'
 
 import Button from '@material-ui/core/Button';
 
@@ -12,54 +12,14 @@ import './ResetPasswordForm.css';
 import { useReduxEffect } from '../../hooks';
 import { ServerTypes } from '../../store';
 
-const ResetPasswordForm = (props) => {
-  const { dispatch, handleSubmit } = props;
-
+const ResetPasswordForm = ({ onSubmit, userName }) => {
   const [errorMessage, setErrorMessage] = useState(false);
-
-
-  const onHostChange: any = ({ host, port }) => {
-    dispatch(change(FormKey.RESET_PASSWORD, 'host', host));
-    dispatch(change(FormKey.RESET_PASSWORD, 'port', port));
-  }
 
   useReduxEffect(() => {
     setErrorMessage(true);
   }, ServerTypes.RESET_PASSWORD_FAILED, []);
 
-
-  return (
-    <Form className="ResetPasswordForm" onSubmit={handleSubmit}>
-      <div className="ResetPasswordForm-items">
-        {errorMessage ? (
-          <div><h3>Password Reset Failed, please try again</h3></div>
-        ) : null}
-        <div className="ResetPasswordForm-item">
-          <Field label="Username" name="user" component={InputField} autoComplete="username" />
-        </div>
-        <div className="ResetPasswordForm-item">
-          <Field label="Token" name="token" component={InputField} />
-        </div>
-        <div className="ResetPasswordForm-item">
-          <Field label="Password" name="newPassword" component={InputField} />
-        </div>
-        <div className="ResetPasswordForm-item">
-          <Field label="Password Again" name="passwordAgain" component={InputField} />
-        </div>
-        <div className="ResetPasswordForm-item">
-          <Field name='selectedHost' component={KnownHosts} onChange={onHostChange} />
-        </div>
-      </div>
-      <Button className="ResetPasswordForm-submit rounded tall" color="primary" variant="contained" type="submit">
-        Change Password
-      </Button>
-    </Form>
-  );
-};
-
-const propsMap = {
-  form: FormKey.RESET_PASSWORD,
-  validate: values => {
+  const validate = values => {
     const errors: any = {};
 
     if (!values.user) {
@@ -84,16 +44,46 @@ const propsMap = {
     }
 
     return errors;
-  }
+  };
+
+  return (
+    <Form onSubmit={onSubmit} validate={validate} initialValues={{ userName }}>
+      {({ handleSubmit, form }) => {
+        const onHostChange: any = ({ host, port }) => {
+          form.change('host', host);
+          form.change('port', port);
+        }
+
+        return (
+          <form className="ResetPasswordForm" onSubmit={handleSubmit}>
+            <div className="ResetPasswordForm-items">
+              {errorMessage && (
+                <div><h3>Password Reset Failed, please try again</h3></div>
+              )}
+              <div className="ResetPasswordForm-item">
+                <Field label="Username" name="userName" component={InputField} autoComplete="username" disabled />
+              </div>
+              <div className="ResetPasswordForm-item">
+                <Field label="Token" name="token" component={InputField} />
+              </div>
+              <div className="ResetPasswordForm-item">
+                <Field label="Password" name="newPassword" component={InputField} />
+              </div>
+              <div className="ResetPasswordForm-item">
+                <Field label="Password Again" name="passwordAgain" component={InputField} />
+              </div>
+              <div className="ResetPasswordForm-item">
+                <Field name='selectedHost' component={KnownHosts} disabled />
+              </div>
+            </div>
+            <Button className="ResetPasswordForm-submit rounded tall" color="primary" variant="contained" type="submit">
+              Change Password
+            </Button>
+          </form>
+        );
+      }}
+    </Form>
+  );
 };
 
-const mapStateToProps = () => ({
-  initialValues: {
-    // host: "mtg.tetrarch.co/servatrice",
-    // port: "443"
-    // host: "server.cockatrice.us",
-    // port: "4748"
-  }
-});
-
-export default connect(mapStateToProps)(reduxForm(propsMap)(ResetPasswordForm));
+export default ResetPasswordForm;
