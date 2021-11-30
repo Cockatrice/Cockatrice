@@ -198,6 +198,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
 bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
                                                 const QString &realName,
                                                 const QString &password,
+                                                bool passwordNeedsHash,
                                                 const QString &emailAddress,
                                                 const QString &country,
                                                 bool active)
@@ -205,7 +206,12 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
     if (!checkSql())
         return false;
 
-    QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
+    QString passwordSha512;
+    if (passwordNeedsHash) {
+        passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
+    } else {
+        passwordSha512 = password;
+    }
     QString token = active ? QString() : PasswordHasher::generateActivationToken();
 
     QSqlQuery *query =
@@ -936,9 +942,29 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId,
 }
 
 bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
+                                                      const QString &password,
+                                                      bool passwordNeedsHash)
+{
+    QString passwordSha512 = password;
+    if (passwordNeedsHash) {
+        passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
+    }
+
+    QSqlQuery *passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password, "
+                                            "passwordLastChangedDate = NOW() where name = :name");
+    passwordQuery->bindValue(":password", passwordSha512);
+    passwordQuery->bindValue(":name", user);
+    if (execSqlQuery(passwordQuery))
+        return true;
+
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
                                                       const QString &oldPassword,
+                                                      bool oldPasswordNeedsHash,
                                                       const QString &newPassword,
-                                                      const bool &force = false)
+                                                      bool newPasswordNeedsHash)
 {
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
         return false;
@@ -953,30 +979,24 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
     QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
     passwordQuery->bindValue(":name", user);
 
-    if (!force) {
-        if (!execSqlQuery(passwordQuery)) {
-            qDebug("Change password denied: SQL error");
-            return false;
-        }
-
-        if (!passwordQuery->next())
-            return false;
-
-        const QString correctPassword = passwordQuery->value(0).toString();
-        if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
-            return false;
+    if (!execSqlQuery(passwordQuery)) {
+        qDebug("Change password denied: SQL error");
+        return false;
     }
 
-    QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
+    if (!passwordQuery->next())
+        return false;
 
-    passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password, "
-                                 "passwordLastChangedDate = NOW() where name = :name");
-    passwordQuery->bindValue(":password", passwordSha512);
-    passwordQuery->bindValue(":name", user);
-    if (execSqlQuery(passwordQuery))
-        return true;
+    const QString correctPassword = passwordQuery->value(0).toString();
+    QString oldPasswordSha512 = oldPassword;
+    if (oldPasswordNeedsHash) {
+        QString salt = correctPassword.left(16);
+        oldPasswordSha512 = PasswordHasher::computeHash(oldPassword, salt);
+    }
+    if (correctPassword != oldPasswordSha512)
+        return false;
 
-    return false;
+    return changeUserPassword(user, newPassword, newPasswordNeedsHash);
 }
 
 int Servatrice_DatabaseInterface::getActiveUserCount(QString connectionType)

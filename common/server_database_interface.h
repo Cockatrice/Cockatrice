@@ -115,6 +115,7 @@ public:
     virtual bool registerUser(const QString & /* userName */,
                               const QString & /* realName */,
                               const QString & /* password */,
+                              bool /* passwordNeedsHash */,
                               const QString & /* emailAddress */,
                               const QString & /* country */,
                               bool /* active = false */)
@@ -151,10 +152,16 @@ public:
     {
         return 0;
     };
+    virtual bool
+    changeUserPassword(const QString & /* user */, const QString & /* password */, bool /* passwordNeedsHash */)
+    {
+        return false;
+    };
     virtual bool changeUserPassword(const QString & /* user */,
                                     const QString & /* oldPassword */,
+                                    bool /* oldPasswordNeedsHash */,
                                     const QString & /* newPassword */,
-                                    const bool & /* force */)
+                                    bool /* newPasswordNeedsHash */)
     {
         return false;
     };

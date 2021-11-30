@@ -98,6 +98,7 @@ public:
     bool registerUser(const QString &userName,
                       const QString &realName,
                       const QString &password,
+                      bool passwordNeedsHash,
                       const QString &emailAddress,
                       const QString &country,
                       bool active = false);
@@ -111,8 +112,12 @@ public:
                     LogMessage_TargetType targetType,
                     const int targetId,
                     const QString &targetName);
-    bool
-    changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, const bool &force);
+    bool changeUserPassword(const QString &user, const QString &password, bool passwordNeedsHash);
+    bool changeUserPassword(const QString &user,
+                            const QString &oldPassword,
+                            bool oldPasswordNeedsHash,
+                            const QString &newPassword,
+                            bool newPasswordNeedsHash);
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
     bool
     addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);

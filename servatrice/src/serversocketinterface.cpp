@@ -1164,19 +1164,25 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     QString realName = nameFromStdString(cmd.real_name());
     QString country = nameFromStdString(cmd.country());
-    QString password = nameFromStdString(cmd.password());
-
-    if (!isPasswordLongEnough(password.length())) {
-        if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Password is too short", false);
-
-        return Response::RespPasswordTooShort;
+    QString password;
+    bool passwordNeedsHash = false;
+    if (cmd.has_password()) {
+        password = nameFromStdString(cmd.password());
+        passwordNeedsHash = true;
+        if (!isPasswordLongEnough(password.length())) {
+            if (servatrice->getEnableRegistrationAudit()) {
+                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                             "REGISTER_ACCOUNT", "Password is too short", false);
+            }
+            return Response::RespPasswordTooShort;
+        }
+    } else {
+        password = nameFromStdString(cmd.hashed_password());
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded =
-        sqlInterface->registerUser(userName, realName, password, emailAddress, country, !requireEmailActivation);
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, emailAddress,
+                                                   country, !requireEmailActivation);
 
     if (regSucceeded) {
         qDebug() << "Accepted register command for user: " << userName;
@@ -1301,14 +1307,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
         return Response::RespFunctionNotAllowed;
 
     QString oldPassword = nameFromStdString(cmd.old_password());
-    QString newPassword = nameFromStdString(cmd.new_password());
-
-    if (!isPasswordLongEnough(newPassword.length()))
-        return Response::RespPasswordTooShort;
+    QString newPassword;
+    bool newPasswordNeedsHash = false;
+    if (cmd.has_new_password()) {
+        newPassword = nameFromStdString(cmd.new_password());
+        newPasswordNeedsHash = true;
+        if (!isPasswordLongEnough(newPassword.length()))
+            return Response::RespPasswordTooShort;
+    } else {
+        newPassword = nameFromStdString(cmd.hashed_new_password());
+    }
 
     QString userName = QString::fromStdString(userInfo->name());
-
-    if (!databaseInterface->changeUserPassword(userName, oldPassword, newPassword, false))
+    if (!databaseInterface->changeUserPassword(userName, oldPassword, true, newPassword, newPasswordNeedsHash))
         return Response::RespWrongPassword;
 
     return Response::RespOk;
@@ -1421,7 +1432,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         return Response::RespFunctionNotAllowed;
     }
 
-    if (sqlInterface->changeUserPassword(userName, "", nameFromStdString(cmd.new_password()), true)) {
+    QString password;
+    bool passwordNeedsHash = false;
+    if (cmd.has_new_password()) {
+        password = nameFromStdString(cmd.new_password());
+        passwordNeedsHash = true;
+    } else {
+        password = nameFromStdString(cmd.hashed_new_password());
+    }
+
+    if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit())
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                          "PASSWORD_RESET", "", true);
