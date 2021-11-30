@@ -443,12 +443,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
-    QString password{};
+    QString password;
     bool needsHash = false;
     if (cmd.has_password()) {
         password = QString::fromStdString(cmd.password());
         needsHash = true;
-    } else if (cmd.has_hashed_password()) {
+    } else {
         password = QString::fromStdString(cmd.hashed_password());
     }
 
