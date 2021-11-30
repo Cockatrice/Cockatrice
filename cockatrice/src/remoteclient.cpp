@@ -127,7 +127,13 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordReset.set_user_name(userName.toStdString());
         cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
         cmdForgotPasswordReset.set_token(token.toStdString());
-        cmdForgotPasswordReset.set_new_password(password.toStdString());
+        if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+            const auto passwordSalt = PasswordHasher::generateRandomSalt();
+            const auto hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
+            cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
+        } else {
+            cmdForgotPasswordReset.set_new_password(password.toStdString());
+        }
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(submitForgotPasswordResetResponse(Response)));
@@ -150,7 +156,13 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     if (getStatus() == StatusRegistering) {
         Command_Register cmdRegister;
         cmdRegister.set_user_name(userName.toStdString());
-        cmdRegister.set_password(password.toStdString());
+        if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+            const auto passwordSalt = PasswordHasher::generateRandomSalt();
+            const auto hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
+            cmdRegister.set_hashed_password(hashedPassword.toStdString());
+        } else {
+            cmdRegister.set_password(password.toStdString());
+        }
         cmdRegister.set_email(email.toStdString());
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
