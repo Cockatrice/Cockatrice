@@ -450,8 +450,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         needsHash = true;
     } else if (cmd.has_hashed_password()) {
         password = QString::fromStdString(cmd.hashed_password());
-    } else {
-        return Response::RespContextError;
     }
 
     if (userInfo != 0) {
