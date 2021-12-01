@@ -70,7 +70,7 @@ private slots:
                             const QString &_realname);
     void doRequestPasswordSalt();
     void doLogin();
-    void doLogin(const QString &passwordSalt);
+    void doHashedLogin();
     Command_Login generateCommandLogin();
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
@@ -101,6 +101,7 @@ private:
     QWebSocket *websocket;
     QString lastHostname;
     unsigned int lastPort;
+    QString hashedPassword;
 
     QString getSrvClientID(const QString &_hostname);
     bool newMissingFeatureFound(const QString &_serversMissingFeatures);
