@@ -88,6 +88,7 @@ protected slots:
 protected:
     QMap<int, PendingCommand *> pendingCommands;
     QString userName, password, email, country, realName, token;
+    bool serverSupportsPasswordHash;
     void setStatus(ClientStatus _status);
     int getNewCmdId()
     {
@@ -107,6 +108,10 @@ public:
     void sendCommand(const CommandContainer &cont);
     void sendCommand(PendingCommand *pend);
 
+    bool getServerSupportsPasswordHash()
+    {
+        return serverSupportsPasswordHash;
+    }
     const QString getUserName()
     {
         return userName;

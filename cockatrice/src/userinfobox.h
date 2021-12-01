@@ -49,6 +49,7 @@ public slots:
 
 private:
     void resizeEvent(QResizeEvent *event) override;
+    void changePassword(const QString &oldPassword, const QString &newPassword);
 };
 
 #endif

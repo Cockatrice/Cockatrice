@@ -110,6 +110,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         setStatus(StatusDisconnecting);
         return;
     }
+    serverSupportsPasswordHash = event.server_options() & Event_ServerIdentification::SupportsPasswordHash;
 
     if (getStatus() == StatusRequestingForgotPassword) {
         Command_ForgotPasswordRequest cmdForgotPasswordRequest;
@@ -127,7 +128,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordReset.set_user_name(userName.toStdString());
         cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
         cmdForgotPasswordReset.set_token(token.toStdString());
-        if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+        if (!password.isEmpty() && serverSupportsPasswordHash) {
             const auto passwordSalt = PasswordHasher::generateRandomSalt();
             const auto hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
@@ -156,7 +157,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     if (getStatus() == StatusRegistering) {
         Command_Register cmdRegister;
         cmdRegister.set_user_name(userName.toStdString());
-        if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+        if (!password.isEmpty() && serverSupportsPasswordHash) {
             const auto passwordSalt = PasswordHasher::generateRandomSalt();
             const auto hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdRegister.set_hashed_password(hashedPassword.toStdString());
@@ -187,7 +188,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
+    if (!password.isEmpty() && serverSupportsPasswordHash) {
         // TODO store and log in using stored hashed password
         doRequestPasswordSalt(); // log in using password salt
     } else {

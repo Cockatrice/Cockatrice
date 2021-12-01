@@ -22,7 +22,8 @@
 
 #include <google/protobuf/descriptor.h>
 
-AbstractClient::AbstractClient(QObject *parent) : QObject(parent), nextCmdId(0), status(StatusDisconnected)
+AbstractClient::AbstractClient(QObject *parent)
+    : QObject(parent), nextCmdId(0), status(StatusDisconnected), serverSupportsPasswordHash(false)
 {
     qRegisterMetaType<QVariant>("QVariant");
     qRegisterMetaType<CommandContainer>("CommandContainer");
