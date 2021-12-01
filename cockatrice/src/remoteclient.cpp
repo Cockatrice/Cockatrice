@@ -132,7 +132,8 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             auto passwordSalt = PasswordHasher::generateRandomSalt();
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
-        } else {
+        } else if (!password.isEmpty()) {
+            qDebug() << "Warning: using plain text password to reset password";
             cmdForgotPasswordReset.set_new_password(password.toStdString());
         }
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
@@ -161,7 +162,8 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             auto passwordSalt = PasswordHasher::generateRandomSalt();
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdRegister.set_hashed_password(hashedPassword.toStdString());
-        } else {
+        } else if (!password.isEmpty()) {
+            qDebug() << "Warning: using plain text password to register";
             cmdRegister.set_password(password.toStdString());
         }
         cmdRegister.set_email(email.toStdString());
@@ -231,7 +233,10 @@ void RemoteClient::doLogin()
         // TODO add setting for client to reject unhashed logins
         setStatus(StatusLoggingIn);
         Command_Login cmdLogin = generateCommandLogin();
-        cmdLogin.set_password(password.toStdString());
+        if (!password.isEmpty()) {
+            qDebug() << "Warning: using plain text password to log in";
+            cmdLogin.set_password(password.toStdString());
+        }
 
         PendingCommand *pend = prepareSessionCommand(cmdLogin);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
