@@ -130,7 +130,7 @@ private:
     bool removeAdminFlagFromUser(const QString &user, int flag);
 
     bool isPasswordLongEnough(const int passwordLength);
-    static QString parseEmailAddress(const std::string &stdEmailAddress);
+    static QPair<QString, QString> parseEmailAddress(const std::string &stdEmailAddress);
     void removeSaidMessages(const QString &userName, int amount);
 
 public:
