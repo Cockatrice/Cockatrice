@@ -997,7 +997,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     return Response::RespOk;
 }
 
-QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdEmailAddress)
+QPair<QString, QString> AbstractServerSocketInterface::parseEmailAddress(const std::string &stdEmailAddress)
 {
     QString emailAddress = QString::fromStdString(stdEmailAddress);
 
@@ -1010,6 +1010,7 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
         return {};
     }
 
+    QString capturedEmailUser = match.captured(1);
     QString capturedEmailAddressDomain = match.captured(2);
 
     // Replace googlemail.com with gmail.com, as is standard nowadays
@@ -1020,8 +1021,6 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
 
     // Trim out dots and pluses from Google/Gmail domains
     if (capturedEmailAddressDomain.toLower() == "gmail.com") {
-        QString capturedEmailUser = match.captured(1);
-
         // Remove all content after first plus sign (as unnecessary with gmail)
         // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
         const int firstPlusSign = capturedEmailUser.indexOf("+");
@@ -1032,11 +1031,9 @@ QString AbstractServerSocketInterface::parseEmailAddress(const std::string &stdE
         // Remove all periods (as unnecessary with gmail)
         // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
         capturedEmailUser.replace(".", "");
-
-        emailAddress = capturedEmailUser + "@" + capturedEmailAddressDomain;
     }
 
-    return emailAddress;
+    return {capturedEmailUser, capturedEmailAddressDomain};
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd,
@@ -1058,7 +1055,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     const QString emailBlackList = servatrice->getEmailBlackList();
     const QString emailWhiteList = servatrice->getEmailWhiteList();
-    const QString emailAddress = parseEmailAddress(cmd.email());
+    auto parsedEmailAddress = parseEmailAddress(cmd.email());
+    const QString emailUser = parsedEmailAddress.first;
+    const QString emailDomain = parsedEmailAddress.second;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     const QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
     const QStringList emailWhiteListFilters = emailWhiteList.split(",", Qt::SkipEmptyParts);
@@ -1068,14 +1067,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 #endif
 
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
-    if (requireEmailForRegistration && emailAddress.isEmpty()) {
+    if (requireEmailForRegistration && emailUser.isEmpty()) {
         return Response::RespEmailRequiredToRegister;
     }
 
-    const auto emailAddressDomain = emailAddress.split("@").at(1);
-
     // If a whitelist exists, ensure the email address domain IS in the whitelist
-    if (!emailWhiteListFilters.isEmpty() && !emailWhiteListFilters.contains(emailAddressDomain, Qt::CaseInsensitive)) {
+    if (!emailWhiteListFilters.isEmpty() && !emailWhiteListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit()) {
             sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
                                          QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
@@ -1089,7 +1086,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     }
 
     // If a blacklist exists, ensure the email address domain is NOT in the blacklist
-    if (!emailBlackListFilters.isEmpty() && emailBlackListFilters.contains(emailAddressDomain, Qt::CaseInsensitive)) {
+    if (!emailBlackListFilters.isEmpty() && emailBlackListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
                                          QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
@@ -1130,6 +1127,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespUserAlreadyExists;
     }
 
+    QString emailAddress = emailUser + "@" + emailDomain;
     if (servatrice->getMaxAccountsPerEmail() > 0 &&
         sqlInterface->checkNumberOfUserAccounts(emailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit())
