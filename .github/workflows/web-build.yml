@@ -45,11 +45,11 @@ jobs:
           cache-dependency-path: 'webclient/package-lock.json'
 
       - name: Install dependencies
-        run: npm install
+        run: npm clean-install
+
+      - name: Build app
+        run: npm run build
 
       - name: Test app
         run: npm run test
-
-      - name: Build app
-        if: always()
-        run: npm run build
+        
