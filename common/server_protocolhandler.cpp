@@ -448,10 +448,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     if (cmd.has_password()) {
         password = QString::fromStdString(cmd.password());
         needsHash = true;
-    } else if (cmd.has_hashed_password()) {
-        password = QString::fromStdString(cmd.hashed_password());
     } else {
-        return Response::RespContextError;
+        password = QString::fromStdString(cmd.hashed_password());
     }
 
     if (userInfo != 0) {
