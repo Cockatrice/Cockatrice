@@ -38,6 +38,8 @@ export class WebClient {
     hashedPassword: '',
     newPassword: '',
     email: '',
+    realName: '',
+    country: '',
     clientid: null,
     reason: null,
     autojoinrooms: true,

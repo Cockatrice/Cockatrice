@@ -29,7 +29,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) => {
+const KnownHosts = (props) => {
+  const { input: { onChange }, meta, disabled } = props;
+  const { touched, error, warning } = meta;
   const classes = useStyles();
 
   const [hostsState, setHostsState] = useState({
@@ -169,6 +171,7 @@ const KnownHosts = ({ input: { onChange }, meta: { touched, error, warning } }) 
           value={hostsState.selectedHost}
           fullWidth={true}
           onChange={e => selectHost(e.target.value)}
+          disabled={disabled}
         >
           <Button value={hostsState.selectedHost} onClick={openAddKnownHostDialog}>
             <span>Add new host</span>

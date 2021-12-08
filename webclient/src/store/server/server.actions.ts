@@ -72,18 +72,37 @@ export const Actions = {
     logs
   }),
   clearLogs: () => ({
-    type: Types.CLEAR_LOGS
+    type: Types.CLEAR_LOGS,
+  }),
+  registrationRequiresEmail: () => ({
+    type: Types.REGISTRATION_REQUIRES_EMAIL,
+  }),
+  registrationFailed: (error) => ({
+    type: Types.REGISTRATION_FAILED,
+    error
+  }),
+  registrationEmailError: (error) => ({
+    type: Types.REGISTRATION_EMAIL_ERROR,
+    error
+  }),
+  registrationPasswordError: (error) => ({
+    type: Types.REGISTRATION_PASSWORD_ERROR,
+    error
+  }),
+  registrationUserNameError: (error) => ({
+    type: Types.REGISTRATION_USERNAME_ERROR,
+    error
   }),
   resetPassword: () => ({
-    type: Types.RESET_PASSWORD_REQUESTED
+    type: Types.RESET_PASSWORD_REQUESTED,
   }),
   resetPasswordFailed: () => ({
-    type: Types.RESET_PASSWORD_FAILED
+    type: Types.RESET_PASSWORD_FAILED,
   }),
   resetPasswordChallenge: () => ({
-    type: Types.RESET_PASSWORD_CHALLENGE
+    type: Types.RESET_PASSWORD_CHALLENGE,
   }),
   resetPasswordSuccess: () => ({
-    type: Types.RESET_PASSWORD_SUCCESS
+    type: Types.RESET_PASSWORD_SUCCESS,
   })
 }

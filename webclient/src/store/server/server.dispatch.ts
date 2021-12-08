@@ -65,6 +65,21 @@ export const Dispatch = {
   serverMessage: message => {
     store.dispatch(Actions.serverMessage(message));
   },
+  registrationRequiresEmail: () => {
+    store.dispatch(Actions.registrationRequiresEmail());
+  },
+  registrationFailed: (error) => {
+    store.dispatch(Actions.registrationFailed(error));
+  },
+  registrationEmailError: (error) => {
+    store.dispatch(Actions.registrationEmailError(error));
+  },
+  registrationPasswordError: (error) => {
+    store.dispatch(Actions.registrationPasswordError(error));
+  },
+  registrationUserNameError: (error) => {
+    store.dispatch(Actions.registrationUserNameError(error));
+  },
   resetPassword: () => {
     store.dispatch(Actions.resetPassword());
   },

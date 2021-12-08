@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { AuthenticationService } from 'api';
-import { RequestPasswordResetDialog, ResetPasswordDialog } from 'components';
+import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog } from 'dialogs';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
@@ -63,8 +63,10 @@ const Login = ({ state, description }: LoginProps) => {
   const [hostIdToRemember, setHostIdToRemember] = useState(null);
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
-    resetPasswordDialog: false
+    resetPasswordDialog: false,
+    registrationDialog: false,
   });
+  const [userToResetPassword, setUserToResetPassword] = useState(null);
 
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
@@ -88,11 +90,7 @@ const Login = ({ state, description }: LoginProps) => {
     return !isConnected && description?.length;
   };
 
-  const createAccount = () => {
-    console.log('Login.createAccount->openForgotPasswordDialog');
-  };
-
-  const onSubmit = useCallback((loginForm) => {
+  const onSubmitLogin = useCallback((loginForm) => {
     const {
       userName,
       password,
@@ -133,16 +131,43 @@ const Login = ({ state, description }: LoginProps) => {
     });
   };
 
-  const handleRequestPasswordResetDialogSubmit = async ({ user, email, host, port }) => {
+  const handleRegistrationDialogSubmit = (form) => {
+    const { userName, password, email, country, realName, selectedHost } = form;
+
+    AuthenticationService.register({
+      ...getHostPort(selectedHost),
+      userName,
+      password,
+      email,
+      country,
+      realName,
+    });
+  };
+
+  const handleRequestPasswordResetDialogSubmit = (form) => {
+    const { userName, email, selectedHost } = form;
+    const { host, port } = getHostPort(selectedHost);
+
     if (email) {
-      AuthenticationService.resetPasswordChallenge({ user, email, host, port } as any);
+      AuthenticationService.resetPasswordChallenge({ userName, email, host, port } as any);
     } else {
-      AuthenticationService.resetPasswordRequest({ user, host, port } as any);
+      setUserToResetPassword(userName);
+      AuthenticationService.resetPasswordRequest({ userName, host, port } as any);
     }
   };
 
-  const handleResetPasswordDialogSubmit = async ({ user, token, newPassword, passwordAgain, host, port }) => {
-    AuthenticationService.resetPassword({ user, token, newPassword, host, port } as any);
+  const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
+    const { host, port } = getHostPort(selectedHost);
+    AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
+  };
+
+  const skipTokenRequest = (userName) => {
+    setUserToResetPassword(userName);
+
+    setDialogState(s => ({ ...s,
+      passwordResetRequestDialog: false,
+      resetPasswordDialog: true,
+    }));
   };
 
   const closeRequestPasswordResetDialog = () => {
@@ -161,6 +186,14 @@ const Login = ({ state, description }: LoginProps) => {
     setDialogState(s => ({ ...s, resetPasswordDialog: true }));
   }
 
+  const closeRegistrationDialog = () => {
+    setDialogState(s => ({ ...s, registrationDialog: false }));
+  }
+
+  const openRegistrationDialog = () => {
+    setDialogState(s => ({ ...s, registrationDialog: true }));
+  }
+
   return (
     <div className={'login overflow-scroll ' + classes.root}>
       { isConnected && <Redirect from="*" to={RouteEnum.SERVER} />}
@@ -175,7 +208,7 @@ const Login = ({ state, description }: LoginProps) => {
             <Typography variant="h1">Login</Typography>
             <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
             <div className="login-form">
-              <LoginForm onSubmit={onSubmit} />
+              <LoginForm onSubmit={onSubmitLogin} onResetPassword={openRequestPasswordResetDialog} />
             </div>
 
             {
@@ -189,7 +222,7 @@ const Login = ({ state, description }: LoginProps) => {
             <div className="login-footer">
               <div className="login-footer_register">
                 <span>Not registered yet?</span>
-                <Button color="primary" onClick={createAccount}>Create an account</Button>
+                <Button color="primary" onClick={openRegistrationDialog}>Create an account</Button>
               </div>
               <Typography variant="subtitle2" className="login-footer__copyright">
                 Cockatrice is an open source project. { new Date().getUTCFullYear() }
@@ -236,16 +269,24 @@ const Login = ({ state, description }: LoginProps) => {
         </Paper>
       </div>
 
+      <RegistrationDialog
+        isOpen={dialogState.registrationDialog}
+        onSubmit={handleRegistrationDialogSubmit}
+        handleClose={closeRegistrationDialog}
+      />
+
       <RequestPasswordResetDialog
         isOpen={dialogState.passwordResetRequestDialog}
         onSubmit={handleRequestPasswordResetDialogSubmit}
         handleClose={closeRequestPasswordResetDialog}
+        skipTokenRequest={skipTokenRequest}
       />
 
       <ResetPasswordDialog
         isOpen={dialogState.resetPasswordDialog}
         onSubmit={handleResetPasswordDialogSubmit}
         handleClose={closeResetPasswordDialog}
+        userName={userToResetPassword}
       />
     </div>
   );

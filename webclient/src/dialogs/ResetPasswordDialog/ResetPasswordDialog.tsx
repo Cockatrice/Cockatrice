@@ -6,11 +6,11 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 
-import { RequestPasswordResetForm } from 'forms';
+import { ResetPasswordForm } from 'forms';
 
-import './RequestPasswordResetDialog.css';
+import './ResetPasswordDialog.css';
 
-const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
+const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit, userName }: any) => {
   const handleOnClose = () => {
     handleClose();
   }
@@ -18,7 +18,7 @@ const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit }: 
   return (
     <Dialog onClose={handleOnClose} open={isOpen}>
       <DialogTitle disableTypography className="dialog-title">
-        <Typography variant="h6">Request Password Reset</Typography>
+        <Typography variant="h6">Reset Password</Typography>
 
         {handleOnClose ? (
           <IconButton onClick={handleOnClose}>
@@ -27,10 +27,10 @@ const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit }: 
         ) : null}
       </DialogTitle>
       <DialogContent>
-        <RequestPasswordResetForm onSubmit={onSubmit}></RequestPasswordResetForm>
+        <ResetPasswordForm onSubmit={onSubmit} userName={userName}/>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default RequestPasswordResetDialog;
+export default ResetPasswordDialog;

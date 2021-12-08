@@ -10,13 +10,13 @@ import { RegisterForm } from 'forms';
 
 import './RegistrationDialog.css';
 
-const RegistrationDialog = ({ classes, handleClose, isOpen }: any) => {
+const RegistrationDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
   const handleOnClose = () => {
     handleClose();
   }
 
   return (
-    <Dialog onClose={handleOnClose} open={isOpen}>
+    <Dialog className="RegistrationDialog" onClose={handleOnClose} open={isOpen} maxWidth='xl'>
       <DialogTitle disableTypography className="dialog-title">
         <Typography variant="h6">Create New Account</Typography>
 
@@ -26,8 +26,8 @@ const RegistrationDialog = ({ classes, handleClose, isOpen }: any) => {
           </IconButton>
         ) : null}
       </DialogTitle>
-      <DialogContent>
-        <RegisterForm onSubmit={handleOnClose}></RegisterForm>
+      <DialogContent className="dialog-content">
+        <RegisterForm onSubmit={onSubmit}></RegisterForm>
       </DialogContent>
     </Dialog>
   );

@@ -20,6 +20,8 @@ export interface WebSocketConnectOptions {
   hashedPassword?: string;
   newPassword?: string;
   email?: string;
+  realName?: string;
+  country?: string;
   autojoinrooms?: boolean;
   keepalive?: number;
   clientid?: string;
