@@ -12,6 +12,8 @@
 
 #include <QDateTime>
 #include <QGridLayout>
+#include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 
@@ -201,7 +203,22 @@ void UserInfoBox::actEditInternal(const Response &r)
 
     Command_AccountEdit cmd;
     cmd.set_real_name(dlg.getRealName().toStdString());
-    cmd.set_email(dlg.getEmail().toStdString());
+    if (client->getServerSupportsPasswordHash()) {
+        if (email != dlg.getEmail()) {
+            // real password is required to change email
+            bool ok = false;
+            QString password =
+                QInputDialog::getText(this, tr("Enter Password"),
+                                      tr("Password verification is required in order to change your email address"),
+                                      QLineEdit::Password, "", &ok);
+            if (!ok)
+                return;
+            cmd.set_password_check(password.toStdString());
+            cmd.set_email(dlg.getEmail().toStdString());
+        } // servers that support password hash do not require all fields to be filled anymore
+    } else {
+        cmd.set_email(dlg.getEmail().toStdString());
+    }
     cmd.set_country(dlg.getCountry().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
@@ -287,6 +304,9 @@ void UserInfoBox::processEditResponse(const Response &r)
         case Response::RespFunctionNotAllowed:
             QMessageBox::critical(this, tr("Error"),
                                   tr("This server does not permit you to update your user informations."));
+            break;
+        case Response::RespWrongPassword:
+            QMessageBox::critical(this, tr("Error"), tr("The entered password does not match your account."));
             break;
         case Response::RespInternalError:
         default:
