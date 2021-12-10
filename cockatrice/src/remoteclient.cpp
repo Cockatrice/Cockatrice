@@ -152,7 +152,6 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdRegister.set_user_name(userName.toStdString());
         cmdRegister.set_password(password.toStdString());
         cmdRegister.set_email(email.toStdString());
-        cmdRegister.set_gender((ServerInfo_User_Gender)gender);
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
         cmdRegister.set_clientid(getSrvClientID(lastHostname).toStdString());
@@ -449,7 +448,6 @@ void RemoteClient::doRegisterToServer(const QString &hostname,
                                       const QString &_userName,
                                       const QString &_password,
                                       const QString &_email,
-                                      const int _gender,
                                       const QString &_country,
                                       const QString &_realname)
 {
@@ -458,7 +456,6 @@ void RemoteClient::doRegisterToServer(const QString &hostname,
     userName = _userName;
     password = _password;
     email = _email;
-    gender = _gender;
     country = _country;
     realName = _realname;
     lastHostname = hostname;
@@ -539,11 +536,10 @@ void RemoteClient::registerToServer(const QString &hostname,
                                     const QString &_userName,
                                     const QString &_password,
                                     const QString &_email,
-                                    const int _gender,
                                     const QString &_country,
                                     const QString &_realname)
 {
-    emit sigRegisterToServer(hostname, port, _userName, _password, _email, _gender, _country, _realname);
+    emit sigRegisterToServer(hostname, port, _userName, _password, _email, _country, _realname);
 }
 
 void RemoteClient::activateToServer(const QString &_token)

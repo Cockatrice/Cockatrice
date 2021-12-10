@@ -114,7 +114,6 @@ public:
     }
     virtual bool registerUser(const QString & /* userName */,
                               const QString & /* realName */,
-                              ServerInfo_User_Gender const & /* gender */,
                               const QString & /* password */,
                               const QString & /* emailAddress */,
                               const QString & /* country */,
@@ -158,10 +157,6 @@ public:
                                     const bool & /* force */)
     {
         return false;
-    };
-    virtual QChar getGenderChar(ServerInfo_User_Gender const & /* gender */)
-    {
-        return QChar('u');
     };
 };
 

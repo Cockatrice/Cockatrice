@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `admin` tinyint(1) NOT NULL,
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,
+  -- this field is deprecated and will not be used, this could be removed in a database migration
   `gender` char(1) NOT NULL,
   `password_sha512` char(120) NOT NULL,
   `email` varchar(255) NOT NULL,

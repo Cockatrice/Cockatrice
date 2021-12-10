@@ -88,7 +88,6 @@ protected slots:
 protected:
     QMap<int, PendingCommand *> pendingCommands;
     QString userName, password, email, country, realName, token;
-    int gender;
     void setStatus(ClientStatus _status);
     int getNewCmdId()
     {

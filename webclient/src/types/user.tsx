@@ -3,7 +3,6 @@ export interface User {
   name: string;
   privlevel: UserAccessLevel;
   userLevel: UserPrivLevel;
-  gender?: number;
   realName?: string;
   country?: string;
   avatarBmp?: Uint8Array;

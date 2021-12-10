@@ -307,10 +307,6 @@
         <file>resources/countries/zm.svg</file>
         <file>resources/countries/zw.svg</file>
 
-        <file>resources/genders/male.svg</file>
-        <file>resources/genders/female.svg</file>
-        <file>resources/genders/unknown.svg</file>
-
         <file>resources/phases/untap.svg</file>
         <file>resources/phases/upkeep.svg</file>
         <file>resources/phases/draw.svg</file>
