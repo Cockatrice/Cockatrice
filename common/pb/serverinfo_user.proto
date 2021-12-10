@@ -12,7 +12,7 @@ message ServerInfo_User {
     optional uint32 user_level = 2;
     optional string address = 3;
     optional string real_name = 4;
-    // gender = 5; // deprecated
+    // gender = 5; // obsolete
     optional string country = 6;
     optional bytes avatar_bmp = 7;
     optional sint32 id = 8 [default = -1];
