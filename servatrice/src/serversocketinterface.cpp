@@ -1262,20 +1262,75 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     QString emailAddress = nameFromStdString(cmd.email());
     QString country = nameFromStdString(cmd.country());
 
+    bool checkedPassword = false;
     QString userName = QString::fromStdString(userInfo->name());
+    if (cmd.has_password_check()) {
+        QString password = nameFromStdString(cmd.password_check());
+        QString clientId = QString::fromStdString(userInfo->clientid());
+        QString reasonStr{};
+        int secondsLeft{};
+        AuthenticationResult checkStatus =
+            databaseInterface->checkUserPassword(this, userName, password, clientId, reasonStr, secondsLeft, true);
+        if (checkStatus == PasswordRight) {
+            checkedPassword = true;
+        } else {
+            // the user already logged in with this info, the only change is their password
+            return Response::RespWrongPassword;
+        }
+    }
+    QString queryText = "update {prefix}_users set ";
+    bool changes = false;
+    if (cmd.has_real_name()) {
+        queryText += "realname=:realName, ";
+        changes = true;
+    }
+    if (cmd.has_email()) {
+        // a real password is required in order to change the email address
+        if (usingRealPassword || checkedPassword) {
+            queryText += "email=:email, ";
+            changes = true;
+        } else {
+            return Response::RespFunctionNotAllowed;
+        }
+    }
+    if (cmd.has_country()) {
+        queryText += "country=:country, ";
+        changes = true;
+    }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set realname=:realName, email=:email, "
-                                                  "country=:country where name=:userName");
-    query->bindValue(":realName", realName);
-    query->bindValue(":email", emailAddress);
-    query->bindValue(":country", country);
+    if (!changes)
+        return Response::RespOk;
+
+    queryText.chop(2); // remove ", "
+    queryText += " where name=:userName";
+
+    QSqlQuery *query = sqlInterface->prepareQuery(queryText);
+    if (cmd.has_real_name()) {
+        QString realName = nameFromStdString(cmd.real_name());
+        query->bindValue(":realName", realName);
+    }
+    if (cmd.has_email()) {
+        QString emailAddress = nameFromStdString(cmd.email());
+        query->bindValue(":email", emailAddress);
+    }
+    if (cmd.has_country()) {
+        QString country = nameFromStdString(cmd.country());
+        query->bindValue(":country", country);
+    }
     query->bindValue(":userName", userName);
+
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
-    userInfo->set_real_name(realName.toStdString());
-    userInfo->set_email(emailAddress.toStdString());
-    userInfo->set_country(country.toStdString());
+    if (cmd.has_real_name()) {
+        userInfo->set_real_name(realName.toStdString());
+    }
+    if (cmd.has_email()) {
+        userInfo->set_email(emailAddress.toStdString());
+    }
+    if (cmd.has_country()) {
+        userInfo->set_country(country.toStdString());
+    }
 
     return Response::RespOk;
 }

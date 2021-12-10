@@ -31,7 +31,7 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
                                                QObject *parent)
     : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), databaseInterface(_databaseInterface),
-      authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false),
+      authState(NotLoggedIn), usingRealPassword(false), acceptsUserListChanges(false), acceptsRoomListChanges(false),
       idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
 
 {
@@ -515,6 +515,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             return Response::RespAccountNotActivated;
         default:
             authState = res;
+            usingRealPassword = needsHash;
     }
 
     // limit the number of non-privileged users that can connect to the server based on configuration settings
