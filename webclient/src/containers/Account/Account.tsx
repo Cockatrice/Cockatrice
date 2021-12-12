@@ -11,7 +11,7 @@ import { AuthenticationService, SessionService } from 'api';
 import { ServerSelectors } from 'store';
 import { User } from 'types';
 
-import { secondsToString } from 'utils/convertTime';
+import { timeService } from './../../services';
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';
 
@@ -31,7 +31,7 @@ class Account extends Component<AccountProps> {
 
     const { buddyList, ignoreList, serverName, serverVersion, user } = this.props;
     const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user;
-    const { daysString, yearsString } = secondsToString(accountageSecs);
+    const accountAge = timeService.renderAccountAge(accountageSecs);
 
     let url = URL.createObjectURL(new Blob([avatarBmp], { 'type': 'image/png' }));
 
@@ -80,7 +80,7 @@ class Account extends Component<AccountProps> {
             <p><strong>{name}</strong></p>
             <p>Location: ({country?.toUpperCase()})</p>
             <p>User Level: {userLevel}</p>
-            <p>Account Age: {yearsString} {daysString}</p>
+            <p>Account Age: {accountAge}</p>
             <p>Real Name: {realName}</p>
             <div className='account-details__actions'>
               <Button size='small' color='primary' variant='contained'>Edit</Button>
