@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Button from '@material-ui/core/Button';
@@ -11,6 +11,7 @@ import { AuthenticationService, SessionService } from 'api';
 import { ServerSelectors } from 'store';
 import { User } from 'types';
 
+import { secondsToString } from 'utils/convertTime';
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';
 
@@ -30,15 +31,16 @@ class Account extends Component<AccountProps> {
 
     const { buddyList, ignoreList, serverName, serverVersion, user } = this.props;
     const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user;
+    const { daysString, yearsString } = secondsToString(accountageSecs);
 
     let url = URL.createObjectURL(new Blob([avatarBmp], { 'type': 'image/png' }));
 
     return (
-      <div className="account">
+      <div className='account'>
         <AuthGuard />
-        <div className="account-column">
-          <Paper className="account-list">
-            <div className="">
+        <div className='account-column'>
+          <Paper className='account-list'>
+            <div className=''>
               Buddies Online: ?/{buddyList.length}
             </div>
             <VirtualList
@@ -49,14 +51,14 @@ class Account extends Component<AccountProps> {
                 </ListItem>
               )) }
             />
-            <div className="" style={{ borderTop: '1px solid' }}>
+            <div className='' style={{ borderTop: '1px solid' }}>
               <AddToBuddies onSubmit={this.handleAddToBuddies} />
             </div>
           </Paper>
         </div>
-        <div className="account-column">
-          <Paper className="account-list overflow-scroll">
-            <div className="">
+        <div className='account-column'>
+          <Paper className='account-list overflow-scroll'>
+            <div className=''>
               Ignored Users Online: ?/{ignoreList.length}
             </div>
             <VirtualList
@@ -67,29 +69,29 @@ class Account extends Component<AccountProps> {
                 </ListItem>
               )) }
             />
-            <div className="" style={{ borderTop: '1px solid' }}>
+            <div className='' style={{ borderTop: '1px solid' }}>
               <AddToIgnore onSubmit={this.handleAddToIgnore} />
             </div>
           </Paper>
         </div>
-        <div className="account-column overflow-scroll">
-          <Paper className="account-details" style={{ margin: '0 0 5px 0' }}>
+        <div className='account-column overflow-scroll'>
+          <Paper className='account-details' style={{ margin: '0 0 5px 0' }}>
             <img src={url} alt={name} />
             <p><strong>{name}</strong></p>
             <p>Location: ({country?.toUpperCase()})</p>
             <p>User Level: {userLevel}</p>
-            <p>Account Age: {accountageSecs}</p>
+            <p>Account Age: {yearsString} {daysString}</p>
             <p>Real Name: {realName}</p>
-            <div className="account-details__actions">
-              <Button size="small" color="primary" variant="contained">Edit</Button>
-              <Button size="small" color="primary" variant="contained">Change<br />Password</Button>
-              <Button size="small" color="primary" variant="contained">Change<br />Avatar</Button>
+            <div className='account-details__actions'>
+              <Button size='small' color='primary' variant='contained'>Edit</Button>
+              <Button size='small' color='primary' variant='contained'>Change<br />Password</Button>
+              <Button size='small' color='primary' variant='contained'>Change<br />Avatar</Button>
             </div>
           </Paper>
-          <Paper className="account-details">
+          <Paper className='account-details'>
             <p>Server Name: {serverName}</p>
             <p>Server Version: {serverVersion}</p>
-            <Button color="primary" variant="contained" onClick={() => AuthenticationService.disconnect()}>Disconnect</Button>
+            <Button color='primary' variant='contained' onClick={() => AuthenticationService.disconnect()}>Disconnect</Button>
           </Paper>
         </div>
       </div>
