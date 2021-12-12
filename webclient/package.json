@@ -31,8 +31,8 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "postinstall": "run-script-os && prepare",
-    "postinstall:windows": "powershell .\\copy_shared_files.ps1",
+    "postinstall": "run-script-os && npm run prepare",
+    "postinstall:windows": "powershell ./copy_shared_files.ps1",
     "postinstall:default": "./copy_shared_files.sh",
     "start": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts start",
     "build": "react-scripts build",
