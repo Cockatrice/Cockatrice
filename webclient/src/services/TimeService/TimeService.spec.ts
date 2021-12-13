@@ -13,6 +13,10 @@ describe('renderAccountAge', () => {
     expect(timeService.renderAccountAge(0)).toEqual('');
   });
 
+  test('returns "" for less than one day', () => {
+    expect(timeService.renderAccountAge(120)).toEqual('');
+  });
+
   test('returns "1 Day" for exactly', () => {
     expect(timeService.renderAccountAge(secondsInDay)).toEqual('1 Day');
   });
