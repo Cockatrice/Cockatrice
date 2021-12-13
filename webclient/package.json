@@ -42,7 +42,7 @@
     "lint": "eslint \"./**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"./**/*.{ts,tsx}\" --fix",
     "golden": "npm run lint && npm run test",
-    "prepare": "cd .. && husky install webclient/.husky"
+    "prepare": "cd .. && husky install ./.husky"
   },
   "husky": {
     "hooks": {
