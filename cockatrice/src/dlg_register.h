@@ -34,10 +34,6 @@ public:
     {
         return emailEdit->text();
     }
-    int getGender() const
-    {
-        return -1;
-    } // This will return GenderUnknown for the protocol.
     QString getCountry() const
     {
         return countryEdit->currentIndex() == 0 ? "" : countryEdit->currentText();

@@ -200,7 +200,6 @@ void UserInfoBox::actEditInternal(const Response &r)
     Command_AccountEdit cmd;
     cmd.set_real_name(dlg.getRealName().toStdString());
     cmd.set_email(dlg.getEmail().toStdString());
-    cmd.set_gender((ServerInfo_User_Gender)dlg.getGender());
     cmd.set_country(dlg.getCountry().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);

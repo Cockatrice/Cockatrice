@@ -197,7 +197,6 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
 
 bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
                                                 const QString &realName,
-                                                ServerInfo_User_Gender const &gender,
                                                 const QString &password,
                                                 const QString &emailAddress,
                                                 const QString &country,
@@ -211,14 +210,13 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
 
     QSqlQuery *query =
         prepareQuery("insert into {prefix}_users "
-                     "(name, realname, gender, password_sha512, email, country, registrationDate, active, token, "
+                     "(name, realname, password_sha512, email, country, registrationDate, active, token, "
                      "admin, avatar_bmp, clientid, privlevel, privlevelStartDate, privlevelEndDate) "
                      "values "
-                     "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, "
+                     "(:userName, :realName, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, "
                      ":token, 0, '', '', 'NONE', UTC_TIMESTAMP(), UTC_TIMESTAMP())");
     query->bindValue(":userName", userName);
     query->bindValue(":realName", realName);
-    query->bindValue(":gender", getGenderChar(gender));
     query->bindValue(":password_sha512", passwordSha512);
     query->bindValue(":email", emailAddress);
     query->bindValue(":country", country);
@@ -266,20 +264,6 @@ bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const Q
         }
     }
     return false;
-}
-
-QChar Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)
-{
-    switch (gender) {
-        case ServerInfo_User_Gender_GenderUnknown:
-            return QChar('u');
-        case ServerInfo_User_Gender_Male:
-            return QChar('m');
-        case ServerInfo_User_Gender_Female:
-            return QChar('f');
-        default:
-            return QChar('u');
-    }
 }
 
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler,
@@ -602,31 +586,25 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         result.set_privlevel(privlevel.toStdString());
 
     if (complete) {
-        const QString genderStr = query->value(5).toString();
-        if (genderStr == "m")
-            result.set_gender(ServerInfo_User::Male);
-        else if (genderStr == "f")
-            result.set_gender(ServerInfo_User::Female);
-
-        const QString realName = query->value(6).toString();
+        const QString realName = query->value(5).toString();
         if (!realName.isEmpty())
             result.set_real_name(realName.toStdString());
 
-        const QByteArray avatarBmp = query->value(7).toByteArray();
+        const QByteArray avatarBmp = query->value(6).toByteArray();
         if (avatarBmp.size())
             result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
 
-        const QDateTime regDate = query->value(8).toDateTime();
+        const QDateTime regDate = query->value(7).toDateTime();
         if (!regDate.toString(Qt::ISODate).isEmpty()) {
             qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
             result.set_accountage_secs(accountAgeInSeconds);
         }
 
-        const QString email = query->value(9).toString();
+        const QString email = query->value(8).toString();
         if (!email.isEmpty())
             result.set_email(email.toStdString());
 
-        const QString clientid = query->value(10).toString();
+        const QString clientid = query->value(9).toString();
         if (!clientid.isEmpty())
             result.set_clientid(clientid.toStdString());
     }
@@ -644,7 +622,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
             return result;
 
         QSqlQuery *query =
-            prepareQuery("select id, name, admin, country, privlevel, gender, realname, avatar_bmp, registrationDate, "
+            prepareQuery("select id, name, admin, country, privlevel, realname, avatar_bmp, registrationDate, "
                          "email, clientid from {prefix}_users where name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))

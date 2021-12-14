@@ -28,7 +28,7 @@ message GameEvent {
         SET_ACTIVE_PLAYER = 2016;
         SET_ACTIVE_PHASE = 2017;
         DUMP_ZONE = 2018;
-        STOP_DUMP_ZONE = 2019; // deprecated
+        // STOP_DUMP_ZONE = 2019; // obsolete
         CHANGE_ZONE_PROPERTIES = 2020;
         REVERSE_TURN = 2021;
     }

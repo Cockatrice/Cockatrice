@@ -8,16 +8,11 @@ message ServerInfo_User {
         IsAdmin = 8;
         IsJudge = 16;
     };
-    enum Gender {
-        GenderUnknown = -1;
-        Male = 0;
-        Female = 1;
-    };
     optional string name = 1;
     optional uint32 user_level = 2;
     optional string address = 3;
     optional string real_name = 4;
-    optional Gender gender = 5 [default = GenderUnknown];
+    // gender = 5; // obsolete
     optional string country = 6;
     optional bytes avatar_bmp = 7;
     optional sint32 id = 8 [default = -1];

@@ -78,25 +78,6 @@ QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 
 QMap<int, QPixmap> PingPixmapGenerator::pmCache;
 
-QPixmap GenderPixmapGenerator::generatePixmap(int height)
-{
-    ServerInfo_User::Gender gender = ServerInfo_User::GenderUnknown;
-
-    int key = gender * 100000 + height;
-    if (pmCache.contains(key))
-        return pmCache.value(key);
-
-    QString genderStr;
-    genderStr = "unknown";
-
-    QPixmap pixmap =
-        QPixmap("theme:genders/" + genderStr).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    pmCache.insert(key, pixmap);
-    return pixmap;
-}
-
-QMap<int, QPixmap> GenderPixmapGenerator::pmCache;
-
 QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countryCode)
 {
     if (countryCode.size() != 2)
