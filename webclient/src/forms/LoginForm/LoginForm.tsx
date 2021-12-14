@@ -42,7 +42,7 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
 
-  
+
 
   return (
     <Form onSubmit={handleFireOnce} validate={validate}>
