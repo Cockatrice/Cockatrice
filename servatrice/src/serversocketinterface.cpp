@@ -1278,32 +1278,27 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
             return Response::RespWrongPassword;
         }
     }
-    QString queryText = "update {prefix}_users set ";
-    bool changes = false;
+
+    QStringList queryList({});
     if (cmd.has_real_name()) {
-        queryText += "realname=:realName, ";
-        changes = true;
+        queryList << "realname=:realName";
     }
     if (cmd.has_email()) {
         // a real password is required in order to change the email address
         if (usingRealPassword || checkedPassword) {
-            queryText += "email=:email, ";
-            changes = true;
+            queryList << "email=:email";
         } else {
             return Response::RespFunctionNotAllowed;
         }
     }
     if (cmd.has_country()) {
-        queryText += "country=:country, ";
-        changes = true;
+        queryList << "country=:country";
     }
 
-    if (!changes)
+    if (queryList.isEmpty())
         return Response::RespOk;
 
-    queryText.chop(2); // remove ", "
-    queryText += " where name=:userName";
-
+    QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
     QSqlQuery *query = sqlInterface->prepareQuery(queryText);
     if (cmd.has_real_name()) {
         QString realName = nameFromStdString(cmd.real_name());
