@@ -133,7 +133,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
         } else if (!password.isEmpty()) {
-            qDebug() << "Warning: using plain text password to reset password";
+            qWarning() << "using plain text password to reset password";
             cmdForgotPasswordReset.set_new_password(password.toStdString());
         }
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
@@ -163,7 +163,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdRegister.set_hashed_password(hashedPassword.toStdString());
         } else if (!password.isEmpty()) {
-            qDebug() << "Warning: using plain text password to register";
+            qWarning() << "using plain text password to register";
             cmdRegister.set_password(password.toStdString());
         }
         cmdRegister.set_email(email.toStdString());
@@ -234,7 +234,7 @@ void RemoteClient::doLogin()
         setStatus(StatusLoggingIn);
         Command_Login cmdLogin = generateCommandLogin();
         if (!password.isEmpty()) {
-            qDebug() << "Warning: using plain text password to log in";
+            qWarning() << "using plain text password to log in";
             cmdLogin.set_password(password.toStdString());
         }
 
@@ -585,7 +585,7 @@ QString RemoteClient::getSrvClientID(const QString &_hostname)
         QHostAddress hostAddress = hostInfo.addresses().first();
         srvClientID += hostAddress.toString();
     } else {
-        qDebug() << "Warning: ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
+        qWarning() << "ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
         srvClientID += _hostname;
     }
     QString uniqueServerClientID =

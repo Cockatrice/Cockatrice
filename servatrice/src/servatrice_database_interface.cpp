@@ -309,7 +309,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
             }
 
             if (passwordQuery->next()) {
-                const QString correctPassword = passwordQuery->value(0).toString();
+                const QString correctPasswordSha512 = passwordQuery->value(0).toString();
                 const bool userIsActive = passwordQuery->value(1).toBool();
                 if (!userIsActive) {
                     qDebug("Login denied: user not active");
@@ -317,11 +317,11 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                 }
                 QString hashedPassword;
                 if (passwordNeedsHash) {
-                    hashedPassword = PasswordHasher::computeHash(password, correctPassword.left(16));
+                    hashedPassword = PasswordHasher::computeHash(password, correctPasswordSha512.left(16));
                 } else {
                     hashedPassword = password;
                 }
-                if (correctPassword == hashedPassword) {
+                if (correctPasswordSha512 == hashedPassword) {
                     qDebug("Login accepted: password right");
                     return PasswordRight;
                 } else {
@@ -987,13 +987,13 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
     if (!passwordQuery->next())
         return false;
 
-    const QString correctPassword = passwordQuery->value(0).toString();
+    const QString correctPasswordSha512 = passwordQuery->value(0).toString();
     QString oldPasswordSha512 = oldPassword;
     if (oldPasswordNeedsHash) {
-        QString salt = correctPassword.left(16);
+        QString salt = correctPasswordSha512.left(16);
         oldPasswordSha512 = PasswordHasher::computeHash(oldPassword, salt);
     }
-    if (correctPassword != oldPasswordSha512)
+    if (correctPasswordSha512 != oldPasswordSha512)
         return false;
 
     return changeUserPassword(user, newPassword, newPasswordNeedsHash);
