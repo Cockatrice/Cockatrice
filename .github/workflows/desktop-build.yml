@@ -231,7 +231,6 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
 
     env:
-      CCACHE_DIR: ~/.ccache
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
 
@@ -243,7 +242,7 @@ jobs:
         shell: bash
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
-        run: brew install ccache protobuf
+        run: brew install protobuf
 
       - name: Install QT using homebrew
         id: brew_install_qt
@@ -254,21 +253,6 @@ jobs:
       - name: Install QT using actions
         if: steps.brew_install_qt.outcome != 'success'
         uses: jurplel/install-qt-action@v2
-
-      - name: Get ccache timestamp
-        id: ccache_timestamp
-        shell: bash
-        run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
-
-      - name: Restore ccache cache
-        uses: actions/cache@v2
-        env:
-          timestamp: ${{steps.ccache_timestamp.outputs.timestamp}}
-        with:
-          path: ${{env.CCACHE_DIR}}
-          key: ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-${{env.timestamp}}
-          restore-keys: |
-            ${{runner.os}}-xcode-${{matrix.xcode}}-ccache-
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
