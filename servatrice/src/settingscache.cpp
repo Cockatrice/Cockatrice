@@ -23,7 +23,7 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
     }
 }
 
-QString SettingsCache::guessConfigurationPath(QString &specificPath)
+QString SettingsCache::guessConfigurationPath()
 {
     const QString fileName = "servatrice.ini";
     if (QFile::exists(qApp->applicationDirPath() + "/portable.dat")) {
@@ -32,9 +32,6 @@ QString SettingsCache::guessConfigurationPath(QString &specificPath)
     }
 
     QString guessFileName;
-    // specific path
-    if (!specificPath.isEmpty() && QFile::exists(specificPath))
-        return specificPath;
 
     // application directory path
     guessFileName = QCoreApplication::applicationDirPath() + "/" + fileName;
