@@ -242,7 +242,7 @@ jobs:
         shell: bash
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
-        run: brew install protobuf
+        run: brew update && brew install protobuf
 
       - name: Install QT using homebrew
         id: brew_install_qt
