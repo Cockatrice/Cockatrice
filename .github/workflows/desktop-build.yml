@@ -152,7 +152,7 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test
+          RUN --server --debug --test --ccache
 
       - name: Build release package
         id: package
