@@ -30,6 +30,7 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QFile>
 #include <QMetaType>
 #include <QTextCodec>
 #include <QtGlobal>
@@ -140,7 +141,12 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<QList<int>>("QList<int>");
 
-    configPath = SettingsCache::guessConfigurationPath(configPath);
+    if (configPath.isEmpty()) {
+        configPath = SettingsCache::guessConfigurationPath();
+    } else if (!QFile::exists(configPath)) {
+        qCritical() << "Could not find configuration file at" << configPath;
+        return 1;
+    }
     qWarning() << "Using configuration file: " << configPath;
     settingsCache = new SettingsCache(configPath);
 
@@ -167,10 +173,15 @@ int main(int argc, char *argv[])
 
     PasswordHasher::initialize();
 
-    if (testRandom)
+    if (testRandom) {
         testRNG();
-    if (testHashFunction)
+    }
+    if (testHashFunction) {
         testHash();
+    }
+    if (testRandom || testHashFunction) {
+        return 0;
+    }
 
     smtpClient = new SmtpClient();
 

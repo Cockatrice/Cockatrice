@@ -79,7 +79,7 @@ requiredfeatures=""
 ; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
 ; menu option.  This list is comma seperated that each item will appear in the drop down list for staff members
 ; to choose from.  Example: "Flaming,Foul Language"
-officialwarnings="Flamming,Spamming,Causing Drama,Abusive Language"
+officialwarnings="Flaming,Spamming,Causing Drama,Abusive Language"
 
 ; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
 ; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
