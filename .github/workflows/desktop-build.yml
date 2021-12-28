@@ -170,11 +170,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{matrix.distro}}-servatrice-build
-          path: |
-#            ./build/**/*
-#            !./build/${{steps.package.outputs.name}}
-#            !./build/_CPack_Packages
-            ./**/*
+          path: ./**/*
           if-no-files-found: error
 
       - name: Upload artifact
