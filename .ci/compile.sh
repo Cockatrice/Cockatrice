@@ -49,6 +49,10 @@ while [[ "$@" ]]; do
       BUILDTYPE="Release"
       shift
       ;;
+    '--ccache')
+      USE_CCACHE=1
+      shift
+      ;;
     *)
       if [[ $1 == -* ]]; then
         echo "::error file=$0::unrecognized option: $1"
@@ -93,16 +97,20 @@ if [[ $PACKAGE_TYPE ]]; then
 fi
 
 if [[ $(uname) == "Darwin" ]]; then
-  # prepend ccache compiler binaries to path
-  PATH="/usr/local/opt/ccache/libexec:$PATH"
+  if [[ $USE_CCACHE ]]; then
+    # prepend ccache compiler binaries to path
+    PATH="/usr/local/opt/ccache/libexec:$PATH"
+  fi
   # Add qt install location when using homebrew
   flags+=" -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/"
 fi
 
 # Compile
-echo "::group::Show ccache stats"
-ccache --show-stats
-echo "::endgroup::"
+if [[ $USE_CCACHE ]]; then
+  echo "::group::Show ccache stats"
+  ccache --show-stats
+  echo "::endgroup::"
+fi
 
 echo "::group::Configure cmake"
 cmake --version
@@ -113,9 +121,11 @@ echo "::group::Build project"
 cmake --build .
 echo "::endgroup::"
 
-echo "::group::Show ccache stats again"
-ccache --show-stats
-echo "::endgroup::"
+if [[ $USE_CCACHE ]]; then
+  echo "::group::Show ccache stats again"
+  ccache --show-stats
+  echo "::endgroup::"
+fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
