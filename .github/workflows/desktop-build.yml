@@ -169,14 +169,12 @@ jobs:
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v2
         with:
-          name: ${{matrix.distro}}-build
+          name: ${{matrix.distro}}-servatrice-build
           path: |
-            ./build/**/*
-            !./build/${{steps.package.outputs.name}}
-            !./build/_CPack_Packages
-            !./build/cockatrice
-            !./build/oracle
-            !./build/dbconverter
+#            ./build/**/*
+#            !./build/${{steps.package.outputs.name}}
+#            !./build/_CPack_Packages
+            ./**/*
           if-no-files-found: error
 
       - name: Upload artifact
