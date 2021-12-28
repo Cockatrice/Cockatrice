@@ -165,7 +165,7 @@ jobs:
           source .ci/docker.sh
           RUN --server --release --package "$type" --suffix "$suffix"
 
-      - name: Upload build directory artifact
+      - name: Upload servatrice build directory artifact
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v2
         with:
@@ -173,6 +173,10 @@ jobs:
           path: |
             ./build/**/*
             !./build/${{steps.package.outputs.name}}
+            !./build/_CPack_Packages
+            !./build/cockatrice
+            !./build/oracle
+            !./build/dbconverter
           if-no-files-found: error
 
       - name: Upload artifact
