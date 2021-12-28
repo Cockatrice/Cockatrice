@@ -165,6 +165,16 @@ jobs:
           source .ci/docker.sh
           RUN --server --release --package "$type" --suffix "$suffix"
 
+      - name: Upload build directory artifact
+        if: matrix.package != 'skip'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.distro}}-build
+          path: |
+            ./build/**/*
+            !./build/${{steps.package.outputs.name}}
+          if-no-files-found: error
+
       - name: Upload artifact
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v2
