@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 
 import { AuthenticationService } from 'api';
 import { CheckboxField, InputField, KnownHosts } from 'components';
-import { useAutoConnect, useFireOnce } from 'hooks';
+import { useAutoConnect } from 'hooks';
 import { HostDTO, SettingDTO } from 'services';
 import { APP_USER } from 'types';
 
@@ -15,11 +15,10 @@ import './LoginForm.css';
 const PASSWORD_LABEL = 'Password';
 const STORED_PASSWORD_LABEL = '* SAVED *';
 
-const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
+const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginFormProps) => {
   const [host, setHost] = useState(null);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
   const [autoConnect, setAutoConnect] = useAutoConnect();
-  const [disableSubmitButton, handleFireOnce] = useFireOnce(onSubmit)
 
   const validate = values => {
     const errors: any = {};
@@ -45,7 +44,7 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
 
 
   return (
-    <Form onSubmit={handleFireOnce} validate={validate}>
+    <Form onSubmit={onSubmit} validate={validate}>
       {({ handleSubmit, form }) => {
         const { values } = form.getState();
 
@@ -159,6 +158,7 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
 
 interface LoginFormProps {
   onSubmit: any;
+  disableSubmitButton: boolean,
   onResetPassword: any;
 }
 

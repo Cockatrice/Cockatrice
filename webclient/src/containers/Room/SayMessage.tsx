@@ -1,18 +1,21 @@
-// eslint-disable-next-line
-import React from "react";
-import { connect } from 'react-redux';
-import { Form, reduxForm } from 'redux-form'
+import React from 'react';
+import { Form } from 'react-final-form'
 
 import { InputAction } from 'components';
 
-const SayMessage = ({ handleSubmit }) => (
-  <Form onSubmit={handleSubmit}>
-    <InputAction action="Send" label="Chat" name="message" />
-  </Form>
-);
+const required = (value) => (value ? undefined : 'Required');
 
-const propsMap = {
-  form: 'sayMessage'
-};
+const SayMessage = (props) => {
+  const { onSubmit, disableSendButton } = props
+  return (
+    <Form onSubmit={values => onSubmit(values)}>
+      {({ handleSubmit }) => (
+        <form onSubmit={handleSubmit}>
+          <InputAction action="Send" label="Chat" name="message" disabled={disableSendButton} validate={required}/>
+        </form>
+      )}
+    </Form>
+  );
+}
 
-export default connect()(reduxForm(propsMap)(SayMessage));
+export default SayMessage;

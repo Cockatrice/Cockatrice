@@ -1,19 +1,16 @@
-// eslint-disable-next-line
-import React from "react";
-import { connect } from 'react-redux';
-import { Form, reduxForm } from 'redux-form'
+import React from 'react';
+import { Form } from 'react-final-form'
 
 import { InputAction } from 'components';
-import { FormKey } from 'types';
 
-const AddToIgnore = ({ handleSubmit }) => (
-  <Form onSubmit={handleSubmit}>
-    <InputAction action="Add" label="Add to Ignore" name="userName" />
+const AddToIgnore = ({ onSubmit }) => (
+  <Form onSubmit={values => onSubmit(values)}>
+    {({ handleSubmit }) => (
+      <form onSubmit={handleSubmit}>
+        <InputAction action="Add" label="Add to Ignore" name="userName" validate={() => true} />
+      </form>
+    )}
   </Form>
 );
 
-const propsMap = {
-  form: FormKey.ADD_TO_IGNORE,
-};
-
-export default connect()(reduxForm(propsMap)(AddToIgnore));
+export default AddToIgnore;
