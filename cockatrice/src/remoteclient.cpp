@@ -56,7 +56,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this,
             SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
     connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
-    connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)),
+    connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, QString, QString)),
             this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
     connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
     connect(this, SIGNAL(sigRequestForgotPasswordToServer(QString, unsigned int, QString)), this,
