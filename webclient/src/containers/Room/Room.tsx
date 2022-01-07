@@ -9,7 +9,6 @@ import { RoomsService } from 'api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
 import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors, RoomsTypes } from 'store';
 import { RouteEnum } from 'types';
-import { useReduxEffect, useFireOnce } from 'hooks';
 
 import OpenGames from './OpenGames';
 import Messages from './Messages';
@@ -27,19 +26,11 @@ function Room(props) {
     history.push(generatePath(RouteEnum.SERVER));
   }
 
-  function onRoomSay({ message }) {
+  function handleRoomSay({ message }) {
     if (message) {
       RoomsService.roomSay(roomId, message);
     }
   }
-
-  const [sendButtonIsDisabled, resetSendButton, handleRoomSay] = useFireOnce(onRoomSay)
-
-  // TODO: Have this use a better action than ADD_MESSAGE since it really doesn't do much here.
-  useReduxEffect(() => {
-    resetSendButton()
-  }, RoomsTypes.ADD_MESSAGE, []);
-
 
   const room = rooms[roomId];
 
@@ -68,7 +59,7 @@ function Room(props) {
                 )} />
               </Paper>
               <Paper className="room-view__messages-sayMessage">
-                <SayMessage onSubmit={handleRoomSay} disableSendButton={sendButtonIsDisabled} />
+                <SayMessage onSubmit={handleRoomSay} />
               </Paper>
             </div>
           )}
