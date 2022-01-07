@@ -559,8 +559,13 @@ void TabDeckEditor::refreshShortcuts()
 void TabDeckEditor::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    restoreState(layouts.getDeckEditorLayoutState());
-    restoreGeometry(layouts.getDeckEditorGeometry());
+    auto &layoutState = layouts.getDeckEditorLayoutState();
+    if (layoutState.isNull()) {
+        restartLayout();
+    } else {
+        restoreState(layoutState);
+        restoreGeometry(layouts.getDeckEditorGeometry());
+    }
 
     aCardInfoDockVisible->setChecked(cardInfoDock->isVisible());
     aFilterDockVisible->setChecked(filterDock->isVisible());
@@ -599,15 +604,13 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     createCardInfoDock();
     createFiltersDock();
 
-    restartLayout();
-
     this->installEventFilter(this);
 
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
-    QTimer::singleShot(0, this, SLOT(loadLayout()));
+    loadLayout();
 }
 
 TabDeckEditor::~TabDeckEditor()
