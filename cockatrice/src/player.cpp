@@ -3034,7 +3034,7 @@ void Player::actSetPT()
     }
     bool ok;
     dialogSemaphore = true;
-    QString pt = QInputDialog::getText(nullptr, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
+    QString pt = QInputDialog::getText(game, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
                                        oldPT, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
@@ -3140,8 +3140,8 @@ void Player::actSetAnnotation()
 
     bool ok;
     dialogSemaphore = true;
-    QString annotation = QInputDialog::getText(nullptr, tr("Set annotation"), tr("Please enter the new annotation:"),
-                                               QLineEdit::Normal, oldAnnotation, &ok);
+    QString annotation = QInputDialog::getMultiLineText(game, tr("Set annotation"),
+                                                        tr("Please enter the new annotation:"), oldAnnotation, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
