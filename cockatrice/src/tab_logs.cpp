@@ -146,7 +146,6 @@ void TabLog::clearClicked()
 
 void TabLog::createDock()
 {
-
     labelFindUserName = new QLabel(tr("Username: "));
     findUsername = new LineEditUnfocusable("");
     findUsername->setAlignment(Qt::AlignCenter);
@@ -202,7 +201,8 @@ void TabLog::createDock()
 
     criteriaGroupBox = new QGroupBox(tr("Filters"));
     criteriaGroupBox->setLayout(criteriaGrid);
-    criteriaGroupBox->setFixedSize(500, 300);
+    criteriaGroupBox->setMaximumSize(500, 300);
+    criteriaGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     locationGrid = new QGridLayout;
     locationGrid->addWidget(mainRoom, 0, 0);
