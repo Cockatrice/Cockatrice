@@ -46,7 +46,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     QSize translatedSize = translatedRect.size().toSize();
     QFont font("Serif");
     font.setWeight(QFont::Bold);
-    font.setPixelSize(qMax((int)qRound(translatedSize.height() / 1.3), 9));
+    font.setPixelSize(qMax(qRound(translatedSize.height() / 1.3), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
@@ -132,7 +132,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         name = name.mid(0, 10) + "...";
 
     QFont font;
-    font.setPixelSize(qMax((int)qRound(translatedNameRect.height() / 1.5), 9));
+    font.setPixelSize(qMax(qRound(translatedNameRect.height() / 1.5), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);
     painter->drawText(translatedNameRect, Qt::AlignVCenter | Qt::AlignLeft, "  " + name);
