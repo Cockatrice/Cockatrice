@@ -21,7 +21,7 @@ describe('useFireOnce hook', () => {
 
     function Button(props) {
       const { children, onClick } = props
-      const [buttonIsDisabled, handleClickOnce] = useFireOnce(onClick)
+      const [buttonIsDisabled, setButtonIsDisabled, handleClickOnce] = useFireOnce(onClick)
       return <button onClick={handleClickOnce} disabled={buttonIsDisabled}>{children}</button>
     }
 
@@ -65,7 +65,7 @@ describe('useFireOnce hook', () => {
 
     function Form(props) {
       const { onSubmit } = props
-      const [buttonIsDisabled, handleSubmitOnce] = useFireOnce(onSubmit)
+      const [buttonIsDisabled, setButtonIsDisabled, handleSubmitOnce] = useFireOnce(onSubmit)
       return (
         <form onSubmit={handleSubmitOnce}>
           <input type="text" defaultValue="Hell World" name="thing-to-say" />
