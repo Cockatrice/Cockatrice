@@ -3,13 +3,9 @@
 #include "pb/serverinfo_user.pb.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QPainter>
 #include <QPalette>
-#include <cmath>
-#ifdef _WIN32
-#include "round.h"
-#endif /* _WIN32 */
-#include <QDebug>
 
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
 

@@ -1,18 +1,16 @@
+#include "phasestoolbar.h"
+
+#include "pb/command_draw_cards.pb.h"
+#include "pb/command_next_turn.pb.h"
+#include "pb/command_set_active_phase.pb.h"
+#include "pb/command_set_card_attr.pb.h"
+#include "pixmapgenerator.h"
+
 #include <QAction>
 #include <QDebug>
 #include <QPainter>
 #include <QPen>
 #include <QTimer>
-#include <cmath>
-#ifdef _WIN32
-#include "round.h"
-#endif /* _WIN32 */
-#include "pb/command_draw_cards.pb.h"
-#include "pb/command_next_turn.pb.h"
-#include "pb/command_set_active_phase.pb.h"
-#include "pb/command_set_card_attr.pb.h"
-#include "phasestoolbar.h"
-#include "pixmapgenerator.h"
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
     : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),
@@ -38,8 +36,7 @@ void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     QRectF iconRect = boundingRect().adjusted(3, 3, -3, -3);
     QRectF translatedIconRect = painter->combinedTransform().mapRect(iconRect);
     qreal scaleFactor = translatedIconRect.width() / iconRect.width();
-    QPixmap iconPixmap =
-        PhasePixmapGenerator::generatePixmap(static_cast<int>(round(translatedIconRect.height())), name);
+    QPixmap iconPixmap = PhasePixmapGenerator::generatePixmap(qRound(translatedIconRect.height()), name);
 
     painter->setBrush(QColor(static_cast<int>(220 * (activeAnimationCounter / 10.0)),
                              static_cast<int>(220 * (activeAnimationCounter / 10.0)),
@@ -48,9 +45,8 @@ void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     painter->drawRect(0, 0, static_cast<int>(width - 1), static_cast<int>(width - 1));
     painter->save();
     resetPainterTransform(painter);
-    painter->drawPixmap(iconPixmap.rect().translated(static_cast<int>(round(3 * scaleFactor)),
-                                                     static_cast<int>(round(3 * scaleFactor))),
-                        iconPixmap, iconPixmap.rect());
+    painter->drawPixmap(iconPixmap.rect().translated(qRound(3 * scaleFactor), qRound(3 * scaleFactor)), iconPixmap,
+                        iconPixmap.rect());
     painter->restore();
 
     painter->setBrush(QColor(0, 0, 0, static_cast<int>(255 * ((10 - activeAnimationCounter) / 15.0))));

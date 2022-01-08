@@ -4,10 +4,6 @@
 #include <QPainterPath>
 #include <QPalette>
 #include <QTimer>
-#include <cmath>
-#ifdef _WIN32
-#include "round.h"
-#endif /* _WIN32 */
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentTime(0), currentEvent(0)
@@ -54,7 +50,7 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     QPainterPath path;
     path.moveTo(0, height() - 1);
     for (int i = 0; i < histogram.size(); ++i)
-        path.lineTo(round(i * binWidth), (height() - 1) * (1.0 - (qreal)histogram[i] / maxBinValue));
+        path.lineTo(qRound(i * binWidth), (height() - 1) * (1.0 - (qreal)histogram[i] / maxBinValue));
     path.lineTo(width() - 1, height() - 1);
     path.lineTo(0, height() - 1);
     painter.fillPath(path, Qt::black);
