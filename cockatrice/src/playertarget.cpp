@@ -7,10 +7,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QPixmapCache>
-#include <cmath>
-#ifdef _WIN32
-#include "round.h"
-#endif /* _WIN32 */
+#include <QtMath>
 
 PlayerCounter::PlayerCounter(Player *_player,
                              int _id,
@@ -49,7 +46,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     QSize translatedSize = translatedRect.size().toSize();
     QFont font("Serif");
     font.setWeight(QFont::Bold);
-    font.setPixelSize(qMax((int)round(translatedSize.height() / 1.3), 9));
+    font.setPixelSize(qMax((int)qRound(translatedSize.height() / 1.3), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
@@ -96,9 +93,9 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         QPainter tempPainter(&cachedPixmap);
         // pow(foo, 0.5) equals to sqrt(foo), but using sqrt(foo) in this context will produce a compile error with
         // MSVC++
-        QRadialGradient grad(translatedRect.center(), pow(translatedSize.width() * translatedSize.width() +
-                                                              translatedSize.height() * translatedSize.height(),
-                                                          0.5) /
+        QRadialGradient grad(translatedRect.center(), qPow(translatedSize.width() * translatedSize.width() +
+                                                               translatedSize.height() * translatedSize.height(),
+                                                           0.5) /
                                                           2);
         grad.setColorAt(1, Qt::black);
         grad.setColorAt(0, QColor(180, 180, 180));
@@ -135,7 +132,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         name = name.mid(0, 10) + "...";
 
     QFont font;
-    font.setPixelSize(qMax((int)round(translatedNameRect.height() / 1.5), 9));
+    font.setPixelSize(qMax((int)qRound(translatedNameRect.height() / 1.5), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);
     painter->drawText(translatedNameRect, Qt::AlignVCenter | Qt::AlignLeft, "  " + name);

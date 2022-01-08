@@ -1,18 +1,16 @@
-#include <QCursor>
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <algorithm>
-#include <cmath>
-#ifdef _WIN32
-#include "round.h"
-#endif /* _WIN32 */
 #include "abstractcarditem.h"
+
 #include "carddatabase.h"
 #include "gamescene.h"
 #include "main.h"
 #include "pictureloader.h"
 #include "settingscache.h"
+
+#include <QCursor>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <algorithm>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id, QGraphicsItem *parent)
     : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0),

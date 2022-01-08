@@ -1,10 +1,5 @@
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QSet>
-#include <cmath>
-#ifdef _WIN32
-#include "round.h"
-#endif /* _WIN32 */
+#include "tablezone.h"
+
 #include "arrowitem.h"
 #include "carddatabase.h"
 #include "carddragitem.h"
@@ -13,8 +8,11 @@
 #include "pb/command_set_card_attr.pb.h"
 #include "player.h"
 #include "settingscache.h"
-#include "tablezone.h"
 #include "thememanager.h"
+
+#include <QGraphicsScene>
+#include <QPainter>
+#include <QSet>
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
