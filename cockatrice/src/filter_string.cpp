@@ -337,7 +337,7 @@ static void setupParserRules()
 
 FilterString::FilterString(const QString &expr)
 {
-    QByteArray ba = expr.toLocal8Bit();
+    QByteArray ba = expr.simplified().toLocal8Bit();
 
     std::call_once(init, setupParserRules);
 
