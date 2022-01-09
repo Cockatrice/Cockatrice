@@ -7,7 +7,7 @@ const AddToBuddies = ({ onSubmit }) => (
   <Form onSubmit={values => onSubmit(values)}>
     {({ handleSubmit }) => (
       <form onSubmit={handleSubmit}>
-        <InputAction action="Add" label="Add to Buddies" name="userName" validate={() => true} />
+        <InputAction action="Add" label="Add to Buddies" name="userName" />
       </form>
     )}
   </Form>
