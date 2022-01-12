@@ -44,7 +44,7 @@ If you'd like to help contribute to Cockatrice in any way, check out our [README
 > ⚠️ **With this release, we no longer provide a ready-to-install binary for:**
 > --DEPRECATED-OS-HERE--
  -->
- 
+
 - Run the internal software updater: <kbd>Help → Check for Client Updates</kbd>
 
 Don't forget to update your card database right after! (<kbd>Help → Check for Card Updates...</kbd>)

@@ -2613,15 +2613,6 @@ void Player::clearArrows()
 void Player::rearrangeCounters()
 {
     qreal marginTop = 80;
-
-    // Determine total height of bounding rectangles
-    qreal totalHeight = 0;
-    for (const auto &counter : counters) {
-        if (counter->getShownInCounterArea()) {
-            totalHeight += counter->boundingRect().height();
-        }
-    }
-
     const qreal padding = 5;
     qreal ySize = boundingRect().y() + marginTop;
 

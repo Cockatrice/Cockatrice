@@ -49,9 +49,9 @@ void Server_ProtocolHandler::prepareDestroy()
         return;
     deleted = true;
 
-    QMapIterator<int, Server_Room *> roomIterator(rooms);
-    while (roomIterator.hasNext())
-        roomIterator.next().value()->removeClient(this);
+    for (auto *room : rooms.values()) {
+        room->removeClient(this);
+    }
 
     QMap<int, QPair<int, int>> tempGames(getGames());
 
@@ -60,27 +60,27 @@ void Server_ProtocolHandler::prepareDestroy()
     while (gameIterator.hasNext()) {
         gameIterator.next();
 
-        Server_Room *r = server->getRooms().value(gameIterator.value().first);
-        if (!r)
+        Server_Room *room = server->getRooms().value(gameIterator.value().first);
+        if (!room)
             continue;
-        r->gamesLock.lockForRead();
-        Server_Game *g = r->getGames().value(gameIterator.key());
-        if (!g) {
-            r->gamesLock.unlock();
+        room->gamesLock.lockForRead();
+        Server_Game *game = room->getGames().value(gameIterator.key());
+        if (!game) {
+            room->gamesLock.unlock();
             continue;
         }
-        g->gameMutex.lock();
-        Server_Player *p = g->getPlayers().value(gameIterator.value().second);
+        game->gameMutex.lock();
+        Server_Player *p = game->getPlayers().value(gameIterator.value().second);
         if (!p) {
-            g->gameMutex.unlock();
-            r->gamesLock.unlock();
+            game->gameMutex.unlock();
+            room->gamesLock.unlock();
             continue;
         }
 
         p->disconnectClient();
 
-        g->gameMutex.unlock();
-        r->gamesLock.unlock();
+        game->gameMutex.unlock();
+        room->gamesLock.unlock();
     }
     server->roomsLock.unlock();
 
@@ -669,24 +669,24 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         return Response::RespContextError;
 
     QReadLocker serverLocker(&server->roomsLock);
-    Server_Room *r = server->getRooms().value(cmd.room_id(), 0);
-    if (!r)
+    Server_Room *room = server->getRooms().value(cmd.room_id(), 0);
+    if (!room)
         return Response::RespNameNotFound;
 
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-        if (!(r->userMayJoin(*userInfo)))
+        if (!(room->userMayJoin(*userInfo)))
             return Response::RespUserLevelTooLow;
 
-    r->addClient(this);
-    rooms.insert(r->getId(), r);
+    room->addClient(this);
+    rooms.insert(room->getId(), room);
 
     Event_RoomSay joinMessageEvent;
-    joinMessageEvent.set_message(r->getJoinMessage().toStdString());
+    joinMessageEvent.set_message(room->getJoinMessage().toStdString());
     joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
-    rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(joinMessageEvent));
+    rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
 
-    QReadLocker chatHistoryLocker(&r->historyLock);
-    QList<ServerInfo_ChatMessage> chatHistory = r->getChatHistory();
+    QReadLocker chatHistoryLocker(&room->historyLock);
+    QList<ServerInfo_ChatMessage> chatHistory = room->getChatHistory();
     ServerInfo_ChatMessage chatMessage;
     for (int i = 0; i < chatHistory.size(); ++i) {
         chatMessage = chatHistory.at(i);
@@ -695,11 +695,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         roomChatHistory.set_message_type(Event_RoomSay::ChatHistory);
         roomChatHistory.set_time_of(
             QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
-        rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(roomChatHistory));
+        rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
     }
 
     Response_JoinRoom *re = new Response_JoinRoom;
-    r->getInfo(*re->mutable_room_info(), true);
+    room->getInfo(*re->mutable_room_info(), true);
 
     rc.setResponseExtension(re);
     return Response::RespOk;
