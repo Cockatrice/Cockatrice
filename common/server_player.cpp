@@ -79,6 +79,7 @@
 #include "server_database_interface.h"
 #include "server_game.h"
 #include "server_room.h"
+#include "stringsizes.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -214,8 +215,8 @@ void Server_Player::setupZones()
 
     const QList<MoveCard_ToZone> &sideboardPlan = deck->getCurrentSideboardPlan();
     for (const auto &m : sideboardPlan) {
-        const QString startZone = QString::fromStdString(m.start_zone());
-        const QString targetZone = QString::fromStdString(m.target_zone());
+        const QString startZone = nameFromStdString(m.start_zone());
+        const QString targetZone = nameFromStdString(m.target_zone());
 
         Server_CardZone *start, *target;
         if (startZone == DECK_ZONE_MAIN) {
@@ -234,7 +235,7 @@ void Server_Player::setupZones()
         }
 
         for (int j = 0; j < start->getCards().size(); ++j) {
-            if (start->getCards()[j]->getName() == QString::fromStdString(m.card_name())) {
+            if (start->getCards()[j]->getName() == nameFromStdString(m.card_name())) {
                 Server_Card *card = start->getCard(j, nullptr, true);
                 target->insertCard(card, -1, 0);
                 break;
@@ -715,7 +716,7 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
             return r;
         }
     } else {
-        newDeck = new DeckList(QString::fromStdString(cmd.deck()));
+        newDeck = new DeckList(fileFromStdString(cmd.deck()));
     }
 
     if (!newDeck) {
@@ -928,7 +929,7 @@ Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/
 
     game->getRoom()->getServer()->getDatabaseInterface()->logMessage(
         userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()),
-        QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetGame, game->getGameId(),
+        textFromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetGame, game->getGameId(),
         game->getDescription());
 
     return Response::RespOk;
@@ -1092,7 +1093,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if (!startPlayer) {
         return Response::RespNameNotFound;
     }
-    Server_CardZone *startZone = startPlayer->getZones().value(QString::fromStdString(cmd.start_zone()));
+    Server_CardZone *startZone = startPlayer->getZones().value(nameFromStdString(cmd.start_zone()));
     if (!startZone) {
         return Response::RespNameNotFound;
     }
@@ -1105,7 +1106,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if (!targetPlayer) {
         return Response::RespNameNotFound;
     }
-    Server_CardZone *targetZone = targetPlayer->getZones().value(QString::fromStdString(cmd.target_zone()));
+    Server_CardZone *targetZone = targetPlayer->getZones().value(nameFromStdString(cmd.target_zone()));
     if (!targetZone) {
         return Response::RespNameNotFound;
     }
@@ -1136,7 +1137,7 @@ Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc
         return Response::RespContextError;
     }
 
-    Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone()));
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone()));
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -1165,7 +1166,7 @@ Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc
     event.set_face_down(faceDown);
     ges.enqueueGameEvent(event, playerId);
 
-    QString ptString = QString::fromStdString(cmd.pt());
+    QString ptString = nameFromStdString(cmd.pt());
     if (!ptString.isEmpty() && !faceDown) {
         setCardAttrHelper(ges, playerId, zone->getName(), card->getId(), AttrPT, ptString);
     }
@@ -1187,7 +1188,7 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_CardZone *startzone = zones.value(QString::fromStdString(cmd.start_zone()));
+    Server_CardZone *startzone = zones.value(nameFromStdString(cmd.start_zone()));
     if (!startzone) {
         return Response::RespNameNotFound;
     }
@@ -1210,7 +1211,7 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
     if (targetPlayer) {
-        targetzone = targetPlayer->getZones().value(QString::fromStdString(cmd.target_zone()));
+        targetzone = targetPlayer->getZones().value(nameFromStdString(cmd.target_zone()));
     }
     if (targetzone) {
         // This is currently enough to make sure cards don't get attached to a card that is not on the table.
@@ -1305,12 +1306,12 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         return Response::RespContextError;
     }
 
-    Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone()));
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone()));
     if (!zone) {
         return Response::RespNameNotFound;
     }
 
-    QString cardName = QString::fromStdString(cmd.card_name());
+    QString cardName = nameFromStdString(cmd.card_name());
     int xCoord = cmd.x();
     int yCoord = cmd.y();
     if (zone->hasCoords()) {
@@ -1325,9 +1326,9 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
 
     auto *card = new Server_Card(cardName, newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
-    card->setPT(QString::fromStdString(cmd.pt()));
-    card->setColor(QString::fromStdString(cmd.color()));
-    card->setAnnotation(QString::fromStdString(cmd.annotation()));
+    card->setPT(nameFromStdString(cmd.pt()));
+    card->setColor(nameFromStdString(cmd.color()));
+    card->setAnnotation(nameFromStdString(cmd.annotation()));
     card->setDestroyOnZoneChange(cmd.destroy_on_zone_change());
 
     zone->insertCard(card, xCoord, yCoord);
@@ -1379,12 +1380,12 @@ Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer 
     if (!startPlayer || !targetPlayer) {
         return Response::RespNameNotFound;
     }
-    QString startZoneName = QString::fromStdString(cmd.start_zone());
+    QString startZoneName = nameFromStdString(cmd.start_zone());
     Server_CardZone *startZone = startPlayer->getZones().value(startZoneName);
     bool playerTarget = !cmd.has_target_zone();
     Server_CardZone *targetZone = nullptr;
     if (!playerTarget) {
-        targetZone = targetPlayer->getZones().value(QString::fromStdString(cmd.target_zone()));
+        targetZone = targetPlayer->getZones().value(nameFromStdString(cmd.target_zone()));
     }
     if (!startZone || (!targetZone && !playerTarget)) {
         return Response::RespNameNotFound;
@@ -1481,8 +1482,8 @@ Server_Player::cmdSetCardAttr(const Command_SetCardAttr &cmd, ResponseContainer 
         return Response::RespContextError;
     }
 
-    return setCardAttrHelper(ges, playerId, QString::fromStdString(cmd.zone()), cmd.card_id(), cmd.attribute(),
-                             QString::fromStdString(cmd.attr_value()));
+    return setCardAttrHelper(ges, playerId, nameFromStdString(cmd.zone()), cmd.card_id(), cmd.attribute(),
+                             nameFromStdString(cmd.attr_value()));
 }
 
 Response::ResponseCode
@@ -1499,7 +1500,7 @@ Server_Player::cmdSetCardCounter(const Command_SetCardCounter &cmd, ResponseCont
         return Response::RespContextError;
     }
 
-    Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone()));
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone()));
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -1538,7 +1539,7 @@ Server_Player::cmdIncCardCounter(const Command_IncCardCounter &cmd, ResponseCont
         return Response::RespContextError;
     }
 
-    Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone()));
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone()));
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -1607,7 +1608,7 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
         return Response::RespContextError;
     }
 
-    auto *c = new Server_Counter(newCounterId(), QString::fromStdString(cmd.counter_name()), cmd.counter_color(),
+    auto *c = new Server_Counter(newCounterId(), nameFromStdString(cmd.counter_name()), cmd.counter_color(),
                                  cmd.radius(), cmd.value());
     addCounter(c);
 
@@ -1739,7 +1740,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
     if (!otherPlayer) {
         return Response::RespNameNotFound;
     }
-    Server_CardZone *zone = otherPlayer->getZones().value(QString::fromStdString(cmd.zone_name()));
+    Server_CardZone *zone = otherPlayer->getZones().value(nameFromStdString(cmd.zone_name()));
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -1824,7 +1825,7 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
         if (!otherPlayer)
             return Response::RespNameNotFound;
     }
-    Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone_name()));
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -1922,7 +1923,7 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
                                                               ResponseContainer & /* rc */,
                                                               GameEventStorage &ges)
 {
-    Server_CardZone *zone = zones.value(QString::fromStdString(cmd.zone_name()));
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
     if (!zone) {
         return Response::RespNameNotFound;
     }

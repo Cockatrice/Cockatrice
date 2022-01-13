@@ -20,6 +20,7 @@
 #include "server_game.h"
 #include "server_player.h"
 #include "server_room.h"
+#include "stringsizes.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -440,16 +441,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cm
 
 Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, ResponseContainer &rc)
 {
-    QString userName = QString::fromStdString(cmd.user_name()).simplified();
-    QString clientId = QString::fromStdString(cmd.clientid()).simplified();
-    QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
+    QString userName = nameFromStdString(cmd.user_name()).simplified();
+    QString clientId = nameFromStdString(cmd.clientid()).simplified();
+    QString clientVersion = nameFromStdString(cmd.clientver()).simplified();
     QString password;
     bool needsHash = false;
     if (cmd.has_password()) {
-        password = QString::fromStdString(cmd.password());
+        password = nameFromStdString(cmd.password());
         needsHash = true;
     } else {
-        password = QString::fromStdString(cmd.hashed_password());
+        password = nameFromStdString(cmd.hashed_password());
     }
 
     if (userInfo != 0) {
@@ -462,7 +463,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QMap<QString, bool> missingClientFeatures;
 
     for (int i = 0; i < cmd.clientfeatures().size(); ++i) {
-        receivedClientFeatures.insert(QString::fromStdString(cmd.clientfeatures(i)).simplified(), false);
+        receivedClientFeatures.insert(nameFromStdString(cmd.clientfeatures(i)).simplified(), false);
     }
 
     missingClientFeatures =
@@ -563,7 +564,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 
     QReadLocker locker(&server->clientsLock);
 
-    QString receiver = QString::fromStdString(cmd.user_name());
+    QString receiver = nameFromStdString(cmd.user_name());
     Server_AbstractUserInterface *userInterface = server->findUser(receiver);
     if (!userInterface) {
         return Response::RespNameNotFound;
@@ -577,7 +578,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 
     Event_UserMessage event;
     event.set_sender_name(userInfo->name());
-    event.set_receiver_name(cmd.user_name());
+    event.set_receiver_name(receiver.toStdString());
     event.set_message(cmd.message());
 
     SessionEvent *se = prepareSessionEvent(event);
@@ -608,7 +609,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
         Server_Room *room = roomIterator.next().value();
         room->gamesLock.lockForRead();
         room->getInfo(*re->add_room_list(), false, true);
-        QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(QString::fromStdString(cmd.user_name())));
+        QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(nameFromStdString(cmd.user_name())));
         while (gameIterator.hasNext())
             re->add_game_list()->CopyFrom(gameIterator.next());
         room->gamesLock.unlock();
@@ -624,7 +625,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
 
-    QString userName = QString::fromStdString(cmd.user_name());
+    QString userName = nameFromStdString(cmd.user_name());
     Response_GetUserInfo *re = new Response_GetUserInfo;
     if (userName.isEmpty())
         re->mutable_user_info()->CopyFrom(*userInfo);
@@ -811,14 +812,14 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
         gameTypes.append(cmd.game_type_ids(i));
     }
 
-    QString description = QString::fromStdString(cmd.description()).left(60);
+    QString description = nameFromStdString(cmd.description());
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    Server_Game *game = new Server_Game(
-        copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
-        cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
-        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+    Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, nameFromStdString(cmd.password()),
+                                        cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
+                                        cmd.spectators_allowed(), cmd.spectators_need_password(),
+                                        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
