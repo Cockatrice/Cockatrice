@@ -27,7 +27,6 @@ void DlgCreateGame::sharedCtor()
     descriptionEdit = new QLineEdit;
     descriptionEdit->setMaxLength(MAX_NAME_LENGTH);
     descriptionLabel->setBuddy(descriptionEdit);
-    descriptionEdit->setMaxLength(60);
 
     maxPlayersLabel = new QLabel(tr("P&layers:"));
     maxPlayersEdit = new QSpinBox();
