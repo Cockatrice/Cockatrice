@@ -1,6 +1,7 @@
 #include "dlg_edit_user.h"
 
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -12,6 +13,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
 {
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
+    emailEdit->setMaxLength(MAX_NAME_LENGTH);
     emailLabel->setBuddy(emailEdit);
     emailEdit->setText(email);
 
@@ -33,6 +35,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
 
     realnameLabel = new QLabel(tr("Real name:"));
     realnameEdit = new QLineEdit();
+    realnameEdit->setMaxLength(MAX_NAME_LENGTH);
     realnameLabel->setBuddy(realnameEdit);
     realnameEdit->setText(realName);
 

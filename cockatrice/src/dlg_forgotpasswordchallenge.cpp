@@ -1,6 +1,7 @@
 #include "dlg_forgotpasswordchallenge.h"
 
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QCheckBox>
 #include <QDebug>
@@ -38,18 +39,22 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(lastfphost);
+    hostEdit->setMaxLength(MAX_NAME_LENGTH);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
     portEdit = new QLineEdit(lastfpport);
+    portEdit->setValidator(new QIntValidator(0, 0xffff, portEdit));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
     playernameEdit = new QLineEdit(lastfpplayername);
+    playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
+    emailEdit->setMaxLength(MAX_NAME_LENGTH);
     emailLabel->setBuddy(emailLabel);
 
     if (!servers.getFPHostname().isEmpty() && !servers.getFPPort().isEmpty() && !servers.getFPPlayerName().isEmpty()) {

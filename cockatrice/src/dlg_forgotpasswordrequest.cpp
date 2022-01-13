@@ -1,6 +1,7 @@
 #include "dlg_forgotpasswordrequest.h"
 
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QCheckBox>
 #include <QDebug>
@@ -31,14 +32,17 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(lastfphost);
+    hostEdit->setMaxLength(MAX_NAME_LENGTH);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
     portEdit = new QLineEdit(lastfpport);
+    portEdit->setValidator(new QIntValidator(0, 0xffff, portEdit));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
     playernameEdit = new QLineEdit(lastfpplayername);
+    playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
     QGridLayout *grid = new QGridLayout;

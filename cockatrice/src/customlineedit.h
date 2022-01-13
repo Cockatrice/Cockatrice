@@ -12,12 +12,13 @@ class QString;
 // shortcuts and other shortcuts
 class LineEditUnfocusable : public QLineEdit
 {
+    Q_OBJECT
 public:
-    LineEditUnfocusable(QWidget *parent = nullptr);
-    LineEditUnfocusable(const QString &contents, QWidget *parent = nullptr);
+    explicit LineEditUnfocusable(QWidget *parent = nullptr);
+    explicit LineEditUnfocusable(const QString &contents, QWidget *parent = nullptr);
 
 private:
-    bool isUnfocusShortcut(QKeyEvent *key);
+    static bool isUnfocusShortcut(QKeyEvent *key);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

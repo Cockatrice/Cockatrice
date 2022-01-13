@@ -3,6 +3,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "tab_room.h"
 
 #include <QApplication>
@@ -24,6 +25,7 @@ void DlgCreateGame::sharedCtor()
     rememberGameSettings = new QCheckBox(tr("Re&member settings"));
     descriptionLabel = new QLabel(tr("&Description:"));
     descriptionEdit = new QLineEdit;
+    descriptionEdit->setMaxLength(MAX_NAME_LENGTH);
     descriptionLabel->setBuddy(descriptionEdit);
     descriptionEdit->setMaxLength(60);
 
@@ -57,6 +59,7 @@ void DlgCreateGame::sharedCtor()
 
     passwordLabel = new QLabel(tr("&Password:"));
     passwordEdit = new QLineEdit;
+    passwordEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordLabel->setBuddy(passwordEdit);
 
     onlyBuddiesCheckBox = new QCheckBox(tr("Only &buddies can join"));

@@ -8,6 +8,7 @@
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
 #include "pixmapgenerator.h"
+#include "stringsizes.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"
 #include "user_context_menu.h"
@@ -36,12 +37,15 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
     nameBanCheckBox = new QCheckBox(tr("ban &user name"));
     nameBanCheckBox->setChecked(true);
     nameBanEdit = new QLineEdit(QString::fromStdString(info.name()));
+    nameBanEdit->setMaxLength(MAX_NAME_LENGTH);
     ipBanCheckBox = new QCheckBox(tr("ban &IP address"));
     ipBanCheckBox->setChecked(true);
     ipBanEdit = new QLineEdit(QString::fromStdString(info.address()));
+    ipBanEdit->setMaxLength(MAX_NAME_LENGTH);
     idBanCheckBox = new QCheckBox(tr("ban client I&D"));
     idBanCheckBox->setChecked(true);
     idBanEdit = new QLineEdit(QString::fromStdString(info.clientid()));
+    idBanEdit->setMaxLength(MAX_NAME_LENGTH);
     if (QString::fromStdString(info.clientid()).isEmpty())
         idBanCheckBox->setChecked(false);
 
@@ -129,7 +133,9 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
     setAttribute(Qt::WA_DeleteOnClose);
     descriptionLabel = new QLabel(tr("Which warning would you like to send?"));
     nameWarning = new QLineEdit(userName);
+    nameWarning->setMaxLength(MAX_NAME_LENGTH);
     warnClientID = new QLineEdit(clientID);
+    warnClientID->setMaxLength(MAX_NAME_LENGTH);
     warningOption = new QComboBox();
     warningOption->addItem("");
 

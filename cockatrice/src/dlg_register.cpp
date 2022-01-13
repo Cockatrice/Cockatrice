@@ -2,6 +2,7 @@
 
 #include "pb/serverinfo_user.pb.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QCheckBox>
 #include <QDebug>
@@ -20,32 +21,39 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(servers.getHostname());
+    hostEdit->setMaxLength(MAX_NAME_LENGTH);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
     portEdit = new QLineEdit(servers.getPort());
+    portEdit->setValidator(new QIntValidator(0, 0xffff, portEdit));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
     playernameEdit = new QLineEdit(servers.getPlayerName());
+    playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
     passwordEdit = new QLineEdit();
+    passwordEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
     passwordConfirmationLabel = new QLabel(tr("Password (again):"));
     passwordConfirmationEdit = new QLineEdit();
+    passwordConfirmationEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordConfirmationLabel->setBuddy(passwordConfirmationEdit);
     passwordConfirmationEdit->setEchoMode(QLineEdit::Password);
 
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
+    emailEdit->setMaxLength(MAX_NAME_LENGTH);
     emailLabel->setBuddy(emailEdit);
 
     emailConfirmationLabel = new QLabel(tr("Email (again):"));
     emailConfirmationEdit = new QLineEdit();
+    emailConfirmationEdit->setMaxLength(MAX_NAME_LENGTH);
     emailConfirmationLabel->setBuddy(emailConfirmationEdit);
 
     countryLabel = new QLabel(tr("Country:"));
@@ -308,6 +316,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
     realnameLabel = new QLabel(tr("Real name:"));
     realnameEdit = new QLineEdit();
+    realnameEdit->setMaxLength(MAX_NAME_LENGTH);
     realnameLabel->setBuddy(realnameEdit);
 
     QGridLayout *grid = new QGridLayout;

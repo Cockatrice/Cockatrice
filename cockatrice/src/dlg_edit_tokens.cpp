@@ -3,6 +3,7 @@
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "main.h"
+#include "stringsizes.h"
 
 #include <QAction>
 #include <QComboBox>
@@ -23,6 +24,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
 {
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
+    nameEdit->setMaxLength(MAX_NAME_LENGTH);
     nameEdit->setEnabled(false);
     nameLabel->setBuddy(nameEdit);
 
@@ -40,11 +42,13 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
 
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;
+    ptEdit->setMaxLength(MAX_NAME_LENGTH);
     ptLabel->setBuddy(ptEdit);
     connect(ptEdit, SIGNAL(textChanged(QString)), this, SLOT(ptChanged(QString)));
 
     annotationLabel = new QLabel(tr("&Annotation:"));
     annotationEdit = new QLineEdit;
+    annotationEdit->setMaxLength(MAX_NAME_LENGTH);
     annotationLabel->setBuddy(annotationEdit);
     connect(annotationEdit, SIGNAL(textChanged(QString)), this, SLOT(annotationChanged(QString)));
 

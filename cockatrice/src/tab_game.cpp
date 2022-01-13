@@ -52,6 +52,7 @@
 #include "playerlistwidget.h"
 #include "replay_timeline_widget.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "tab_supervisor.h"
 #include "window_main.h"
 #include "zoneviewwidget.h"
@@ -1823,6 +1824,7 @@ void TabGame::createMessageDock(bool bReplay)
 
         sayLabel = new QLabel;
         sayEdit = new LineEditCompleter;
+        sayEdit->setMaxLength(MAX_TEXT_LENGTH);
         sayLabel->setBuddy(sayEdit);
         completer = new QCompleter(autocompleteUserList, sayEdit);
         completer->setCaseSensitivity(Qt::CaseInsensitive);

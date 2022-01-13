@@ -56,6 +56,7 @@
 #include "playertarget.h"
 #include "settingscache.h"
 #include "stackzone.h"
+#include "stringsizes.h"
 #include "tab_game.h"
 #include "tablezone.h"
 #include "thememanager.h"
@@ -3032,16 +3033,21 @@ void Player::actSetPT()
             oldPT = card->getPT();
         }
     }
-    bool ok;
+    QInputDialog *ptDialog = new QInputDialog(game);
+    ptDialog->setWindowTitle(tr("Change power/toughness"));
+    ptDialog->setLabelText(tr("Change stats to:"));
+    ptDialog->setTextValue(oldPT);
+    // find the qlineedit that this dialog holds, there should be only one
+    ptDialog->findChild<QLineEdit *>()->setMaxLength(MAX_NAME_LENGTH);
+
     dialogSemaphore = true;
-    QString pt = QInputDialog::getText(game, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
-                                       oldPT, &ok);
+    bool ok = ptDialog->exec();
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
     }
 
-    const auto ptList = parsePT(pt);
+    const auto ptList = parsePT(ptDialog->textValue());
     bool empty = ptList.isEmpty();
 
     QList<const ::google::protobuf::Message *> commandList;
@@ -3141,7 +3147,8 @@ void Player::actSetAnnotation()
     bool ok;
     dialogSemaphore = true;
     QString annotation = QInputDialog::getMultiLineText(game, tr("Set annotation"),
-                                                        tr("Please enter the new annotation:"), oldAnnotation, &ok);
+                                                        tr("Please enter the new annotation:"), oldAnnotation, &ok)
+                             .left(MAX_NAME_LENGTH);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
