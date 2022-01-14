@@ -176,9 +176,15 @@ void TabDeckStorage::actUpload()
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 
+    QString deckString;
     DeckLoader deck;
-    if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat)) {
-        QMessageBox::critical(this, tr("Invalid deck file"), tr("Deck could not be uploaded to the server"));
+    bool error = !deck.loadFromFile(filePath, DeckLoader::CockatriceFormat);
+    if (!error) {
+        deckString = deck.writeToString_Native();
+        error = deckString.length() > MAX_FILE_LENGTH;
+    }
+    if (error) {
+        QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
     }
 
@@ -196,12 +202,6 @@ void TabDeckStorage::actUpload()
         deck.setName(deck.getName().left(MAX_NAME_LENGTH));
     }
 
-    QString deckString = deck.writeToString_Native();
-    if (deckString.length() > MAX_FILE_LENGTH) {
-        QMessageBox::critical(this, tr("Invalid deck file"), tr("Deck could not be uploaded to the server"));
-        return;
-    }
-
     Command_DeckUpload cmd;
     cmd.set_path(targetPath.toStdString());
     cmd.set_deck_list(deckString.toStdString());
@@ -216,7 +216,7 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
 {
     if (r.response_code() != Response::RespOk) {
         qCritical() << "failed to upload deck:" << r.response_code();
-        QMessageBox::critical(this, tr("Could not upload deck"), tr("Failed to upload deck to server"));
+        QMessageBox::critical(this, tr("Error"), tr("Failed to upload deck to server"));
         return;
     }
 
