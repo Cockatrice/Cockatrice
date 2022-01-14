@@ -4,6 +4,7 @@
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
 #include "gamesmodel.h"
+#include "gettextwithmax.h"
 #include "pb/response.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
@@ -243,7 +244,7 @@ void GameSelector::actJoin()
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
-        password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
+        password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
         if (!ok)
             return;
     }

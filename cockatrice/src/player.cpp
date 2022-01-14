@@ -10,6 +10,7 @@
 #include "deck_loader.h"
 #include "dlg_create_token.h"
 #include "gamescene.h"
+#include "gettextwithmax.h"
 #include "handcounter.h"
 #include "handzone.h"
 #include "main.h"
@@ -3033,21 +3034,16 @@ void Player::actSetPT()
             oldPT = card->getPT();
         }
     }
-    QInputDialog *ptDialog = new QInputDialog(game);
-    ptDialog->setWindowTitle(tr("Change power/toughness"));
-    ptDialog->setLabelText(tr("Change stats to:"));
-    ptDialog->setTextValue(oldPT);
-    // find the qlineedit that this dialog holds, there should be only one
-    ptDialog->findChild<QLineEdit *>()->setMaxLength(MAX_NAME_LENGTH);
-
+    bool ok;
     dialogSemaphore = true;
-    bool ok = ptDialog->exec();
+    QString pt =
+        getTextWithMax(game, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal, oldPT, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
     }
 
-    const auto ptList = parsePT(ptDialog->textValue());
+    const auto ptList = parsePT(pt);
     bool empty = ptList.isEmpty();
 
     QList<const ::google::protobuf::Message *> commandList;

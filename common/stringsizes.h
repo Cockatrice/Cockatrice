@@ -1,4 +1,7 @@
 // max sizes of strings used in the protocol
+#ifndef STRINGSIZES_H
+#define STRINGSIZES_H
+
 #include <QString>
 #include <QtMath>
 
@@ -22,3 +25,5 @@ static inline QString fileFromStdString(const std::string &_string)
 {
     return QString::fromUtf8(_string.data(), std::min(int(_string.size()), MAX_FILE_LENGTH));
 }
+
+#endif // STRINGSIZES_H

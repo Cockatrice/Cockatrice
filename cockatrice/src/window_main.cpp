@@ -31,6 +31,7 @@
 #include "dlg_tip_of_the_day.h"
 #include "dlg_update.h"
 #include "dlg_viewlog.h"
+#include "gettextwithmax.h"
 #include "localclient.h"
 #include "localserver.h"
 #include "localserverinterface.h"
@@ -426,10 +427,10 @@ void MainWindow::loginError(Response::ResponseCode r,
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
-            QString token = QInputDialog::getText(this, tr("Account activation"),
-                                                  tr("Your account has not been activated yet.\nYou need to provide "
-                                                     "the activation token received in the activation email."),
-                                                  QLineEdit::Normal, QString(), &ok);
+            QString token = getTextWithMax(this, tr("Account activation"),
+                                           tr("Your account has not been activated yet.\nYou need to provide "
+                                              "the activation token received in the activation email."),
+                                           QLineEdit::Normal, QString(), &ok);
             if (ok && !token.isEmpty()) {
                 client->activateToServer(token);
                 return;

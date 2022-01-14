@@ -1,6 +1,7 @@
 #include "dlg_settings.h"
 
 #include "carddatabase.h"
+#include "gettextwithmax.h"
 #include "main.h"
 #include "releasechannel.h"
 #include "sequenceEdit/sequenceedit.h"
@@ -76,12 +77,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setPixmapCacheSize(int)));
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings,
-            SLOT(setUpdateReleaseChannel(int)));
-    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &settings,
-            SLOT(setNotifyAboutUpdate(int)));
-    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &settings,
-            SLOT(setNotifyAboutNewVersion(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
+    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setNotifyAboutUpdate(int)));
+    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setNotifyAboutNewVersion(int)));
     connect(&showTipsOnStartup, SIGNAL(clicked(bool)), &settings, SLOT(setShowTipsOnStartup(bool)));
 
     auto *personalGrid = new QGridLayout;
@@ -949,7 +947,8 @@ void MessagesSettingsPage::storeSettings()
 void MessagesSettingsPage::actAdd()
 {
     bool ok;
-    QString msg = QInputDialog::getText(this, tr("Add message"), tr("Message:"), QLineEdit::Normal, QString(), &ok);
+    QString msg =
+        getTextWithMax(this, tr("Add message"), tr("Message:"), QLineEdit::Normal, QString(), &ok, MAX_TEXT_LENGTH);
     if (ok) {
         messageList->addItem(msg);
         storeSettings();
@@ -961,7 +960,8 @@ void MessagesSettingsPage::actEdit()
     if (messageList->currentItem()) {
         QString oldText = messageList->currentItem()->text();
         bool ok;
-        QString msg = QInputDialog::getText(this, tr("Edit message"), tr("Message:"), QLineEdit::Normal, oldText, &ok);
+        QString msg =
+            getTextWithMax(this, tr("Edit message"), tr("Message:"), QLineEdit::Normal, oldText, &ok, MAX_TEXT_LENGTH);
         if (ok) {
             messageList->currentItem()->setText(msg);
             storeSettings();

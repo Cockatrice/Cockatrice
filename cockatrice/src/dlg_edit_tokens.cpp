@@ -2,6 +2,7 @@
 
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
+#include "gettextwithmax.h"
 #include "main.h"
 #include "stringsizes.h"
 
@@ -146,9 +147,8 @@ void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QMod
 void DlgEditTokens::actAddToken()
 {
     QString name;
-    bool askAgain = true;
-    do {
-        name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
+    for (;;) {
+        name = getTextWithMax(this, tr("Add token"), tr("Please enter the name of the token:"));
         if (name.isEmpty())
             return;
         if (databaseModel->getDatabase()->getCard(name)) {
@@ -156,9 +156,9 @@ void DlgEditTokens::actAddToken()
                                   tr("The chosen name conflicts with an existing card or token.\nMake sure to enable "
                                      "the 'Token' set in the \"Manage sets\" dialog to display them correctly."));
         } else {
-            askAgain = false;
+            break;
         }
-    } while (askAgain);
+    }
 
     QString setName = CardDatabase::TOKENS_SETNAME;
     CardInfoPerSetMap sets;

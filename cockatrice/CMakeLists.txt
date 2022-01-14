@@ -5,126 +5,127 @@
 PROJECT(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 SET(cockatrice_SOURCES
+    src/abstractcarddragitem.cpp
+    src/abstractcarditem.cpp
+    src/abstractclient.cpp
     src/abstractcounter.cpp
+    src/abstractgraphicsitem.cpp
+    src/arrowitem.cpp
+    src/arrowtarget.cpp
+    src/carddatabase.cpp
+    src/carddatabasemodel.cpp
+    src/carddbparser/carddatabaseparser.cpp
+    src/carddbparser/cockatricexml3.cpp
+    src/carddbparser/cockatricexml4.cpp
+    src/carddragitem.cpp
+    src/cardfilter.cpp
+    src/cardframe.cpp
+    src/cardinfopicture.cpp
+    src/cardinfotext.cpp
+    src/cardinfowidget.cpp
+    src/carditem.cpp
+    src/cardlist.cpp
+    src/cardzone.cpp
+    src/chatview/chatview.cpp
     src/counter_general.cpp
-    src/dlg_creategame.cpp
-    src/dlg_filter_games.cpp
+    src/customlineedit.cpp
+    src/deck_loader.cpp
+    src/decklistmodel.cpp
+    src/deckstats_interface.cpp
+    src/deckview.cpp
     src/dlg_connect.cpp
     src/dlg_create_token.cpp
+    src/dlg_creategame.cpp
     src/dlg_edit_avatar.cpp
     src/dlg_edit_password.cpp
     src/dlg_edit_tokens.cpp
     src/dlg_edit_user.cpp
+    src/dlg_filter_games.cpp
+    src/dlg_forgotpasswordchallenge.cpp
     src/dlg_forgotpasswordrequest.cpp
     src/dlg_forgotpasswordreset.cpp
-    src/dlg_forgotpasswordchallenge.cpp
-    src/dlg_manage_sets.cpp
-    src/dlg_register.cpp
-    src/dlg_tip_of_the_day.cpp
-    src/tip_of_the_day.cpp
-    src/dlg_update.cpp
-    src/dlg_viewlog.cpp
-    src/abstractclient.cpp
-    src/remoteclient.cpp
-    src/main.cpp
-    src/window_main.cpp
-    src/gamesmodel.cpp
-    src/player.cpp
-    src/playertarget.cpp
-    src/cardzone.cpp
-    src/selectzone.cpp
-    src/cardlist.cpp
-    src/abstractcarditem.cpp
-    src/carditem.cpp
-    src/tablezone.cpp
-    src/handzone.cpp
-    src/handcounter.cpp
-    src/carddatabase.cpp
-    src/keysignals.cpp
-    src/gameview.cpp
-    src/gameselector.cpp
-    src/decklistmodel.cpp
-    src/deck_loader.cpp
     src/dlg_load_deck_from_clipboard.cpp
     src/dlg_load_remote_deck.cpp
-    src/cardinfowidget.cpp
-    src/cardframe.cpp
-    src/cardinfopicture.cpp
-    src/cardinfotext.cpp
-    src/filterbuilder.cpp
-    src/cardfilter.cpp
-    src/filtertreemodel.cpp
-    src/filtertree.cpp
-    src/messagelogwidget.cpp
-    src/zoneviewzone.cpp
-    src/zoneviewwidget.cpp
-    src/pilezone.cpp
-    src/stackzone.cpp
-    src/carddragitem.cpp
-    src/carddatabasemodel.cpp
-    src/setsmodel.cpp
-    src/abstractgraphicsitem.cpp
-    src/abstractcarddragitem.cpp
+    src/dlg_manage_sets.cpp
+    src/dlg_register.cpp
     src/dlg_settings.cpp
-    src/phasestoolbar.cpp
+    src/dlg_tip_of_the_day.cpp
+    src/dlg_update.cpp
+    src/dlg_viewlog.cpp
+    src/filter_string.cpp
+    src/filterbuilder.cpp
+    src/filtertree.cpp
+    src/filtertreemodel.cpp
     src/gamescene.cpp
-    src/arrowitem.cpp
-    src/arrowtarget.cpp
-    src/tab.cpp
-    src/tab_server.cpp
-    src/tab_room.cpp
-    src/tab_message.cpp
-    src/tab_game.cpp
-    src/tab_deck_storage.cpp
-    src/tab_replays.cpp
-    src/tab_supervisor.cpp
-    src/tab_admin.cpp
-    src/tab_account.cpp
-    src/tab_deck_editor.cpp
-    src/tab_logs.cpp
-    src/replay_timeline_widget.cpp
-    src/deckstats_interface.cpp
-    src/tappedout_interface.cpp
-    src/chatview/chatview.cpp
-    src/userlist.cpp
-    src/userinfobox.cpp
-    src/user_context_menu.cpp
-    src/remotedecklist_treewidget.cpp
-    src/remotereplaylist_treewidget.cpp
-    src/deckview.cpp
-    src/playerlistwidget.cpp
-    src/pixmapgenerator.cpp
-    src/settingscache.cpp
-    src/thememanager.cpp
+    src/gameselector.cpp
+    src/gamesmodel.cpp
+    src/gameview.cpp
+    src/gettextwithmax.cpp
+    src/handcounter.cpp
+    src/handle_public_servers.cpp
+    src/handzone.cpp
+    src/keysignals.cpp
+    src/lineeditcompleter.cpp
+    src/localclient.cpp
     src/localserver.cpp
     src/localserverinterface.cpp
-    src/localclient.cpp
-    src/soundengine.cpp
+    src/logger.cpp
+    src/main.cpp
+    src/messagelogwidget.cpp
     src/pending_command.cpp
+    src/phase.cpp
+    src/phasestoolbar.cpp
     src/pictureloader.cpp
-    src/shortcutssettings.cpp
+    src/pilezone.cpp
+    src/pixmapgenerator.cpp
+    src/player.cpp
+    src/playerlistwidget.cpp
+    src/playertarget.cpp
+    src/releasechannel.cpp
+    src/remoteclient.cpp
+    src/remotedecklist_treewidget.cpp
+    src/remotereplaylist_treewidget.cpp
+    src/replay_timeline_widget.cpp
+    src/selectzone.cpp
     src/sequenceEdit/sequenceedit.cpp
-    src/lineeditcompleter.cpp
-    src/settings/settingsmanager.cpp
+    src/setsmodel.cpp
     src/settings/carddatabasesettings.cpp
-    src/settings/serverssettings.cpp
-    src/settings/messagesettings.cpp
+    src/settings/downloadsettings.cpp
     src/settings/gamefilterssettings.cpp
     src/settings/layoutssettings.cpp
-    src/settings/downloadsettings.cpp
-    src/update_downloader.cpp
-    src/logger.cpp
-    src/releasechannel.cpp
-    src/userconnection_information.cpp
+    src/settings/messagesettings.cpp
+    src/settings/serverssettings.cpp
+    src/settings/settingsmanager.cpp
+    src/settingscache.cpp
+    src/shortcutssettings.cpp
+    src/soundengine.cpp
     src/spoilerbackgroundupdater.cpp
-    src/handle_public_servers.cpp
-    src/carddbparser/carddatabaseparser.cpp
-    src/carddbparser/cockatricexml3.cpp
-    src/carddbparser/cockatricexml4.cpp
-    src/filter_string.cpp
-    src/phase.cpp
-    src/customlineedit.cpp
+    src/stackzone.cpp
+    src/tab.cpp
+    src/tab_account.cpp
+    src/tab_admin.cpp
+    src/tab_deck_editor.cpp
+    src/tab_deck_storage.cpp
+    src/tab_game.cpp
+    src/tab_logs.cpp
+    src/tab_message.cpp
+    src/tab_replays.cpp
+    src/tab_room.cpp
+    src/tab_server.cpp
+    src/tab_supervisor.cpp
+    src/tablezone.cpp
+    src/tappedout_interface.cpp
+    src/thememanager.cpp
+    src/tip_of_the_day.cpp
     src/translatecountername.cpp
+    src/update_downloader.cpp
+    src/user_context_menu.cpp
+    src/userconnection_information.cpp
+    src/userinfobox.cpp
+    src/userlist.cpp
+    src/window_main.cpp
+    src/zoneviewwidget.cpp
+    src/zoneviewzone.cpp
     ${VERSION_STRING_CPP}
     )
 
