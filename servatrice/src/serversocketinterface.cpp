@@ -72,6 +72,7 @@
 #include <QHostAddress>
 #include <QRegularExpression>
 #include <QSqlError>
+#include <QtMath>
 #include <QSqlQuery>
 #include <QString>
 #include <iostream>
@@ -422,15 +423,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
 
     sqlInterface->checkSql();
 
-    int folderId = getDeckPathId(nameFromStdString(cmd.path()));
+    QString path = nameFromStdString(cmd.path());
+    int folderId = getDeckPathId(path);
     if (folderId == -1)
         return Response::RespNameNotFound;
+
+    QString name = nameFromStdString(cmd.dir_name());
+    if (path.length() + name.length() + 1 > MAX_NAME_LENGTH)
+        return Response::RespContextError; // do not allow creation of paths that would be too long to delete
 
     QSqlQuery *query = sqlInterface->prepareQuery(
         "insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
     query->bindValue(":id_parent", folderId);
     query->bindValue(":id_user", userInfo->id());
-    query->bindValue(":name", nameFromStdString(cmd.dir_name()));
+    query->bindValue(":name", name);
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespContextError;
     return Response::RespOk;
@@ -519,7 +525,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     sqlInterface->checkSql();
 
     QString deckStr = fileFromStdString(cmd.deck_list());
-    DeckList deck(deckStr);
+    DeckList deck;
+    if (!deck.loadFromString_Native(deckStr))
+        return Response::RespContextError;
 
     QString deckName = deck.getName();
     if (deckName.isEmpty())
@@ -826,8 +834,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
     foreach (QString warning, warningsList) {
         re->add_warning(warning.toStdString());
     }
-    re->set_user_name(cmd.user_name());
-    re->set_user_clientid(cmd.user_clientid());
+    re->set_user_name(nameFromStdString(cmd.user_name()).toStdString());
+    re->set_user_clientid(nameFromStdString(cmd.user_clientid()).toStdString());
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
@@ -879,7 +887,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
         if (user != nullptr) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::WARNING);
-            event.set_warning_reason(cmd.reason());
+            event.set_warning_reason(warningReason.toStdString());
             SessionEvent *se = user->prepareSessionEvent(event);
             user->sendProtocolItem(*se);
             delete se;
@@ -908,6 +916,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     QString userName = nameFromStdString(cmd.user_name()).simplified();
     QString address = nameFromStdString(cmd.address()).simplified();
     QString clientId = nameFromStdString(cmd.clientid()).simplified();
+    QString visibleReason = textFromStdString(cmd.visible_reason());
 
     if (userName.isEmpty() && address.isEmpty() && clientId.isEmpty())
         return Response::RespOk;
@@ -929,7 +938,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     query->bindValue(":id_admin", userInfo->id());
     query->bindValue(":minutes", minutes);
     query->bindValue(":reason", textFromStdString(cmd.reason()));
-    query->bindValue(":visible_reason", textFromStdString(cmd.visible_reason()));
+    query->bindValue(":visible_reason", visibleReason);
     query->bindValue(":client_id", nameFromStdString(cmd.clientid()));
     sqlInterface->execSqlQuery(query);
 
@@ -967,7 +976,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::BANNED);
         if (cmd.has_visible_reason())
-            event.set_reason_str(cmd.visible_reason());
+            event.set_reason_str(visibleReason.toStdString());
         if (minutes)
             event.set_end_time(QDateTime::currentDateTime().addSecs(60 * minutes).toTime_t());
         for (int i = 0; i < userList.size(); ++i) {
@@ -1260,9 +1269,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
-    userInfo->set_real_name(cmd.real_name());
-    userInfo->set_email(cmd.email());
-    userInfo->set_country(cmd.country());
+    userInfo->set_real_name(realName.toStdString());
+    userInfo->set_email(emailAddress.toStdString());
+    userInfo->set_country(country.toStdString());
 
     return Response::RespOk;
 }
@@ -1273,7 +1282,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QByteArray image(cmd.image().c_str(), cmd.image().length());
+    size_t length = qMin(cmd.image().length(), (size_t)MAX_FILE_LENGTH);
+    QByteArray image(cmd.image().c_str(), length);
     int id = userInfo->id();
 
     QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
@@ -1282,7 +1292,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
-    userInfo->set_avatar_bmp(cmd.image().c_str(), cmd.image().length());
+    userInfo->set_avatar_bmp(cmd.image().c_str(), length);
     return Response::RespOk;
 }
 

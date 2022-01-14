@@ -3,6 +3,7 @@
 #include "abstractclient.h"
 #include "deck_loader.h"
 #include "decklist.h"
+#include "gettextwithmax.h"
 #include "pb/command_deck_del.pb.h"
 #include "pb/command_deck_del_dir.pb.h"
 #include "pb/command_deck_download.pb.h"
@@ -17,6 +18,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QDebug>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -127,6 +129,24 @@ void TabDeckStorage::retranslateUi()
     aDeleteRemoteDeck->setText(tr("Delete"));
 }
 
+QString TabDeckStorage::getTargetPath() const
+{
+    RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
+    if (curRight == nullptr)
+        return {};
+    auto *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
+    if (dir == nullptr) {
+        dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight->getParent());
+        if (dir != nullptr) {
+            return dir->getPath();
+        } else {
+            return {};
+        }
+    } else {
+        return dir->getPath();
+    }
+}
+
 void TabDeckStorage::actOpenLocalDeck()
 {
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
@@ -146,35 +166,45 @@ void TabDeckStorage::actUpload()
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (localDirModel->isDir(curLeft))
         return;
+    QString targetPath = getTargetPath();
+    if (targetPath.length() > MAX_NAME_LENGTH) {
+        qCritical() << "target path to upload to is too long" << targetPath;
+        return;
+    }
+
     QString filePath = localDirModel->filePath(curLeft);
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
+
     DeckLoader deck;
-    if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat))
+    if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat)) {
+        QMessageBox::critical(this, tr("Invalid deck file"), tr("Deck could not be uploaded to the server"));
         return;
+    }
+
     if (deck.getName().isEmpty()) {
         bool ok;
-        QString deckName = QInputDialog::getText(this, tr("Enter deck name"),
-                                                 tr("This decklist does not have a name.\nPlease enter a name:"),
-                                                 QLineEdit::Normal, deckFileInfo.completeBaseName(), &ok);
+        QString deckName =
+            getTextWithMax(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"),
+                           QLineEdit::Normal, deckFileInfo.completeBaseName(), &ok);
         if (!ok)
             return;
         if (deckName.isEmpty())
             deckName = tr("Unnamed deck");
         deck.setName(deckName);
+    } else {
+        deck.setName(deck.getName().left(MAX_NAME_LENGTH));
     }
 
-    QString targetPath;
-    RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
-    if (!curRight)
+    QString deckString = deck.writeToString_Native();
+    if (deckString.length() > MAX_FILE_LENGTH) {
+        QMessageBox::critical(this, tr("Invalid deck file"), tr("Deck could not be uploaded to the server"));
         return;
-    if (!dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight))
-        curRight = curRight->getParent();
-    targetPath = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight)->getPath();
+    }
 
     Command_DeckUpload cmd;
     cmd.set_path(targetPath.toStdString());
-    cmd.set_deck_list(deck.writeToString_Native().toStdString());
+    cmd.set_deck_list(deckString.toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
@@ -184,8 +214,11 @@ void TabDeckStorage::actUpload()
 
 void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &commandContainer)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
+        qCritical() << "failed to upload deck:" << r.response_code();
+        QMessageBox::critical(this, tr("Could not upload deck"), tr("Failed to upload deck to server"));
         return;
+    }
 
     const Response_DeckUpload &resp = r.GetExtension(Response_DeckUpload::ext);
     const Command_DeckUpload &cmd = commandContainer.session_command(0).GetExtension(Command_DeckUpload::ext);
@@ -282,7 +315,13 @@ void TabDeckStorage::downloadFinished(const Response &r,
 
 void TabDeckStorage::actNewFolder()
 {
-    QString folderName = QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"));
+    QString targetPath = getTargetPath();
+    int max_length = MAX_NAME_LENGTH - targetPath.length() - 1; // generated length would be path + / + name
+
+    if (max_length < 1) // can't create path that's short enough
+        return;
+
+    QString folderName = getTextWithMax(this, tr("New folder"), tr("Name of new folder:"), max_length);
     if (folderName.isEmpty())
         return;
 
@@ -290,15 +329,6 @@ void TabDeckStorage::actNewFolder()
     // character.
     std::string folder = folderName.toStdString();
     std::replace(folder.begin(), folder.end(), '/', '-');
-
-    QString targetPath;
-    RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
-    if (!curRight)
-        return;
-    if (!dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight))
-        curRight = curRight->getParent();
-    RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
-    targetPath = dir->getPath();
 
     Command_DeckNewDir cmd;
     cmd.set_path(targetPath.toStdString());
@@ -328,15 +358,19 @@ void TabDeckStorage::actDeleteRemoteDeck()
         return;
     RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
     if (dir) {
-        QString path = dir->getPath();
-        if (path.isEmpty())
+        QString targetPath = dir->getPath();
+        if (targetPath.isEmpty())
             return;
+        if (targetPath.length() > MAX_NAME_LENGTH) {
+            qCritical() << "target path to delete is too long" << targetPath;
+            return;
+        }
         if (QMessageBox::warning(this, tr("Delete remote folder"),
-                                 tr("Are you sure you want to delete \"%1\"?").arg(path),
+                                 tr("Are you sure you want to delete \"%1\"?").arg(targetPath),
                                  QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
             return;
         Command_DeckDelDir cmd;
-        cmd.set_path(path.toStdString());
+        cmd.set_path(targetPath.toStdString());
         pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(deleteFolderFinished(Response, CommandContainer)));

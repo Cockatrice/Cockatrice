@@ -462,7 +462,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QMap<QString, bool> receivedClientFeatures;
     QMap<QString, bool> missingClientFeatures;
 
-    for (int i = 0; i < cmd.clientfeatures().size(); ++i) {
+    int featureCount = qMin(cmd.clientfeatures().size(), MAX_NAME_LENGTH);
+    for (int i = 0; i < featureCount; ++i) {
         receivedClientFeatures.insert(nameFromStdString(cmd.clientfeatures(i)).simplified(), false);
     }
 
@@ -766,11 +767,11 @@ bool Server_ProtocolHandler::addSaidMessageSize(int size)
 Response::ResponseCode
 Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer & /*rc*/)
 {
-    QString msg = QString::fromStdString(cmd.message());
-
-    if (!addSaidMessageSize(msg.size())) {
+    if (!addSaidMessageSize(cmd.message().size())) {
         return Response::RespChatFlood;
     }
+    QString msg = QString::fromStdString(cmd.message());
+
     msg.replace(QChar('\n'), QChar(' '));
 
     room->say(QString::fromStdString(userInfo->name()), msg);
@@ -808,7 +809,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     }
 
     QList<int> gameTypes;
-    for (int i = cmd.game_type_ids_size() - 1; i >= 0; --i) { // FIXME: why are these iterated in reverse?
+    int gameTypeCount = qMin(cmd.game_type_ids().size(), MAX_NAME_LENGTH);
+    for (int i = 0; i < gameTypeCount; ++i) { // the client actually only sends one of these
         gameTypes.append(cmd.game_type_ids(i));
     }
 
