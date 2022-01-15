@@ -29,6 +29,12 @@ TEST(AgeFormatting, LeapDayWithYear)
     auto got = UserInfoBox::getDaysAndYearsBetween(QDate(2000, 2, 28), QDate(2001, 3, 1));
     ASSERT_EQ(got, dayyear(1, 1)) << "there is a leap day in between these days but not in the last year";
 }
+
+TEST(AgeFormatting, LeapDayThisYear)
+{
+    auto got = UserInfoBox::getDaysAndYearsBetween(QDate(2003, 2, 28), QDate(2004, 3, 1));
+    ASSERT_EQ(got, dayyear(2, 1)) << "there is a leap day in between these days this year";
+}
 } // namespace
 
 int main(int argc, char **argv)
