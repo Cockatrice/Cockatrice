@@ -122,28 +122,35 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QString accountAgeString = tr("Unregistered user");
     if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) ||
         userLevel.testFlag(ServerInfo_User::IsRegistered)) {
-        accountAgeString = tr("Unknown");
-        if (user.accountage_secs() != 0) {
-            auto date = QDateTime::fromTime_t(QDateTime::currentSecsSinceEpoch() - user.accountage_secs()).date();
-            if (date.isValid()) {
-                QString dateString = QLocale().toString(date, QLocale::ShortFormat);
-                auto now = QDate::currentDate();
-                int years = now.addDays(-date.dayOfYear()).year() - date.year(); // there is no yearsTo
-                int days = date.addYears(years).daysTo(now);
-
-                QString yearString;
-                if (years > 0) {
-                    yearString = tr("%n Year(s), ", "amount of years (only shown if more than 0)", years);
-                }
-                accountAgeString =
-                    tr("%10%n Day(s) %20",
-                       "amount of years (if more than 0), amount of days, date in local short format", days)
-                        .arg(yearString)
-                        .arg(dateString);
-            }
-        }
+        accountAgeString = getAgeString(user.accountage_secs());
     }
     accountAgeLabel2.setText(accountAgeString);
+}
+
+QString UserInfoBox::getAgeString(int ageSeconds)
+{
+    QString accountAgeString = tr("Unknown");
+    if (ageSeconds == 0)
+        return accountAgeString;
+
+    auto date = QDateTime::fromTime_t(QDateTime::currentSecsSinceEpoch() - ageSeconds).date();
+    if (!date.isValid())
+        return accountAgeString;
+
+    QString dateString = QLocale().toString(date, QLocale::ShortFormat);
+    auto now = QDate::currentDate();
+    auto daysAndYears = getDaysAndYearsBetween(date, now);
+
+    QString yearString;
+    if (daysAndYears.second > 0) {
+        yearString = tr("%n Year(s), ", "amount of years (only shown if more than 0)", daysAndYears.second);
+    }
+    accountAgeString =
+        tr("%10%n Day(s) %20", "amount of years (if more than 0), amount of days, date in local short format",
+           daysAndYears.first)
+            .arg(yearString)
+            .arg(dateString);
+    return accountAgeString;
 }
 
 void UserInfoBox::updateInfo(const QString &userName)

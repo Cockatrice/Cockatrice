@@ -1,6 +1,7 @@
 #ifndef USERINFOBOX_H
 #define USERINFOBOX_H
 
+#include <QDateTime>
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
@@ -20,9 +21,18 @@ private:
     QPushButton editButton, passwordButton, avatarButton;
     QPixmap avatarPixmap;
 
+    static QString getAgeString(int ageSeconds);
+
 public:
     UserInfoBox(AbstractClient *_client, bool editable, QWidget *parent = nullptr, Qt::WindowFlags flags = {});
     void retranslateUi();
+
+    inline static QPair<int, int> getDaysAndYearsBetween(QDate then, QDate now)
+    {
+        int years = now.addDays(-then.dayOfYear()).year() - then.year(); // there is no yearsTo
+        int days = then.addYears(years).daysTo(now);
+        return {days, years};
+    }
 private slots:
     void processResponse(const Response &r);
     void processEditResponse(const Response &r);
