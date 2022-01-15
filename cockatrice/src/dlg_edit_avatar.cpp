@@ -1,5 +1,7 @@
 #include "dlg_edit_avatar.h"
 
+#include "stringsizes.h"
+
 #include <QBuffer>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -75,6 +77,13 @@ QByteArray DlgEditAvatar::getImage()
     QByteArray ba;
     QBuffer buffer(&ba);
     buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "JPG");
-    return ba;
+    for (;;) {
+        image.save(&buffer, "JPG");
+        if (ba.length() > MAX_FILE_LENGTH) {
+            ba.clear();
+            image = image.scaledToWidth(image.width() / 2); // divide the amount of pixels in four to get the size down
+        } else {
+            return ba;
+        }
+    }
 }

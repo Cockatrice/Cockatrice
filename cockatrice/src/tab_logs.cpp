@@ -6,6 +6,7 @@
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
 #include "pending_command.h"
+#include "stringsizes.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -148,18 +149,23 @@ void TabLog::createDock()
 {
     labelFindUserName = new QLabel(tr("Username: "));
     findUsername = new LineEditUnfocusable("");
+    findUsername->setMaxLength(MAX_NAME_LENGTH);
     findUsername->setAlignment(Qt::AlignCenter);
     labelFindIPAddress = new QLabel(tr("IP Address: "));
     findIPAddress = new LineEditUnfocusable("");
+    findIPAddress->setMaxLength(MAX_NAME_LENGTH);
     findIPAddress->setAlignment(Qt::AlignCenter);
     labelFindGameName = new QLabel(tr("Game Name: "));
     findGameName = new LineEditUnfocusable("");
+    findGameName->setMaxLength(MAX_NAME_LENGTH);
     findGameName->setAlignment(Qt::AlignCenter);
     labelFindGameID = new QLabel(tr("GameID: "));
     findGameID = new LineEditUnfocusable("");
+    findGameID->setMaxLength(MAX_NAME_LENGTH);
     findGameID->setAlignment(Qt::AlignCenter);
     labelMessage = new QLabel(tr("Message: "));
     findMessage = new LineEditUnfocusable("");
+    findMessage->setMaxLength(MAX_TEXT_LENGTH);
     findMessage->setAlignment(Qt::AlignCenter);
 
     mainRoom = new QCheckBox(tr("Main Room"));
