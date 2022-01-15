@@ -67,8 +67,6 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     setWindowTitle(tr("User Information"));
     setLayout(mainLayout);
     retranslateUi();
-    setFixedHeight(sizeHint().height());
-    setFixedWidth(sizeHint().width());
 }
 
 void UserInfoBox::retranslateUi()
