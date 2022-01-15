@@ -64,16 +64,16 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
         connect(&avatarButton, SIGNAL(clicked()), this, SLOT(actAvatar()));
     }
 
-    setWindowTitle(tr("User information"));
+    setWindowTitle(tr("User Information"));
     setLayout(mainLayout);
     retranslateUi();
 }
 
 void UserInfoBox::retranslateUi()
 {
-    realNameLabel1.setText(tr("Real name:"));
+    realNameLabel1.setText(tr("Real Name:"));
     countryLabel1.setText(tr("Location:"));
-    userLevelLabel1.setText(tr("User level:"));
+    userLevelLabel1.setText(tr("User Level:"));
     accountAgeLabel1.setText(tr("Account Age:"));
 
     editButton.setText(tr("Edit"));
@@ -98,7 +98,9 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     if (country.length() != 0) {
         countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
-        countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
+		//TODO have some extra width here to not clue the coutnry code right to the flag icon
+        countryLabel2.setAlignment(Qt::AlignCenter);
+        countryLabel3.setText(QString("%1").arg(country.toUpper()));
     } else {
         countryLabel2.setText("");
         countryLabel3.setText("");
@@ -106,6 +108,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     userLevelLabel2.setPixmap(
         UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
+    userLevelLabel2.setAlignment(Qt::AlignCenter);
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
