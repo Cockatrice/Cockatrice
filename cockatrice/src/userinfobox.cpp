@@ -98,7 +98,6 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     if (country.length() != 0) {
         countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
-        // TODO have some extra width here to not clue the coutnry code right to the flag icon
         countryLabel2.setAlignment(Qt::AlignCenter);
         countryLabel3.setText(QString("%1").arg(country.toUpper()));
     } else {
