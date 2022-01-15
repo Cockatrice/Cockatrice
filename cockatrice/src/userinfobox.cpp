@@ -14,16 +14,16 @@
 #include <QLabel>
 #include <QMessageBox>
 
-const qint64 SIXTY = 60;
-const qint64 HOURS_IN_A_DAY = 24;
-const qint64 DAYS_IN_A_YEAR = 365;
+const quint64 SIXTY = 60;
+const quint64 HOURS_IN_A_DAY = 24;
+const quint64 DAYS_IN_A_YEAR = 365;
 
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)
 {
     QFont nameFont = nameLabel.font();
     nameFont.setBold(true);
-    nameFont.setPointSizeF(nameFont.pointSize() * 1.5);
+    nameFont.setPointSizeF(nameFont.pointSizeF() * 1.5);
     nameLabel.setFont(nameFont);
 
     avatarLabel.setMinimumSize(200, 200);
@@ -129,12 +129,12 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         if (user.accountage_secs() == 0)
             accountAgeString = tr("Unknown");
         else {
-            auto seconds = static_cast<qint64>(user.accountage_secs());
-            qint64 minutes = seconds / SIXTY;
-            qint64 hours = minutes / SIXTY;
-            qint64 days = hours / HOURS_IN_A_DAY;
-            qint64 years = days / DAYS_IN_A_YEAR;
-            qint64 daysMinusYears = days - (years * DAYS_IN_A_YEAR);
+            quint64 seconds = user.accountage_secs();
+            quint64 minutes = seconds / SIXTY;
+            quint64 hours = minutes / SIXTY;
+            quint64 days = hours / HOURS_IN_A_DAY;
+            quint64 years = days / DAYS_IN_A_YEAR;
+            quint64 daysMinusYears = days - (years * DAYS_IN_A_YEAR);
 
             accountAgeString = "";
             if (years >= 1) {
