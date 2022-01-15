@@ -43,7 +43,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
     mainLayout->addWidget(&countryLabel1, 4, 0, 1, 1);
-    mainLayout->addWidget(&countryLabel2, 4, 1, 1, 2);
+    mainLayout->addWidget(&countryLabel2, 4, 1, 1, 1);
     mainLayout->addWidget(&countryLabel3, 4, 2, 1, 1);
     mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
     mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1);
