@@ -13,7 +13,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <cmath>
 
 const qint64 SIXTY = 60;
 const qint64 HOURS_IN_A_DAY = 24;
@@ -24,7 +23,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 {
     QFont nameFont = nameLabel.font();
     nameFont.setBold(true);
-    nameFont.setPointSize(std::ceil(nameFont.pointSize() * 1.5));
+    nameFont.setPointSizeF(nameFont.pointSize() * 1.5);
     nameLabel.setFont(nameFont);
 
     avatarLabel.setMinimumSize(200, 200);
@@ -169,6 +168,7 @@ void UserInfoBox::processResponse(const Response &r)
 {
     const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
     updateInfo(response.user_info());
+    resize(sizeHint());
     show();
 }
 
@@ -304,6 +304,5 @@ void UserInfoBox::resizeEvent(QResizeEvent *event)
 {
     QPixmap resizedPixmap = avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     avatarLabel.setPixmap(resizedPixmap);
-    resize(sizeHint());
     QWidget::resizeEvent(event);
 }
