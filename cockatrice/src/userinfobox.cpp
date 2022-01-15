@@ -249,7 +249,7 @@ void UserInfoBox::processEditResponse(const Response &r)
         case Response::RespInternalError:
         default:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("An error occured while trying to update your user informations."));
+                                  tr("An error occurred while trying to update your user information."));
             break;
     }
 }
