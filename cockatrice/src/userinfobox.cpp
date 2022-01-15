@@ -11,7 +11,6 @@
 
 #include <QDateTime>
 #include <QGridLayout>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
 
@@ -24,7 +23,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 {
     QFont nameFont = nameLabel.font();
     nameFont.setBold(true);
-    nameFont.setPointSize(nameFont.pointSize() * 1.5);
+    nameFont.setPointSize(std::ceil(nameFont.pointSize() * 1.5));
     nameLabel.setFont(nameFont);
 
     avatarLabel.setMinimumSize(200, 200);
@@ -90,7 +89,6 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         avatarPixmap =
             UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
     }
-    avatarLabel.setPixmap(avatarPixmap.scaled(400, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
@@ -131,7 +129,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         if (user.accountage_secs() == 0)
             accountAgeString = tr("Unknown");
         else {
-            qint64 seconds = user.accountage_secs();
+            auto seconds = static_cast<qint64>(user.accountage_secs());
             qint64 minutes = seconds / SIXTY;
             qint64 hours = minutes / SIXTY;
             qint64 days = hours / HOURS_IN_A_DAY;
@@ -305,5 +303,6 @@ void UserInfoBox::resizeEvent(QResizeEvent *event)
 {
     QPixmap resizedPixmap = avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     avatarLabel.setPixmap(resizedPixmap);
+    resize(sizeHint());
     QWidget::resizeEvent(event);
 }
