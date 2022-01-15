@@ -13,6 +13,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <cmath>
 
 const qint64 SIXTY = 60;
 const qint64 HOURS_IN_A_DAY = 24;
