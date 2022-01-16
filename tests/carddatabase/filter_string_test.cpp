@@ -1,57 +1,59 @@
-#include "gtest/gtest.h"
 #include "../../cockatrice/src/filter_string.h"
 #include "mocks.h"
 
+#include "gtest/gtest.h"
 #include <cmath>
 
 CardDatabase *db;
 
-#define Query(name, card, query, match) \
-TEST_F(CardQuery, name) {\
-    ASSERT_EQ(FilterString(query).check(card), match);\
-}
-
+#define QUERY(name, card, query, match)                                                                                \
+    TEST_F(CardQuery, name)                                                                                            \
+    {                                                                                                                  \
+        ASSERT_EQ(FilterString(query).check(card), match);                                                             \
+    }
 
 namespace
 {
 
-class CardQuery : public ::testing::Test {
- protected:
-  void SetUp() override {
-     cat = db->getCardBySimpleName("Cat");
-  }
+class CardQuery : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        cat = db->getCardBySimpleName("Cat");
+    }
 
-  // void TearDown() override {}
+    // void TearDown() override {}
 
-  CardData cat;
+    CardData cat;
 };
 
-    Query(Empty, cat, "", true)
-    Query(Typing, cat, "t", true)
+QUERY(Empty, cat, "", true)
+QUERY(Typing, cat, "t", true)
 
-    Query(NonMatchingType, cat, "t:kithkin", false)
-    Query(MatchingType, cat, "t:creature", true)
-    Query(Not1, cat, "not t:kithkin", true)
-    Query(Not2, cat, "not t:creature", false)
-    Query(Case, cat, "t:cReAtUrE", true)
+QUERY(NonMatchingType, cat, "t:kithkin", false)
+QUERY(MatchingType, cat, "t:creature", true)
+QUERY(Not1, cat, "not t:kithkin", true)
+QUERY(Not2, cat, "not t:creature", false)
+QUERY(Case, cat, "t:cReAtUrE", true)
 
-    Query(And, cat, "t:creature t:creature", true)
-    Query(And2, cat, "t:creature t:sorcery", false)
-    
-    Query(Or, cat, "t:bat or t:creature", true)
+QUERY(And, cat, "t:creature t:creature", true)
+QUERY(And2, cat, "t:creature t:sorcery", false)
 
-    Query(Cmc1, cat, "cmc=2", true)
-    Query(Cmc2, cat, "cmc>3", false)
-    Query(Cmc3, cat, "cmc>1", true)
+QUERY(Or, cat, "t:bat or t:creature", true)
 
-    Query(Quotes, cat, "t:\"creature\"", true);
+QUERY(Cmc1, cat, "cmc=2", true)
+QUERY(Cmc2, cat, "cmc>3", false)
+QUERY(Cmc3, cat, "cmc>1", true)
 
-    Query(Field, cat, "pt:\"3/3\"", true)
+QUERY(Quotes, cat, "t:\"creature\"", true)
 
-    Query(Color1, cat, "c:g", true);
-    Query(Color2, cat, "c:gw", true);
-    Query(Color3, cat, "c!g", true);
-    Query(Color4, cat, "c!gw", false);
+QUERY(Field, cat, "pt:\"3/3\"", true)
+
+QUERY(Color1, cat, "c:g", true)
+QUERY(Color2, cat, "c:gw", true)
+QUERY(Color3, cat, "c!g", true)
+QUERY(Color4, cat, "c!gw", false)
 
 } // namespace
 
