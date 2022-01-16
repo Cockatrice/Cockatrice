@@ -1,6 +1,7 @@
 #include "dlg_forgotpasswordreset.h"
 
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QCheckBox>
 #include <QDebug>
@@ -37,27 +38,33 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(lastfphost);
+    hostEdit->setMaxLength(MAX_NAME_LENGTH);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
     portEdit = new QLineEdit(lastfpport);
+    portEdit->setValidator(new QIntValidator(0, 0xffff, portEdit));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
     playernameEdit = new QLineEdit(lastfpplayername);
+    playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
     tokenLabel = new QLabel(tr("Token:"));
     tokenEdit = new QLineEdit();
+    tokenEdit->setMaxLength(MAX_NAME_LENGTH);
     tokenLabel->setBuddy(tokenLabel);
 
     newpasswordLabel = new QLabel(tr("New Password:"));
     newpasswordEdit = new QLineEdit();
+    newpasswordEdit->setMaxLength(MAX_NAME_LENGTH);
     newpasswordLabel->setBuddy(newpasswordEdit);
     newpasswordEdit->setEchoMode(QLineEdit::Password);
 
     newpasswordverifyLabel = new QLabel(tr("New Password:"));
     newpasswordverifyEdit = new QLineEdit();
+    newpasswordverifyEdit->setMaxLength(MAX_NAME_LENGTH);
     newpasswordverifyLabel->setBuddy(newpasswordEdit);
     newpasswordverifyEdit->setEchoMode(QLineEdit::Password);
 

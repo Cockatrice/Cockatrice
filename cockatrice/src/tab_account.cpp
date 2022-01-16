@@ -10,6 +10,7 @@
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
 #include "soundengine.h"
+#include "stringsizes.h"
 #include "userinfobox.h"
 #include "userlist.h"
 
@@ -60,6 +61,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
 
     QHBoxLayout *addToBuddyList = new QHBoxLayout;
     addBuddyEdit = new LineEditUnfocusable;
+    addBuddyEdit->setMaxLength(MAX_NAME_LENGTH);
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
     connect(addBuddyEdit, SIGNAL(returnPressed()), this, SLOT(addToBuddyList()));
     QPushButton *addBuddyButton = new QPushButton("Add");
@@ -69,6 +71,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
 
     QHBoxLayout *addToIgnoreList = new QHBoxLayout;
     addIgnoreEdit = new LineEditUnfocusable;
+    addIgnoreEdit->setMaxLength(MAX_NAME_LENGTH);
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
     connect(addIgnoreEdit, SIGNAL(returnPressed()), this, SLOT(addToIgnoreList()));
     QPushButton *addIgnoreButton = new QPushButton("Add");

@@ -10,6 +10,7 @@
 #include "deck_loader.h"
 #include "dlg_create_token.h"
 #include "gamescene.h"
+#include "gettextwithmax.h"
 #include "handcounter.h"
 #include "handzone.h"
 #include "main.h"
@@ -56,6 +57,7 @@
 #include "playertarget.h"
 #include "settingscache.h"
 #include "stackzone.h"
+#include "stringsizes.h"
 #include "tab_game.h"
 #include "tablezone.h"
 #include "thememanager.h"
@@ -3034,8 +3036,8 @@ void Player::actSetPT()
     }
     bool ok;
     dialogSemaphore = true;
-    QString pt = QInputDialog::getText(game, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
-                                       oldPT, &ok);
+    QString pt =
+        getTextWithMax(game, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal, oldPT, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
@@ -3141,7 +3143,8 @@ void Player::actSetAnnotation()
     bool ok;
     dialogSemaphore = true;
     QString annotation = QInputDialog::getMultiLineText(game, tr("Set annotation"),
-                                                        tr("Please enter the new annotation:"), oldAnnotation, &ok);
+                                                        tr("Please enter the new annotation:"), oldAnnotation, &ok)
+                             .left(MAX_NAME_LENGTH);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;

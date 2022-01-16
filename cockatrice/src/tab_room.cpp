@@ -15,6 +15,7 @@
 #include "pb/serverinfo_room.pb.h"
 #include "pending_command.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"
 #include "userlist.h"
@@ -60,6 +61,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(&SettingsCache::instance(), SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
     sayLabel = new QLabel;
     sayEdit = new LineEditCompleter;
+    sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 

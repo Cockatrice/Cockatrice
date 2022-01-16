@@ -1,6 +1,7 @@
 #include "dlg_connect.h"
 
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "userconnection_information.h"
 
 #include <QCheckBox>
@@ -39,22 +40,27 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     saveLabel = new QLabel(tr("Name:"));
     saveEdit = new QLineEdit;
+    saveEdit->setMaxLength(MAX_NAME_LENGTH);
     saveLabel->setBuddy(saveEdit);
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit;
+    hostEdit->setMaxLength(MAX_NAME_LENGTH);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
     portEdit = new QLineEdit;
+    portEdit->setValidator(new QIntValidator(0, 0xffff, portEdit));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
     playernameEdit = new QLineEdit;
+    playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
     passwordEdit = new QLineEdit;
+    passwordEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 

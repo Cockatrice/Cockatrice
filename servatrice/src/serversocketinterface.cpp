@@ -64,6 +64,7 @@
 #include "server_response_containers.h"
 #include "server_room.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "version_string.h"
 
 #include <QDateTime>
@@ -73,6 +74,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
+#include <QtMath>
 #include <iostream>
 #include <string>
 
@@ -249,8 +251,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QString list = QString::fromStdString(cmd.list());
-    QString user = QString::fromStdString(cmd.user_name());
+    QString list = nameFromStdString(cmd.list());
+    QString user = nameFromStdString(cmd.user_name());
 
     if ((list != "buddy") && (list != "ignore"))
         return Response::RespContextError;
@@ -290,8 +292,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveFromList(const Co
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QString list = QString::fromStdString(cmd.list());
-    QString user = QString::fromStdString(cmd.user_name());
+    QString list = nameFromStdString(cmd.list());
+    QString user = nameFromStdString(cmd.user_name());
 
     if ((list != "buddy") && (list != "ignore"))
         return Response::RespContextError;
@@ -421,15 +423,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
 
     sqlInterface->checkSql();
 
-    int folderId = getDeckPathId(QString::fromStdString(cmd.path()));
+    QString path = nameFromStdString(cmd.path());
+    int folderId = getDeckPathId(path);
     if (folderId == -1)
         return Response::RespNameNotFound;
+
+    QString name = nameFromStdString(cmd.dir_name());
+    if (path.length() + name.length() + 1 > MAX_NAME_LENGTH)
+        return Response::RespContextError; // do not allow creation of paths that would be too long to delete
 
     QSqlQuery *query = sqlInterface->prepareQuery(
         "insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
     query->bindValue(":id_parent", folderId);
     query->bindValue(":id_user", userInfo->id());
-    query->bindValue(":name", QString::fromStdString(cmd.dir_name()));
+    query->bindValue(":name", name);
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespContextError;
     return Response::RespOk;
@@ -478,7 +485,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDelDir(const Comman
 
     sqlInterface->checkSql();
 
-    int basePathId = getDeckPathId(QString::fromStdString(cmd.path()));
+    int basePathId = getDeckPathId(nameFromStdString(cmd.path()));
     if ((basePathId == -1) || (basePathId == 0))
         return Response::RespNameNotFound;
     deckDelDirHelper(basePathId);
@@ -517,15 +524,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
 
     sqlInterface->checkSql();
 
-    QString deckStr = QString::fromStdString(cmd.deck_list());
-    DeckList deck(deckStr);
+    QString deckStr = fileFromStdString(cmd.deck_list());
+    DeckList deck;
+    if (!deck.loadFromString_Native(deckStr))
+        return Response::RespContextError;
 
     QString deckName = deck.getName();
     if (deckName.isEmpty())
         deckName = "Unnamed deck";
 
     if (cmd.has_path()) {
-        int folderId = getDeckPathId(QString::fromStdString(cmd.path()));
+        int folderId = getDeckPathId(nameFromStdString(cmd.path()));
         if (folderId == -1)
             return Response::RespNameNotFound;
 
@@ -724,21 +733,21 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
 {
 
     QList<ServerInfo_ChatMessage> messageList;
-    QString userName = QString::fromStdString(cmd.user_name());
-    QString ipAddress = QString::fromStdString(cmd.ip_address());
-    QString gameName = QString::fromStdString(cmd.game_name());
-    QString gameID = QString::fromStdString(cmd.game_id());
-    QString message = QString::fromStdString(cmd.message());
+    QString userName = nameFromStdString(cmd.user_name());
+    QString ipAddress = nameFromStdString(cmd.ip_address());
+    QString gameName = nameFromStdString(cmd.game_name());
+    QString gameID = nameFromStdString(cmd.game_id());
+    QString message = textFromStdString(cmd.message());
     bool chatType = false;
     bool gameType = false;
     bool roomType = false;
 
     for (int i = 0; i != cmd.log_location_size(); ++i) {
-        if (QString::fromStdString(cmd.log_location(i)).simplified() == "room")
+        if (nameFromStdString(cmd.log_location(i)).simplified() == "room")
             roomType = true;
-        if (QString::fromStdString(cmd.log_location(i)).simplified() == "game")
+        if (nameFromStdString(cmd.log_location(i)).simplified() == "game")
             gameType = true;
-        if (QString::fromStdString(cmd.log_location(i)).simplified() == "chat")
+        if (nameFromStdString(cmd.log_location(i)).simplified() == "chat")
             chatType = true;
     }
 
@@ -801,7 +810,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetBanHistory(const Com
                                                                        ResponseContainer &rc)
 {
     QList<ServerInfo_Ban> banList;
-    QString userName = QString::fromStdString(cmd.user_name());
+    QString userName = nameFromStdString(cmd.user_name());
 
     Response_BanHistory *re = new Response_BanHistory;
     QListIterator<ServerInfo_Ban> banIterator(sqlInterface->getUserBanHistory(userName));
@@ -825,8 +834,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
     foreach (QString warning, warningsList) {
         re->add_warning(warning.toStdString());
     }
-    re->set_user_name(cmd.user_name());
-    re->set_user_clientid(cmd.user_clientid());
+    re->set_user_name(nameFromStdString(cmd.user_name()).toStdString());
+    re->set_user_clientid(nameFromStdString(cmd.user_clientid()).toStdString());
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
@@ -835,7 +844,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnHistory(const Co
                                                                         ResponseContainer &rc)
 {
     QList<ServerInfo_Warning> warnList;
-    QString userName = QString::fromStdString(cmd.user_name());
+    QString userName = nameFromStdString(cmd.user_name());
 
     Response_WarnHistory *re = new Response_WarnHistory;
     QListIterator<ServerInfo_Warning> warnIterator(sqlInterface->getUserWarnHistory(userName));
@@ -859,16 +868,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
         return Response::RespInternalError;
     }
 
-    QString userName = QString::fromStdString(cmd.user_name()).simplified();
-    QString warningReason = QString::fromStdString(cmd.reason()).simplified();
-    QString clientID = QString::fromStdString(cmd.clientid()).simplified();
+    QString userName = nameFromStdString(cmd.user_name()).simplified();
+    QString warningReason = textFromStdString(cmd.reason()).simplified();
+    QString clientId = nameFromStdString(cmd.clientid()).simplified();
     QString sendingModerator = QString::fromStdString(userInfo->name()).simplified();
     int amountRemove = cmd.remove_messages();
     if (amountRemove != 0) {
         removeSaidMessages(userName, amountRemove);
     }
 
-    if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientID)) {
+    if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientId)) {
         servatrice->clientsLock.lockForRead();
         AbstractServerSocketInterface *user =
             static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
@@ -878,7 +887,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
         if (user != nullptr) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::WARNING);
-            event.set_warning_reason(cmd.reason());
+            event.set_warning_reason(warningReason.toStdString());
             SessionEvent *se = user->prepareSessionEvent(event);
             user->sendProtocolItem(*se);
             delete se;
@@ -904,11 +913,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     if (!sqlInterface->checkSql())
         return Response::RespInternalError;
 
-    QString userName = QString::fromStdString(cmd.user_name()).simplified();
-    QString address = QString::fromStdString(cmd.address()).simplified();
-    QString clientID = QString::fromStdString(cmd.clientid()).simplified();
+    QString userName = nameFromStdString(cmd.user_name()).simplified();
+    QString address = nameFromStdString(cmd.address()).simplified();
+    QString clientId = nameFromStdString(cmd.clientid()).simplified();
+    QString visibleReason = textFromStdString(cmd.visible_reason());
 
-    if (userName.isEmpty() && address.isEmpty() && clientID.isEmpty())
+    if (userName.isEmpty() && address.isEmpty() && clientId.isEmpty())
         return Response::RespOk;
 
     int amountRemove = cmd.remove_messages();
@@ -927,9 +937,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     query->bindValue(":ip_address", address);
     query->bindValue(":id_admin", userInfo->id());
     query->bindValue(":minutes", minutes);
-    query->bindValue(":reason", QString::fromStdString(cmd.reason()));
-    query->bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
-    query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
+    query->bindValue(":reason", textFromStdString(cmd.reason()));
+    query->bindValue(":visible_reason", visibleReason);
+    query->bindValue(":client_id", nameFromStdString(cmd.clientid()));
     sqlInterface->execSqlQuery(query);
 
     servatrice->clientsLock.lockForRead();
@@ -943,10 +953,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
             userList.append(user);
     }
 
-    if (userName.isEmpty() && address.isEmpty() && (!clientID.isEmpty())) {
+    if (userName.isEmpty() && address.isEmpty() && (!clientId.isEmpty())) {
         QSqlQuery *clientIdQuery =
             sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
-        clientIdQuery->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
+        clientIdQuery->bindValue(":client_id", nameFromStdString(cmd.clientid()));
         sqlInterface->execSqlQuery(clientIdQuery);
         if (!sqlInterface->execSqlQuery(clientIdQuery)) {
             qDebug("ClientID username ban lookup failed: SQL Error");
@@ -966,7 +976,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::BANNED);
         if (cmd.has_visible_reason())
-            event.set_reason_str(cmd.visible_reason());
+            event.set_reason_str(visibleReason.toStdString());
         if (minutes)
             event.set_end_time(QDateTime::currentDateTime().addSecs(60 * minutes).toTime_t());
         for (int i = 0; i < userList.size(); ++i) {
@@ -985,22 +995,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
             notificationMessage.append("\n    Username: " + userName);
         if (!address.isEmpty())
             notificationMessage.append("\n    IP Address: " + address);
-        if (!clientID.isEmpty())
-            notificationMessage.append("\n    Client ID: " + clientID);
+        if (!clientId.isEmpty())
+            notificationMessage.append("\n    Client ID: " + clientId);
 
         notificationMessage.append("\n    Length: " + QString::number(minutes) + " minute(s)");
-        notificationMessage.append("\n    Internal Reason: " + QString::fromStdString(cmd.reason()));
-        notificationMessage.append("\n    Visible Reason: " + QString::fromStdString(cmd.visible_reason()));
+        notificationMessage.append("\n    Internal Reason: " + textFromStdString(cmd.reason()));
+        notificationMessage.append("\n    Visible Reason: " + textFromStdString(cmd.visible_reason()));
         sendServerMessage(moderator.simplified(), notificationMessage);
     }
 
     return Response::RespOk;
 }
 
-QPair<QString, QString> AbstractServerSocketInterface::parseEmailAddress(const std::string &stdEmailAddress)
+QPair<QString, QString> AbstractServerSocketInterface::parseEmailAddress(const QString &emailAddress)
 {
-    QString emailAddress = QString::fromStdString(stdEmailAddress);
-
     // https://www.regular-expressions.info/email.html
     static const QRegularExpression emailRegex(R"(^([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,})$)",
                                                QRegularExpression::CaseInsensitiveOption);
@@ -1039,23 +1047,22 @@ QPair<QString, QString> AbstractServerSocketInterface::parseEmailAddress(const s
 Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd,
                                                                          ResponseContainer &rc)
 {
-    QString userName = QString::fromStdString(cmd.user_name());
-    QString clientId = QString::fromStdString(cmd.clientid());
+    QString userName = nameFromStdString(cmd.user_name());
+    QString clientId = nameFromStdString(cmd.clientid());
     qDebug() << "Got register command: " << userName;
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     if (!registrationEnabled) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Server functionality disabled", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Server functionality disabled", false);
 
         return Response::RespRegistrationDisabled;
     }
 
     const QString emailBlackList = servatrice->getEmailBlackList();
     const QString emailWhiteList = servatrice->getEmailWhiteList();
-    auto parsedEmailAddress = parseEmailAddress(cmd.email());
+    auto parsedEmailAddress = parseEmailAddress(nameFromStdString(cmd.email()));
     const QString emailUser = parsedEmailAddress.first;
     const QString emailDomain = parsedEmailAddress.second;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -1074,9 +1081,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // If a whitelist exists, ensure the email address domain IS in the whitelist
     if (!emailWhiteListFilters.isEmpty() && !emailWhiteListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Email used is not whitelisted", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Email used is not whitelisted", false);
         }
         auto *re = new Response_Register;
         re->set_denied_reason_str(
@@ -1088,9 +1094,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // If a blacklist exists, ensure the email address domain is NOT in the blacklist
     if (!emailBlackListFilters.isEmpty() && emailBlackListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Email used is blacklisted", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Email used is blacklisted", false);
 
         return Response::RespEmailBlackListed;
     }
@@ -1099,9 +1104,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     QString errorString;
     if (!sqlInterface->usernameIsValid(userName, errorString)) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Username is invalid", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Username is invalid", false);
 
         Response_Register *re = new Response_Register;
         re->set_denied_reason_str(errorString.toStdString());
@@ -1111,18 +1115,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (userName.toLower().simplified() == "servatrice") {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Username is invalid", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Username is invalid", false);
 
         return Response::RespUsernameInvalid;
     }
 
     if (sqlInterface->userExists(userName)) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Username already exists", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Username already exists", false);
 
         return Response::RespUserAlreadyExists;
     }
@@ -1131,9 +1133,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if (servatrice->getMaxAccountsPerEmail() > 0 &&
         sqlInterface->checkNumberOfUserAccounts(emailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Too many usernames registered with this email address", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Too many usernames registered with this email address",
+                                         false);
 
         return Response::RespTooManyRequests;
     }
@@ -1142,9 +1144,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     int banSecondsRemaining;
     if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "User is banned", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "User is banned", false);
 
         Response_Register *re = new Response_Register;
         re->set_denied_reason_str(banReason.toStdString());
@@ -1156,22 +1157,21 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (tooManyRegistrationAttempts(this->getAddress())) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Too many registration attempts from this ip address", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Too many registration attempts from this ip address",
+                                         false);
 
         return Response::RespTooManyRequests;
     }
 
-    QString realName = QString::fromStdString(cmd.real_name());
-    QString country = QString::fromStdString(cmd.country());
-    QString password = QString::fromStdString(cmd.password());
+    QString realName = nameFromStdString(cmd.real_name());
+    QString country = nameFromStdString(cmd.country());
+    QString password = nameFromStdString(cmd.password());
 
     if (!isPasswordLongEnough(password.length())) {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Password is too short", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Password is too short", false);
 
         return Response::RespPasswordTooShort;
     }
@@ -1190,25 +1190,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                 return Response::RespRegistrationFailed;
 
             if (servatrice->getEnableRegistrationAudit())
-                sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                             QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                             "", true);
+                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                             "REGISTER_ACCOUNT", "", true);
 
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
 
             if (servatrice->getEnableRegistrationAudit())
-                sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                             QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                             "", true);
+                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                             "REGISTER_ACCOUNT", "", true);
 
             return Response::RespRegistrationAccepted;
         }
     } else {
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Unknown reason for failure", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "REGISTER_ACCOUNT", "Unknown reason for failure", false);
 
         return Response::RespRegistrationFailed;
     }
@@ -1224,28 +1221,28 @@ bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &i
 Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd,
                                                                          ResponseContainer & /*rc*/)
 {
-    QString userName = QString::fromStdString(cmd.user_name());
-    QString token = QString::fromStdString(cmd.token());
-    QString clientID = QString::fromStdString(cmd.clientid());
+    QString userName = nameFromStdString(cmd.user_name());
+    QString token = nameFromStdString(cmd.token());
+    QString clientId = nameFromStdString(cmd.clientid());
 
-    if (clientID.isEmpty())
-        clientID = "UNKNOWN";
+    if (clientId.isEmpty())
+        clientId = "UNKNOWN";
 
     if (sqlInterface->activateUser(userName, token)) {
-        qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());
+        qDebug() << "Accepted activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         clientID, "ACTIVATE_ACCOUNT", "", true);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "ACTIVATE_ACCOUNT", "", true);
 
         return Response::RespActivationAccepted;
     } else {
-        qDebug() << "Failed activation for user" << QString::fromStdString(cmd.user_name());
+        qDebug() << "Failed activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         clientID, "ACTIVATE_ACCOUNT",
-                                         "Failed to activate account, incorrect activation token", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "ACTIVATE_ACCOUNT", "Failed to activate account, incorrect activation token",
+                                         false);
 
         return Response::RespActivationFailed;
     }
@@ -1257,9 +1254,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QString realName = QString::fromStdString(cmd.real_name());
-    QString emailAddress = QString::fromStdString(cmd.email());
-    QString country = QString::fromStdString(cmd.country());
+    QString realName = nameFromStdString(cmd.real_name());
+    QString emailAddress = nameFromStdString(cmd.email());
+    QString country = nameFromStdString(cmd.country());
 
     QString userName = QString::fromStdString(userInfo->name());
 
@@ -1272,9 +1269,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
-    userInfo->set_real_name(cmd.real_name());
-    userInfo->set_email(cmd.email());
-    userInfo->set_country(cmd.country());
+    userInfo->set_real_name(realName.toStdString());
+    userInfo->set_email(emailAddress.toStdString());
+    userInfo->set_country(country.toStdString());
 
     return Response::RespOk;
 }
@@ -1285,7 +1282,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QByteArray image(cmd.image().c_str(), cmd.image().length());
+    size_t length = qMin(cmd.image().length(), (size_t)MAX_FILE_LENGTH);
+    QByteArray image(cmd.image().c_str(), length);
     int id = userInfo->id();
 
     QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
@@ -1294,7 +1292,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
-    userInfo->set_avatar_bmp(cmd.image().c_str(), cmd.image().length());
+    userInfo->set_avatar_bmp(cmd.image().c_str(), length);
     return Response::RespOk;
 }
 
@@ -1304,8 +1302,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QString oldPassword = QString::fromStdString(cmd.old_password());
-    QString newPassword = QString::fromStdString(cmd.new_password());
+    QString oldPassword = nameFromStdString(cmd.old_password());
+    QString newPassword = nameFromStdString(cmd.new_password());
 
     if (!isPasswordLongEnough(newPassword.length()))
         return Response::RespPasswordTooShort;
@@ -1321,8 +1319,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd,
                                                                                ResponseContainer &rc)
 {
-    const QString userName = QString::fromStdString(cmd.user_name());
-    const QString clientId = QString::fromStdString(cmd.clientid());
+    const QString userName = nameFromStdString(cmd.user_name());
+    const QString clientId = nameFromStdString(cmd.clientid());
 
     qDebug() << "Received reset password request from user: " << userName;
 
@@ -1404,35 +1402,33 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
                                                                              ResponseContainer &rc)
 {
     Q_UNUSED(rc);
-    qDebug() << "Received reset password reset from user: " << QString::fromStdString(cmd.user_name());
+    QString userName = nameFromStdString(cmd.user_name());
+    QString clientId = nameFromStdString(cmd.clientid());
+    qDebug() << "Received reset password reset from user: " << userName;
 
-    if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
+    if (!sqlInterface->doesForgotPasswordExist(userName)) {
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET",
-                                         "Request does not exist for user", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET", "Request does not exist for user", false);
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "token", QString::fromStdString(cmd.user_name()),
-                                                     QString::fromStdString(cmd.token()))) {
+    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "token", userName,
+                                                     nameFromStdString(cmd.token()))) {
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET",
-                                         "Failed token validation", false);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), userName.simplified(),
+                                         "PASSWORD_RESET", "Failed token validation", false);
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (sqlInterface->changeUserPassword(QString::fromStdString(cmd.user_name()), "",
-                                         QString::fromStdString(cmd.new_password()), true)) {
+    if (sqlInterface->changeUserPassword(userName, "", nameFromStdString(cmd.new_password()), true)) {
         if (servatrice->getEnableForgotPasswordAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET", "",
-                                         true);
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET", "", true);
 
-        sqlInterface->removeForgotPassword(QString::fromStdString(cmd.user_name()));
+        sqlInterface->removeForgotPassword(nameFromStdString(cmd.user_name()));
         return Response::RespOk;
     }
 
@@ -1443,8 +1439,8 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                           ResponseContainer &rc)
 {
-    const QString userName = QString::fromStdString(cmd.user_name());
-    const QString clientId = QString::fromStdString(cmd.clientid());
+    const QString userName = nameFromStdString(cmd.user_name());
+    const QString clientId = nameFromStdString(cmd.clientid());
 
     qDebug() << "Received reset password challenge from user: " << userName;
 
@@ -1465,7 +1461,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     }
 
     if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName,
-                                                     QString::fromStdString(cmd.email()))) {
+                                                     nameFromStdString(cmd.email()))) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                          "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
@@ -1484,7 +1480,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
 Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd,
                                                                              ResponseContainer &rc)
 {
-    const QString userName = QString::fromStdString(cmd.user_name());
+    const QString userName = nameFromStdString(cmd.user_name());
     QString passwordSalt = sqlInterface->getUserSalt(userName);
     if (passwordSalt.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
@@ -1514,7 +1510,7 @@ AbstractServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServer
 Response::ResponseCode AbstractServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd,
                                                                         ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, QString::fromStdString(cmd.reason())),
+    QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, textFromStdString(cmd.reason())),
                               Q_ARG(int, cmd.minutes()));
     return Response::RespOk;
 }
@@ -1535,8 +1531,7 @@ bool AbstractServerSocketInterface::addAdminFlagToUser(const QString &userName, 
     query->bindValue(":adminlevel", flag);
     query->bindValue(":username", userName);
     if (!sqlInterface->execSqlQuery(query)) {
-        logger->logMessage(
-            QString::fromStdString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
+        logger->logMessage(QString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
         return false;
     }
 
@@ -1560,8 +1555,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
     query->bindValue(":adminlevel", flag);
     query->bindValue(":username", userName);
     if (!sqlInterface->execSqlQuery(query)) {
-        logger->logMessage(
-            QString::fromStdString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
+        logger->logMessage(QString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
         return false;
     }
 
@@ -1586,7 +1580,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
                                                                    ResponseContainer & /*rc*/)
 {
 
-    QString userName = QString::fromStdString(cmd.user_name());
+    QString userName = nameFromStdString(cmd.user_name());
 
     if (cmd.has_should_be_mod()) {
         if (cmd.should_be_mod()) {

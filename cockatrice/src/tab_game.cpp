@@ -52,6 +52,7 @@
 #include "playerlistwidget.h"
 #include "replay_timeline_widget.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "tab_supervisor.h"
 #include "window_main.h"
 #include "zoneviewwidget.h"
@@ -268,14 +269,21 @@ void DeckViewContainer::loadLocalDeck()
 
     QString fileName = dialog.selectedFiles().at(0);
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    QString deckString;
     DeckLoader deck;
-    if (!deck.loadFromFile(fileName, fmt)) {
+
+    bool error = !deck.loadFromFile(fileName, fmt);
+    if (!error) {
+        deckString = deck.writeToString_Native();
+        error = deckString.length() > MAX_FILE_LENGTH;
+    }
+    if (error) {
         QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
         return;
     }
 
     Command_DeckSelect cmd;
-    cmd.set_deck(deck.writeToString_Native().toStdString());
+    cmd.set_deck(deckString.toStdString());
     PendingCommand *pend = parentGame->prepareGameCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
             SLOT(deckSelectFinished(const Response &)));
@@ -1823,6 +1831,7 @@ void TabGame::createMessageDock(bool bReplay)
 
         sayLabel = new QLabel;
         sayEdit = new LineEditCompleter;
+        sayEdit->setMaxLength(MAX_TEXT_LENGTH);
         sayLabel->setBuddy(sayEdit);
         completer = new QCompleter(autocompleteUserList, sayEdit);
         completer->setCaseSensitivity(Qt::CaseInsensitive);

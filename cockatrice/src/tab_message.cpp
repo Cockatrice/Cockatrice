@@ -10,6 +10,7 @@
 #include "pending_command.h"
 #include "settingscache.h"
 #include "soundengine.h"
+#include "stringsizes.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -29,6 +30,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
     sayEdit = new LineEditUnfocusable;
+    sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
     QVBoxLayout *vbox = new QVBoxLayout;

@@ -2,7 +2,9 @@
 
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
+#include "gettextwithmax.h"
 #include "main.h"
+#include "stringsizes.h"
 
 #include <QAction>
 #include <QComboBox>
@@ -23,6 +25,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
 {
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
+    nameEdit->setMaxLength(MAX_NAME_LENGTH);
     nameEdit->setEnabled(false);
     nameLabel->setBuddy(nameEdit);
 
@@ -40,11 +43,13 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
 
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;
+    ptEdit->setMaxLength(MAX_NAME_LENGTH);
     ptLabel->setBuddy(ptEdit);
     connect(ptEdit, SIGNAL(textChanged(QString)), this, SLOT(ptChanged(QString)));
 
     annotationLabel = new QLabel(tr("&Annotation:"));
     annotationEdit = new QLineEdit;
+    annotationEdit->setMaxLength(MAX_NAME_LENGTH);
     annotationLabel->setBuddy(annotationEdit);
     connect(annotationEdit, SIGNAL(textChanged(QString)), this, SLOT(annotationChanged(QString)));
 
@@ -142,9 +147,8 @@ void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QMod
 void DlgEditTokens::actAddToken()
 {
     QString name;
-    bool askAgain = true;
-    do {
-        name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
+    for (;;) {
+        name = getTextWithMax(this, tr("Add token"), tr("Please enter the name of the token:"));
         if (name.isEmpty())
             return;
         if (databaseModel->getDatabase()->getCard(name)) {
@@ -152,9 +156,9 @@ void DlgEditTokens::actAddToken()
                                   tr("The chosen name conflicts with an existing card or token.\nMake sure to enable "
                                      "the 'Token' set in the \"Manage sets\" dialog to display them correctly."));
         } else {
-            askAgain = false;
+            break;
         }
-    } while (askAgain);
+    }
 
     QString setName = CardDatabase::TOKENS_SETNAME;
     CardInfoPerSetMap sets;

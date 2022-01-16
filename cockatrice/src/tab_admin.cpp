@@ -2,6 +2,7 @@
 
 #include "abstractclient.h"
 #include "pb/admin_commands.pb.h"
+#include "stringsizes.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -18,6 +19,7 @@ ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 {
     QLabel *reasonLabel = new QLabel(tr("&Reason for shutdown:"));
     reasonEdit = new QLineEdit;
+    reasonEdit->setMaxLength(MAX_TEXT_LENGTH);
     reasonLabel->setBuddy(reasonEdit);
     QLabel *minutesLabel = new QLabel(tr("&Time until shutdown (minutes):"));
     minutesEdit = new QSpinBox;

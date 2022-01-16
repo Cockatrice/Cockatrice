@@ -1,6 +1,7 @@
 #include "dlg_edit_password.h"
 
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -12,6 +13,7 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 {
     oldPasswordLabel = new QLabel(tr("Old password:"));
     oldPasswordEdit = new QLineEdit();
+    oldPasswordEdit->setMaxLength(MAX_NAME_LENGTH);
 
     auto &servers = SettingsCache::instance().servers();
     if (servers.getSavePassword()) {
@@ -23,11 +25,13 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 
     newPasswordLabel = new QLabel(tr("New password:"));
     newPasswordEdit = new QLineEdit();
+    newPasswordEdit->setMaxLength(MAX_NAME_LENGTH);
     newPasswordLabel->setBuddy(newPasswordLabel);
     newPasswordEdit->setEchoMode(QLineEdit::Password);
 
     newPasswordLabel2 = new QLabel(tr("Confirm new password:"));
     newPasswordEdit2 = new QLineEdit();
+    newPasswordEdit2->setMaxLength(MAX_NAME_LENGTH);
     newPasswordLabel2->setBuddy(newPasswordLabel2);
     newPasswordEdit2->setEchoMode(QLineEdit::Password);
 

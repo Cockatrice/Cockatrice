@@ -15,6 +15,7 @@
 #include "pictureloader.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 #include "tab_supervisor.h"
 #include "tappedout_interface.h"
 
@@ -81,6 +82,7 @@ void TabDeckEditor::createDeckDock()
     nameLabel = new QLabel();
     nameLabel->setObjectName("nameLabel");
     nameEdit = new LineEditUnfocusable;
+    nameEdit->setMaxLength(MAX_NAME_LENGTH);
     nameEdit->setObjectName("nameEdit");
     nameLabel->setBuddy(nameEdit);
     connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateName(const QString &)));
@@ -798,9 +800,15 @@ bool TabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = deckModel->getDeckList();
     if (deck->getLastRemoteDeckId() != -1) {
+        QString deckString = deck->writeToString_Native();
+        if (deckString.length() > MAX_FILE_LENGTH) {
+            QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
+            return false;
+        }
+
         Command_DeckUpload cmd;
         cmd.set_deck_id(static_cast<google::protobuf::uint32>(deck->getLastRemoteDeckId()));
-        cmd.set_deck_list(deck->writeToString_Native().toStdString());
+        cmd.set_deck_list(deckString.toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,

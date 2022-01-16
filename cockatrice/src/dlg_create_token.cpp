@@ -5,6 +5,7 @@
 #include "decklist.h"
 #include "main.h"
 #include "settingscache.h"
+#include "stringsizes.h"
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -28,6 +29,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
+    nameEdit->setMaxLength(MAX_NAME_LENGTH);
     nameEdit->selectAll();
     connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     nameLabel->setBuddy(nameEdit);
@@ -45,10 +47,12 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;
+    ptEdit->setMaxLength(MAX_NAME_LENGTH);
     ptLabel->setBuddy(ptEdit);
 
     annotationLabel = new QLabel(tr("&Annotation:"));
     annotationEdit = new QLineEdit;
+    annotationEdit->setMaxLength(MAX_NAME_LENGTH);
     annotationLabel->setBuddy(annotationEdit);
 
     destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
