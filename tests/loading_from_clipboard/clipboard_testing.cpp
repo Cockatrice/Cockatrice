@@ -1,4 +1,5 @@
 #include "clipboard_testing.h"
+
 #include <QTextStream>
 
 void Result::operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card)
