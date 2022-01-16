@@ -4,11 +4,6 @@
 
 #include <QCryptographicHash>
 
-void PasswordHasher::initialize()
-{
-    // dummy
-}
-
 QString PasswordHasher::computeHash(const QString &password, const QString &salt)
 {
     QCryptographicHash::Algorithm algo = QCryptographicHash::Sha512;

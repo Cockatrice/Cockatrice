@@ -893,8 +893,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
             delete se;
         }
 
-        QListIterator<QString> modIterator(moderatorList);
-        foreach (QString moderator, moderatorList) {
+        for (QString &moderator : moderatorList) {
             QString notificationMessage = sendingModerator + " has sent a warning with the following information";
             notificationMessage.append("\n    Username: " + userName);
             notificationMessage.append("\n    Reason: " + warningReason);
@@ -987,8 +986,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         }
     }
 
-    QListIterator<QString> modIterator(moderatorList);
-    foreach (QString moderator, moderatorList) {
+    for (QString &moderator : moderatorList) {
         QString notificationMessage =
             QString::fromStdString(userInfo->name()).simplified() + " has placed a ban with the following information";
         if (!userName.isEmpty())

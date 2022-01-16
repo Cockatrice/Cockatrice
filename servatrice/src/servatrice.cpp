@@ -206,8 +206,9 @@ Servatrice::~Servatrice()
 
     // clients live in other threads, we need to lock them
     clientsLock.lockForRead();
-    for (auto client : clients)
+    for (auto *client : clients) {
         QMetaObject::invokeMethod(client, "prepareDestroy", Qt::QueuedConnection);
+    }
     clientsLock.unlock();
 
     // client destruction is asynchronous, wait for all clients to be gone
