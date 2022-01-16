@@ -102,15 +102,19 @@ jobs:
             package: skip # we are packaged in arch already
             allow-failure: yes
 
-          - distro: DebianBuster
+          - distro: Debian10
             package: DEB
-
-          - distro: Fedora35
-            package: RPM
+ 
+          - distro: Debian11
+            package: DEB
 
           - distro: Fedora34
             package: RPM
             test: skip # gtest does not compile for some reason
+
+          - distro: Fedora35
+            package: RPM
+
 
     name: ${{matrix.distro}}
 
