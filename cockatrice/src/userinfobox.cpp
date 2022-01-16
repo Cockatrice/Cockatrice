@@ -251,7 +251,7 @@ void UserInfoBox::actPassword()
                         changePassword(oldPassword, newPassword);
                     } else {
                         QMessageBox::critical(this, tr("Error"),
-                                              tr("An error occured while trying to update your user information."));
+                                              tr("An error occurred while trying to update your user information."));
                     }
                 });
         client->sendCommand(pend);
