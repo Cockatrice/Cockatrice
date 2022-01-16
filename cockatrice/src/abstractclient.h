@@ -108,11 +108,11 @@ public:
     void sendCommand(const CommandContainer &cont);
     void sendCommand(PendingCommand *pend);
 
-    bool getServerSupportsPasswordHash()
+    bool getServerSupportsPasswordHash() const
     {
         return serverSupportsPasswordHash;
     }
-    const QString getUserName()
+    const QString &getUserName() const
     {
         return userName;
     }
