@@ -14,10 +14,6 @@
 #include <QLabel>
 #include <QMessageBox>
 
-const quint64 SIXTY = 60;
-const quint64 HOURS_IN_A_DAY = 24;
-const quint64 DAYS_IN_A_YEAR = 365;
-
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)
 {
@@ -126,30 +122,35 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QString accountAgeString = tr("Unregistered user");
     if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) ||
         userLevel.testFlag(ServerInfo_User::IsRegistered)) {
-        if (user.accountage_secs() == 0)
-            accountAgeString = tr("Unknown");
-        else {
-            quint64 seconds = user.accountage_secs();
-            quint64 minutes = seconds / SIXTY;
-            quint64 hours = minutes / SIXTY;
-            quint64 days = hours / HOURS_IN_A_DAY;
-            quint64 years = days / DAYS_IN_A_YEAR;
-            quint64 daysMinusYears = days - (years * DAYS_IN_A_YEAR);
-
-            accountAgeString = "";
-            if (years >= 1) {
-                accountAgeString = QString::number(years);
-                accountAgeString.append(" ");
-                accountAgeString.append(years == 1 ? tr("Year") : tr("Years"));
-                accountAgeString.append(" ");
-            }
-
-            accountAgeString.append(QString::number(daysMinusYears));
-            accountAgeString.append(" ");
-            accountAgeString.append(days == 1 ? tr("Day") : tr("Days"));
-        }
+        accountAgeString = getAgeString(user.accountage_secs());
     }
     accountAgeLabel2.setText(accountAgeString);
+}
+
+QString UserInfoBox::getAgeString(int ageSeconds)
+{
+    QString accountAgeString = tr("Unknown");
+    if (ageSeconds == 0)
+        return accountAgeString;
+
+    auto date = QDateTime::fromTime_t(QDateTime::currentSecsSinceEpoch() - ageSeconds).date();
+    if (!date.isValid())
+        return accountAgeString;
+
+    QString dateString = QLocale().toString(date, QLocale::ShortFormat);
+    auto now = QDate::currentDate();
+    auto daysAndYears = getDaysAndYearsBetween(date, now);
+
+    QString yearString;
+    if (daysAndYears.second > 0) {
+        yearString = tr("%n Year(s), ", "amount of years (only shown if more than 0)", daysAndYears.second);
+    }
+    accountAgeString =
+        tr("%10%n Day(s) %20", "amount of years (if more than 0), amount of days, date in local short format",
+           daysAndYears.first)
+            .arg(yearString)
+            .arg(dateString);
+    return accountAgeString;
 }
 
 void UserInfoBox::updateInfo(const QString &userName)
@@ -255,7 +256,7 @@ void UserInfoBox::processEditResponse(const Response &r)
         case Response::RespInternalError:
         default:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("An error occured while trying to update your user informations."));
+                                  tr("An error occurred while trying to update your user information."));
             break;
     }
 }
