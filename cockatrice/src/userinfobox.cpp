@@ -335,7 +335,7 @@ void UserInfoBox::processPasswordResponse(const Response &r)
         case Response::RespInternalError:
         default:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("An error occured while trying to update your user information."));
+                                  tr("An error occurred while trying to update your user information."));
             break;
     }
 }
