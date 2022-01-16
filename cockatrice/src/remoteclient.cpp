@@ -267,7 +267,7 @@ void RemoteClient::passwordSaltResponse(const Response &response)
         const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
         auto passwordSalt = QString::fromStdString(resp.password_salt());
         if (passwordSalt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
-            password = "";            // the password will not be used
+            password.clear();            // the password will not be used
             doLogin();
         } else {
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
@@ -460,7 +460,7 @@ void RemoteClient::doConnectToServer(const QString &hostname,
     password = _password;
     lastHostname = hostname;
     lastPort = port;
-    hashedPassword = "";
+    hashedPassword.clear();
 
     connectToHost(hostname, port);
     setStatus(StatusConnecting);
@@ -483,7 +483,7 @@ void RemoteClient::doRegisterToServer(const QString &hostname,
     realName = _realname;
     lastHostname = hostname;
     lastPort = port;
-    hashedPassword = "";
+    hashedPassword.clear();
 
     connectToHost(hostname, port);
     setStatus(StatusRegistering);
@@ -672,7 +672,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
     lastPort = port;
     token = _token.trimmed();
     password = _newpassword;
-    hashedPassword = "";
+    hashedPassword.clear();
 
     connectToHost(lastHostname, lastPort);
     setStatus(StatusSubmitForgotPasswordReset);
