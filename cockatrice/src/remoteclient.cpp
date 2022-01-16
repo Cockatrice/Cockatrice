@@ -267,7 +267,7 @@ void RemoteClient::passwordSaltResponse(const Response &response)
         const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
         auto passwordSalt = QString::fromStdString(resp.password_salt());
         if (passwordSalt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
-            password.clear();            // the password will not be used
+            password.clear();         // the password will not be used
             doLogin();
         } else {
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);

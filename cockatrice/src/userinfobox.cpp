@@ -4,6 +4,7 @@
 #include "dlg_edit_avatar.h"
 #include "dlg_edit_password.h"
 #include "dlg_edit_user.h"
+#include "gettextwithmax.h"
 #include "passwordhasher.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/session_commands.pb.h"
@@ -208,9 +209,9 @@ void UserInfoBox::actEditInternal(const Response &r)
             // real password is required to change email
             bool ok = false;
             QString password =
-                QInputDialog::getText(this, tr("Enter Password"),
-                                      tr("Password verification is required in order to change your email address"),
-                                      QLineEdit::Password, "", &ok);
+                getTextWithMax(this, tr("Enter Password"),
+                               tr("Password verification is required in order to change your email address"),
+                               QLineEdit::Password, "", &ok);
             if (!ok)
                 return;
             cmd.set_password_check(password.toStdString());
