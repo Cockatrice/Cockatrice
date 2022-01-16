@@ -10,12 +10,13 @@ namespace
 {
 class PasswordHashTest : public ::testing::Test
 {
-    PasswordHashTest()
+protected:
+    void SetUp() override
     {
         rng = new RNG_SFMT;
     }
 
-    ~PasswordHashTest()
+    void TearDown() override
     {
         delete rng;
     }
