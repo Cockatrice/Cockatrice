@@ -41,14 +41,9 @@ QString SettingsCache::getSafeConfigFilePath(QString /* configEntry */, QString 
     return defaultPath;
 }
 SettingsCache::SettingsCache()
-    : settings{new QSettings("global.ini", QSettings::IniFormat, this)},
-      shortcutsSettings{nullptr},
-      cardDatabaseSettings{new CardDatabaseSettings("", this)},
-      serversSettings{nullptr},
-      messageSettings{nullptr},
-      gameFiltersSettings{nullptr},
-      layoutsSettings{nullptr},
-      downloadSettings{nullptr},
+    : settings{new QSettings("global.ini", QSettings::IniFormat, this)}, shortcutsSettings{nullptr},
+      cardDatabaseSettings{new CardDatabaseSettings("", this)}, serversSettings{nullptr}, messageSettings{nullptr},
+      gameFiltersSettings{nullptr}, layoutsSettings{nullptr}, downloadSettings{nullptr},
       cardDatabasePath{QString("%1/cards.xml").arg(CARDDB_DATADIR)},
       customCardDatabasePath{QString("%1/customsets/").arg(CARDDB_DATADIR)},
       spoilerDatabasePath{QString("%1/spoiler.xml").arg(CARDDB_DATADIR)},
@@ -58,13 +53,13 @@ SettingsCache::SettingsCache()
 void SettingsCache::setUseTearOffMenus(bool /* _useTearOffMenus */)
 {
 }
-void SettingsCache::setKnownMissingFeatures(const QString &/* _knownMissingFeatures */)
+void SettingsCache::setKnownMissingFeatures(const QString & /* _knownMissingFeatures */)
 {
 }
 void SettingsCache::setCardInfoViewMode(const int /* _viewMode */)
 {
 }
-void SettingsCache::setHighlightWords(const QString &/* _highlightWords */)
+void SettingsCache::setHighlightWords(const QString & /* _highlightWords */)
 {
 }
 void SettingsCache::setMasterVolume(int /* _masterVolume */)
@@ -85,40 +80,40 @@ void SettingsCache::setShowMentionPopups(const int /* _showMentionPopus */)
 void SettingsCache::setRoomHistory(const int /* _roomHistory */)
 {
 }
-void SettingsCache::setLang(const QString &/* _lang */)
+void SettingsCache::setLang(const QString & /* _lang */)
 {
 }
 void SettingsCache::setShowTipsOnStartup(bool /* _showTipsOnStartup */)
 {
 }
-void SettingsCache::setSeenTips(const QList<int> &/* _seenTips */)
+void SettingsCache::setSeenTips(const QList<int> & /* _seenTips */)
 {
 }
-void SettingsCache::setDeckPath(const QString &/* _deckPath */)
+void SettingsCache::setDeckPath(const QString & /* _deckPath */)
 {
 }
-void SettingsCache::setReplaysPath(const QString &/* _replaysPath */)
+void SettingsCache::setReplaysPath(const QString & /* _replaysPath */)
 {
 }
-void SettingsCache::setThemesPath(const QString &/* _themesPath */)
+void SettingsCache::setThemesPath(const QString & /* _themesPath */)
 {
 }
-void SettingsCache::setPicsPath(const QString &/* _picsPath */)
+void SettingsCache::setPicsPath(const QString & /* _picsPath */)
 {
 }
-void SettingsCache::setCardDatabasePath(const QString &/* _cardDatabasePath */)
+void SettingsCache::setCardDatabasePath(const QString & /* _cardDatabasePath */)
 {
 }
-void SettingsCache::setCustomCardDatabasePath(const QString &/* _customCardDatabasePath */)
+void SettingsCache::setCustomCardDatabasePath(const QString & /* _customCardDatabasePath */)
 {
 }
-void SettingsCache::setSpoilerDatabasePath(const QString &/* _spoilerDatabasePath */)
+void SettingsCache::setSpoilerDatabasePath(const QString & /* _spoilerDatabasePath */)
 {
 }
-void SettingsCache::setTokenDatabasePath(const QString &/* _tokenDatabasePath */)
+void SettingsCache::setTokenDatabasePath(const QString & /* _tokenDatabasePath */)
 {
 }
-void SettingsCache::setThemeName(const QString &/* _themeName */)
+void SettingsCache::setThemeName(const QString & /* _themeName */)
 {
 }
 void SettingsCache::setPicDownload(int /* _picDownload */)
@@ -145,7 +140,7 @@ void SettingsCache::setStartingHandSize(int /* _startingHandSize */)
 void SettingsCache::setAnnotateTokens(int /* _annotateTokens */)
 {
 }
-void SettingsCache::setTabGameSplitterSizes(const QByteArray &/* _tabGameSplitterSizes */)
+void SettingsCache::setTabGameSplitterSizes(const QByteArray & /* _tabGameSplitterSizes */)
 {
 }
 void SettingsCache::setDisplayCardNames(int /* _displayCardNames */)
@@ -175,10 +170,10 @@ void SettingsCache::setChatMentionForeground(int /* _chatMentionForeground */)
 void SettingsCache::setChatHighlightForeground(int /* _chatHighlightForeground */)
 {
 }
-void SettingsCache::setChatMentionColor(const QString &/* _chatMentionColor */)
+void SettingsCache::setChatMentionColor(const QString & /* _chatMentionColor */)
 {
 }
-void SettingsCache::setChatHighlightColor(const QString &/* _chatHighlightColor */)
+void SettingsCache::setChatHighlightColor(const QString & /* _chatHighlightColor */)
 {
 }
 void SettingsCache::setZoneViewSortByName(int /* _zoneViewSortByName */)
@@ -193,7 +188,7 @@ void SettingsCache::setZoneViewPileView(int /* _zoneViewPileView */)
 void SettingsCache::setSoundEnabled(int /* _soundEnabled */)
 {
 }
-void SettingsCache::setSoundThemeName(const QString &/* _soundThemeName */)
+void SettingsCache::setSoundThemeName(const QString & /* _soundThemeName */)
 {
 }
 void SettingsCache::setIgnoreUnregisteredUsers(int /* _ignoreUnregisteredUsers */)
@@ -202,19 +197,19 @@ void SettingsCache::setIgnoreUnregisteredUsers(int /* _ignoreUnregisteredUsers *
 void SettingsCache::setIgnoreUnregisteredUserMessages(int /* _ignoreUnregisteredUserMessages */)
 {
 }
-void SettingsCache::setMainWindowGeometry(const QByteArray &/* _mainWindowGeometry */)
+void SettingsCache::setMainWindowGeometry(const QByteArray & /* _mainWindowGeometry */)
 {
 }
-void SettingsCache::setTokenDialogGeometry(const QByteArray &/* _tokenDialogGeometry */)
+void SettingsCache::setTokenDialogGeometry(const QByteArray & /* _tokenDialogGeometry */)
 {
 }
 void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
 {
 }
-void SettingsCache::setClientID(const QString &/* _clientID */)
+void SettingsCache::setClientID(const QString & /* _clientID */)
 {
 }
-void SettingsCache::setClientVersion(const QString &/* _clientVersion */)
+void SettingsCache::setClientVersion(const QString & /* _clientVersion */)
 {
 }
 QStringList SettingsCache::getCountries() const
@@ -277,7 +272,7 @@ void PictureLoader::clearPixmapCache(CardInfoPtr /* card */)
 
 SettingsCache *settingsCache;
 
-SettingsCache& SettingsCache::instance()
+SettingsCache &SettingsCache::instance()
 {
     return *settingsCache;
 }

@@ -2,6 +2,7 @@
 #define CLIPBOARD_TESTING_H
 
 #include "../../common/decklist.h"
+
 #include "gtest/gtest.h"
 
 struct Result

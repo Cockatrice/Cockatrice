@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "mocks.h"
+
+#include "gtest/gtest.h"
 
 namespace
 {
