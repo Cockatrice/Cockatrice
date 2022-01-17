@@ -356,7 +356,11 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
 void DlgRegister::actOk()
 {
-    if (passwordEdit->text() != passwordConfirmationEdit->text()) {
+    // TODO this stuff should be using qvalidators
+    if (passwordEdit->text().length() < 8) {
+        QMessageBox::critical(this, tr("Registration Warning"), tr("Your password is too short."));
+        return;
+    } else if (passwordEdit->text() != passwordConfirmationEdit->text()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
         return;
     } else if (emailConfirmationEdit->text() != emailEdit->text()) {

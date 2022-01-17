@@ -27,7 +27,7 @@ static const unsigned int protocolVersion = 14;
 
 RemoteClient::RemoteClient(QObject *parent)
     : AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false),
-      usingWebSocket(false), messageLength(0)
+      usingWebSocket(false), messageLength(0), hashedPassword()
 {
 
     clearNewClientFeatures();
@@ -110,6 +110,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         setStatus(StatusDisconnecting);
         return;
     }
+    serverSupportsPasswordHash = event.server_options() & Event_ServerIdentification::SupportsPasswordHash;
 
     if (getStatus() == StatusRequestingForgotPassword) {
         Command_ForgotPasswordRequest cmdForgotPasswordRequest;
@@ -127,7 +128,14 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordReset.set_user_name(userName.toStdString());
         cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
         cmdForgotPasswordReset.set_token(token.toStdString());
-        cmdForgotPasswordReset.set_new_password(password.toStdString());
+        if (!password.isEmpty() && serverSupportsPasswordHash) {
+            auto passwordSalt = PasswordHasher::generateRandomSalt();
+            hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
+            cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
+        } else if (!password.isEmpty()) {
+            qWarning() << "using plain text password to reset password";
+            cmdForgotPasswordReset.set_new_password(password.toStdString());
+        }
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(submitForgotPasswordResetResponse(Response)));
@@ -150,7 +158,14 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     if (getStatus() == StatusRegistering) {
         Command_Register cmdRegister;
         cmdRegister.set_user_name(userName.toStdString());
-        cmdRegister.set_password(password.toStdString());
+        if (!password.isEmpty() && serverSupportsPasswordHash) {
+            auto passwordSalt = PasswordHasher::generateRandomSalt();
+            hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
+            cmdRegister.set_hashed_password(hashedPassword.toStdString());
+        } else if (!password.isEmpty()) {
+            qWarning() << "using plain text password to register";
+            cmdRegister.set_password(password.toStdString());
+        }
         cmdRegister.set_email(email.toStdString());
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
@@ -175,13 +190,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (!password.isEmpty() && event.server_options() & Event_ServerIdentification::SupportsPasswordHash) {
-        // TODO store and log in using stored hashed password
-        doRequestPasswordSalt(); // log in using password salt
-    } else {
-        // TODO add setting for client to reject unhashed logins
-        doLogin();
-    }
+    doLogin();
 }
 
 void RemoteClient::doRequestPasswordSalt()
@@ -213,21 +222,33 @@ Command_Login RemoteClient::generateCommandLogin()
 
 void RemoteClient::doLogin()
 {
-    setStatus(StatusLoggingIn);
-    Command_Login cmdLogin = generateCommandLogin();
-    cmdLogin.set_password(password.toStdString());
+    if (!password.isEmpty() && serverSupportsPasswordHash) {
+        // TODO store and log in using stored hashed password
+        if (hashedPassword.isEmpty()) {
+            doRequestPasswordSalt(); // ask salt to create hashedPassword, then log in
+        } else {
+            doHashedLogin(); // log in using hashed password instead
+        }
+    } else {
+        // TODO add setting for client to reject unhashed logins
+        setStatus(StatusLoggingIn);
+        Command_Login cmdLogin = generateCommandLogin();
+        if (!password.isEmpty()) {
+            qWarning() << "using plain text password to log in";
+            cmdLogin.set_password(password.toStdString());
+        }
 
-    PendingCommand *pend = prepareSessionCommand(cmdLogin);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
-    sendCommand(pend);
+        PendingCommand *pend = prepareSessionCommand(cmdLogin);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
+        sendCommand(pend);
+    }
 }
 
-void RemoteClient::doLogin(const QString &passwordSalt)
+void RemoteClient::doHashedLogin()
 {
     setStatus(StatusLoggingIn);
     Command_Login cmdLogin = generateCommandLogin();
 
-    const auto hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
     cmdLogin.set_hashed_password(hashedPassword.toStdString());
 
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
@@ -244,12 +265,13 @@ void RemoteClient::passwordSaltResponse(const Response &response)
 {
     if (response.response_code() == Response::RespOk) {
         const Response_PasswordSalt &resp = response.GetExtension(Response_PasswordSalt::ext);
-        QString salt = QString::fromStdString(resp.password_salt());
-        if (salt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
-            password = "";    // the password will not be used
+        auto passwordSalt = QString::fromStdString(resp.password_salt());
+        if (passwordSalt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
+            password.clear();         // the password will not be used
             doLogin();
         } else {
-            doLogin(salt);
+            hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
+            doHashedLogin();
         }
     } else if (response.response_code() != Response::RespNotConnected) {
         emit loginError(response.response_code(), {}, 0, {});
@@ -438,6 +460,7 @@ void RemoteClient::doConnectToServer(const QString &hostname,
     password = _password;
     lastHostname = hostname;
     lastPort = port;
+    hashedPassword.clear();
 
     connectToHost(hostname, port);
     setStatus(StatusConnecting);
@@ -460,6 +483,7 @@ void RemoteClient::doRegisterToServer(const QString &hostname,
     realName = _realname;
     lastHostname = hostname;
     lastPort = port;
+    hashedPassword.clear();
 
     connectToHost(hostname, port);
     setStatus(StatusRegistering);
@@ -561,7 +585,7 @@ QString RemoteClient::getSrvClientID(const QString &_hostname)
         QHostAddress hostAddress = hostInfo.addresses().first();
         srvClientID += hostAddress.toString();
     } else {
-        qDebug() << "Warning: ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
+        qWarning() << "ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
         srvClientID += _hostname;
     }
     QString uniqueServerClientID =
@@ -648,6 +672,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
     lastPort = port;
     token = _token.trimmed();
     password = _newpassword;
+    hashedPassword.clear();
 
     connectToHost(lastHostname, lastPort);
     setStatus(StatusSubmitForgotPasswordReset);

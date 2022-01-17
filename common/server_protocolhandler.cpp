@@ -31,7 +31,7 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
                                                QObject *parent)
     : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), databaseInterface(_databaseInterface),
-      authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false),
+      authState(NotLoggedIn), usingRealPassword(false), acceptsUserListChanges(false), acceptsRoomListChanges(false),
       idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
 
 {
@@ -447,8 +447,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString password;
     bool needsHash = false;
     if (cmd.has_password()) {
-        password = nameFromStdString(cmd.password());
+        if (cmd.password().length() > MAX_NAME_LENGTH)
+            return Response::RespWrongPassword;
+        password = QString::fromStdString(cmd.password());
         needsHash = true;
+    } else if (cmd.hashed_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespContextError;
     } else {
         password = nameFromStdString(cmd.hashed_password());
     }
@@ -515,6 +519,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             return Response::RespAccountNotActivated;
         default:
             authState = res;
+            usingRealPassword = needsHash;
     }
 
     // limit the number of non-privileged users that can connect to the server based on configuration settings
@@ -791,6 +796,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1)
         return Response::RespInternalError;
+    if (cmd.password().length() > MAX_NAME_LENGTH)
+        return Response::RespContextError;
 
     auto level = userInfo->user_level();
     bool isJudge = level & ServerInfo_User::IsJudge;
@@ -818,10 +825,10 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, nameFromStdString(cmd.password()),
-                                        cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
-                                        cmd.spectators_allowed(), cmd.spectators_need_password(),
-                                        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+    Server_Game *game = new Server_Game(
+        copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
+        cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
+        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);

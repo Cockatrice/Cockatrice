@@ -1164,19 +1164,29 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     QString realName = nameFromStdString(cmd.real_name());
     QString country = nameFromStdString(cmd.country());
-    QString password = nameFromStdString(cmd.password());
-
-    if (!isPasswordLongEnough(password.length())) {
-        if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Password is too short", false);
-
-        return Response::RespPasswordTooShort;
+    QString password;
+    bool passwordNeedsHash = false;
+    if (cmd.has_password()) {
+        if (cmd.password().length() > MAX_NAME_LENGTH)
+            return Response::RespRegistrationFailed;
+        password = QString::fromStdString(cmd.password());
+        passwordNeedsHash = true;
+        if (!isPasswordLongEnough(password.length())) {
+            if (servatrice->getEnableRegistrationAudit()) {
+                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                             "REGISTER_ACCOUNT", "Password is too short", false);
+            }
+            return Response::RespPasswordTooShort;
+        }
+    } else if (cmd.hashed_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespRegistrationFailed;
+    } else {
+        password = QString::fromStdString(cmd.hashed_password());
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded =
-        sqlInterface->registerUser(userName, realName, password, emailAddress, country, !requireEmailActivation);
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, emailAddress,
+                                                   country, !requireEmailActivation);
 
     if (regSucceeded) {
         qDebug() << "Accepted register command for user: " << userName;
@@ -1256,20 +1266,72 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     QString emailAddress = nameFromStdString(cmd.email());
     QString country = nameFromStdString(cmd.country());
 
+    bool checkedPassword = false;
     QString userName = QString::fromStdString(userInfo->name());
+    if (cmd.has_password_check()) {
+        if (cmd.password_check().length() > MAX_NAME_LENGTH)
+            return Response::RespWrongPassword;
+        QString password = QString::fromStdString(cmd.password_check());
+        QString clientId = QString::fromStdString(userInfo->clientid());
+        QString reasonStr{};
+        int secondsLeft{};
+        AuthenticationResult checkStatus =
+            databaseInterface->checkUserPassword(this, userName, password, clientId, reasonStr, secondsLeft, true);
+        if (checkStatus == PasswordRight) {
+            checkedPassword = true;
+        } else {
+            // the user already logged in with this info, the only change is their password
+            return Response::RespWrongPassword;
+        }
+    }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set realname=:realName, email=:email, "
-                                                  "country=:country where name=:userName");
-    query->bindValue(":realName", realName);
-    query->bindValue(":email", emailAddress);
-    query->bindValue(":country", country);
+    QStringList queryList({});
+    if (cmd.has_real_name()) {
+        queryList << "realname=:realName";
+    }
+    if (cmd.has_email()) {
+        // a real password is required in order to change the email address
+        if (usingRealPassword || checkedPassword) {
+            queryList << "email=:email";
+        } else {
+            return Response::RespFunctionNotAllowed;
+        }
+    }
+    if (cmd.has_country()) {
+        queryList << "country=:country";
+    }
+
+    if (queryList.isEmpty())
+        return Response::RespOk;
+
+    QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
+    QSqlQuery *query = sqlInterface->prepareQuery(queryText);
+    if (cmd.has_real_name()) {
+        QString realName = nameFromStdString(cmd.real_name());
+        query->bindValue(":realName", realName);
+    }
+    if (cmd.has_email()) {
+        QString emailAddress = nameFromStdString(cmd.email());
+        query->bindValue(":email", emailAddress);
+    }
+    if (cmd.has_country()) {
+        QString country = nameFromStdString(cmd.country());
+        query->bindValue(":country", country);
+    }
     query->bindValue(":userName", userName);
+
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
 
-    userInfo->set_real_name(realName.toStdString());
-    userInfo->set_email(emailAddress.toStdString());
-    userInfo->set_country(country.toStdString());
+    if (cmd.has_real_name()) {
+        userInfo->set_real_name(realName.toStdString());
+    }
+    if (cmd.has_email()) {
+        userInfo->set_email(emailAddress.toStdString());
+    }
+    if (cmd.has_country()) {
+        userInfo->set_country(country.toStdString());
+    }
 
     return Response::RespOk;
 }
@@ -1300,15 +1362,26 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QString oldPassword = nameFromStdString(cmd.old_password());
-    QString newPassword = nameFromStdString(cmd.new_password());
-
-    if (!isPasswordLongEnough(newPassword.length()))
-        return Response::RespPasswordTooShort;
+    if (cmd.old_password().length() > MAX_NAME_LENGTH)
+        return Response::RespWrongPassword;
+    QString oldPassword = QString::fromStdString(cmd.old_password());
+    QString newPassword;
+    bool newPasswordNeedsHash = false;
+    if (cmd.has_new_password()) {
+        if (cmd.new_password().length() > MAX_NAME_LENGTH)
+            return Response::RespContextError;
+        newPassword = QString::fromStdString(cmd.new_password());
+        newPasswordNeedsHash = true;
+        if (!isPasswordLongEnough(newPassword.length()))
+            return Response::RespPasswordTooShort;
+    } else if (cmd.hashed_new_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespContextError;
+    } else {
+        newPassword = QString::fromStdString(cmd.hashed_new_password());
+    }
 
     QString userName = QString::fromStdString(userInfo->name());
-
-    if (!databaseInterface->changeUserPassword(userName, oldPassword, newPassword, false))
+    if (!databaseInterface->changeUserPassword(userName, oldPassword, true, newPassword, newPasswordNeedsHash))
         return Response::RespWrongPassword;
 
     return Response::RespOk;
@@ -1421,7 +1494,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         return Response::RespFunctionNotAllowed;
     }
 
-    if (sqlInterface->changeUserPassword(userName, "", nameFromStdString(cmd.new_password()), true)) {
+    QString password;
+    bool passwordNeedsHash = false;
+    if (cmd.has_new_password()) {
+        if (cmd.new_password().length() > MAX_NAME_LENGTH)
+            return Response::RespContextError;
+        password = QString::fromStdString(cmd.new_password());
+        passwordNeedsHash = true;
+    } else if (cmd.hashed_new_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespContextError;
+    } else {
+        password = QString::fromStdString(cmd.hashed_new_password());
+    }
+
+    if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit())
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                          "PASSWORD_RESET", "", true);

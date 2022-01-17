@@ -52,6 +52,7 @@ protected:
     bool deleted;
     Server_DatabaseInterface *databaseInterface;
     AuthenticationResult authState;
+    bool usingRealPassword;
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
     bool idleClientWarningSent;

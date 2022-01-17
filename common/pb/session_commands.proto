@@ -119,7 +119,7 @@ message Command_Register {
     // User name client wants to register
     required string user_name = 1;
     // Hashed password to be inserted into database
-    required string password = 2;
+    optional string password = 2;
     // Email address of the client for user validation
     optional string email = 3;
     // gender = 4; // obsolete
@@ -127,6 +127,7 @@ message Command_Register {
     optional string country = 5;
     optional string real_name = 6;
     optional string clientid = 7;
+    optional string hashed_password = 8;
 }
 
 // User wants to activate an account
@@ -149,6 +150,7 @@ message Command_AccountEdit {
     optional string email = 2;
     // gender = 3; // obsolete
     optional string country = 4;
+    optional string password_check = 100; // password is required to change sensitive information
 }
 
 message Command_AccountImage {
@@ -164,6 +166,8 @@ message Command_AccountPassword {
     }
     optional string old_password = 1;
     optional string new_password = 2;
+    // optional string hashed_old_password = 3; // we don't want users to steal hashed passwords and change them
+    optional string hashed_new_password = 4;
 }
 
 message Command_ForgotPasswordRequest {
@@ -182,6 +186,7 @@ message Command_ForgotPasswordReset {
     optional string clientid = 2;
     optional string token = 3;
     optional string new_password = 4;
+    optional string hashed_new_password = 5;
 }
 
 message Command_ForgotPasswordChallenge {

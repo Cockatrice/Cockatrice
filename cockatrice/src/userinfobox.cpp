@@ -4,6 +4,8 @@
 #include "dlg_edit_avatar.h"
 #include "dlg_edit_password.h"
 #include "dlg_edit_user.h"
+#include "gettextwithmax.h"
+#include "passwordhasher.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
@@ -11,6 +13,8 @@
 
 #include <QDateTime>
 #include <QGridLayout>
+#include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 
@@ -200,7 +204,22 @@ void UserInfoBox::actEditInternal(const Response &r)
 
     Command_AccountEdit cmd;
     cmd.set_real_name(dlg.getRealName().toStdString());
-    cmd.set_email(dlg.getEmail().toStdString());
+    if (client->getServerSupportsPasswordHash()) {
+        if (email != dlg.getEmail()) {
+            // real password is required to change email
+            bool ok = false;
+            QString password =
+                getTextWithMax(this, tr("Enter Password"),
+                               tr("Password verification is required in order to change your email address"),
+                               QLineEdit::Password, "", &ok);
+            if (!ok)
+                return;
+            cmd.set_password_check(password.toStdString());
+            cmd.set_email(dlg.getEmail().toStdString());
+        } // servers that support password hash do not require all fields to be filled anymore
+    } else {
+        cmd.set_email(dlg.getEmail().toStdString());
+    }
     cmd.set_country(dlg.getCountry().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
@@ -216,9 +235,42 @@ void UserInfoBox::actPassword()
     if (!dlg.exec())
         return;
 
+    auto oldPassword = dlg.getOldPassword();
+    auto newPassword = dlg.getNewPassword();
+
+    if (client->getServerSupportsPasswordHash()) {
+        Command_RequestPasswordSalt cmd;
+        cmd.set_user_name(client->getUserName().toStdString());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend,
+                // we need qoverload here in order to select the right version of this function
+                QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
+                this, [=](const Response &response, const CommandContainer &, const QVariant &) {
+                    if (response.response_code() == Response::RespOk) {
+                        changePassword(oldPassword, newPassword);
+                    } else {
+                        QMessageBox::critical(this, tr("Error"),
+                                              tr("An error occurred while trying to update your user information."));
+                    }
+                });
+        client->sendCommand(pend);
+    } else {
+        changePassword(oldPassword, newPassword);
+    }
+}
+
+void UserInfoBox::changePassword(const QString &oldPassword, const QString &newPassword)
+{
     Command_AccountPassword cmd;
-    cmd.set_old_password(dlg.getOldPassword().toStdString());
-    cmd.set_new_password(dlg.getNewPassword().toStdString());
+    cmd.set_old_password(oldPassword.toStdString());
+    if (client->getServerSupportsPasswordHash()) {
+        auto passwordSalt = PasswordHasher::generateRandomSalt();
+        QString hashedPassword = PasswordHasher::computeHash(newPassword, passwordSalt);
+        cmd.set_hashed_new_password(hashedPassword.toStdString());
+    } else {
+        cmd.set_new_password(newPassword.toStdString());
+    }
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
@@ -254,6 +306,9 @@ void UserInfoBox::processEditResponse(const Response &r)
             QMessageBox::critical(this, tr("Error"),
                                   tr("This server does not permit you to update your user informations."));
             break;
+        case Response::RespWrongPassword:
+            QMessageBox::critical(this, tr("Error"), tr("The entered password does not match your account."));
+            break;
         case Response::RespInternalError:
         default:
             QMessageBox::critical(this, tr("Error"),
@@ -280,7 +335,7 @@ void UserInfoBox::processPasswordResponse(const Response &r)
         case Response::RespInternalError:
         default:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("An error occured while trying to update your user informations."));
+                                  tr("An error occurred while trying to update your user information."));
             break;
     }
 }
