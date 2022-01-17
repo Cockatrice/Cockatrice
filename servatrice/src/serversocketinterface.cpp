@@ -1167,7 +1167,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     QString password;
     bool passwordNeedsHash = false;
     if (cmd.has_password()) {
-        password = nameFromStdString(cmd.password());
+        if (cmd.password().length() > MAX_NAME_LENGTH)
+            return Response::RespRegistrationFailed;
+        password = QString::fromStdString(cmd.password());
         passwordNeedsHash = true;
         if (!isPasswordLongEnough(password.length())) {
             if (servatrice->getEnableRegistrationAudit()) {
@@ -1176,8 +1178,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
             }
             return Response::RespPasswordTooShort;
         }
+    } else if (cmd.hashed_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespRegistrationFailed;
     } else {
-        password = nameFromStdString(cmd.hashed_password());
+        password = QString::fromStdString(cmd.hashed_password());
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
@@ -1265,7 +1269,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     bool checkedPassword = false;
     QString userName = QString::fromStdString(userInfo->name());
     if (cmd.has_password_check()) {
-        QString password = nameFromStdString(cmd.password_check());
+        if (cmd.password_check().length() > MAX_NAME_LENGTH)
+            return Response::RespWrongPassword;
+        QString password = QString::fromStdString(cmd.password_check());
         QString clientId = QString::fromStdString(userInfo->clientid());
         QString reasonStr{};
         int secondsLeft{};
@@ -1356,16 +1362,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
 
-    QString oldPassword = nameFromStdString(cmd.old_password());
+    if (cmd.old_password().length() > MAX_NAME_LENGTH)
+        return Response::RespWrongPassword;
+    QString oldPassword = QString::fromStdString(cmd.old_password());
     QString newPassword;
     bool newPasswordNeedsHash = false;
     if (cmd.has_new_password()) {
-        newPassword = nameFromStdString(cmd.new_password());
+        if (cmd.new_password().length() > MAX_NAME_LENGTH)
+            return Response::RespContextError;
+        newPassword = QString::fromStdString(cmd.new_password());
         newPasswordNeedsHash = true;
         if (!isPasswordLongEnough(newPassword.length()))
             return Response::RespPasswordTooShort;
+    } else if (cmd.hashed_new_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespContextError;
     } else {
-        newPassword = nameFromStdString(cmd.hashed_new_password());
+        newPassword = QString::fromStdString(cmd.hashed_new_password());
     }
 
     QString userName = QString::fromStdString(userInfo->name());
@@ -1485,10 +1497,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
     QString password;
     bool passwordNeedsHash = false;
     if (cmd.has_new_password()) {
-        password = nameFromStdString(cmd.new_password());
+        if (cmd.new_password().length() > MAX_NAME_LENGTH)
+            return Response::RespContextError;
+        password = QString::fromStdString(cmd.new_password());
         passwordNeedsHash = true;
+    } else if (cmd.hashed_new_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespContextError;
     } else {
-        password = nameFromStdString(cmd.hashed_new_password());
+        password = QString::fromStdString(cmd.hashed_new_password());
     }
 
     if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {

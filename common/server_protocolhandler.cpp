@@ -447,8 +447,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString password;
     bool needsHash = false;
     if (cmd.has_password()) {
-        password = nameFromStdString(cmd.password());
+        if (cmd.password().length() > MAX_NAME_LENGTH)
+            return Response::RespWrongPassword;
+        password = QString::fromStdString(cmd.password());
         needsHash = true;
+    } else if (cmd.hashed_password().length() > MAX_NAME_LENGTH) {
+        return Response::RespContextError;
     } else {
         password = nameFromStdString(cmd.hashed_password());
     }
@@ -792,6 +796,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1)
         return Response::RespInternalError;
+    if (cmd.password().length() > MAX_NAME_LENGTH)
+        return Response::RespContextError;
 
     auto level = userInfo->user_level();
     bool isJudge = level & ServerInfo_User::IsJudge;
@@ -819,10 +825,10 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, nameFromStdString(cmd.password()),
-                                        cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
-                                        cmd.spectators_allowed(), cmd.spectators_need_password(),
-                                        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+    Server_Game *game = new Server_Game(
+        copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
+        cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
+        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);

@@ -241,6 +241,8 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
                                                            ResponseContainer &rc,
                                                            Server_AbstractUserInterface *userInterface)
 {
+    if (cmd.password().length() > MAX_NAME_LENGTH)
+        return Response::RespWrongPassword;
     // This function is called from the Server thread and from the S_PH thread.
     // server->roomsMutex is always locked.
 
@@ -265,8 +267,9 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 
     QMutexLocker gameLocker(&game->gameMutex);
 
-    Response::ResponseCode result = game->checkJoin(userInterface->getUserInfo(), nameFromStdString(cmd.password()),
-                                                    cmd.spectator(), cmd.override_restrictions(), cmd.join_as_judge());
+    Response::ResponseCode result =
+        game->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(),
+                        cmd.override_restrictions(), cmd.join_as_judge());
     if (result == Response::RespOk)
         game->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
 
