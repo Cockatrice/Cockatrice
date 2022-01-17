@@ -191,11 +191,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - 11_Big_Sur
-          - 10.15_Catalina
-          - 10.14_Mojave
-          - Debug
         include:
           - target: 11_Big_Sur
             os: macos-11
@@ -301,9 +296,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch:
-          - 64
-          - 32
         include:
           - arch: 64
             triplet: x64
