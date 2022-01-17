@@ -616,7 +616,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpMainLayout = new QVBoxLayout;
     lpMainLayout->addWidget(mpGeneralGroupBox);
     lpMainLayout->addWidget(mpSpoilerGroupBox);
-    lpMainLayout->addStretch();
 
     setLayout(lpMainLayout);
 }
@@ -891,7 +890,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     mainLayout->addWidget(messageShortcuts);
     mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(highlightGroupBox);
-    mainLayout->addStretch();
 
     setLayout(mainLayout);
 
