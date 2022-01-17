@@ -84,6 +84,23 @@ jobs:
       matrix:
         # these names correspond to the files in .ci/$distro
         include:
+          - distro: ArchLinux
+            package: skip # we are packaged in arch already
+            allow-failure: yes
+
+          - distro: Debian11
+            package: DEB
+
+          - distro: Debian10
+            package: DEB
+ 
+          - distro: Fedora35
+            package: RPM
+
+          - distro: Fedora34
+            package: RPM
+            test: skip # gtest does not compile for some reason
+
           - distro: UbuntuImpish
             package: DEB
 
@@ -97,24 +114,6 @@ jobs:
 
           - distro: UbuntuBionic
             package: DEB
-
-          - distro: ArchLinux
-            package: skip # we are packaged in arch already
-            allow-failure: yes
-
-          - distro: Debian10
-            package: DEB
- 
-          - distro: Debian11
-            package: DEB
-
-          - distro: Fedora34
-            package: RPM
-            test: skip # gtest does not compile for some reason
-
-          - distro: Fedora35
-            package: RPM
-
 
     name: ${{matrix.distro}}
 
@@ -193,21 +192,14 @@ jobs:
       fail-fast: false
       matrix:
         target:
-          - Debug
-          - 10.14_Mojave
-          - 10.15_Catalina
           - 11_Big_Sur
+          - 10.15_Catalina
+          - 10.14_Mojave
+          - Debug
         include:
-          - target: Debug # tests only
-            os: macos-latest
+          - target: 11_Big_Sur
+            os: macos-11
             xcode: 12.5.1
-            type: Debug
-            do_tests: 0 # tests do not work yet on mac
-            make_package: false
-
-          - target: 10.14_Mojave
-            os: macos-10.15 # runs on Catalina
-            xcode: 10.3 # allows compatibility with macOS 10.14
             type: Release
             do_tests: 0
             make_package: true
@@ -219,12 +211,19 @@ jobs:
             do_tests: 0
             make_package: true
 
-          - target: 11_Big_Sur
-            os: macos-11
-            xcode: 12.5.1
+          - target: 10.14_Mojave
+            os: macos-10.15 # runs on Catalina
+            xcode: 10.3 # allows compatibility with macOS 10.14
             type: Release
             do_tests: 0
             make_package: true
+
+          - target: Debug # tests only
+            os: macos-latest
+            xcode: 12.5.1
+            type: Debug
+            do_tests: 0 # tests do not work yet on mac
+            make_package: false
 
     name: macOS ${{matrix.target}}
 
