@@ -45,7 +45,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&countryLabel2, 4, 1, 1, 1, Qt::AlignCenter);
     mainLayout->addWidget(&countryLabel3, 4, 2, 1, 1);
     mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
-    mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1);
+    mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1, Qt::AlignCenter);
     mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
     mainLayout->addWidget(&accountAgeLabel1, 6, 0, 1, 1);
     mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
@@ -104,7 +104,6 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     userLevelLabel2.setPixmap(
         UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
-    userLevelLabel2.setAlignment(Qt::AlignCenter);
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
