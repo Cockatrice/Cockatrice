@@ -829,9 +829,9 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&invertMentionForeground, 0, 1);
-    chatGrid->addWidget(&hexStringLabel, 0, 2, Qt::AlignRight);
-    chatGrid->addWidget(mentionColor, 0, 3);
+    chatGrid->addWidget(&hexStringLabel, 0, 1, Qt::AlignRight);
+    chatGrid->addWidget(mentionColor, 0, 2);
+    chatGrid->addWidget(&invertMentionForeground, 0, 3);
     chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, -1);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, -1);
     chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, -1);
@@ -853,9 +853,9 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *highlightNotice = new QGridLayout;
     highlightNotice->addWidget(customAlertString, 0, 0);
-    highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
-    highlightNotice->addWidget(&hexStringLabel, 0, 2, Qt::AlignRight);
-    highlightNotice->addWidget(highlightColor, 0, 3);
+    highlightNotice->addWidget(&hexStringLabel, 0, 1, Qt::AlignRight);
+    highlightNotice->addWidget(highlightColor, 0, 2);
+    highlightNotice->addWidget(&invertHighlightForeground, 0, 3);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, -1);
     // Expand first column more than following ones
     highlightNotice->setColumnStretch(0, 2);
