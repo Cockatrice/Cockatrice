@@ -805,7 +805,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
-    mentionColor->setClearButtonEnabled(enable);
+    mentionColor->setClearButtonEnabled(true);
     mentionColor->setPlaceholderText(tr("Color Code"));
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
@@ -821,7 +821,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&roomHistory, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setRoomHistory(int)));
 
     customAlertString = new QLineEdit();
-    customAlertString->setClearButtonEnabled(enable);
+    customAlertString->setClearButtonEnabled(true);
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
     customAlertString->setText(SettingsCache::instance().getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), &SettingsCache::instance(),
@@ -841,7 +841,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
-    highlightColor->setClearButtonEnabled(enable);
+    highlightColor->setClearButtonEnabled(true);
     highlightColor->setPlaceholderText(tr("Color Code"));
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
