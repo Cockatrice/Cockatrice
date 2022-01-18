@@ -421,7 +421,7 @@ void AppearanceSettingsPage::retranslateUi()
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
 
     handGroupBox->setTitle(tr("Hand layout"));
-    horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
+    horizontalHandCheckBox.setText(tr("Display hand horizontally (requires more space)"));
     leftJustifiedHandCheckBox.setText(tr("Enable left justification"));
 
     tableGroupBox->setTitle(tr("Table grid layout"));
@@ -805,6 +805,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
+    mentionColor->setPlaceholderText(tr("HEX Color Code"));
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
@@ -828,13 +829,13 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
     chatGrid->addWidget(mentionColor, 0, 2);
-    chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0);
+    chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, 2);
     chatGrid->addWidget(&hexLabel, 1, 2);
-    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
-    chatGrid->addWidget(&messagePopups, 4, 0);
-    chatGrid->addWidget(&mentionPopups, 5, 0);
-    chatGrid->addWidget(&roomHistory, 6, 0);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, 2);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, 2);
+    chatGrid->addWidget(&messagePopups, 4, 0, 1, 2);
+    chatGrid->addWidget(&mentionPopups, 5, 0, 1, 2);
+    chatGrid->addWidget(&roomHistory, 6, 0, 1, 2);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -848,7 +849,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
     highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
     highlightNotice->addWidget(customAlertString, 0, 0);
-    highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, 2);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
