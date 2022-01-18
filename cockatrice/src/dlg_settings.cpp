@@ -829,7 +829,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&hexStringLabel, 0, 1, Qt::AlignRight);
+    chatGrid->addWidget(&hexMentionStringLabel, 0, 1, Qt::AlignRight);
     chatGrid->addWidget(mentionColor, 0, 2);
     chatGrid->addWidget(&invertMentionForeground, 0, 3);
     chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, -1);
@@ -853,7 +853,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *highlightNotice = new QGridLayout;
     highlightNotice->addWidget(customAlertString, 0, 0);
-    highlightNotice->addWidget(&hexStringLabel, 0, 1, Qt::AlignRight);
+    highlightNotice->addWidget(&hexHighlightStringLabel, 0, 1, Qt::AlignRight);
     highlightNotice->addWidget(highlightColor, 0, 2);
     highlightNotice->addWidget(&invertHighlightForeground, 0, 3);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, -1);
@@ -1004,7 +1004,8 @@ void MessagesSettingsPage::retranslateUi()
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
     invertHighlightForeground.setText(tr("Invert text color"));
-    hexStringLabel.setText("HEX");
+    hexMentionStringLabel.setText("HEX");
+    hexHighlightStringLabel.setText("HEX");
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
