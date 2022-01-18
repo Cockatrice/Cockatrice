@@ -207,6 +207,7 @@ private:
     QLineEdit *highlightColor;
     QLineEdit *customAlertString;
     QLabel customAlertStringLabel;
+    QLabel hexStringLabel;
 
     void storeSettings();
     void updateMentionPreview();
