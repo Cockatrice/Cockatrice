@@ -845,7 +845,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
-    highlightColor->setClearButtonEnabled(true);
     highlightColor->setPlaceholderText(tr("Color Code"));
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
