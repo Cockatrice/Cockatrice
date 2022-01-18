@@ -827,15 +827,15 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&invertMentionForeground, 0, 1);
-    chatGrid->addWidget(mentionColor, 0, 2);
+    chatGrid->addWidget(&invertMentionForeground, 0, 2);
+    chatGrid->addWidget(mentionColor, 0, 3);
     chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, 2);
-    chatGrid->addWidget(&hexLabel, 1, 2);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, 3);
-    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, 3);
-    chatGrid->addWidget(&messagePopups, 4, 0, 1, 3);
-    chatGrid->addWidget(&mentionPopups, 5, 0, 1, 3);
-    chatGrid->addWidget(&roomHistory, 6, 0, 1, 3);
+    chatGrid->addWidget(&hexLabel, 1, 3);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, 2);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, 2);
+    chatGrid->addWidget(&messagePopups, 4, 0, 1, 2);
+    chatGrid->addWidget(&mentionPopups, 5, 0, 1, 2);
+    chatGrid->addWidget(&roomHistory, 6, 0, 1, 2);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -847,9 +847,9 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *highlightNotice = new QGridLayout;
     highlightNotice->addWidget(customAlertString, 0, 0);
-    highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
-    highlightNotice->addWidget(highlightColor, 0, 2);
-    highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
+    highlightNotice->addWidget(&invertHighlightForeground, 0, 2);
+    highlightNotice->addWidget(highlightColor, 0, 3);
+    highlightNotice->addWidget(&hexHighlightLabel, 1, 3);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, 2);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
