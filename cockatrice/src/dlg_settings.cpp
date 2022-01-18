@@ -837,7 +837,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&messagePopups, 4, 0, 1, 3);
     chatGrid->addWidget(&mentionPopups, 5, 0, 1, 3);
     chatGrid->addWidget(&roomHistory, 6, 0, 1, 3);
-    chatGrid->setColumnStretch(0, 1)
+    chatGrid->setColumnStretch(0, 1);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -853,7 +853,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
     highlightNotice->addWidget(highlightColor, 0, 2);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, 2);
-    highlightNotice->setColumnStretch(0, 1)
+    highlightNotice->setColumnStretch(0, 1);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
