@@ -805,8 +805,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
-    mentionColor->setClearButtonEnabled(true);
-    mentionColor->setPlaceholderText(tr("Color Code"));
+    mentionColor->setPlaceholderText(tr("HEX Code"));
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
@@ -821,7 +820,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&roomHistory, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setRoomHistory(int)));
 
     customAlertString = new QLineEdit();
-    customAlertString->setClearButtonEnabled(true);
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
     customAlertString->setText(SettingsCache::instance().getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), &SettingsCache::instance(),
@@ -829,7 +827,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&hexMentionStringLabel, 0, 1, Qt::AlignRight);
+    chatGrid->addWidget(&mentionColorStringLabel, 0, 1, Qt::AlignRight);
     chatGrid->addWidget(mentionColor, 0, 2);
     chatGrid->addWidget(&invertMentionForeground, 0, 3);
     chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, -1);
@@ -845,14 +843,14 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
-    highlightColor->setPlaceholderText(tr("Color Code"));
+    highlightColor->setPlaceholderText(tr("HEX Code"));
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
     connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
 
     auto *highlightNotice = new QGridLayout;
     highlightNotice->addWidget(customAlertString, 0, 0);
-    highlightNotice->addWidget(&hexHighlightStringLabel, 0, 1, Qt::AlignRight);
+    highlightNotice->addWidget(&highlightColorStringLabel, 0, 1, Qt::AlignRight);
     highlightNotice->addWidget(highlightColor, 0, 2);
     highlightNotice->addWidget(&invertHighlightForeground, 0, 3);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, -1);
@@ -1003,8 +1001,8 @@ void MessagesSettingsPage::retranslateUi()
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
     invertHighlightForeground.setText(tr("Invert text color"));
-    hexMentionStringLabel.setText("HEX");
-    hexHighlightStringLabel.setText("HEX");
+    mentionColorStringLabel.setText(tr("Color"));
+    highlightColorStringLabel.setText(tr("Color"));
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
