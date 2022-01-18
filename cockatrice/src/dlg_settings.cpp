@@ -806,7 +806,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     mentionColor = new QLineEdit();
     mentionColor->setClearButtonEnabled(enable);
-    mentionColor->setPlaceholderText(tr("HEX Color Code"));
+    mentionColor->setPlaceholderText(tr("Color Code"));
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
@@ -832,7 +832,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
     chatGrid->addWidget(mentionColor, 0, 2);
     chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, 2);
-    chatGrid->addWidget(&hexLabel, 1, 2);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, 3);
     chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, 3);
     chatGrid->addWidget(&messagePopups, 4, 0, 1, 3);
@@ -843,7 +842,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     highlightColor = new QLineEdit();
     highlightColor->setClearButtonEnabled(enable);
-    highlightColor->setPlaceholderText(tr("HEX Color Code"));
+    highlightColor->setPlaceholderText(tr("Color Code"));
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
     connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
@@ -852,7 +851,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightNotice->addWidget(customAlertString, 0, 0);
     highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
     highlightNotice->addWidget(highlightColor, 0, 2);
-    highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, 2);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
@@ -996,13 +994,11 @@ void MessagesSettingsPage::retranslateUi()
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
-    invertMentionForeground.setText(tr("Invert text color"));
-    invertHighlightForeground.setText(tr("Invert text color"));
+    invertMentionForeground.setText(tr("Invert text color (HEX)"));
+    invertHighlightForeground.setText(tr("Invert text color (HEX)"));
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
-    hexLabel.setText(tr("(Color is hexadecimal)"));
-    hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
 }
 
