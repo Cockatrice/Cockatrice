@@ -306,7 +306,7 @@ jobs:
             triplet: x86
             cmake: Win32
 
-    name: Windows ${{matrix.arch}}
+    name: Windows ${{matrix.arch}}-bit
 
     needs: configure
 
