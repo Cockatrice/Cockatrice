@@ -38,17 +38,17 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     auto *mainLayout = new QGridLayout;
     mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
-    mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
-    mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
-    mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
-    mainLayout->addWidget(&countryLabel1, 4, 0, 1, 1);
-    mainLayout->addWidget(&countryLabel2, 4, 1, 1, 1, Qt::AlignCenter);
-    mainLayout->addWidget(&countryLabel3, 4, 2, 1, 1);
-    mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
-    mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1, Qt::AlignCenter);
-    mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
-    mainLayout->addWidget(&accountAgeLabel1, 6, 0, 1, 1);
-    mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
+    mainLayout->addWidget(&userLevelLabel2, 1, 0, 1, 1, Qt::AlignCenter);
+    mainLayout->addWidget(&nameLabel, 1, 1, 1, 2);
+    mainLayout->addWidget(&userLevelLabel1, 2, 0, 1, 1);
+    mainLayout->addWidget(&userLevelLabel3, 2, 2, 1, 2);
+    mainLayout->addWidget(&realNameLabel1, 3, 0, 1, 1);
+    mainLayout->addWidget(&realNameLabel2, 3, 1, 1, 2);
+    mainLayout->addWidget(&accountAgeLabel1, 4, 0, 1, 1);
+    mainLayout->addWidget(&accountAgeLabel2, 4, 1, 1, 2);
+    mainLayout->addWidget(&countryLabel1, 5, 0, 1, 1);
+    mainLayout->addWidget(&countryLabel2, 5, 1, 1, 1, Qt::AlignCenter);
+    mainLayout->addWidget(&countryLabel3, 5, 2, 1, 1);
     mainLayout->setColumnStretch(2, 10);
 
     if (editable) {
@@ -103,7 +103,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     }
 
     userLevelLabel2.setPixmap(
-        UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
+        UserLevelPixmapGenerator::generatePixmap(20, userLevel, false, QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
