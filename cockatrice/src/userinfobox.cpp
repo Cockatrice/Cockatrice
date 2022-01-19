@@ -38,10 +38,10 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     auto *mainLayout = new QGridLayout;
     mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
-    mainLayout->addWidget(&userLevelLabel2, 1, 0, 1, 1, Qt::AlignCenter);
+    mainLayout->addWidget(&userLevelIcon, 1, 0, 1, 1, Qt::AlignCenter);
     mainLayout->addWidget(&nameLabel, 1, 1, 1, 2);
     mainLayout->addWidget(&userLevelLabel1, 2, 0, 1, 1);
-    mainLayout->addWidget(&userLevelLabel3, 2, 2, 1, 2);
+    mainLayout->addWidget(&userLevelLabel2, 2, 2, 1, 2);
     mainLayout->addWidget(&realNameLabel1, 3, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 3, 1, 1, 2);
     mainLayout->addWidget(&accountAgeLabel1, 4, 0, 1, 1);
@@ -102,7 +102,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         countryLabel3.setText("");
     }
 
-    userLevelLabel2.setPixmap(
+    userLevelIcon.setPixmap(
         UserLevelPixmapGenerator::generatePixmap(20, userLevel, false, QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
@@ -121,7 +121,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
     }
 
-    userLevelLabel3.setText(userLevelText);
+    userLevelLabel2.setText(userLevelText);
 
     QString accountAgeString = tr("Unregistered user");
     if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) ||
