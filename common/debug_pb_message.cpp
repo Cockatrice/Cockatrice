@@ -6,6 +6,7 @@
 #include <QString>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/text_format.h>
 
 // FastFieldValuePrinter is added in protobuf 3.4, going out of our way to add the old FieldValuePrinter is not worth it
