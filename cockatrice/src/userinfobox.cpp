@@ -37,8 +37,8 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     auto *mainLayout = new QGridLayout;
     mainLayout->addLayout(avatarLayout, 0, 0, 1, 3, Qt::AlignCenter);
-    mainLayout->addWidget(&nameLabel, 1, 0, 1, 2);
-    mainLayout->addWidget(&userLevelIcon, 1, 1, 1, 1, Qt::AlignCenter);
+    mainLayout->addWidget(&userLevelIcon, 1, 0, 1, 1);
+    mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
     mainLayout->addWidget(&userLevelLabel1, 3, 0, 1, 1);
