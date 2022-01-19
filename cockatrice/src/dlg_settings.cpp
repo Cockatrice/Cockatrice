@@ -805,7 +805,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
-    mentionColor->setPlaceholderText(tr("HEX Code"));
+    mentionColor->setPlaceholderText(tr("Enter HEX code"));
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
@@ -837,13 +837,13 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&mentionPopups, 5, 0, 1, -1);
     chatGrid->addWidget(&roomHistory, 6, 0, 1, -1);
     // Expand first column more than following ones
-    chatGrid->setColumnStretch(0, 2);
+    chatGrid->setColumnStretch(0, 3);
     chatGrid->setColumnStretch(1, 1);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
-    highlightColor->setPlaceholderText(tr("HEX Code"));
+    highlightColor->setPlaceholderText(tr("Enter HEX code"));
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
     connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
@@ -855,7 +855,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightNotice->addWidget(&invertHighlightForeground, 0, 3);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, -1);
     // Expand first column more than following ones
-    highlightNotice->setColumnStretch(0, 2);
+    highlightNotice->setColumnStretch(0, 3);
     highlightNotice->setColumnStretch(1, 1);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
