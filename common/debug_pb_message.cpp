@@ -6,8 +6,16 @@
 #include <QString>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
-#include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/text_format.h>
+
+// google/protobuf/stubs/strutil.h is missing on some systems!
+namespace google
+{
+namespace protobuf
+{
+std::string CEscape(const std::string &src);
+} // namespace protobuf
+} // namespace google
 
 // FastFieldValuePrinter is added in protobuf 3.4, going out of our way to add the old FieldValuePrinter is not worth it
 #if GOOGLE_PROTOBUF_VERSION > 3004000
@@ -36,10 +44,8 @@ void LimitedPrinter::PrintString(const std::string &val,
 {
     auto length = val.length();
     if (length > MAX_TEXT_LENGTH) {
-        std::string escaped;
-        ::google::protobuf::CEscapeAndAppend(::google::protobuf::CEscape(val.substr(0, MAX_NAME_LENGTH)), &escaped);
-        generator->PrintString("\"" + escaped + "... ---snip--- (" + ::google::protobuf::StrCat(length) +
-                               " bytes total) \"");
+        generator->PrintString("\"" + ::google::protobuf::CEscape(val.substr(0, MAX_NAME_LENGTH)) + "... ---snip--- (" +
+                               std::to_string(length) + " bytes total) \"");
     } else {
         ::google::protobuf::TextFormat::FastFieldValuePrinter::PrintString(val, generator);
     }
