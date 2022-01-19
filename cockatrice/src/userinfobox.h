@@ -16,8 +16,8 @@ class UserInfoBox : public QWidget
 private:
     AbstractClient *client;
     bool editable;
-    QLabel avatarLabel, userLevelIcon, nameLabel, realNameLabel1, realNameLabel2, countryLabel1, countryLabel2, countryLabel3,
-        userLevelLabel1, userLevelLabel2, accountAgeLabel1, accountAgeLabel2;
+    QLabel avatarLabel, userLevelIcon, nameLabel, realNameLabel1, realNameLabel2, countryLabel1, countryLabel2,
+	    countryLabel3, userLevelLabel1, userLevelLabel2, accountAgeLabel1, accountAgeLabel2;
     QPushButton editButton, passwordButton, avatarButton;
     QPixmap avatarPixmap;
 
