@@ -28,7 +28,6 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     avatarLabel.setMinimumSize(200, 200);
     avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    avatarLabel.setAlignment(Qt::AlignCenter);
 
     auto *avatarLayout = new QHBoxLayout;
     avatarLayout->setContentsMargins(0, 0, 0, 0);
@@ -37,13 +36,13 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     avatarLayout->addStretch(1);
 
     auto *mainLayout = new QGridLayout;
-    mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
-    mainLayout->addWidget(&userLevelIcon, 1, 0, 1, 1, Qt::AlignCenter);
-    mainLayout->addWidget(&nameLabel, 1, 1, 1, 2);
-    mainLayout->addWidget(&userLevelLabel1, 2, 0, 1, 1);
-    mainLayout->addWidget(&userLevelLabel2, 2, 2, 1, 2);
-    mainLayout->addWidget(&realNameLabel1, 3, 0, 1, 1);
-    mainLayout->addWidget(&realNameLabel2, 3, 1, 1, 2);
+    mainLayout->addLayout(avatarLayout, 0, 0, 1, 3, Qt::AlignCenter);
+    mainLayout->addWidget(&nameLabel, 1, 0, 1, 2);
+    mainLayout->addWidget(&userLevelIcon, 1, 1, 1, 1, Qt::AlignCenter);
+    mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
+    mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
+    mainLayout->addWidget(&userLevelLabel1, 3, 0, 1, 1);
+    mainLayout->addWidget(&userLevelLabel2, 3, 1, 1, 2);
     mainLayout->addWidget(&accountAgeLabel1, 4, 0, 1, 1);
     mainLayout->addWidget(&accountAgeLabel2, 4, 1, 1, 2);
     mainLayout->addWidget(&countryLabel1, 5, 0, 1, 1);
@@ -103,7 +102,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     }
 
     userLevelIcon.setPixmap(
-        UserLevelPixmapGenerator::generatePixmap(20, userLevel, false, QString::fromStdString(user.privlevel())));
+        UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
