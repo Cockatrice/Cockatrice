@@ -1,5 +1,6 @@
 #include "remoteclient.h"
 
+#include "debug_pb_message.h"
 #include "main.h"
 #include "passwordhasher.h"
 #include "pb/event_server_identification.pb.h"
@@ -387,7 +388,7 @@ void RemoteClient::readData()
         ServerMessage newServerMessage;
         newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
 #ifdef QT_DEBUG
-        qDebug() << "IN" << messageLength << QString::fromStdString(newServerMessage.ShortDebugString());
+        qDebug() << "IN" << getSafeDebugString(newServerMessage);
 #endif
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
@@ -405,7 +406,7 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
     ServerMessage newServerMessage;
     newServerMessage.ParseFromArray(message.data(), message.length());
 #ifdef QT_DEBUG
-    qDebug() << "IN" << messageLength << QString::fromStdString(newServerMessage.ShortDebugString());
+    qDebug() << "IN" << getSafeDebugString(newServerMessage);
 #endif
     processProtocolItem(newServerMessage);
 }
@@ -418,7 +419,7 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     auto size = static_cast<unsigned int>(cont.ByteSize());
 #endif
 #ifdef QT_DEBUG
-    qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
+    qDebug() << "OUT" << getSafeDebugString(cont);
 #endif
 
     QByteArray buf;

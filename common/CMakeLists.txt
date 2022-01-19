@@ -5,6 +5,7 @@
 add_subdirectory(pb)
 
 SET(common_SOURCES
+    debug_pb_message.cpp
     decklist.cpp
     expression.cpp
     featureset.cpp
