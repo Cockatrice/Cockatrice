@@ -27,21 +27,23 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     nameLabel.setFont(nameFont);
 
     auto *userIconAndNameLayout = new QHBoxLayout;
-    userIconAndNameLayout->addWidget(&userLevelIcon, 0, 0);
-    userIconAndNameLayout->addWidget(&nameLabel, 0, 1);
+    userIconAndNameLayout->addWidget(&userLevelIcon, 0, Qt::AlignCenter);
+    userIconAndNameLayout->addWidget(&nameLabel, 1);
+    userIconAndNameLayout->addStretch();
 
-    avatarLabel.setMinimumSize(200, 200);
-    avatarLabel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    avatarPic.setMinimumSize(200, 200);
+    avatarPic.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    avatarPic.setAlignment(Qt::AlignCenter);
 
     auto *avatarLayout = new QHBoxLayout;
     avatarLayout->setContentsMargins(0, 0, 0, 0);
     avatarLayout->addStretch(1);
-    avatarLayout->addWidget(&avatarLabel, 3);
+    avatarLayout->addWidget(&avatarPic, 3);
     avatarLayout->addStretch(1);
 
     auto *mainLayout = new QGridLayout;
-    mainLayout->addLayout(avatarLayout, 0, 0, 1, 3, Qt::AlignCenter);
-    mainLayout->addWidget(userIconAndNameLayout, 1, 0, 1, 3);
+    mainLayout->addLayout(avatarLayout, 0, 0, 1, 3);
+    mainLayout->addLayout(userIconAndNameLayout, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
     mainLayout->addWidget(&userLevelLabel1, 3, 0, 1, 1);
@@ -97,7 +99,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QString country = QString::fromStdString(user.country());
 
     if (country.length() != 0) {
-        countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
+        countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(13, country));
         countryLabel3.setText(QString("%1").arg(country.toUpper()));
     } else {
         countryLabel2.setText("");
@@ -360,7 +362,7 @@ void UserInfoBox::processAvatarResponse(const Response &r)
 
 void UserInfoBox::resizeEvent(QResizeEvent *event)
 {
-    QPixmap resizedPixmap = avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    avatarLabel.setPixmap(resizedPixmap);
+    QPixmap resizedPixmap = avatarPixmap.scaled(avatarPic.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    avatarPic.setPixmap(resizedPixmap);
     QWidget::resizeEvent(event);
 }
