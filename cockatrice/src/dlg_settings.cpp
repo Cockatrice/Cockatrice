@@ -14,6 +14,7 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QCloseEvent>
+#include <QColorDialog>
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
@@ -798,17 +799,15 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setIgnoreUnregisteredUserMessages(int)));
 
-    invertMentionForeground.setChecked(SettingsCache::instance().getChatMentionForeground());
-    connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
-
     invertHighlightForeground.setChecked(SettingsCache::instance().getChatHighlightForeground());
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
-    mentionColor = new QLineEdit();
-    mentionColor->setPlaceholderText(tr("Enter HEX code"));
-    mentionColor->setText(SettingsCache::instance().getChatMentionColor());
+    mentionColor = new QPushButton(this);
+    mentionColorReset = new QPushButton(this);
+    mentionColorReset->setIcon(QPixmap("theme:icons/update"));
     updateMentionPreview();
-    connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
+    connect(mentionColor, SIGNAL(clicked()), this, SLOT(updateColor()));
+    connect(mentionColorReset, SIGNAL(clicked()), this, SLOT(resetMentionColor()));
 
     messagePopups.setChecked(SettingsCache::instance().getShowMessagePopup());
     connect(&messagePopups, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setShowMessagePopups(int)));
@@ -829,7 +828,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&mentionColorStringLabel, 0, 1, Qt::AlignRight);
     chatGrid->addWidget(mentionColor, 0, 2);
-    chatGrid->addWidget(&invertMentionForeground, 0, 3);
+    chatGrid->addWidget(mentionColorReset, 0, 3);
     chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, -1);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, -1);
     chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, -1);
@@ -868,15 +867,12 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    aAdd->setToolTip(tr("Add New Message"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    aEdit->setToolTip(tr("Edit Message"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    aRemove->setToolTip(tr("Remove Message"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     auto *messageToolBar = new QToolBar;
@@ -904,11 +900,13 @@ MessagesSettingsPage::MessagesSettingsPage()
     retranslateUi();
 }
 
-void MessagesSettingsPage::updateColor(const QString &value)
+void MessagesSettingsPage::updateColor()
 {
-    QColor colorToSet;
-    colorToSet.setNamedColor("#" + value);
+    QColor initialColor("#" + SettingsCache::instance().getChatMentionColor());
+    QColor colorToSet = QColorDialog::getColor(initialColor, this, tr("Select mention color"));
     if (colorToSet.isValid()) {
+        QString value = colorToSet.name();
+        value.remove(0, 1); // remove #
         SettingsCache::instance().setChatMentionColor(value);
         updateMentionPreview();
     }
@@ -924,9 +922,9 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value)
     }
 }
 
-void MessagesSettingsPage::updateTextColor(int value)
+void MessagesSettingsPage::resetMentionColor()
 {
-    SettingsCache::instance().setChatMentionForeground(value);
+    SettingsCache::instance().setChatMentionColor("000000");
     updateMentionPreview();
 }
 
@@ -938,9 +936,8 @@ void MessagesSettingsPage::updateTextHighlightColor(int value)
 
 void MessagesSettingsPage::updateMentionPreview()
 {
-    mentionColor->setStyleSheet(
-        "QLineEdit{background:#" + SettingsCache::instance().getChatMentionColor() +
-        ";color: " + (SettingsCache::instance().getChatMentionForeground() ? "white" : "black") + ";}");
+    qDebug() << ("QLabel{ color: #" + SettingsCache::instance().getChatMentionColor() + "; font-weight: bold }");
+    mentionColorStringLabel.setStyleSheet("QLabel{ color: #" + SettingsCache::instance().getChatMentionColor() + "; font-weight: bold }");
 }
 
 void MessagesSettingsPage::updateHighlightPreview()
@@ -999,14 +996,17 @@ void MessagesSettingsPage::retranslateUi()
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
-    invertMentionForeground.setText(tr("Invert text color"));
     invertHighlightForeground.setText(tr("Invert text color"));
     mentionColorStringLabel.setText(tr("Color"));
     highlightColorStringLabel.setText(tr("Color"));
+    mentionColor->setText(tr("Change mention color"));
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
+    aAdd->setToolTip(tr("Add New Message"));
+    aEdit->setToolTip(tr("Edit Message"));
+    aRemove->setToolTip(tr("Remove Message"));
 }
 
 SoundSettingsPage::SoundSettingsPage()

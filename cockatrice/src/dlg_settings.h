@@ -181,9 +181,9 @@ private slots:
     void actAdd();
     void actEdit();
     void actRemove();
-    void updateColor(const QString &value);
+    void updateColor();
     void updateHighlightColor(const QString &value);
-    void updateTextColor(int value);
+    void resetMentionColor();
     void updateTextHighlightColor(int value);
 
 private:
@@ -193,7 +193,6 @@ private:
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
     QCheckBox chatMentionCompleterCheckbox;
-    QCheckBox invertMentionForeground;
     QCheckBox invertHighlightForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
@@ -203,7 +202,9 @@ private:
     QGroupBox *chatGroupBox;
     QGroupBox *highlightGroupBox;
     QGroupBox *messageShortcuts;
-    QLineEdit *mentionColor;
+    QValidator *hexValidator;
+    QPushButton *mentionColor;
+    QPushButton *mentionColorReset;
     QLineEdit *highlightColor;
     QLineEdit *customAlertString;
     QLabel customAlertStringLabel;
