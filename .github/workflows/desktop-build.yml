@@ -84,27 +84,13 @@ jobs:
       matrix:
         # these names correspond to the files in .ci/$distro
         include:
-          - distro: UbuntuImpish
-            package: DEB
-
-          - distro: UbuntuHirsute
-            package: DEB
-            test: skip
-
-          - distro: UbuntuFocal
-            package: DEB
-            test: skip # UbuntuFocal has a broken qt for debug builds
-
-          - distro: UbuntuBionic
-            package: DEB
-
           - distro: ArchLinux
             package: skip # we are packaged in arch already
             allow-failure: yes
 
           - distro: Debian10
             package: DEB
- 
+
           - distro: Debian11
             package: DEB
 
@@ -115,6 +101,19 @@ jobs:
           - distro: Fedora35
             package: RPM
 
+          - distro: UbuntuBionic
+            package: DEB
+
+          - distro: UbuntuFocal
+            package: DEB
+            test: skip # UbuntuFocal has a broken qt for debug builds
+
+          - distro: UbuntuHirsute
+            package: DEB
+            test: skip
+
+          - distro: UbuntuImpish
+            package: DEB
 
     name: ${{matrix.distro}}
 
@@ -192,11 +191,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - Debug
-          - 10.14_Mojave
-          - 10.15_Catalina
-          - 11_Big_Sur
         include:
           - target: Debug # tests only
             os: macos-latest
@@ -283,7 +277,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v2
         with:
-          name: macOS-${{matrix.target}}-xcode-${{matrix.xcode}}-dmg
+          name: macOS-${{matrix.target}}-dmg
           path: ${{steps.package.outputs.path}}
           if-no-files-found: error
 
@@ -302,20 +296,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch:
-          - 64
-          - 32
         include:
+          - arch: 32
+            triplet: x86
+            cmake: Win32
+
           - arch: 64
             triplet: x64
             cmake: x64
             append: _64
 
-          - arch: 32
-            triplet: x86
-            cmake: Win32
-
-    name: Windows ${{matrix.arch}}
+    name: Windows ${{matrix.arch}}-bit
 
     needs: configure
 
