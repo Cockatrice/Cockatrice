@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="nl" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="nl">
 <context>
     <name>IntroPage</name>
     <message>
@@ -65,87 +65,87 @@
         <translation>Stelt JSON-bestand in (%1)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="304"/>
-        <location filename="../src/oraclewizard.cpp" line="323"/>
-        <location filename="../src/oraclewizard.cpp" line="328"/>
-        <location filename="../src/oraclewizard.cpp" line="396"/>
-        <location filename="../src/oraclewizard.cpp" line="520"/>
-        <location filename="../src/oraclewizard.cpp" line="541"/>
+        <location filename="../src/oraclewizard.cpp" line="310"/>
+        <location filename="../src/oraclewizard.cpp" line="329"/>
+        <location filename="../src/oraclewizard.cpp" line="334"/>
+        <location filename="../src/oraclewizard.cpp" line="403"/>
+        <location filename="../src/oraclewizard.cpp" line="527"/>
+        <location filename="../src/oraclewizard.cpp" line="548"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="304"/>
+        <location filename="../src/oraclewizard.cpp" line="310"/>
         <source>The provided URL is not valid.</source>
         <translation>De ingevoerde URL is niet geldig.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="308"/>
+        <location filename="../src/oraclewizard.cpp" line="314"/>
         <source>Downloading (0MB)</source>
         <translation>Downloaden (0MB)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="323"/>
+        <location filename="../src/oraclewizard.cpp" line="329"/>
         <source>Please choose a file.</source>
         <translation>Gelieve een bestand te kiezen.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="328"/>
+        <location filename="../src/oraclewizard.cpp" line="334"/>
         <source>Cannot open file &apos;%1&apos;.</source>
         <translation>Bestand &apos;%1&apos; kan niet geopend worden.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="387"/>
+        <location filename="../src/oraclewizard.cpp" line="394"/>
         <source>Downloading (%1MB)</source>
         <translation>Downloaden (%1MB)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="396"/>
+        <location filename="../src/oraclewizard.cpp" line="403"/>
         <source>Network error: %1.</source>
         <translation>Netwerk fout: %1.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="434"/>
+        <location filename="../src/oraclewizard.cpp" line="441"/>
         <source>Parsing file</source>
         <translation>Parsen van bestand</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="448"/>
+        <location filename="../src/oraclewizard.cpp" line="455"/>
         <source>Xz extraction failed.</source>
         <translation>Xz extractie mislukt.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="456"/>
+        <location filename="../src/oraclewizard.cpp" line="463"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
         <translation>Sorry, deze versie van Oracle ondersteunt geen xz gecomprimeerde bestanden.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="475"/>
+        <location filename="../src/oraclewizard.cpp" line="482"/>
         <source>Failed to open Zip archive: %1.</source>
         <translation>Zip archief kan niet geopend worden: %1.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="480"/>
+        <location filename="../src/oraclewizard.cpp" line="487"/>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
         <translation>Uitpakken van Zip niet gelukt: het archief moet precies één bestand bevatten.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="488"/>
+        <location filename="../src/oraclewizard.cpp" line="495"/>
         <source>Zip extraction failed: %1.</source>
         <translation>Uitpakken van Zip niet gelukt: %1.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="497"/>
+        <location filename="../src/oraclewizard.cpp" line="504"/>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
         <translation>Sorry, deze versie van Oracle ondersteunt geen gecomprimeerde bestanden.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="520"/>
+        <location filename="../src/oraclewizard.cpp" line="527"/>
         <source>Do you want to download the uncompressed file instead?</source>
         <translation>Wilt u het ongecomprimeerde bestand downloaden?</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="542"/>
+        <location filename="../src/oraclewizard.cpp" line="549"/>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>Het bestand is succesvol binnengehaald, maar bevat geen set data.</translation>
     </message>
@@ -153,42 +153,42 @@
 <context>
     <name>LoadSpoilersPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="697"/>
+        <location filename="../src/oraclewizard.cpp" line="700"/>
         <source>Save spoiler database</source>
         <translation>Opslaan spoiler database</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="702"/>
+        <location filename="../src/oraclewizard.cpp" line="705"/>
         <source>XML; spoiler database (*.xml)</source>
         <translation>XML; spoiler database (*.xml)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="707"/>
+        <location filename="../src/oraclewizard.cpp" line="710"/>
         <source>Spoilers import</source>
         <translation>Spoilers import</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="708"/>
+        <location filename="../src/oraclewizard.cpp" line="711"/>
         <source>Please specify a compatible source for spoiler data.</source>
         <translation>Gelieve een compatibele bron voor spoilergegevens te specificeren.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="710"/>
+        <location filename="../src/oraclewizard.cpp" line="713"/>
         <source>Download URL:</source>
         <translation>Download URL:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="711"/>
+        <location filename="../src/oraclewizard.cpp" line="714"/>
         <source>Restore default URL</source>
         <translation>Herstel standaard URL</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="712"/>
+        <location filename="../src/oraclewizard.cpp" line="715"/>
         <source>The spoiler database will be saved at the following location:</source>
         <translation>De spoiler database wordt op de volgende locatie opgeslagen:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="714"/>
+        <location filename="../src/oraclewizard.cpp" line="717"/>
         <source>Save to a custom path (not recommended)</source>
         <translation>Opslaan naar een aangepaste locatie (niet aanbevolen)</translation>
     </message>
@@ -196,42 +196,42 @@
 <context>
     <name>LoadTokensPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="660"/>
+        <location filename="../src/oraclewizard.cpp" line="663"/>
         <source>Save token database</source>
         <translation>token database opslaan</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="665"/>
+        <location filename="../src/oraclewizard.cpp" line="668"/>
         <source>XML; token database (*.xml)</source>
         <translation>XML; token database (*.xml)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="670"/>
+        <location filename="../src/oraclewizard.cpp" line="673"/>
         <source>Tokens import</source>
         <translation>Tokens import</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="671"/>
+        <location filename="../src/oraclewizard.cpp" line="674"/>
         <source>Please specify a compatible source for token data.</source>
         <translation>Gelieve een compatibele bron voor tokengegevens op te geven.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="673"/>
+        <location filename="../src/oraclewizard.cpp" line="676"/>
         <source>Download URL:</source>
         <translation>Download URL:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="674"/>
+        <location filename="../src/oraclewizard.cpp" line="677"/>
         <source>Restore default URL</source>
         <translation>Herstel standaard URL</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="675"/>
+        <location filename="../src/oraclewizard.cpp" line="678"/>
         <source>The token database will be saved at the following location:</source>
         <translation>De token database wordt op de volgende locatie opgeslagen:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="677"/>
+        <location filename="../src/oraclewizard.cpp" line="680"/>
         <source>Save to a custom path (not recommended)</source>
         <translation>Opslaan naar een aangepaste locatie (niet aanbevolen)</translation>
     </message>
@@ -239,7 +239,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="445"/>
+        <location filename="../src/oracleimporter.cpp" line="475"/>
         <source>Dummy set containing tokens</source>
         <translation>Token voorbeeldset</translation>
     </message>
@@ -278,68 +278,68 @@
 <context>
     <name>SaveSetsPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="579"/>
-        <location filename="../src/oraclewizard.cpp" line="636"/>
+        <location filename="../src/oraclewizard.cpp" line="586"/>
+        <location filename="../src/oraclewizard.cpp" line="639"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="579"/>
+        <location filename="../src/oraclewizard.cpp" line="586"/>
         <source>No set has been imported.</source>
         <translation>Er zijn geen sets geïmporteerd.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="585"/>
+        <location filename="../src/oraclewizard.cpp" line="592"/>
         <source>Sets imported</source>
         <translation>Sets geïmporteerd</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="586"/>
+        <location filename="../src/oraclewizard.cpp" line="593"/>
         <source>The following sets have been found:</source>
         <translation>De volgende sets zijn gevonden:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="588"/>
+        <location filename="../src/oraclewizard.cpp" line="595"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
         <translation>Druk op &quot;Opslaan&quot; om de geïmporteerde kaarten op te slaan in de Cockatrice database.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="589"/>
+        <location filename="../src/oraclewizard.cpp" line="596"/>
         <source>The card database will be saved at the following location:</source>
         <translation>De kaartendatabase wordt op de volgende locatie opgeslagen:</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="591"/>
+        <location filename="../src/oraclewizard.cpp" line="598"/>
         <source>Save to a custom path (not recommended)</source>
         <translation>Opslaan naar een aangepaste locatie (niet aanbevolen)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="593"/>
+        <location filename="../src/oraclewizard.cpp" line="600"/>
         <source>&amp;Save</source>
         <translation>&amp;Opslaan</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="599"/>
+        <location filename="../src/oraclewizard.cpp" line="606"/>
         <source>Import finished: %1 cards.</source>
         <translation>Import klaar: %1 kaarten.</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="602"/>
+        <location filename="../src/oraclewizard.cpp" line="609"/>
         <source>%1: %2 cards imported</source>
         <translation>%1: %2 kaarten geïmporteerd</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="612"/>
+        <location filename="../src/oraclewizard.cpp" line="618"/>
         <source>Save card database</source>
         <translation>Kaartendatabase opslaan</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="613"/>
+        <location filename="../src/oraclewizard.cpp" line="619"/>
         <source>XML; card database (*.xml)</source>
         <translation>XML; kaart database (*.xml)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="636"/>
+        <location filename="../src/oraclewizard.cpp" line="639"/>
         <source>The file could not be saved to %1</source>
         <translation>Het bestand kon niet worden opgeslagen in %1</translation>
     </message>
@@ -349,7 +349,7 @@
     <message>
         <location filename="../src/pagetemplates.cpp" line="73"/>
         <location filename="../src/pagetemplates.cpp" line="113"/>
-        <location filename="../src/pagetemplates.cpp" line="173"/>
+        <location filename="../src/pagetemplates.cpp" line="169"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
@@ -374,164 +374,15 @@
         <translation>Netwerk fout: %1.</translation>
     </message>
     <message>
-        <location filename="../src/pagetemplates.cpp" line="173"/>
+        <location filename="../src/pagetemplates.cpp" line="169"/>
         <source>The file could not be saved to %1</source>
         <translation>Het bestand kon niet worden opgeslagen naar %1</translation>
     </message>
 </context>
 <context>
-    <name>UnZip</name>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1177"/>
-        <source>ZIP operation completed successfully.</source>
-        <translation>ZIP taak succesvol voltooid.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1178"/>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Zlib bibliotheek kon niet geladen of geïnitialiseerd worden.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1179"/>
-        <source>zlib library error.</source>
-        <translation>Zlib bibliotheek fout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1180"/>
-        <source>Unable to create or open file.</source>
-        <translation>Kan het bestand niet openen of aanmaken.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1181"/>
-        <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Gedeeltelijk beschadigd archief. Sommige bestanden kunnen mogelijk uitgepakt worden.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1182"/>
-        <source>Corrupted archive.</source>
-        <translation>Beschadigd archief.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1183"/>
-        <source>Wrong password.</source>
-        <translation>Verkeerd wachtwoord.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1184"/>
-        <source>No archive has been created yet.</source>
-        <translation>Er is nog geen archief gemaakt.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1185"/>
-        <source>File or directory does not exist.</source>
-        <translation>Bestand of map bestaat niet.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1186"/>
-        <source>File read error.</source>
-        <translation>Bestand leesfout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1187"/>
-        <source>File write error.</source>
-        <translation>Bestand schrijffout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1188"/>
-        <source>File seek error.</source>
-        <translation>Bestand zoekfout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1189"/>
-        <source>Unable to create a directory.</source>
-        <translation>Map kon niet aangemaakt worden.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1190"/>
-        <source>Invalid device.</source>
-        <translation>Ongeldig apparaat.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1191"/>
-        <source>Invalid or incompatible zip archive.</source>
-        <translation>Ongeldig of onverenigbare zip archief.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1192"/>
-        <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>Inconsistente headers. Archief is mogelijk beschadigd.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/unzip.cpp" line="1196"/>
-        <source>Unknown error.</source>
-        <translation>Onbekende fout.</translation>
-    </message>
-</context>
-<context>
-    <name>Zip</name>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1604"/>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Zip handeling succesvol voltooid.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1605"/>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Initialisatie van zlib bibliotheek niet gelukt.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1606"/>
-        <source>zlib library error.</source>
-        <translation>Zlib bibliotheek fout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1607"/>
-        <source>Unable to create or open file.</source>
-        <translation>Kon geen bestand openen of aanmaken.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1608"/>
-        <source>No archive has been created yet.</source>
-        <translation>Er is nog geen archief gemaakt.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1609"/>
-        <source>File or directory does not exist.</source>
-        <translation>Bestand of map bestaat niet.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1610"/>
-        <source>File read error.</source>
-        <translation>Bestand leesfout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1611"/>
-        <source>File write error.</source>
-        <translation>Bestand schrijffout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1612"/>
-        <source>File seek error.</source>
-        <translation>Bestand zoekfout.</translation>
-    </message>
-    <message>
-        <location filename="../src/zip/zip.cpp" line="1616"/>
-        <source>Unknown error.</source>
-        <translation>Onbekende fout.</translation>
-    </message>
-</context>
-<context>
-    <name>i18n</name>
-    <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="158"/>
-        <source>English</source>
-        <translation>Nederlands (Dutch)</translation>
-    </message>
-</context>
-<context>
     <name>main</name>
     <message>
-        <location filename="../src/main.cpp" line="43"/>
+        <location filename="../src/main.cpp" line="42"/>
         <source>Only run in spoiler mode</source>
         <translation>Alleen in spoiler-modus werken</translation>
     </message>
