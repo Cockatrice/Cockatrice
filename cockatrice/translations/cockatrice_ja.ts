@@ -23,77 +23,77 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="409"/>
+        <location filename="../src/dlg_settings.cpp" line="406"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="409"/>
+        <location filename="../src/dlg_settings.cpp" line="406"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="415"/>
+        <location filename="../src/dlg_settings.cpp" line="412"/>
         <source>Theme settings</source>
         <translation>テーマ設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="416"/>
+        <location filename="../src/dlg_settings.cpp" line="413"/>
         <source>Current theme:</source>
         <translation>現在のテーマ</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="417"/>
+        <location filename="../src/dlg_settings.cpp" line="414"/>
         <source>Open themes folder</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="419"/>
+        <location filename="../src/dlg_settings.cpp" line="416"/>
         <source>Card rendering</source>
         <translation>カードの描画</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="420"/>
+        <location filename="../src/dlg_settings.cpp" line="417"/>
         <source>Display card names on cards having a picture</source>
         <translation>画像のあるカードにカード名を表示</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="421"/>
+        <location filename="../src/dlg_settings.cpp" line="418"/>
         <source>Scale cards on mouse over</source>
         <translation>マウスオーバーでカードを拡大</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="423"/>
+        <location filename="../src/dlg_settings.cpp" line="420"/>
         <source>Hand layout</source>
         <translation>手札のレイアウト</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="424"/>
+        <location filename="../src/dlg_settings.cpp" line="421"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>手札を横に並べる</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="425"/>
+        <location filename="../src/dlg_settings.cpp" line="422"/>
         <source>Enable left justification</source>
         <translation>左揃えを有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="427"/>
+        <location filename="../src/dlg_settings.cpp" line="424"/>
         <source>Table grid layout</source>
         <translation>テーブルのレイアウト</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="428"/>
+        <location filename="../src/dlg_settings.cpp" line="425"/>
         <source>Invert vertical coordinate</source>
         <translation>カード配置の垂直反転</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="429"/>
+        <location filename="../src/dlg_settings.cpp" line="426"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>プレイヤーを複数列レイアウトにする最少人数:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="430"/>
+        <location filename="../src/dlg_settings.cpp" line="427"/>
         <source>Maximum font size for information displayed on cards:</source>
         <translation>カードに表示する情報の最大のフォントサイズ:</translation>
     </message>
@@ -529,131 +529,131 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="547"/>
-        <location filename="../src/dlg_settings.cpp" line="726"/>
+        <location filename="../src/dlg_settings.cpp" line="544"/>
+        <location filename="../src/dlg_settings.cpp" line="723"/>
         <source>Update Spoilers</source>
         <translation>スポイラーを更新</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="628"/>
-        <location filename="../src/dlg_settings.cpp" line="659"/>
+        <location filename="../src/dlg_settings.cpp" line="625"/>
+        <location filename="../src/dlg_settings.cpp" line="656"/>
         <source>Success</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="628"/>
+        <location filename="../src/dlg_settings.cpp" line="625"/>
         <source>Download URLs have been reset.</source>
         <translation>ダウンロードURLをリセットしました。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="659"/>
+        <location filename="../src/dlg_settings.cpp" line="656"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation>ダウンロードしたカード画像を削除しました。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="661"/>
+        <location filename="../src/dlg_settings.cpp" line="658"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="661"/>
+        <location filename="../src/dlg_settings.cpp" line="658"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation>一部のカード画像が削除できませんでした。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="668"/>
+        <location filename="../src/dlg_settings.cpp" line="665"/>
         <source>Add URL</source>
         <translation>URLを追加</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="668"/>
-        <location filename="../src/dlg_settings.cpp" line="688"/>
+        <location filename="../src/dlg_settings.cpp" line="665"/>
+        <location filename="../src/dlg_settings.cpp" line="685"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="571"/>
-        <location filename="../src/dlg_settings.cpp" line="688"/>
+        <location filename="../src/dlg_settings.cpp" line="568"/>
+        <location filename="../src/dlg_settings.cpp" line="685"/>
         <source>Edit URL</source>
         <translation>URLを編集</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="567"/>
+        <location filename="../src/dlg_settings.cpp" line="564"/>
         <source>Add New URL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="575"/>
+        <location filename="../src/dlg_settings.cpp" line="572"/>
         <source>Remove URL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="715"/>
+        <location filename="../src/dlg_settings.cpp" line="712"/>
         <source>Updating...</source>
         <translation>更新中...</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="745"/>
+        <location filename="../src/dlg_settings.cpp" line="742"/>
         <source>Choose path</source>
         <translation>パスを選ぶ</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="771"/>
+        <location filename="../src/dlg_settings.cpp" line="768"/>
         <source>URL Download Priority</source>
         <translation>ダウンロードURL優先設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="772"/>
+        <location filename="../src/dlg_settings.cpp" line="769"/>
         <source>Spoilers</source>
         <translation>スポイラー</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="773"/>
+        <location filename="../src/dlg_settings.cpp" line="770"/>
         <source>Download Spoilers Automatically</source>
         <translation>スポイラーを自動的にダウンロード</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="774"/>
+        <location filename="../src/dlg_settings.cpp" line="771"/>
         <source>Spoiler Location:</source>
         <translation>スポイラーの保存場所:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="775"/>
+        <location filename="../src/dlg_settings.cpp" line="772"/>
         <source>Last Change</source>
         <translation>最新に更新</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="776"/>
+        <location filename="../src/dlg_settings.cpp" line="773"/>
         <source>Spoilers download automatically on launch</source>
         <translation>スポイラーは起動時に自動的にダウンロードされます。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="777"/>
+        <location filename="../src/dlg_settings.cpp" line="774"/>
         <source>Press the button to manually update without relaunching</source>
         <translation>ボタンを押すと再起動せずに手動で更新します。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="778"/>
+        <location filename="../src/dlg_settings.cpp" line="775"/>
         <source>Do not close settings until manual update is complete</source>
         <translation>手動更新が完了するまでこのウィンドウを閉じないでください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="779"/>
+        <location filename="../src/dlg_settings.cpp" line="776"/>
         <source>Download card pictures on the fly</source>
         <translation>カード画像を自動的にダウンロード（英語）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="780"/>
+        <location filename="../src/dlg_settings.cpp" line="777"/>
         <source>How to add a custom URL</source>
         <translation>URLの追加方法について（英語）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="781"/>
+        <location filename="../src/dlg_settings.cpp" line="778"/>
         <source>Delete Downloaded Images</source>
         <translation>ダウンロードした画像を削除</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="782"/>
+        <location filename="../src/dlg_settings.cpp" line="779"/>
         <source>Reset Download URLs</source>
         <translation>ダウンロードURLをデフォルトに戻す</translation>
     </message>
@@ -1706,12 +1706,12 @@ Your email will be used to verify your account.</source>
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1361"/>
+        <location filename="../src/dlg_settings.cpp" line="1358"/>
         <source>Unknown Error loading card database</source>
         <translation>カードデータベース読み込みの不明なエラー。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1369"/>
+        <location filename="../src/dlg_settings.cpp" line="1366"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1728,7 +1728,7 @@ Oracle Importerでデータベースを更新する必要があります。
 データベースの場所の設定を変更してみてください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1375"/>
+        <location filename="../src/dlg_settings.cpp" line="1372"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1745,7 +1745,7 @@ Oracle Importerでデータベースを更新する必要があります。
 データベースの場所の設定を変更してみてください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1381"/>
+        <location filename="../src/dlg_settings.cpp" line="1378"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1754,7 +1754,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1387"/>
+        <location filename="../src/dlg_settings.cpp" line="1384"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -1763,7 +1763,7 @@ Would you like to change your database location setting?</source>
 データベースの場所の設定を変更してみてください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1391"/>
+        <location filename="../src/dlg_settings.cpp" line="1388"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -1772,7 +1772,7 @@ Would you like to change your database location setting?</source>
 データベースの場所の設定を変更してみてください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1395"/>
+        <location filename="../src/dlg_settings.cpp" line="1392"/>
         <source>Unknown card database load status
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
@@ -1781,59 +1781,59 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1403"/>
-        <location filename="../src/dlg_settings.cpp" line="1413"/>
-        <location filename="../src/dlg_settings.cpp" line="1423"/>
+        <location filename="../src/dlg_settings.cpp" line="1400"/>
+        <location filename="../src/dlg_settings.cpp" line="1410"/>
+        <location filename="../src/dlg_settings.cpp" line="1420"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1414"/>
+        <location filename="../src/dlg_settings.cpp" line="1411"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>あなたのデッキディレクトリへのパスは無効です。前に戻って正しいパスを設定してください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1424"/>
+        <location filename="../src/dlg_settings.cpp" line="1421"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>あなたのカード画像ディレクトリへのパスは無効です。前に戻って正しいパスを設定してください。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1436"/>
+        <location filename="../src/dlg_settings.cpp" line="1433"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1438"/>
+        <location filename="../src/dlg_settings.cpp" line="1435"/>
         <source>General</source>
         <translation>全般</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1439"/>
+        <location filename="../src/dlg_settings.cpp" line="1436"/>
         <source>Appearance</source>
         <translation>外観</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1440"/>
+        <location filename="../src/dlg_settings.cpp" line="1437"/>
         <source>User Interface</source>
         <translation>UI</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1441"/>
+        <location filename="../src/dlg_settings.cpp" line="1438"/>
         <source>Card Sources</source>
         <translation>カードダウンロード</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1442"/>
+        <location filename="../src/dlg_settings.cpp" line="1439"/>
         <source>Chat</source>
         <translation>チャット</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1443"/>
+        <location filename="../src/dlg_settings.cpp" line="1440"/>
         <source>Sound</source>
         <translation>サウンド</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1444"/>
+        <location filename="../src/dlg_settings.cpp" line="1441"/>
         <source>Shortcuts</source>
         <translation>ショートカット</translation>
     </message>
@@ -2264,87 +2264,87 @@ You may have to build from source yourself.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="206"/>
-        <location filename="../src/dlg_settings.cpp" line="216"/>
-        <location filename="../src/dlg_settings.cpp" line="226"/>
-        <location filename="../src/dlg_settings.cpp" line="236"/>
-        <location filename="../src/dlg_settings.cpp" line="246"/>
-        <location filename="../src/dlg_settings.cpp" line="256"/>
+        <location filename="../src/dlg_settings.cpp" line="203"/>
+        <location filename="../src/dlg_settings.cpp" line="213"/>
+        <location filename="../src/dlg_settings.cpp" line="223"/>
+        <location filename="../src/dlg_settings.cpp" line="233"/>
+        <location filename="../src/dlg_settings.cpp" line="243"/>
+        <location filename="../src/dlg_settings.cpp" line="253"/>
         <source>Choose path</source>
         <translation>パスを選択</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="284"/>
+        <location filename="../src/dlg_settings.cpp" line="281"/>
         <source>Personal settings</source>
         <translation>個人設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="285"/>
+        <location filename="../src/dlg_settings.cpp" line="282"/>
         <source>Language:</source>
         <translation>言語:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="288"/>
+        <location filename="../src/dlg_settings.cpp" line="285"/>
         <source>Paths (editing disabled in portable mode)</source>
         <translation>パス（ポータブルモードでの編集は無効）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="290"/>
+        <location filename="../src/dlg_settings.cpp" line="287"/>
         <source>Paths</source>
         <translation>パス</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="293"/>
+        <location filename="../src/dlg_settings.cpp" line="290"/>
         <source>Decks directory:</source>
         <translation>デッキフォルダ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="294"/>
+        <location filename="../src/dlg_settings.cpp" line="291"/>
         <source>Replays directory:</source>
         <translation>リプレイフォルダ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="295"/>
+        <location filename="../src/dlg_settings.cpp" line="292"/>
         <source>Pictures directory:</source>
         <translation>カード画像フォルダ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="296"/>
+        <location filename="../src/dlg_settings.cpp" line="293"/>
         <source>Card database:</source>
         <translation>カードデータベース:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="297"/>
+        <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Custom database directory:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="298"/>
+        <location filename="../src/dlg_settings.cpp" line="295"/>
         <source>Token database:</source>
         <translation>トークンデータベース:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="299"/>
+        <location filename="../src/dlg_settings.cpp" line="296"/>
         <source>Picture cache size:</source>
         <translation>画像キャッシュサイズ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="300"/>
+        <location filename="../src/dlg_settings.cpp" line="297"/>
         <source>Update channel</source>
         <translation>更新チャンネル</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="301"/>
+        <location filename="../src/dlg_settings.cpp" line="298"/>
         <source>Notify if a feature supported by the server is missing in my client</source>
         <translation>サーバーでサポートされている機能がクライアントに存在しない場合に通知する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="302"/>
+        <location filename="../src/dlg_settings.cpp" line="299"/>
         <source>Automatically run Oracle when running a new version of Cockatrice</source>
         <translation>新バージョンのCockatriceを起動したら自動的にOracleも起動する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="303"/>
+        <location filename="../src/dlg_settings.cpp" line="300"/>
         <source>Show tips on startup</source>
         <translation>起動時にヒントを表示</translation>
     </message>
@@ -3689,105 +3689,105 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="822"/>
+        <location filename="../src/dlg_settings.cpp" line="819"/>
         <source>Word1 Word2 Word3</source>
         <translation>ここに入力してください</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="863"/>
+        <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>Add New Message</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="867"/>
+        <location filename="../src/dlg_settings.cpp" line="864"/>
         <source>Edit Message</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="871"/>
+        <location filename="../src/dlg_settings.cpp" line="868"/>
         <source>Remove Message</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="956"/>
+        <location filename="../src/dlg_settings.cpp" line="953"/>
         <source>Add message</source>
         <translation>定型文を追加</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="956"/>
-        <location filename="../src/dlg_settings.cpp" line="969"/>
+        <location filename="../src/dlg_settings.cpp" line="953"/>
+        <location filename="../src/dlg_settings.cpp" line="966"/>
         <source>Message:</source>
         <translation>定型文:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="969"/>
+        <location filename="../src/dlg_settings.cpp" line="966"/>
         <source>Edit message</source>
         <translation>定型文を編集</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="987"/>
+        <location filename="../src/dlg_settings.cpp" line="984"/>
         <source>Chat settings</source>
         <translation>チャット設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="988"/>
+        <location filename="../src/dlg_settings.cpp" line="985"/>
         <source>Custom alert words</source>
         <translation>反応するキーワード</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="989"/>
+        <location filename="../src/dlg_settings.cpp" line="986"/>
         <source>Enable chat mentions</source>
         <translation>メンション機能を有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="990"/>
+        <location filename="../src/dlg_settings.cpp" line="987"/>
         <source>Enable mention completer</source>
         <translation>メンション補完を有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="991"/>
+        <location filename="../src/dlg_settings.cpp" line="988"/>
         <source>In-game message macros</source>
         <translation>定型文</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="992"/>
+        <location filename="../src/dlg_settings.cpp" line="989"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation>未登録ユーザーのルームメッセージを無視</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="993"/>
+        <location filename="../src/dlg_settings.cpp" line="990"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation>未登録ユーザーの個人チャットを無視</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="994"/>
-        <location filename="../src/dlg_settings.cpp" line="995"/>
+        <location filename="../src/dlg_settings.cpp" line="991"/>
+        <location filename="../src/dlg_settings.cpp" line="992"/>
         <source>Invert text color</source>
         <translation>反転テキストの色</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="996"/>
+        <location filename="../src/dlg_settings.cpp" line="993"/>
         <source>Enable desktop notifications for private messages</source>
         <translation>個人チャットのデスクトップ通知を有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="997"/>
+        <location filename="../src/dlg_settings.cpp" line="994"/>
         <source>Enable desktop notification for mentions</source>
         <translation>メンションのデスクトップ通知を有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="998"/>
+        <location filename="../src/dlg_settings.cpp" line="995"/>
         <source>Enable room message history on join</source>
         <translation>参加時にルームのメッセージ履歴を表示</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="999"/>
-        <location filename="../src/dlg_settings.cpp" line="1000"/>
+        <location filename="../src/dlg_settings.cpp" line="996"/>
+        <location filename="../src/dlg_settings.cpp" line="997"/>
         <source>(Color is hexadecimal)</source>
         <translation>(色は16進数)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1001"/>
+        <location filename="../src/dlg_settings.cpp" line="998"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation>英数字のみ使用可能。単語を半角スペースで区切って下さい。</translation>
     </message>
@@ -4854,52 +4854,52 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>ShortcutSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1158"/>
+        <location filename="../src/dlg_settings.cpp" line="1155"/>
         <source>Restore all default shortcuts</source>
         <translation>すべてのショートカットを元に戻す</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1159"/>
+        <location filename="../src/dlg_settings.cpp" line="1156"/>
         <source>Do you really want to restore all default shortcuts?</source>
         <translation>本当にすべてのショートカットキーを元に戻しますか？</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1219"/>
+        <location filename="../src/dlg_settings.cpp" line="1216"/>
         <source>Clear all default shortcuts</source>
         <translation>すべてのショートカットをクリア</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1220"/>
+        <location filename="../src/dlg_settings.cpp" line="1217"/>
         <source>Do you really want to clear all shortcuts?</source>
         <translation>本当にすべてのショートカットキーをクリアしますか？</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1227"/>
+        <location filename="../src/dlg_settings.cpp" line="1224"/>
         <source>Action</source>
         <translation>アクション</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1227"/>
+        <location filename="../src/dlg_settings.cpp" line="1224"/>
         <source>Shortcut</source>
         <translation>ショートカットキー</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1230"/>
+        <location filename="../src/dlg_settings.cpp" line="1227"/>
         <source>Section:</source>
         <translation>セクション:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1231"/>
+        <location filename="../src/dlg_settings.cpp" line="1228"/>
         <source>Action:</source>
         <translation>アクション:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1232"/>
+        <location filename="../src/dlg_settings.cpp" line="1229"/>
         <source>Shortcut:</source>
         <translation>ショートカット:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1234"/>
+        <location filename="../src/dlg_settings.cpp" line="1231"/>
         <source>How to set custom shortcuts</source>
         <translation>ショートカットキーの設定方法について（英語）</translation>
     </message>
@@ -4942,27 +4942,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1070"/>
+        <location filename="../src/dlg_settings.cpp" line="1067"/>
         <source>Enable &amp;sounds</source>
         <translation>サウンドを有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1071"/>
+        <location filename="../src/dlg_settings.cpp" line="1068"/>
         <source>Current sounds theme:</source>
         <translation>現在のサウンドテーマ:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1072"/>
+        <location filename="../src/dlg_settings.cpp" line="1069"/>
         <source>Test system sound engine</source>
         <translation>サウンドテスト</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1073"/>
+        <location filename="../src/dlg_settings.cpp" line="1070"/>
         <source>Sound settings</source>
         <translation>サウンド設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1074"/>
+        <location filename="../src/dlg_settings.cpp" line="1071"/>
         <source>Master volume</source>
         <translation>音量</translation>
     </message>
@@ -6534,57 +6534,57 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="513"/>
+        <location filename="../src/dlg_settings.cpp" line="510"/>
         <source>General interface settings</source>
         <translation>インターフェース全般設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="514"/>
+        <location filename="../src/dlg_settings.cpp" line="511"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>ダブルクリックでカードをプレイする (シングルクリックの代わり)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="515"/>
+        <location filename="../src/dlg_settings.cpp" line="512"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation>土地でないカードをプレイする時、すぐに戦場に出さずにスタックに置く</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="516"/>
+        <location filename="../src/dlg_settings.cpp" line="513"/>
         <source>Annotate card text on tokens</source>
         <translation>トークンのカードテキストを注釈にもつける</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="517"/>
+        <location filename="../src/dlg_settings.cpp" line="514"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
         <translation>ティアオフメニューを使用して、右クリックメニューを画面に表示したままにする</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="518"/>
+        <location filename="../src/dlg_settings.cpp" line="515"/>
         <source>Notifications settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="519"/>
+        <location filename="../src/dlg_settings.cpp" line="516"/>
         <source>Enable notifications in taskbar</source>
         <translation>タスクバーの通知を有効</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="520"/>
+        <location filename="../src/dlg_settings.cpp" line="517"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
         <translation>タスクバーに観戦中のゲームイベントを通知する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="521"/>
+        <location filename="../src/dlg_settings.cpp" line="518"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
         <translation>フレンドリストのユーザーが接続したときにタスクバーで通知する</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="522"/>
+        <location filename="../src/dlg_settings.cpp" line="519"/>
         <source>Animation settings</source>
         <translation>アニメーション設定</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="523"/>
+        <location filename="../src/dlg_settings.cpp" line="520"/>
         <source>&amp;Tap/untap animation</source>
         <translation>タップ/アンタップアニメーション</translation>
     </message>
@@ -6819,12 +6819,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/main.cpp" line="125"/>
+        <location filename="../src/main.cpp" line="126"/>
         <source>Connect on startup</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="126"/>
+        <location filename="../src/main.cpp" line="127"/>
         <source>Debug to file</source>
         <translation type="unfinished"/>
     </message>
