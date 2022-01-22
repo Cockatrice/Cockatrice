@@ -20,7 +20,6 @@ class ReleaseChannel;
 #define PIXMAPCACHE_SIZE_MIN 64
 #define PIXMAPCACHE_SIZE_MAX 2047
 
-#define DEFAULT_LANG_CODE "en"
 #define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
 

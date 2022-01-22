@@ -187,18 +187,15 @@ QStringList GeneralSettingsPage::findQmFiles()
     QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
     fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
+    fileNames.removeOne("en@source");
     return fileNames;
 }
 
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
-    if (qmFile == DEFAULT_LANG_CODE)
-        return DEFAULT_LANG_NAME;
-
-    QTranslator translator;
-    translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
-
-    return translator.translate("i18n", DEFAULT_LANG_NAME);
+    QTranslator qTranslator;
+    qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void GeneralSettingsPage::deckPathButtonClicked()
