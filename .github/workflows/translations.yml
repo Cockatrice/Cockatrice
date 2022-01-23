@@ -3,8 +3,8 @@ name: Update translation source
 on:
   workflow_dispatch:
   schedule:
-    # runs every day
-    - cron: '0 0 * * *'
+    # runs once per month
+    - cron: '0 0 1 * *'
 
 jobs:
   translations:
