@@ -46,13 +46,13 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addLayout(userIconAndNameLayout, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
-    mainLayout->addWidget(&userLevelLabel1, 3, 0, 1, 1);
-    mainLayout->addWidget(&userLevelLabel2, 3, 1, 1, 2);
-    mainLayout->addWidget(&accountAgeLabel1, 4, 0, 1, 1);
-    mainLayout->addWidget(&accountAgeLabel2, 4, 1, 1, 2);
-    mainLayout->addWidget(&countryLabel1, 5, 0, 1, 1);
-    mainLayout->addWidget(&countryLabel2, 5, 1, 1, 1, Qt::AlignCenter);
-    mainLayout->addWidget(&countryLabel3, 5, 2, 1, 1);
+    mainLayout->addWidget(&countryLabel1, 3, 0, 1, 1);
+    mainLayout->addWidget(&countryLabel2, 3, 1, 1, 1, Qt::AlignCenter);
+    mainLayout->addWidget(&countryLabel3, 3, 2, 1, 1);
+    mainLayout->addWidget(&userLevelLabel1, 4, 0, 1, 1);
+    mainLayout->addWidget(&userLevelLabel2, 4, 1, 1, 2);
+    mainLayout->addWidget(&accountAgeLabel1, 5, 0, 1, 1);
+    mainLayout->addWidget(&accountAgeLabel2, 5, 1, 1, 2);
     mainLayout->setColumnStretch(2, 10);
 
     if (editable) {
