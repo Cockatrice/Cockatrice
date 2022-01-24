@@ -333,11 +333,11 @@ When new translatable strings have been added to the code, a maintainer has to
 make them available to translators on Transifex.
 
 To help with that, we have an automated CI run setup, that regularly looks at the
-code in the master branch, extracts all strings and updates a dedicated source string
-file with any changes. This file is the basis for all translations and is used as
-reference for other languages. Our translation tool constantly monitors it for changes
-and deploys them to our translators, so that they easily can work with strings and
-provide translations.
+code in the master branch, extracts all strings and updates dedicated source string
+files with any changes.<br>
+These updates are not commited right away, the CI creates a PR for reviewing instead.<br>
+After approval, our translation tool automatically picks the changes up and deploys
+them to our translators.
 
 Before a beta or stable release, or when a lot of strings have been added or changed,
 a maintainer can manually trigger a CI run to extract all new strings on demand and add
