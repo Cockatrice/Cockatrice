@@ -5,11 +5,14 @@ on:
   schedule:
     # runs at the start of each month (UTC)
     - cron: '0 0 1 * *'
+  pull_request:
+    paths:
+      - '.github/workflows/translations.yml'
 
 jobs:
   translations:
-    # Do not run the scheduled workflow on forks, and ensure the action runs only from master branch
-    if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice') && github.ref_name == 'master'
+    # Do not run the scheduled workflow on forks, and ensure the action runs only from master branch but still from any PR's
+    if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice') && (github.ref_name == 'master' || github.event_name == 'pull_request')
 
     name: Update source strings
     runs-on: ubuntu-latest
@@ -52,6 +55,8 @@ jobs:
           echo "::set-output name=oracle_stats::$stats"
 
       - name: Create pull request
+        # do not run when triggered from an PR
+        if: github.event_name != 'pull_request'
         id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
@@ -71,6 +76,7 @@ jobs:
           draft: false
 
       - name: Check outputs
+        if: steps.create_pr.outcome == 'success'
         run: |
           echo "Pull Request Commit: ${{ steps.create_pr.outputs.pull-request-head-sha }}"
           echo "Pull Request Number: ${{ steps.create_pr.outputs.pull-request-number }}"
