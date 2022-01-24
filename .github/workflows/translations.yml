@@ -11,7 +11,7 @@ on:
 
 jobs:
   translations:
-    # Do not run the scheduled workflow on forks, and ensure the action runs only from master branch but still from any PR's
+    # Do not run the scheduled workflow on forks, and ensure the action runs only from master branch but still from any PR
     if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice') && (github.ref_name == 'master' || github.event_name == 'pull_request')
 
     name: Update source strings
@@ -55,7 +55,7 @@ jobs:
           echo "::set-output name=oracle_stats::$stats"
 
       - name: Create pull request
-        # do not run when triggered from an PR
+        # do not run when triggered from a PR
         if: github.event_name != 'pull_request'
         id: create_pr
         uses: peter-evans/create-pull-request@v3
@@ -76,6 +76,7 @@ jobs:
           draft: false
 
       - name: Check outputs
+        # only run when the PR step succeeds
         if: steps.create_pr.outcome == 'success'
         run: |
           echo "Pull Request Commit: ${{ steps.create_pr.outputs.pull-request-head-sha }}"
