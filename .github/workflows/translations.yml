@@ -51,7 +51,7 @@ jobs:
           echo "$stats"
           echo "::set-output name=oracle_stats::$stats"
 
-      - name: Commit changes and create PR
+      - name: Create pull request
         id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
@@ -60,7 +60,7 @@ jobs:
           delete-branch: true
           title: 'Update source strings'
           body: |
-            Update  for translation at [Transifex](https://www.transifex.com/projects/p/cockatrice/)
+            After merging, all changes to the language source strings are available for translation at [Transifex](https://www.transifex.com/projects/p/cockatrice/) shortly
             - ${{ steps.cockatrice.outputs.cockatrice_stats }}
               ${{ steps.oracle.outputs.oracle_stats }}
 
