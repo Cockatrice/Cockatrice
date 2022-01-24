@@ -6,6 +6,7 @@ on:
       - '**.md'
       - 'webclient/**'
       - '.github/workflows/web-*.yml'
+      - '.github/workflows/translations.yml'
 
 jobs:
   clang-format:
