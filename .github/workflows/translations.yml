@@ -1,29 +1,30 @@
-name: Update translation source
+name: Update Translation Source
 
 on:
   workflow_dispatch:
   schedule:
-    # runs once per month
+    # runs at the start of each month (UTC)
     - cron: '0 0 1 * *'
 
 jobs:
   translations:
-    # Do not run the scheduled workflow on forks
-    if: github.event != 'schedule' || github.repository_owner == 'Cockatrice'
+    # Do not run the scheduled workflow on forks, and ensure the action runs only from master branch
+    if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice') && github.ref_name == 'master'
 
+    name: Update source strings
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
       - name: Install lupdate
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends qttools5-dev-tools
 
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
-      - name: Update cockatrice translations
+      - name: Update Cockatrice translations
         shell: bash
         run: |
           shopt -s globstar # globstar is needed for recursive **
@@ -34,7 +35,7 @@ jobs:
           echo "$(echo {cockatrice,common}/**/*.{cpp,h} | wc -w) files total"
           lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts
 
-      - name: Update oracle translations
+      - name: Update Oracle translations
         shell: bash
         run: |
           shopt -s globstar # globstar is needed for recursive **
@@ -60,7 +61,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add cockatrice/translations/cockatrice_en@source.ts oracle/translations/oracle_en@source.ts
-          git commit -m "Automated translation update ( $GITHUB_SHA )"
+          git commit -m "Automated translation update ($GITHUB_SHA)"
           git push
           deploy_commit=$(git rev-parse HEAD)
           echo "Created commit: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$deploy_commit"
