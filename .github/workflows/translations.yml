@@ -24,7 +24,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends qttools5-dev-tools
 
-      - name: Update Cockatrice translations
+      - name: Update Cockatrice translation source
+        id: cockatrice
         shell: bash
         run: |
           shopt -s globstar # globstar is needed for recursive **
@@ -33,9 +34,12 @@ jobs:
           # note: there are three strings to translate in common right now
           echo {cockatrice,common}/**/*.{cpp,h}
           echo "$(echo {cockatrice,common}/**/*.{cpp,h} | wc -w) files total"
-          lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts
+          stats=$(lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts)
+          echo "$stats"
+          echo "::set-output name=cockatrice_stats::$stats"
 
-      - name: Update Oracle translations
+      - name: Update Oracle translation source
+        id: oracle
         shell: bash
         run: |
           shopt -s globstar # globstar is needed for recursive **
@@ -43,25 +47,31 @@ jobs:
           echo "reading the following source files:"
           echo oracle/**/*.{cpp,h}
           echo "$(echo oracle/**/*.{cpp,h} | wc -w) files total"
-          lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts
+          stats=$(lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts)
+          echo "$stats"
+          echo "::set-output name=oracle_stats::$stats"
 
-      - name: Check for updates
-        id: check
-        shell: bash
-        run: |
-          set +e # do not fail, just save the exit state
-          git diff --exit-code
-          echo "::set-output name=deploy::$?"
+      - name: Commit changes and create PR
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Update source strings ($GITHUB_SHA)
+          branch: ci-source_strings
+          delete-branch: true
+          title: 'Update source strings'
+          body: |
+            Update  for translation at [Transifex](https://www.transifex.com/projects/p/cockatrice/)
+            - ${{ steps.cockatrice.outputs.cockatrice_stats }}
+              ${{ steps.oracle.outputs.oracle_stats }}
 
-      - name: Commit changes
-        if: steps.check.outputs.deploy == '1'
-        shell: bash
-        working-directory: ${{env.OUTPUT_PATH}}
+            *This PR is automatically generated and updated via CI*
+          labels: |
+            CI
+            Translation
+          draft: false
+
+      - name: Check outputs
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add cockatrice/translations/cockatrice_en@source.ts oracle/translations/oracle_en@source.ts
-          git commit -m "Automated translation update ($GITHUB_SHA)"
-          git push
-          deploy_commit=$(git rev-parse HEAD)
-          echo "Created commit: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$deploy_commit"
+          echo "Pull Request Commit: ${{ steps.create_pr.outputs.pull-request-head-sha }}"
+          echo "Pull Request Number: ${{ steps.create_pr.outputs.pull-request-number }}"
+          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
