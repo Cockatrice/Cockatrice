@@ -8,6 +8,7 @@ on:
       - '**.md'
       - 'webclient/**'
       - '.github/workflows/web-*.yml'
+      - '.github/workflows/translations.yml'
     tags:
       - '*'
   pull_request:
@@ -15,6 +16,7 @@ on:
       - '**.md'
       - 'webclient/**'
       - '.github/workflows/web-*.yml'
+      - '.github/workflows/translations.yml'
 
 jobs:
   configure:
