@@ -334,8 +334,8 @@ make them available to translators on Transifex.
 
 To help with that, we have an automated CI run setup, that regularly looks at the
 code in the master branch, extracts all strings and updates dedicated source string
-files with any changes.<br>
-These updates are not commited right away, the CI creates a PR for reviewing instead.<br>
+files with any changes. These updates are not commited right away, the CI creates a
+PR for reviewing instead.<br>
 After approval, our translation tool automatically picks the changes up and deploys
 them to our translators. Be mindful when merging only a few changes!
 
