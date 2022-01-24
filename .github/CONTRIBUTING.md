@@ -337,11 +337,10 @@ code in the master branch, extracts all strings and updates dedicated source str
 files with any changes.<br>
 These updates are not commited right away, the CI creates a PR for reviewing instead.<br>
 After approval, our translation tool automatically picks the changes up and deploys
-them to our translators.
+them to our translators. Be mindful when merging only a few changes!
 
-Before a beta or stable release, or when a lot of strings have been added or changed,
-a maintainer can manually trigger a CI run to extract all new strings on demand and add
-them to the english source files for quicker translation. Be mindful when using this!
+Once a release is planned, or when a lot of strings have been added or changed, a
+maintainer can manually trigger a CI run to extract all strings on demand.
 
 <details>
 <summary><b>Manually trigger CI run (Workflow Dispatch)</b></summary>
