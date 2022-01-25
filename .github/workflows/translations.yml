@@ -40,7 +40,7 @@ jobs:
           lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts | tee cockatrice_stats.txt
           sed -i '1d; s/^[ \t]*//' cockatrice_stats.txt
           echo "::set-output name=cockatrice_stats::$(cat cockatrice_stats.txt)"
-          
+
       - name: Update Oracle translation source
         id: oracle
         shell: bash
