@@ -39,7 +39,9 @@ jobs:
           echo "$(echo {cockatrice,common}/**/*.{cpp,h} | wc -w) files total"
           lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts | tee cockatrice_stats.txt
           sed -i '1d; s/^[ \t]*//' cockatrice_stats.txt
-
+          echo "::set-output name=cockatrice_stats_out::$(cat cockatrice_stats.txt)"
+          echo "cockatrice_stats_env=$(cat cockatrice_stats.txt)" >> $GITHUB_ENV
+          
       - name: Update Oracle translation source
         id: oracle
         shell: bash
@@ -51,6 +53,12 @@ jobs:
           echo "$(echo oracle/**/*.{cpp,h} | wc -w) files total"
           lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts | tee oracle_stats.txt
           sed -i '1d; s/^[ \t]*//' oracle_stats.txt
+          echo ""
+          echo "print cockatrice stats from former step from step output"
+          echo "${{ steps.cockatrice.outputs.cockatrice_stats_out }}"
+          echo ""
+          echo "print cockatrice stats from former step out of environment variable"
+          echo "${{ env.cockatrice_stats_env }}"
 
       - name: Create pull request
         # do not run when triggered from a PR
@@ -67,8 +75,8 @@ jobs:
           title: 'Update source strings'
           body: |
             After merging, all changes to the source language are available for translation at [Transifex](https://www.transifex.com/projects/p/cockatrice/) shortly
-            - ${{ steps.cockatrice.outputs.cockatrice_stats }}
-              ${{ steps.oracle.outputs.oracle_stats }}
+            - Cockatrice: ${{ env.cockatrice_stats }}
+            - Oracle: ${{ env.oracle_stats }}
 
             *This PR is automatically generated and updated via CI*
           labels: |
