@@ -37,9 +37,15 @@ jobs:
           # note: there are three strings to translate in common right now
           echo {cockatrice,common}/**/*.{cpp,h}
           echo "$(echo {cockatrice,common}/**/*.{cpp,h} | wc -w) files total"
-          stats=$(lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts)
-          echo "$stats"
-          echo "::set-output name=cockatrice_stats::$stats"
+          lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts | tee cockatrice_stats.txt
+          sed -i '1d' cockatrice_stats.txt
+          echo ""
+          echo "print cockatrice_stats after removing first line"
+          cat cockatrice_stats.txt
+          echo ""
+          echo "remove leading whitespace and print again"
+          sed -i 's/^[ \t]*//' cockatrice_stats.txt
+          cat cockatrice_stats.txt
 
       - name: Update Oracle translation source
         id: oracle
@@ -50,9 +56,14 @@ jobs:
           echo "reading the following source files:"
           echo oracle/**/*.{cpp,h}
           echo "$(echo oracle/**/*.{cpp,h} | wc -w) files total"
-          stats=$(lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts)
-          echo "$stats"
-          echo "::set-output name=oracle_stats::$stats"
+          lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts | tee oracle_stats.txt
+          echo ""
+          echo "print full oracle stats again"
+          cat oracle_stats.txt
+          echo ""
+          echo "remove first line, remove leading whitespace and print again"
+          sed -i '1d;s/^[ \t]*//' oracle_stats.txt
+          cat oracle_stats.txt
 
       - name: Create pull request
         # do not run when triggered from a PR
@@ -60,6 +71,9 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
+          add-paths: |
+            cockatrice/translations/*.ts
+            oracle/translations/*.ts
           commit-message: Update source strings ($GITHUB_SHA)
           branch: ci-source_strings
           delete-branch: true
