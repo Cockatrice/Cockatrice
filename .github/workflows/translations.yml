@@ -5,16 +5,13 @@ on:
   schedule:
     # runs at the start of each month (UTC)
     - cron: '0 0 1 * *'
-  pull_request:
-    paths:
-      - '.github/workflows/translations.yml'
 
 jobs:
   translations:
-    # Do not run the scheduled workflow on forks, and ensure the action runs only from master branch but still from any PR
-    if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice') && (github.ref_name == 'master' || github.event_name == 'pull_request')
+    # Do not run the scheduled workflow on forks
+    if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice')
 
-    name: Update source strings
+    name: Update translation source strings
     runs-on: ubuntu-latest
 
     steps:
@@ -30,58 +27,57 @@ jobs:
       - name: Update Cockatrice translation source
         id: cockatrice
         shell: bash
-        run: |
-          shopt -s globstar # globstar is needed for recursive **
-          lupdate -version
-          echo "reading the following source files:"
-          # note: there are three strings to translate in common right now
-          echo {cockatrice,common}/**/*.{cpp,h}
-          echo "$(echo {cockatrice,common}/**/*.{cpp,h} | wc -w) files total"
-          lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts | tee cockatrice_stats.txt
-          sed -i '1d; s/^[ \t]*//' cockatrice_stats.txt
-          echo "::set-output name=cockatrice_stats::$(cat cockatrice_stats.txt)"
+        env:
+          FILE: 'cockatrice/translations/cockatrice_en@source.ts'
+          DIRS: 'cockatrice/src common'
+        run: .ci/update_translations.sh
 
       - name: Update Oracle translation source
         id: oracle
         shell: bash
-        run: |
-          shopt -s globstar # globstar is needed for recursive **
-          lupdate -version
-          echo "reading the following source files:"
-          echo oracle/**/*.{cpp,h}
-          echo "$(echo oracle/**/*.{cpp,h} | wc -w) files total"
-          lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts | tee oracle_stats.txt
-          sed -i '1d; s/^[ \t]*//' oracle_stats.txt
-          echo "::set-output name=oracle_stats::$(cat oracle_stats.txt)"
+        env:
+          FILE: 'oracle/translations/oracle_en@source.ts'
+          DIRS: 'oracle/src'
+        run: .ci/update_translations.sh
+
+      - name: Render template
+        id: template
+        uses: chuhlomin/render-template@v1.2
+        with:
+          template: .ci/update_translations_template.md
+          vars: |
+            cockatrice_output: ${{ steps.cockatrice.outputs.output }}
+            oracle_output: ${{ steps.oracle.outputs.output }}
+            commit: ${{ github.sha }}
 
       - name: Create pull request
-        # do not run when triggered from a PR
-        if: github.event_name != 'pull_request'
         id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
           add-paths: |
-            cockatrice/translations/*.ts
-            oracle/translations/*.ts
-          commit-message: Update source strings ($GITHUB_SHA)
-          branch: ci-source_strings
+            cockatrice/translations/cockatrice_en@source.ts
+            oracle/translations/oracle_en@source.ts
+          commit-message: Update translation source strings
+          # author is the owner of the commit
+          author: github-actions <github-actions@github.com>
+          branch: ci-update-translations
           delete-branch: true
-          title: 'Update source strings'
-          body: |
-            After merging, all changes to the source language are available for translation at [Transifex](https://www.transifex.com/projects/p/cockatrice/) shortly
-            - Cockatrice: ${{ steps.cockatrice.outputs.cockatrice_stats }}
-            - Oracle: ${{ steps.oracle.outputs.oracle_stats }}
-
-            *This PR is automatically generated and updated via CI*
+          title: '[Translations] Update source strings'
+          body: ${{ steps.template.outputs.result }}
           labels: |
             CI
             Translation
           draft: false
 
-      - name: Check outputs
-        # only run when the PR step succeeds
-        if: steps.create_pr.outcome == 'success'
+      - name: PR Status
+        shell: bash
+        env:
+          STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
         run: |
-          echo "Pull Request Commit: ${{ steps.create_pr.outputs.pull-request-head-sha }}"
-          echo "Pull Request Number: ${{ steps.create_pr.outputs.pull-request-number }}"
-          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
+          if [[ "$STATUS" == "" ]]; then
+            echo "PR unchanged:"
+          else
+            echo "PR $STATUS:"
+          fi
+          echo "ticket #${{ steps.create_pr.outputs.pull-request-number }}"
+          echo "url ${{ steps.create_pr.outputs.pull-request-url }}"
