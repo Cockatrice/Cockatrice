@@ -28,8 +28,8 @@ const AccountActivationDialog = ({ classes, handleClose, isOpen, onSubmit }: any
       </DialogTitle>
       <DialogContent>
         <div className="content">
-          <Typography>Your account has not been activated yet.</Typography>
-          <Typography>You need to provide the activation token received in the activation email.</Typography>
+          <Typography variant='subtitle1'>Your account has not been activated yet.</Typography>
+          <Typography variant='subtitle1'>You need to provide the activation token received in the activation email.</Typography>
         </div>
 
         <AccountActivationForm onSubmit={onSubmit}></AccountActivationForm>
