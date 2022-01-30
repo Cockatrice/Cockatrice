@@ -80,10 +80,10 @@ const Login = ({ state, description }: LoginProps) => {
 
   useReduxEffect(() => {
     closeActivateAccountDialog();
-    closeRegistrationDialog();
   }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
 
   useReduxEffect(() => {
+    closeRegistrationDialog();
     openActivateAccountDialog();
   }, ServerTypes.ACCOUNT_AWAITING_ACTIVATION, []);
 
