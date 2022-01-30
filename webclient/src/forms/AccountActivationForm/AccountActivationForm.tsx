@@ -50,7 +50,7 @@ const AccountActivationForm = ({ onSubmit }) => {
                 <Typography color="error">Account activation failed</Typography>
               </div>
             )}
-            
+
             <Button className="AccountActivationForm-submit rounded tall" color="primary" variant="contained" type="submit">
               Activate Account
             </Button>

@@ -137,7 +137,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc, raw => {
       switch (raw.responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
-          const passwordSalt = raw['.Response_PasswordSalt.ext'].passwordSalt;
+          const passwordSalt = raw['.Response_PasswordSalt.ext']?.passwordSalt;
           SessionCommands.login(passwordSalt);
           break;
         }
