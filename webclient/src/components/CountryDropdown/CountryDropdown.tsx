@@ -7,8 +7,10 @@ import { Images } from 'images/Images';
 import './CountryDropdown.css';
 import { CountryLabel } from 'types';
 
-const CountryDropdown = ({ onChange }) => {
+const CountryDropdown = ({ input: { onChange } }) => {
   const [state, setState] = useState('');
+
+  useEffect(() => onChange(state), [state]);
 
   return (
     <FormControl variant='outlined' className='CountryDropdown'>
