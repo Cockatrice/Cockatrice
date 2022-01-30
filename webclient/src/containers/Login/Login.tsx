@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { AuthenticationService } from 'api';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog } from 'dialogs';
 import { LoginForm } from 'forms';
-import { useReduxEffect } from 'hooks';
+import { useReduxEffect, useFireOnce } from 'hooks';
 import { Images } from 'images';
 import { HostDTO } from 'services';
 import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
@@ -77,15 +77,6 @@ const Login = ({ state, description }: LoginProps) => {
     closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
-  useReduxEffect(({ options: { hashedPassword } }) => {
-    if (hostIdToRemember) {
-      HostDTO.get(hostIdToRemember).then(host => {
-        host.hashedPassword = hashedPassword;
-        host.save();
-      });
-    }
-  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
-
   const showDescription = () => {
     return !isConnected && description?.length;
   };
@@ -120,6 +111,19 @@ const Login = ({ state, description }: LoginProps) => {
 
     AuthenticationService.login(options as WebSocketConnectOptions);
   }, []);
+
+  const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin)
+
+  useReduxEffect(({ options: { hashedPassword } }) => {
+    if (hostIdToRemember) {
+      HostDTO.get(hostIdToRemember).then(host => {
+        host.hashedPassword = hashedPassword;
+        host.save();
+      });
+    }
+    resetSubmitButton()
+  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
+
 
   const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
     HostDTO.get(selectedHost.id).then(hostDTO => {
@@ -208,7 +212,11 @@ const Login = ({ state, description }: LoginProps) => {
             <Typography variant="h1">Login</Typography>
             <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
             <div className="login-form">
-              <LoginForm onSubmit={onSubmitLogin} onResetPassword={openRequestPasswordResetDialog} />
+              <LoginForm
+                onSubmit={handleLogin}
+                onResetPassword={openRequestPasswordResetDialog}
+                disableSubmitButton={submitButtonDisabled}
+              />
             </div>
 
             {

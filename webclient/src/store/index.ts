@@ -13,6 +13,7 @@ export {
 export * from 'store/server/server.interfaces';
 
 export {
+  Types as RoomsTypes,
   Selectors as RoomsSelectors,
   Dispatch as RoomsDispatch } from 'store/rooms';
 
