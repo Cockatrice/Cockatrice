@@ -131,18 +131,7 @@ const Login = ({ state, description }: LoginProps) => {
     AuthenticationService.login(options as WebSocketConnectOptions);
   }, []);
 
-  const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin)
-
-  useReduxEffect(({ options: { hashedPassword } }) => {
-    if (hostIdToRemember) {
-      HostDTO.get(hostIdToRemember).then(host => {
-        host.hashedPassword = hashedPassword;
-        host.save();
-      });
-    }
-    resetSubmitButton()
-  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
-
+  const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
 
   const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
     HostDTO.get(selectedHost.id).then(hostDTO => {
