@@ -1,7 +1,5 @@
-// eslint-disable-next-line
-import React, { Component, useCallback, useEffect, useState, useRef } from 'react';
-import { connect } from 'react-redux';
-import { Form, Field, useField } from 'react-final-form';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 
 import Button from '@material-ui/core/Button';
@@ -10,14 +8,14 @@ import { AuthenticationService } from 'api';
 import { CheckboxField, InputField, KnownHosts } from 'components';
 import { useAutoConnect } from 'hooks';
 import { HostDTO, SettingDTO } from 'services';
-import { FormKey, APP_USER } from 'types';
+import { APP_USER } from 'types';
 
 import './LoginForm.css';
 
 const PASSWORD_LABEL = 'Password';
 const STORED_PASSWORD_LABEL = '* SAVED *';
 
-const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
+const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginFormProps) => {
   const [host, setHost] = useState(null);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
   const [autoConnect, setAutoConnect] = useAutoConnect();
@@ -42,6 +40,8 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
   const togglePasswordLabel = (useStoredLabel) => {
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
+
+
 
   return (
     <Form onSubmit={onSubmit} validate={validate}>
@@ -140,7 +140,13 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
                 <OnChange name="autoConnect">{onAutoConnectChange}</OnChange>
               </div>
             </div>
-            <Button className='loginForm-submit rounded tall' color='primary' variant='contained' type='submit'>
+            <Button
+              className='loginForm-submit rounded tall'
+              color='primary'
+              variant='contained'
+              type='submit'
+              disabled={disableSubmitButton}
+            >
               Login
             </Button>
           </form>
@@ -152,6 +158,7 @@ const LoginForm = ({ onSubmit, onResetPassword }: LoginFormProps) => {
 
 interface LoginFormProps {
   onSubmit: any;
+  disableSubmitButton: boolean,
   onResetPassword: any;
 }
 

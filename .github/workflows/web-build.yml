@@ -9,8 +9,6 @@ on:
       - 'webclient/**'
       - '!**.md'
   pull_request:
-    branches:
-      - master
     paths:
       - '.github/workflows/web-*.yml'
       - 'webclient/**'

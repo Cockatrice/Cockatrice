@@ -57,7 +57,9 @@ export class WebClient {
       this.handleStatusChange(status);
     });
 
-    console.log(this);
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(this);
+    }
   }
 
   public connect(options: WebSocketConnectOptions) {

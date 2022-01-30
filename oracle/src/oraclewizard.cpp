@@ -54,6 +54,9 @@
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
+    // define a dummy context that will be used where needed
+    QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
+
     settings = new QSettings(SettingsCache::instance().getSettingsPath() + "global.ini", QSettings::IniFormat, this);
     connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
@@ -168,19 +171,15 @@ QStringList IntroPage::findQmFiles()
     QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
     fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
+    fileNames.removeOne("en@source");
     return fileNames;
 }
 
 QString IntroPage::languageName(const QString &qmFile)
 {
-    if (qmFile == DEFAULT_LANG_CODE) {
-        return DEFAULT_LANG_NAME;
-    }
-
-    QTranslator translator;
-    translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
-
-    return translator.translate("i18n", DEFAULT_LANG_NAME);
+    QTranslator qTranslator;
+    qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void IntroPage::languageBoxChanged(int index)
