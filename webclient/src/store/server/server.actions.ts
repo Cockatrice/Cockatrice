@@ -93,6 +93,15 @@ export const Actions = {
     type: Types.REGISTRATION_USERNAME_ERROR,
     error
   }),
+  accountAwaitingActivation: () => ({
+    type: Types.ACCOUNT_AWAITING_ACTIVATION,
+  }),
+  accountActivationSuccess: () => ({
+    type: Types.ACCOUNT_ACTIVATION_SUCCESS,
+  }),
+  accountActivationFailed: () => ({
+    type: Types.ACCOUNT_ACTIVATION_FAILED,
+  }),
   resetPassword: () => ({
     type: Types.RESET_PASSWORD_REQUESTED,
   }),

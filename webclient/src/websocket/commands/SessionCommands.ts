@@ -236,6 +236,7 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
+        SessionPersistence.accountActivationSuccess();
         SessionCommands.login();
       } else {
         SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');

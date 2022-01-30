@@ -78,11 +78,15 @@ export class SessionPersistence {
   }
 
   static accountAwaitingActivation() {
-    console.log('Open Modal for Activation Code input');
+    ServerDispatch.accountAwaitingActivation();
+  }
+
+  static accountActivationSuccess() {
+    ServerDispatch.accountActivationSuccess();
   }
 
   static accountActivationFailed() {
-    console.log('Account activation failed, show an action here');
+    ServerDispatch.accountActivationFailed();
   }
 
   static registrationRequiresEmail() {

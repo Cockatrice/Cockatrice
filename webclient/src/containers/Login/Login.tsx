@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { AuthenticationService } from 'api';
-import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog } from 'dialogs';
+import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from 'dialogs';
 import { LoginForm } from 'forms';
 import { useReduxEffect } from 'hooks';
 import { Images } from 'images';
@@ -65,6 +65,7 @@ const Login = ({ state, description }: LoginProps) => {
     passwordResetRequestDialog: false,
     resetPasswordDialog: false,
     registrationDialog: false,
+    activationDialog: false,
   });
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
@@ -76,6 +77,15 @@ const Login = ({ state, description }: LoginProps) => {
   useReduxEffect(() => {
     closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
+
+  useReduxEffect(() => {
+    closeActivateAccountDialog();
+    closeRegistrationDialog();
+  }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
+
+  useReduxEffect(() => {
+    openActivateAccountDialog();
+  }, ServerTypes.ACCOUNT_AWAITING_ACTIVATION, []);
 
   useReduxEffect(({ options: { hashedPassword } }) => {
     if (hostIdToRemember) {
@@ -161,6 +171,10 @@ const Login = ({ state, description }: LoginProps) => {
     AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
   };
 
+  const handleAccountActivationDialogSubmit = ({ token }) => {
+    AuthenticationService.activateAccount({ token } as any);
+  };
+
   const skipTokenRequest = (userName) => {
     setUserToResetPassword(userName);
 
@@ -193,6 +207,14 @@ const Login = ({ state, description }: LoginProps) => {
   const openRegistrationDialog = () => {
     setDialogState(s => ({ ...s, registrationDialog: true }));
   }
+
+  const closeActivateAccountDialog = () => {
+    setDialogState(s => ({ ...s, activationDialog: false }));
+  };
+
+  const openActivateAccountDialog = () => {
+    setDialogState(s => ({ ...s, activationDialog: true }));
+  };
 
   return (
     <div className={'login overflow-scroll ' + classes.root}>
@@ -287,6 +309,12 @@ const Login = ({ state, description }: LoginProps) => {
         onSubmit={handleResetPasswordDialogSubmit}
         handleClose={closeResetPasswordDialog}
         userName={userToResetPassword}
+      />
+
+      <AccountActivationDialog
+        isOpen={dialogState.activationDialog}
+        onSubmit={handleAccountActivationDialogSubmit}
+        handleClose={closeActivateAccountDialog}
       />
     </div>
   );
