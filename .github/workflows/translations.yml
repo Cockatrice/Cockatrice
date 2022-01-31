@@ -5,11 +5,14 @@ on:
   schedule:
     # runs at the start of each month (UTC)
     - cron: '0 0 1 * *'
+  pull_request:
+    paths:
+      - '.github/workflows/translations.yml'
 
 jobs:
   translations:
     # Do not run the scheduled workflow on forks
-    if: (github.event != 'schedule' || github.repository_owner == 'Cockatrice')
+    if: (github.event_name != 'schedule' || github.repository_owner == 'Cockatrice')
 
     name: Update translation source
     runs-on: ubuntu-latest
@@ -51,6 +54,7 @@ jobs:
             commit: ${{ github.sha }}
 
       - name: Create pull request
+        if: github.event_name != 'pull_request'
         id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
@@ -70,6 +74,7 @@ jobs:
           draft: false
 
       - name: PR Status
+        if: github.event_name != 'pull_request'
         shell: bash
         env:
           STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
