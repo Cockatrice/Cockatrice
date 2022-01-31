@@ -22,7 +22,7 @@ export const generateSalt = (): string => {
     salt += characters.charAt(Math.floor(Math.random() * characters.length));
   }
 
-  return salt;
+	  return salt;
 }
 
 export const passwordSaltSupported = (serverOptions, webClient): number => {
