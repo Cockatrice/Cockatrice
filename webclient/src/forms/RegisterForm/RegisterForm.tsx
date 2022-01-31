@@ -63,6 +63,8 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
     if (!values.password) {
       errors.password = 'Required';
+    } else if (values.password.length < 8) {
+      errors.password = 'Minimum of 8 characters required';
     } else if (passwordError) {
       errors.password = passwordError;
     }
