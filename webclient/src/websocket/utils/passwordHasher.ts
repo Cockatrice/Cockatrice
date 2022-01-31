@@ -24,3 +24,8 @@ export const generateSalt = (): string => {
 
   return salt;
 }
+
+export const passwordSaltSupported = (serverOptions, webClient): number => {
+  // Intentional use of Bitwise operator b/c of how Servatrice Enums work
+  return serverOptions & webClient.protobuf.controller.Event_ServerIdentification.ServerOptions.SupportsPasswordHash;
+}

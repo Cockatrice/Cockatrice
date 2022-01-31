@@ -3,6 +3,7 @@ import { Room, StatusEnum, User, WebSocketConnectReason } from 'types';
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import { ProtobufEvents } from '../services/ProtobufService';
+import { passwordSaltSupported } from '../utils';
 import webClient from '../WebClient';
 
 export const SessionEvents: ProtobufEvents = {
@@ -122,15 +123,18 @@ function serverIdentification(info: ServerIdentificationData) {
   switch (webClient.options.reason) {
     case WebSocketConnectReason.LOGIN:
       SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
-      // Intentional use of Bitwise operator b/c of how Servatrice Enums work
-      if (serverOptions & webClient.protobuf.controller.Event_ServerIdentification.ServerOptions.SupportsPasswordHash) {
+      if (passwordSaltSupported(serverOptions, webClient)) {
         SessionCommands.requestPasswordSalt();
       } else {
         SessionCommands.login();
       }
       break;
     case WebSocketConnectReason.REGISTER:
-      SessionCommands.register();
+      if (passwordSaltSupported(serverOptions, webClient)) {
+        SessionCommands.requestPasswordSalt();
+      } else {
+        SessionCommands.register();
+      }
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
       SessionCommands.activateAccount();
@@ -142,7 +146,11 @@ function serverIdentification(info: ServerIdentificationData) {
       SessionCommands.resetPasswordChallenge();
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
-      SessionCommands.resetPassword();
+      if (passwordSaltSupported(serverOptions, webClient)) {
+        SessionCommands.requestPasswordSalt();
+      } else {
+        SessionCommands.resetPassword();
+      }
       break;
     default:
       SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + webClient.options.reason);
