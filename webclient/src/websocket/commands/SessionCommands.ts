@@ -202,7 +202,7 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted) {
-        SessionCommands.login();
+        SessionCommands.login(passwordSalt);
         return;
       }
 
