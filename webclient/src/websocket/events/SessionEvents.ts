@@ -137,7 +137,11 @@ function serverIdentification(info: ServerIdentificationData) {
       }
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-      SessionCommands.activateAccount();
+      if (passwordSaltSupported(serverOptions, webClient)) {
+        SessionCommands.requestPasswordSalt();
+      } else {
+        SessionCommands.activateAccount();
+      }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
       SessionCommands.resetPasswordRequest();
