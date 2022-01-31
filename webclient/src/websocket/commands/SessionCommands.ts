@@ -137,7 +137,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc, raw => {
       switch (raw.responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
-          const passwordSalt = raw['.Response_PasswordSalt.ext'].passwordSalt;
+          const passwordSalt = raw['.Response_PasswordSalt.ext']?.passwordSalt;
 
           switch (webClient.options.reason) {
             case WebSocketConnectReason.REGISTER: {
@@ -258,6 +258,7 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
+        SessionPersistence.accountActivationSuccess();
         SessionCommands.login();
       } else {
         SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');

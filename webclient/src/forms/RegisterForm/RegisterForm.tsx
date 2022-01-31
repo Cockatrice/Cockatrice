@@ -8,7 +8,7 @@ import setFieldTouched from 'final-form-set-field-touched'
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
-import { InputField, KnownHosts } from 'components';
+import { CountryDropdown, InputField, KnownHosts } from 'components';
 import { useReduxEffect } from 'hooks';
 import { ServerTypes } from 'store';
 import { FormKey } from 'types';
@@ -131,7 +131,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
                   <OnChange name="email">{onEmailChange}</OnChange>
                 </div>
                 <div className="RegisterForm-item">
-                  <Field label="Country" name="country" component={InputField} />
+                  <Field label="Country" name="country" component={CountryDropdown} />
                 </div>
                 <Button className="RegisterForm-submit tall" color="primary" variant="contained" type="submit">
                   Register

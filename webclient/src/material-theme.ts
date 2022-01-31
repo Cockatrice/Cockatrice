@@ -97,6 +97,13 @@ export const materialTheme = createTheme({
         fontSize: 12,
         fontWeight: 'bold',
         color: palette.primary.main,
+
+      },
+    },
+
+    MuiInputLabel: {
+      outlined: {
+        transform: 'translate(1em, 1em) scale(1)',
       },
     },
 

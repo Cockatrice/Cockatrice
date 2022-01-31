@@ -80,6 +80,15 @@ export const Dispatch = {
   registrationUserNameError: (error) => {
     store.dispatch(Actions.registrationUserNameError(error));
   },
+  accountAwaitingActivation: () => {
+    store.dispatch(Actions.accountAwaitingActivation());
+  },
+  accountActivationSuccess: () => {
+    store.dispatch(Actions.accountActivationSuccess());
+  },
+  accountActivationFailed: () => {
+    store.dispatch(Actions.accountActivationFailed());
+  },
   resetPassword: () => {
     store.dispatch(Actions.resetPassword());
   },
