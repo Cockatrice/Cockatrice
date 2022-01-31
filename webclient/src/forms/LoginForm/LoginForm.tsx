@@ -41,8 +41,6 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
 
-
-
   return (
     <Form onSubmit={onSubmit} validate={validate}>
       {({ handleSubmit, form }) => {

@@ -11,6 +11,9 @@ export const Actions = {
     type: Types.LOGIN_SUCCESSFUL,
     options
   }),
+  loginFailed: () => ({
+    type: Types.LOGIN_FAILED,
+  }),
   connectionClosed: reason => ({
     type: Types.CONNECTION_CLOSED,
     reason

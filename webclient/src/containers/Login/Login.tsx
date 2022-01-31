@@ -87,6 +87,10 @@ const Login = ({ state, description }: LoginProps) => {
     openActivateAccountDialog();
   }, ServerTypes.ACCOUNT_AWAITING_ACTIVATION, []);
 
+  useReduxEffect(() => {
+    resetSubmitButton();
+  }, [ServerTypes.LOGIN_FAILED], []);
+
   useReduxEffect(({ options: { hashedPassword } }) => {
     if (hostIdToRemember) {
       HostDTO.get(hostIdToRemember).then(host => {

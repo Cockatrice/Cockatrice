@@ -13,6 +13,10 @@ export class SessionPersistence {
     ServerDispatch.loginSuccessful(options);
   }
 
+  static loginFailed() {
+    ServerDispatch.loginFailed();
+  }
+
   static connectionClosed(reason: number) {
     ServerDispatch.connectionClosed(reason);
   }
