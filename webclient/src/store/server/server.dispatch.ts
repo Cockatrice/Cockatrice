@@ -9,6 +9,9 @@ export const Dispatch = {
   loginSuccessful: options => {
     store.dispatch(Actions.loginSuccessful(options));
   },
+  loginFailed: () => {
+    store.dispatch(Actions.loginFailed());
+  },
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
   },

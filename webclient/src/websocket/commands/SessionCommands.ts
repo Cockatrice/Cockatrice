@@ -116,6 +116,7 @@ export class SessionCommands {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Login failed: unknown error: ${raw.responseCode}`);
       }
 
+      SessionPersistence.loginFailed();
       SessionCommands.disconnect();
     });
   }
