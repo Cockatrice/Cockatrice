@@ -36,7 +36,7 @@
     "postinstall:windows": "powershell .\\copy_shared_files.ps1",
     "postinstall:default": "./copy_shared_files.sh",
     "start": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts start",
-    "build": "react-scripts build",
+    "build": "cross-env DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "cross-env CI=true react-scripts test",
     "test:watch": "react-scripts test",
     "eject": "react-scripts eject",
