@@ -162,18 +162,40 @@ export class SessionCommands {
             }
           }
 
-          break;
+          return;
         }
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
-          SessionCommands.disconnect();
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
           break;
         }
         default: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
-          SessionCommands.disconnect();
         }
       }
+
+      switch (webClient.options.reason) {
+        case WebSocketConnectReason.REGISTER: {
+          SessionPersistence.registrationFailed('Failed to retrieve password salt');
+          break;
+        }
+
+        case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
+          SessionPersistence.accountActivationFailed();
+          break;
+        }
+
+        case WebSocketConnectReason.PASSWORD_RESET: {
+          SessionPersistence.resetPasswordFailed();
+          break;
+        }
+
+        case WebSocketConnectReason.LOGIN:
+        default: {
+          SessionPersistence.loginFailed();
+        }
+      }
+
+      SessionCommands.disconnect();
     });
   }
 
