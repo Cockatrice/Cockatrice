@@ -162,18 +162,19 @@ export class SessionCommands {
             }
           }
 
-          break;
+          return;
         }
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
-          SessionCommands.disconnect();
           break;
         }
         default: {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
-          SessionCommands.disconnect();
         }
       }
+
+      SessionCommands.disconnect();
+      SessionPersistence.loginFailed();
     });
   }
 
