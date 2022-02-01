@@ -105,7 +105,7 @@ export class SessionCommands {
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, '');
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
           SessionPersistence.accountAwaitingActivation();
           break;
 
