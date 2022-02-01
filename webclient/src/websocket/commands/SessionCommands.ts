@@ -84,6 +84,7 @@ export class SessionCommands {
 
         case webClient.protobuf.controller.Response.ResponseCode.RespWrongPassword:
         case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
+        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
           break;
 
@@ -95,10 +96,6 @@ export class SessionCommands {
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: banned user');
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
-          break;
-
         case webClient.protobuf.controller.Response.ResponseCode.RespClientIdRequired:
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing client ID');
           break;
@@ -108,7 +105,7 @@ export class SessionCommands {
           break;
 
         case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, '');
           SessionPersistence.accountAwaitingActivation();
           break;
 
@@ -165,7 +162,7 @@ export class SessionCommands {
           return;
         }
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
+          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
           break;
         }
         default: {
