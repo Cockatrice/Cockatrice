@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Select, MenuItem } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -14,6 +13,7 @@ import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
 import { KnownHostDialog } from 'dialogs';
 import { HostDTO } from 'services';
 import { DefaultHosts, Host, getHostPort } from 'types';
+import Toast from 'components/Toast/Toast';
 
 import './KnownHosts.css';
 
@@ -43,6 +43,10 @@ const KnownHosts = (props) => {
     open: false,
     edit: null,
   });
+
+  const [showCreateToast, setShowCreateToast] = useState(false)
+  const [showDeleteToast, setShowDeleteToast] = useState(false)
+  const [showEditToast, setShowEditToast] = useState(false)
 
   const loadKnownHosts = useCallback(async () => {
     const hosts = await HostDTO.getAll();
@@ -96,6 +100,7 @@ const KnownHosts = (props) => {
 
     closeKnownHostDialog();
     HostDTO.delete(id);
+    setShowDeleteToast(true)
   };
 
   const handleDialogSubmit = async ({ id, name, host, port }) => {
@@ -111,6 +116,7 @@ const KnownHosts = (props) => {
         hosts: s.hosts.map(h => h.id === id ? hostDTO : h),
         selectedHost: hostDTO
       }));
+      setShowEditToast(true)
     } else {
       const newHost: Host = { name, host, port, editable: true };
       newHost.id = await HostDTO.add(newHost) as number;
@@ -120,6 +126,7 @@ const KnownHosts = (props) => {
         hosts: [...s.hosts, newHost],
         selectedHost: newHost,
       }));
+      setShowCreateToast(true)
     }
 
     closeKnownHostDialog();
@@ -206,6 +213,9 @@ const KnownHosts = (props) => {
         onSubmit={handleDialogSubmit}
         handleClose={closeKnownHostDialog}
       />
+      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>Host successfully created.</Toast>
+      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>Host successfully deleted.</Toast>
+      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>Host successfully edited.</Toast>
     </div>
   )
 };
