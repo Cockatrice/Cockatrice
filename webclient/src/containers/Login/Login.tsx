@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
