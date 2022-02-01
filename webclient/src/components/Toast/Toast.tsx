@@ -6,7 +6,6 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Slide, { SlideProps } from '@material-ui/core/Slide';
 import Snackbar from '@material-ui/core/Snackbar';
 
-
 const iconMapping = {
   success: <CheckCircleIcon />
 }
@@ -62,6 +61,5 @@ Toast.defaultProps = {
 function TransitionLeft(props) {
   return <Slide {...props} direction="left" />;
 }
-
 
 export default Toast
