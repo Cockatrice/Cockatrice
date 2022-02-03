@@ -88,7 +88,7 @@ const Login = ({ state, description }: LoginProps) => {
 
   useReduxEffect(() => {
     resetSubmitButton();
-  }, [ServerTypes.LOGIN_FAILED], []);
+  }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
   useReduxEffect(({ options: { hashedPassword } }) => {
     if (hostIdToRemember) {
