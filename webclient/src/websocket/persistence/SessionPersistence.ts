@@ -25,6 +25,10 @@ export class SessionPersistence {
     ServerDispatch.connectionClosed(reason);
   }
 
+  static connectionFailed() {
+    ServerDispatch.connectionFailed();
+  }
+
   static updateBuddyList(buddyList) {
     ServerDispatch.updateBuddyList(buddyList);
   }

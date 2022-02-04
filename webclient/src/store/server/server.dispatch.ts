@@ -18,6 +18,9 @@ export const Dispatch = {
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
   },
+  connectionFailed: () => {
+    store.dispatch(Actions.connectionFailed());
+  },
   updateBuddyList: buddyList => {
     store.dispatch(Actions.updateBuddyList(buddyList));
   },

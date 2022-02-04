@@ -21,6 +21,9 @@ export const Actions = {
     type: Types.CONNECTION_CLOSED,
     reason
   }),
+  connectionFailed: () => ({
+    type: Types.CONNECTION_FAILED,
+  }),
   serverMessage: message => ({
     type: Types.SERVER_MESSAGE,
     message
