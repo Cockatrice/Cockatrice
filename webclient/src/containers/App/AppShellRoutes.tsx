@@ -10,7 +10,8 @@ import {
   Room,
   Server,
   Login,
-  Logs
+  Logs,
+  Initialize,
 } from 'containers';
 
 const Routes = () => (
@@ -24,8 +25,9 @@ const Routes = () => (
       {<Route path={RouteEnum.ROOM} render={() => <Room />} />}
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
       <Route path={RouteEnum.LOGIN} render={() => <Login />} />
+      <Route path={RouteEnum.INITIALIZE} render={() => <Initialize />} />
 
-      <Redirect from="*" to={RouteEnum.LOGIN} />
+      <Redirect from="*" to={RouteEnum.INITIALIZE} />
     </Switch>
   </div>
 );

@@ -39,6 +39,7 @@ export interface AccountActivationParams extends ServerRegisterParams {
 }
 
 export interface ServerState {
+  initialized: boolean;
   buddyList: User[];
   ignoreList: User[];
   info: ServerStateInfo;

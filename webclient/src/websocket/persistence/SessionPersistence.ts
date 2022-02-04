@@ -5,6 +5,10 @@ import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
 
 export class SessionPersistence {
+  static initialized() {
+    ServerDispatch.initialized();
+  }
+
   static clearStore() {
     ServerDispatch.clearStore();
   }
