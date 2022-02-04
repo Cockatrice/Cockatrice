@@ -3,7 +3,7 @@ import { Room, StatusEnum, User, WebSocketConnectReason } from 'types';
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import { ProtobufEvents } from '../services/ProtobufService';
-import { passwordSaltSupported } from '../utils';
+import { generateSalt, passwordSaltSupported } from '../utils';
 import webClient from '../WebClient';
 
 export const SessionEvents: ProtobufEvents = {
@@ -130,11 +130,8 @@ function serverIdentification(info: ServerIdentificationData) {
       }
       break;
     case WebSocketConnectReason.REGISTER:
-      if (passwordSaltSupported(serverOptions, webClient)) {
-        SessionCommands.requestPasswordSalt();
-      } else {
-        SessionCommands.register();
-      }
+      const passwordSalt = passwordSaltSupported(serverOptions, webClient) ? generateSalt() : undefined;
+      SessionCommands.register(passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
       if (passwordSaltSupported(serverOptions, webClient)) {
