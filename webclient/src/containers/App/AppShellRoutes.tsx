@@ -10,7 +10,8 @@ import {
   Room,
   Server,
   Login,
-  Logs
+  Logs,
+  Unsupported
 } from 'containers';
 
 const Routes = () => (
@@ -24,6 +25,7 @@ const Routes = () => (
       {<Route path={RouteEnum.ROOM} render={() => <Room />} />}
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
       <Route path={RouteEnum.LOGIN} render={() => <Login />} />
+      <Route path={RouteEnum.UNSUPPORTED} render={() => <Unsupported />} />
 
       <Redirect from="*" to={RouteEnum.LOGIN} />
     </Switch>
