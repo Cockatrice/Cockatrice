@@ -130,7 +130,7 @@ function serverIdentification(info: ServerIdentificationData) {
       }
       break;
     case WebSocketConnectReason.REGISTER:
-      const passwordSalt = passwordSaltSupported(serverOptions, webClient) ? generateSalt() : undefined;
+      const passwordSalt = passwordSaltSupported(serverOptions, webClient) ? generateSalt() : null;
       SessionCommands.register(passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
