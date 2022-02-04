@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 const Initialize = ({ initialized }: InitializeProps) => {
   const classes = useStyles();
 
-  return false
+  return initialized
     ? <Redirect from="*" to={RouteEnum.LOGIN} />
     : (
       <div className={'Initialize ' + classes.root}>
