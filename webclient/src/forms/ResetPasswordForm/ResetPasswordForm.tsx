@@ -34,7 +34,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
     if (!values.newPassword) {
       errors.newPassword = 'Required';
     } else if (values.newPassword.length < 8) {
-      errors.password = 'Minimum of 8 characters required';
+      errors.newPassword = 'Minimum of 8 characters required';
     }
 
     if (!values.passwordAgain) {

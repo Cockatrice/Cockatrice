@@ -4,6 +4,9 @@ import { WebSocketConnectOptions } from 'types';
 import { Types } from './server.types';
 
 export const Actions = {
+  initialized: () => ({
+    type: Types.INITIALIZED
+  }),
   clearStore: () => ({
     type: Types.CLEAR_STORE
   }),

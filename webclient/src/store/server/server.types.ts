@@ -1,4 +1,5 @@
 export const Types = {
+  INITIALIZED: '[Server] Initialized',
   CLEAR_STORE: '[Server] Clear Store',
   LOGIN_SUCCESSFUL: '[Server] Login Successful',
   LOGIN_FAILED: '[Server] Login Failed',

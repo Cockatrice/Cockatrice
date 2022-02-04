@@ -6,6 +6,7 @@ import { ServerState } from './server.interfaces'
 import { Types } from './server.types';
 
 const initialState: ServerState = {
+  initialized: false,
   buddyList: [],
   ignoreList: [],
 
@@ -33,6 +34,12 @@ const initialState: ServerState = {
 
 export const serverReducer = (state = initialState, action: any) => {
   switch (action.type) {
+    case Types.INITIALIZED: {
+      return {
+        ...initialState,
+        initialized: true
+      }
+    }
     case Types.CLEAR_STORE: {
       return {
         ...initialState,

@@ -3,6 +3,9 @@ import { Actions } from './server.actions';
 import { store } from 'store';
 
 export const Dispatch = {
+  initialized: () => {
+    store.dispatch(Actions.initialized());
+  },
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },

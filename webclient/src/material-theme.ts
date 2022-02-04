@@ -193,11 +193,11 @@ export const materialTheme = createTheme({
       fontSize: 14,
       fontWeight: 'bold',
       lineHeight: 1.4,
-      color: '#9E9E9E',
+      color: palette.grey[500],
     },
     subtitle2: {
       lineHeight: 1.4,
-      color: '#9E9E9E',
+      color: palette.grey[500],
     },
     // body1: {},
     // body2: {},
