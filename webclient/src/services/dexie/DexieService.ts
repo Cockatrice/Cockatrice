@@ -28,6 +28,10 @@ class DexieService {
   get hosts() {
     return this.db.table(Stores.HOSTS);
   }
+
+  testConnection() {
+    return this.db.open();
+  }
 }
 
 export const dexieService = new DexieService();

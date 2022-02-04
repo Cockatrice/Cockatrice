@@ -1,0 +1,18 @@
+.Unsupported {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.Unsupported-paper {
+  width: 600px;
+  max-width: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.Unsupported-paper__header {
+  margin-bottom: 40px;
+}

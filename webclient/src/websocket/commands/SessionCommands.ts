@@ -141,11 +141,6 @@ export class SessionCommands {
           const passwordSalt = raw['.Response_PasswordSalt.ext']?.passwordSalt;
 
           switch (webClient.options.reason) {
-            case WebSocketConnectReason.REGISTER: {
-              SessionCommands.register(passwordSalt);
-              break;
-            }
-
             case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
               SessionCommands.activateAccount(passwordSalt);
               break;
@@ -174,11 +169,6 @@ export class SessionCommands {
       }
 
       switch (webClient.options.reason) {
-        case WebSocketConnectReason.REGISTER: {
-          SessionPersistence.registrationFailed('Failed to retrieve password salt');
-          break;
-        }
-
         case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
           SessionPersistence.accountActivationFailed();
           break;

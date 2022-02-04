@@ -4,6 +4,7 @@ import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
+import { SessionPersistence } from '../persistence';
 
 export class WebSocketService {
   private socket: WebSocket;
@@ -60,7 +61,10 @@ export class WebSocketService {
     const socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
 
+    const connectionTimer = setTimeout(() => socket.close(), this.keepalive);
+
     socket.onopen = () => {
+      clearTimeout(connectionTimer);
       this.updateStatus(StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: Function) => {
@@ -79,6 +83,7 @@ export class WebSocketService {
 
     socket.onerror = () => {
       this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
+      SessionPersistence.connectionFailed();
     };
 
     socket.onmessage = (event: MessageEvent) => {

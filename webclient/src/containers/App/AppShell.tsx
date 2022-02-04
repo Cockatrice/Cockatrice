@@ -6,6 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { store } from 'store';
 import { Header } from 'components';
 import Routes from './AppShellRoutes';
+import FeatureDetection from './FeatureDetection';
 
 import './AppShell.css';
 
@@ -26,6 +27,8 @@ class AppShell extends Component {
         <div className="AppShell" onContextMenu={this.handleContextMenu}>
           <Router>
             <Header />
+
+            <FeatureDetection />
             <Routes />
           </Router>
         </div>
