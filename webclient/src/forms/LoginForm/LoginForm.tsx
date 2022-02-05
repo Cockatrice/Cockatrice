@@ -26,9 +26,6 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     if (!values.userName) {
       errors.userName = 'Required';
     }
-    if (!values.password && !values.selectedHost?.hashedPassword) {
-      errors.password = 'Required';
-    }
     if (!values.selectedHost) {
       errors.selectedHost = 'Required';
     }
