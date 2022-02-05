@@ -42,7 +42,7 @@ const AccountActivationForm = ({ onSubmit }) => {
         return (
           <form className="AccountActivationForm" onSubmit={handleSubmit}>
             <div className="AccountActivationForm-item">
-              <Field label="Token" name="token" component={InputField} autoComplete="off" />
+              <Field label="Token" name="token" component={InputField} />
             </div>
 
             {errorMessage && (

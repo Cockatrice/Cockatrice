@@ -109,7 +109,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
           <form className='loginForm' onSubmit={handleSubmit}>
             <div className='loginForm-items'>
               <div className='loginForm-item'>
-                <Field label='Username' name='userName' component={InputField} autoComplete='off' />
+                <Field label='Username' name='userName' component={InputField} autoComplete='username' />
                 <OnChange name="userName">{onUserNameChange}</OnChange>
               </div>
               <div className='loginForm-item'>
