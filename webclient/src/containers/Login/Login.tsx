@@ -164,7 +164,7 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
-    let { userName, email, selectedHost } = form;
+    const { userName, email, selectedHost } = form;
     const { host, port } = getHostPort(selectedHost);
 
     if (email) {
