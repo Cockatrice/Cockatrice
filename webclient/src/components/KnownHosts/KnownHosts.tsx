@@ -104,6 +104,10 @@ const KnownHosts = (props) => {
   };
 
   const handleDialogSubmit = async ({ id, name, host, port }) => {
+    name = name.trim();
+    host = host.trim();
+    port = port.trim();
+
     if (id) {
       const hostDTO = await HostDTO.get(id);
       hostDTO.name = name;
