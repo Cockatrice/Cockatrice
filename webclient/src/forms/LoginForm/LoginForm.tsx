@@ -41,7 +41,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
 
-  const handleOnSubmit = ({userName, ...values}) => {
+  const handleOnSubmit = ({ userName, ...values }) => {
     userName = userName.trim();
 
     onSubmit({ userName, ...values });
