@@ -29,8 +29,8 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
   const handleOnSubmit = ({ userName, email, ...values }) => {
     setErrorMessage(false);
 
-    userName = userName.trim();
-    email = email.trim();
+    userName = userName?.trim();
+    email = email?.trim();
 
     onSubmit({ userName, email, ...values });
   }

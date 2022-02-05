@@ -42,7 +42,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
   };
 
   const handleOnSubmit = ({ userName, ...values }) => {
-    userName = userName.trim();
+    userName = userName?.trim();
 
     onSubmit({ userName, ...values });
   }

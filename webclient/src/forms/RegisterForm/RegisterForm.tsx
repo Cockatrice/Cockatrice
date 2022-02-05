@@ -50,9 +50,9 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const handleOnSubmit = ({ userName, email, realName, ...values }) => {
     setError(null);
 
-    userName = userName.trim();
-    email = email.trim();
-    realName = realName.trim();
+    userName = userName?.trim();
+    email = email?.trim();
+    realName = realName?.trim();
 
     onSubmit({ userName, email, realName, ...values });
   }

@@ -24,7 +24,7 @@ const AccountActivationForm = ({ onSubmit }) => {
   const handleOnSubmit = ({ token, ...values }) => {
     setErrorMessage(false);
 
-    token = token.trim();
+    token = token?.trim();
 
     onSubmit({ token, ...values });
   }

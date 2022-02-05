@@ -50,8 +50,8 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
   };
 
   const handleOnSubmit = ({ userName, token, ...values }) => {
-    userName = userName.trim();
-    token = token.trim();
+    userName = userName?.trim();
+    token = token?.trim();
 
     onSubmit({ userName, token, ...values });
   }
