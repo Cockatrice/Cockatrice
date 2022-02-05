@@ -49,8 +49,15 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
     return errors;
   };
 
+  const handleOnSubmit = ({ userName, token, ...values }) => {
+    userName = userName.trim();
+    token = token.trim();
+
+    onSubmit({ userName, token, ...values });
+  }
+
   return (
-    <Form onSubmit={onSubmit} validate={validate} initialValues={{ userName }}>
+    <Form onSubmit={handleOnSubmit} validate={validate} initialValues={{ userName }}>
       {({ handleSubmit, form }) => (
         <form className='ResetPasswordForm' onSubmit={handleSubmit}>
           <div className='ResetPasswordForm-items'>

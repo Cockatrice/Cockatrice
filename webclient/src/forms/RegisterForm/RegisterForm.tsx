@@ -47,9 +47,14 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     setUserNameError(error);
   }, ServerTypes.REGISTRATION_USERNAME_ERROR);
 
-  const handleOnSubmit = form => {
+  const handleOnSubmit = ({ userName, email, realName, ...values }) => {
     setError(null);
-    onSubmit(form);
+
+    userName = userName.trim();
+    email = email.trim();
+    realName = realName.trim();
+
+    onSubmit({ userName, email, realName, ...values });
   }
 
   const validate = values => {

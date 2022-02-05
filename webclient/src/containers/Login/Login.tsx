@@ -104,7 +104,7 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const onSubmitLogin = useCallback((loginForm) => {
-    let {
+    const {
       userName,
       password,
       selectedHost,
@@ -114,8 +114,6 @@ const Login = ({ state, description }: LoginProps) => {
       },
       remember
     } = loginForm;
-
-    userName = userName.trim();
 
     updateHost(loginForm);
 
@@ -141,7 +139,7 @@ const Login = ({ state, description }: LoginProps) => {
   const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
     HostDTO.get(selectedHost.id).then(hostDTO => {
       hostDTO.remember = remember;
-      hostDTO.userName = remember ? userName.trim() : null;
+      hostDTO.userName = remember ? userName : null;
       hostDTO.hashedPassword = remember ? hashedPassword : null;
 
       hostDTO.save();
@@ -149,11 +147,7 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const handleRegistrationDialogSubmit = (form) => {
-    let { userName, password, email, country, realName, selectedHost } = form;
-
-    userName = userName.trim();
-    email = email.trim();
-    realName = realName.trim();
+    const { userName, password, email, country, realName, selectedHost } = form;
 
     AuthenticationService.register({
       ...getHostPort(selectedHost),
@@ -166,16 +160,12 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const handleAccountActivationDialogSubmit = ({ token }) => {
-    token = token.trim();
     AuthenticationService.activateAccount({ token } as any);
   };
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
     let { userName, email, selectedHost } = form;
     const { host, port } = getHostPort(selectedHost);
-
-    userName = userName.trim();
-    email = email.trim();
 
     if (email) {
       AuthenticationService.resetPasswordChallenge({ userName, email, host, port } as any);
@@ -187,9 +177,6 @@ const Login = ({ state, description }: LoginProps) => {
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = getHostPort(selectedHost);
-
-    userName = userName.trim();
-    token = token.trim();
 
     AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
   };

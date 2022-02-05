@@ -41,8 +41,14 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
 
+  const handleOnSubmit = ({userName, ...values}) => {
+    userName = userName.trim();
+
+    onSubmit({ userName, ...values });
+  }
+
   return (
-    <Form onSubmit={onSubmit} validate={validate}>
+    <Form onSubmit={handleOnSubmit} validate={validate}>
       {({ handleSubmit, form }) => {
         const { values } = form.getState();
 

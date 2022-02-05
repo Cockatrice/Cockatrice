@@ -21,9 +21,12 @@ const AccountActivationForm = ({ onSubmit }) => {
     setErrorMessage(true);
   }, ServerTypes.ACCOUNT_ACTIVATION_FAILED, []);
 
-  const handleOnSubmit = (form) => {
+  const handleOnSubmit = ({ token }) => {
     setErrorMessage(false);
-    onSubmit(form);
+
+    token = token.trim();
+
+    onSubmit({ token });
   }
 
   const validate = values => {

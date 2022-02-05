@@ -26,9 +26,13 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
     setIsMFA(true);
   }, ServerTypes.RESET_PASSWORD_CHALLENGE, []);
 
-  const handleOnSubmit = (form) => {
+  const handleOnSubmit = ({ userName, email, ...values }) => {
     setErrorMessage(false);
-    onSubmit(form);
+
+    userName = userName.trim();
+    email = email.trim();
+
+    onSubmit({ userName, email, ...values });
   }
 
   const validate = values => {
