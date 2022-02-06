@@ -4,9 +4,10 @@ import { Language } from 'types';
 
 class I18nBackend {
   static type: ModuleType = 'backend';
+  static BASE_URL = `${process.env.PUBLIC_URL}/locales`;
 
   read(language, namespace, callback) {
-    fetch(`/locales/${Language[language]}/${namespace}.json`)
+    fetch(`${I18nBackend.BASE_URL}/${Language[language]}/${namespace}.json`)
       .then(resp => resp.json().then(json => callback(null, json)))
       .catch(error => callback(error, null));
   }
