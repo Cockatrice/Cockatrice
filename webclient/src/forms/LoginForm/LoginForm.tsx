@@ -33,7 +33,9 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     return errors;
   }
 
-  const useStoredPassword = (remember) => remember && host.hashedPassword;
+  const useStoredPassword = (remember, password) => {
+    return remember && host.hashedPassword && !password;
+  }
   const togglePasswordLabel = (useStoredLabel) => {
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
@@ -78,12 +80,12 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
 
           onRememberChange(host.remember);
           onAutoConnectChange(host.remember && autoConnect);
-          togglePasswordLabel(useStoredPassword(host.remember));
+          togglePasswordLabel(useStoredPassword(host.remember, values.password));
         }, [host]);
 
         const onUserNameChange = (userName) => {
           const fieldChanged = host.userName?.toLowerCase() !== values.userName?.toLowerCase();
-          if (useStoredPassword(values.remember) && fieldChanged) {
+          if (useStoredPassword(values.remember, values.password) && fieldChanged) {
             setHost(({ hashedPassword, ...s }) => ({ ...s, userName }));
           }
         }
@@ -95,7 +97,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
             onAutoConnectChange(false);
           }
 
-          togglePasswordLabel(useStoredPassword(checked));
+          togglePasswordLabel(useStoredPassword(checked, values.password));
         }
 
         const onAutoConnectChange = (checked) => {
@@ -119,7 +121,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
                 <Field
                   label={passwordLabel}
                   onFocus={() => setPasswordLabel(PASSWORD_LABEL)}
-                  onBlur={() => togglePasswordLabel(useStoredPassword(values.remember))}
+                  onBlur={() => togglePasswordLabel(useStoredPassword(values.remember, values.password))}
                   name='password'
                   type='password'
                   component={InputField}

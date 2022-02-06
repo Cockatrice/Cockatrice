@@ -127,7 +127,7 @@ const Login = ({ state, description }: LoginProps) => {
       password
     };
 
-    if (!password) {
+    if (remember && !password) {
       options.hashedPassword = hashedPassword;
     }
 
