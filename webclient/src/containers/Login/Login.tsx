@@ -100,7 +100,7 @@ const Login = ({ state, description }: LoginProps) => {
     return !isConnected && description?.length;
   };
 
-  const onSubmitLogin = useCallback((form) => {
+  const onSubmitLogin = useCallback((loginForm) => {
     const {
       userName,
       password,
@@ -110,10 +110,10 @@ const Login = ({ state, description }: LoginProps) => {
         hashedPassword
       },
       remember
-    } = form;
+    } = loginForm;
 
     if (remember) {
-      setRememberLogin(form);
+      setRememberLogin(loginForm);
     }
 
     const options: WebSocketConnectOptions = {

@@ -33,9 +33,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     return errors;
   }
 
-  const useStoredPassword = (remember, password) => {
-    return remember && host.hashedPassword && !password;
-  }
+  const useStoredPassword = (remember, password) => remember && host.hashedPassword && !password;
   const togglePasswordLabel = (useStoredLabel) => {
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
