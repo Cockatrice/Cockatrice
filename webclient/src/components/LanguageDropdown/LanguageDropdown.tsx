@@ -15,7 +15,9 @@ const LanguageDropdown = () => {
   const [language, setLanguage] = useState(i18n.resolvedLanguage);
 
   useEffect(() => {
-    i18n.changeLanguage(language);
+    if (language !== i18n.resolvedLanguage) {
+      i18n.changeLanguage(language);
+    }
   }, [language]);
 
   return (
