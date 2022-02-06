@@ -59,7 +59,7 @@ const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
-  const [hostIdToRemember, setHostIdToRemember] = useState(null);
+  const [rememberLogin, setRememberLogin] = useState(null);
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
     resetPasswordDialog: false,
@@ -91,19 +91,16 @@ const Login = ({ state, description }: LoginProps) => {
   }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
   useReduxEffect(({ options: { hashedPassword } }) => {
-    if (hostIdToRemember) {
-      HostDTO.get(hostIdToRemember).then(host => {
-        host.hashedPassword = hashedPassword;
-        host.save();
-      });
+    if (rememberLogin) {
+      updateHost(hashedPassword, rememberLogin);
     }
-  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
+  }, ServerTypes.LOGIN_SUCCESSFUL, [rememberLogin]);
 
   const showDescription = () => {
     return !isConnected && description?.length;
   };
 
-  const onSubmitLogin = useCallback((loginForm) => {
+  const onSubmitLogin = useCallback((form) => {
     const {
       userName,
       password,
@@ -113,12 +110,10 @@ const Login = ({ state, description }: LoginProps) => {
         hashedPassword
       },
       remember
-    } = loginForm;
-
-    updateHost(loginForm);
+    } = form;
 
     if (remember) {
-      setHostIdToRemember(hostId);
+      setRememberLogin(form);
     }
 
     const options: WebSocketConnectOptions = {
@@ -136,7 +131,7 @@ const Login = ({ state, description }: LoginProps) => {
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
 
-  const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
+  const updateHost = (hashedPassword, { selectedHost, remember, userName }) => {
     HostDTO.get(selectedHost.id).then(hostDTO => {
       hostDTO.remember = remember;
       hostDTO.userName = remember ? userName : null;
