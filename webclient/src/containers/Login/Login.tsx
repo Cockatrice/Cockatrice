@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-
 
 import { AuthenticationService } from 'api';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from 'dialogs';
@@ -57,6 +57,8 @@ const useStyles = makeStyles(theme => ({
 
 const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const isConnected = AuthenticationService.isConnected(state);
 
   const [hostIdToRemember, setHostIdToRemember] = useState(null);
@@ -232,8 +234,8 @@ const Login = ({ state, description }: LoginProps) => {
               <img src={Images.Logo} alt="logo" />
               <span>COCKATRICE</span>
             </div>
-            <Typography variant="h1">Login</Typography>
-            <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
+            <Typography variant="h1">{ t('LoginView.title') }</Typography>
+            <Typography variant="subtitle1">{ t('LoginView.subtitle') }</Typography>
             <div className="login-form">
               <LoginForm
                 onSubmit={handleLogin}
