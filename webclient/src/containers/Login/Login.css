@@ -185,9 +185,13 @@
   margin-top: 30px;
 }
 
-.login-footer_register {
+.login-footer__register {
   margin-bottom: 10px;
   font-weight: bold;
+}
+
+.login-footer__language {
+  margin-top: 20px;
 }
 
 .login-content__connectionStatus {

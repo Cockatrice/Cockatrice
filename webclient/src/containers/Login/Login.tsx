@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { AuthenticationService } from 'api';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from 'dialogs';
+import { LanguageDropdown } from 'components';
 import { LoginForm } from 'forms';
 import { useReduxEffect, useFireOnce } from 'hooks';
 import { Images } from 'images';
@@ -253,13 +254,16 @@ const Login = ({ state, description }: LoginProps) => {
             }
 
             <div className="login-footer">
-              <div className="login-footer_register">
+              <div className="login-footer__register">
                 <span>Not registered yet?</span>
                 <Button color="primary" onClick={openRegistrationDialog}>Create an account</Button>
               </div>
               <Typography variant="subtitle2" className="login-footer__copyright">
                 Cockatrice is an open source project. { new Date().getUTCFullYear() }
               </Typography>
+              <div className="login-footer__language">
+                <LanguageDropdown />
+              </div>
             </div>
           </div>
           <div className="login-content__description">
