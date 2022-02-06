@@ -35,6 +35,7 @@
   "scripts": {
     "postinstall": "node postinstall.js",
     "prebuild": "node prebuild.js",
+    "prestart": "node prebuild.js",
     "build": "cross-env DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "start": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts start",
     "test": "cross-env CI=true react-scripts test",
