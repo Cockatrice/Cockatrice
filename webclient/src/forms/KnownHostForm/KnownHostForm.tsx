@@ -33,12 +33,11 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
     }
   };
 
-  const handleOnSubmit = ({ name, host, port, ...values }) => {
+  const handleOnSubmit = ({ name, host, ...values }) => {
     name = name?.trim();
     host = host?.trim();
-    port = port?.trim();
 
-    onSubmit({ name, host, port, ...values });
+    onSubmit({ name, host, ...values });
   }
 
   return (

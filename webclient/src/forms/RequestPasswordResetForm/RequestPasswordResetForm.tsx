@@ -67,7 +67,7 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
               </div>
               {isMFA ? (
                 <div className="RequestPasswordResetForm-item">
-                  <Field label="Email" name="email" component={InputField} autoComplete="email" />
+                  <Field label="Email" name="email" type="email" component={InputField} autoComplete="email" />
                   <div>Server has multi-factor authentication enabled</div>
                 </div>
               ) : null}
