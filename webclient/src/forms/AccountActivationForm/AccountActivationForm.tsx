@@ -21,9 +21,12 @@ const AccountActivationForm = ({ onSubmit }) => {
     setErrorMessage(true);
   }, ServerTypes.ACCOUNT_ACTIVATION_FAILED, []);
 
-  const handleOnSubmit = (form) => {
+  const handleOnSubmit = ({ token, ...values }) => {
     setErrorMessage(false);
-    onSubmit(form);
+
+    token = token?.trim();
+
+    onSubmit({ token, ...values });
   }
 
   const validate = values => {
@@ -42,7 +45,7 @@ const AccountActivationForm = ({ onSubmit }) => {
         return (
           <form className="AccountActivationForm" onSubmit={handleSubmit}>
             <div className="AccountActivationForm-item">
-              <Field label="Token" name="token" component={InputField} autoComplete="off" />
+              <Field label="Token" name="token" component={InputField} />
             </div>
 
             {errorMessage && (

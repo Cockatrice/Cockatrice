@@ -1,6 +1,5 @@
 export { default as AccountActivationForm } from './AccountActivationForm/AccountActivationForm';
 export { default as CardImportForm } from './CardImportForm/CardImportForm';
-export { default as ConnectForm } from './ConnectForm/ConnectForm';
 export { default as LoginForm } from './LoginForm/LoginForm';
 export { default as KnownHostForm } from './KnownHostForm/KnownHostForm';
 export { default as RegisterForm } from './RegisterForm/RegisterForm';

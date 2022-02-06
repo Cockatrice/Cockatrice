@@ -33,6 +33,13 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
     }
   };
 
+  const handleOnSubmit = ({ name, host, ...values }) => {
+    name = name?.trim();
+    host = host?.trim();
+
+    onSubmit({ name, host, ...values });
+  }
+
   return (
     <Form
       initialValues={{
@@ -41,7 +48,7 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
         host: host?.host,
         port: host?.port,
       }}
-      onSubmit={onSubmit}
+      onSubmit={handleOnSubmit}
       validate={validate}
     >
       {({ handleSubmit }) => (

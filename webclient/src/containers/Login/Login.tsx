@@ -159,6 +159,10 @@ const Login = ({ state, description }: LoginProps) => {
     });
   };
 
+  const handleAccountActivationDialogSubmit = ({ token }) => {
+    AuthenticationService.activateAccount({ token } as any);
+  };
+
   const handleRequestPasswordResetDialogSubmit = (form) => {
     const { userName, email, selectedHost } = form;
     const { host, port } = getHostPort(selectedHost);
@@ -173,11 +177,8 @@ const Login = ({ state, description }: LoginProps) => {
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = getHostPort(selectedHost);
-    AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
-  };
 
-  const handleAccountActivationDialogSubmit = ({ token }) => {
-    AuthenticationService.activateAccount({ token } as any);
+    AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
   };
 
   const skipTokenRequest = (userName) => {
