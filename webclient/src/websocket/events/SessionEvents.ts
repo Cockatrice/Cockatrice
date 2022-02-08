@@ -131,7 +131,6 @@ function serverIdentification(info: ServerIdentificationData) {
       break;
     case WebSocketConnectReason.REGISTER:
       const passwordSalt = passwordSaltSupported(serverOptions, webClient) ? generateSalt() : null;
-      console.log({ passwordSalt })
       SessionCommands.register(passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
