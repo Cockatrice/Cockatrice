@@ -208,7 +208,6 @@ export class SessionCommands {
     }
 
     const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
-    console.log(CmdRegister)
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
       '.Command_Register.ext': CmdRegister

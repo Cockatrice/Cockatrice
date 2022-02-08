@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import setFieldTouched from 'final-form-set-field-touched'
@@ -10,10 +9,9 @@ import Typography from '@material-ui/core/Typography';
 import { CountryDropdown, InputField, KnownHosts } from 'components';
 import { useReduxEffect } from 'hooks';
 import { ServerTypes } from 'store';
-import { FormKey } from 'types';
 
 import './RegisterForm.css';
-import Toast from 'components/Toast/Toast';
+import { useToast } from 'components/Toast';
 
 const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const [emailRequired, setEmailRequired] = useState(false);
@@ -21,7 +19,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [userNameError, setUserNameError] = useState(null);
-  const [showRegSuccessToast, setShowRegSuccessToast] = useState(null)
+  const { openToast } = useToast({ key: 'registration-success', children: 'Registration Successful!' })
 
   const onHostChange = (host) => setEmailRequired(false);
   const onEmailChange = () => emailError && setEmailError(null);
@@ -36,8 +34,8 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     setError(error);
   }, ServerTypes.REGISTRATION_FAILED);
 
-  useReduxEffect(({ error }) => {
-    setShowRegSuccessToast(true)
+  useReduxEffect(() => {
+    openToast()
   }, ServerTypes.REGISTRATION_SUCCES);
 
   useReduxEffect(({ error }) => {
@@ -156,9 +154,6 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
                 <Typography color="error">{error}</Typography>
               </div>
             )}
-            <Toast open={showRegSuccessToast}>
-              Registration Successful!
-            </Toast>
           </>
         );
       }}
