@@ -52,7 +52,7 @@ const ToastProvider: React.FC<React.ReactNode> = (props) => {
 }
 
 function useToast({ key, children }) {
-  const { addToast, openToast, closeToast, removeToast, toasts } = React.useContext(ToastContext)
+  const { addToast, openToast, closeToast, removeToast } = React.useContext(ToastContext)
 
   React.useEffect(() => {
     addToast(key, children)
