@@ -208,6 +208,7 @@ export class SessionCommands {
     }
 
     const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
+    console.log(CmdRegister)
 
     const sc = webClient.protobuf.controller.SessionCommand.create({
       '.Command_Register.ext': CmdRegister
@@ -216,6 +217,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted) {
         SessionCommands.login(passwordSalt);
+        SessionPersistence.registrationSuccess()
         return;
       }
 

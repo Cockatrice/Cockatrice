@@ -86,6 +86,9 @@ export const Actions = {
   registrationRequiresEmail: () => ({
     type: Types.REGISTRATION_REQUIRES_EMAIL,
   }),
+  registrationSuccess: () => ({
+    type: Types.REGISTRATION_SUCCES,
+  }),
   registrationFailed: (error) => ({
     type: Types.REGISTRATION_FAILED,
     error
