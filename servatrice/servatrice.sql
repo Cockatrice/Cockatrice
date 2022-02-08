@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(28);
+INSERT INTO cockatrice_schema_version VALUES(29);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `password_sha512` char(120) NOT NULL,
   `email` varchar(255) NOT NULL,
   `country` char(2) NOT NULL,
-  `avatar_bmp` blob NOT NULL,
+  `avatar_bmp` mediumblob NOT NULL,
   `registrationDate` datetime NOT NULL,
   `active` tinyint(1) NOT NULL,
   `token` binary(16),
