@@ -194,8 +194,8 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), shutdownTimer(nullptr),
-      isFirstShutdownMessage(true)
+    : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), txBytes(0), rxBytes(0),
+      shutdownTimer(nullptr), isFirstShutdownMessage(true)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
