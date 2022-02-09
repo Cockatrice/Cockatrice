@@ -30,9 +30,6 @@ export class SessionCommands {
         return;
     }
 
-    console.log(options);
-    console.log(webClient.options);
-
     webClient.connect({ ...options, reason });
   }
 
