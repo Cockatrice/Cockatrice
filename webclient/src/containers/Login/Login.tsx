@@ -91,9 +91,7 @@ const Login = ({ state, description }: LoginProps) => {
   }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
   useReduxEffect(({ options: { hashedPassword } }) => {
-    if (rememberLogin) {
-      updateHost(hashedPassword, rememberLogin);
-    }
+    updateHost(hashedPassword, rememberLogin);
   }, ServerTypes.LOGIN_SUCCESSFUL, [rememberLogin]);
 
   const showDescription = () => {
@@ -101,6 +99,8 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const onSubmitLogin = useCallback((loginForm) => {
+    setRememberLogin(loginForm);
+
     const {
       userName,
       password,
@@ -111,10 +111,6 @@ const Login = ({ state, description }: LoginProps) => {
       },
       remember
     } = loginForm;
-
-    if (remember) {
-      setRememberLogin(loginForm);
-    }
 
     const options: WebSocketConnectOptions = {
       ...getHostPort(selectedHost),
