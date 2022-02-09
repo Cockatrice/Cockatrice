@@ -1846,11 +1846,32 @@ void Player::eventShuffle(const Event_Shuffle &event)
     if (!zone) {
         return;
     }
+    auto &cardList = zone->getCards();
+    int absStart = event.start();
+    if (absStart < 0) { // negative indexes start from the end
+        absStart += cardList.length();
+    }
+
+    // close all views that contain shuffled cards
     for (auto *view : zone->getViews()) {
         if (view != nullptr) {
-            emit view->beingDeleted();
+            int length = view->getCards().length();
+            // we want to close empty views as well
+            if (length == 0 || length > absStart) { // note this assumes views always start at the top of the library
+                view->deleteLater();
+                break;
+            }
+        } else {
+            qWarning() << zone->getName() << "of" << getName() << "holds empty zoneview!";
         }
     }
+
+    // remove revealed card name on top of decks
+    if (absStart == 0 && !cardList.isEmpty()) {
+        cardList.first()->setName("");
+        zone->update();
+    }
+
     emit logShuffle(this, zone, event.start(), event.end());
 }
 
@@ -1926,7 +1947,7 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventCon
     } else {
         CardItem *card = zone->getCard(event.card_id(), QString());
         if (!card) {
-            qDebug() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
+            qWarning() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
         }
         setCardAttrHelper(context, card, event.attribute(), QString::fromStdString(event.attr_value()), false);
@@ -2326,7 +2347,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
             eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext));
             break;
         default: {
-            qDebug() << "unhandled game event" << type;
+            qWarning() << "unhandled game event" << type;
         }
     }
 }
@@ -2501,7 +2522,6 @@ AbstractCounter *Player::addCounter(const ServerInfo_Counter &counter)
 
 AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
 {
-    qDebug() << "addCounter:" << getName() << counterId << name;
     if (counters.contains(counterId)) {
         return nullptr;
     }
