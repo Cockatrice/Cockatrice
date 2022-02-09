@@ -17,6 +17,7 @@ import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
 
 import './Login.css';
+import { useToast } from 'components/Toast';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -68,6 +69,8 @@ const Login = ({ state, description }: LoginProps) => {
   });
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
+  const passwordResetToast = useToast({key: 'password-reset-success', children: 'Password Reset Successfully'})
+
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
     openResetPasswordDialog();
@@ -98,6 +101,10 @@ const Login = ({ state, description }: LoginProps) => {
       });
     }
   }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
+
+  useReduxEffect(() => {
+    passwordResetToast.openToast()
+  }, ServerTypes.RESET_PASSWORD_SUCCESS)
 
   const showDescription = () => {
     return !isConnected && description?.length;
