@@ -70,6 +70,7 @@ const Login = ({ state, description }: LoginProps) => {
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
   const passwordResetToast = useToast({key: 'password-reset-success', children: 'Password Reset Successfully'})
+  const accountActivatedToast = useToast({key: 'account-activation-success', children: 'Account Activated Successfully'})
 
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
@@ -77,10 +78,12 @@ const Login = ({ state, description }: LoginProps) => {
   }, ServerTypes.RESET_PASSWORD_REQUESTED, []);
 
   useReduxEffect(() => {
+    passwordResetToast.openToast()
     closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
   useReduxEffect(() => {
+    accountActivatedToast.openToast()
     closeActivateAccountDialog();
   }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
 
@@ -101,10 +104,6 @@ const Login = ({ state, description }: LoginProps) => {
       });
     }
   }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
-
-  useReduxEffect(() => {
-    passwordResetToast.openToast()
-  }, ServerTypes.RESET_PASSWORD_SUCCESS)
 
   const showDescription = () => {
     return !isConnected && description?.length;
