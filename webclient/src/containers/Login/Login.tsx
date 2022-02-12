@@ -12,7 +12,7 @@ import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, Ac
 import { LoginForm } from 'forms';
 import { useReduxEffect, useFireOnce } from 'hooks';
 import { Images } from 'images';
-import { HostDTO } from 'services';
+import { HostDTO, serverProps } from 'services';
 import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
 
@@ -260,9 +260,9 @@ const Login = ({ state, description }: LoginProps) => {
                 Cockatrice is an open source project. { new Date().getUTCFullYear() }
               </Typography>
               {
-                process.env.REACT_APP_VERSION && (
+                serverProps.REACT_APP_VERSION && (
                   <Typography variant="subtitle2">
-                    Version: { process.env.REACT_APP_VERSION }
+                    Version: { serverProps.REACT_APP_VERSION }
                   </Typography>
                 )
               }

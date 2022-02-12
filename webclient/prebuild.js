@@ -2,27 +2,41 @@ const fse = require('fs-extra');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-createEnvFile();
+const sharedFiles = [
+  ['../common/pb', './public/pb'],
+  ['../cockatrice/resources/countries', './src/images/countries'],
+];
 
-async function createEnvFile() {
-  try {
-    writeFile({
-      REACT_APP_VERSION: await getCommitHash(),
+const serverPropsFile = './src/server-props.json';
+
+copySharedFiles();
+createServerProps();
+
+function copySharedFiles() {
+  runCommand(() => {
+    sharedFiles.forEach(([src, dest]) => {
+      fse.copy(src, dest, { overwrite: true });
     });
+  });
+}
+
+function createServerProps() {
+  runCommand(async () => {
+    fse.outputFile(serverPropsFile, JSON.stringify({
+      REACT_APP_VERSION: await getCommitHash(),
+    }));
+  });
+}
+
+async function getCommitHash() {
+  return (await exec('git rev-parse HEAD')).stdout.trim();
+}
+
+function runCommand(command) {
+  try {
+    command();
   } catch (e) {
     console.error(e);
     process.exitCode = 1;
   }
-}
-
-async function getCommitHash() {
-  return (await exec('git rev-parse HEAD')).stdout;
-}
-
-function writeFile(props) {
-  const file = Object.keys(props).reduce((str, prop) => {
-    return str + `${prop}=${props[prop]}\n`;
-  }, '');
-
-  fse.outputFile('.env', file);
 }
