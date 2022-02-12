@@ -1,5 +1,4 @@
 syntax = "proto2";
-import "serverinfo_user.proto";
 
 message SessionCommand {
     enum SessionCommandType {
