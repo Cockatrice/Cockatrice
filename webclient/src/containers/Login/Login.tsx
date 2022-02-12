@@ -12,7 +12,7 @@ import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, Ac
 import { LoginForm } from 'forms';
 import { useReduxEffect, useFireOnce } from 'hooks';
 import { Images } from 'images';
-import { HostDTO } from 'services';
+import { HostDTO, serverProps } from 'services';
 import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
 
@@ -256,9 +256,16 @@ const Login = ({ state, description }: LoginProps) => {
                 <span>Not registered yet?</span>
                 <Button color="primary" onClick={openRegistrationDialog}>Create an account</Button>
               </div>
-              <Typography variant="subtitle2" className="login-footer__copyright">
+              <Typography variant="subtitle2">
                 Cockatrice is an open source project. { new Date().getUTCFullYear() }
               </Typography>
+              {
+                serverProps.REACT_APP_VERSION && (
+                  <Typography variant="subtitle2">
+                    Version: { serverProps.REACT_APP_VERSION }
+                  </Typography>
+                )
+              }
             </div>
           </div>
           <div className="login-content__description">
