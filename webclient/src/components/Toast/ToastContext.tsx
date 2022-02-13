@@ -1,23 +1,23 @@
-import { createContext, FC, ReactChild, ReactNode, useContext, useEffect, useReducer } from 'react'
+import { createContext, FC, ReactChild, ReactNode, useContext, useEffect, useReducer, ContextType, Context } from 'react'
 
 import { ACTIONS, initialState, reducer } from './reducer';
 import Toast from './Toast'
 
-interface Toast {
+interface ToastEntry {
   isOpen: boolean,
   children: ReactChild,
 }
 
-interface ToastContext {
-    toasts: Toast[],
+interface ToastState {
+    toasts: Map<string, ToastEntry>,
     addToast: (key, children) => void,
     openToast: (key) => void,
     closeToast: (key) => void,
     removeToast: (key) => void,
 }
 
-const ToastContext: any = createContext({
-  toasts: new Map(),
+const ToastContext: Context<any> = createContext<ToastState>({
+  toasts: new Map<string, ToastEntry>(),
   addToast: (key, children) => {},
   openToast: (key) => {},
   closeToast: (key) => {},
