@@ -162,16 +162,16 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
     // If the user has notifications enabled, let them know
-    // when the database was last updated
+    // when the spoiler database was last updated
     if (trayIcon) {
         QList<QByteArray> lines = data.split('\n');
 
         foreach (QByteArray line, lines) {
-            if (line.contains("Created At:")) {
-                QString timeStamp = QString(line).replace("Created At:", "").trimmed();
-                timeStamp.chop(6); // Remove " (UTC)"
+            if (line.contains("<createdAt>")) {
+                QString timeStamp = QString(line).replace("<createdAt>", "").trimmed();
+                timeStamp.chop(18); // Remove " (UTC)</createdAt>"
 
-                auto utcTime = QLocale().toDateTime(timeStamp, "ddd, MMM dd yyyy, hh:mm:ss");
+                auto utcTime = QLocale().toDateTime(timeStamp, "yyyy-mm-dd hh:mm:ss");
                 utcTime.setTimeSpec(Qt::UTC);
 
                 QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
