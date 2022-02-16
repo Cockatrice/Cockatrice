@@ -24,8 +24,8 @@ class AppShell extends Component {
   render() {
     return (
       <Provider store={store}>
+        <CssBaseline />
         <ToastProvider>
-          <CssBaseline />
           <div className="AppShell" onContextMenu={this.handleContextMenu}>
             <Router>
               <Header />
