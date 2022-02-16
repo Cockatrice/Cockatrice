@@ -21,6 +21,7 @@ export const Types = {
   VIEW_LOGS: '[Server] View Logs',
   CLEAR_LOGS: '[Server] Clear Logs',
   REGISTRATION_REQUIRES_EMAIL: '[Server] Registration Requires Email',
+  REGISTRATION_SUCCES: '[Server] Registration Success',
   REGISTRATION_FAILED: '[Server] Registration Failed',
   REGISTRATION_EMAIL_ERROR: '[Server] Registration Email Error',
   REGISTRATION_PASSWORD_ERROR: '[Server] Registration Password Error',

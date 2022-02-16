@@ -105,6 +105,10 @@ export class SessionPersistence {
     ServerDispatch.registrationRequiresEmail();
   }
 
+  static registrationSuccess() {
+    ServerDispatch.registrationSuccess();
+  }
+
   static registrationFailed(error: string) {
     ServerDispatch.registrationFailed(error);
   }

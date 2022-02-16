@@ -17,6 +17,7 @@ import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
 
 import './Login.css';
+import { useToast } from 'components/Toast';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -68,16 +69,21 @@ const Login = ({ state, description }: LoginProps) => {
   });
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
+  const passwordResetToast = useToast({ key: 'password-reset-success', children: 'Password Reset Successfully' })
+  const accountActivatedToast = useToast({ key: 'account-activation-success', children: 'Account Activated Successfully' })
+
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
     openResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_REQUESTED, []);
 
   useReduxEffect(() => {
+    passwordResetToast.openToast()
     closeResetPasswordDialog();
   }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
 
   useReduxEffect(() => {
+    accountActivatedToast.openToast()
     closeActivateAccountDialog();
   }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
 

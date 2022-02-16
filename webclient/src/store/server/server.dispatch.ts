@@ -77,6 +77,9 @@ export const Dispatch = {
   registrationRequiresEmail: () => {
     store.dispatch(Actions.registrationRequiresEmail());
   },
+  registrationSuccess: () => {
+    store.dispatch(Actions.registrationSuccess())
+  },
   registrationFailed: (error) => {
     store.dispatch(Actions.registrationFailed(error));
   },
