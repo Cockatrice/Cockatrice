@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
+LINT_SCRIPT=".ci/lint_cpp.sh"
 
 # Read arguments
-while [[ "$@" ]]; do
+while [[ $# != 0 ]]; do
   case "$1" in
     '--')
       shift
@@ -67,7 +68,7 @@ done
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
   echo "::group::Run linter"
-  source ./.ci/lint.sh
+  source "$LINT_SCRIPT"
   echo "::endgroup::"
 fi
 
@@ -83,17 +84,18 @@ if [[ ! $CMAKE_BUILD_PARALLEL_LEVEL ]]; then
 fi
 
 # Add cmake flags
+flags=()
 if [[ $MAKE_SERVER ]]; then
-  flags+=" -DWITH_SERVER=1"
+  flags+=("-DWITH_SERVER=1")
 fi
 if [[ $MAKE_TEST ]]; then
-  flags+=" -DTEST=1"
+  flags+=("-DTEST=1")
 fi
 if [[ $BUILDTYPE ]]; then
-  flags+=" -DCMAKE_BUILD_TYPE=$BUILDTYPE"
+  flags+=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 fi
 if [[ $PACKAGE_TYPE ]]; then
-  flags+=" -DCPACK_GENERATOR=$PACKAGE_TYPE"
+  flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
 if [[ $(uname) == "Darwin" ]]; then
@@ -102,7 +104,7 @@ if [[ $(uname) == "Darwin" ]]; then
     PATH="/usr/local/opt/ccache/libexec:$PATH"
   fi
   # Add qt install location when using homebrew
-  flags+=" -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/"
+  flags+=("-DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/")
 fi
 
 # Compile
@@ -114,7 +116,7 @@ fi
 
 echo "::group::Configure cmake"
 cmake --version
-cmake .. $flags
+cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
