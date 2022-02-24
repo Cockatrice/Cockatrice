@@ -312,13 +312,13 @@ jobs:
 
     env:
       QT_VERSION: '5.15.2'
-      QT_ARCH: msvc2019${{matrix.append}}
-      CMAKE_GENERATOR: 'Visual Studio 16 2019'
+      QT_ARCH: msvc2022${{matrix.append}}
+      CMAKE_GENERATOR: 'Visual Studio 17 2022'
 
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -340,7 +340,7 @@ jobs:
           arch: win${{matrix.arch}}_${{env.QT_ARCH}}
 
       - name: Restore or setup vcpkg
-        uses: lukka/run-vcpkg@v6
+        uses: lukka/run-vcpkg@v10.1
         with:
           vcpkgArguments: '@${{github.workspace}}/vcpkg.txt'
           vcpkgDirectory: ${{github.workspace}}/vcpkg
