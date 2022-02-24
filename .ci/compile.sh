@@ -131,7 +131,7 @@ fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  ctest
+  ctest -C "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
