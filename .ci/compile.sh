@@ -91,9 +91,10 @@ fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
-if [[ $BUILDTYPE ]]; then
-  flags+=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
+if [[ ! $BUILDTYPE ]]; then
+  BUILDTYPE=Release
 fi
+flags+=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
@@ -120,7 +121,7 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-cmake --build .
+cmake --build . --config "$BUILDTYPE"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
@@ -137,13 +138,13 @@ fi
 
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
-  cmake --build . --target install
+  cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
-  cmake --build . --target package
+  cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
   if [[ $PACKAGE_SUFFIX ]]; then
