@@ -131,7 +131,7 @@ fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  cmake --build . --target test
+  ctest
   echo "::endgroup::"
 fi
 
