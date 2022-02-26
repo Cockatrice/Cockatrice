@@ -26,9 +26,6 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     if (!values.userName) {
       errors.userName = 'Required';
     }
-    if (!values.password && !values.selectedHost?.hashedPassword) {
-      errors.password = 'Required';
-    }
     if (!values.selectedHost) {
       errors.selectedHost = 'Required';
     }
@@ -41,8 +38,14 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
   };
 
+  const handleOnSubmit = ({ userName, ...values }) => {
+    userName = userName?.trim();
+
+    onSubmit({ userName, ...values });
+  }
+
   return (
-    <Form onSubmit={onSubmit} validate={validate}>
+    <Form onSubmit={handleOnSubmit} validate={validate}>
       {({ handleSubmit, form }) => {
         const { values } = form.getState();
 
@@ -109,7 +112,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
           <form className='loginForm' onSubmit={handleSubmit}>
             <div className='loginForm-items'>
               <div className='loginForm-item'>
-                <Field label='Username' name='userName' component={InputField} autoComplete='off' />
+                <Field label='Username' name='userName' component={InputField} autoComplete='username' />
                 <OnChange name="userName">{onUserNameChange}</OnChange>
               </div>
               <div className='loginForm-item'>

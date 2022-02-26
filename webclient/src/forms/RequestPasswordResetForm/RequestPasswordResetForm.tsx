@@ -26,9 +26,13 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
     setIsMFA(true);
   }, ServerTypes.RESET_PASSWORD_CHALLENGE, []);
 
-  const handleOnSubmit = (form) => {
+  const handleOnSubmit = ({ userName, email, ...values }) => {
     setErrorMessage(false);
-    onSubmit(form);
+
+    userName = userName?.trim();
+    email = email?.trim();
+
+    onSubmit({ userName, email, ...values });
   }
 
   const validate = values => {
@@ -63,7 +67,7 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
               </div>
               {isMFA ? (
                 <div className="RequestPasswordResetForm-item">
-                  <Field label="Email" name="email" component={InputField} autoComplete="email" />
+                  <Field label="Email" name="email" type="email" component={InputField} autoComplete="email" />
                   <div>Server has multi-factor authentication enabled</div>
                 </div>
               ) : null}

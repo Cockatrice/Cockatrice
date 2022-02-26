@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "server.h"
 
+#include "debug_pb_message.h"
 #include "featureset.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -486,7 +487,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
         GameEventStorage ges;
         for (int i = cont.game_command_size() - 1; i >= 0; --i) {
             const GameCommand &sc = cont.game_command(i);
-            qDebug() << "[ISL]" << QString::fromStdString(sc.ShortDebugString());
+            qDebug() << "[ISL]" << getSafeDebugString(sc);
 
             Response::ResponseCode resp = player->processGameCommand(sc, responseContainer, ges);
 

@@ -36,12 +36,11 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "postinstall": "run-script-os",
-    "postinstall:windows": "powershell .\\copy_shared_files.ps1",
-    "postinstall:default": "./copy_shared_files.sh",
-    "start": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts start",
-    "build": "cross-env DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "test": "cross-env CI=true react-scripts test",
+    "prebuild": "node prebuild.js",
+    "prestart": "node prebuild.js",
+    "build": "react-scripts build",
+    "start": "react-scripts start",
+    "test": "react-scripts test",
     "test:watch": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint \"./**/*.{ts,tsx}\"",
@@ -85,9 +84,8 @@
     "@types/redux-form": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
-    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
-    "identity-obj-proxy": "^3.0.0",
-    "run-script-os": "^1.1.6"
+    "fs-extra": "^10.0.0",
+    "identity-obj-proxy": "^3.0.0"
   }
 }

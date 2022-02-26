@@ -216,6 +216,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted) {
         SessionCommands.login(passwordSalt);
+        SessionPersistence.registrationSuccess()
         return;
       }
 

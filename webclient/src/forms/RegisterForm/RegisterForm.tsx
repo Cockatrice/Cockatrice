@@ -1,6 +1,4 @@
-// eslint-disable-next-line
-import React, { Component, useState } from 'react';
-import { connect } from 'react-redux';
+import { useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import setFieldTouched from 'final-form-set-field-touched'
@@ -11,9 +9,9 @@ import Typography from '@material-ui/core/Typography';
 import { CountryDropdown, InputField, KnownHosts } from 'components';
 import { useReduxEffect } from 'hooks';
 import { ServerTypes } from 'store';
-import { FormKey } from 'types';
 
 import './RegisterForm.css';
+import { useToast } from 'components/Toast';
 
 const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const [emailRequired, setEmailRequired] = useState(false);
@@ -21,6 +19,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [userNameError, setUserNameError] = useState(null);
+  const { openToast } = useToast({ key: 'registration-success', children: 'Registration Successful!' })
 
   const onHostChange = (host) => setEmailRequired(false);
   const onEmailChange = () => emailError && setEmailError(null);
@@ -35,6 +34,10 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     setError(error);
   }, ServerTypes.REGISTRATION_FAILED);
 
+  useReduxEffect(() => {
+    openToast()
+  }, ServerTypes.REGISTRATION_SUCCES);
+
   useReduxEffect(({ error }) => {
     setEmailError(error);
   }, ServerTypes.REGISTRATION_EMAIL_ERROR);
@@ -47,9 +50,14 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     setUserNameError(error);
   }, ServerTypes.REGISTRATION_USERNAME_ERROR);
 
-  const handleOnSubmit = form => {
+  const handleOnSubmit = ({ userName, email, realName, ...values }) => {
     setError(null);
-    onSubmit(form);
+
+    userName = userName?.trim();
+    email = email?.trim();
+    realName = realName?.trim();
+
+    onSubmit({ userName, email, realName, ...values });
   }
 
   const validate = values => {
@@ -100,10 +108,10 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
         return (
           <>
-            <form className="RegisterForm" onSubmit={handleSubmit} autoComplete="off">
+            <form className="RegisterForm" onSubmit={handleSubmit}>
               <div className="RegisterForm-column">
                 <div className="RegisterForm-item">
-                  <Field label="Player Name" name="userName" component={InputField} />
+                  <Field label="Player Name" name="userName" component={InputField} autoComplete="username" />
                   <OnChange name="userName">{onUserNameChange}</OnChange>
                 </div>
                 <div className="RegisterForm-item">
@@ -126,7 +134,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
               </div>
               <div className="RegisterForm-column" >
                 <div className="RegisterForm-item">
-                  <Field label="Real Name" name="realName" component={InputField} autoComplete='off' />
+                  <Field label="Real Name" name="realName" component={InputField} />
                 </div>
                 <div className="RegisterForm-item">
                   <Field label="Email" name="email" type="email" component={InputField} />
