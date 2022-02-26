@@ -6,6 +6,7 @@ interface State {
 
 export const Selectors = {
   getInitialized: ({ server }: State) => server.initialized,
+  getConnectOptions: ({ server }: State) => server.connectOptions,
   getMessage: ({ server }: State) => server.info.message,
   getName: ({ server }: State) => server.info.name,
   getVersion: ({ server }: State) => server.info.version,

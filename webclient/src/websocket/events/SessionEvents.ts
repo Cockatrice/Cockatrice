@@ -79,7 +79,7 @@ function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
 function listRooms({ roomList }: ListRoomsData) {
   RoomPersistence.updateRooms(roomList);
 
-  if (webClient.options.autojoinrooms) {
+  if (webClient.clientOptions.autojoinrooms) {
     roomList.forEach(({ autoJoin, roomId }) => {
       if (autoJoin) {
         SessionCommands.joinRoom(roomId);
@@ -120,45 +120,49 @@ function serverIdentification(info: ServerIdentificationData) {
     return;
   }
 
-  switch (webClient.options.reason) {
+  const getPasswordSalt = passwordSaltSupported(serverOptions, webClient);
+  const { options } = webClient;
+
+  switch (options.reason) {
     case WebSocketConnectReason.LOGIN:
       SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
-      if (passwordSaltSupported(serverOptions, webClient)) {
-        SessionCommands.requestPasswordSalt();
+      if (getPasswordSalt) {
+        SessionCommands.requestPasswordSalt(options);
       } else {
-        SessionCommands.login();
+        SessionCommands.login(options);
       }
       break;
     case WebSocketConnectReason.REGISTER:
-      const passwordSalt = passwordSaltSupported(serverOptions, webClient) ? generateSalt() : null;
-      SessionCommands.register(passwordSalt);
+      const passwordSalt = getPasswordSalt ? generateSalt() : null;
+      SessionCommands.register(options, passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-      if (passwordSaltSupported(serverOptions, webClient)) {
-        SessionCommands.requestPasswordSalt();
+      if (getPasswordSalt) {
+        SessionCommands.requestPasswordSalt(options);
       } else {
-        SessionCommands.activateAccount();
+        SessionCommands.activateAccount(options);
       }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
-      SessionCommands.resetPasswordRequest();
+      SessionCommands.resetPasswordRequest(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
-      SessionCommands.resetPasswordChallenge();
+      SessionCommands.resetPasswordChallenge(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
-      if (passwordSaltSupported(serverOptions, webClient)) {
-        SessionCommands.requestPasswordSalt();
+      if (getPasswordSalt) {
+        SessionCommands.requestPasswordSalt(options);
       } else {
-        SessionCommands.resetPassword();
+        SessionCommands.resetPassword(options);
       }
       break;
     default:
-      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + webClient.options.reason);
+      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + options.reason);
       SessionCommands.disconnect();
       break;
   }
 
+  webClient.options = {};
   SessionPersistence.updateInfo(serverName, serverVersion);
 }
 

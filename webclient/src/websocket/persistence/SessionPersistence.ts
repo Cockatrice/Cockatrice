@@ -89,8 +89,8 @@ export class SessionPersistence {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
 
-  static accountAwaitingActivation() {
-    ServerDispatch.accountAwaitingActivation();
+  static accountAwaitingActivation(options: WebSocketConnectOptions) {
+    ServerDispatch.accountAwaitingActivation(options);
   }
 
   static accountActivationSuccess() {

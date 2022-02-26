@@ -32,8 +32,8 @@ export class WebSocketService {
       protocol = 'ws';
     }
 
-    const { host, port, keepalive } = options;
-    this.keepalive = keepalive;
+    const { host, port } = options;
+    this.keepalive = this.webClient.clientOptions.keepalive;
 
     this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
   }

@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Login = ({ state, description }: LoginProps) => {
+const Login = ({ state, description, connectOptions }: LoginProps) => {
   const classes = useStyles();
   const isConnected = AuthenticationService.isConnected(state);
 
@@ -157,7 +157,10 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const handleAccountActivationDialogSubmit = ({ token }) => {
-    AuthenticationService.activateAccount({ token } as any);
+    AuthenticationService.activateAccount({
+      ...connectOptions,
+      token,
+    } as any);
   };
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
@@ -337,11 +340,13 @@ const Login = ({ state, description }: LoginProps) => {
 interface LoginProps {
   state: number;
   description: string;
+  connectOptions: WebSocketConnectOptions;
 }
 
 const mapStateToProps = state => ({
   state: ServerSelectors.getState(state),
   description: ServerSelectors.getDescription(state),
+  connectOptions: ServerSelectors.getConnectOptions(state),
 });
 
 export default connect(mapStateToProps)(Login);

@@ -105,8 +105,9 @@ export const Actions = {
     type: Types.REGISTRATION_USERNAME_ERROR,
     error
   }),
-  accountAwaitingActivation: () => ({
+  accountAwaitingActivation: (options: WebSocketConnectOptions) => ({
     type: Types.ACCOUNT_AWAITING_ACTIVATION,
+    options
   }),
   accountActivationSuccess: () => ({
     type: Types.ACCOUNT_ACTIVATION_SUCCESS,
