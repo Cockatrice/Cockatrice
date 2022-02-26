@@ -56,7 +56,7 @@ bool Servatrice_DatabaseInterface::openDatabase()
         sqlDatabase.close();
 
     const QString poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
-    qDebug() << QString("[%1] Opening database...").arg(poolStr);
+    qDebug().noquote() << QString("[%1] Opening database...").arg(poolStr);
     if (!sqlDatabase.open()) {
         qCritical() << QString("[%1] Error opening database: %2").arg(poolStr).arg(sqlDatabase.lastError().text());
         return false;

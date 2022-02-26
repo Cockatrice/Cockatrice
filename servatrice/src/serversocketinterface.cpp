@@ -1047,7 +1047,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 {
     QString userName = nameFromStdString(cmd.user_name());
     QString clientId = nameFromStdString(cmd.clientid());
-    qDebug() << "Got register command: " << userName;
+    qDebug() << "Got register command for user:" << userName;
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     if (!registrationEnabled) {
@@ -1189,7 +1189,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                                                    country, !requireEmailActivation);
 
     if (regSucceeded) {
-        qDebug() << "Accepted register command for user: " << userName;
+        qDebug() << "Accepted register command for user:" << userName;
         if (requireEmailActivation) {
             QSqlQuery *query =
                 sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
@@ -1393,7 +1393,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
     const QString userName = nameFromStdString(cmd.user_name());
     const QString clientId = nameFromStdString(cmd.clientid());
 
-    qDebug() << "Received reset password request from user: " << userName;
+    qDebug() << "Received reset password request from user:" << userName;
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit())
@@ -1475,7 +1475,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
     Q_UNUSED(rc);
     QString userName = nameFromStdString(cmd.user_name());
     QString clientId = nameFromStdString(cmd.clientid());
-    qDebug() << "Received reset password reset from user: " << userName;
+    qDebug() << "Received reset password reset from user:" << userName;
 
     if (!sqlInterface->doesForgotPasswordExist(userName)) {
         if (servatrice->getEnableForgotPasswordAudit())
@@ -1526,7 +1526,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     const QString userName = nameFromStdString(cmd.user_name());
     const QString clientId = nameFromStdString(cmd.clientid());
 
-    qDebug() << "Received reset password challenge from user: " << userName;
+    qDebug() << "Received reset password challenge from user:" << userName;
 
     if (!servatrice->getEnableForgotPasswordChallenge()) {
         if (servatrice->getEnableForgotPasswordAudit()) {

@@ -74,13 +74,12 @@ QByteArray DlgEditAvatar::getImage()
         return QByteArray();
     }
 
-    QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
     for (;;) {
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
         image.save(&buffer, "JPG");
         if (ba.length() > MAX_FILE_LENGTH) {
-            ba.clear();
             image = image.scaledToWidth(image.width() / 2); // divide the amount of pixels in four to get the size down
         } else {
             return ba;
