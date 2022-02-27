@@ -30,14 +30,14 @@ const LanguageDropdown = () => {
         onChange={e => setLanguage(e.target.value as Language)}
       >
         {
-          Object.keys(LanguageCountry).map((_language, index: number) => {
-            const country = LanguageCountry[_language];
+          Object.keys(LanguageCountry).map((lang) => {
+            const country = LanguageCountry[lang];
 
             return (
-              <MenuItem value={_language} key={index}>
+              <MenuItem value={lang} key={lang}>
                 <div className="LanguageDropdown-item">
                   <img className="LanguageDropdown-item__image" src={Images.Countries[country]} alt={CountryLabel[country]} />
-                  <span className="LanguageDropdown-item__label">{_language}</span>
+                  <span className="LanguageDropdown-item__label">{lang}</span>
                 </div>
               </MenuItem>
             );

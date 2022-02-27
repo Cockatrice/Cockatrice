@@ -242,8 +242,8 @@ const Login = ({ state, description }: LoginProps) => {
               <img src={Images.Logo} alt="logo" />
               <span>COCKATRICE</span>
             </div>
-            <Typography variant="h1">{ t('LoginView.title') }</Typography>
-            <Typography variant="subtitle1">{ t('LoginView.subtitle') }</Typography>
+            <Typography variant="h1">{ t('LoginContainer.title') }</Typography>
+            <Typography variant="subtitle1">{ t('LoginContainer.subtitle') }</Typography>
             <div className="login-form">
               <LoginForm
                 onSubmit={handleLogin}
