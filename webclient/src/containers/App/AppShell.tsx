@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -23,19 +23,21 @@ class AppShell extends Component {
 
   render() {
     return (
-      <Provider store={store}>
-        <CssBaseline />
-        <ToastProvider>
-          <div className="AppShell" onContextMenu={this.handleContextMenu}>
-            <Router>
-              <Header />
+      <Suspense fallback="loading">
+        <Provider store={store}>
+          <CssBaseline />
+          <ToastProvider>
+            <div className="AppShell" onContextMenu={this.handleContextMenu}>
+              <Router>
+                <Header />
 
-              <FeatureDetection />
-              <Routes />
-            </Router>
-          </div>
-        </ToastProvider>
-      </Provider>
+                <FeatureDetection />
+                <Routes />
+              </Router>
+            </div>
+          </ToastProvider>
+        </Provider>
+      </Suspense>
     );
   }
 }
