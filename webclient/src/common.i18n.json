@@ -1,6 +1,13 @@
 {
   "Common": {
     "language": "Translate into English.",
-    "disconnect": "Disconnect"
+    "disconnect": "Disconnect",
+    "label": {
+      "password": "Password",
+      "username": "Username"
+    },
+    "validation": {
+      "required": "Required"
+    }
   } 
 }

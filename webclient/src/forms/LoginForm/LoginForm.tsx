@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { useTranslation } from 'react-i18next';
 
 import Button from '@material-ui/core/Button';
 
@@ -12,22 +13,24 @@ import { APP_USER } from 'types';
 
 import './LoginForm.css';
 
-const PASSWORD_LABEL = 'Password';
-const STORED_PASSWORD_LABEL = '* Saved Password *';
-
 const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginFormProps) => {
+  const { t } = useTranslation();
+  const PASSWORD_LABEL = t('Common.label.password');
+  const STORED_PASSWORD_LABEL = `* ${t('LoginForm.label.savedPassword')} *`;
+
   const [host, setHost] = useState(null);
   const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
   const [autoConnect, setAutoConnect] = useAutoConnect();
+
 
   const validate = values => {
     const errors: any = {};
 
     if (!values.userName) {
-      errors.userName = 'Required';
+      errors.userName = t('Common.validation.required');
     }
     if (!values.selectedHost) {
-      errors.selectedHost = 'Required';
+      errors.selectedHost = t('Common.validation.required');
     }
 
     return errors;
@@ -112,7 +115,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
           <form className='loginForm' onSubmit={handleSubmit}>
             <div className='loginForm-items'>
               <div className='loginForm-item'>
-                <Field label='Username' name='userName' component={InputField} autoComplete='username' />
+                <Field label={t('Common.label.username')} name='userName' component={InputField} autoComplete='username' />
                 <OnChange name="userName">{onUserNameChange}</OnChange>
               </div>
               <div className='loginForm-item'>
@@ -127,17 +130,19 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
                 />
               </div>
               <div className='loginForm-actions'>
-                <Field label='Save Password' name='remember' component={CheckboxField} />
+                <Field label={t('LoginForm.label.savePassword')} name='remember' component={CheckboxField} />
                 <OnChange name="remember">{onRememberChange}</OnChange>
 
-                <Button color='primary' onClick={onResetPassword}>Forgot Password</Button>
+                <Button color='primary' onClick={onResetPassword}>
+                  { t('LoginForm.label.forgot') }
+                </Button>
               </div>
               <div className='loginForm-item'>
                 <Field name='selectedHost' component={KnownHosts} />
                 <OnChange name="selectedHost">{setHost}</OnChange>
               </div>
               <div className='loginForm-actions'>
-                <Field label='Auto Connect' name='autoConnect' component={CheckboxField} />
+                <Field label={t('LoginForm.label.autoConnect')} name='autoConnect' component={CheckboxField} />
                 <OnChange name="autoConnect">{onAutoConnectChange}</OnChange>
               </div>
             </div>
@@ -148,7 +153,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
               type='submit'
               disabled={disableSubmitButton}
             >
-              Login
+              { t('LoginForm.label.login') }
             </Button>
           </form>
         )
