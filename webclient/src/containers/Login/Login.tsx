@@ -143,8 +143,9 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
     });
   };
 
-  const handleRegistrationDialogSubmit = (form) => {
-    const { userName, password, email, country, realName, selectedHost } = form;
+  const handleRegistrationDialogSubmit = (registerForm) => {
+    setRememberLogin(registerForm);
+    const { userName, password, email, country, realName, selectedHost } = registerForm;
 
     AuthenticationService.register({
       ...getHostPort(selectedHost),
