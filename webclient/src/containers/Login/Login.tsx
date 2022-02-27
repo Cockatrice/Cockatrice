@@ -72,8 +72,11 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
   });
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
-  const passwordResetToast = useToast({ key: 'password-reset-success', children: t('LoginContainer.toasts.passwordResetSuccess') })
-  const accountActivatedToast = useToast({ key: 'account-activation-success', children: t('LoginContainer.toasts.accountActivationSuccess') })
+  const passwordResetToast = useToast({ key: 'password-reset-success', children: t('LoginContainer.toasts.passwordResetSuccess') });
+  const accountActivatedToast = useToast({
+    key: 'account-activation-success',
+    children: t('LoginContainer.toasts.accountActivationSuccess')
+  });
 
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();

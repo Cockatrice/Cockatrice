@@ -1,0 +1,10 @@
+{
+  "AccountActivationForm": {
+    "error": {
+      "failed": "Account activation failed"
+    },
+    "label": {
+      "activate": "Activate Account"
+    }
+  }
+}
