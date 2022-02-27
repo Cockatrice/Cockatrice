@@ -1,6 +1,7 @@
 import { reset } from 'redux-form';
 import { Actions } from './server.actions';
 import { store } from 'store';
+import { WebSocketConnectOptions } from 'types';
 
 export const Dispatch = {
   initialized: () => {
@@ -92,8 +93,8 @@ export const Dispatch = {
   registrationUserNameError: (error) => {
     store.dispatch(Actions.registrationUserNameError(error));
   },
-  accountAwaitingActivation: () => {
-    store.dispatch(Actions.accountAwaitingActivation());
+  accountAwaitingActivation: (options: WebSocketConnectOptions) => {
+    store.dispatch(Actions.accountAwaitingActivation(options));
   },
   accountActivationSuccess: () => {
     store.dispatch(Actions.accountActivationSuccess());

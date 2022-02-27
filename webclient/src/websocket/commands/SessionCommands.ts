@@ -37,8 +37,8 @@ export class SessionCommands {
     webClient.disconnect();
   }
 
-  static login(passwordSalt?: string): void {
-    const { userName, password, hashedPassword } = webClient.options;
+  static login(options: WebSocketConnectOptions, passwordSalt?: string): void {
+    const { userName, password, hashedPassword } = options;
 
     const loginConfig: any = {
       ...webClient.clientConfig,
@@ -109,7 +109,7 @@ export class SessionCommands {
 
         case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
           SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
-          SessionPersistence.accountAwaitingActivation();
+          SessionPersistence.accountAwaitingActivation(options);
           break;
 
         default:
@@ -121,8 +121,8 @@ export class SessionCommands {
     });
   }
 
-  static requestPasswordSalt(): void {
-    const { userName } = webClient.options as unknown as RequestPasswordSaltParams;
+  static requestPasswordSalt(options: WebSocketConnectOptions): void {
+    const { userName } = options as RequestPasswordSaltParams;
 
     const registerConfig = {
       ...webClient.clientConfig,
@@ -140,20 +140,20 @@ export class SessionCommands {
         case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
           const passwordSalt = raw['.Response_PasswordSalt.ext']?.passwordSalt;
 
-          switch (webClient.options.reason) {
+          switch (options.reason) {
             case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
-              SessionCommands.activateAccount(passwordSalt);
+              SessionCommands.activateAccount(options, passwordSalt);
               break;
             }
 
             case WebSocketConnectReason.PASSWORD_RESET: {
-              SessionCommands.resetPassword(passwordSalt);
+              SessionCommands.resetPassword(options, passwordSalt);
               break;
             }
 
             case WebSocketConnectReason.LOGIN:
             default: {
-              SessionCommands.login(passwordSalt);
+              SessionCommands.login(options, passwordSalt);
             }
           }
 
@@ -168,7 +168,7 @@ export class SessionCommands {
         }
       }
 
-      switch (webClient.options.reason) {
+      switch (options.reason) {
         case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
           SessionPersistence.accountActivationFailed();
           break;
@@ -189,12 +189,11 @@ export class SessionCommands {
     });
   }
 
-  static register(passwordSalt?: string): void {
-    const { userName, password, email, country, realName } = webClient.options as unknown as ServerRegisterParams;
+  static register(options: WebSocketConnectOptions, passwordSalt?: string): void {
+    const { userName, password, email, country, realName } = options as ServerRegisterParams;
 
     const registerConfig: any = {
       ...webClient.clientConfig,
-      clientid: 'webatrice',
       userName,
       email,
       country,
@@ -215,14 +214,14 @@ export class SessionCommands {
 
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted) {
-        SessionCommands.login(passwordSalt);
+        SessionCommands.login(options, passwordSalt);
         SessionPersistence.registrationSuccess()
         return;
       }
 
       switch (raw.responseCode) {
         case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation:
-          SessionPersistence.accountAwaitingActivation();
+          SessionPersistence.accountAwaitingActivation(options);
           break;
         case webClient.protobuf.controller.Response.ResponseCode.RespUserAlreadyExists:
           SessionPersistence.registrationUserNameError('Username is taken');
@@ -259,12 +258,11 @@ export class SessionCommands {
     });
   };
 
-  static activateAccount(passwordSalt?: string): void {
-    const { userName, token } = webClient.options as unknown as AccountActivationParams;
+  static activateAccount(options: WebSocketConnectOptions, passwordSalt?: string): void {
+    const { userName, token } = options as unknown as AccountActivationParams;
 
     const accountActivationConfig = {
       ...webClient.clientConfig,
-      clientid: 'webatrice',
       userName,
       token,
     };
@@ -278,7 +276,7 @@ export class SessionCommands {
     webClient.protobuf.sendSessionCommand(sc, raw => {
       if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
         SessionPersistence.accountActivationSuccess();
-        SessionCommands.login(passwordSalt);
+        SessionCommands.login(options, passwordSalt);
       } else {
         SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');
         SessionCommands.disconnect();
@@ -287,12 +285,11 @@ export class SessionCommands {
     });
   }
 
-  static resetPasswordRequest(): void {
-    const { userName } = webClient.options as unknown as ForgotPasswordParams;
+  static resetPasswordRequest(options: WebSocketConnectOptions): void {
+    const { userName } = options as unknown as ForgotPasswordParams;
 
     const forgotPasswordConfig = {
       ...webClient.clientConfig,
-      clientid: 'webatrice',
       userName,
     };
 
@@ -322,12 +319,11 @@ export class SessionCommands {
     });
   }
 
-  static resetPasswordChallenge(): void {
-    const { userName, email } = webClient.options as unknown as ForgotPasswordChallengeParams;
+  static resetPasswordChallenge(options: WebSocketConnectOptions): void {
+    const { userName, email } = options as unknown as ForgotPasswordChallengeParams;
 
     const forgotPasswordChallengeConfig = {
       ...webClient.clientConfig,
-      clientid: 'webatrice',
       userName,
       email,
     };
@@ -351,12 +347,11 @@ export class SessionCommands {
     });
   }
 
-  static resetPassword(passwordSalt?: string): void {
-    const { userName, token, newPassword } = webClient.options as unknown as ForgotPasswordResetParams;
+  static resetPassword(options: WebSocketConnectOptions, passwordSalt?: string): void {
+    const { userName, token, newPassword } = options as unknown as ForgotPasswordResetParams;
 
     const forgotPasswordResetConfig: any = {
       ...webClient.clientConfig,
-      clientid: 'webatrice',
       userName,
       token,
     };

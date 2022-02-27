@@ -57,13 +57,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Login = ({ state, description }: LoginProps) => {
+const Login = ({ state, description, connectOptions }: LoginProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
   const isConnected = AuthenticationService.isConnected(state);
 
-  const [hostIdToRemember, setHostIdToRemember] = useState(null);
+  const [rememberLogin, setRememberLogin] = useState(null);
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
     resetPasswordDialog: false,
@@ -100,35 +100,16 @@ const Login = ({ state, description }: LoginProps) => {
   }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
   useReduxEffect(({ options: { hashedPassword } }) => {
-    if (hostIdToRemember) {
-      HostDTO.get(hostIdToRemember).then(host => {
-        host.hashedPassword = hashedPassword;
-        host.save();
-      });
-    }
-  }, ServerTypes.LOGIN_SUCCESSFUL, [hostIdToRemember]);
+    updateHost(hashedPassword, rememberLogin);
+  }, ServerTypes.LOGIN_SUCCESSFUL, [rememberLogin]);
 
   const showDescription = () => {
     return !isConnected && description?.length;
   };
 
   const onSubmitLogin = useCallback((loginForm) => {
-    const {
-      userName,
-      password,
-      selectedHost,
-      selectedHost: {
-        id: hostId,
-        hashedPassword
-      },
-      remember
-    } = loginForm;
-
-    updateHost(loginForm);
-
-    if (remember) {
-      setHostIdToRemember(hostId);
-    }
+    setRememberLogin(loginForm);
+    const { userName, password, selectedHost, remember } = loginForm;
 
     const options: WebSocketConnectOptions = {
       ...getHostPort(selectedHost),
@@ -136,8 +117,8 @@ const Login = ({ state, description }: LoginProps) => {
       password
     };
 
-    if (!password) {
-      options.hashedPassword = hashedPassword;
+    if (remember && !password) {
+      options.hashedPassword = selectedHost.hashedPassword;
     }
 
     AuthenticationService.login(options as WebSocketConnectOptions);
@@ -145,7 +126,7 @@ const Login = ({ state, description }: LoginProps) => {
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
 
-  const updateHost = ({ selectedHost, userName, hashedPassword, remember }) => {
+  const updateHost = (hashedPassword, { selectedHost, remember, userName }) => {
     HostDTO.get(selectedHost.id).then(hostDTO => {
       hostDTO.remember = remember;
       hostDTO.userName = remember ? userName : null;
@@ -155,8 +136,9 @@ const Login = ({ state, description }: LoginProps) => {
     });
   };
 
-  const handleRegistrationDialogSubmit = (form) => {
-    const { userName, password, email, country, realName, selectedHost } = form;
+  const handleRegistrationDialogSubmit = (registerForm) => {
+    setRememberLogin(registerForm);
+    const { userName, password, email, country, realName, selectedHost } = registerForm;
 
     AuthenticationService.register({
       ...getHostPort(selectedHost),
@@ -169,7 +151,10 @@ const Login = ({ state, description }: LoginProps) => {
   };
 
   const handleAccountActivationDialogSubmit = ({ token }) => {
-    AuthenticationService.activateAccount({ token } as any);
+    AuthenticationService.activateAccount({
+      ...connectOptions,
+      token,
+    });
   };
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
@@ -177,17 +162,17 @@ const Login = ({ state, description }: LoginProps) => {
     const { host, port } = getHostPort(selectedHost);
 
     if (email) {
-      AuthenticationService.resetPasswordChallenge({ userName, email, host, port } as any);
+      AuthenticationService.resetPasswordChallenge({ userName, email, host, port });
     } else {
       setUserToResetPassword(userName);
-      AuthenticationService.resetPasswordRequest({ userName, host, port } as any);
+      AuthenticationService.resetPasswordRequest({ userName, host, port });
     }
   };
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = getHostPort(selectedHost);
 
-    AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
+    AuthenticationService.resetPassword({ userName, token, newPassword, host, port });
   };
 
   const skipTokenRequest = (userName) => {
@@ -354,11 +339,13 @@ const Login = ({ state, description }: LoginProps) => {
 interface LoginProps {
   state: number;
   description: string;
+  connectOptions: WebSocketConnectOptions;
 }
 
 const mapStateToProps = state => ({
   state: ServerSelectors.getState(state),
   description: ServerSelectors.getDescription(state),
+  connectOptions: ServerSelectors.getConnectOptions(state),
 });
 
 export default connect(mapStateToProps)(Login);
