@@ -291,6 +291,7 @@ describe('SessionEvents', () => {
 
       jest.spyOn(SessionPersistence, 'updateInfo').mockImplementation(() => {});
       webClient.protobuf.controller.Event_ServerIdentification = { ServerOptions: { SupportsPasswordHash: 1 } };
+      webClient.options = {};
     });
 
     it('update status/info and login', () => {

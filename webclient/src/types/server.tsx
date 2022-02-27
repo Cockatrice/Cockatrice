@@ -19,6 +19,7 @@ export interface WebSocketConnectOptions {
   password?: string;
   hashedPassword?: string;
   newPassword?: string;
+  token?: string;
   email?: string;
   realName?: string;
   country?: string;

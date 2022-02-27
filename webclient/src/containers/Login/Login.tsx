@@ -154,7 +154,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
     AuthenticationService.activateAccount({
       ...connectOptions,
       token,
-    } as any);
+    });
   };
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
@@ -162,17 +162,17 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
     const { host, port } = getHostPort(selectedHost);
 
     if (email) {
-      AuthenticationService.resetPasswordChallenge({ userName, email, host, port } as any);
+      AuthenticationService.resetPasswordChallenge({ userName, email, host, port });
     } else {
       setUserToResetPassword(userName);
-      AuthenticationService.resetPasswordRequest({ userName, host, port } as any);
+      AuthenticationService.resetPasswordRequest({ userName, host, port });
     }
   };
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = getHostPort(selectedHost);
 
-    AuthenticationService.resetPassword({ userName, token, newPassword, host, port } as any);
+    AuthenticationService.resetPassword({ userName, token, newPassword, host, port });
   };
 
   const skipTokenRequest = (userName) => {

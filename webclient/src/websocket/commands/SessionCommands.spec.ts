@@ -1,4 +1,4 @@
-import { StatusEnum, WebSocketConnectReason } from 'types';
+import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
 import { SessionCommands } from './SessionCommands';
 
@@ -81,22 +81,25 @@ describe('SessionCommands', () => {
   });
 
   describe('login', () => {
+    let options: WebSocketConnectOptions;
+
     beforeEach(() => {
       webClient.protobuf.controller.Command_Login = { create: args => args };
-      webClient.options.userName = 'user';
-      webClient.options.password = 'pass';
+      options = {
+        userName: 'userName',
+        password: 'password',
+      };
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
-      SessionCommands.login();
+      SessionCommands.login(options);
 
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_Login.ext': {
           ...webClient.clientConfig,
-          userName: webClient.options.userName,
-          password: webClient.options.password,
-          clientid: expect.any(String)
+          userName: options.userName,
+          password: options.password
         }
       }, expect.any(Function));
     });
@@ -128,7 +131,7 @@ describe('SessionCommands', () => {
         jest.spyOn(SessionCommands, 'listUsers').mockImplementation(() => {});
         jest.spyOn(SessionCommands, 'listRooms').mockImplementation(() => {});
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionPersistence.updateBuddyList).toHaveBeenCalledWith(response[respKey].buddyList);
         expect(SessionPersistence.updateIgnoreList).toHaveBeenCalledWith(response[respKey].ignoreList);
@@ -144,7 +147,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespClientUpdateRequired = RespClientUpdateRequired;
         response.responseCode = RespClientUpdateRequired;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: missing features');
       });
@@ -154,7 +157,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespWrongPassword = RespWrongPassword;
         response.responseCode = RespWrongPassword;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
       });
@@ -164,7 +167,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid = RespUsernameInvalid;
         response.responseCode = RespUsernameInvalid;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
       });
@@ -174,7 +177,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespWouldOverwriteOldSession = RespWouldOverwriteOldSession;
         response.responseCode = RespWouldOverwriteOldSession;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: duplicated user session');
       });
@@ -184,7 +187,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned = RespUserIsBanned;
         response.responseCode = RespUserIsBanned;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: banned user');
       });
@@ -194,7 +197,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired = RespRegistrationRequired;
         response.responseCode = RespRegistrationRequired;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: registration required');
       });
@@ -204,7 +207,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespClientIdRequired = RespClientIdRequired;
         response.responseCode = RespClientIdRequired;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: missing client ID');
       });
@@ -214,7 +217,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespContextError = RespContextError;
         response.responseCode = RespContextError;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Login failed: server error');
       });
@@ -224,7 +227,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated = RespAccountNotActivated;
         response.responseCode = RespAccountNotActivated;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(
           StatusEnum.DISCONNECTED,
@@ -237,7 +240,7 @@ describe('SessionCommands', () => {
         webClient.protobuf.controller.Response.ResponseCode.UnknownCode = UnknownCode;
         response.responseCode = UnknownCode;
 
-        SessionCommands.login();
+        SessionCommands.login(options);
 
         expect(SessionCommands.updateStatus).toHaveBeenCalledWith(
           StatusEnum.DISCONNECTED,
@@ -248,23 +251,24 @@ describe('SessionCommands', () => {
   });
 
   describe('register', () => {
+    let options: WebSocketConnectOptions;
+
     beforeEach(() => {
       webClient.protobuf.controller.Command_Register = { create: args => args };
-      webClient.options = {
+      options = {
         ...webClient.options,
-        user: 'user',
-        pass: 'pass',
+        userName: 'userName',
+        password: 'password',
         email: 'email@example.com',
         country: 'us',
         realName: 'realName',
         clientid: 'abcdefg'
-      } as any;
+      };
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
-      SessionCommands.register();
+      SessionCommands.register(options);
 
-      const options = webClient.options as unknown as ServerRegisterParams;
 
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
@@ -275,7 +279,6 @@ describe('SessionCommands', () => {
           email: options.email,
           country: options.country,
           realName: options.realName,
-          clientid: expect.any(String)
         }
       }, expect.any(Function));
     });
@@ -302,7 +305,7 @@ describe('SessionCommands', () => {
       describe('RespRegistrationAccepted', () => {
         it('should call SessionCommands.login()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).toHaveBeenCalled();
 
@@ -321,7 +324,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.accountAwaitingActivation()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'accountAwaitingActivation').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
@@ -329,7 +332,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -347,7 +350,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationUserNameError()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationUserNameError').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationUserNameError).toHaveBeenCalledWith(expect.any(String));
@@ -355,7 +358,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -373,7 +376,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationUserNameError()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationUserNameError').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationUserNameError).toHaveBeenCalledWith(expect.any(String));
@@ -381,7 +384,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -399,7 +402,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationPasswordError()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationPasswordError').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationPasswordError).toHaveBeenCalledWith(expect.any(String));
@@ -407,7 +410,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -425,7 +428,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationRequiresEmail()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationRequiresEmail').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationRequiresEmail).toHaveBeenCalled();
@@ -433,7 +436,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -451,7 +454,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationEmailError()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationEmailError').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationEmailError).toHaveBeenCalledWith(expect.any(String));
@@ -459,7 +462,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -477,7 +480,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationEmailError()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationEmailError').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationEmailError).toHaveBeenCalledWith(expect.any(String));
@@ -485,7 +488,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -503,7 +506,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationFailed()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
@@ -511,7 +514,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -529,7 +532,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationFailed()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
@@ -537,7 +540,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -555,7 +558,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationFailed()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
@@ -563,7 +566,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -581,7 +584,7 @@ describe('SessionCommands', () => {
         it('should call SessionPersistence.registrationFailed()', () => {
           jest.spyOn(SessionCommands, 'login').mockImplementation(() => {});
           jest.spyOn(SessionPersistence, 'registrationFailed').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.login).not.toHaveBeenCalled();
           expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith(expect.any(String));
@@ -589,7 +592,7 @@ describe('SessionCommands', () => {
 
         it('should disconnect', () => {
           jest.spyOn(SessionCommands, 'disconnect').mockImplementation(() => {});
-          SessionCommands.register();
+          SessionCommands.register(options);
 
           expect(SessionCommands.disconnect).toHaveBeenCalled();
         });
@@ -598,27 +601,25 @@ describe('SessionCommands', () => {
   });
 
   describe('activateAccount', () => {
+    let options: WebSocketConnectOptions;
+
     beforeEach(() => {
       webClient.protobuf.controller.Command_Activate = { create: args => args };
-      webClient.options = {
-        ...webClient.options,
-        user: 'user',
-        activationCode: 'token',
-        clientid: 'abcdefg'
-      } as any;
+      options = {
+        userName: 'userName',
+        token: 'token',
+      };
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
-      SessionCommands.activateAccount();
+      SessionCommands.activateAccount(options);
 
-      const options = webClient.options as unknown as AccountActivationParams;
 
       expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith({
         '.Command_Activate.ext': {
           ...webClient.clientConfig,
           userName: options.userName,
           token: options.token,
-          clientid: expect.any(String)
         }
       }, expect.any(Function));
     });
@@ -644,7 +645,7 @@ describe('SessionCommands', () => {
       });
 
       it('should activate user and login if correct activation token used', () => {
-        SessionCommands.activateAccount();
+        SessionCommands.activateAccount(options);
 
         expect(SessionCommands.login).toHaveBeenCalled();
         expect(SessionPersistence.accountActivationFailed).not.toHaveBeenCalled();
@@ -655,7 +656,7 @@ describe('SessionCommands', () => {
         response.responseCode = RespActivationFailed;
         webClient.protobuf.controller.Response.ResponseCode.RespActivationFailed = RespActivationFailed;
 
-        SessionCommands.activateAccount();
+        SessionCommands.activateAccount(options);
 
         expect(SessionCommands.login).not.toHaveBeenCalled();
         expect(SessionPersistence.accountActivationFailed).toHaveBeenCalled();
