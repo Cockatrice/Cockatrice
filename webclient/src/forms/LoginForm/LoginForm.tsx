@@ -13,7 +13,7 @@ import { APP_USER } from 'types';
 import './LoginForm.css';
 
 const PASSWORD_LABEL = 'Password';
-const STORED_PASSWORD_LABEL = '* SAVED *';
+const STORED_PASSWORD_LABEL = '* SAVED PASSWORD *';
 
 const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginFormProps) => {
   const [host, setHost] = useState(null);
