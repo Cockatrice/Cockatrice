@@ -106,17 +106,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
 
   const onSubmitLogin = useCallback((loginForm) => {
     setRememberLogin(loginForm);
-
-    const {
-      userName,
-      password,
-      selectedHost,
-      selectedHost: {
-        id: hostId,
-        hashedPassword
-      },
-      remember
-    } = loginForm;
+    const { userName, password, selectedHost, remember } = loginForm;
 
     const options: WebSocketConnectOptions = {
       ...getHostPort(selectedHost),
@@ -125,7 +115,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
     };
 
     if (remember && !password) {
-      options.hashedPassword = hashedPassword;
+      options.hashedPassword = selectedHost.hashedPassword;
     }
 
     AuthenticationService.login(options as WebSocketConnectOptions);
