@@ -90,7 +90,7 @@ const Account = (props: AccountProps) => {
           <p>Server Name: {serverName}</p>
           <p>Server Version: {serverVersion}</p>
           <Button color="primary" variant="contained" onClick={() => AuthenticationService.disconnect()}>{ t('Common.disconnect') }</Button>
-          
+
           <div className="account-details__lang">
             <LanguageDropdown />
           </div>
