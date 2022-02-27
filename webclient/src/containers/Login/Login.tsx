@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -6,9 +7,9 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-
 import { AuthenticationService } from 'api';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from 'dialogs';
+import { LanguageDropdown } from 'components';
 import { LoginForm } from 'forms';
 import { useReduxEffect, useFireOnce } from 'hooks';
 import { Images } from 'images';
@@ -58,6 +59,8 @@ const useStyles = makeStyles(theme => ({
 
 const Login = ({ state, description }: LoginProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const isConnected = AuthenticationService.isConnected(state);
 
   const [hostIdToRemember, setHostIdToRemember] = useState(null);
@@ -239,8 +242,8 @@ const Login = ({ state, description }: LoginProps) => {
               <img src={Images.Logo} alt="logo" />
               <span>COCKATRICE</span>
             </div>
-            <Typography variant="h1">Login</Typography>
-            <Typography variant="subtitle1">A cross-platform virtual tabletop for multiplayer card games.</Typography>
+            <Typography variant="h1">{ t('LoginContainer.title') }</Typography>
+            <Typography variant="subtitle1">{ t('LoginContainer.subtitle') }</Typography>
             <div className="login-form">
               <LoginForm
                 onSubmit={handleLogin}
@@ -258,13 +261,14 @@ const Login = ({ state, description }: LoginProps) => {
             }
 
             <div className="login-footer">
-              <div className="login-footer_register">
+              <div className="login-footer__register">
                 <span>Not registered yet?</span>
                 <Button color="primary" onClick={openRegistrationDialog}>Create an account</Button>
               </div>
               <Typography variant="subtitle2">
                 Cockatrice is an open source project. { new Date().getUTCFullYear() }
               </Typography>
+
               {
                 serverProps.REACT_APP_VERSION && (
                   <Typography variant="subtitle2">
@@ -272,6 +276,10 @@ const Login = ({ state, description }: LoginProps) => {
                   </Typography>
                 )
               }
+
+              <div className="login-footer__language">
+                <LanguageDropdown />
+              </div>
             </div>
           </div>
           <div className="login-content__description">

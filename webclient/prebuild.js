@@ -1,15 +1,22 @@
 const fse = require('fs-extra');
+const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const protoFilesDir = './public/pb';
-const serverPropsFile = './src/server-props.json';
-const masterProtoFile = './src/proto-files.json';
+const ROOT_DIR = './src';
+const PUBLIC_DIR = './public';
+
+const protoFilesDir = `${PUBLIC_DIR}/pb`;
+const i18nDefaultFile = `${ROOT_DIR}/i18n-default.json`;
+const serverPropsFile = `${ROOT_DIR}/server-props.json`;
+const masterProtoFile = `${ROOT_DIR}/proto-files.json`;
 
 const sharedFiles = [
   ['../common/pb', protoFilesDir],
-  ['../cockatrice/resources/countries', './src/images/countries'],
+  ['../cockatrice/resources/countries', `${ROOT_DIR}/images/countries`],
 ];
+
+const i18nFileRegex = /\.i18n\.json$/;
 
 
 (async () => {
@@ -18,6 +25,7 @@ const sharedFiles = [
 
   createMasterProtoFile();
   createServerProps();
+  createI18NDefault();
 })();
 
 async function copySharedFiles() {
@@ -53,6 +61,37 @@ async function createServerProps() {
   }
 }
 
+async function createI18NDefault() {
+  try {
+    const files = getAllFiles(ROOT_DIR, i18nFileRegex);
+    const allJson = await Promise.all(files.map(file => fse.readJson(file)));
+
+    const rollup = allJson.reduce((acc, json) => ({
+      ...acc,
+      ...json,
+    }), {});
+
+    fse.outputFile(i18nDefaultFile, JSON.stringify(rollup));
+  } catch (e) {
+    console.error(e);
+    process.exitCode = 1;
+  }
+}
+
 async function getCommitHash() {
   return (await exec('git rev-parse HEAD')).stdout.trim();
+}
+
+function getAllFiles(dirPath, regex = /./, allFiles = []) {
+  return fse.readdirSync(dirPath).reduce((files, file) => {
+    const filePath = dirPath + "/" + file;
+
+    if (fse.statSync(filePath).isDirectory()) {
+      files.concat(getAllFiles(filePath, regex, files));
+    } else if (regex.test(file)) {
+      files.push(path.join(__dirname, filePath));
+    }
+
+    return files;
+  }, allFiles);
 }

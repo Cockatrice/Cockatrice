@@ -11,3 +11,4 @@ export * from './sort';
 export * from './forms';
 export * from './message';
 export * from './settings';
+export * from './languages';
