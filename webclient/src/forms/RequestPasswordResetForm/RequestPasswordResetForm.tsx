@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { useTranslation } from 'react-i18next';
 
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -17,6 +18,7 @@ import { ServerTypes } from 'store';
 const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
   const [errorMessage, setErrorMessage] = useState(false);
   const [isMFA, setIsMFA] = useState(false);
+  const { t } = useTranslation();
 
   useReduxEffect(() => {
     setErrorMessage(true);
@@ -39,13 +41,13 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
     const errors: any = {};
 
     if (!values.userName) {
-      errors.userName = 'Required';
+      errors.userName = t('Common.validation.required');
     }
     if (isMFA && !values.email) {
-      errors.email = 'Required';
+      errors.email = t('Common.validation.required');
     }
     if (!values.selectedHost) {
-      errors.selectedHost = 'Required';
+      errors.selectedHost = t('Common.validation.required');
     }
 
     return errors;
@@ -63,12 +65,12 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
           <form className="RequestPasswordResetForm" onSubmit={handleSubmit}>
             <div className="RequestPasswordResetForm-items">
               <div className="RequestPasswordResetForm-item">
-                <Field label="Username" name="userName" component={InputField} autoComplete="username" disabled={isMFA} />
+                <Field label={t('Common.label.username')} name="userName" component={InputField} autoComplete="username" disabled={isMFA} />
               </div>
               {isMFA ? (
                 <div className="RequestPasswordResetForm-item">
-                  <Field label="Email" name="email" type="email" component={InputField} autoComplete="email" />
-                  <div>Server has multi-factor authentication enabled</div>
+                  <Field label={t('Common.label.email')} name="email" type="email" component={InputField} autoComplete="email" />
+                  <div>{ t('RequestPasswordResetForm.mfaEnabled') }</div>
                 </div>
               ) : null}
               <div className="RequestPasswordResetForm-item selectedHost">
@@ -78,18 +80,18 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
 
               {errorMessage && (
                 <div className="RequestPasswordResetForm-item">
-                  <Typography color="error">Request password reset failed</Typography>
+                  <Typography color="error">{ t('RequestPasswordResetForm.error') }</Typography>
                 </div>
               )}
             </div>
 
             <Button className="RequestPasswordResetForm-submit rounded tall" color="primary" variant="contained" type="submit">
-              Request Reset Token
+              { t('RequestPasswordResetForm.request') }
             </Button>
 
             <div>
               <Button color="primary" onClick={() => skipTokenRequest(form.getState().values.userName)}>
-                I already have a reset token
+                { t('RequestPasswordResetForm.skipRequest') }
               </Button>
             </div>
           </form>

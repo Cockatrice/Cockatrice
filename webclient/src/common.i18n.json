@@ -11,6 +11,7 @@
       "hostName": "Host Name",
       "hostAddress": "Host Address",
       "password": "Password",
+      "passwordAgain": "Password Again",
       "port": "Port",
       "realName": "Real Name",
       "saveChanges": "Save Changes",
