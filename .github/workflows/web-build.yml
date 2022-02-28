@@ -40,7 +40,6 @@ jobs:
         with:
           node-version: ${{matrix.node_version}}
           cache: 'npm'
-          cache-dependency-path: 'webclient/package-lock.json'
 
       - name: Install dependencies
         run: npm clean-install
