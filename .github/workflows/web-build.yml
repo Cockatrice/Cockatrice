@@ -39,7 +39,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{matrix.node_version}}
-          cache: 'npm'
+          # cache: 'npm'
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('webclient/package-lock.json') }}
+          restore-keys: npm-
 
       - name: Install dependencies
         run: npm clean-install
