@@ -19,8 +19,7 @@
       "username": "Username"
     },
     "validation": {
-      "minChars_one": "Minimum of {{count}} character required",
-      "minChars_other": "Minimum of {{count}} characters required",
+      "minChars": "Minimum of {count} {count, plural, one {character} other {characters}} required",
       "passwordsMustMatch": "Passwords don't match",
       "required": "Required"
     }

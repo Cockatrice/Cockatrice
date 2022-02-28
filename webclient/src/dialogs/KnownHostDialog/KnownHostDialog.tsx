@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
+import { useTranslation } from 'react-i18next';
 
 import { KnownHostForm } from 'forms';
 
@@ -22,6 +23,9 @@ const useStyles = makeStyles(theme => ({
 
 const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
+  const mode = host ? 'edit' : 'add';
 
   const handleOnClose = () => {
     if (handleClose) {
@@ -33,7 +37,7 @@ const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any)
     <Dialog className={'KnownHostDialog ' + classes.root} onClose={handleOnClose} open={isOpen}>
       <DialogTitle disableTypography className='dialog-title'>
         <div className='dialog-title__wrapper'>
-          <Typography variant='h2'>{ host ? 'Edit' : 'Add' } Known Host</Typography>
+          <Typography variant='h2'>{ t('KnownHostDialog.title', { mode }) }</Typography>
 
           {handleClose ? (
             <IconButton onClick={handleClose}>
@@ -44,7 +48,7 @@ const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any)
       </DialogTitle>
       <DialogContent className='dialog-content'>
         <Typography className='dialog-content__subtitle' variant='subtitle1'>
-          Adding a new host allows you to connect to different servers. Enter the details below to your host list.
+          { t('KnownHostDialog.subtitle') }
         </Typography>
         <KnownHostForm onRemove={onRemove} onSubmit={onSubmit} host={host}></KnownHostForm>
       </DialogContent>
