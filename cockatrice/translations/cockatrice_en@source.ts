@@ -4630,6 +4630,21 @@ Cockatrice will now reload the card database.</source>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../common/decklist.cpp" line="111"/>
+        <source>Maindeck</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../common/decklist.cpp" line="113"/>
+        <source>Sideboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../common/decklist.cpp" line="115"/>
+        <source>Tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPlatformTheme</name>
@@ -4810,6 +4825,39 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="63"/>
         <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SequenceEdit</name>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="43"/>
+        <source>Choose an action from the table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="49"/>
+        <source>Hit the key/combination of keys you want to set for this action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="172"/>
+        <source>Shortcut already in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="175"/>
+        <source>Invalid key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="192"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="193"/>
+        <source>Restore default</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6802,12 +6850,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/main.cpp" line="126"/>
+        <location filename="../src/main.cpp" line="125"/>
         <source>Connect on startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="127"/>
+        <location filename="../src/main.cpp" line="126"/>
         <source>Debug to file</source>
         <translation type="unfinished"></translation>
     </message>
