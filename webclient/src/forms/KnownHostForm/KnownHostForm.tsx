@@ -78,7 +78,7 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
               ) }
             </div>
             <AnchorLink href='https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers' target='_blank'>
-              { t('KnownHostForm.label.hosts') }
+              { t('KnownHostForm.label.find') }
             </AnchorLink>
           </div>
         </form>

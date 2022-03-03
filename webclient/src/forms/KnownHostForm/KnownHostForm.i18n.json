@@ -2,7 +2,8 @@
   "KnownHostForm": {
     "help": "Need help adding a new host?",
     "label": {
-      "hosts": "Find Host"
+      "add": "Add Host",
+      "find": "Find Host"
     }
   }
 }

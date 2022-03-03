@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Select, MenuItem } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -33,6 +34,7 @@ const KnownHosts = (props) => {
   const { input: { onChange }, meta, disabled } = props;
   const { touched, error, warning } = meta;
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const [hostsState, setHostsState] = useState({
     hosts: [],
@@ -168,7 +170,7 @@ const KnownHosts = (props) => {
           </div>
         ) }
 
-        <InputLabel id='KnownHosts-select'>Host</InputLabel>
+        <InputLabel id='KnownHosts-select'>{ t('KnownHosts.label') }</InputLabel>
         <Select
           id='KnownHosts-select'
           labelId='KnownHosts-label'
@@ -181,7 +183,7 @@ const KnownHosts = (props) => {
           disabled={disabled}
         >
           <Button value={hostsState.selectedHost} onClick={openAddKnownHostDialog}>
-            <span>Add new host</span>
+            <span>{ t('KnownHosts.add') }</span>
             <AddIcon fontSize='small' color='primary' />
           </Button>
 
@@ -213,9 +215,9 @@ const KnownHosts = (props) => {
         onSubmit={handleDialogSubmit}
         handleClose={closeKnownHostDialog}
       />
-      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>Host successfully created.</Toast>
-      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>Host successfully deleted.</Toast>
-      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>Host successfully edited.</Toast>
+      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>{ t('KnownHosts.toast', { mode: 'created' }) }</Toast>
+      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>{ t('KnownHosts.toast', { mode: 'deleted' }) }</Toast>
+      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>{ t('KnownHosts.toast', { mode: 'edited' }) }</Toast>
     </div>
   )
 };
