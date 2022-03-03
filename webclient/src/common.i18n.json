@@ -1,6 +1,27 @@
 {
   "Common": {
     "language": "Translate into English.",
-    "disconnect": "Disconnect"
+    "disconnect": "Disconnect",
+    "label": {
+      "confirmPassword": "Confirm Password",
+      "confirmSure": "Are you sure?",
+      "country": "Country",
+      "delete": "Delete",
+      "email": "Email",
+      "hostName": "Host Name",
+      "hostAddress": "Host Address",
+      "password": "Password",
+      "passwordAgain": "Password Again",
+      "port": "Port",
+      "realName": "Real Name",
+      "saveChanges": "Save Changes",
+      "token": "Token",
+      "username": "Username"
+    },
+    "validation": {
+      "minChars": "Minimum of {count} {count, plural, one {character} other {characters}} required",
+      "passwordsMustMatch": "Passwords don't match",
+      "required": "Required"
+    }
   } 
 }

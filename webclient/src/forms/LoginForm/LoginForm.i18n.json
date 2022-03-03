@@ -1,0 +1,11 @@
+{
+  "LoginForm": {
+    "label": {
+      "autoConnect": "Auto Connect",
+      "forgot": "Forgot Password",
+      "login": "Login",
+      "savePassword": "Save Password",
+      "savedPassword": "Saved Password"
+    }
+  }
+}

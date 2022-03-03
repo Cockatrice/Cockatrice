@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { connect } from 'react-redux';
 import { Redirect, withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,6 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 const Initialize = ({ initialized }: InitializeProps) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return initialized
     ? <Redirect from="*" to={RouteEnum.LOGIN} />
@@ -31,9 +33,11 @@ const Initialize = ({ initialized }: InitializeProps) => {
       <div className={'Initialize ' + classes.root}>
         <div className='Initialize-content'>
           <img src={Images.Logo} alt="logo" />
-          <Typography variant="subtitle1" className='subtitle'>DID YOU KNOW</Typography>
-          <Typography variant="subtitle2">Cockatrice is run by volunteers</Typography>
-          <Typography variant="subtitle2">that love card games!</Typography>
+          <Typography variant="subtitle1" className='subtitle'>{ t('InitializeContainer.title') }</Typography>
+          <Trans i18nKey="InitializeContainer.subtitle">
+            <Typography variant="subtitle2"></Typography>
+            <Typography variant="subtitle2"></Typography>
+          </Trans>
         </div>
 
         <div className="Initialize-graphics">

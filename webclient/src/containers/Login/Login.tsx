@@ -72,8 +72,11 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
   });
   const [userToResetPassword, setUserToResetPassword] = useState(null);
 
-  const passwordResetToast = useToast({ key: 'password-reset-success', children: 'Password Reset Successfully' })
-  const accountActivatedToast = useToast({ key: 'account-activation-success', children: 'Account Activated Successfully' })
+  const passwordResetToast = useToast({ key: 'password-reset-success', children: t('LoginContainer.toasts.passwordResetSuccess') });
+  const accountActivatedToast = useToast({
+    key: 'account-activation-success',
+    children: t('LoginContainer.toasts.accountActivationSuccess')
+  });
 
   useReduxEffect(() => {
     closeRequestPasswordResetDialog();
@@ -227,8 +230,8 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
               <img src={Images.Logo} alt="logo" />
               <span>COCKATRICE</span>
             </div>
-            <Typography variant="h1">{ t('LoginContainer.title') }</Typography>
-            <Typography variant="subtitle1">{ t('LoginContainer.subtitle') }</Typography>
+            <Typography variant="h1">{ t('LoginContainer.header.title') }</Typography>
+            <Typography variant="subtitle1">{ t('LoginContainer.header.subtitle') }</Typography>
             <div className="login-form">
               <LoginForm
                 onSubmit={handleLogin}
@@ -247,17 +250,17 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
 
             <div className="login-footer">
               <div className="login-footer__register">
-                <span>Not registered yet?</span>
-                <Button color="primary" onClick={openRegistrationDialog}>Create an account</Button>
+                <span>{ t('LoginContainer.footer.registerPrompt') }</span>
+                <Button color="primary" onClick={openRegistrationDialog}>{ t('LoginContainer.footer.registerAction') }</Button>
               </div>
               <Typography variant="subtitle2">
-                Cockatrice is an open source project. { new Date().getUTCFullYear() }
+                { t('LoginContainer.footer.credit') } - { new Date().getUTCFullYear() }
               </Typography>
 
               {
                 serverProps.REACT_APP_VERSION && (
                   <Typography variant="subtitle2">
-                    Version: { serverProps.REACT_APP_VERSION }
+                    { t('LoginContainer.footer.version') }: { serverProps.REACT_APP_VERSION }
                   </Typography>
                 )
               }
@@ -298,10 +301,8 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
                 </div>
               </div>
               { /*<img src={loginGraphic} className="login-content__description-image"/>*/}
-              <p className="login-content__description-subtitle1">Play multiplayer card games online.</p>
-              <p className="login-content__description-subtitle2">
-                Cross-platform virtual tabletop for multiplayer card games. Forever free.
-              </p>
+              <p className="login-content__description-subtitle1">{ t('LoginContainer.content.subtitle1') }</p>
+              <p className="login-content__description-subtitle2">{ t('LoginContainer.content.subtitle2') }</p>
             </div>
           </div>
         </Paper>

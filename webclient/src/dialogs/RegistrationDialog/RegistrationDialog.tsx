@@ -5,12 +5,15 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
+import { useTranslation } from 'react-i18next';
 
 import { RegisterForm } from 'forms';
 
 import './RegistrationDialog.css';
 
 const RegistrationDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
+  const { t } = useTranslation();
+
   const handleOnClose = () => {
     handleClose();
   }
@@ -18,7 +21,7 @@ const RegistrationDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => 
   return (
     <Dialog className="RegistrationDialog" onClose={handleOnClose} open={isOpen} maxWidth='xl'>
       <DialogTitle disableTypography className="dialog-title">
-        <Typography variant="h6">Create New Account</Typography>
+        <Typography variant="h6">{ t('RegistrationDialog.title') }</Typography>
 
         {handleOnClose ? (
           <IconButton onClick={handleOnClose}>
