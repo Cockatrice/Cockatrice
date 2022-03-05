@@ -19,9 +19,8 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
   const STORED_PASSWORD_LABEL = `* ${t('LoginForm.label.savedPassword')} *`;
 
   const [host, setHost] = useState(null);
-  const [passwordLabel, setPasswordLabel] = useState(PASSWORD_LABEL);
+  const [useStoredPasswordLabel, setUseStoredPasswordLabel] = useState(false);
   const [autoConnect, setAutoConnect] = useAutoConnect();
-
 
   const validate = values => {
     const errors: any = {};
@@ -38,7 +37,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
 
   const useStoredPassword = (remember, password) => remember && host.hashedPassword && !password;
   const togglePasswordLabel = (useStoredLabel) => {
-    setPasswordLabel(useStoredLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL);
+    setUseStoredPasswordLabel(useStoredLabel);
   };
 
   const handleOnSubmit = ({ userName, ...values }) => {
@@ -120,8 +119,8 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
               </div>
               <div className='loginForm-item'>
                 <Field
-                  label={passwordLabel}
-                  onFocus={() => setPasswordLabel(PASSWORD_LABEL)}
+                  label={useStoredPasswordLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL}
+                  onFocus={() => setUseStoredPasswordLabel(false)}
                   onBlur={() => togglePasswordLabel(useStoredPassword(values.remember, values.password))}
                   name='password'
                   type='password'
