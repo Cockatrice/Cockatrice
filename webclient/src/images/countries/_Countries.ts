@@ -45,6 +45,8 @@ import ci from './ci.svg';
 import ck from './ck.svg';
 import cl from './cl.svg';
 import cm from './cm.svg';
+import cn from './cn.svg';
+import co from './co.svg';
 import cr from './cr.svg';
 import cu from './cu.svg';
 import cv from './cv.svg';
@@ -295,6 +297,8 @@ export const Countries = {
   ck,
   cl,
   cm,
+  cn,
+  co,
   cr,
   cu,
   cv,
