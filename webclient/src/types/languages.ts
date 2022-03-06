@@ -1,11 +1,17 @@
-import { CountryLabel } from './countries';
-
 export enum Language {
   'en-US' = 'en-US',
-  'es-ES' = 'es-ES',
+  'fr' = 'fr',
+  'nl' = 'nl',
 }
 
 export enum LanguageCountry {
   'en-US' = 'us',
-  'es-ES' = 'es',
+  'fr' = 'fr',
+  'nl' = 'nl',
+}
+
+export enum LanguageNative {
+  'en-US' = 'English - US',
+  'fr' = 'Français',
+  'nl' = 'Nederlands',
 }
