@@ -66,10 +66,20 @@ async function createI18NDefault() {
     const files = getAllFiles(ROOT_DIR, i18nFileRegex);
     const allJson = await Promise.all(files.map(file => fse.readJson(file)));
 
-    const rollup = allJson.reduce((acc, json) => ({
-      ...acc,
-      ...json,
-    }), {});
+    const rollup = allJson.reduce((acc, json) => {
+      const newKeys = Object.keys(json);
+
+      newKeys.forEach(key => {
+        if (acc[key]) {
+          throw new Error(`i18n key collision: ${key}\n${JSON.stringify(json)}`);
+        }
+      });
+
+      return {
+        ...acc,
+        ...json,
+      };
+    }, {});
 
     fse.outputFile(i18nDefaultFile, JSON.stringify(rollup));
   } catch (e) {

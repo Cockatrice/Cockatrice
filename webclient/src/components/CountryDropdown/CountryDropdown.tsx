@@ -3,14 +3,27 @@ import React, { useEffect, useState } from 'react';
 import { Select, MenuItem } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
+import { useTranslation } from 'react-i18next';
+
 import { Images } from 'images/Images';
+import { CountryCode } from 'types';
+
 import './CountryDropdown.css';
-import { CountryLabel } from 'types';
 
 const CountryDropdown = ({ input: { onChange } }) => {
   const [state, setState] = useState('');
+  const [sortedCountries, setSortedCountries] = useState([]);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => onChange(state), [state]);
+
+  useEffect(() => {
+    const collator = new Intl.Collator(i18n.language);
+
+    setSortedCountries(Object.keys(CountryCode).sort((a, b) =>
+      collator.compare(t(`Common.countries.${a}`), t(`Common.countries.${b}`))
+    ));
+  }, [i18n.language]);
 
   return (
     <FormControl variant='outlined' className='CountryDropdown'>
@@ -31,11 +44,11 @@ const CountryDropdown = ({ input: { onChange } }) => {
         </MenuItem>
 
         {
-          Object.keys(CountryLabel).map((country, index:number) => (
+          sortedCountries.map((country, index:number) => (
             <MenuItem value={country} key={index}>
               <div className="CountryDropdown-item">
-                <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} alt={CountryLabel[country]} />
-                <span className="CountryDropdown-item__label">{CountryLabel[country.toUpperCase()] || country.toUpperCase()}</span>
+                <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} />
+                <span className="CountryDropdown-item__label">{t(`Common.countries.${country}`)}</span>
               </div>
             </MenuItem>
           ))
