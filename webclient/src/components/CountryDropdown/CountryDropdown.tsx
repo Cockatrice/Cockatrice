@@ -12,9 +12,16 @@ import './CountryDropdown.css';
 
 const CountryDropdown = ({ input: { onChange } }) => {
   const [state, setState] = useState('');
-  const { t } = useTranslation();
+  const [sortedCountries, setSortedCountries] = useState([]);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => onChange(state), [state]);
+
+  useEffect(() => {
+    setSortedCountries(Object.keys(CountryCode).sort((a, b) =>
+      t(`Common.countries.${a}`).localeCompare(t(`Common.countries.${b}`), i18n.language)
+    ));
+  }, [i18n.language]);
 
   return (
     <FormControl variant='outlined' className='CountryDropdown'>
@@ -35,7 +42,7 @@ const CountryDropdown = ({ input: { onChange } }) => {
         </MenuItem>
 
         {
-          Object.keys(CountryCode).map((country, index:number) => (
+          sortedCountries.map((country, index:number) => (
             <MenuItem value={country} key={index}>
               <div className="CountryDropdown-item">
                 <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} />
