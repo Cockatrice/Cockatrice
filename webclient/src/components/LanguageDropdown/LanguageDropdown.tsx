@@ -6,7 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 
 import { Images } from 'images/Images';
-import { CountryLabel, Language, LanguageCountry } from 'types';
+import { Language, LanguageCountry } from 'types';
 
 import './LanguageDropdown.css';
 
@@ -36,7 +36,7 @@ const LanguageDropdown = () => {
             return (
               <MenuItem value={lang} key={lang}>
                 <div className="LanguageDropdown-item">
-                  <img className="LanguageDropdown-item__image" src={Images.Countries[country]} alt={CountryLabel[country]} />
+                  <img className="LanguageDropdown-item__image" src={Images.Countries[country]} />
                   <span className="LanguageDropdown-item__label">{lang}</span>
                 </div>
               </MenuItem>

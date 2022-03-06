@@ -1,5 +1,3 @@
-import { CountryLabel } from './countries';
-
 export enum Language {
   'en' = 'en',
   'fr' = 'fr',
