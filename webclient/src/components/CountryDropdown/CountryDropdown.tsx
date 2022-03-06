@@ -18,8 +18,10 @@ const CountryDropdown = ({ input: { onChange } }) => {
   useEffect(() => onChange(state), [state]);
 
   useEffect(() => {
+    const collator = new Intl.Collator(i18n.language);
+
     setSortedCountries(Object.keys(CountryCode).sort((a, b) =>
-      t(`Common.countries.${a}`).localeCompare(t(`Common.countries.${b}`), i18n.language)
+      collator.compare(t(`Common.countries.${a}`), t(`Common.countries.${b}`))
     ));
   }, [i18n.language]);
 
