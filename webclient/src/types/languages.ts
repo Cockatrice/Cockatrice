@@ -1,11 +1,20 @@
 export enum Language {
-  'en' = 'en',
+  'en-US' = 'en-US',
   'fr' = 'fr',
   'nl' = 'nl',
+  'pt-BR' = 'pt-BR',
 }
 
 export enum LanguageCountry {
-  'en' = 'us',
+  'en-US' = 'us',
   'fr' = 'fr',
   'nl' = 'nl',
+  'pt-BR' = 'br'
+}
+
+export enum LanguageNative {
+  'en-US' = 'English - US',
+  'fr' = 'Français',
+  'nl' = 'Nederlands',
+  'pt-BR' = 'Portugues do Brasil',
 }

@@ -1,29 +1,24 @@
-// eslint-disable-next-line
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, MenuItem } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { useTranslation } from 'react-i18next';
 
+import { useLocaleSort } from 'hooks';
 import { Images } from 'images/Images';
-import { CountryCode } from 'types';
+import { countryCodes } from 'types';
+
 
 import './CountryDropdown.css';
 
 const CountryDropdown = ({ input: { onChange } }) => {
-  const [state, setState] = useState('');
-  const [sortedCountries, setSortedCountries] = useState([]);
-  const { t, i18n } = useTranslation();
+  const [value, setValue] = useState('');
+  const { t } = useTranslation();
 
-  useEffect(() => onChange(state), [state]);
+  useEffect(() => onChange(value), [value]);
 
-  useEffect(() => {
-    const collator = new Intl.Collator(i18n.language);
-
-    setSortedCountries(Object.keys(CountryCode).sort((a, b) =>
-      collator.compare(t(`Common.countries.${a}`), t(`Common.countries.${b}`))
-    ));
-  }, [i18n.language]);
+  const translateCountry = country => t(`Common.countries.${country}`);
+  const sortedCountries = useLocaleSort(countryCodes, translateCountry);
 
   return (
     <FormControl variant='outlined' className='CountryDropdown'>
@@ -33,9 +28,9 @@ const CountryDropdown = ({ input: { onChange } }) => {
         labelId='CountryDropdown-label'
         label='Country'
         margin='dense'
-        value={state}
+        value={value}
         fullWidth={true}
-        onChange={e => setState(e.target.value as string)}
+        onChange={e => setValue(e.target.value as string)}
       >
         <MenuItem value={''} key={-1}>
           <div className="CountryDropdown-item">
@@ -48,7 +43,7 @@ const CountryDropdown = ({ input: { onChange } }) => {
             <MenuItem value={country} key={index}>
               <div className="CountryDropdown-item">
                 <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} />
-                <span className="CountryDropdown-item__label">{t(`Common.countries.${country}`)}</span>
+                <span className="CountryDropdown-item__label">{translateCountry(country)}</span>
               </div>
             </MenuItem>
           ))

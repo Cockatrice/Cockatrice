@@ -17,9 +17,9 @@ i18n
   .use(initReactI18next)
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    fallbackLng: Language['en'],
+    fallbackLng: Language['en-US'],
     resources: {
-      [Language['en']]: { translation },
+      [Language['en-US']]: { translation },
     },
     partialBundledLanguages: true,
 

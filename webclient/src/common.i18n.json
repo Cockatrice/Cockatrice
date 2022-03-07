@@ -274,6 +274,12 @@
       "YE": "Yemen",
       "ZM": "Zambia",
       "ZW": "Zimbabwe"
+    },
+    "languages": {
+      "en-US": "English - US",
+      "fr": "French",
+      "nl": "Dutch",
+      "pt-BR": "Portuguese - Brazil"
     }
   } 
 }

@@ -6,12 +6,12 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 
 import { Images } from 'images/Images';
-import { Language, LanguageCountry } from 'types';
+import { Language, LanguageCountry, LanguageNative } from 'types';
 
 import './LanguageDropdown.css';
 
 const LanguageDropdown = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState(i18n.resolvedLanguage);
 
   useEffect(() => {
@@ -30,14 +30,20 @@ const LanguageDropdown = () => {
         onChange={e => setLanguage(e.target.value as Language)}
       >
         {
-          Object.keys(LanguageCountry).map((lang) => {
+          Object.keys(Language).map((lang) => {
             const country = LanguageCountry[lang];
 
             return (
               <MenuItem value={lang} key={lang}>
                 <div className="LanguageDropdown-item">
                   <img className="LanguageDropdown-item__image" src={Images.Countries[country]} />
-                  <span className="LanguageDropdown-item__label">{lang}</span>
+                  <span className="LanguageDropdown-item__label">
+                    {LanguageNative[lang]} {
+                      LanguageNative[lang] !== t(`Common.languages.${lang}`) && (
+                        <>({ t(`Common.languages.${lang}`) })</>
+                      )
+                    }
+                  </span>
                 </div>
               </MenuItem>
             );
