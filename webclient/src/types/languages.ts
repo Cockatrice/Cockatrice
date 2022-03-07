@@ -9,7 +9,7 @@ export enum LanguageCountry {
   'en-US' = 'us',
   'fr' = 'fr',
   'nl' = 'nl',
-  'pt-BR' = 'pt'
+  'pt-BR' = 'br'
 }
 
 export enum LanguageNative {
