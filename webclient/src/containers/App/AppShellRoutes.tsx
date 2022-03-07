@@ -19,6 +19,7 @@ const AppShellRoutes = () => (
   <div className="AppShell-routes overflow-scroll">
     <Routes>
       <Route path='*' element={<Initialize />} />
+
       <Route path={RouteEnum.ACCOUNT} element={<Account />} />
       <Route path={RouteEnum.DECKS} element={<Decks />} />
       <Route path={RouteEnum.GAME} element={<Game />} />
@@ -28,8 +29,6 @@ const AppShellRoutes = () => (
       <Route path={RouteEnum.SERVER} element={<Server />} />
       <Route path={RouteEnum.LOGIN} element={<Login />} />
       <Route path={RouteEnum.UNSUPPORTED} element={<Unsupported />} />
-
-      {/*<Navigate to={RouteEnum.INITIALIZE} />*/}
     </Routes>
   </div>
 );
