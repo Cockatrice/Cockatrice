@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { connect } from 'react-redux';
-import { Redirect, withRouter } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
@@ -28,7 +28,7 @@ const Initialize = ({ initialized }: InitializeProps) => {
   const { t } = useTranslation();
 
   return initialized
-    ? <Redirect from="*" to={RouteEnum.LOGIN} />
+    ? <Navigate to={RouteEnum.LOGIN} />
     : (
       <div className={'Initialize ' + classes.root}>
         <div className='Initialize-content'>
@@ -60,4 +60,4 @@ const mapStateToProps = state => ({
   initialized: ServerSelectors.getInitialized(state),
 });
 
-export default withRouter(connect(mapStateToProps)(Initialize));
+export default connect(mapStateToProps)(Initialize);
