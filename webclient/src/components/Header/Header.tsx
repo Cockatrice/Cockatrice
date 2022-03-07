@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { NavLink, withRouter, generatePath } from 'react-router-dom';
+import { NavLink, useNavigate, generatePath } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
@@ -20,71 +20,19 @@ import { Room, RouteEnum, User } from 'types';
 
 import './Header.css';
 
-class Header extends Component<HeaderProps> {
-  state: HeaderState;
-  options: string[] = [
-    'Account',
-    'Replays',
-  ];
+const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
+  const navigate = useNavigate();
+  const [state, setState] = useState<HeaderState>({
+    anchorEl: null,
+    showCardImportDialog: false,
+    options: [],
+  });
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      anchorEl: null,
-      showCardImportDialog: false,
-    };
-
-    this.handleMenuOpen = this.handleMenuOpen.bind(this);
-    this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
-    this.handleMenuClose = this.handleMenuClose.bind(this);
-    this.leaveRoom = this.leaveRoom.bind(this);
-    this.openImportCardWizard = this.openImportCardWizard.bind(this);
-    this.closeImportCardWizard = this.closeImportCardWizard.bind(this);
-  }
-
-  componentDidUpdate(prevProps) {
-    const currentRooms = this.props.joinedRooms;
-    const previousRooms = prevProps.joinedRooms;
-
-    if (currentRooms > previousRooms) {
-      const { roomId } = _.difference(currentRooms, previousRooms)[0];
-      this.props.history.push(generatePath(RouteEnum.ROOM, { roomId }));
-    }
-  }
-
-  handleMenuOpen(event) {
-    this.setState({ anchorEl: event.target });
-  }
-
-  handleMenuItemClick(option: string) {
-    const route = RouteEnum[option.toUpperCase()];
-    this.props.history.push(generatePath(route));
-  }
-
-  handleMenuClose() {
-    this.setState({ anchorEl: null });
-  }
-
-  leaveRoom(event, roomId) {
-    event.preventDefault();
-    RoomsService.leaveRoom(roomId);
-  };
-
-  openImportCardWizard() {
-    this.setState({ showCardImportDialog: true });
-    this.handleMenuClose();
-  }
-
-  closeImportCardWizard() {
-    this.setState({ showCardImportDialog: false });
-  }
-
-  render() {
-    const { joinedRooms, state, user } = this.props;
-    const { anchorEl, showCardImportDialog } = this.state;
-
-    let options = [...this.options];
+  useEffect(() => {
+    let options: string[] = [
+      'Account',
+      'Replays',
+    ];
 
     if (user && AuthenticationService.isModerator(user)) {
       options = [
@@ -94,122 +42,155 @@ class Header extends Component<HeaderProps> {
       ];
     }
 
-    return (
-      <AppBar className="Header" position="static">
-        <Toolbar variant="dense">
-          <div className="Header__logo">
-            <NavLink to={RouteEnum.SERVER}>
-              <img src={Images.Logo} alt="logo" />
-            </NavLink>
-            { AuthenticationService.isConnected(state) && (
-              <span className="Header-server__indicator"></span>
-            ) }
-          </div>
-          { AuthenticationService.isConnected(state) && (
-            <div className="Header-content">
-              <nav className="Header-nav">
-                <nav className="Header-nav__links">
-                  <div className="Header-nav__link">
-                    <NavLink
-                      className="Header-nav__link-btn"
-                      to={ joinedRooms.length ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId }) : RouteEnum.SERVER }
-                    >
-                      Rooms
-                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
-                    </NavLink>
-                    <div className="Header-nav__link-menu">
-                      {joinedRooms.map(({ name, roomId }) => (
-                        <MenuItem className="Header-nav__link-menu__item" key={roomId}>
-                          <NavLink className="Header-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId }) }>
-                            {name}
+    setState(s => ({ ...s, options }));
+  }, [user]);
 
-                            <IconButton size="small" edge="end" onClick={event => this.leaveRoom(event, roomId)}>
-                              <CloseIcon style={{ fontSize: 10, color: 'white' }} />
-                            </IconButton>
-                          </NavLink>
-                        </MenuItem>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="Header-nav__link">
-                    <NavLink className="Header-nav__link-btn" to={ RouteEnum.GAME }>
-                      Games
-                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
-                    </NavLink>
-                  </div>
-                  <div className="Header-nav__link">
-                    <NavLink className="Header-nav__link-btn" to={ RouteEnum.DECKS }>
-                      Decks
-                      <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
-                    </NavLink>
-                  </div>
-                </nav>
-                <div className="Header-nav__actions">
-                  <div className="Header-nav__action">
-                    <IconButton>
-                      <MailOutlineRoundedIcon style={{ color: 'inherit' }} />
-                    </IconButton>
-                  </div>
-                  <div className="Header-nav__action">
-                    <IconButton onClick={this.handleMenuOpen}>
-                      <MenuRoundedIcon style={{ color: 'inherit' }} />
-                    </IconButton>
-                    <Menu
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={!!anchorEl}
-                      onClose={() => this.handleMenuClose()}
-                      PaperProps={{
-                        style: {
-                          marginTop: '32px',
-                          width: '20ch',
-                        },
-                      }}
-                    >
-                      {options.map((option) => (
-                        <MenuItem key={option} onClick={(event) => this.handleMenuItemClick(option)}>
-                          {option}
-                        </MenuItem>
-                      ))}
+  const handleMenuOpen = (event) => {
+    setState(s => ({ ...s, anchorEl: event.target }));
+  }
 
-                      <MenuItem key='Import Cards' onClick={(event) => this.openImportCardWizard()}>
-                        Import Cards
+  const handleMenuItemClick = (option: string) => {
+    const route = RouteEnum[option.toUpperCase()];
+    navigate(generatePath(route));
+  }
+
+  const handleMenuClose = () => {
+    setState(s => ({ ...s, anchorEl: null }));
+  }
+
+  const leaveRoom = (event, roomId) => {
+    event.preventDefault();
+    RoomsService.leaveRoom(roomId);
+  };
+
+  const openImportCardWizard = () => {
+    setState(s => ({ ...s, showCardImportDialog: true }));
+    handleMenuClose();
+  }
+
+  const closeImportCardWizard = () => {
+    setState(s => ({ ...s, showCardImportDialog: false }));
+  }
+
+  return (
+    <AppBar className="Header" position="static">
+      <Toolbar variant="dense">
+        <div className="Header__logo">
+          <NavLink to={RouteEnum.SERVER}>
+            <img src={Images.Logo} alt="logo" />
+          </NavLink>
+          { AuthenticationService.isConnected(serverState) && (
+            <span className="Header-server__indicator"></span>
+          ) }
+        </div>
+        { AuthenticationService.isConnected(serverState) && (
+          <div className="Header-content">
+            <nav className="Header-nav">
+              <nav className="Header-nav__links">
+                <div className="Header-nav__link">
+                  <NavLink
+                    className="Header-nav__link-btn"
+                    to={
+                      joinedRooms.length
+                        ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId.toString() })
+                        : RouteEnum.SERVER
+                    }
+                  >
+                    Rooms
+                    <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                  </NavLink>
+                  <div className="Header-nav__link-menu">
+                    {joinedRooms.map(({ name, roomId }) => (
+                      <MenuItem className="Header-nav__link-menu__item" key={roomId}>
+                        <NavLink className="Header-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId.toString() }) }>
+                          {name}
+
+                          <IconButton size="small" edge="end" onClick={event => leaveRoom(event, roomId)}>
+                            <CloseIcon style={{ fontSize: 10, color: 'white' }} />
+                          </IconButton>
+                        </NavLink>
                       </MenuItem>
-                    </Menu>
+                    ))}
                   </div>
                 </div>
+                <div className="Header-nav__link">
+                  <NavLink className="Header-nav__link-btn" to={ RouteEnum.GAME }>
+                    Games
+                    <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                  </NavLink>
+                </div>
+                <div className="Header-nav__link">
+                  <NavLink className="Header-nav__link-btn" to={ RouteEnum.DECKS }>
+                    Decks
+                    <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                  </NavLink>
+                </div>
               </nav>
-            </div>
-          ) }
-        </Toolbar>
+              <div className="Header-nav__actions">
+                <div className="Header-nav__action">
+                  <IconButton>
+                    <MailOutlineRoundedIcon style={{ color: 'inherit' }} />
+                  </IconButton>
+                </div>
+                <div className="Header-nav__action">
+                  <IconButton onClick={handleMenuOpen}>
+                    <MenuRoundedIcon style={{ color: 'inherit' }} />
+                  </IconButton>
+                  <Menu
+                    anchorEl={state.anchorEl}
+                    keepMounted
+                    open={!!state.anchorEl}
+                    onClose={() => handleMenuClose()}
+                    PaperProps={{
+                      style: {
+                        marginTop: '32px',
+                        width: '20ch',
+                      },
+                    }}
+                  >
+                    {state.options.map((option) => (
+                      <MenuItem key={option} onClick={(event) => handleMenuItemClick(option)}>
+                        {option}
+                      </MenuItem>
+                    ))}
 
-        <CardImportDialog
-          isOpen={showCardImportDialog}
-          handleClose={this.closeImportCardWizard}
-        ></CardImportDialog>
-      </AppBar>
-    )
-  }
+                    <MenuItem key='Import Cards' onClick={(event) => openImportCardWizard()}>
+                      Import Cards
+                    </MenuItem>
+                  </Menu>
+                </div>
+              </div>
+            </nav>
+          </div>
+        ) }
+      </Toolbar>
+
+      <CardImportDialog
+        isOpen={state.showCardImportDialog}
+        handleClose={closeImportCardWizard}
+      ></CardImportDialog>
+    </AppBar>
+  )
 }
 
 interface HeaderProps {
-  state: number;
+  serverState: number;
   server: string;
   user: User;
   joinedRooms: Room[];
-  history: any;
 }
 
 interface HeaderState {
   anchorEl: Element;
   showCardImportDialog: boolean;
+  options: string[];
 }
 
 const mapStateToProps = state => ({
-  state: ServerSelectors.getState(state),
+  serverState: ServerSelectors.getState(state),
   server: ServerSelectors.getName(state),
   user: ServerSelectors.getUser(state),
   joinedRooms: RoomsSelectors.getJoinedRooms(state),
 });
 
-export default withRouter(connect(mapStateToProps)(Header));
+export default connect(mapStateToProps)(Header);

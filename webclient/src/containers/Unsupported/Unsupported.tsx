@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { withRouter } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
@@ -27,4 +26,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default withRouter(connect(mapStateToProps)(Unsupported));
+export default connect(mapStateToProps)(Unsupported);

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
@@ -221,7 +221,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
 
   return (
     <div className={'login overflow-scroll ' + classes.root}>
-      { isConnected && <Redirect from="*" to={RouteEnum.SERVER} />}
+      { isConnected && <Navigate to={RouteEnum.SERVER} />}
 
       <div className="login__wrapper">
         <Paper className="login-content">

@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import React from "react";
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import * as _ from 'lodash';
 
 import Button from '@material-ui/core/Button';
@@ -16,10 +16,12 @@ import { RouteEnum } from 'types';
 
 import './Rooms.css';
 
-const Rooms = ({ rooms, joinedRooms, history }) => {
+const Rooms = ({ rooms, joinedRooms }) => {
+  const navigate = useNavigate();
+
   function onClick(roomId) {
     if (_.find(joinedRooms, room => room.roomId === roomId)) {
-      history.push(generatePath(RouteEnum.ROOM, { roomId }));
+      navigate(generatePath(RouteEnum.ROOM, { roomId }));
     } else {
       RoomsService.joinRoom(roomId);
     }

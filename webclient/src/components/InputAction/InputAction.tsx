@@ -21,7 +21,7 @@ const InputAction = ({ action, label, name, validate, disabled }) => (
 
 InputAction.defaultProps = {
   disabled: false,
-  validate: () => true,
+  validate: () => false,
 }
 
 export default InputAction;
