@@ -46,7 +46,8 @@
     "lint": "eslint \"./**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"./**/*.{ts,tsx}\" --fix",
     "golden": "npm run lint && npm run test",
-    "prepare": "cd .. && husky install"
+    "prepare": "cd .. && husky install",
+    "translate": "node prebuild.js -i18nOnly"
   },
   "eslintConfig": {
     "extends": "react-app"

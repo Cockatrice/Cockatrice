@@ -2,7 +2,7 @@
 . "$(dirname "$0")/_/husky.sh"
 
 cd webclient
-node prebuild.js -i18nOnly
+npm run translate
 
 cd ..
 git diff-tree --diff-filter=ACMRTUXB --no-commit-id --name-only -r HEAD | xargs git add --force
