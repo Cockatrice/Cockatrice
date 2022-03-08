@@ -1,4 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-git diff-tree --diff-filter=ACMRTUXB --no-commit-id --name-only -r HEAD | xargs git add --force

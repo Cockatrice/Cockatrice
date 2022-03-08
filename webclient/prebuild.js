@@ -20,8 +20,6 @@ const i18nFileRegex = /\.i18n\.json$/;
 
 const i18nOnly = process.argv.indexOf('-i18nOnly') > -1;
 
-console.log('prebuild', i18nOnly);
-
 (async () => {
   if (i18nOnly) {
     await createI18NDefault();

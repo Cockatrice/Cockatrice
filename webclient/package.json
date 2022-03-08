@@ -48,11 +48,6 @@
     "golden": "npm run lint && npm run test",
     "prepare": "cd .. && husky install"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "node prebuild.js -i18nOnly && npm run golden"
-    }
-  },
   "eslintConfig": {
     "extends": "react-app"
   },
