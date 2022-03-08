@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd webclient
+node prebuild.js -i18nOnly
+npm run golden
