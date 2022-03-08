@@ -4,5 +4,4 @@
 cd webclient
 npm run translate
 
-cd ..
-git diff-tree --diff-filter=ACMRTUXB --no-commit-id --name-only -r HEAD | xargs git add --force
+git add src/i18n-default.json
