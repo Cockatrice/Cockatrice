@@ -4,4 +4,5 @@
 cd webclient
 node prebuild.js -i18nOnly
 
+cd ..
 git diff-tree --diff-filter=ACMRTUXB --no-commit-id --name-only -r HEAD | xargs git add --force
