@@ -1,6 +1,6 @@
 {
   "Common": {
-    "language": "Translate into English.",
+    "language": "English",
     "disconnect": "Disconnect",
     "label": {
       "confirmPassword": "Confirm Password",
@@ -270,6 +270,7 @@
       "WS": "Samoa",
       "YE": "Yemen",
       "YT": "Mayotte",
+      "XK": "Kosovo",
       "ZA": "South Africa",
       "ZM": "Zambia",
       "ZW": "Zimbabwe",

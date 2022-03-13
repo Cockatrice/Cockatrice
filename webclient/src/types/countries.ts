@@ -247,6 +247,7 @@ export const countryCodes = [
   'WF',
   'EH',
   'YE',
+  'XK',
   'ZM',
   'ZW',
 ];
