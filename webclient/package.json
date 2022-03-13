@@ -45,7 +45,9 @@
     "eject": "react-scripts eject",
     "lint": "eslint \"./**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"./**/*.{ts,tsx}\" --fix",
-    "golden": "npm run lint && npm run test"
+    "golden": "npm run lint && npm run test",
+    "prepare": "cd .. && husky install",
+    "translate": "node prebuild.js -i18nOnly"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -85,6 +87,7 @@
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "fs-extra": "^10.0.1",
+    "husky": "^7.0.4",
     "i18next-icu": "^2.0.3",
     "identity-obj-proxy": "^3.0.0",
     "intl-messageformat": "^9.11.4"

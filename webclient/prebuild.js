@@ -18,14 +18,20 @@ const sharedFiles = [
 
 const i18nFileRegex = /\.i18n\.json$/;
 
+const i18nOnly = process.argv.indexOf('-i18nOnly') > -1;
 
 (async () => {
+  if (i18nOnly) {
+    await createI18NDefault();
+    return;
+  }
+
   // make sure these files finish copying before master file is created
   await copySharedFiles();
 
-  createMasterProtoFile();
-  createServerProps();
-  createI18NDefault();
+  await createMasterProtoFile();
+  await createServerProps();
+  await createI18NDefault();
 })();
 
 async function copySharedFiles() {
@@ -37,7 +43,7 @@ async function copySharedFiles() {
   }
 }
 
-function createMasterProtoFile() {
+async function createMasterProtoFile() {
   try {
     fse.readdir(protoFilesDir, (err, files) => {
       if (err) throw err;
