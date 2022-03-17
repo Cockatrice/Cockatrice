@@ -827,7 +827,8 @@ void DeckList::updateDeckHash()
                      (((quint64)(unsigned char)deckHashArray[1]) << 24) +
                      (((quint64)(unsigned char)deckHashArray[2] << 16)) +
                      (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
-    deckHash = (isValidDeckList) ? QString::number(number, 32).rightJustified(8, '0') : "INVALID";
+    QString hash = QString::number(number, 32).rightJustified(8, '0');
+    deckHash = (isValidDeckList) ? hash : hash.prepend("INVALID ");
 
     emit deckHashChanged();
 }
