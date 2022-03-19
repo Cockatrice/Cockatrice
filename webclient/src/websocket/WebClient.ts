@@ -57,7 +57,11 @@ export class WebClient {
   public connect(options: WebSocketConnectOptions) {
     this.connectionAttemptMade = true;
     this.options = options;
-    this.socket.connect(this.options);
+    this.socket.connect(options);
+  }
+
+  public testConnect(options: WebSocketConnectOptions) {
+    this.socket.testConnect(options);
   }
 
   public disconnect() {

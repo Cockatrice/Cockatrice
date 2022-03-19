@@ -29,6 +29,14 @@ export class SessionPersistence {
     ServerDispatch.connectionFailed();
   }
 
+  static testConnectionSuccessful() {
+    ServerDispatch.testConnectionSuccessful();
+  }
+
+  static testConnectionFailed() {
+    ServerDispatch.testConnectionFailed();
+  }
+
   static updateBuddyList(buddyList) {
     ServerDispatch.updateBuddyList(buddyList);
   }

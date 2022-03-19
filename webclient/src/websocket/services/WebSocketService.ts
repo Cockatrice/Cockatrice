@@ -38,6 +38,16 @@ export class WebSocketService {
     this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
   }
 
+  public testConnect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
+    if (window.location.hostname === 'localhost') {
+      protocol = 'ws';
+    }
+
+    const { host, port } = options;
+
+    this.testWebSocket(`${protocol}://${host}:${port}`);
+  }
+
   public disconnect(): void {
     if (this.socket) {
       this.socket.close();
@@ -91,5 +101,22 @@ export class WebSocketService {
     }
 
     return socket;
+  }
+
+  private testWebSocket(url: string): void {
+    const socket = new WebSocket(url);
+    socket.binaryType = 'arraybuffer';
+
+    const connectionTimer = setTimeout(() => socket.close(), this.webClient.clientOptions.keepalive);
+
+    socket.onopen = () => {
+      clearTimeout(connectionTimer);
+      SessionPersistence.testConnectionSuccessful();
+      socket.close();
+    };
+
+    socket.onerror = () => {
+      SessionPersistence.testConnectionFailed();
+    };
   }
 }
