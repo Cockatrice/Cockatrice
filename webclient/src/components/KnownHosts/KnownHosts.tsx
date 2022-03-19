@@ -23,6 +23,12 @@ import Toast from 'components/Toast/Toast';
 
 import './KnownHosts.css';
 
+enum TestConnection {
+  TESTING = 'testing',
+  FAILED = 'failed',
+  SUCCESS = 'success',
+}
+
 const useStyles = makeStyles(theme => ({
   root: {
     '& .KnownHosts-error': {
@@ -34,13 +40,13 @@ const useStyles = makeStyles(theme => ({
     },
 
     '& .KnownHosts-item': {
-      '& .testing': {
+      [`& .${TestConnection.TESTING}`]: {
         color: theme.palette.warning.main
       },
-      '& .failed': {
+      [`& .${TestConnection.FAILED}`]: {
         color: theme.palette.error.main
       },
-      '& .success': {
+      [`& .${TestConnection.SUCCESS}`]: {
         color: theme.palette.success.main
       }
     }
@@ -63,11 +69,7 @@ const KnownHosts = (props) => {
     edit: null,
   });
 
-  const [testingConnection, setTestingConnection] = useState({
-    testing: false,
-    failed: false,
-    success: false,
-  });
+  const [testingConnection, setTestingConnection] = useState<TestConnection>(null);
 
   const [showCreateToast, setShowCreateToast] = useState(false);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
@@ -101,19 +103,11 @@ const KnownHosts = (props) => {
   }, [hostsState, onChange]);
 
   useReduxEffect(() => {
-    setTestingConnection({
-      testing: false,
-      failed: false,
-      success: true,
-    });
+    setTestingConnection(TestConnection.SUCCESS);
   }, ServerTypes.TEST_CONNECTION_SUCCESSFUL, []);
 
   useReduxEffect(() => {
-    setTestingConnection({
-      testing: false,
-      failed: true,
-      success: false,
-    });
+    setTestingConnection(TestConnection.FAILED);
   }, ServerTypes.TEST_CONNECTION_FAILED, []);
 
   const selectHost = (selectedHost) => {
@@ -194,11 +188,7 @@ const KnownHosts = (props) => {
   };
 
   const testConnection = () => {
-    setTestingConnection(s => ({
-      testing: true,
-      failed: false,
-      success: false,
-    }));
+    setTestingConnection(TestConnection.TESTING);
 
     const options = { ...getHostPort(hostsState.selectedHost) };
     AuthenticationService.testConnection(options);
@@ -245,14 +235,9 @@ const KnownHosts = (props) => {
                 <div className='KnownHosts-item'>
                   <div className='KnownHosts-item__wrapper'>
                     <div className='KnownHosts-item__status'>
-                      <div className={
-                        testingConnection.testing ? 'testing' :
-                          testingConnection.failed ? 'failed' :
-                            testingConnection.success ? 'success' :
-                              ''
-                      }>
+                      <div className={testingConnection}>
                         {
-                          testingConnection.failed
+                          testingConnection === TestConnection.FAILED
                             ? <PortableWifiOffIcon fontSize="small" />
                             : <WifiTetheringIcon fontSize="small" />
                         }
