@@ -107,6 +107,7 @@ export class WebSocketService {
 
   private testWebSocket(url: string): void {
     if (this.testSocket) {
+      this.testSocket.onerror = null;
       this.testSocket.close();
     }
 
