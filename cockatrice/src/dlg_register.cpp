@@ -129,6 +129,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     countryEdit->addItem(QPixmap("theme:countries/er"), "er");
     countryEdit->addItem(QPixmap("theme:countries/es"), "es");
     countryEdit->addItem(QPixmap("theme:countries/et"), "et");
+    countryEdit->addItem(QPixmap("theme:countries/eu"), "eu");
     countryEdit->addItem(QPixmap("theme:countries/fi"), "fi");
     countryEdit->addItem(QPixmap("theme:countries/fj"), "fj");
     countryEdit->addItem(QPixmap("theme:countries/fk"), "fk");
@@ -304,6 +305,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     countryEdit->addItem(QPixmap("theme:countries/vu"), "vu");
     countryEdit->addItem(QPixmap("theme:countries/wf"), "wf");
     countryEdit->addItem(QPixmap("theme:countries/ws"), "ws");
+    countryEdit->addItem(QPixmap("theme:countries/xk"), "xk");
     countryEdit->addItem(QPixmap("theme:countries/ye"), "ye");
     countryEdit->addItem(QPixmap("theme:countries/yt"), "yt");
     countryEdit->addItem(QPixmap("theme:countries/za"), "za");
