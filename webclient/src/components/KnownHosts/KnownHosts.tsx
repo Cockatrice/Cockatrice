@@ -4,6 +4,8 @@ import { Select, MenuItem } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
+import WifiTetheringIcon from '@material-ui/icons/WifiTethering';
+import PortableWifiOffIcon from '@material-ui/icons/PortableWifiOff';
 import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles } from '@material-ui/core/styles';
 import Check from '@material-ui/icons/Check';
@@ -11,12 +13,21 @@ import AddIcon from '@material-ui/icons/Add';
 import EditRoundedIcon from '@material-ui/icons/Edit';
 import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
 
+import { AuthenticationService } from 'api';
 import { KnownHostDialog } from 'dialogs';
+import { useReduxEffect } from 'hooks';
 import { HostDTO } from 'services';
+import { ServerTypes } from 'store';
 import { DefaultHosts, Host, getHostPort } from 'types';
 import Toast from 'components/Toast/Toast';
 
 import './KnownHosts.css';
+
+enum TestConnection {
+  TESTING = 'testing',
+  FAILED = 'failed',
+  SUCCESS = 'success',
+}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -26,6 +37,18 @@ const useStyles = makeStyles(theme => ({
 
     '& .KnownHosts-warning': {
       color: theme.palette.warning.main
+    },
+
+    '& .KnownHosts-item': {
+      [`& .${TestConnection.TESTING}`]: {
+        color: theme.palette.warning.main
+      },
+      [`& .${TestConnection.FAILED}`]: {
+        color: theme.palette.error.main
+      },
+      [`& .${TestConnection.SUCCESS}`]: {
+        color: theme.palette.success.main
+      }
     }
   },
 }));
@@ -46,9 +69,11 @@ const KnownHosts = (props) => {
     edit: null,
   });
 
-  const [showCreateToast, setShowCreateToast] = useState(false)
-  const [showDeleteToast, setShowDeleteToast] = useState(false)
-  const [showEditToast, setShowEditToast] = useState(false)
+  const [testingConnection, setTestingConnection] = useState<TestConnection>(null);
+
+  const [showCreateToast, setShowCreateToast] = useState(false);
+  const [showDeleteToast, setShowDeleteToast] = useState(false);
+  const [showEditToast, setShowEditToast] = useState(false);
 
   const loadKnownHosts = useCallback(async () => {
     const hosts = await HostDTO.getAll();
@@ -76,6 +101,14 @@ const KnownHosts = (props) => {
       });
     }
   }, [hostsState, onChange]);
+
+  useReduxEffect(() => {
+    setTestingConnection(TestConnection.SUCCESS);
+  }, ServerTypes.TEST_CONNECTION_SUCCESSFUL, []);
+
+  useReduxEffect(() => {
+    setTestingConnection(TestConnection.FAILED);
+  }, ServerTypes.TEST_CONNECTION_FAILED, []);
 
   const selectHost = (selectedHost) => {
     setHostsState(s => ({ ...s, selectedHost }));
@@ -135,6 +168,8 @@ const KnownHosts = (props) => {
   };
 
   const updateLastSelectedHost = (hostId): Promise<any[]> => {
+    testConnection();
+
     return HostDTO.getAll().then(hosts =>
       hosts.map(async host => {
         if (host.id === hostId) {
@@ -152,20 +187,27 @@ const KnownHosts = (props) => {
     );
   };
 
+  const testConnection = () => {
+    setTestingConnection(TestConnection.TESTING);
+
+    const options = { ...getHostPort(hostsState.selectedHost) };
+    AuthenticationService.testConnection(options);
+  }
+
   return (
-    <div>
-      <FormControl variant='outlined' className={'KnownHosts ' + classes.root}>
+    <div className={'KnownHosts ' + classes.root}>
+      <FormControl variant='outlined' className='KnownHosts-form'>
         { touched && (
-          <div className="KnownHosts-validation">
+          <div className='KnownHosts-validation'>
             {
               (error &&
-                <div className="KnownHosts-error">
+                <div className='KnownHosts-error'>
                   {error}
                   <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
                 </div>
               ) ||
 
-              (warning && <div className="KnownHosts-warning">{warning}</div>)
+              (warning && <div className='KnownHosts-warning'>{warning}</div>)
             }
           </div>
         ) }
@@ -189,19 +231,33 @@ const KnownHosts = (props) => {
 
           {
             hostsState.hosts.map((host, index) => (
-              <MenuItem className='KnownHosts-item' value={host} key={index}>
-                <div className='KnownHosts-item__label'>
-                  <Check />
-                  <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>
-                </div>
+              <MenuItem value={host} key={index}>
+                <div className='KnownHosts-item'>
+                  <div className='KnownHosts-item__wrapper'>
+                    <div className='KnownHosts-item__status'>
+                      <div className={testingConnection}>
+                        {
+                          testingConnection === TestConnection.FAILED
+                            ? <PortableWifiOffIcon fontSize="small" />
+                            : <WifiTetheringIcon fontSize="small" />
+                        }
+                      </div>
+                    </div>
 
-                { host.editable && (
-                  <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={(e) => {
-                    openEditKnownHostDialog(hostsState.hosts[index]);
-                  }}>
-                    <EditRoundedIcon fontSize='small' />
-                  </IconButton>
-                ) }
+                    <div className='KnownHosts-item__label'>
+                      <Check />
+                      <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>
+                    </div>
+                  </div>
+
+                  { host.editable && (
+                    <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={(e) => {
+                      openEditKnownHostDialog(hostsState.hosts[index]);
+                    }}>
+                      <EditRoundedIcon fontSize='small' />
+                    </IconButton>
+                  ) }
+                </div>
               </MenuItem>
             ))
           }

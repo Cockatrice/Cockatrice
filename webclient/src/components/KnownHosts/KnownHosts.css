@@ -1,6 +1,21 @@
 .KnownHosts {
+}
+
+.KnownHosts-form {
   width: 100%;
   position: relative;
+}
+
+.KnownHosts-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.KnownHosts-item__wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .KnownHosts-item__label {
@@ -14,6 +29,16 @@
   top: 50%;
   transform: translate(-100%, -50%);
   font-size: .9em;
+}
+
+.KnownHosts-item__status {
+  display: none;
+}
+
+.KnownHosts-item__status svg {
+  display: none;
+  margin-left: -5px;
+  margin-right: 5px;
 }
 
 .KnownHosts-validation {
@@ -31,6 +56,11 @@
 
 .KnownHosts-error svg {
   margin-left: 4px;
+}
+
+.KnownHosts .MuiSelect-selectMenu .KnownHosts-item__status,
+.KnownHosts .MuiSelect-selectMenu .KnownHosts-item__status svg {
+  display: block;
 }
 
 .Mui-selected .KnownHosts-item__label svg {

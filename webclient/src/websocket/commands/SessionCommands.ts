@@ -25,6 +25,9 @@ export class SessionCommands {
       case WebSocketConnectReason.PASSWORD_RESET:
         SessionCommands.updateStatus(StatusEnum.CONNECTING, 'Connecting...');
         break;
+      case WebSocketConnectReason.TEST_CONNECTION:
+        webClient.testConnect({ ...options });
+        return;
       default:
         SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Attempt: ' + reason);
         return;

@@ -5,6 +5,8 @@ export const Types = {
   LOGIN_FAILED: '[Server] Login Failed',
   CONNECTION_CLOSED: '[Server] Connection Closed',
   CONNECTION_FAILED: '[Server] Connection Failed',
+  TEST_CONNECTION_SUCCESSFUL: '[Server] Test Connection Successful',
+  TEST_CONNECTION_FAILED: '[Server] Test Connection Failed',
   SERVER_MESSAGE: '[Server] Server Message',
   UPDATE_BUDDY_LIST: '[Server] Update Buddy List',
   ADD_TO_BUDDY_LIST: '[Server] Add to Buddy List',

@@ -22,6 +22,12 @@ export const Dispatch = {
   connectionFailed: () => {
     store.dispatch(Actions.connectionFailed());
   },
+  testConnectionSuccessful: () => {
+    store.dispatch(Actions.testConnectionSuccessful());
+  },
+  testConnectionFailed: () => {
+    store.dispatch(Actions.testConnectionFailed());
+  },
   updateBuddyList: buddyList => {
     store.dispatch(Actions.updateBuddyList(buddyList));
   },

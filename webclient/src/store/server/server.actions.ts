@@ -24,6 +24,12 @@ export const Actions = {
   connectionFailed: () => ({
     type: Types.CONNECTION_FAILED,
   }),
+  testConnectionSuccessful: () => ({
+    type: Types.TEST_CONNECTION_SUCCESSFUL,
+  }),
+  testConnectionFailed: () => ({
+    type: Types.TEST_CONNECTION_FAILED,
+  }),
   serverMessage: message => ({
     type: Types.SERVER_MESSAGE,
     message
