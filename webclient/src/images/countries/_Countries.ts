@@ -245,6 +245,7 @@ import vn from '!file-loader!./vn.svg';
 import vu from '!file-loader!./vu.svg';
 import wf from '!file-loader!./wf.svg';
 import ws from '!file-loader!./ws.svg';
+import xk from '!file-loader!./xk.svg';
 import ye from '!file-loader!./ye.svg';
 import yt from '!file-loader!./yt.svg';
 import za from '!file-loader!./za.svg';
@@ -497,6 +498,7 @@ export const Countries = {
   vu,
   wf,
   ws,
+  xk,
   ye,
   yt,
   za,
