@@ -55,6 +55,12 @@ export class Host {
 
 export const DefaultHosts: Host[] = [
   {
+    name: 'Chickatrice',
+    host: 'mtg.chickatrice.net/servatrice',
+    port: '443',
+    editable: false,
+  },
+  {
     name: 'Rooster',
     host: 'server.cockatrice.us/servatrice',
     port: '4748',
@@ -93,11 +99,13 @@ export const getHostPort = (host: Host): { host: string, port: string } => {
 };
 
 export enum KnownHost {
+  CHICKATRICE = 'Chickatrice',
   ROOSTER = 'Rooster',
   TETRARCH = 'Tetrarch',
 }
 
 export const KnownHosts = {
+  [KnownHost.CHICKATRICE]: { port: 443, host: 'mtg.chickatrice.net', },
   [KnownHost.ROOSTER]: { port: 4748, host: 'server.cockatrice.us', },
   [KnownHost.TETRARCH]: { port: 443, host: 'mtg.tetrarch.co/servatrice' },
 }
