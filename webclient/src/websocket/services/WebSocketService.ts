@@ -8,6 +8,8 @@ import { SessionPersistence } from '../persistence';
 
 export class WebSocketService {
   private socket: WebSocket;
+  private testSocket: WebSocket;
+
   private webClient: WebClient;
   private keepAliveService: KeepAliveService;
 
@@ -104,6 +106,11 @@ export class WebSocketService {
   }
 
   private testWebSocket(url: string): void {
+    if (this.testSocket) {
+      this.testSocket.onerror = null;
+      this.testSocket.close();
+    }
+
     const socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
 
@@ -118,5 +125,11 @@ export class WebSocketService {
     socket.onerror = () => {
       SessionPersistence.testConnectionFailed();
     };
+
+    socket.onclose = () => {
+      this.testSocket = null;
+    }
+
+    this.testSocket = socket;
   }
 }
