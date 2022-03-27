@@ -96,9 +96,9 @@ private:
 public:
     Servatrice_IslServer(Servatrice *_server,
                          const QSslCertificate &_cert,
-                         const QSslKey &_privateKey,
+                         QSslKey _privateKey,
                          QObject *parent = nullptr)
-        : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey)
+        : QTcpServer(parent), server(_server), cert(_cert), privateKey(std::move(_privateKey))
     {
     }
 
@@ -143,7 +143,7 @@ private slots:
     void shutdownTimeout();
 
 protected:
-    void doSendIslMessage(const IslMessage &msg, int serverId) override;
+    void doSendIslMessage(const IslMessage &msg, int islServerId) override;
 
 private:
     enum DatabaseType
@@ -160,7 +160,6 @@ private:
     mutable QMutex loginMessageMutex;
     QString loginMessage;
     QString dbPrefix;
-    QString requiredFeatures;
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
     Servatrice_DatabaseInterface *servatriceDatabaseInterface;
@@ -173,7 +172,6 @@ private:
     int shutdownMinutes;
     int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
-    bool isFirstShutdownMessage;
 
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
@@ -203,7 +201,7 @@ private:
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
-    void setRequiredFeatures(QString featureList);
+    void setRequiredFeatures(const QString &featureList);
 
 public:
     explicit Servatrice(QObject *parent = nullptr);
@@ -212,10 +210,6 @@ public:
     QMap<QString, bool> getServerRequiredFeatureList() const override
     {
         return serverRequiredFeatureList;
-    }
-    QString getOfficialWarningsList() const
-    {
-        return officialWarnings;
     }
     QString getServerName() const;
     QString getLoginMessage() const override
@@ -282,9 +276,9 @@ public:
     void incRxBytes(quint64 num);
     void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
 
-    bool islConnectionExists(int serverId) const;
-    void addIslInterface(int serverId, IslInterface *interface);
-    void removeIslInterface(int serverId);
+    bool islConnectionExists(int islServerId) const;
+    void addIslInterface(int islServerId, IslInterface *interface);
+    void removeIslInterface(int islServerId);
     QReadWriteLock islLock;
 
     QList<ServerProperties> getServerList() const;

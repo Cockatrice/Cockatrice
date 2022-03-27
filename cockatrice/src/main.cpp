@@ -67,11 +67,29 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().getLang();
 
-    qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    QString qtNameHint = "qt_" + lang;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+#else
+    QString qtTranslationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#endif
+
+    bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
+    if (!qtTranslationLoaded) {
+        qDebug() << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
+    } else {
+        qDebug() << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
+    }
     qApp->installTranslator(qtTranslator);
-    translator->load(translationPrefix + "_" + lang, translationPath);
+
+    QString appNameHint = translationPrefix + "_" + lang;
+    bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
+    if (!appTranslationLoaded) {
+        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
+    } else {
+        qDebug() << "Loaded" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
+    }
     qApp->installTranslator(translator);
-    qDebug() << "Language changed:" << lang;
 }
 
 QString const generateClientID()
@@ -165,7 +183,9 @@ int main(int argc, char *argv[])
     ui.show();
     qDebug("main(): ui.show() finished");
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
     app.exec();
 
     qDebug("Event loop finished, terminating...");

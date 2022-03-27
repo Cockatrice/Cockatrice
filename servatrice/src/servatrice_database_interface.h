@@ -36,14 +36,14 @@ protected:
                                            const QString &clientId,
                                            QString &reasonStr,
                                            int &banSecondsLeft,
-                                           bool passwordNeedsHash);
+                                           bool passwordNeedsHash) override;
 
 public slots:
     void initDatabase(const QSqlDatabase &_sqlDatabase);
 
 public:
-    Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
-    ~Servatrice_DatabaseInterface();
+    explicit Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
+    ~Servatrice_DatabaseInterface() override;
     bool initDatabase(const QString &type,
                       const QString &hostName,
                       const QString &databaseName,
@@ -58,66 +58,66 @@ public:
         return sqlDatabase;
     }
 
-    bool activeUserExists(const QString &user);
-    bool userExists(const QString &user);
-    QString getUserSalt(const QString &user);
+    bool activeUserExists(const QString &user) override;
+    bool userExists(const QString &user) override;
+    QString getUserSalt(const QString &user) override;
     int getUserIdInDB(const QString &name);
-    QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
-    QMap<QString, ServerInfo_User> getIgnoreList(const QString &name);
-    bool isInBuddyList(const QString &whoseList, const QString &who);
-    bool isInIgnoreList(const QString &whoseList, const QString &who);
-    ServerInfo_User getUserData(const QString &name, bool withId = false);
+    QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
+    QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;
+    bool isInBuddyList(const QString &whoseList, const QString &who) override;
+    bool isInIgnoreList(const QString &whoseList, const QString &who) override;
+    ServerInfo_User getUserData(const QString &name, bool withId = false) override;
     void storeGameInformation(const QString &roomName,
                               const QStringList &roomGameTypes,
                               const ServerInfo_Game &gameInfo,
                               const QSet<QString> &allPlayersEver,
                               const QSet<QString> &allSpectatorsEver,
-                              const QList<GameReplay *> &replayList);
-    DeckList *getDeckFromDatabase(int deckId, int userId);
+                              const QList<GameReplay *> &replayList) override;
+    DeckList *getDeckFromDatabase(int deckId, int userId) override;
 
-    int getNextGameId();
-    int getNextReplayId();
-    int getActiveUserCount(QString connectionType = QString());
+    int getNextGameId() override;
+    int getNextReplayId() override;
+    int getActiveUserCount(QString connectionType = QString()) override;
 
     qint64 startSession(const QString &userName,
                         const QString &address,
                         const QString &clientId,
-                        const QString &connectionType);
-    void endSession(qint64 sessionId);
-    void clearSessionTables();
-    void lockSessionTables();
-    void unlockSessionTables();
-    bool userSessionExists(const QString &userName);
-    bool usernameIsValid(const QString &user, QString &error);
+                        const QString &connectionType) override;
+    void endSession(qint64 sessionId) override;
+    void clearSessionTables() override;
+    void lockSessionTables() override;
+    void unlockSessionTables() override;
+    bool userSessionExists(const QString &userName) override;
+    bool usernameIsValid(const QString &user, QString &error) override;
     bool checkUserIsBanned(const QString &ipAddress,
                            const QString &userName,
                            const QString &clientId,
                            QString &banReason,
-                           int &banSecondsRemaining);
-    int checkNumberOfUserAccounts(const QString &email);
+                           int &banSecondsRemaining) override;
+    int checkNumberOfUserAccounts(const QString &email) override;
     bool registerUser(const QString &userName,
                       const QString &realName,
                       const QString &password,
                       bool passwordNeedsHash,
                       const QString &emailAddress,
                       const QString &country,
-                      bool active = false);
-    bool activateUser(const QString &userName, const QString &token);
-    void updateUsersClientID(const QString &userName, const QString &userClientID);
-    void updateUsersLastLoginData(const QString &userName, const QString &clientVersion);
+                      bool active = false) override;
+    bool activateUser(const QString &userName, const QString &token) override;
+    void updateUsersClientID(const QString &userName, const QString &userClientID) override;
+    void updateUsersLastLoginData(const QString &userName, const QString &clientVersion) override;
     void logMessage(const int senderId,
                     const QString &senderName,
                     const QString &senderIp,
                     const QString &logMessage,
                     LogMessage_TargetType targetType,
                     const int targetId,
-                    const QString &targetName);
-    bool changeUserPassword(const QString &user, const QString &password, bool passwordNeedsHash);
+                    const QString &targetName) override;
+    bool changeUserPassword(const QString &user, const QString &password, bool passwordNeedsHash) override;
     bool changeUserPassword(const QString &user,
                             const QString &oldPassword,
                             bool oldPasswordNeedsHash,
                             const QString &newPassword,
-                            bool newPasswordNeedsHash);
+                            bool newPasswordNeedsHash) override;
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
     bool
     addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
@@ -133,7 +133,7 @@ public:
                                                        int &range,
                                                        int &maxresults);
     bool addForgotPassword(const QString &user);
-    bool removeForgotPassword(const QString &user);
+    bool removeForgotPassword(const QString &user) override;
     bool doesForgotPasswordExist(const QString &user);
     bool updateUserToken(const QString &token, const QString &user);
     bool validateTableColumnStringData(const QString &table,

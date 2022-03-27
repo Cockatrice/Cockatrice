@@ -121,7 +121,12 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+    connect(searchField, SIGNAL(textChanged(const QString &)), displayModel,
+            SLOT(setFilterRegularExpression(const QString &)));
+#else
     connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
+#endif
     connect(view->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(actDisableSortButtons(int)));
     connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(actDisableResetButton(const QString &)));
 
@@ -139,7 +144,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
                                tr("How to use custom card art") + "</a>"));
 
     QGridLayout *hintsGrid = new QGridLayout;
-    hintsGrid->setMargin(2);
     hintsGrid->addWidget(labNotes, 0, 0);
     hintsGroupBox = new QGroupBox(tr("Hints"));
     hintsGroupBox->setLayout(hintsGrid);

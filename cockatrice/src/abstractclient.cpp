@@ -48,6 +48,7 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<QList<ServerInfo_User>>("QList<ServerInfo_User>");
     qRegisterMetaType<Event_ReplayAdded>("Event_ReplayAdded");
     qRegisterMetaType<QList<QString>>("missingFeatures");
+    qRegisterMetaType<PendingCommand *>("pendingCommand");
 
     FeatureSet features;
     features.initalizeFeatureList(clientFeatures);

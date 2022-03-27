@@ -12,8 +12,9 @@ LocalServer::LocalServer(QObject *parent) : Server(parent)
 LocalServer::~LocalServer()
 {
     // LocalServer is single threaded so it doesn't need locks on this
-    while (!clients.isEmpty())
-        clients.first()->prepareDestroy();
+    for (auto *client : clients) {
+        client->prepareDestroy();
+    }
 
     prepareDestroy();
 }

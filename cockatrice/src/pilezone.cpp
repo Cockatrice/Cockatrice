@@ -44,6 +44,10 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
     connect(card, SIGNAL(sigPixmapUpdated()), this, SLOT(callUpdate()));
+    // if x is negative set it to add at end
+    if (x < 0 || x >= cards.size()) {
+        x = cards.size();
+    }
     cards.insert(x, card);
     card->setPos(0, 0);
     if (!contentsKnown()) {

@@ -1,8 +1,8 @@
 #ifndef SOUNDENGINE_H
 #define SOUNDENGINE_H
 
-#include <QDir>
 #include <QMap>
+#include <QMediaPlayer>
 #include <QObject>
 #include <QString>
 
@@ -21,10 +21,9 @@ public:
     QStringMap &getAvailableThemes();
 
 private:
-    QMap<QString, QByteArray> audioData;
-    QBuffer *inputBuffer;
-    QAudioOutput *player;
     QStringMap availableThemes;
+    QMap<QString, QString> audioData;
+    QMediaPlayer *player;
 
 protected:
     void ensureThemeDirectoryExists();

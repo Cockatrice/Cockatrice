@@ -52,7 +52,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
             SIGNAL(openMessageDialog(const QString &, bool)));
 
     chatView = new ChatView(tabSupervisor, tabSupervisor, nullptr, true, this);
-    connect(chatView, SIGNAL(showMentionPopup(QString &)), this, SLOT(actShowMentionPopup(QString &)));
+    connect(chatView, SIGNAL(showMentionPopup(const QString &)), this, SLOT(actShowMentionPopup(const QString &)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -160,7 +160,7 @@ void TabRoom::focusTab()
     emit maximizeClient();
 }
 
-void TabRoom::actShowMentionPopup(QString &sender)
+void TabRoom::actShowMentionPopup(const QString &sender)
 {
     this->actShowPopup(sender + tr(" mentioned you."));
 }
