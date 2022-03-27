@@ -153,25 +153,25 @@ private:
     };
     AuthenticationMethod authenticationMethod;
     DatabaseType databaseType;
-    QTimer *pingClock, *statusUpdateClock;
-    Servatrice_GameServer *gameServer;
-    Servatrice_WebsocketGameServer *websocketGameServer;
-    Servatrice_IslServer *islServer;
+    QTimer *pingClock{}, *statusUpdateClock{};
+    Servatrice_GameServer *gameServer{};
+    Servatrice_WebsocketGameServer *websocketGameServer{};
+    Servatrice_IslServer *islServer{};
     mutable QMutex loginMessageMutex;
     QString loginMessage;
     QString dbPrefix;
     QString requiredFeatures;
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
-    Servatrice_DatabaseInterface *servatriceDatabaseInterface;
-    int serverId;
+    Servatrice_DatabaseInterface *servatriceDatabaseInterface{};
+    int serverId{};
     int uptime;
     QMutex txBytesMutex, rxBytesMutex;
     quint64 txBytes, rxBytes;
 
     QString shutdownReason;
-    int shutdownMinutes;
-    int nextShutdownMessageMinutes;
+    int shutdownMinutes{};
+    int nextShutdownMessageMinutes{};
     QTimer *shutdownTimer;
     bool isFirstShutdownMessage;
 

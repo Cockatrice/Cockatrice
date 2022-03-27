@@ -76,6 +76,7 @@ Servatrice_GameServer::~Servatrice_GameServer()
         QThread *poolThread = connectionPools[i]->thread();
         connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
         poolThread->wait();
+        poolThread->deleteLater();
     }
 }
 
@@ -144,6 +145,7 @@ Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
         QThread *poolThread = connectionPools[i]->thread();
         connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
         poolThread->wait();
+        poolThread->deleteLater();
     }
 }
 
@@ -204,21 +206,11 @@ Servatrice::~Servatrice()
 {
     gameServer->close();
 
-    // clients live in other threads, we need to lock them
-    clientsLock.lockForRead();
     for (auto *client : clients) {
-        QMetaObject::invokeMethod(client, "prepareDestroy", Qt::QueuedConnection);
-    }
-    clientsLock.unlock();
-
-    // client destruction is asynchronous, wait for all clients to be gone
-    for (;;) {
-        QThread::usleep(10);
-        QReadLocker locker(&clientsLock);
-        if (clients.isEmpty())
-            break;
+        client->prepareDestroy();
     }
 
+    servatriceDatabaseInterface->deleteLater();
     prepareDestroy();
 }
 
@@ -715,8 +707,9 @@ void Servatrice::shutdownTimeout()
         clientsLock.unlock();
         delete se;
 
-        if (!shutdownMinutes)
+        if (!shutdownMinutes) {
             deleteLater();
+        }
     }
     shutdownMinutes--;
 }
