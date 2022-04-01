@@ -45,7 +45,7 @@ jobs:
 
       - name: Render template
         id: template
-        uses: chuhlomin/render-template@v1.2
+        uses: chuhlomin/render-template@v1
         with:
           template: .ci/update_translations_template.md
           vars: |
@@ -56,7 +56,7 @@ jobs:
       - name: Create pull request
         if: github.event_name != 'pull_request'
         id: create_pr
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           add-paths: |
             cockatrice/translations/cockatrice_en@source.ts
