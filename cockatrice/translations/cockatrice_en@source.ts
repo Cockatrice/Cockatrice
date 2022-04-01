@@ -1664,40 +1664,40 @@ Your email will be used to verify your account.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="317"/>
+        <location filename="../src/dlg_register.cpp" line="319"/>
         <source>Real name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="352"/>
+        <location filename="../src/dlg_register.cpp" line="354"/>
         <source>Register to server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="361"/>
-        <location filename="../src/dlg_register.cpp" line="364"/>
-        <location filename="../src/dlg_register.cpp" line="367"/>
-        <location filename="../src/dlg_register.cpp" line="372"/>
+        <location filename="../src/dlg_register.cpp" line="363"/>
+        <location filename="../src/dlg_register.cpp" line="366"/>
+        <location filename="../src/dlg_register.cpp" line="369"/>
+        <location filename="../src/dlg_register.cpp" line="374"/>
         <source>Registration Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="361"/>
+        <location filename="../src/dlg_register.cpp" line="363"/>
         <source>Your password is too short.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="364"/>
+        <location filename="../src/dlg_register.cpp" line="366"/>
         <source>Your passwords do not match, please try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="368"/>
+        <location filename="../src/dlg_register.cpp" line="370"/>
         <source>Your email addresses do not match, please try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="372"/>
+        <location filename="../src/dlg_register.cpp" line="374"/>
         <source>The player name can&apos;t be empty.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4362,12 +4362,12 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2707"/>
+        <location filename="../src/player.cpp" line="2727"/>
         <source>Which position should this card be placed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2707"/>
+        <location filename="../src/player.cpp" line="2727"/>
         <source>(max. %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4388,7 +4388,7 @@ Cockatrice will now reload the card database.</source>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1703"/>
-        <location filename="../src/player.cpp" line="3224"/>
+        <location filename="../src/player.cpp" line="3244"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4509,7 +4509,7 @@ Cockatrice will now reload the card database.</source>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1559"/>
-        <location filename="../src/player.cpp" line="3605"/>
+        <location filename="../src/player.cpp" line="3625"/>
         <source>C&amp;reate another %1 token</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4519,52 +4519,52 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2706"/>
+        <location filename="../src/player.cpp" line="2726"/>
         <source>Place card X cards from top of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3031"/>
+        <location filename="../src/player.cpp" line="3051"/>
         <source>Change power/toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3031"/>
+        <location filename="../src/player.cpp" line="3051"/>
         <source>Change stats to:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3136"/>
+        <location filename="../src/player.cpp" line="3156"/>
         <source>Set annotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3137"/>
+        <location filename="../src/player.cpp" line="3157"/>
         <source>Please enter the new annotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3224"/>
+        <location filename="../src/player.cpp" line="3244"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3443"/>
+        <location filename="../src/player.cpp" line="3463"/>
         <source>View related cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3481"/>
+        <location filename="../src/player.cpp" line="3501"/>
         <source>Token: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3483"/>
+        <location filename="../src/player.cpp" line="3503"/>
         <source>Attach to </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3497"/>
+        <location filename="../src/player.cpp" line="3517"/>
         <source>All tokens</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4628,6 +4628,21 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/deck_loader.cpp" line="12"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../common/decklist.cpp" line="111"/>
+        <source>Maindeck</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../common/decklist.cpp" line="113"/>
+        <source>Sideboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../common/decklist.cpp" line="115"/>
+        <source>Tokens</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4810,6 +4825,39 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="63"/>
         <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SequenceEdit</name>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="43"/>
+        <source>Choose an action from the table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="49"/>
+        <source>Hit the key/combination of keys you want to set for this action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="172"/>
+        <source>Shortcut already in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="175"/>
+        <source>Invalid key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="192"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="193"/>
+        <source>Restore default</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6802,12 +6850,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/main.cpp" line="126"/>
+        <location filename="../src/main.cpp" line="125"/>
         <source>Connect on startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="127"/>
+        <location filename="../src/main.cpp" line="126"/>
         <source>Debug to file</source>
         <translation type="unfinished"></translation>
     </message>
