@@ -43,7 +43,11 @@
   font-size: 10px;
 }
 
-.account-details img {
+.account-details > img {
   width: 100%;
   margin-bottom: 20px;
+}
+
+.account-details__lang {
+  margin-top: 20px;
 }

@@ -1,0 +1,6 @@
+{
+ "KnownHostDialog": {
+    "title": "{mode, select, edit {Edit} other {Add}} Known Host",
+    "subtitle": "Adding a new host allows you to connect to different servers. Enter the details below to your host list."
+  }
+}

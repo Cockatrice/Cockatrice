@@ -162,11 +162,11 @@ jobs:
         if: matrix.package != 'skip'
         shell: bash
         env:
-          suffix: '-${{matrix.distro}}'
-          type: '${{matrix.package}}'
+          PACKAGE_SUFFIX: '-${{matrix.distro}}'
+          CPACK_GENERATOR: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --suffix "$suffix"
+          RUN --server --release --package
 
       - name: Upload artifact
         if: matrix.package != 'skip'
@@ -314,13 +314,13 @@ jobs:
 
     env:
       QT_VERSION: '5.15.2'
-      QT_ARCH: msvc2019${{matrix.append}}
-      CMAKE_GENERATOR: 'Visual Studio 16 2019'
+      QT_ARCH: msvc2022${{matrix.append}}
+      CMAKE_GENERATOR: 'Visual Studio 17 2022'
 
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -349,32 +349,20 @@ jobs:
           appendedCacheKey: ${{hashFiles('**/vcpkg.txt')}}
           vcpkgTriplet: ${{matrix.triplet}}-windows
 
-      - name: Configure Cockatrice ${{matrix.arch}}-bit
-        shell: bash
-        run: |
-          mkdir -p build
-          cd build
-          export QTDIR="${{runner.workspace}}/Qt/${{env.QT_VERSION}}/${{env.QT_ARCH}}"
-          cmake .. -G "${{env.CMAKE_GENERATOR}}" -A "${{matrix.cmake}}" -DCMAKE_BUILD_TYPE="Release" -DWITH_SERVER=1 -DTEST=1
-
       - name: Build Cockatrice ${{matrix.arch}}-bit
-        id: package
+        id: build
         shell: bash
-        working-directory: build
-        run: |
-          cmake --build . --target package --config Release
-          ../.ci/name_build.sh "-win${{matrix.arch}}"
-
-      - name: Run tests
-        shell: bash
-        working-directory: build
-        run: ctest -T Test -C Release
+        env:
+          PACKAGE_SUFFIX: '-win${{matrix.arch}}'
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake}}'
+        run: ./.ci/compile.sh --server --release --test --package
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: Windows-${{matrix.arch}}bit-installer
-          path: ./build/${{steps.package.outputs.name}}
+          path: ./build/${{steps.build.outputs.name}}
           if-no-files-found: error
 
       - name: Upload to release
@@ -384,6 +372,6 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.configure.outputs.upload_url}}
-          asset_path: ./build/${{steps.package.outputs.name}}
-          asset_name: ${{steps.package.outputs.name}}
+          asset_path: ./build/${{steps.build.outputs.name}}
+          asset_name: ${{steps.build.outputs.name}}
           asset_content_type: application/octet-stream

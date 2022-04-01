@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd webclient
+npm run translate
+
+git add src/i18n-default.json

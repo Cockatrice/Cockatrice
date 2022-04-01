@@ -1,5 +1,6 @@
 #include "isl_interface.h"
 
+#include "debug_pb_message.h"
 #include "get_pb_extension.h"
 #include "main.h"
 #include "pb/event_game_joined.pb.h"
@@ -437,7 +438,7 @@ void IslInterface::processRoomCommand(const CommandContainer &cont, qint64 sessi
 
 void IslInterface::processMessage(const IslMessage &item)
 {
-    qDebug() << QString::fromStdString(item.DebugString());
+    qDebug() << getSafeDebugString(item);
 
     switch (item.message_type()) {
         case IslMessage::ROOM_COMMAND_CONTAINER: {

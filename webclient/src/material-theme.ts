@@ -97,6 +97,13 @@ export const materialTheme = createTheme({
         fontSize: 12,
         fontWeight: 'bold',
         color: palette.primary.main,
+
+      },
+    },
+
+    MuiInputLabel: {
+      outlined: {
+        transform: 'translate(1em, 1em) scale(1)',
       },
     },
 
@@ -186,11 +193,11 @@ export const materialTheme = createTheme({
       fontSize: 14,
       fontWeight: 'bold',
       lineHeight: 1.4,
-      color: '#9E9E9E',
+      color: palette.grey[500],
     },
     subtitle2: {
       lineHeight: 1.4,
-      color: '#9E9E9E',
+      color: palette.grey[500],
     },
     // body1: {},
     // body2: {},

@@ -1,0 +1,22 @@
+{
+  "LoginContainer": {
+    "header": {
+      "title": "Login",
+      "subtitle": "A cross-platform virtual tabletop for multiplayer card games."
+    },
+    "footer": {
+      "registerPrompt": "Not registered yet?",
+      "registerAction": "Create an account",
+      "credit": "Cockatrice is an open source project",
+      "version": "Version"
+    },
+    "content": {
+      "subtitle1": "Play multiplayer card games online.",
+      "subtitle2": "Cross-platform virtual tabletop for multiplayer card games. Forever free."
+    },
+    "toasts": {
+      "passwordResetSuccessToast": "Password Reset Successfully",
+      "accountActivationSuccess": "Account Activated Successfully"
+    }
+  }
+}

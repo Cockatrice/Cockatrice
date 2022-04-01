@@ -6,6 +6,10 @@ export default class AuthenticationService {
     SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
   }
 
+  static testConnection(options: WebSocketConnectOptions): void {
+    SessionCommands.connect(options, WebSocketConnectReason.TEST_CONNECTION);
+  }
+
   static register(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.REGISTER);
   }

@@ -1,16 +1,32 @@
 import { reset } from 'redux-form';
 import { Actions } from './server.actions';
 import { store } from 'store';
+import { WebSocketConnectOptions } from 'types';
 
 export const Dispatch = {
+  initialized: () => {
+    store.dispatch(Actions.initialized());
+  },
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
   loginSuccessful: options => {
     store.dispatch(Actions.loginSuccessful(options));
   },
+  loginFailed: () => {
+    store.dispatch(Actions.loginFailed());
+  },
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
+  },
+  connectionFailed: () => {
+    store.dispatch(Actions.connectionFailed());
+  },
+  testConnectionSuccessful: () => {
+    store.dispatch(Actions.testConnectionSuccessful());
+  },
+  testConnectionFailed: () => {
+    store.dispatch(Actions.testConnectionFailed());
   },
   updateBuddyList: buddyList => {
     store.dispatch(Actions.updateBuddyList(buddyList));
@@ -68,6 +84,9 @@ export const Dispatch = {
   registrationRequiresEmail: () => {
     store.dispatch(Actions.registrationRequiresEmail());
   },
+  registrationSuccess: () => {
+    store.dispatch(Actions.registrationSuccess())
+  },
   registrationFailed: (error) => {
     store.dispatch(Actions.registrationFailed(error));
   },
@@ -79,6 +98,15 @@ export const Dispatch = {
   },
   registrationUserNameError: (error) => {
     store.dispatch(Actions.registrationUserNameError(error));
+  },
+  accountAwaitingActivation: (options: WebSocketConnectOptions) => {
+    store.dispatch(Actions.accountAwaitingActivation(options));
+  },
+  accountActivationSuccess: () => {
+    store.dispatch(Actions.accountActivationSuccess());
+  },
+  accountActivationFailed: () => {
+    store.dispatch(Actions.accountActivationFailed());
   },
   resetPassword: () => {
     store.dispatch(Actions.resetPassword());

@@ -5,6 +5,10 @@ import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
 
 export class SessionPersistence {
+  static initialized() {
+    ServerDispatch.initialized();
+  }
+
   static clearStore() {
     ServerDispatch.clearStore();
   }
@@ -13,8 +17,24 @@ export class SessionPersistence {
     ServerDispatch.loginSuccessful(options);
   }
 
+  static loginFailed() {
+    ServerDispatch.loginFailed();
+  }
+
   static connectionClosed(reason: number) {
     ServerDispatch.connectionClosed(reason);
+  }
+
+  static connectionFailed() {
+    ServerDispatch.connectionFailed();
+  }
+
+  static testConnectionSuccessful() {
+    ServerDispatch.testConnectionSuccessful();
+  }
+
+  static testConnectionFailed() {
+    ServerDispatch.testConnectionFailed();
   }
 
   static updateBuddyList(buddyList) {
@@ -77,16 +97,24 @@ export class SessionPersistence {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
 
-  static accountAwaitingActivation() {
-    console.log('Open Modal for Activation Code input');
+  static accountAwaitingActivation(options: WebSocketConnectOptions) {
+    ServerDispatch.accountAwaitingActivation(options);
+  }
+
+  static accountActivationSuccess() {
+    ServerDispatch.accountActivationSuccess();
   }
 
   static accountActivationFailed() {
-    console.log('Account activation failed, show an action here');
+    ServerDispatch.accountActivationFailed();
   }
 
   static registrationRequiresEmail() {
     ServerDispatch.registrationRequiresEmail();
+  }
+
+  static registrationSuccess() {
+    ServerDispatch.registrationSuccess();
   }
 
   static registrationFailed(error: string) {

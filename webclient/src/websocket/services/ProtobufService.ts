@@ -1,9 +1,10 @@
 import protobuf from 'protobufjs';
 
-import ProtoFiles from '../ProtoFiles';
+import { RoomEvents, SessionEvents } from '../events';
+import { SessionPersistence } from '../persistence';
 import { WebClient } from '../WebClient';
 
-import { RoomEvents, SessionEvents } from '../events';
+import ProtoFiles from '../../proto-files.json';
 
 export interface ProtobufEvents {
   [event: string]: Function;
@@ -135,6 +136,8 @@ export class ProtobufService {
       if (err) {
         throw err;
       }
+
+      SessionPersistence.initialized();
     });
   }
 }

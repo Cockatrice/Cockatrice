@@ -4,9 +4,12 @@ import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
+import { SessionPersistence } from '../persistence';
 
 export class WebSocketService {
   private socket: WebSocket;
+  private testSocket: WebSocket;
+
   private webClient: WebClient;
   private keepAliveService: KeepAliveService;
 
@@ -31,10 +34,20 @@ export class WebSocketService {
       protocol = 'ws';
     }
 
-    const { host, port, keepalive } = options;
-    this.keepalive = keepalive;
+    const { host, port } = options;
+    this.keepalive = this.webClient.clientOptions.keepalive;
 
     this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
+  }
+
+  public testConnect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
+    if (window.location.hostname === 'localhost') {
+      protocol = 'ws';
+    }
+
+    const { host, port } = options;
+
+    this.testWebSocket(`${protocol}://${host}:${port}`);
   }
 
   public disconnect(): void {
@@ -60,7 +73,10 @@ export class WebSocketService {
     const socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
 
+    const connectionTimer = setTimeout(() => socket.close(), this.keepalive);
+
     socket.onopen = () => {
+      clearTimeout(connectionTimer);
       this.updateStatus(StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: Function) => {
@@ -79,6 +95,7 @@ export class WebSocketService {
 
     socket.onerror = () => {
       this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
+      SessionPersistence.connectionFailed();
     };
 
     socket.onmessage = (event: MessageEvent) => {
@@ -86,5 +103,33 @@ export class WebSocketService {
     }
 
     return socket;
+  }
+
+  private testWebSocket(url: string): void {
+    if (this.testSocket) {
+      this.testSocket.onerror = null;
+      this.testSocket.close();
+    }
+
+    const socket = new WebSocket(url);
+    socket.binaryType = 'arraybuffer';
+
+    const connectionTimer = setTimeout(() => socket.close(), this.webClient.clientOptions.keepalive);
+
+    socket.onopen = () => {
+      clearTimeout(connectionTimer);
+      SessionPersistence.testConnectionSuccessful();
+      socket.close();
+    };
+
+    socket.onerror = () => {
+      SessionPersistence.testConnectionFailed();
+    };
+
+    socket.onclose = () => {
+      this.testSocket = null;
+    }
+
+    this.testSocket = socket;
   }
 }

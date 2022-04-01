@@ -95,7 +95,7 @@ double Expression::eval(const peg::Ast &ast)
 
 double Expression::parse(const QString &expr)
 {
-    QByteArray ba = expr.toLocal8Bit();
+    QByteArray ba = expr.toUtf8();
 
     math.enable_ast();
 

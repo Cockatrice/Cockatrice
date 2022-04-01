@@ -18,7 +18,7 @@ image_cache="image"
 ccache_cache=".ccache"
 
 # Read arguments
-while [[ "$@" ]]; do
+while [[ $# != 0 ]]; do
   case "$1" in
     '--build')
       BUILD=1
@@ -70,7 +70,7 @@ if ! [[ $CACHE ]]; then
 else
   if ! [[ -d $CACHE ]]; then
     echo "could not find cache dir: $CACHE" >&2
-    mkdir -p $CACHE
+    mkdir -p "$CACHE"
     unset GET # the dir is empty
   fi
   if [[ $GET || $SAVE ]]; then
@@ -133,11 +133,11 @@ function RUN ()
 {
   echo "running image:"
   if docker images | grep "$IMAGE_NAME"; then
-    args="--mount type=bind,source=$PWD,target=/src -w=/src"
+    args=(--mount "type=bind,source=$PWD,target=/src" -w="/src")
     if [[ $CCACHE_DIR ]]; then
-      args+=" --mount type=bind,source=$CCACHE_DIR,target=/.ccache -e CCACHE_DIR=/.ccache"
+      args+=(--mount "type=bind,source=$CCACHE_DIR,target=/.ccache" -e "CCACHE_DIR=/.ccache")
     fi
-    docker run $args $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS $@
+    docker run "${args[@]}" $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS "$@"
     return $?
   else
     echo "could not find docker image: $IMAGE_NAME" >&2
