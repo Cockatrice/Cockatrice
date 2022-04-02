@@ -1861,6 +1861,7 @@ WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_serv
                                                                QObject *parent)
     : AbstractServerSocketInterface(_server, _databaseInterface, parent)
 {
+    connect(_server, &Servatrice::destroyed, this, [=]() {this->servatrice = nullptr;});
 }
 
 WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
@@ -1969,7 +1970,9 @@ void WebsocketServerSocketInterface::flushOutputQueue()
         locker.relock();
     }
     locker.unlock();
-    servatrice->incTxBytes(totalBytes);
+    if (servatrice) {
+        servatrice->incTxBytes(totalBytes);
+    }
     // see above wrt mutex
     flushSocket();
 }
