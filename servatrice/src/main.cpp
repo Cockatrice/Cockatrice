@@ -69,7 +69,7 @@ void testRNG()
     }
     for (int i = 0; i <= maxMax - min; ++i) {
         std::cerr << (min + i);
-        for (auto & number : numbers) {
+        for (auto &number : numbers) {
             if (i < number.size())
                 std::cerr << "\t" << number[i];
             else

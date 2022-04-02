@@ -1861,7 +1861,7 @@ WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_serv
                                                                QObject *parent)
     : AbstractServerSocketInterface(_server, _databaseInterface, parent)
 {
-    connect(_server, &Servatrice::destroyed, this, [=]() {this->servatrice = nullptr;});
+    connect(_server, &Servatrice::destroyed, this, [=]() { this->servatrice = nullptr; });
 }
 
 WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
