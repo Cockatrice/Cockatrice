@@ -90,6 +90,7 @@ AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
     // deadlocks etc.
     connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
+    connect(_server, &Servatrice::destroyed, this, [=]() { this->servatrice = nullptr; });
 }
 
 bool AbstractServerSocketInterface::initSession()
@@ -1765,7 +1766,9 @@ void TcpServerSocketInterface::flushOutputQueue()
         locker.relock();
     }
     locker.unlock();
-    servatrice->incTxBytes(totalBytes);
+    if (servatrice) {
+        servatrice->incTxBytes(totalBytes);
+    }
     // see above wrt mutex
     flushSocket();
 }
@@ -1859,9 +1862,8 @@ bool TcpServerSocketInterface::initTcpSession()
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
                                                                Servatrice_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
-    : AbstractServerSocketInterface(_server, _databaseInterface, parent)
+    : AbstractServerSocketInterface(_server, _databaseInterface, parent), socket(nullptr)
 {
-    connect(_server, &Servatrice::destroyed, this, [=]() { this->servatrice = nullptr; });
 }
 
 WebsocketServerSocketInterface::~WebsocketServerSocketInterface()

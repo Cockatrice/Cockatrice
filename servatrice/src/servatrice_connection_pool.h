@@ -17,8 +17,8 @@ private:
     int clientCount;
 
 public:
-    Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface);
-    ~Servatrice_ConnectionPool();
+    explicit Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface);
+    ~Servatrice_ConnectionPool() override;
 
     Servatrice_DatabaseInterface *getDatabaseInterface() const
     {
