@@ -197,7 +197,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 
 Servatrice::Servatrice(QObject *parent)
     : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), txBytes(0), rxBytes(0),
-      shutdownTimer(nullptr), isFirstShutdownMessage(true)
+      shutdownTimer(nullptr)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -551,7 +551,7 @@ void Servatrice::updateLoginMessage()
         }
 }
 
-void Servatrice::setRequiredFeatures(const QString featureList)
+void Servatrice::setRequiredFeatures(const QString& featureList)
 {
     FeatureSet features;
     serverRequiredFeatureList.clear();
