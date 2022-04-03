@@ -201,7 +201,7 @@ private:
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
-    void setRequiredFeatures(const QString& featureList);
+    void setRequiredFeatures(const QString &featureList);
 
 public:
     explicit Servatrice(QObject *parent = nullptr);
