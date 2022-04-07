@@ -551,7 +551,7 @@ void Servatrice::updateLoginMessage()
         }
 }
 
-void Servatrice::setRequiredFeatures(const QString& featureList)
+void Servatrice::setRequiredFeatures(const QString &featureList)
 {
     FeatureSet features;
     serverRequiredFeatureList.clear();
