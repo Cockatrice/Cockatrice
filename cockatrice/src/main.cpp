@@ -67,16 +67,26 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().getLang();
 
-    const auto loadOk0 = qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    if (!loadOk0) {
-        qDebug() << "Unable to load";
+    const auto fileName0 = "qt_" + lang;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    const auto dir0 = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+#else
+    const auto dir0 = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#endif
+
+    const auto fileLoaded0 = qtTranslator->load(fileName0, dir0);
+    if (!fileLoaded0) {
+        qWarning() << "Unable to load file" << dir0 + fileName0;
     }
     qApp->installTranslator(qtTranslator);
-    const auto loadOk1 = translator->load(translationPrefix + "_" + lang, translationPath);
-    if (!loadOk1) {
-        qDebug() << "Error";
+
+    const auto fileName1 = translationPrefix + "_" + lang;
+    const auto fileLoaded1 = translator->load(fileName1, translationPath);
+    if (!fileLoaded1) {
+        qWarning() << "Unable to load translation file" << translationPath + fileName1;
     }
     qApp->installTranslator(translator);
+
     qDebug() << "Language changed:" << lang;
 }
 
@@ -171,7 +181,9 @@ int main(int argc, char *argv[])
     ui.show();
     qDebug("main(): ui.show() finished");
 
-    // app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
     app.exec();
 
     qDebug("Event loop finished, terminating...");

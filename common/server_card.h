@@ -28,7 +28,6 @@
 #include <QString>
 
 class Server_CardZone;
-// class ServerInfo_Card;
 
 class Server_Card : public Server_ArrowTarget
 {

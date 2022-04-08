@@ -163,7 +163,6 @@ void UserInfoBox::updateInfo(const QString &userName)
     cmd.set_user_name(userName.toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
             SLOT(processResponse(const Response &)));
 

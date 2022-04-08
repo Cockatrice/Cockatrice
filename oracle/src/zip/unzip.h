@@ -39,7 +39,6 @@ class QDir;
 class QFile;
 class QIODevice;
 class QString;
-// class QStringList;
 
 OSDAB_BEGIN_NAMESPACE(Zip)
 

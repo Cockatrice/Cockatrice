@@ -178,9 +178,10 @@ QStringList IntroPage::findQmFiles()
 QString IntroPage::languageName(const QString &qmFile)
 {
     QTranslator qTranslator;
-    const auto okLoad1 = qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
-    if (!okLoad1) {
-        qDebug() << "Unable to load this";
+    const auto fileName = translationPrefix + "_" + qmFile + ".qm";
+    const auto fileLoaded = qTranslator.load(fileName, translationPath);
+    if (!fileLoaded) {
+        qWarning() << "Unable to load translation file" << translationPath + fileName;
     }
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }

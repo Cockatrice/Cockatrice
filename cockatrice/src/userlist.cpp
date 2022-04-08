@@ -296,7 +296,11 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            static_cast<UserList *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
+#else
             static_cast<UserList *>(parent())->showContextMenu(mouseEvent->globalPos(), index);
+#endif
             return true;
         }
     }

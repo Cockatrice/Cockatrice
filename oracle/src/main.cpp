@@ -22,14 +22,24 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().getLang();
 
-    const auto okLoad1 = qtTranslator->load("qt_" + lang, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    if (!okLoad1) {
-        qDebug() << "Error Loading";
+    const auto fileName1 = "qt_" + lang;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    const auto dir = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+#else
+    const auto dir = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#endif
+
+    const auto fileLoaded1 = qtTranslator->load(fileName1, dir);
+    if (!fileLoaded1) {
+        qWarning() << "Unable to load translation file" << dir + fileName1;
     }
+
     qApp->installTranslator(qtTranslator);
-    const auto okLoad2 = translator->load(translationPrefix + "_" + lang, translationPath);
-    if (!okLoad2) {
-        qDebug() << "Error Loading 2";
+
+    const auto fileName2 = translationPrefix + "_" + lang;
+    const auto fileLoaded2 = qtTranslator->load(fileName2, translationPath);
+    if (!fileLoaded2) {
+        qWarning() << "Unable to load translation file" << translationPath + fileName2;
     }
     qApp->installTranslator(translator);
 }

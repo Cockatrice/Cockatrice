@@ -17,7 +17,11 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
-//#include <QDesktopWidget>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+#include <QScreen>
+#else
+#include <QDesktopWidget>
+#endif
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -194,10 +198,13 @@ QStringList GeneralSettingsPage::findQmFiles()
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
     QTranslator qTranslator;
-    const auto ok = qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
-    if (!ok) {
-        qDebug() << "Unable to load";
+
+    const auto fileName = translationPrefix + "_" + qmFile + ".qm";
+    const auto fileLoaded = qTranslator.load(fileName, translationPath);
+    if (!fileLoaded) {
+        qWarning() << "Unable to load translation file" << translationPath + fileName;
     }
+
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 

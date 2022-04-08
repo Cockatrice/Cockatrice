@@ -41,8 +41,14 @@ RemoteClient::RemoteClient(QObject *parent)
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
-    connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    connect(socket, &QTcpSocket::errorOccurred, this, &RemoteClient::slotSocketError);
+#else
+    // connect(socket, &QTcpSocket::error, this, &RemoteClient::slotSocketError);
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(slotSocketError(QAbstractSocket::SocketError)));
+#endif
 
     websocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
     connect(websocket, &QWebSocket::binaryMessageReceived, this, &RemoteClient::websocketMessageReceived);
