@@ -41,11 +41,28 @@ if(APPLE)
     set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-# Qt5
-find_package(Qt5 COMPONENTS Network Sql WebSockets REQUIRED)
-set(SERVATRICE_QT_MODULES Qt5::Core Qt5::Network Qt5::Sql Qt5::WebSockets)
+# Detect Qt6 then Qt5, unless user forces Qt5
+IF(NOT FORCE_USE_QT5)
+    FIND_PACKAGE(Qt6 COMPONENTS Core Network Sql WebSockets Core5Compat)
+ENDIF()
+IF(Qt6_FOUND)
+    SET(QT_VERSION_MAJOR Qt6)
+ELSE()
+    SET(QT_VERSION_MAJOR Qt5)
+    FIND_PACKAGE(Qt5 COMPONENTS Core Network Sql WebSockets REQUIRED)
+ENDIF()
 
-QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
+LIST(APPEND SERVATRICE_QT_MODULES ${QT_VERSION_MAJOR}::Core ${QT_VERSION_MAJOR}::Network ${QT_VERSION_MAJOR}::Sql ${QT_VERSION_MAJOR}::WebSockets)
+IF (Qt6_FOUND)
+    LIST(APPEND SERVATRICE_QT_MODULES ${QT_VERSION_MAJOR}::Core5Compat)
+ENDIF()
+
+IF(Qt6_FOUND)
+    Qt6_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
+ELSEIF(Qt5_FOUND)
+    Qt5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
+ENDIF()
+
 SET(QT_DONT_USE_QTGUI TRUE)
 
 # Mysql connector
@@ -84,7 +101,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOURCES_RCC} ${servatrice_MOC_SRCS})
 
 if(MSVC)
-    TARGET_LINK_LIBRARIES(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} Qt5::WinMain)
+    TARGET_LINK_LIBRARIES(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} ${QT_VERSION_MAJOR}::WinMain)
 elseif(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY})
 else()
@@ -126,7 +143,7 @@ if(APPLE)
     set(qtconf_dest_dir servatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -157,7 +174,7 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING REGEX "(platforms/.*|sqldrivers/qsqlmysql)\\.dll"
         REGEX ".*d\\.dll" EXCLUDE)

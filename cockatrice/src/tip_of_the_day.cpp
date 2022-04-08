@@ -36,7 +36,7 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
             break;
         }
 
-        if (reader.name() == "tip") {
+        if (reader.name().toString() == "tip") {
             QString title, content, imagePath;
             QDate date;
             reader.readNext();
@@ -45,13 +45,13 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
                     break;
                 }
 
-                if (reader.name() == "title") {
+                if (reader.name().toString() == "title") {
                     title = reader.readElementText();
-                } else if (reader.name() == "text") {
+                } else if (reader.name().toString() == "text") {
                     content = reader.readElementText();
-                } else if (reader.name() == "image") {
+                } else if (reader.name().toString() == "image") {
                     imagePath = "theme:tips/images/" + reader.readElementText();
-                } else if (reader.name() == "date") {
+                } else if (reader.name().toString() == "date") {
                     date = QDate::fromString(reader.readElementText(), Qt::ISODate);
                 } else {
                     // unkown element, do nothing

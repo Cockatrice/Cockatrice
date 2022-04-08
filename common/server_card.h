@@ -21,13 +21,14 @@
 #define SERVER_CARD_H
 
 #include "pb/card_attributes.pb.h"
+#include "pb/serverinfo_card.pb.h"
 #include "server_arrowtarget.h"
 
 #include <QMap>
 #include <QString>
 
 class Server_CardZone;
-class ServerInfo_Card;
+// class ServerInfo_Card;
 
 class Server_Card : public Server_ArrowTarget
 {

@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QMap>
+#include <QMediaPlayer>
 #include <QObject>
 #include <QString>
 
@@ -21,10 +22,15 @@ public:
     QStringMap &getAvailableThemes();
 
 private:
-    QMap<QString, QByteArray> audioData;
-    QBuffer *inputBuffer;
-    QAudioOutput *player;
     QStringMap availableThemes;
+    QBuffer *inputBuffer;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    QMap<QString, QString> audioData;
+    QMediaPlayer *player;
+#else
+    QMap<QString, QByteArray> audioData;
+    QAudioOutput *player;
+#endif
 
 protected:
     void ensureThemeDirectoryExists();

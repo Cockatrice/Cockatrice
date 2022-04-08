@@ -52,6 +52,8 @@ AbstractClient::AbstractClient(QObject *parent)
     FeatureSet features;
     features.initalizeFeatureList(clientFeatures);
 
+    qRegisterMetaType<PendingCommand *>("pendingCommand");
+
     connect(this, SIGNAL(sigQueuePendingCommand(PendingCommand *)), this, SLOT(queuePendingCommand(PendingCommand *)));
 }
 

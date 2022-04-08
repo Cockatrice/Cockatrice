@@ -101,8 +101,8 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
             if (event.has_end_time())
-                reasonStr.append("\n" +
-                                 tr("Expected end time: %1").arg(QDateTime::fromTime_t(event.end_time()).toString()));
+                reasonStr.append(
+                    "\n" + tr("Expected end time: %1").arg(QDateTime::fromSecsSinceEpoch(event.end_time()).toString()));
             else
                 reasonStr.append("\n" + tr("This ban lasts indefinitely."));
             if (event.has_reason_str())
@@ -393,7 +393,7 @@ void MainWindow::loginError(Response::ResponseCode r,
         case Response::RespUserIsBanned: {
             QString bannedStr;
             if (endTime)
-                bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
+                bannedStr = tr("You are banned until %1.").arg(QDateTime::fromSecsSinceEpoch(endTime).toString());
             else
                 bannedStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
@@ -530,7 +530,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
         case Response::RespUserIsBanned: {
             QString bannedStr;
             if (endTime)
-                bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
+                bannedStr = tr("You are banned until %1.").arg(QDateTime::fromSecsSinceEpoch(endTime).toString());
             else
                 bannedStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
@@ -865,13 +865,13 @@ void MainWindow::startupConfigCheck()
         if (SettingsCache::instance().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         } else {
-            QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+            const auto reloadOk0 = QtConcurrent::run([] { db->loadCardDatabases(); });
         }
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qDebug() << "Startup: found config with current version";
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+        const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
@@ -932,7 +932,8 @@ void MainWindow::createTrayIcon()
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::DoubleClick) {
-        if (windowState() != Qt::WindowMinimized && windowState() != Qt::WindowMinimized + Qt::WindowMaximized)
+        if (windowState() != Qt::WindowMinimized &&
+            windowState() != ((int)Qt::WindowMinimized + (int)Qt::WindowMaximized))
             showMinimized();
         else {
             showNormal();
@@ -1058,7 +1059,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
     if (msgBox.clickedButton() == yesButton) {
         db->enableAllUnknownSets();
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+        const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
     } else if (msgBox.clickedButton() == noButton) {
         db->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
@@ -1086,7 +1087,7 @@ void MainWindow::actCheckCardUpdates()
     }
 
     cardUpdateProcess = new QProcess(this);
-    connect(cardUpdateProcess, SIGNAL(error(QProcess::ProcessError)), this,
+    connect(cardUpdateProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this,
             SLOT(cardUpdateError(QProcess::ProcessError)));
     connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
@@ -1148,7 +1149,7 @@ void MainWindow::exitCardDatabaseUpdate()
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
 
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1278,7 +1279,7 @@ void MainWindow::actAddCustomSet()
         QMessageBox::information(
             this, tr("Load sets/cards"),
             tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+        const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
     } else {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
     }

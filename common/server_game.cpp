@@ -126,7 +126,7 @@ void Server_Game::storeGameInformation()
     ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
     replayMatchInfo->set_game_id(gameInfo.game_id());
     replayMatchInfo->set_room_name(room->getName().toStdString());
-    replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
+    replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toSecsSinceEpoch());
     replayMatchInfo->set_length(secondsElapsed);
     replayMatchInfo->set_game_name(gameInfo.description());
 
@@ -769,6 +769,6 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_spectators_can_chat(spectatorsCanTalk);
         result.set_spectators_omniscient(spectatorsSeeEverything);
         result.set_spectators_count(getSpectatorCount());
-        result.set_start_time(startTime.toTime_t());
+        result.set_start_time(startTime.toSecsSinceEpoch());
     }
 }

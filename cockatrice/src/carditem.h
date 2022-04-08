@@ -2,6 +2,7 @@
 #define CARDITEM_H
 
 #include "abstractcarditem.h"
+#include "server_card.h"
 
 class CardDatabase;
 class CardDragItem;

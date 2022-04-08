@@ -321,7 +321,7 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
 
 void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString &userName, UserLevelFlags userLevel)
 {
-    const QRegExp notALetterOrNumber = QRegExp("[^a-zA-Z0-9]");
+    const auto notALetterOrNumber = QRegularExpression("[^a-zA-Z0-9]");
 
     int firstSpace = message.indexOf(' ');
     QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
@@ -510,10 +510,17 @@ void ChatView::redactMessages(const QString &userName, int amount)
     }
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void ChatView::enterEvent(QEnterEvent * /*event*/)
+{
+    setMouseTracking(true);
+}
+#else
 void ChatView::enterEvent(QEvent * /*event*/)
 {
     setMouseTracking(true);
 }
+#endif
 
 void ChatView::leaveEvent(QEvent * /*event*/)
 {

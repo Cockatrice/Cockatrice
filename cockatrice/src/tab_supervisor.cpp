@@ -58,11 +58,19 @@ QSize CloseButton::sizeHint() const
     return QSize(width, height);
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void CloseButton::enterEvent(QEnterEvent *event)
+{
+    update();
+    QAbstractButton::enterEvent(event);
+}
+#else
 void CloseButton::enterEvent(QEvent *event)
 {
     update();
     QAbstractButton::enterEvent(event);
 }
+#endif
 
 void CloseButton::leaveEvent(QEvent *event)
 {
@@ -74,7 +82,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 {
     QPainter p(this);
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this);
     opt.state |= QStyle::State_AutoRaise;
     if (isEnabled() && underMouse() && !isChecked() && !isDown())
         opt.state |= QStyle::State_Raised;

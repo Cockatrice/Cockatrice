@@ -489,7 +489,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             Response_Login *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             if (banSecondsLeft != 0)
-                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toTime_t());
+                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toSecsSinceEpoch());
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
         }

@@ -17,7 +17,7 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -186,7 +186,7 @@ QStringList GeneralSettingsPage::findQmFiles()
 {
     QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
+    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
     fileNames.removeOne("en@source");
     return fileNames;
 }
@@ -194,7 +194,10 @@ QStringList GeneralSettingsPage::findQmFiles()
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
     QTranslator qTranslator;
-    qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    const auto ok = qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    if (!ok) {
+        qDebug() << "Unable to load";
+    }
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 

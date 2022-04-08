@@ -114,7 +114,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         emit spoilerCheckerDone();
     } else {
         if (trayIcon) {
-            trayIcon->showMessage(tr("Spoilers download failed"), tr("Error") + " " + errorCode);
+            trayIcon->showMessage(tr("Spoilers download failed"), tr("Error") + " " + (short)errorCode);
         }
 
         qDebug() << "Spoiler download failed with reason" << errorCode;
@@ -159,7 +159,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     // Data written, so reload the card database
     qDebug() << "Spoiler Service Data Written";
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    const auto reloadOk = QtConcurrent::run([] { db->loadCardDatabases(); });
 
     // If the user has notifications enabled, let them know
     // when the database was last updated

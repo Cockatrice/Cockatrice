@@ -3,19 +3,26 @@
 #include "settingscache.h"
 
 #include <QApplication>
+#include <QAudioFormat>
 #include <QAudioOutput>
 #include <QBuffer>
-#include <QDebug>
 #include <QFileInfo>
-#include <QLibraryInfo>
 #include <QStandardPaths>
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QAudioDevice>
+#include <QMediaPlayer>
+#endif
 
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
 
 SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(0)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    inputBuffer = new QBuffer();
+#else
     inputBuffer = new QBuffer(this);
+#endif
 
     ensureThemeDirectoryExists();
     connect(&SettingsCache::instance(), SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
@@ -40,6 +47,11 @@ void SoundEngine::soundEnabledChanged()
     if (SettingsCache::instance().getSoundEnabled()) {
         qDebug("SoundEngine: enabling sound");
         if (!player) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            player = new QMediaPlayer;
+            auto qAudioOutput = new QAudioOutput;
+            player->setAudioOutput(qAudioOutput);
+#else
             QAudioFormat format;
             format.setSampleRate(44100);
             format.setChannelCount(1);
@@ -48,6 +60,7 @@ void SoundEngine::soundEnabledChanged()
             format.setByteOrder(QAudioFormat::LittleEndian);
             format.setSampleType(QAudioFormat::SignedInt);
             player = new QAudioOutput(format, this);
+#endif
         }
     } else {
         qDebug("SoundEngine: disabling sound");
@@ -61,18 +74,33 @@ void SoundEngine::soundEnabledChanged()
 
 void SoundEngine::playSound(QString fileName)
 {
-    if (!player)
+    if (!player) {
         return;
+    }
 
     // still playing the previous sound?
-    if (player->state() == QAudio::ActiveState)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    if (player->playbackState() == QMediaPlayer::PlaybackState::PlayingState) {
         return;
+    }
+#else
+    if (player->state() == QAudio::ActiveState) {
+        return;
+    }
+#endif
 
-    if (!audioData.contains(fileName))
+    if (!audioData.contains(fileName)) {
         return;
+    }
 
     qDebug() << "playing" << fileName;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    player->audioOutput()->setVolume(SettingsCache::instance().getMasterVolume() / 100.0);
+    player->stop();
+    player->setSource(QUrl::fromLocalFile(audioData[fileName]));
+    player->play();
+#else
     inputBuffer->close();
     inputBuffer->setData(audioData[fileName]);
     inputBuffer->open(QIODevice::ReadOnly);
@@ -80,6 +108,7 @@ void SoundEngine::playSound(QString fileName)
     player->setVolume(SettingsCache::instance().getMasterVolume() / 100.0);
     player->stop();
     player->start(inputBuffer);
+#endif
 }
 
 void SoundEngine::testSound()
@@ -105,7 +134,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
     dir.setPath(SettingsCache::instance().getDataPath() + "/sounds");
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+    for (const QString &themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
@@ -121,7 +150,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 #endif
     );
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+    for (const QString &themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
@@ -181,10 +210,14 @@ void SoundEngine::themeChangedSlot()
             continue;
 
         QFile file(dir.filePath(fileNames[i] + ".wav"));
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+        audioData.insert(fileNames[i], file.fileName());
+#else
         file.open(QIODevice::ReadOnly);
         // 44 = length of wav header
         audioData.insert(fileNames[i], file.readAll().mid(44));
         file.close();
+#endif
     }
 
     soundEnabledChanged();

@@ -49,7 +49,7 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
 endif()
 
 # Use c++11 for all targets
-set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ ISO Standard")
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set conventional loops
@@ -123,6 +123,10 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
         set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
     endif()
 
+    IF(APPLE)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+    ENDIF()
+
     set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=missing-declarations)
 
     FOREACH(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -165,23 +169,32 @@ elseif(DEFINED ENV{QTDIR})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
 
-FIND_PACKAGE(Qt5Core 5.5.0 REQUIRED)
+# Detect Qt6 then Qt5, unless user forces Qt5
+# This is the ONLY place the versions of Qt are specified
+IF(NOT FORCE_USE_QT5)
+    FIND_PACKAGE(Qt6 6.2.3 COMPONENTS Concurrent Network Svg Widgets LinguistTools Core5Compat Gui Websockets)
+ENDIF()
+IF(Qt6_FOUND)
+    SET(QT_VERSION_MAJOR Qt6)
+ELSE()
+    SET(QT_VERSION_MAJOR Qt5)
+    FIND_PACKAGE(Qt5 5.5.0 COMPONENTS Concurrent Network Svg Widgets LinguistTools REQUIRED)
+ENDIF()
 
-IF(Qt5Core_FOUND)
-    MESSAGE(STATUS "Found Qt ${Qt5Core_VERSION_STRING}")
+IF(${QT_VERSION_MAJOR}_FOUND)
+    MESSAGE(STATUS "Found Qt ${${QT_VERSION_MAJOR}_VERSION}")
 
     # FIX: Qt was built with -reduce-relocations
-    if (Qt5_POSITION_INDEPENDENT_CODE)
+    if (${QT_VERSION_MAJOR}_POSITION_INDEPENDENT_CODE)
         SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
     endif()
 
     # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${Qt5Core_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
+    set(QT_PLUGINS_DIR "${${QT_VERSION_MAJOR}Core_DIR}/../../../plugins")
+    get_target_property(QT_LIBRARY_DIR ${QT_VERSION_MAJOR}::Core LOCATION)
     get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
-
 ELSE()
-    MESSAGE(FATAL_ERROR "No Qt5 found!")
+    MESSAGE(FATAL_ERROR "${QT_VERSION_MAJOR} was not found!")
 ENDIF()
 
 # Check for translation updates
@@ -209,7 +222,7 @@ IF(MSVC)
 ENDIF()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Zach Halpern <zahalpern+github@gmail.com>")
+set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
@@ -231,7 +244,11 @@ if(UNIX)
         # linux
         IF(CPACK_GENERATOR STREQUAL "RPM")
             set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-            set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
+            IF(QT6_FOUND)
+                SET(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia")
+            ELSEIF(Qt5_FOUND)
+                SET(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
+            ENDIF()
             set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
             set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
         ELSE()
@@ -239,7 +256,11 @@ if(UNIX)
             set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
             set(CPACK_DEBIAN_PACKAGE_SECTION "games")
             set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-            set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
+            IF(QT6_FOUND)
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6")
+            ELSEIF(Qt5_FOUND)
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
+            ENDIF()
         ENDIF()
     endif()
 elseif(WIN32)

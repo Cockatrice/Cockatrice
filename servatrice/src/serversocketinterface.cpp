@@ -389,7 +389,7 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId, ServerInfo_Deck
         newItem->set_name(query->value(1).toString().toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
-        newFile->set_creation_time(query->value(2).toDateTime().toTime_t());
+        newFile->set_creation_time(query->value(2).toDateTime().toSecsSinceEpoch());
     }
 
     return true;
@@ -552,7 +552,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
         fileInfo->set_id(query->lastInsertId().toInt());
         fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
+        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
         rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
         QSqlQuery *query =
@@ -571,7 +571,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
         fileInfo->set_id(cmd.deck_id());
         fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toTime_t());
+        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
         rc.setResponseExtension(re);
     } else
         return Response::RespInvalidData;
@@ -620,8 +620,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayList(const Comman
         const int gameId = query1->value(0).toInt();
         matchInfo->set_game_id(gameId);
         matchInfo->set_room_name(query1->value(2).toString().toStdString());
-        const int timeStarted = query1->value(3).toDateTime().toTime_t();
-        const int timeFinished = query1->value(4).toDateTime().toTime_t();
+        const int timeStarted = query1->value(3).toDateTime().toSecsSinceEpoch();
+        const int timeFinished = query1->value(4).toDateTime().toSecsSinceEpoch();
         matchInfo->set_time_started(timeStarted);
         matchInfo->set_length(timeFinished - timeStarted);
         matchInfo->set_game_name(query1->value(5).toString().toStdString());
@@ -978,7 +978,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         if (cmd.has_visible_reason())
             event.set_reason_str(visibleReason.toStdString());
         if (minutes)
-            event.set_end_time(QDateTime::currentDateTime().addSecs(60 * minutes).toTime_t());
+            event.set_end_time(QDateTime::currentDateTime().addSecs(60 * minutes).toSecsSinceEpoch());
         for (int i = 0; i < userList.size(); ++i) {
             SessionEvent *se = userList[i]->prepareSessionEvent(event);
             userList[i]->sendProtocolItem(*se);
@@ -1149,7 +1149,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         Response_Register *re = new Response_Register;
         re->set_denied_reason_str(banReason.toStdString());
         if (banSecondsRemaining != 0)
-            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toTime_t());
+            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toSecsSinceEpoch());
         rc.setResponseExtension(re);
         return Response::RespUserIsBanned;
     }
@@ -1650,7 +1650,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::DEMOTED);
         event.set_reason_str("Your moderator and/or judge status has been revoked.");
-        event.set_end_time(QDateTime::currentDateTime().toTime_t());
+        event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
 
         SessionEvent *se = user->prepareSessionEvent(event);
         user->sendProtocolItem(*se);

@@ -562,8 +562,9 @@ void Servatrice::setRequiredFeatures(const QString &featureList)
     QStringList listReqFeatures = featureList.split(",", QString::SkipEmptyParts);
 #endif
     if (!listReqFeatures.isEmpty())
-        foreach (QString reqFeature, listReqFeatures)
+        for (const QString &reqFeature : listReqFeatures) {
             features.enableRequiredFeature(serverRequiredFeatureList, reqFeature);
+        }
 
     qDebug() << "Set required client features to:" << serverRequiredFeatureList;
 }

@@ -170,7 +170,7 @@ QStringList IntroPage::findQmFiles()
 {
     QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
+    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
     fileNames.removeOne("en@source");
     return fileNames;
 }
@@ -178,7 +178,10 @@ QStringList IntroPage::findQmFiles()
 QString IntroPage::languageName(const QString &qmFile)
 {
     QTranslator qTranslator;
-    qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    const auto okLoad1 = qTranslator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
+    if (!okLoad1) {
+        qDebug() << "Unable to load this";
+    }
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
@@ -455,7 +458,8 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
             return;
         }
 
-        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        future = QtConcurrent::run(
+            [this, &outBuffer] { return wizard()->importer->readSetsFromByteArray(outBuffer->data()); });
         watcher.setFuture(future);
         return;
 #else
@@ -496,7 +500,8 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
             return;
         }
 
-        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        future = QtConcurrent::run(
+            [this, &outBuffer] { return wizard()->importer->readSetsFromByteArray(outBuffer->data()); });
         watcher.setFuture(future);
         return;
 #else
@@ -510,7 +515,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 #endif
     }
     // Start the computation.
-    future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, data);
+    future = QtConcurrent::run([this, &data] { return wizard()->importer->readSetsFromByteArray(data); });
     watcher.setFuture(future);
 }
 

@@ -52,30 +52,55 @@ if(APPLE)
     set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-# Qt5
-find_package(Qt5 COMPONENTS Concurrent Network Svg Widgets REQUIRED)
-set(ORACLE_QT_MODULES Qt5::Concurrent Qt5::Network Qt5::Svg Qt5::Widgets)
+IF(NOT FORCE_USE_QT5)
+    FIND_PACKAGE(Qt6 COMPONENTS Concurrent LinguistTools Network Svg Widgets Core5Compat)
+ENDIF()
+IF(Qt6_FOUND)
+    SET(QT_VERSION_MAJOR Qt6)
+ELSE()
+    SET(QT_VERSION_MAJOR Qt5)
+    FIND_PACKAGE(Qt5 COMPONENTS Concurrent LinguistTools Network Svg Widgets REQUIRED)
+ENDIF()
 
-# Qt5LinguistTools
-find_package(Qt5LinguistTools)
-if(Qt5LinguistTools_FOUND)
-    list(APPEND ORACLE_LIBS Qt5::LinguistTools)
 
-    if(NOT Qt5_LRELEASE_EXECUTABLE)
-        MESSAGE(WARNING "Qt's lrelease not found.")
-    endif()
+LIST(APPEND ORACLE_QT_MODULES ${QT_VERSION_MAJOR}::Concurrent ${QT_VERSION_MAJOR}::Network ${QT_VERSION_MAJOR}::Svg ${QT_VERSION_MAJOR}::Widgets)
+IF(Qt6_FOUND)
+    LIST(APPEND ORACLE_QT_MODULES ${QT_VERSION_MAJOR}::Core5Compat)
+ENDIF()
 
-    if(UPDATE_TRANSLATIONS)
-        if(NOT Qt5_LUPDATE_EXECUTABLE)
-            MESSAGE(WARNING "Qt's lupdate not found.")
-        endif()
-        QT5_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
-    else()
-        QT5_ADD_TRANSLATION(oracle_QM ${oracle_TS})
-    endif()
-endif()
+# Optional Qt LinguistTools
+FIND_PACKAGE(${QT_VERSION_MAJOR} COMPONENTS LinguistTools)
+IF(${QT_VERSION_MAJOR}LinguistTools_FOUND)
+    LIST(APPEND ORACLE_LIBS ${QT_VERSION_MAJOR}::LinguistTools)
 
-QT5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
+    IF(NOT ${QT_VERSION_MAJOR}_LRELEASE_EXECUTABLE)
+        MESSAGE(WARNING "${QT_VERSION_MAJOR} lrelease not found.")
+    ENDIF()
+
+    IF(UPDATE_TRANSLATIONS)
+        IF(NOT ${QT_VERSION_MAJOR}_LUPDATE_EXECUTABLE)
+            MESSAGE(WARNING "${QT_VERSION_MAJOR} lupdate not found.")
+        ENDIF()
+
+        IF(Qt6_FOUND)
+            Qt6_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
+        ELSEIF(Qt5_FOUND)
+            Qt5_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
+        ENDIF()
+    ELSE()
+        IF(Qt6_FOUND)
+            Qt6_ADD_TRANSLATION(oracle_QM ${oracle_TS})
+        ELSEIF(Qt5_FOUND)
+            Qt5_ADD_TRANSLATION(oracle_QM ${oracle_TS})
+        ENDIF()
+    ENDIF()
+ENDIF()
+
+IF(Qt6_FOUND)
+    Qt6_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
+ELSEIF(Qt5_FOUND)
+    Qt5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
+ENDIF()
 
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
@@ -152,7 +177,7 @@ if(APPLE)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: iconengines, platforms
+    # Qt plugins: iconengines, platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -185,7 +210,7 @@ IF(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: iconengines, platforms
+    # Qt plugins: iconengines, platforms
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING REGEX "(iconengines|platforms|styles)/.*[^d]\\.dll")

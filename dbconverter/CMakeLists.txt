@@ -13,21 +13,37 @@ SET(dbconverter_SOURCES
     ${VERSION_STRING_CPP}
 )
 
-# Qt5
-find_package(Qt5 COMPONENTS Network Widgets REQUIRED)
-set(dbconverter_QT_MODULES Qt5::Core Qt5::Network Qt5::Widgets)
+# Detect Qt6 then Qt5, unless user forces Qt5
+IF(NOT FORCE_USE_QT5)
+    FIND_PACKAGE(Qt6 COMPONENTS Core Network Widgets)
+ENDIF()
+IF(Qt6_FOUND)
+    SET(QT_VERSION_MAJOR Qt6)
+ELSE()
+    SET(QT_VERSION_MAJOR Qt5)
+    FIND_PACKAGE(Qt5 COMPONENTS Core Network Widgets REQUIRED)
+ENDIF()
+
+LIST(APPEND dbconverter_QT_MODULES ${QT_VERSION_MAJOR}::Core ${QT_VERSION_MAJOR}::Network ${QT_VERSION_MAJOR}::Widgets )
 SET(QT_DONT_USE_QTGUI TRUE)
 
-QT5_WRAP_CPP(dbconverter_SOURCES
-    ../cockatrice/src/settingscache.h
-    ../cockatrice/src/settings/carddatabasesettings.h
-)
+IF(Qt6_FOUND)
+    Qt6_WRAP_CPP(dbconverter_SOURCES
+        ../cockatrice/src/settingscache.h
+        ../cockatrice/src/settings/carddatabasesettings.h
+    )
+ELSEIF(Qt5_FOUND)
+    Qt5_WRAP_CPP(dbconverter_SOURCES
+            ../cockatrice/src/settingscache.h
+            ../cockatrice/src/settings/carddatabasesettings.h
+            )
+ENDIF()
 
 # Build servatrice binary and link it
 ADD_EXECUTABLE(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES} ${dbconverter_MOC_SRCS})
 
 if(MSVC)
-    TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES} Qt5::WinMain)
+    TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES} ${QT_VERSION_MAJOR}::WinMain)
 else()
     TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES})
 endif()
@@ -57,7 +73,7 @@ if(APPLE)
     set(qtconf_dest_dir dbconverter.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -87,7 +103,7 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING REGEX "(platforms/.*)\\.dll"
         REGEX ".*d\\.dll" EXCLUDE)

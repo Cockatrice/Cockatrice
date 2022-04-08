@@ -153,30 +153,55 @@ if(APPLE)
     set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-# Qt5
-find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg WebSockets Widgets REQUIRED)
-set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets Qt5::WebSockets)
+# Detect Qt6 then Qt5, unless user forces Qt5
+IF(NOT FORCE_USE_QT5)
+    FIND_PACKAGE(Qt6 COMPONENTS Concurrent Multimedia Network PrintSupport Svg WebSockets Widgets Core5Compat Gui)
+ENDIF()
+IF(Qt6_FOUND)
+    SET(QT_VERSION_MAJOR Qt6)
+ELSE()
+    SET(QT_VERSION_MAJOR Qt5)
+    FIND_PACKAGE(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg WebSockets Widgets REQUIRED)
+ENDIF()
 
-# Qt5LinguistTools
-find_package(Qt5LinguistTools)
-if(Qt5LinguistTools_FOUND)
-    list(APPEND COCKATRICE_LIBS Qt5::LinguistTools)
+LIST(APPEND COCKATRICE_QT_MODULES ${QT_VERSION_MAJOR}::Concurrent ${QT_VERSION_MAJOR}::Multimedia ${QT_VERSION_MAJOR}::Network ${QT_VERSION_MAJOR}::PrintSupport ${QT_VERSION_MAJOR}::Svg ${QT_VERSION_MAJOR}::Widgets ${QT_VERSION_MAJOR}::WebSockets)
+IF (Qt6_FOUND)
+    LIST(APPEND COCKATRICE_QT_MODULES ${QT_VERSION_MAJOR}::Core5Compat ${QT_VERSION_MAJOR}::Gui)
+ENDIF()
 
-    if(NOT Qt5_LRELEASE_EXECUTABLE)
-        MESSAGE(WARNING "Qt's lrelease not found.")
-    endif()
+# Optional Qt LinguistTools
+FIND_PACKAGE(${QT_VERSION_MAJOR} COMPONENTS LinguistTools)
+IF(${QT_VERSION_MAJOR}LinguistTools_FOUND)
+    LIST(APPEND COCKATRICE_LIBS ${QT_VERSION_MAJOR}::LinguistTools)
 
-    if(UPDATE_TRANSLATIONS)
-        if(NOT Qt5_LUPDATE_EXECUTABLE)
-            MESSAGE(WARNING "Qt's lupdate not found.")
-        endif()
-        QT5_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
-    else()
-        QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
-    endif()
-endif()
+    IF(NOT ${QT_VERSION_MAJOR}LinguistTools_LRELEASE_EXECUTABLE)
+        MESSAGE(WARNING "${QT_VERSION_MAJOR} lrelease not found.")
+    ENDIF()
 
-QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+    IF(UPDATE_TRANSLATIONS)
+        IF(NOT ${QT_VERSION_MAJOR}_LUPDATE_EXECUTABLE)
+            MESSAGE(WARNING "${QT_VERSION_MAJOR} lupdate not found.")
+        ENDIF()
+
+        IF(Qt6_FOUND)
+            Qt6_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
+        ELSEIF(Qt5_FOUND)
+            Qt5_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
+        ENDIF()
+    ELSE()
+        IF(Qt6_FOUND)
+            Qt6_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+        ELSEIF(Qt5_FOUND)
+            Qt5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
+        ENDIF()
+    ENDIF()
+ENDIF()
+
+IF(Qt6_FOUND)
+    Qt6_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+ELSEIF(Qt5_FOUND)
+    Qt5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+ENDIF()
 
 # Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
@@ -225,7 +250,7 @@ if(APPLE)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
+    # Qt plugins: audio, iconengines, imageformats, platforms, printsupport
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -261,7 +286,7 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
+    # Qt plugins: audio, iconengines, imageformats, platforms, printsupport
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport|styles)/.*[^d]\\.dll")
 

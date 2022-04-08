@@ -116,7 +116,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
         QStringList symbols = manacost.split("}");
         QString formattedCardCost;
         for (QString symbol : symbols) {
-            if (symbol.contains(QRegExp("[0-9WUBGRP]/[0-9WUBGRP]"))) {
+            if (symbol.contains(QRegularExpression("[0-9WUBGRP]/[0-9WUBGRP]"))) {
                 symbol.append("}");
             } else {
                 symbol.remove(QChar('{'));

@@ -238,7 +238,11 @@ int DeckViewCardContainer::getCardTypeTextWidth() const
     QFontMetrics fm(f);
 
     int maxCardTypeWidth = 0;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    QMultiMapIterator<QString, DeckViewCard *> i(cardsByType);
+#else
     QMapIterator<QString, DeckViewCard *> i(cardsByType);
+#endif
     while (i.hasNext()) {
         int cardTypeWidth = fm.size(Qt::TextSingleLine, i.next().key()).width();
         if (cardTypeWidth > maxCardTypeWidth)

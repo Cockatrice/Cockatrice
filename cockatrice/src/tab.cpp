@@ -4,7 +4,8 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QDesktopWidget>
+#include <QScreen>
+
 Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
     : QMainWindow(parent), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
 {
@@ -20,7 +21,9 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
     infoPopup = new CardInfoWidget(
         cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
-    QRect screenRect = qApp->desktop()->screenGeometry(this);
+
+    const auto *primaryScreen = qApp->primaryScreen();
+    QRect screenRect = primaryScreen->geometry();
     infoPopup->move(qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2,
                                                  screenRect.left() + screenRect.width() - infoPopup->width())),
                     qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2,
