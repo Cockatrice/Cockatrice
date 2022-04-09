@@ -174,7 +174,7 @@ endif()
 # Detect Qt6 then Qt5, unless user forces Qt5
 # This is the ONLY place the versions of Qt are specified
 IF(NOT FORCE_USE_QT5)
-    FIND_PACKAGE(Qt6 6.2.3 COMPONENTS Concurrent Network Svg Widgets LinguistTools Core5Compat Gui Websockets)
+    FIND_PACKAGE(Qt6 6.2.3 COMPONENTS Concurrent Network Svg Widgets LinguistTools Core5Compat Gui WebSockets)
 ENDIF()
 IF(Qt6_FOUND)
     SET(QT_VERSION_MAJOR Qt6)
