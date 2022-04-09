@@ -55,7 +55,11 @@ QxtSmtp::QxtSmtp(QObject* parent) : QObject(parent)
     //QObject::connect(socket(), SIGNAL(encrypted()), &qxt_d(), SLOT(ehlo()));
     QObject::connect(socket(), SIGNAL(connected()), this, SIGNAL(connected()));
     QObject::connect(socket(), SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    QObject::connect(socket(), SIGNAL(errorOccurred(QAbstractSocket::SocketError)), &qxt_d(), SLOT(socketError(QAbstractSocket::SocketError)));
+#else
     QObject::connect(socket(), SIGNAL(error(QAbstractSocket::SocketError)), &qxt_d(), SLOT(socketError(QAbstractSocket::SocketError)));
+#endif
     QObject::connect(this, SIGNAL(authenticated()), &qxt_d(), SLOT(sendNext()));
     QObject::connect(socket(), SIGNAL(readyRead()), &qxt_d(), SLOT(socketRead()));
 }
