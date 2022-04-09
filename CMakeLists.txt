@@ -106,6 +106,8 @@ endif()
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 
+add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
 # Define proper compilation flags
 IF(MSVC)
     # Visual Studio: Maximum optimization, disable warning C4251
@@ -152,7 +154,7 @@ ENDIF()
 
 FIND_PACKAGE(Threads REQUIRED)
 
-# Find Qt5
+# Determine 32 or 64 bit build
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(_lib_suffix 64)
 else()
@@ -182,7 +184,7 @@ ELSE()
 ENDIF()
 
 IF(${QT_VERSION_MAJOR}_FOUND)
-    MESSAGE(STATUS "Found Qt ${${QT_VERSION_MAJOR}_VERSION}")
+    MESSAGE(STATUS "Found Qt ${${QT_VERSION_MAJOR}_VERSION} at: ${${QT_VERSION_MAJOR}_DIR}")
 
     # FIX: Qt was built with -reduce-relocations
     if (${QT_VERSION_MAJOR}_POSITION_INDEPENDENT_CODE)
@@ -208,7 +210,7 @@ FIND_PACKAGE(Protobuf REQUIRED)
 IF(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
     MESSAGE(FATAL_ERROR "No protoc command found!")
 ELSE()
-    MESSAGE(STATUS "Protoc version ${Protobuf_VERSION} found!")
+    MESSAGE(STATUS "Found Protobuf ${Protobuf_VERSION} at: ${Protobuf_LIBRARIES}")
 ENDIF()
 
 #Find OpenSSL
@@ -257,7 +259,7 @@ if(UNIX)
             set(CPACK_DEBIAN_PACKAGE_SECTION "games")
             set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
             IF(QT6_FOUND)
-                set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6")
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6-plugins, libqt6svg6")
             ELSEIF(Qt5_FOUND)
                 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
             ENDIF()

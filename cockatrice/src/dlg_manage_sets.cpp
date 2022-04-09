@@ -139,9 +139,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
                                tr("How to use custom card art") + "</a>"));
 
     QGridLayout *hintsGrid = new QGridLayout;
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    hintsGrid->setMargin(2);
-#endif
     hintsGrid->addWidget(labNotes, 0, 0);
     hintsGroupBox = new QGroupBox(tr("Hints"));
     hintsGroupBox->setLayout(hintsGrid);
