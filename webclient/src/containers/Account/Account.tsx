@@ -3,9 +3,9 @@ import React, { Component } from "react";
 import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 
-import Button from '@material-ui/core/Button';
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import Button from '@mui/material/Button';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from 'components';
 import { AuthenticationService, SessionService } from 'api';

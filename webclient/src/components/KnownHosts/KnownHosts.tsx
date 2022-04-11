@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Select, MenuItem } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
-import IconButton from '@material-ui/core/IconButton';
-import WifiTetheringIcon from '@material-ui/icons/WifiTethering';
-import PortableWifiOffIcon from '@material-ui/icons/PortableWifiOff';
-import InputLabel from '@material-ui/core/InputLabel';
-import { makeStyles } from '@material-ui/core/styles';
-import Check from '@material-ui/icons/Check';
-import AddIcon from '@material-ui/icons/Add';
-import EditRoundedIcon from '@material-ui/icons/Edit';
-import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
+import { Select, MenuItem } from '@mui/material';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
+import WifiTetheringIcon from '@mui/icons-material/WifiTethering';
+import PortableWifiOffIcon from '@mui/icons-material/PortableWifiOff';
+import InputLabel from '@mui/material/InputLabel';
+import makeStyles from '@mui/styles/makeStyles';
+import Check from '@mui/icons-material/Check';
+import AddIcon from '@mui/icons-material/Add';
+import EditRoundedIcon from '@mui/icons-material/Edit';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
 import { AuthenticationService } from 'api';
 import { KnownHostDialog } from 'dialogs';
@@ -196,7 +196,7 @@ const KnownHosts = (props) => {
 
   return (
     <div className={'KnownHosts ' + classes.root}>
-      <FormControl variant='outlined' className='KnownHosts-form'>
+      <FormControl className='KnownHosts-form' size='small' variant='outlined'>
         { touched && (
           <div className='KnownHosts-validation'>
             {
@@ -234,14 +234,12 @@ const KnownHosts = (props) => {
               <MenuItem value={host} key={index}>
                 <div className='KnownHosts-item'>
                   <div className='KnownHosts-item__wrapper'>
-                    <div className='KnownHosts-item__status'>
-                      <div className={testingConnection}>
-                        {
-                          testingConnection === TestConnection.FAILED
-                            ? <PortableWifiOffIcon fontSize="small" />
-                            : <WifiTetheringIcon fontSize="small" />
-                        }
-                      </div>
+                    <div className={'KnownHosts-item__status ' + testingConnection}>
+                      {
+                        testingConnection === TestConnection.FAILED
+                          ? <PortableWifiOffIcon fontSize="small" />
+                          : <WifiTetheringIcon fontSize="small" />
+                      }
                     </div>
 
                     <div className='KnownHosts-item__label'>

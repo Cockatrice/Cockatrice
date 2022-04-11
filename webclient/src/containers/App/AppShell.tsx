@@ -1,7 +1,7 @@
 import { Component, Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import CssBaseline from '@mui/material/CssBaseline';
 import { store } from 'store';
 import { Header } from 'components';
 import Routes from './AppShellRoutes';

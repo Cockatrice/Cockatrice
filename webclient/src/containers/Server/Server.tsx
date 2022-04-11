@@ -3,8 +3,8 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { generatePath, useNavigate } from 'react-router-dom';
 
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from 'components';
 import { useReduxEffect } from 'hooks';

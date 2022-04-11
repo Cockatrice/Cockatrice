@@ -3,8 +3,8 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { NavLink, generatePath } from 'react-router-dom';
 
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import { Images } from 'images/Images';
 import { SessionService } from 'api';

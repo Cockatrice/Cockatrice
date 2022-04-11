@@ -55,6 +55,13 @@ export class Host {
 
 export const DefaultHosts: Host[] = [
   {
+    name: 'Chickatrice',
+    host: 'mtg.chickatrice.net',
+    port: '443',
+    localPort: '4748',
+    editable: false,
+  },
+  {
     name: 'Rooster',
     host: 'server.cockatrice.us/servatrice',
     port: '4748',

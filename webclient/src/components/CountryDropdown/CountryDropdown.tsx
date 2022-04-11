@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Select, MenuItem } from '@material-ui/core';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
+import { Select, MenuItem } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import { useTranslation } from 'react-i18next';
 
 import { useLocaleSort } from 'hooks';
@@ -21,7 +21,7 @@ const CountryDropdown = ({ input: { onChange } }) => {
   const sortedCountries = useLocaleSort(countryCodes, translateCountry);
 
   return (
-    <FormControl variant='outlined' className='CountryDropdown'>
+    <FormControl size='small' variant='outlined' className='CountryDropdown'>
       <InputLabel id='CountryDropdown-select'>Country</InputLabel>
       <Select
         id='CountryDropdown-select'

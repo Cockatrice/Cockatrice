@@ -1,7 +1,7 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
+import makeStyles from '@mui/styles/makeStyles';
+import TextField from '@mui/material/TextField';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
 import './InputField.css';
 
@@ -44,6 +44,7 @@ const InputField = ({ input, meta: { touched, error, warning }, ...args }) => {
         className="rounded"
         variant="outlined"
         margin="dense"
+        size="small"
         fullWidth={true}
       />
     </div>
