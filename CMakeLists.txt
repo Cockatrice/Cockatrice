@@ -180,7 +180,7 @@ IF(Qt6_FOUND)
     SET(QT_VERSION_MAJOR Qt6)
 ELSE()
     SET(QT_VERSION_MAJOR Qt5)
-    FIND_PACKAGE(Qt5 5.5.0 COMPONENTS Concurrent Network Svg Widgets LinguistTools REQUIRED)
+    FIND_PACKAGE(Qt5 5.8.0 COMPONENTS Concurrent Network Svg Widgets LinguistTools REQUIRED)
 ENDIF()
 
 IF(${QT_VERSION_MAJOR}_FOUND)

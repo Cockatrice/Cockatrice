@@ -379,6 +379,8 @@ QByteArray QxtMailMessage::rfc2822() const
                     line = line + ' ' + word;
                     word = "";
                 }
+                if (line.isEmpty())
+                    continue;
                 if (line[0] == '.')
                     rv += ".";
                 rv += line + "\r\n";
