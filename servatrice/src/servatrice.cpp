@@ -210,6 +210,10 @@ Servatrice::~Servatrice()
         client->prepareDestroy();
     }
 
+    if (shutdownTimer) {
+        shutdownTimer->deleteLater();
+    }
+
     servatriceDatabaseInterface->deleteLater();
     prepareDestroy();
 }

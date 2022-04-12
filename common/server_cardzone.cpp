@@ -292,10 +292,10 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
         insertCardIntoCoordMap(card, x, y);
     } else {
         card->setCoords(0, 0);
-        if (x <= 0 || x >= cards.length()) {
-            cards.append(card);
-        } else {
+        if (0 <= x && x < cards.length()) {
             cards.insert(x, card);
+        } else {
+            cards.append(card);
         }
     }
     card->setZone(this);
