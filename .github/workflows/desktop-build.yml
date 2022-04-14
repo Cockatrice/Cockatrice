@@ -55,7 +55,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare release paramaters
+      - name: Prepare release parameters
         id: prepare
         if: steps.configure.outputs.tag != null
         shell: bash
@@ -99,6 +99,9 @@ jobs:
           - distro: Fedora35
             package: RPM
 
+          - distro: Fedora36
+            package: RPM
+
           - distro: UbuntuBionic
             package: DEB
 
@@ -111,6 +114,9 @@ jobs:
             test: skip
 
           - distro: UbuntuImpish
+            package: DEB
+
+          - distro: UbuntuJammy
             package: DEB
 
     name: ${{matrix.distro}}
@@ -194,7 +200,7 @@ jobs:
             os: macos-latest
             xcode: 12.5.1
             type: Debug
-            do_tests: 0 # tests do not work yet on mac
+            do_tests: 0 # tests do not work yet on Mac
             make_package: false
 
           - target: 10.14_Mojave
@@ -217,6 +223,13 @@ jobs:
             type: Release
             do_tests: 0
             make_package: true
+
+#          - target: 12_Monterey
+#            os: macos-12
+#            xcode: 13.1
+#            type: Release
+#            do_tests: 0
+#            make_package: true
 
     name: macOS ${{matrix.target}}
 
@@ -248,12 +261,12 @@ jobs:
 
       - name: Install QT using actions
         if: steps.brew_install_qt.outcome != 'success'
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v3
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
         env:
-          CMAKE_BUILD_PARALLEL_LEVEL: 3  # mac machines actually have 3 cores
+          CMAKE_BUILD_PARALLEL_LEVEL: 3  # Mac machines actually have 3 cores
         run: .ci/compile.sh ${{matrix.type}} --server
 
       - name: Test
@@ -296,74 +309,72 @@ jobs:
       matrix:
         include:
           - arch: 32
-            triplet: x86
-            cmake: Win32
-
+            vcpkg_default_triplet: x86
+            qt_version: '5.15.2'
+            cmake_generator_platform: Win32
+            qt_arch: msvc2019
           - arch: 64
-            triplet: x64
-            cmake: x64
-            append: _64
-
-    name: Windows ${{matrix.arch}}-bit
-
+            vcpkg_default_triplet: x64
+            qt_version: '6.3.0'
+            cmake_generator_platform: x64
+            qt_arch: msvc2019_64
+            qt_modules: "qt5compat qtmultimedia qtwebsockets"
+    name: Windows (${{matrix.arch}}-bit)
     needs: configure
-
     runs-on: windows-2019
-
     env:
-      QT_VERSION: '5.15.2'
-      QT_ARCH: msvc2022${{matrix.append}}
-      CMAKE_GENERATOR: 'Visual Studio 17 2022'
-
+      CMAKE_GENERATOR: 'Visual Studio 16 2019'
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - name: Restore Qt ${{env.QT_VERSION}} ${{matrix.arch}}-bit from cache
+      - name: Restore Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit) from cache
         id: cache-qt
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         with:
-          key: ${{runner.os}}-QtCache-${{env.QT_VERSION}}-${{matrix.arch}}
-          path: ${{runner.workspace}}/Qt
+          key: ${{runner.os}}-QtCache-${{matrix.qt_version}}-${{matrix.arch}}
+          path: '${{github.workspace}}/Qt'
 
-      - name: Install ${{matrix.arch}}-bit Qt
-        uses: jurplel/install-qt-action@v2
+      - name: Install Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit)
+        uses: jurplel/install-qt-action@v3
         with:
           cached: ${{steps.cache-qt.outputs.cache-hit}}
-          version: ${{env.QT_VERSION}}
-          arch: win${{matrix.arch}}_${{env.QT_ARCH}}
-
-      - name: Restore or setup vcpkg
-        uses: lukka/run-vcpkg@v6
+          version: ${{matrix.qt_version}}
+          arch: win${{matrix.arch}}_${{matrix.qt_arch}}
+          modules: ${{matrix.qt_modules}}
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v10.2
         with:
-          vcpkgArguments: '@${{github.workspace}}/vcpkg.txt'
-          vcpkgDirectory: ${{github.workspace}}/vcpkg
-          appendedCacheKey: ${{hashFiles('**/vcpkg.txt')}}
-          vcpkgTriplet: ${{matrix.triplet}}-windows
+          runVcpkgInstall: true
+        env:
+          VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
+          VCPKG_DISABLE_METRICS: 1
 
-      - name: Build Cockatrice ${{matrix.arch}}-bit
+      - name: Build Cockatrice (${{matrix.arch}}-bit)
         id: build
         shell: bash
         env:
           PACKAGE_SUFFIX: '-win${{matrix.arch}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake}}'
+          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
+          CMAKE_PREFIX_PATH: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
         run: ./.ci/compile.sh --server --release --test --package
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Windows-${{matrix.arch}}bit-installer
           path: ./build/${{steps.build.outputs.name}}
           if-no-files-found: error
 
-      - name: Upload to release
+      - name: Upload artifact to release
         if: needs.configure.outputs.tag != null
         uses: actions/upload-release-asset@v1
         env:

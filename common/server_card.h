@@ -52,7 +52,7 @@ private:
 
 public:
     Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
-    ~Server_Card();
+    ~Server_Card() override;
 
     Server_CardZone *getZone() const
     {

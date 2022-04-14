@@ -238,7 +238,13 @@ void Server::removeClient(Server_ProtocolHandler *client)
         webSocketUserCount--;
 
     QWriteLocker locker(&clientsLock);
-    clients.removeAt(clients.indexOf(client));
+    auto indexToRemove = clients.indexOf(client);
+    if (indexToRemove == -1) {
+        qWarning() << "We lost track of client" << client;
+    } else {
+        clients.removeAt(indexToRemove);
+    }
+
     ServerInfo_User *data = client->getUserInfo();
     if (data) {
         Event_UserLeft event;

@@ -106,12 +106,14 @@ endif()
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)
+    add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+ENDIF()
 
 # Define proper compilation flags
 IF(MSVC)
     # Visual Studio: Maximum optimization, disable warning C4251
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 ")
+    SET(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive-")
     # Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
@@ -171,37 +173,11 @@ elseif(DEFINED ENV{QTDIR})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
 
-# Detect Qt6 then Qt5, unless user forces Qt5
-# This is the ONLY place the versions of Qt are specified
-IF(NOT FORCE_USE_QT5)
-    FIND_PACKAGE(Qt6 6.2.3 COMPONENTS Concurrent Network Svg Widgets LinguistTools Core5Compat Gui WebSockets)
-ENDIF()
-IF(Qt6_FOUND)
-    SET(QT_VERSION_MAJOR Qt6)
-ELSE()
-    SET(QT_VERSION_MAJOR Qt5)
-    FIND_PACKAGE(Qt5 5.8.0 COMPONENTS Concurrent Network Svg Widgets LinguistTools REQUIRED)
-ENDIF()
-
-IF(${QT_VERSION_MAJOR}_FOUND)
-    MESSAGE(STATUS "Found Qt ${${QT_VERSION_MAJOR}_VERSION} at: ${${QT_VERSION_MAJOR}_DIR}")
-
-    # FIX: Qt was built with -reduce-relocations
-    if (${QT_VERSION_MAJOR}_POSITION_INDEPENDENT_CODE)
-        SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    endif()
-
-    # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${${QT_VERSION_MAJOR}Core_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR ${QT_VERSION_MAJOR}::Core LOCATION)
-    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
-ELSE()
-    MESSAGE(FATAL_ERROR "${QT_VERSION_MAJOR} was not found!")
-ENDIF()
-
 # Check for translation updates
-OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+OPTION(UPDATE_TRANSLATIONS "Update translations on compile" 0)
+MESSAGE(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
+
+INCLUDE(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
 
@@ -275,7 +251,7 @@ elseif(WIN32)
 
     # Configure file with custom definitions for NSIS.
     configure_file(
-        ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
+        cmake/NSIS.definitions.nsh.in
         ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
     )
 

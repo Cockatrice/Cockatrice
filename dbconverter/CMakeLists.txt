@@ -13,18 +13,7 @@ SET(dbconverter_SOURCES
     ${VERSION_STRING_CPP}
 )
 
-# Detect Qt6 then Qt5, unless user forces Qt5
-IF(NOT FORCE_USE_QT5)
-    FIND_PACKAGE(Qt6 COMPONENTS Core Network Widgets)
-ENDIF()
-IF(Qt6_FOUND)
-    SET(QT_VERSION_MAJOR Qt6)
-ELSE()
-    SET(QT_VERSION_MAJOR Qt5)
-    FIND_PACKAGE(Qt5 COMPONENTS Core Network Widgets REQUIRED)
-ENDIF()
-
-LIST(APPEND dbconverter_QT_MODULES ${QT_VERSION_MAJOR}::Core ${QT_VERSION_MAJOR}::Network ${QT_VERSION_MAJOR}::Widgets )
+LIST(APPEND dbconverter_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::Widgets )
 SET(QT_DONT_USE_QTGUI TRUE)
 
 IF(Qt6_FOUND)
@@ -42,11 +31,7 @@ ENDIF()
 # Build servatrice binary and link it
 ADD_EXECUTABLE(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES} ${dbconverter_MOC_SRCS})
 
-if(MSVC)
-    TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES} ${QT_VERSION_MAJOR}::WinMain)
-else()
-    TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES})
-endif()
+TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES})
 
 # install rules
 if(UNIX)

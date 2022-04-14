@@ -50,7 +50,7 @@ while [[ $# != 0 ]]; do
     *)
       if [[ $1 == -* ]]; then
         echo "unrecognized option: $1"
-        return 3
+        exit 3
       fi
       NAME="$1"
       shift
@@ -64,7 +64,7 @@ if ! [[ $NAME ]]; then
   return 3
 fi
 
-export IMAGE_NAME="${project_name,,}_${NAME,,}" # lower case
+export IMAGE_NAME="${project_name,,}"_"${NAME,,}" # lower case
 
 docker_dir=".ci/$NAME"
 if ! [[ -r $docker_dir/Dockerfile ]]; then

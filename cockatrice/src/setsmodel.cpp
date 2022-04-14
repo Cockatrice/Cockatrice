@@ -276,9 +276,19 @@ bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
     auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
 
-    return (sourceModel()->data(typeIndex).toString().contains(filterRegularExpression()) ||
-            sourceModel()->data(nameIndex).toString().contains(filterRegularExpression()) ||
-            sourceModel()->data(shortNameIndex).toString().contains(filterRegularExpression()));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+    auto filter1 = filterRegularExpression();
+    auto filter2 = filterRegularExpression();
+    auto filter3 = filterRegularExpression();
+#else
+    auto filter1 = filterRegExp();
+    auto filter2 = filterRegExp();
+    auto filter3 = filterRegExp();
+#endif
+
+    return (sourceModel()->data(typeIndex).toString().contains(filter1) ||
+            sourceModel()->data(nameIndex).toString().contains(filter2) ||
+            sourceModel()->data(shortNameIndex).toString().contains(filter3));
 }
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const

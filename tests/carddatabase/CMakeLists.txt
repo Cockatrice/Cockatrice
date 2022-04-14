@@ -1,11 +1,18 @@
 ADD_DEFINITIONS("-DCARDDB_DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 
-find_package(Qt5 COMPONENTS Concurrent Network Widgets Svg REQUIRED)
+SET(TEST_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Concurrent ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::Widgets ${COCKATRICE_QT_VERSION_NAME}::Svg)
 
-QT5_WRAP_CPP(MOCKS_SOURCES
-    ../../cockatrice/src/settingscache.h
-    ../../cockatrice/src/settings/carddatabasesettings.h
-)
+IF(Qt6_FOUND)
+    QT6_WRAP_CPP(MOCKS_SOURCES
+        ../../cockatrice/src/settingscache.h
+        ../../cockatrice/src/settings/carddatabasesettings.h
+    )
+ELSEIF(Qt5_FOUND)
+    QT5_WRAP_CPP(MOCKS_SOURCES
+        ../../cockatrice/src/settingscache.h
+        ../../cockatrice/src/settings/carddatabasesettings.h
+    )
+ENDIF()
 
 add_executable(carddatabase_test
     carddatabase_test.cpp
@@ -36,8 +43,6 @@ if(NOT GTEST_FOUND)
     add_dependencies(carddatabase_test gtest)
     add_dependencies(filter_string_test gtest)
 endif()
-
-set(TEST_QT_MODULES Qt5::Concurrent Qt5::Network Qt5::Widgets Qt5::Svg)
 
 target_link_libraries(carddatabase_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(filter_string_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
