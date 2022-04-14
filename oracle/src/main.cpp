@@ -31,7 +31,7 @@ void installNewTranslator()
 
     const auto fileLoaded1 = qtTranslator->load(fileName1, dir);
     if (!fileLoaded1) {
-        qWarning() << "Unable to load translation file" << dir + fileName1;
+        qWarning() << "Unable to load translation file" << QDir(dir, fileName1).absolutePath();
     }
 
     qApp->installTranslator(qtTranslator);
@@ -39,7 +39,7 @@ void installNewTranslator()
     const auto fileName2 = translationPrefix + "_" + lang;
     const auto fileLoaded2 = qtTranslator->load(fileName2, translationPath);
     if (!fileLoaded2) {
-        qWarning() << "Unable to load translation file" << translationPath + fileName2;
+        qWarning() << "Unable to load translation file" << QDir(translationPath, fileName2).absolutePath();
     }
     qApp->installTranslator(translator);
 }
@@ -78,10 +78,8 @@ int main(int argc, char *argv[])
 
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("oracle");
-#endif
 
     wizard.show();
 

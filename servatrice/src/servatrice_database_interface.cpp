@@ -1360,7 +1360,6 @@ bool Servatrice_DatabaseInterface::updateUserToken(const QString &token, const Q
     return false;
 }
 
-// TODO
 bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &table,
                                                                  const QString &column,
                                                                  const QString &_user,

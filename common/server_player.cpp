@@ -120,6 +120,7 @@ Server_Player::~Server_Player() = default;
 void Server_Player::prepareDestroy()
 {
     delete deck;
+    deck = nullptr;
 
     playerMutex.lock();
     if (userInterface) {
@@ -1234,26 +1235,22 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    // Get all arrows pointing to or originating from the card being attached and delete them.
-    {
-        QMutexLocker locker(&game->gameMutex);
-        QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
-        while (playerIterator.hasNext()) {
-            Server_Player *p = playerIterator.next().value();
-            QList<Server_Arrow *> arrows = p->getArrows().values();
-            QList<Server_Arrow *> toDelete;
-            for (auto a : arrows) {
-                auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
-                if ((tCard == card) || (a->getStartCard() == card)) {
-                    toDelete.append(a);
-                }
+    QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
+    while (playerIterator.hasNext()) {
+        Server_Player *p = playerIterator.next().value();
+        QList<Server_Arrow *> arrows = p->getArrows().values();
+        QList<Server_Arrow *> toDelete;
+        for (auto a : arrows) {
+            auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
+            if ((tCard == card) || (a->getStartCard() == card)) {
+                toDelete.append(a);
             }
-            for (auto &i : toDelete) {
-                Event_DeleteArrow event;
-                event.set_arrow_id(i->getId());
-                ges.enqueueGameEvent(event, p->getPlayerId());
-                p->deleteArrow(i->getId());
-            }
+        }
+        for (auto &i : toDelete) {
+            Event_DeleteArrow event;
+            event.set_arrow_id(i->getId());
+            ges.enqueueGameEvent(event, p->getPlayerId());
+            p->deleteArrow(i->getId());
         }
     }
 

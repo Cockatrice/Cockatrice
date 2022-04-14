@@ -97,7 +97,7 @@ Server_Game::~Server_Game()
 
     gameClosed = true;
     sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
-    for (Server_Player *player : players.values()) {
+    for (auto *player : players.values()) {
         player->prepareDestroy();
     }
     players.clear();
@@ -112,10 +112,19 @@ Server_Game::~Server_Game()
     replayList.append(currentReplay);
     storeGameInformation();
 
-    for (int i = 0; i < replayList.size(); ++i)
-        delete replayList[i];
+    for (auto *replay : replayList) {
+        delete replay;
+    }
+    replayList.clear();
+
+    room = nullptr;
+    currentReplay = nullptr;
+    creatorInfo = nullptr;
+
+    delete pingClock;
 
     qDebug() << "Server_Game destructor: gameId=" << gameId;
+    deleteLater();
 }
 
 void Server_Game::storeGameInformation()

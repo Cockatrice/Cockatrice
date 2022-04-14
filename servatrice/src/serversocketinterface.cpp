@@ -1888,17 +1888,12 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     address = socket->peerAddress();
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
-    if (websocketIPHeader.length() > 0) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-        if (socket->request().hasRawHeader(websocketIPHeader)) {
-            QString header(socket->request().rawHeader(websocketIPHeader));
-            QHostAddress parsed(header);
-            if (!parsed.isNull())
-                address = parsed;
+    if (websocketIPHeader.length() > 0 && socket->request().hasRawHeader(websocketIPHeader)) {
+        QString header(socket->request().rawHeader(websocketIPHeader));
+        QHostAddress parsed(header);
+        if (!parsed.isNull()) {
+            address = parsed;
         }
-#else
-        logger->logMessage(QString("Reading the websocket IP header is unsupported on this version of QT."));
-#endif
     }
 
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
@@ -1908,11 +1903,11 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 
     // Add this object to the server's list of connections before it can receive socket events.
-    // Otherwise, in case a of a socket error, it could be removed from the list before it is added.
+    // Otherwise, in case of a socket error, it could be removed from the list before it is added.
     server->addClient(this);
 
     logger->logMessage(
-        QString("Incoming websocket connection: %1 (%2)").arg(address.toString()).arg(socket->peerAddress().toString()),
+        QString("Incoming websocket connection: %1 (%2)").arg(address.toString(), socket->peerAddress().toString()),
         this);
 
     if (!initWebsocketSession())

@@ -93,11 +93,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case CREATED: {
             switch (role) {
                 case Qt::DisplayRole: {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
                     QDateTime then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), Qt::UTC);
-#else
-                    QDateTime then = QDateTime::fromTime_t(gameentry.start_time(), Qt::UTC);
-#endif
                     int secs = then.secsTo(QDateTime::currentDateTimeUtc());
                     return getGameCreatedString(secs);
                 }
