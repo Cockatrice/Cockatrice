@@ -21,9 +21,9 @@ include different targets -->
  - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")</i>
  - <kbd>Debian 10</kbd> ("Buster")</i>
  - <kbd>Debian 11</kbd> ("Bullseye")</i>
- - <kbd>Fedora 33</kbd></i>
  - <kbd>Fedora 34</kbd></i>
  - <kbd>Fedora 35</kbd></i>
+ - <kbd>Fedora 36</kbd></i>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
