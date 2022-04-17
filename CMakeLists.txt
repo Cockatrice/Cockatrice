@@ -8,6 +8,23 @@
 # Cmake 3.1 is required to enable C++11 support correctly
 cmake_minimum_required(VERSION 3.10)
 
+# Early detect ccache
+option(USE_CCACHE "Cache the build results with ccache" ON)
+# Treat warnings as errors (Debug builds only)
+option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
+# Check for translation updates
+option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
+# Compile servatrice
+option(WITH_SERVER "build servatrice" OFF)
+# Compile cockatrice
+option(WITH_CLIENT "build cockatrice" ON)
+# Compile oracle
+option(WITH_ORACLE "build oracle" ON)
+# Compile dbconverter
+option(WITH_DBCONVERTER "build dbconverter" ON)
+# Compile tests
+option(TEST "build tests" OFF)
+
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
 IF(DEFINED CMAKE_BUILD_TYPE)
@@ -16,8 +33,6 @@ ELSE()
    SET(CMAKE_BUILD_TYPE Release CACHE STRING "Type of build")
 ENDIF()
 
-# Early detect ccache
-OPTION(USE_CCACHE "Cache the build results with ccache" ON)
 if(USE_CCACHE)
     find_program(CCACHE_PROGRAM ccache)
     if(CCACHE_PROGRAM)
@@ -41,7 +56,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-PROJECT("Cockatrice" VERSION 2.8.1)
+project("Cockatrice" VERSION 2.8.1)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
@@ -103,16 +118,9 @@ elseif(WIN32)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
-# Treat warnings as errors (Debug builds only)
-option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
-
-IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)
-    add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
-ENDIF()
-
 # Define proper compilation flags
 IF(MSVC)
-    # Visual Studio: Maximum optimization, disable warning C4251
+    # Visual Studio: Maximum optimization, disable warning C4251, establish C++17 compatibility
     SET(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive-")
     # Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
@@ -173,11 +181,9 @@ elseif(DEFINED ENV{QTDIR})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
 
-# Check for translation updates
-OPTION(UPDATE_TRANSLATIONS "Update translations on compile" 0)
 MESSAGE(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
-INCLUDE(FindQtRuntime)
+include(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
 
@@ -263,37 +269,27 @@ endif()
 
 include(CPack)
 
-# Compile servatrice (default off)
-option(WITH_SERVER "build servatrice" OFF)
 add_subdirectory(common)
 if(WITH_SERVER)
     add_subdirectory(servatrice)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile cockatrice (default on)
-option(WITH_CLIENT "build cockatrice" ON)
 if(WITH_CLIENT)
     add_subdirectory(cockatrice)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile oracle (default on)
-option(WITH_ORACLE "build oracle" ON)
 if(WITH_ORACLE)
     add_subdirectory(oracle)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile dbconverter (default on)
-option(WITH_DBCONVERTER "build dbconverter" ON)
 if(WITH_DBCONVERTER)
     add_subdirectory(dbconverter)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Dbconverter;Dbconverter;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile tests (default off)
-option(TEST "build tests" OFF)
 if(TEST)
     include(CTest)
     add_subdirectory(tests)

@@ -10,7 +10,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -238,15 +238,9 @@ int DeckViewCardContainer::getCardTypeTextWidth() const
     QFontMetrics fm(f);
 
     int maxCardTypeWidth = 0;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    QMultiMapIterator<QString, DeckViewCard *> i(cardsByType);
-#else
-    QMapIterator<QString, DeckViewCard *> i(cardsByType);
-#endif
-    while (i.hasNext()) {
-        int cardTypeWidth = fm.size(Qt::TextSingleLine, i.next().key()).width();
-        if (cardTypeWidth > maxCardTypeWidth)
-            maxCardTypeWidth = cardTypeWidth;
+    for (const auto &key : cardsByType.keys()) {
+        int cardTypeWidth = fm.size(Qt::TextSingleLine, key).width();
+        maxCardTypeWidth = std::max(maxCardTypeWidth, cardTypeWidth);
     }
 
     return maxCardTypeWidth + 15;

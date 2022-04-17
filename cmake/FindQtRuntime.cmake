@@ -1,53 +1,44 @@
 # Find a compatible Qt version
-# Sets COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6
+# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5
+# Outputs: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6
 
-FIND_PACKAGE(Qt6 6.2.3 COMPONENTS
-        Concurrent
-        Core5Compat
-        Gui
-        LinguistTools
-        Multimedia
-        Network
-        PrintSupport
-        Sql
-        Svg
-        WebSockets
-        Widgets
-        QUIET
-        HINTS ${Qt6_DIR}
-)
+set(COCKATRICE_QT_COMPONENTS Core Core5Compat)
+if(WITH_SERVER)
+    set(COCKATRICE_QT_COMPONENTS ${COCKATRICE_QT_COMPONENTS} Network Sql WebSockets)
+endif()
+if(WITH_CLIENT)
+    set(COCKATRICE_QT_COMPONENTS ${COCKATRICE_QT_COMPONENTS} Concurrent Multimedia Network PrintSupport Svg Widgets WebSockets)
+endif()
+if(WITH_ORACLE)
+    set(COCKATRICE_QT_COMPONENTS ${COCKATRICE_QT_COMPONENTS} Concurrent Network Svg Widgets)
+endif()
+if(WITH_DBCONVERTER)
+    set(COCKATRICE_QT_COMPONENTS ${COCKATRICE_QT_COMPONENTS} Network Widgets)
+endif()
+list(REMOVE_DUPLICATES COCKATRICE_QT_COMPONENTS)
 
-FIND_PACKAGE(Qt5 5.8.0 COMPONENTS
-        Concurrent
-        LinguistTools
-        Multimedia
-        Network
-        PrintSupport
-        Sql
-        Svg
-        WebSockets
-        Widgets
-        QUIET
-        HINTS ${Qt5_DIR}
-)
+if(NOT FORCE_USE_QT5)
+    find_package(Qt6 6.2.3 COMPONENTS ${COCKATRICE_QT_COMPONENTS} QUIET HINTS ${Qt6_DIR})
+endif()
+if(Qt6_FOUND)
+    set(COCKATRICE_QT_VERSION_NAME Qt6)
+else()
+    list(REMOVE_ITEM COCKATRICE_QT_COMPONENTS Core5Compat) # Core5Compat is Qt6 Only
+    find_package(Qt5 5.8.0 COMPONENTS ${COCKATRICE_QT_COMPONENTS} QUIET HINTS ${Qt5_DIR})
+    if(Qt5_FOUND)
+        set(COCKATRICE_QT_VERSION_NAME Qt5)
+    else()
+        message(FATAL_ERROR "No suitable version of Qt was found")
+    endif()
+endif()
 
-IF(Qt6_FOUND AND NOT FORCE_USE_QT5)
-    SET(COCKATRICE_QT_VERSION_NAME Qt6)
-    UNSET(Qt5_FOUND)
-ELSEIF(Qt5_FOUND)
-    SET(COCKATRICE_QT_VERSION_NAME Qt5)
-    UNSET(Qt6_FOUND)
-ELSE()
-    MESSAGE(FATAL_ERROR "No suitable version of Qt was found")
-ENDIF()
-
-IF(${COCKATRICE_QT_VERSION_NAME}_POSITION_INDEPENDENT_CODE OR Qt6_FOUND)
-    SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-ENDIF()
+if(Qt5_POSITION_INDEPENDENT_CODE OR Qt6_FOUND)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # guess plugins and libraries directory
-SET(QT_PLUGINS_DIR "${${COCKATRICE_QT_VERSION_NAME}Core_DIR}/../../../plugins")
-GET_TARGET_PROPERTY(QT_LIBRARY_DIR ${COCKATRICE_QT_VERSION_NAME}::Core LOCATION)
-GET_FILENAME_COMPONENT(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
+set(QT_PLUGINS_DIR "${${COCKATRICE_QT_VERSION_NAME}Core_DIR}/../../../plugins")
+get_target_property(QT_LIBRARY_DIR ${COCKATRICE_QT_VERSION_NAME}::Core LOCATION)
+get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
 
-MESSAGE(STATUS "Found Qt ${${COCKATRICE_QT_VERSION_NAME}_VERSION} at: ${${COCKATRICE_QT_VERSION_NAME}_DIR}")
+message(STATUS "Found Qt ${${COCKATRICE_QT_VERSION_NAME}_VERSION} at: ${${COCKATRICE_QT_VERSION_NAME}_DIR}")

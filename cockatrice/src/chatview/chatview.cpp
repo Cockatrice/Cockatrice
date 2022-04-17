@@ -512,15 +512,12 @@ void ChatView::redactMessages(const QString &userName, int amount)
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void ChatView::enterEvent(QEnterEvent * /*event*/)
-{
-    setMouseTracking(true);
-}
 #else
 void ChatView::enterEvent(QEvent * /*event*/)
+#endif
 {
     setMouseTracking(true);
 }
-#endif
 
 void ChatView::leaveEvent(QEvent * /*event*/)
 {

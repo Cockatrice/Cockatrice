@@ -8,22 +8,20 @@ git push -d origin --REPLACE-WITH-BETA-LIST--
 include different targets -->
 <pre>
 <b>Pre-compiled binaries we serve:</b>
- - <kbd>Windows 7/8/10/11 (32-bit)</kbd></i>
- - <kbd>Windows 7/8/10/11 (64-bit)</kbd></i>
- - <kbd>macOS 10.14</kbd> ("Mojave")</i>
- - <kbd>macOS 10.15</kbd> ("Catalina")</i>
- - <kbd>macOS 11.0</kbd> ("Big Sur")</i>
- - <kbd>macOS 12.0</kbd> ("Monterey")</i>
- - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")</i>
- - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")</i>
- - <kbd>Ubuntu 21.10</kbd> ("Hirsute Hippo")</i>
- - <kbd>Ubuntu 21.10</kbd> ("Impish Indri")</i>
- - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")</i>
- - <kbd>Debian 10</kbd> ("Buster")</i>
- - <kbd>Debian 11</kbd> ("Bullseye")</i>
- - <kbd>Fedora 34</kbd></i>
- - <kbd>Fedora 35</kbd></i>
- - <kbd>Fedora 36</kbd></i>
+ - <kbd>Windows 7/8/10/11 (32-bit)</kbd>
+ - <kbd>Windows 7/8/10/11 (64-bit)</kbd>
+ - <kbd>macOS 10.14</kbd> ("Mojave")
+ - <kbd>macOS 10.15</kbd> ("Catalina")
+ - <kbd>macOS 11.0</kbd> ("Big Sur")
+ - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")
+ - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")
+ - <kbd>Ubuntu 21.10</kbd> ("Impish Indri")
+ - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")
+ - <kbd>Debian 10</kbd> ("Buster")
+ - <kbd>Debian 11</kbd> ("Bullseye")
+ - <kbd>Fedora 34</kbd>
+ - <kbd>Fedora 35</kbd>
+ - <kbd>Fedora 36</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
