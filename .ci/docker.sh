@@ -6,8 +6,9 @@
 # --get loads the image from a previously saved image cache, will build if no image is found
 # --build builds the image from the Dockerfile in .ci/$NAME
 # --save stores the image, if an image was loaded it will not be stored
+# --interactive immediately starts the image interactively for debugging
 # requires: docker
-# uses env: NAME CACHE BUILD GET SAVE (correspond to args: <name> --set-cache <cache> --build --get --save)
+# uses env: NAME CACHE BUILD GET SAVE INTERACTIVE (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
 export BUILD_SCRIPT=".ci/compile.sh"
@@ -26,6 +27,10 @@ while [[ $# != 0 ]]; do
       ;;
     '--get')
       GET=1
+      shift
+      ;;
+    '--interactive')
+      INTERACTIVE=1
       shift
       ;;
     '--save')
@@ -147,3 +152,11 @@ function RUN ()
     return 3
   fi
 }
+
+# for debugging, start the docker image interactively instead of building
+# starts immediately, does not require sourcing or RUN
+if [[ $INTERACTIVE ]]; then
+  export BUILD_SCRIPT="-i"
+  export RUN_ARGS="$RUN_ARGS -it"
+  RUN
+fi
