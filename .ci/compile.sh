@@ -54,6 +54,15 @@ while [[ $# != 0 ]]; do
       USE_CCACHE=1
       shift
       ;;
+    '--dir')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--dir expects an argument"
+        exit 1
+      fi
+      BUILD_DIR="$1"
+      shift
+      ;;
     *)
       if [[ $1 == -* ]]; then
         echo "::error file=$0::unrecognized option: $1"
@@ -76,8 +85,11 @@ set -e
 
 # Setup
 ./servatrice/check_schema_version.sh
-mkdir -p build
-cd build
+if [[ ! $BUILD_DIR ]]; then
+  BUILD_DIR="build"
+fi
+mkdir -p "$BUILD_DIR"
+cd "$BUILD_DIR"
 
 if [[ ! $CMAKE_BUILD_PARALLEL_LEVEL ]]; then
   CMAKE_BUILD_PARALLEL_LEVEL=2 # default machines have 2 cores
