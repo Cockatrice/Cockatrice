@@ -52,12 +52,12 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
                     break;
                 }
 
-                const auto name = xml.name().toString();
+                auto name = xml.name().toString();
                 if (name == "sets") {
                     loadSetsFromXml(xml);
                 } else if (name == "cards") {
                     loadCardsFromXml(xml);
-                } else if (name != "") {
+                } else if (!name.isEmpty()) {
                     qDebug() << "[CockatriceXml3Parser] Unknown item" << name << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
@@ -73,7 +73,7 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
             break;
         }
 
-        const auto name = xml.name().toString();
+        auto name = xml.name().toString();
         if (name == "set") {
             QString shortName, longName, setType;
             QDate releaseDate;
@@ -81,6 +81,7 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 if (xml.readNext() == QXmlStreamReader::EndElement) {
                     break;
                 }
+                name = xml.name().toString();
 
                 if (name == "name") {
                     shortName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
@@ -147,7 +148,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             break;
         }
 
-        const auto xmlName = xml.name().toString();
+        auto xmlName = xml.name().toString();
         if (xmlName == "card") {
             QString name = QString("");
             QString text = QString("");
@@ -164,6 +165,8 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 if (xml.readNext() == QXmlStreamReader::EndElement) {
                     break;
                 }
+                xmlName = xml.name().toString();
+
                 // variable - assigned properties
                 if (xmlName == "name") {
                     name = xml.readElementText(QXmlStreamReader::IncludeChildElements);

@@ -109,10 +109,6 @@ jobs:
             package: DEB
             test: skip # UbuntuFocal has a broken qt for debug builds
 
-          - distro: UbuntuHirsute
-            package: DEB
-            test: skip
-
           - distro: UbuntuImpish
             package: DEB
 
