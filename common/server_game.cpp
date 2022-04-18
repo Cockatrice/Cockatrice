@@ -69,6 +69,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
       spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0),
       secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()),
+      pingClock(nullptr),
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
 #else
@@ -121,7 +122,10 @@ Server_Game::~Server_Game()
     currentReplay = nullptr;
     creatorInfo = nullptr;
 
-    delete pingClock;
+    if (pingClock) {
+        delete pingClock;
+        pingClock = nullptr;
+    }
 
     qDebug() << "Server_Game destructor: gameId=" << gameId;
     deleteLater();
