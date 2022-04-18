@@ -133,9 +133,12 @@ function RUN ()
 {
   echo "running image:"
   if docker images | grep "$IMAGE_NAME"; then
-    args=(--mount "type=bind,source=$PWD,target=/src" -w="/src")
+    local args=(--mount "type=bind,source=$PWD,target=/src")
+    args+=(--workdir "/src")
+    args+=(--user "$(id -u):$(id -g)")
     if [[ $CCACHE_DIR ]]; then
-      args+=(--mount "type=bind,source=$CCACHE_DIR,target=/.ccache" -e "CCACHE_DIR=/.ccache")
+      args+=(--mount "type=bind,source=$CCACHE_DIR,target=/.ccache")
+      args+=(--env "CCACHE_DIR=/.ccache")
     fi
     docker run "${args[@]}" $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS "$@"
     return $?
