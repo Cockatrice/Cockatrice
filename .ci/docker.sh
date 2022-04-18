@@ -3,6 +3,7 @@
 # This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
 
 # Creates or loads docker images to use in compilation, creates RUN function to start compilation on the docker image.
+# <arg> sets the name of the docker image, these correspond to directories in .ci
 # --get loads the image from a previously saved image cache, will build if no image is found
 # --build builds the image from the Dockerfile in .ci/$NAME
 # --save stores the image, if an image was loaded it will not be stored
