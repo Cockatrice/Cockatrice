@@ -160,11 +160,11 @@ jobs:
         if: matrix.package != 'skip'
         shell: bash
         env:
-          PACKAGE_SUFFIX: '-${{matrix.distro}}'
-          CPACK_GENERATOR: '${{matrix.package}}'
+          suffix: '-${{matrix.distro}}'
+          type: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package
+          RUN --server --release --package "$type" --suffix "$suffix"
 
       - name: Upload artifact
         if: matrix.package != 'skip'
