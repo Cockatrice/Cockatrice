@@ -7,6 +7,7 @@
 # --build builds the image from the Dockerfile in .ci/$NAME
 # --save stores the image, if an image was loaded it will not be stored
 # --interactive immediately starts the image interactively for debugging
+# --set-cache <location> sets the location to cache the image or for ccache
 # requires: docker
 # uses env: NAME CACHE BUILD GET SAVE INTERACTIVE (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
@@ -41,7 +42,7 @@ while [[ $# != 0 ]]; do
       CACHE=$2
       if ! [[ -d $CACHE ]]; then
         echo "could not find cache path: $CACHE" >&2
-        exit 3
+        return 3
       fi
       shift 2
       ;;
@@ -92,7 +93,6 @@ else
     mkdir -p "$CCACHE_DIR"
   fi
 fi
-
 
 # Get the docker image from previously stored save
 if [[ $GET ]]; then

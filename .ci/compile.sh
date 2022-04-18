@@ -1,6 +1,19 @@
 #!/bin/bash
 
 # This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
+
+# Compiles cockatrice inside of a ci environment
+# --format runs the clang-format script first
+# --install runs make install
+# --package [<package type>] runs make package, optionally force the type
+# --suffix <suffix> renames package with this suffix, requires arg
+# --server compiles servatrice
+# --test runs tests
+# --debug or --release or <arg> sets the build type ie CMAKE_BUILD_TYPE
+# --ccache uses ccache and shows stats
+# --dir <dir> sets the name of the build dir, default is "build"
+# uses env: BUILDTYPE CHECK_FORMAT MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE BUILD_DIR (correspond to args: <buildtype>/--debug/--release --format --install --package <package type> --suffix <suffix> --server --test --ccache --dir <dir>)
+# exitcode: 1 for failure, 3 for invalid arguments
 LINT_SCRIPT=".ci/lint_cpp.sh"
 
 # Read arguments
@@ -29,7 +42,7 @@ while [[ $# != 0 ]]; do
       shift
       if [[ $# == 0 ]]; then
         echo "::error file=$0::--suffix expects an argument"
-        exit 1
+        exit 3
       fi
       PACKAGE_SUFFIX="$1"
       shift
@@ -58,7 +71,7 @@ while [[ $# != 0 ]]; do
       shift
       if [[ $# == 0 ]]; then
         echo "::error file=$0::--dir expects an argument"
-        exit 1
+        exit 3
       fi
       BUILD_DIR="$1"
       shift
