@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
+#include <QtMath>
 #include <algorithm>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
@@ -437,7 +438,7 @@ void DeckViewScene::rearrangeItems()
         const int maxRows = rowsAndColsList[maxIndex1][maxIndex2].first;
         const int maxCardCount = cardCountList[maxIndex1][maxIndex2];
         rowsAndColsList[maxIndex1][maxIndex2] =
-            QPair<int, int>(maxRows + 1, (int)ceil((qreal)maxCardCount / (qreal)(maxRows + 1)));
+            QPair<int, int>(maxRows + 1, (int)qCeil((qreal)maxCardCount / (qreal)(maxRows + 1)));
     }
 
     totalHeight = -spacing;

@@ -14,6 +14,7 @@
 #include <QDebug>
 #include <QGraphicsSceneWheelEvent>
 #include <QPainter>
+#include <QtMath>
 
 ZoneViewZone::ZoneViewZone(Player *_p,
                            CardZone *_origZone,
@@ -102,17 +103,17 @@ void ZoneViewZone::reorganizeCards()
         for (int i = 0; i < cardCount; ++i)
             cards[i]->setId(i);
 
-    int cols = floor(sqrt((double)cardCount / 2));
+    int cols = qFloor(qSqrt((double)cardCount / 2));
     if (cols > 7)
         cols = 7;
-    int rows = ceil((double)cardCount / cols);
+    int rows = qCeil((double)cardCount / cols);
     if (rows < 1)
         rows = 1;
     if (minRows == 0)
         minRows = rows;
     else if (rows < minRows) {
         rows = minRows;
-        cols = ceil((double)cardCount / minRows);
+        cols = qCeil((double)cardCount / minRows);
     }
     if (cols < 2)
         cols = 2;

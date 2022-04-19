@@ -1,6 +1,7 @@
 #include "../common/expression.h"
 
 #include "gtest/gtest.h"
+#include <QtMath>
 
 #define TEST_EXPR(name, a, b)                                                                                          \
     TEST(ExpressionTest, name)                                                                                         \
@@ -17,7 +18,7 @@ TEST_EXPR(Multiply, "2*2", 4)
 TEST_EXPR(Whitespace, "3 * 3", 9)
 TEST_EXPR(Powers, "2^8", 256)
 TEST_EXPR(OrderOfOperations, "2+2*2", 6)
-TEST_EXPR(Fn, "2*cos(1)", 2 * cos(1))
+TEST_EXPR(Fn, "2*cos(1)", 2 * qCos(1))
 TEST_EXPR(Variable, "x / 2", 4)
 TEST_EXPR(Negative, "-2 * 2", -4)
 TEST_EXPR(UnknownFnReturnsZero, "blah(22)", 0)
