@@ -2,28 +2,15 @@
 
 #include "settingscache.h"
 
-#include <QApplication>
-#include <QAudioFormat>
 #include <QAudioOutput>
-#include <QBuffer>
-#include <QFileInfo>
-#include <QStandardPaths>
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-#include <QAudioDevice>
+#include <QDir>
 #include <QMediaPlayer>
-#endif
 
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
 
 SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(0)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    inputBuffer = new QBuffer();
-#else
-    inputBuffer = new QBuffer(this);
-#endif
-
     ensureThemeDirectoryExists();
     connect(&SettingsCache::instance(), SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
     connect(&SettingsCache::instance(), SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
@@ -38,8 +25,6 @@ SoundEngine::~SoundEngine()
         player->deleteLater();
         player = 0;
     }
-
-    inputBuffer->deleteLater();
 }
 
 void SoundEngine::soundEnabledChanged()
@@ -47,19 +32,10 @@ void SoundEngine::soundEnabledChanged()
     if (SettingsCache::instance().getSoundEnabled()) {
         qDebug("SoundEngine: enabling sound");
         if (!player) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             player = new QMediaPlayer;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             auto qAudioOutput = new QAudioOutput;
             player->setAudioOutput(qAudioOutput);
-#else
-            QAudioFormat format;
-            format.setSampleRate(44100);
-            format.setChannelCount(1);
-            format.setSampleSize(16);
-            format.setCodec("audio/pcm");
-            format.setByteOrder(QAudioFormat::LittleEndian);
-            format.setSampleType(QAudioFormat::SignedInt);
-            player = new QAudioOutput(format, this);
 #endif
         }
     } else {
@@ -81,13 +57,11 @@ void SoundEngine::playSound(QString fileName)
     // still playing the previous sound?
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     if (player->playbackState() == QMediaPlayer::PlaybackState::PlayingState) {
-        return;
-    }
 #else
-    if (player->state() == QAudio::ActiveState) {
+    if (player->state() == QMediaPlayer::PlayingState) {
+#endif
         return;
     }
-#endif
 
     if (!audioData.contains(fileName)) {
         return;
@@ -96,19 +70,15 @@ void SoundEngine::playSound(QString fileName)
     qDebug() << "playing" << fileName;
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    player->audioOutput()->setVolume(SettingsCache::instance().getMasterVolume() / 100.0);
+    player->audioOutput()->setVolume(SettingsCache::instance().getMasterVolume());
     player->stop();
     player->setSource(QUrl::fromLocalFile(audioData[fileName]));
-    player->play();
 #else
-    inputBuffer->close();
-    inputBuffer->setData(audioData[fileName]);
-    inputBuffer->open(QIODevice::ReadOnly);
-
-    player->setVolume(SettingsCache::instance().getMasterVolume() / 100.0);
+    player->setVolume(SettingsCache::instance().getMasterVolume());
     player->stop();
-    player->start(inputBuffer);
+    player->setMedia(QUrl::fromLocalFile(audioData[fileName]));
 #endif
+    player->play();
 }
 
 void SoundEngine::testSound()
@@ -210,14 +180,7 @@ void SoundEngine::themeChangedSlot()
             continue;
 
         QFile file(dir.filePath(fileNames[i] + ".wav"));
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
         audioData.insert(fileNames[i], file.fileName());
-#else
-        file.open(QIODevice::ReadOnly);
-        // 44 = length of wav header
-        audioData.insert(fileNames[i], file.readAll().mid(44));
-        file.close();
-#endif
     }
 
     soundEnabledChanged();
