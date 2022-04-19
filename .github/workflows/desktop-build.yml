@@ -172,7 +172,8 @@ jobs:
           type: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --suffix "$suffix" --ccache
+          RUN --server --release --package "$type" --suffix "$suffix" \
+                  --ccache "$CCACHE_SIZE"
 
       - name: Upload artifact
         if: matrix.package != 'skip'
