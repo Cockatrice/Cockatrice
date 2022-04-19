@@ -10,7 +10,6 @@ RUN dnf install -y \
         git \
         hicolor-icon-theme \
         libappstream-glib \
-        libxkbcommon-devel \
         mariadb-devel \
         protobuf-devel \
         qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets,qt5compat}-devel \
