@@ -13,7 +13,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QSet>
-#include <QtMath>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
     : QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize()), playerRotation(0)

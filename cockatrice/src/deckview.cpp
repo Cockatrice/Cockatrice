@@ -9,7 +9,6 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
-#include <QtMath>
 #include <algorithm>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
