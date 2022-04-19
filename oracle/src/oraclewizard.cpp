@@ -458,9 +458,10 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
             zipDownloadFailed(tr("Xz extraction failed."));
             return;
         }
+        const auto &outBufferData = outBuffer->data();
 
         future = QtConcurrent::run(
-            [this, &outBuffer] { return wizard()->importer->readSetsFromByteArray(outBuffer->data()); });
+            [this, &outBufferData] { return wizard()->importer->readSetsFromByteArray(outBufferData); });
         watcher.setFuture(future);
         return;
 #else
@@ -500,9 +501,10 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
             uz.closeArchive();
             return;
         }
+        const auto &outBufferData = outBuffer->data();
 
         future = QtConcurrent::run(
-            [this, &outBuffer] { return wizard()->importer->readSetsFromByteArray(outBuffer->data()); });
+            [this, &outBufferData] { return wizard()->importer->readSetsFromByteArray(outBufferData); });
         watcher.setFuture(future);
         return;
 #else
