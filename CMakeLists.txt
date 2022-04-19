@@ -91,8 +91,8 @@ if(UNIX)
         if(RULE_LAUNCH_COMPILE)
             MESSAGE(STATUS "Force enabling CCache usage under macOS")
             # Set up wrapper scripts
-            configure_file(${CMAKE_MODULE_PATH}/launch-c.in   launch-c)
-            configure_file(${CMAKE_MODULE_PATH}/launch-cxx.in launch-cxx)
+            configure_file("${CMAKE_MODULE_PATH}/launch-c.in"   launch-c)
+            configure_file("${CMAKE_MODULE_PATH}/launch-cxx.in" launch-cxx)
             execute_process(COMMAND chmod a+rx
                 "${CMAKE_BINARY_DIR}/launch-c"
                 "${CMAKE_BINARY_DIR}/launch-cxx")
@@ -257,8 +257,8 @@ elseif(WIN32)
 
     # Configure file with custom definitions for NSIS.
     configure_file(
-        ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
-        ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
+        "${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in"
+        "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh"
     )
 
     # include vcredist into the package; NSIS will take care of running it
