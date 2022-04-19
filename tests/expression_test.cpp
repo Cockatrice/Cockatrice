@@ -1,7 +1,7 @@
 #include "../common/expression.h"
 
 #include "gtest/gtest.h"
-#include <cmath>
+#include <QtMath>
 
 #define TEST_EXPR(name, a, b)                                                                                          \
     TEST(ExpressionTest, name)                                                                                         \

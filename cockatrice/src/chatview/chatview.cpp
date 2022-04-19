@@ -321,7 +321,7 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
 
 void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString &userName, UserLevelFlags userLevel)
 {
-    const auto notALetterOrNumber = QRegularExpression("[^a-zA-Z0-9]");
+    const static auto notALetterOrNumber = QRegularExpression("[^a-zA-Z0-9]");
 
     int firstSpace = message.indexOf(' ');
     QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);

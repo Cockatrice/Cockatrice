@@ -2,7 +2,7 @@
 #include "mocks.h"
 
 #include "gtest/gtest.h"
-#include <cmath>
+#include <QtMath>
 
 CardDatabase *db;
 

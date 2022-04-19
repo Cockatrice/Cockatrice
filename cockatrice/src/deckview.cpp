@@ -9,8 +9,8 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
+#include <QtMath>
 #include <algorithm>
-#include <cmath>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -240,7 +240,7 @@ int DeckViewCardContainer::getCardTypeTextWidth() const
     int maxCardTypeWidth = 0;
     for (const auto &key : cardsByType.keys()) {
         int cardTypeWidth = fm.size(Qt::TextSingleLine, key).width();
-        maxCardTypeWidth = std::max(maxCardTypeWidth, cardTypeWidth);
+        maxCardTypeWidth = qMax(maxCardTypeWidth, cardTypeWidth);
     }
 
     return maxCardTypeWidth + 15;

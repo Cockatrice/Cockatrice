@@ -21,5 +21,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         qttools5-dev \
         qttools5-dev-tools \
     && apt-get clean \
-    && git config --global --add safe.directory /src \
     && rm -rf /var/lib/apt/lists/*

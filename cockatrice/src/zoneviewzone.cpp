@@ -14,7 +14,7 @@
 #include <QDebug>
 #include <QGraphicsSceneWheelEvent>
 #include <QPainter>
-#include <math.h>
+#include <QtMath>
 
 ZoneViewZone::ZoneViewZone(Player *_p,
                            CardZone *_origZone,

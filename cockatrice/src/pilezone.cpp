@@ -45,13 +45,7 @@ void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
     connect(card, SIGNAL(sigPixmapUpdated()), this, SLOT(callUpdate()));
 
-    if (0 <= x) {
-        cards.push_front(card);
-    } else if (x < cards.size()) {
-        cards.insert(x, card);
-    } else {
-        cards.push_back(card);
-    }
+    cards.insert(x, card);
 
     card->setPos(0, 0);
     if (!contentsKnown()) {

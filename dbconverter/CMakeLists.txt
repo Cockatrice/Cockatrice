@@ -13,7 +13,7 @@ SET(dbconverter_SOURCES
     ${VERSION_STRING_CPP}
 )
 
-LIST(APPEND dbconverter_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::Widgets )
+
 SET(QT_DONT_USE_QTGUI TRUE)
 
 IF(Qt6_FOUND)
@@ -31,7 +31,7 @@ ENDIF()
 # Build servatrice binary and link it
 ADD_EXECUTABLE(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES} ${dbconverter_MOC_SRCS})
 
-TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES})
+TARGET_LINK_LIBRARIES(dbconverter ${DB_CONVERTER_QT_MODULES})
 
 # install rules
 if(UNIX)

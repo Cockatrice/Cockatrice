@@ -25,8 +25,8 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QtMath>
 #include <google/protobuf/descriptor.h>
-#include <math.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
