@@ -88,6 +88,7 @@ jobs:
 
           - distro: Debian10
             package: DEB
+            test: skip # running tests on all distros is superfluous
 
           - distro: Debian11
             package: DEB
@@ -98,6 +99,7 @@ jobs:
 
           - distro: Fedora35
             package: RPM
+            test: skip
 
           - distro: Fedora36
             package: RPM
@@ -111,6 +113,7 @@ jobs:
 
           - distro: UbuntuImpish
             package: DEB
+            test: skip
 
           - distro: UbuntuJammy
             package: DEB
