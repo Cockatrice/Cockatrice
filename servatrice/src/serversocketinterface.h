@@ -63,6 +63,7 @@ protected slots:
     virtual void flushOutputQueue() = 0;
 signals:
     void outputQueueChanged();
+    void incTxBytes(qint64 amount);
 
 protected:
     void logDebugMessage(const QString &message);

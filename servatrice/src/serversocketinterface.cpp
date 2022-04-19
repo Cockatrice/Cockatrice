@@ -89,7 +89,6 @@ AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
     // deadlocks etc.
     connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
-    connect(_server, &Servatrice::destroyed, this, [=]() { this->servatrice = nullptr; });
 }
 
 bool AbstractServerSocketInterface::initSession()
@@ -1765,9 +1764,7 @@ void TcpServerSocketInterface::flushOutputQueue()
         locker.relock();
     }
     locker.unlock();
-    if (servatrice) {
-        servatrice->incTxBytes(totalBytes);
-    }
+    emit incTxBytes(totalBytes);
     // see above wrt mutex
     flushSocket();
 }
@@ -1906,7 +1903,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     server->addClient(this);
 
     logger->logMessage(
-        QString("Incoming websocket connection: %1 (%2)").arg(address.toString(), socket->peerAddress().toString()),
+        QString("Incoming websocket connection: %1 (%2)").arg(address.toString()).arg(socket->peerAddress().toString()),
         this);
 
     if (!initWebsocketSession())
@@ -1946,7 +1943,7 @@ void WebsocketServerSocketInterface::flushOutputQueue()
     if (outputQueue.isEmpty())
         return;
 
-    int totalBytes = 0;
+    qint64 totalBytes = 0;
     while (!outputQueue.isEmpty()) {
         ServerMessage item = outputQueue.takeFirst();
         locker.unlock();
@@ -1966,9 +1963,7 @@ void WebsocketServerSocketInterface::flushOutputQueue()
         locker.relock();
     }
     locker.unlock();
-    if (servatrice) {
-        servatrice->incTxBytes(totalBytes);
-    }
+    emit incTxBytes(totalBytes);
     // see above wrt mutex
     flushSocket();
 }
