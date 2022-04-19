@@ -129,6 +129,9 @@ jobs:
     env:
       NAME: ${{matrix.distro}}
       CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
+      # cache size over the entire repo is 10Gi link:
+      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      CCACHE_SIZE: 200M
 
     steps:
       - name: Checkout
@@ -158,7 +161,7 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache
+          RUN --server --debug --test --ccache "$CCACHE_SIZE"
 
       - name: Build release package
         id: package
@@ -169,7 +172,7 @@ jobs:
           type: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --suffix "$suffix"
+          RUN --server --release --package "$type" --suffix "$suffix" --ccache
 
       - name: Upload artifact
         if: matrix.package != 'skip'
