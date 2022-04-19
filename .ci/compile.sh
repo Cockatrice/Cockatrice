@@ -9,10 +9,11 @@
 # --suffix <suffix> renames package with this suffix, requires arg
 # --server compiles servatrice
 # --test runs tests
-# --debug or --release or <arg> sets the build type ie CMAKE_BUILD_TYPE
-# --ccache uses ccache and shows stats
+# --debug or --release sets the build type ie CMAKE_BUILD_TYPE
+# --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
-# uses env: BUILDTYPE CHECK_FORMAT MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE BUILD_DIR (correspond to args: <buildtype>/--debug/--release --format --install --package <package type> --suffix <suffix> --server --test --ccache --dir <dir>)
+# uses env: BUILDTYPE CHECK_FORMAT MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR
+# (correspond to args: --debug/--release --format --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 LINT_SCRIPT=".ci/lint_cpp.sh"
 
@@ -33,7 +34,7 @@ while [[ $# != 0 ]]; do
     '--package')
       MAKE_PACKAGE=1
       shift
-      if [[ $# != 0 && $1 != -* ]]; then
+      if [[ $# != 0 && ${1:0:1} != - ]]; then
         PACKAGE_TYPE="$1"
         shift
       fi
@@ -66,6 +67,10 @@ while [[ $# != 0 ]]; do
     '--ccache')
       USE_CCACHE=1
       shift
+      if [[ $# != 0 && ${1:0:1} != - ]]; then
+        CCACHE_SIZE="$1"
+        shift
+      fi
       ;;
     '--dir')
       shift
@@ -77,12 +82,8 @@ while [[ $# != 0 ]]; do
       shift
       ;;
     *)
-      if [[ $1 == -* ]]; then
-        echo "::error file=$0::unrecognized option: $1"
-        exit 3
-      fi
-      BUILDTYPE="$1"
-      shift
+      echo "::error file=$0::unrecognized option: $1"
+      exit 3
       ;;
   esac
 done
@@ -130,13 +131,32 @@ if [[ $(uname) == "Darwin" ]]; then
     PATH="/usr/local/opt/ccache/libexec:$PATH"
   fi
   # Add qt install location when using homebrew
-  flags+=("-DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/")
+  qt_location=(/usr/local/opt/qt*)
+  flags+=("-DCMAKE_PREFIX_PATH=${qt_location[0]}")
 fi
+
+if [[ $USE_CCACHE ]]; then
+  flags+=("-DUSE_CCACHE=1")
+  if [[ $CCACHE_SIZE ]]; then
+    # note, this setting persists after running the script
+    ccache --max-size "$CCACHE_SIZE"
+  fi
+fi
+
+function ccachestatsverbose() {
+  # note, verbose only works on newer ccache, discard the error
+  local got
+  if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
+    echo "$got"
+  else
+    ccache --show-stats
+  fi
+}
 
 # Compile
 if [[ $USE_CCACHE ]]; then
   echo "::group::Show ccache stats"
-  ccache --show-stats
+  ccachestatsverbose
   echo "::endgroup::"
 fi
 
@@ -151,7 +171,7 @@ echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
   echo "::group::Show ccache stats again"
-  ccache --show-stats
+  ccachestatsverbose
   echo "::endgroup::"
 fi
 

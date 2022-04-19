@@ -10,7 +10,8 @@
 # --interactive immediately starts the image interactively for debugging
 # --set-cache <location> sets the location to cache the image or for ccache
 # requires: docker
-# uses env: NAME CACHE BUILD GET SAVE INTERACTIVE (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
+# uses env: NAME CACHE BUILD GET SAVE INTERACTIVE
+# (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
 export BUILD_SCRIPT=".ci/compile.sh"
@@ -48,7 +49,7 @@ while [[ $# != 0 ]]; do
       shift 2
       ;;
     *)
-      if [[ $1 == -* ]]; then
+      if [[ ${1:0:1} == - ]]; then
         echo "unrecognized option: $1"
         return 3
       fi
@@ -74,25 +75,26 @@ fi
 
 if ! [[ $CACHE ]]; then
   echo "cache dir is not set!" >&2
-else
-  if ! [[ -d $CACHE ]]; then
-    echo "could not find cache dir: $CACHE" >&2
-    mkdir -p "$CACHE"
-    unset GET # the dir is empty
+  CACHE="$(mktemp -d)"
+  echo "set cache dir to $CACHE" >&2
+fi
+if ! [[ -d $CACHE ]]; then
+  echo "could not find cache dir: $CACHE" >&2
+  mkdir -p "$CACHE"
+  unset GET # the dir is empty
+fi
+if [[ $GET || $SAVE ]]; then
+  img_dir="$CACHE/$image_cache"
+  img_save="$img_dir/$IMAGE_NAME$save_extension"
+  if ! [[ -d $img_dir ]]; then
+    echo "could not find image dir: $img_dir" >&2
+    mkdir -p "$img_dir"
   fi
-  if [[ $GET || $SAVE ]]; then
-    img_dir="$CACHE/$image_cache"
-    img_save="$img_dir/$IMAGE_NAME$save_extension"
-    if ! [[ -d $img_dir ]]; then
-      echo "could not find image dir: $img_dir" >&2
-      mkdir -p "$img_dir"
-    fi
-  fi
-  export CCACHE_DIR="$CACHE/$ccache_cache"
-  if ! [[ -d $CCACHE_DIR ]]; then
-    echo "could not find ccache dir: $CCACHE_DIR" >&2
-    mkdir -p "$CCACHE_DIR"
-  fi
+fi
+export CCACHE_DIR="$CACHE/$ccache_cache"
+if ! [[ -d $CCACHE_DIR ]]; then
+  echo "could not find ccache dir: $CCACHE_DIR" >&2
+  mkdir -p "$CCACHE_DIR"
 fi
 
 # Get the docker image from previously stored save
