@@ -269,7 +269,8 @@ jobs:
         shell: bash
         env:
           CMAKE_BUILD_PARALLEL_LEVEL: 3  # Mac machines actually have 3 cores
-        run: .ci/compile.sh ${{matrix.type}} --server
+          BUILDTYPE: ${{matrix.type}}
+        run: .ci/compile.sh --server
 
       - name: Test
         if: matrix.do_tests == 1
