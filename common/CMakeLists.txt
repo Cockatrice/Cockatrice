@@ -40,4 +40,4 @@ include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(cockatrice_common ${common_SOURCES} ${common_MOC_SRCS})
-target_link_libraries(cockatrice_common cockatrice_protocol)
+target_link_libraries(cockatrice_common PUBLIC cockatrice_protocol)
