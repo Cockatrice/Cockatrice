@@ -932,10 +932,9 @@ void MainWindow::createTrayIcon()
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::DoubleClick) {
-        if (windowState() != Qt::WindowMinimized &&
-            windowState() != ((int)Qt::WindowMinimized + (int)Qt::WindowMaximized))
+        if ((windowState() & (Qt::WindowMinimized & Qt::WindowMaximized)) == 0) {
             showMinimized();
-        else {
+        } else {
             showNormal();
             QApplication::setActiveWindow(this);
         }
