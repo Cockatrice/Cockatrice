@@ -1,5 +1,7 @@
 # Find a compatible Qt version
 # Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5
+# Optional Input: QT6_DIR -- Hint as to where Qt6 lives on the system
+# Optional Input: QT5_DIR -- Hint as to where Qt5 lives on the system
 # Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6
 # Output: SERVATRICE_QT_MODULES
 # Output: COCKATRICE_QT_MODULES
@@ -29,17 +31,49 @@ set(REQUIRED_QT_COMPONENTS
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
 if(NOT FORCE_USE_QT5)
-    # Core5Compat is Qt6 Only
-    find_package(Qt6 6.2.3 COMPONENTS Core5Compat ${REQUIRED_QT_COMPONENTS} QUIET HINTS ${Qt6_DIR})
+    # Core5Compat is Qt6 Only, Linguist is now a component in Qt6 instead of an external package
+    find_package(Qt6 6.2.3
+            COMPONENTS Core5Compat ${REQUIRED_QT_COMPONENTS}
+            OPTIONAL_COMPONENTS Linguist
+            QUIET
+            HINTS ${Qt6_DIR})
 endif()
 if(Qt6_FOUND)
     set(COCKATRICE_QT_VERSION_NAME Qt6)
+
+    if(Qt6LinguistTools_FOUND)
+        list(FIND Qt6LinguistTools_TARGETS Qt6::lrelease QT6_LRELEASE_INDEX)
+        if(QT6_LRELEASE_INDEX EQUAL -1)
+            message(WARNING "Qt6 lrelease not found.")
+        endif()
+
+        list(FIND Qt6LinguistTools_TARGETS Qt6::lupdate QT6_LUPDATE_INDEX)
+        if(QT6_LUPDATE_INDEX EQUAL -1)
+            message(WARNING "Qt6 lupdate not found.")
+        endif()
+    endif()
 else()
-    find_package(Qt5 5.8.0 COMPONENTS ${REQUIRED_QT_COMPONENTS} QUIET HINTS ${Qt5_DIR})
+    find_package(Qt5 5.8.0
+            COMPONENTS ${REQUIRED_QT_COMPONENTS}
+            QUIET
+            HINTS ${Qt5_DIR})
     if(Qt5_FOUND)
         set(COCKATRICE_QT_VERSION_NAME Qt5)
     else()
         message(FATAL_ERROR "No suitable version of Qt was found")
+    endif()
+
+    # Qt5 Linguist is in a separate package
+    find_package(Qt5LinguistTools QUIET)
+    if (Qt5LinguistTools_FOUND)
+        if(NOT Qt5_LRELEASE_EXECUTABLE)
+            message(WARNING "Qt5 lrelease not found.")
+        endif()
+        if(NOT Qt5_LUPDATE_EXECUTABLE)
+            message(WARNING "Qt5 lupdate not found.")
+        endif()
+    else()
+        message(WARNING "Linguist Tools not found, cannot handle translations")
     endif()
 endif()
 
@@ -52,9 +86,7 @@ set(QT_PLUGINS_DIR "${${COCKATRICE_QT_VERSION_NAME}Core_DIR}/../../../plugins")
 get_target_property(QT_LIBRARY_DIR ${COCKATRICE_QT_VERSION_NAME}::Core LOCATION)
 get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
 
-message(STATUS "Found Qt ${${COCKATRICE_QT_VERSION_NAME}_VERSION} at: ${${COCKATRICE_QT_VERSION_NAME}_DIR}")
-
-# Establish imports used by other parts of the code base
+# Establish exports
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" SERVATRICE_QT_MODULES "${_SERVATRICE_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" COCKATRICE_QT_MODULES "${_COCKATRICE_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" ORACLE_QT_MODULES "${_ORACLE_NEEDED}")
@@ -64,3 +96,5 @@ if(Qt6_FOUND)
     list(APPEND COCKATRICE_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core5Compat)
     LIST(APPEND ORACLE_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core5Compat)
 endif()
+
+message(STATUS "Found Qt ${${COCKATRICE_QT_VERSION_NAME}_VERSION} at: ${${COCKATRICE_QT_VERSION_NAME}_DIR}")

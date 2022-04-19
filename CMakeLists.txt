@@ -294,3 +294,8 @@ if(TEST)
     include(CTest)
     add_subdirectory(tests)
 endif()
+
+if(Qt6Found AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
+    # Qt6.3+ requires project finalization to support translations
+    qt6_finalize_project()
+endif()
