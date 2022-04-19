@@ -257,7 +257,7 @@ elseif(WIN32)
 
     # Configure file with custom definitions for NSIS.
     configure_file(
-        cmake/NSIS.definitions.nsh.in
+        ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
         ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
     )
 
