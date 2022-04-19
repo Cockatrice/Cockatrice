@@ -71,7 +71,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # Search path for cmake modules
-SET(COCKATRICE_CMAKE ${PROJECT_SOURCE_DIR}/cmake)
+set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+list(PREPEND CMAKE_MODULE_PATH "${COCKATRICE_CMAKE_PATH}")
 
 include(getversion)
 
@@ -91,8 +92,8 @@ if(UNIX)
         if(RULE_LAUNCH_COMPILE)
             MESSAGE(STATUS "Force enabling CCache usage under macOS")
             # Set up wrapper scripts
-            configure_file("${COCKATRICE_CMAKE}/launch-c.in"   launch-c)
-            configure_file("${COCKATRICE_CMAKE}/launch-cxx.in" launch-cxx)
+            configure_file("${COCKATRICE_CMAKE_PATH}/launch-c.in"   launch-c)
+            configure_file("${COCKATRICE_CMAKE_PATH}/launch-cxx.in" launch-cxx)
             execute_process(COMMAND chmod a+rx
                 "${CMAKE_BINARY_DIR}/launch-c"
                 "${CMAKE_BINARY_DIR}/launch-cxx")
@@ -257,7 +258,7 @@ elseif(WIN32)
 
     # Configure file with custom definitions for NSIS.
     configure_file(
-        "${COCKATRICE_CMAKE}/NSIS.definitions.nsh.in"
+        "${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in"
         "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh"
     )
 
