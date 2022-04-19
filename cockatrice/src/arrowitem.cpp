@@ -71,7 +71,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     const double arrowWidth = 15.0;
     const double headWidth = 40.0;
     const double headLength =
-        headWidth / pow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
+        headWidth / qPow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
     const double phi = 15;
 
     if (!startItem)
@@ -86,7 +86,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     if (lineLength < 30)
         path = QPainterPath();
     else {
-        QPointF c(lineLength / 2, tan(phi * M_PI / 180) * lineLength);
+        QPointF c(lineLength / 2, qTan(phi * M_PI / 180) * lineLength);
 
         QPainterPath centerLine;
         centerLine.moveTo(0, 0);
@@ -97,22 +97,22 @@ void ArrowItem::updatePath(const QPointF &endPoint)
         QLineF testLine(arrowBodyEndPoint, centerLine.pointAtPercent(percentage + 0.001));
         qreal alpha = testLine.angle() - 90;
         QPointF endPoint1 =
-            arrowBodyEndPoint + arrowWidth / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+            arrowBodyEndPoint + arrowWidth / 2 * QPointF(qCos(alpha * M_PI / 180), -qSin(alpha * M_PI / 180));
         QPointF endPoint2 =
-            arrowBodyEndPoint + arrowWidth / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+            arrowBodyEndPoint + arrowWidth / 2 * QPointF(-qCos(alpha * M_PI / 180), qSin(alpha * M_PI / 180));
         QPointF point1 =
-            endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+            endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(qCos(alpha * M_PI / 180), -qSin(alpha * M_PI / 180));
         QPointF point2 =
-            endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+            endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-qCos(alpha * M_PI / 180), qSin(alpha * M_PI / 180));
 
-        path = QPainterPath(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
+        path = QPainterPath(-arrowWidth / 2 * QPointF(qCos((phi - 90) * M_PI / 180), qSin((phi - 90) * M_PI / 180)));
         path.quadTo(c, endPoint1);
         path.lineTo(point1);
         path.lineTo(QPointF(lineLength, 0));
         path.lineTo(point2);
         path.lineTo(endPoint2);
-        path.quadTo(c, arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
-        path.lineTo(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
+        path.quadTo(c, arrowWidth / 2 * QPointF(qCos((phi - 90) * M_PI / 180), qSin((phi - 90) * M_PI / 180)));
+        path.lineTo(-arrowWidth / 2 * QPointF(qCos((phi - 90) * M_PI / 180), qSin((phi - 90) * M_PI / 180)));
     }
 
     setPos(startPoint);

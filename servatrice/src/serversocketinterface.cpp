@@ -74,7 +74,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
-#include <QtMath>
 #include <iostream>
 #include <string>
 

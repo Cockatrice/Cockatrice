@@ -97,7 +97,7 @@ void GameScene::rearrange()
 
     const int playersCount = playersPlaying.size();
     const int columns = playersCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
-    const int rows = ceil((qreal)playersCount / columns);
+    const int rows = qCeil((qreal)playersCount / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 

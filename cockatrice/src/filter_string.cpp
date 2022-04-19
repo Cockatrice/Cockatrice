@@ -4,7 +4,6 @@
 
 #include <QByteArray>
 #include <QString>
-#include <QtMath>
 #include <functional>
 
 peg::parser search(R"(
