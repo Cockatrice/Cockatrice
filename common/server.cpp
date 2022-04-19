@@ -230,6 +230,11 @@ void Server::addClient(Server_ProtocolHandler *client)
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
+    int clientIndex = clients.indexOf(client);
+    if (clientIndex == -1) {
+        qWarning() << "tried to remove non existing client";
+        return;
+    }
 
     if (client->getConnectionType() == "tcp")
         tcpUserCount--;
@@ -238,13 +243,7 @@ void Server::removeClient(Server_ProtocolHandler *client)
         webSocketUserCount--;
 
     QWriteLocker locker(&clientsLock);
-    auto indexToRemove = clients.indexOf(client);
-    if (indexToRemove == -1) {
-        qWarning() << "We lost track of client" << client;
-    } else {
-        clients.removeAt(indexToRemove);
-    }
-
+    clients.removeAt(clientIndex);
     ServerInfo_User *data = client->getUserInfo();
     if (data) {
         Event_UserLeft event;
