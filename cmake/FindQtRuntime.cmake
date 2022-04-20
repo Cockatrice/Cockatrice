@@ -86,10 +86,22 @@ if(Qt5_POSITION_INDEPENDENT_CODE OR Qt6_FOUND)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# guess plugins and libraries directory
-set(QT_PLUGINS_DIR "${${COCKATRICE_QT_VERSION_NAME}Core_DIR}/../../../plugins")
+# Establish Qt Plugins directory & Library directories
 get_target_property(QT_LIBRARY_DIR ${COCKATRICE_QT_VERSION_NAME}::Core LOCATION)
-get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
+get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} DIRECTORY)
+if(Qt6_FOUND)
+    get_filename_component(QT_PLUGINS_DIR "${Qt6Core_DIR}/../../../${QT6_INSTALL_PLUGINS}" ABSOLUTE)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../../.." ABSOLUTE)
+    if(UNIX AND APPLE)
+        # Mac needs a bit more help finding all necessary components
+        list(APPEND QT_LIBRARY_DIR "/usr/local/lib")
+    endif()
+elseif(Qt5_FOUND)
+    get_filename_component(QT_PLUGINS_DIR "${Qt5Core_DIR}/../../../plugins" ABSOLUTE)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
+endif()
+message(DEBUG "QT_PLUGINS_DIR = ${QT_PLUGINS_DIR}")
+message(DEBUG "QT_LIBRARY_DIR = ${QT_LIBRARY_DIR}")
 
 # Establish exports
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" SERVATRICE_QT_MODULES "${_SERVATRICE_NEEDED}")
