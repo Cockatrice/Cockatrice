@@ -44,6 +44,7 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 }
 
 // This function must only be called from the thread this object lives in.
+// Except when the server is shutting down.
 // The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
 void Server_ProtocolHandler::prepareDestroy()
 {

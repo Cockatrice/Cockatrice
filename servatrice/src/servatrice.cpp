@@ -208,6 +208,7 @@ Servatrice::~Servatrice()
 {
     gameServer->close();
 
+    // we are destroying the clients outside their thread!
     for (auto *client : clients) {
         client->prepareDestroy();
     }
