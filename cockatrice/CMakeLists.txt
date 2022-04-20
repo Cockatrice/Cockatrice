@@ -199,11 +199,7 @@ endif()
 if(Qt5_FOUND)
     target_link_libraries(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
 else()
-    # Cmake 3.13 ... Gotta think of a workaround later so older CMakes can run Qt6
-    cmake_policy(SET CMP0079 NEW)
-    target_link_libraries(cockatrice_common PUBLIC ${COCKATRICE_QT_MODULES})
     target_link_libraries(cockatrice PUBLIC cockatrice_common ${COCKATRICE_QT_MODULES})
-
 endif()
 
 if(UNIX)
