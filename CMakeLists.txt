@@ -5,7 +5,7 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# Cmake 3.1 is required to enable C++11 support correctly
+# cmake 3.16 is required if using qt6
 cmake_minimum_required(VERSION 3.10)
 
 # Early detect ccache
@@ -63,7 +63,7 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
     set(GIT_TAG_RELEASENAME "Prismatic Bridge")
 endif()
 
-# Use c++11 for all targets
+# Use c++17 for all targets
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ ISO Standard")
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
