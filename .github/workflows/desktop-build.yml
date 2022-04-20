@@ -260,7 +260,10 @@ jobs:
         id: brew_install_qt
         continue-on-error: true
         shell: bash
-        run: brew install qt@6 --force-bottle
+        run: |
+          brew remove qt@5
+          brew install qt@6 --force-bottle
+          brew link qt
 
       - name: Install QT using actions
         if: steps.brew_install_qt.outcome != 'success'
