@@ -309,6 +309,11 @@ jobs:
           asset_name: ${{steps.package.outputs.name}}
           asset_content_type: application/octet-stream
 
+      - uses: actions/checkout@v2
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+
   build-windows:
     strategy:
       fail-fast: false
