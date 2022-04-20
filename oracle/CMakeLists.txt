@@ -154,10 +154,6 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir oracle.app/Contents/Plugins)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
-    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
-    if(Qt6_FOUND)
-        get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../.." ABSOLUTE)
-    endif()
 
     # Qt plugins: iconengines, platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
