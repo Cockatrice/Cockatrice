@@ -208,28 +208,28 @@ jobs:
 
           - target: 10.14_Mojave
             os: macos-10.15 # runs on Catalina
-            xcode: 10.3 # allows compatibility with macOS 10.14
+            xcode: 11.3 # allows compatibility with macOS 10.14
             type: Release
             do_tests: 0
             make_package: true
 
           - target: 10.15_Catalina
             os: macos-10.15
-            xcode: 12.1
+            xcode: 12.4
             type: Release
             do_tests: 0
             make_package: true
 
           - target: 11_Big_Sur
             os: macos-11
-            xcode: 12.5.1
+            xcode: 13.2
             type: Release
             do_tests: 0
             make_package: true
 
 #          - target: 12_Monterey
 #            os: macos-12
-#            xcode: 13.1
+#            xcode: 13.3
 #            type: Release
 #            do_tests: 0
 #            make_package: true
