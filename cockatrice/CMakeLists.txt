@@ -230,6 +230,9 @@ if(APPLE)
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
+    if(Qt6_FOUND)
+        get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../.." ABSOLUTE)
+    endif()
 
     # Qt plugins: audio, iconengines, imageformats, platforms, printsupport
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
