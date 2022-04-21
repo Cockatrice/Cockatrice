@@ -26,8 +26,10 @@ void StackZone::updateBg()
 
 void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-    if (x == -1)
+    // if x is negative set it to add at end
+    if (x < 0 || x >= cards.size()) {
         x = cards.size();
+    }
     cards.insert(x, card);
 
     if (!cards.getContentsKnown()) {

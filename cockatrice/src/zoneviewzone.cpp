@@ -193,6 +193,10 @@ void ZoneViewZone::setPileView(int _pileView)
 
 void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
+    // if x is negative set it to add at end
+    if (x < 0 || x >= cards.size()) {
+        x = cards.size();
+    }
     cards.insert(x, card);
     card->setParentItem(this);
     card->update();
