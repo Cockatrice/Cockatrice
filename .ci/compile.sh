@@ -82,7 +82,7 @@ while [[ $# != 0 ]]; do
       BUILD_DIR="$1"
       shift
       ;;
-    `--parallel`)
+    '--parallel')
       shift
       if [[ $# == 0 ]]; then
         echo "::error file=$0::--parallel expects an argument"
