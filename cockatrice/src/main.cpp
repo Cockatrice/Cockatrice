@@ -67,23 +67,27 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().getLang();
 
-    const auto fileName0 = "qt_" + lang;
+    const auto fileName1 = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    const auto dir0 = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+    const auto dir1 = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
 #else
-    const auto dir0 = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+    const auto dir1 = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
 #endif
 
-    const auto fileLoaded0 = qtTranslator->load(fileName0, dir0);
-    if (!fileLoaded0) {
-        qWarning() << "Unable to load file" << QDir(dir0, fileName0).absolutePath();
+    const auto fileLoaded1 = qtTranslator->load(fileName1, dir1);
+    if (!fileLoaded1) {
+        qDebug() << "(1) Unable to load translation file" << QFileInfo(dir1, fileName1).absoluteFilePath();
+    } else {
+        qDebug() << "(1) Loaded translation file" << QFileInfo(dir1, fileName1).absoluteFilePath();
     }
     qApp->installTranslator(qtTranslator);
 
-    const auto fileName1 = translationPrefix + "_" + lang;
-    const auto fileLoaded1 = translator->load(fileName1, translationPath);
-    if (!fileLoaded1) {
-        qWarning() << "Unable to load translation file" << QDir(translationPath, fileName1).absolutePath();
+    const auto fileName2 = translationPrefix + "_" + lang;
+    const auto fileLoaded2 = translator->load(fileName2, translationPath);
+    if (!fileLoaded2) {
+        qDebug() << "(2) Unable to load translation file" << QFileInfo(translationPath, fileName2).absoluteFilePath();
+    } else {
+        qDebug() << "(2) Loaded translation file" << QFileInfo(translationPath, fileName2).absoluteFilePath();
     }
     qApp->installTranslator(translator);
 
