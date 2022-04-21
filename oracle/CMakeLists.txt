@@ -155,7 +155,7 @@ if(APPLE)
     set(plugin_dest_dir oracle.app/Contents/Plugins)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
 
-    # Qt plugins: iconengines, platforms
+    # Qt plugins: iconengines, platforms, styles, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -163,6 +163,7 @@ if(APPLE)
         PATTERN "iconengines/*.dylib"
         PATTERN "platforms/*.dylib"
         PATTERN "styles/*.dylib"
+        PATTERN "tls/*.dylib"
     )
 
     install(CODE "
@@ -188,9 +189,9 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # Qt plugins: iconengines, platforms
+    # Qt plugins: iconengines, platforms, styles, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(iconengines|platforms|styles)/.*[^d]\\.dll")
+        FILES_MATCHING REGEX "(iconengines|platforms|styles|tls)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

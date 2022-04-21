@@ -124,13 +124,14 @@ if(APPLE)
     set(plugin_dest_dir servatrice.app/Contents/Plugins)
     set(qtconf_dest_dir servatrice.app/Contents/Resources)
 
-    # Qt plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
         PATTERN "*_debug.dylib" EXCLUDE
         PATTERN "platforms/*.dylib"
         PATTERN "sqldrivers/libqsqlmysql*.dylib"
+        PATTERN "tls/*.dylib"
     )
 
     install(CODE "
@@ -155,9 +156,9 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # Qt plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(platforms/.*|sqldrivers/qsqlmysql)\\.dll"
+        FILES_MATCHING REGEX "(platforms/.*|sqldrivers/qsqlmysql|tls/.*)\\.dll"
         REGEX ".*d\\.dll" EXCLUDE)
 
     install(CODE "

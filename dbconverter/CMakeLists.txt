@@ -57,7 +57,7 @@ if(APPLE)
     set(plugin_dest_dir dbconverter.app/Contents/Plugins)
     set(qtconf_dest_dir dbconverter.app/Contents/Resources)
 
-    # Qt plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -87,7 +87,7 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # Qt plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING REGEX "(platforms/.*)\\.dll"
         REGEX ".*d\\.dll" EXCLUDE)
