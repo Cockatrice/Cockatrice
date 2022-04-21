@@ -350,12 +350,12 @@ jobs:
         uses: actions/cache@v1 # Intentionally v1, based on jurplel documentation
         with:
           key: ${{runner.os}}-QtCache-${{matrix.qt_version}}-${{matrix.arch}}
-          path: '${{github.workspace}}/../QtFAIL'
+          path: '${{github.workspace}}/../Qt'
 
       - name: Install Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit)
         uses: jurplel/install-qt-action@v3
         with:
-          cached: ${{steps.cache-qt.outputs.cache-hit}}
+          cached: false # ${{steps.cache-qt.outputs.cache-hit}}
           version: ${{matrix.qt_version}}
           arch: win${{matrix.arch}}_${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
