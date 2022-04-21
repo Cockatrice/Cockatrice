@@ -132,7 +132,7 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
     card->setZone(this);
 
-    if (0 <= x) {
+    if (x < 0) {
         x = 0;
     } else if (x >= cards.size()) {
         x = cards.size() - 1;
