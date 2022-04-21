@@ -230,7 +230,7 @@ if(APPLE)
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-    # Qt plugins: audio, iconengines, imageformats, platforms, printsupport
+    # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -241,6 +241,7 @@ if(APPLE)
         PATTERN "platforms/*.dylib"
         PATTERN "printsupport/*.dylib"
         PATTERN "styles/*.dylib"
+        PATTERN "tls/*.dylib"
     )
 
     install(CODE "
@@ -266,9 +267,9 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # Qt plugins: audio, iconengines, imageformats, platforms, printsupport
+    # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport|styles)/.*[^d]\\.dll")
+        FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport|styles|tls)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
