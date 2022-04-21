@@ -23,10 +23,9 @@
 
 int ReleaseChannel::sharedIndex = 0;
 
-ReleaseChannel::ReleaseChannel() : response(nullptr), lastRelease(nullptr)
+ReleaseChannel::ReleaseChannel() : netMan(new QNetworkAccessManager(this)), response(nullptr), lastRelease(nullptr)
 {
     index = sharedIndex++;
-    netMan = new QNetworkAccessManager(this);
 }
 
 ReleaseChannel::~ReleaseChannel()

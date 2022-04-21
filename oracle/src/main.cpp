@@ -31,7 +31,9 @@ void installNewTranslator()
 
     const auto fileLoaded1 = qtTranslator->load(fileName1, dir);
     if (!fileLoaded1) {
-        qWarning() << "Unable to load translation file" << QDir(dir, fileName1).absolutePath();
+        qWarning() << "(1) Unable to load translation file" << QFileInfo(dir, fileName1).absoluteFilePath();
+    } else {
+        qDebug() << "(1) Loaded translation file" << QFileInfo(dir, fileName1).absoluteFilePath();
     }
 
     qApp->installTranslator(qtTranslator);
@@ -39,7 +41,9 @@ void installNewTranslator()
     const auto fileName2 = translationPrefix + "_" + lang;
     const auto fileLoaded2 = qtTranslator->load(fileName2, translationPath);
     if (!fileLoaded2) {
-        qWarning() << "Unable to load translation file" << QDir(translationPath, fileName2).absolutePath();
+        qWarning() << "(2) Unable to load translation file" << QFileInfo(translationPath, fileName2).absoluteFilePath();
+    } else {
+        qDebug() << "(2) Loaded translation file" << QFileInfo(translationPath, fileName2).absoluteFilePath();
     }
     qApp->installTranslator(translator);
 }
