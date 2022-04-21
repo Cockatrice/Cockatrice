@@ -197,7 +197,9 @@ QString GeneralSettingsPage::languageName(const QString &qmFile)
     const auto fileName = translationPrefix + "_" + qmFile + ".qm";
     const auto fileLoaded = qTranslator.load(fileName, translationPath);
     if (!fileLoaded) {
-        qWarning() << "Unable to load translation file" << QDir(translationPath, fileName).absolutePath();
+        qDebug() << "(1) Unable to load translation file" << QFileInfo(translationPath, fileName).absoluteFilePath();
+    } else {
+        qDebug() << "(1) Loaded translation file" << QFileInfo(translationPath, fileName).absoluteFilePath();
     }
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
