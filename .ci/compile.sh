@@ -12,8 +12,9 @@
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
-# uses env: BUILDTYPE CHECK_FORMAT MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR
-# (correspond to args: --debug/--release --format --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
+# --parallel <core count> sets how many cores cmake should build with in parallel
+# uses env: BUILDTYPE CHECK_FORMAT MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT
+# (correspond to args: --debug/--release --format --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count>)
 # exitcode: 1 for failure, 3 for invalid arguments
 LINT_SCRIPT=".ci/lint_cpp.sh"
 
@@ -79,6 +80,15 @@ while [[ $# != 0 ]]; do
         exit 3
       fi
       BUILD_DIR="$1"
+      shift
+      ;;
+    `--parallel`)
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--parallel expects an argument"
+        exit 3
+      fi
+      PARALLEL_COUNT="$1"
       shift
       ;;
     *)
@@ -166,7 +176,11 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-cmake --build . --config "$BUILDTYPE"
+if [[ $PARALLEL_COUNT ]]; then
+  cmake --build . --config "$BUILDTYPE" --parallel "$PARALLEL_COUNT"
+else
+  cmake --build . --config "$BUILDTYPE"
+fi
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
