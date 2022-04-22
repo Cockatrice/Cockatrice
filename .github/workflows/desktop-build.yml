@@ -161,7 +161,7 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 2
 
       - name: Build release package
         id: package
@@ -173,7 +173,7 @@ jobs:
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --suffix "$suffix" \
-                  --ccache "$CCACHE_SIZE"
+                  --ccache "$CCACHE_SIZE" --parallel 2
 
       - name: Upload artifact
         if: matrix.package != 'skip'
@@ -271,9 +271,9 @@ jobs:
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
         env:
-          CMAKE_BUILD_PARALLEL_LEVEL: 3  # Mac machines actually have 3 cores
           BUILDTYPE: ${{matrix.type}}
-        run: .ci/compile.sh --server
+        # Mac machines actually have 3 cores
+        run: .ci/compile.sh --server --parallel 3
 
       - name: Test
         if: matrix.do_tests == 1
@@ -376,7 +376,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
           CMAKE_PREFIX_PATH: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
-        run: ./.ci/compile.sh --server --release --test --package --parallel 2
+        run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3

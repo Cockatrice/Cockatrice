@@ -42,11 +42,11 @@ ${diff#*
 
 Exiting...
 EOM
-      exit 2
-      ;;
+    exit 2
+    ;;
 
-    0)
-      cat <<EOM
+  0)
+    cat <<EOM
 
 ***********************************************************
 ***                                                     ***
@@ -58,12 +58,12 @@ EOM
 
 Exiting...
 EOM
-      exit 0
-      ;;
+    exit 0
+    ;;
 
-    *)
-      echo ""
-      echo "Something went wrong in our formatting checks: clangify returned $err" >&2
-      echo ""
-      ;;
-  esac
+  *)
+    echo ""
+    echo "Something went wrong in our formatting checks: clangify returned $err" >&2
+    echo ""
+    ;;
+esac
