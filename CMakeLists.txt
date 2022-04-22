@@ -208,7 +208,7 @@ ENDIF()
 
 # Package builder
 set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
@@ -229,6 +229,7 @@ if(UNIX)
         # linux
         IF(CPACK_GENERATOR STREQUAL "RPM")
             set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+            set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
             IF(Qt6_FOUND)
                 SET(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia")
             ELSEIF(Qt5_FOUND)
@@ -236,6 +237,15 @@ if(UNIX)
             ENDIF()
             set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
             set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
+            # stop directories from making package conflicts
+            set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+              /usr/share/applications
+              /usr/share/icons
+              /usr/share/icons/hicolor
+              /usr/share/icons/hicolor/48x48
+              /usr/share/icons/hicolor/48x48/apps
+              /usr/share/icons/hicolor/scalable
+              /usr/share/icons/hicolor/scalable/apps)
         ELSE()
             set(CPACK_GENERATOR DEB)
             set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
