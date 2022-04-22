@@ -268,8 +268,31 @@ if(WIN32)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
     # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport|styles|tls)/.*[^d]\\.dll")
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
+            "audio/qtaudio_wasapi.dll"
+            "audio/qtaudio_windows.dll"
+            "iconengines/qsvgicon.dll"
+            "imageformats/qgif.dll"
+            "imageformats/qicns.dll"
+            "imageformats/qico.dll"
+            "imageformats/qjpeg.dll"
+            "imageformats/qsvg.dll"
+            "imageformats/qtga.dll"
+            "imageformats/qtiff.dll"
+            "imageformats/qwbmp.dll"
+            "imageformats/qwebp.dll"
+            "platforms/qdirect2d.dll"
+            "platforms/qminimal.dll"
+            "platforms/qoffscreen.dll"
+            "platforms/qwindows.dll"
+            "printsupport/windowsprintersupport.dll"
+            "styles/qcertonlybackend.dll"
+            "styles/qopensslbackend.dll"
+            "styles/qschannelbackend.dll"
+            "styles/qwindowsvistastyle.dll"
+            "tls/qcertonlybackend.dll"
+            "tls/qopensslbackend.dll"
+            "tls/qschannelbackend.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

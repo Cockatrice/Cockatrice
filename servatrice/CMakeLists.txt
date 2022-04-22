@@ -156,10 +156,19 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # Qt plugins: platforms, sqldrivers/mysql, tls (Qt6)
+    # Qt plugins: platforms, sqldrivers, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(platforms/.*|sqldrivers/qsqlmysql|tls/.*)\\.dll"
-        REGEX ".*d\\.dll" EXCLUDE)
+        FILES_MATCHING
+            "platforms/qdirect2d.dll"
+            "platforms/qminimal.dll"
+            "platforms/qoffscreen.dll"
+            "platforms/qwindows.dll"
+            "tls/qcertonlybackend.dll"
+            "tls/qopensslbackend.dll"
+            "tls/qschannelbackend.dll"
+            "sqldrivers/qsqlite.dll"
+            "sqldrivers/qsqlodbc.dll"
+            "sqldrivers/qsqlpsql.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
