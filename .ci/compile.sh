@@ -85,6 +85,15 @@ while [[ $# != 0 ]]; do
       PARALLEL_COUNT="$1"
       shift
       ;;
+    '--arch')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--arch expects an argument"
+        exit 3
+      fi
+      ARCH="$1"
+      shift
+      ;;
     *)
       echo "::error file=$0::unrecognized option: $1"
       exit 3
@@ -138,6 +147,11 @@ fi
 buildflags=(--config "$BUILDTYPE")
 if [[ $PARALLEL_COUNT ]]; then
   buildflags+=(--parallel "$PARALLEL_COUNT")
+fi
+
+# Specify OpenSSL for Win32
+if [[ $ARCH -eq 32 ]]; then
+  buildflags+=(-DOPENSSL_ROOT_DIR "./vcpkg_installed/x$ARCH-windows/share/openssl_x$ARCH-windows/")
 fi
 
 function ccachestatsverbose() {
