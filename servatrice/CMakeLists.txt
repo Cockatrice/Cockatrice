@@ -158,7 +158,7 @@ if(WIN32)
 
     # Qt plugins: platforms, sqldrivers, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING
+        FILES_MATCHING PATTERN
             "platforms/qdirect2d.dll"
             "platforms/qminimal.dll"
             "platforms/qoffscreen.dll"

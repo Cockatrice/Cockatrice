@@ -88,7 +88,8 @@ if(WIN32)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
     # Qt plugins: platforms
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING PATTERN
             "platforms/qdirect2d.dll"
             "platforms/qminimal.dll"
             "platforms/qoffscreen.dll"

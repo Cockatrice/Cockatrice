@@ -268,7 +268,8 @@ if(WIN32)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
     # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
+            FILES_MATCHING PATTERN
             "audio/qtaudio_wasapi.dll"
             "audio/qtaudio_windows.dll"
             "iconengines/qsvgicon.dll"
