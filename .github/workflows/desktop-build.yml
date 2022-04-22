@@ -355,7 +355,7 @@ jobs:
       - name: Install Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit)
         uses: jurplel/install-qt-action@v3
         with:
-          cached: false # ${{steps.cache-qt.outputs.cache-hit}}
+          cached: ${{steps.cache-qt.outputs.cache-hit}}
           version: ${{matrix.qt_version}}
           arch: win${{matrix.arch}}_${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
