@@ -89,10 +89,10 @@ if(WIN32)
 
     # Qt plugins: platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
-            "platforms/qdirect2d.dll"
-            "platforms/qminimal.dll"
-            "platforms/qoffscreen.dll"
-            "platforms/qwindows.dll")
+            PATTERN "platforms/qdirect2d.dll"
+            PATTERN "platforms/qminimal.dll"
+            PATTERN "platforms/qoffscreen.dll"
+            PATTERN "platforms/qwindows.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
