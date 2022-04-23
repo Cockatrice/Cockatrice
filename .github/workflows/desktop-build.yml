@@ -160,7 +160,7 @@ jobs:
         if: matrix.test != 'skip'
         shell: bash
         env:
-          distro: '${matrix.distro}'
+          distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
           RUN --server --debug --test \
