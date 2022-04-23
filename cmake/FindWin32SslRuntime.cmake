@@ -1,66 +1,39 @@
 # Find the OpenSSL runtime libraries (.dll) for Windows that
 # will be needed by Qt in order to access https urls.
-
 if (WIN32)
-  # Get standard installation paths for OpenSSL under Windows
-
-  # http://www.slproweb.com/products/Win32OpenSSL.html
-
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    # target win64
-    set(_OPENSSL_ROOT_HINTS
-      ${OPENSSL_ROOT_DIR}
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (64-bit)_is1;Inno Setup: App Path]"
-      ENV OPENSSL_ROOT_DIR
-      )
+  if(NOT DEFINED ENV{OS_NAME})
+    message(WARNING "OS_NAME" env not defined, uncertain where to find OpenSSL)
+  elseif("$ENV{OS_NAME}" STREQUAL "Windows-64")
+    message(STATUS "Looking for OpenSSL for $ENV{OS_NAME}")
+    set(_OPENSSL_ROOT_HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
     file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
     set(_OPENSSL_ROOT_PATHS
-      "C:/Tools/vcpkg/installed/x64-windows/bin"
-      "${_programfiles}/OpenSSL-Win64"
-      "C:/OpenSSL-Win64/"
-      )
+            "C:/OpenSSL-Win64/bin/"
+            )
     unset(_programfiles)
-  else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    # target win32
-    set(_OPENSSL_ROOT_HINTS
-      ${OPENSSL_ROOT_DIR}
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (32-bit)_is1;Inno Setup: App Path]"
-      ENV OPENSSL_ROOT_DIR
-      )
+  elseif("$ENV{OS_NAME}" STREQUAL "Windows-32")
+    message(STATUS "Looking for OpenSSL for $ENV{OS_NAME}")
+    set(_OPENSSL_ROOT_HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
     file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
     set(_OPENSSL_ROOT_PATHS
-      "C:/Tools/vcpkg/installed/x86-windows/bin"
-      "${_programfiles}/OpenSSL"
-      "${_programfiles}/OpenSSL-Win32"
-      "C:/OpenSSL/"
-      "C:/OpenSSL-Win32/"
-      )
+            "C:/OpenSSL-Win32/bin/"
+            )
     unset(_programfiles)
-  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
+  else()
+    message(WARNING "Unknown OS_PATH: $ENV{OS_PATH}, Can't find OpenSSL correctly")
+  endif()
 else ()
-  set(_OPENSSL_ROOT_HINTS
-    ${OPENSSL_ROOT_DIR}
-    ENV OPENSSL_ROOT_DIR
-    )
-endif ()
+  set(_OPENSSL_ROOT_HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
+endif()
 
-set(_OPENSSL_ROOT_HINTS_AND_PATHS
-    HINTS ${_OPENSSL_ROOT_HINTS}
-    PATHS ${_OPENSSL_ROOT_PATHS}
-    )
-
-# For OpenSSL < 1.1, they are named libeay32 and ssleay32 and even if the dll is 64bit, it's still suffixed as *32.dll
-# For OpenSSL >= 1.1, they are named libcrypto and libssl with no suffix
-if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-  # target win64
-  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1-x64.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1-x64.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-  # target win32
-  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+message(STATUS "Looking for OpenSSL @ $ENV{OS_NAME} in ${_OPENSSL_ROOT_PATHS}")
+if("$ENV{OS_NAME}" STREQUAL "Windows-64")
+  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1-x64.dll libcrypto.dll PATHS "${_OPENSSL_ROOT_PATHS}" NO_DEFAULT_PATH)
+  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1-x64.dll libssl.dll PATHS "${_OPENSSL_ROOT_PATHS}" NO_DEFAULT_PATH)
+elseif("$ENV{OS_NAME}" STREQUAL "Windows-32")
+  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1.dll libcrypto.dll PATHS "${_OPENSSL_ROOT_PATHS}" NO_DEFAULT_PATH)
+  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1.dll libssl.dll PATHS "${_OPENSSL_ROOT_PATHS}" NO_DEFAULT_PATH)
+endif()
 
 IF(WIN32SSLRUNTIME_LIBEAY AND WIN32SSLRUNTIME_SSLEAY)
   SET(WIN32SSLRUNTIME_LIBRARIES "${WIN32SSLRUNTIME_LIBEAY}" "${WIN32SSLRUNTIME_SSLEAY}")
