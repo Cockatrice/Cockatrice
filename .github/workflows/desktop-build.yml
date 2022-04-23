@@ -19,9 +19,7 @@ on:
 jobs:
   configure:
     name: Configure
-
     runs-on: ubuntu-latest
-
     outputs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
@@ -119,13 +117,9 @@ jobs:
             package: DEB
 
     name: ${{matrix.distro}}
-
     needs: configure
-
     runs-on: ubuntu-latest
-
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
-
     env:
       NAME: ${{matrix.distro}}
       CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
@@ -239,13 +233,9 @@ jobs:
 #            make_package: true
 
     name: macOS ${{matrix.target}}
-
     needs: configure
-
     runs-on: ${{matrix.os}}
-
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
-
     env:
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
@@ -267,10 +257,6 @@ jobs:
         run: |
           brew install qt@6 --force-bottle
           brew link qt
-
-      - name: Install QT using actions
-        if: steps.brew_install_qt.outcome != 'success'
-        uses: jurplel/install-qt-action@v3
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
@@ -314,11 +300,6 @@ jobs:
           asset_name: ${{steps.package.outputs.name}}
           asset_content_type: application/octet-stream
 
-      - uses: actions/checkout@v2
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-
   build-windows:
     strategy:
       fail-fast: false
@@ -335,11 +316,13 @@ jobs:
             cmake_generator_platform: x64
             qt_arch: msvc2019_64
             qt_modules: "qt5compat qtmultimedia qtwebsockets"
+
     name: Windows (${{matrix.arch}}-bit)
     needs: configure
     runs-on: windows-2019
     env:
       CMAKE_GENERATOR: 'Visual Studio 16 2019'
+
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
@@ -383,7 +366,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
           CMAKE_PREFIX_PATH: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
-          OS_NAME: 'Windows-x${{matrix.arch}}'
+          OS_NAME: 'Windows-${{matrix.arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
