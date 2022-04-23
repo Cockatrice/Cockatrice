@@ -364,10 +364,12 @@ jobs:
           version: ${{matrix.qt_version}}
           arch: win${{matrix.arch}}_${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
+
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10.2
         with:
           runVcpkgInstall: true
+          appendedCacheKey: ${{hashFiles('**/vcpkg.json')}}-x${{matrix.arch}}
         env:
           VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
           VCPKG_DISABLE_METRICS: 1
