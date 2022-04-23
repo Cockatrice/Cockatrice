@@ -159,9 +159,12 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
+        env:
+          distro: '${matrix.distro}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 2
+          RUN --server --debug --test \
+                  --ccache "$CCACHE_SIZE" --parallel -j2 --os "$distro"
 
       - name: Build release package
         id: package
@@ -170,10 +173,11 @@ jobs:
         env:
           suffix: '-${{matrix.distro}}'
           type: '${{matrix.package}}'
+          distro: '${matrix.distro}'
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --suffix "$suffix" \
-                  --ccache "$CCACHE_SIZE" --parallel 2
+                  --ccache "$CCACHE_SIZE" --parallel -j2 --os "$distro"
 
       - name: Upload artifact
         if: matrix.package != 'skip'
@@ -271,7 +275,8 @@ jobs:
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
         env:
-          BUILDTYPE: ${{matrix.type}}
+          BUILDTYPE: '${{matrix.type}}'
+          OS_NAME: '${{matrix.os}}'
         # Mac machines actually have 3 cores
         run: .ci/compile.sh --server --parallel 3
 
@@ -376,7 +381,8 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
           CMAKE_PREFIX_PATH: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
-        run: .ci/compile.sh --server --release --test --package --parallel 2 --arch ${{matrix.arch}}
+          OS_NAME: 'Windows-x${matrix.arch}'
+        run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
