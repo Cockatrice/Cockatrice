@@ -12,8 +12,9 @@
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
 # --parallel <core count> sets how many cores cmake should build with in parallel
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count>)
+# --os <os name> sets flags for this type of os
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT OS_NAME
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count> --os <os name>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -85,13 +86,13 @@ while [[ $# != 0 ]]; do
       PARALLEL_COUNT="$1"
       shift
       ;;
-    '--arch')
+    '--os')
       shift
       if [[ $# == 0 ]]; then
-        echo "::error file=$0::--arch expects an argument"
+        echo "::error file=$0::--os expects an argument"
         exit 3
       fi
-      ARCH="$1"
+      OS_NAME="$1"
       shift
       ;;
     *)
@@ -133,7 +134,12 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
-if [[ $(uname) == "Darwin" ]]; then
+if [[ $OS_NAME == Windows-x32 ]]; then
+  # Specify OpenSSL location for Win32
+  flags+=(-DOPENSSL_ROOT_DIR "./vcpkg_installed/x32-windows/share/openssl_x32-windows/")
+fi
+
+if [[ ${OS_NAME:0:5} == macos ]]; then
   if [[ $USE_CCACHE ]]; then
     # prepend ccache compiler binaries to path
     PATH="/usr/local/opt/ccache/libexec:$PATH"
@@ -146,12 +152,13 @@ fi
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 if [[ $PARALLEL_COUNT ]]; then
-  buildflags+=(--parallel "$PARALLEL_COUNT")
-fi
-
-# Specify OpenSSL for Win32
-if [[ $ARCH -eq 32 ]]; then
-  buildflags+=(-DOPENSSL_ROOT_DIR "./vcpkg_installed/x$ARCH-windows/share/openssl_x$ARCH-windows/")
+  if [[ $OS_NAME == UbuntuBionic ]]; then
+    # workaround for bionic having an old cmake
+    buildflags+=(-- -j "$PARALLEL_COUNT")
+    # note, no normal build flags should be added after this
+  else
+    buildflags+=(--parallel "$PARALLEL_COUNT")
+  fi
 fi
 
 function ccachestatsverbose() {
