@@ -121,7 +121,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     connect(searchField, SIGNAL(textChanged(const QString &)), displayModel,
             SLOT(setFilterRegularExpression(const QString &)));
 #else
