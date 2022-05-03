@@ -140,7 +140,7 @@ fi
 function RUN ()
 {
   echo "running image:"
-  if docker images | grep "$IMAGE_NAME"; then
+  if [[ $(docker images) =~ "$IMAGE_NAME" ]]; then
     local args=(--mount "type=bind,source=$PWD,target=/src")
     args+=(--workdir "/src")
     args+=(--user "$(id -u):$(id -g)")
