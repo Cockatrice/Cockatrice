@@ -134,11 +134,6 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
-if [[ $OS_NAME == Windows-32 ]]; then
-  # Specify OpenSSL location for Win32
-  flags+=("-DOPENSSL_ROOT_DIR=./vcpkg_installed/x86-windows/share/openssl_x86-windows/")
-fi
-
 if [[ ${OS_NAME:0:5} == macos ]]; then
   if [[ $USE_CCACHE ]]; then
     # prepend ccache compiler binaries to path
