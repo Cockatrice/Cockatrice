@@ -1087,12 +1087,7 @@ void MainWindow::actCheckCardUpdates()
 
     cardUpdateProcess = new QProcess(this);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     connect(cardUpdateProcess, &QProcess::errorOccurred, this, &MainWindow::cardUpdateError);
-#else
-    connect(cardUpdateProcess, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(cardUpdateError(QAbstractSocket::SocketError)));
-#endif
 
     connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
