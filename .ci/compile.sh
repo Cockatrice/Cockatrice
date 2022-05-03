@@ -12,9 +12,8 @@
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
 # --parallel <core count> sets how many cores cmake should build with in parallel
-# --os <os name> sets flags for this type of os
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT OS_NAME
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count> --os <os name>)
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -86,15 +85,6 @@ while [[ $# != 0 ]]; do
       PARALLEL_COUNT="$1"
       shift
       ;;
-    '--os')
-      shift
-      if [[ $# == 0 ]]; then
-        echo "::error file=$0::--os expects an argument"
-        exit 3
-      fi
-      OS_NAME="$1"
-      shift
-      ;;
     *)
       echo "::error file=$0::unrecognized option: $1"
       exit 3
@@ -134,21 +124,12 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
-if [[ ${OS_NAME:0:5} == macos ]]; then
-  if [[ $USE_CCACHE ]]; then
-    # prepend ccache compiler binaries to path
-    PATH="/usr/local/opt/ccache/libexec:$PATH"
-  fi
-  # Add qt install location when using homebrew
-  qt_location=(/usr/local/opt/qt*)
-  flags+=("-DCMAKE_PREFIX_PATH=${qt_location[0]}")
-fi
-
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 if [[ $PARALLEL_COUNT ]]; then
-  if [[ $OS_NAME == UbuntuBionic ]]; then
+  if [[ $(cmake --build /not_a_dir --parallel |& head -1) =~ parallel ]]; then
     # workaround for bionic having an old cmake
+    echo "this version of cmake does not support --parallel, using native build tool -j instead"
     buildflags+=(-- -j "$PARALLEL_COUNT")
     # note, no normal build flags should be added after this
   else
@@ -207,7 +188,8 @@ if [[ $MAKE_PACKAGE ]]; then
 
   if [[ $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
-    ../.ci/name_build.sh "$PACKAGE_SUFFIX"
+    cd ..
+    BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
 fi
