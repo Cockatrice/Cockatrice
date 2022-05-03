@@ -49,7 +49,7 @@ private slots:
 
 private:
     QStringList findQmFiles();
-    QString languageName(const QString &qmFile);
+    QString languageName(const QString &lang);
     QLineEdit *deckPathEdit;
     QLineEdit *replaysPathEdit;
     QLineEdit *picsPathEdit;

@@ -67,31 +67,29 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().getLang();
 
-    const auto fileName1 = "qt_" + lang;
+    QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    const auto dir1 = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+    QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
 #else
-    const auto dir1 = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+    QString qtTranslationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
 #endif
 
-    const auto fileLoaded1 = qtTranslator->load(fileName1, dir1);
-    if (!fileLoaded1) {
-        qDebug() << "(1) Unable to load translation file" << QFileInfo(dir1, fileName1).absoluteFilePath();
+    bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
+    if (!qtTranslationLoaded) {
+        qDebug() << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
     } else {
-        qDebug() << "(1) Loaded translation file" << QFileInfo(dir1, fileName1).absoluteFilePath();
+        qDebug() << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
     }
     qApp->installTranslator(qtTranslator);
 
-    const auto fileName2 = translationPrefix + "_" + lang;
-    const auto fileLoaded2 = translator->load(fileName2, translationPath);
-    if (!fileLoaded2) {
-        qDebug() << "(2) Unable to load translation file" << QFileInfo(translationPath, fileName2).absoluteFilePath();
+    QString appNameHint = translationPrefix + "_" + lang;
+    bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
+    if (!appTranslationLoaded) {
+        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
     } else {
-        qDebug() << "(2) Loaded translation file" << QFileInfo(translationPath, fileName2).absoluteFilePath();
+        qDebug() << "Loaded" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
     }
     qApp->installTranslator(translator);
-
-    qDebug() << "Language changed:" << lang;
 }
 
 QString const generateClientID()

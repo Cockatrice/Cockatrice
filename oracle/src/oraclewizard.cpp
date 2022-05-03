@@ -143,16 +143,19 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     languageLabel = new QLabel(this);
     versionLabel = new QLabel(this);
     languageBox = new QComboBox(this);
-    QString setLanguage = SettingsCache::instance().getLang();
 
-    QStringList qmFiles = findQmFiles();
-    for (int i = 0; i < qmFiles.size(); i++) {
-        QString langName = languageName(qmFiles[i]);
-        languageBox->addItem(langName, qmFiles[i]);
-        if ((qmFiles[i] == setLanguage) ||
-            (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME))) {
-            languageBox->setCurrentIndex(i);
-        }
+    QStringList languageCodes = findQmFiles();
+    for (const QString &code : languageCodes) {
+        QString langName = languageName(code);
+        languageBox->addItem(langName, code);
+    }
+
+    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
+    int index = languageBox->findText(setLanguage, Qt::MatchExactly);
+    if (index == -1) {
+        qWarning() << "could not find language" << setLanguage;
+    } else {
+        languageBox->setCurrentIndex(index);
     }
 
     connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
@@ -171,18 +174,19 @@ QStringList IntroPage::findQmFiles()
     QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
     fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
-    fileNames.removeOne("en@source");
     return fileNames;
 }
 
-QString IntroPage::languageName(const QString &qmFile)
+QString IntroPage::languageName(const QString &lang)
 {
     QTranslator qTranslator;
-    const auto fileName = translationPrefix + "_" + qmFile + ".qm";
-    const auto fileLoaded = qTranslator.load(fileName, translationPath);
-    if (!fileLoaded) {
-        qWarning() << "Unable to load translation file" << QDir(translationPath, fileName).absolutePath();
+
+    QString appNameHint = translationPrefix + "_" + lang;
+    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
+    if (!appTranslationLoaded) {
+        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
     }
+
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
