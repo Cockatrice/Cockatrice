@@ -199,37 +199,41 @@ jobs:
           - target: Debug # tests only
             os: macos-latest
             xcode: 12.5.1
+            qt_version: 6
             type: Debug
-            do_tests: 0 # tests do not work yet on Mac
-            make_package: false
+            do_tests: 1
 
           - target: 10.14_Mojave
             os: macos-10.15 # runs on Catalina
             xcode: 10.3 # allows compatibility with macOS 10.14
+            qt_version: 5
             type: Release
-            do_tests: 0
-            make_package: true
+            # do_tests: 1 # tests do not work on qt5?
+            make_package: 1
 
           - target: 10.15_Catalina
             os: macos-10.15
             xcode: 12.4
+            qt_version: 6
             type: Release
-            do_tests: 0
-            make_package: true
+            do_tests: 1
+            make_package: 1
 
           - target: 11_Big_Sur
             os: macos-11
             xcode: 13.2
+            qt_version: 6
             type: Release
-            do_tests: 0
-            make_package: true
+            do_tests: 1
+            make_package: 1
 
 #          - target: 12_Monterey
 #            os: macos-12
 #            xcode: 13.3
+#            qt_version: 6
 #            type: Release
-#            do_tests: 0
-#            make_package: true
+#            do_tests: 1
+#            make_package: 1
 
     name: macOS ${{matrix.target}}
     needs: configure
@@ -247,44 +251,32 @@ jobs:
         shell: bash
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
-        run: brew update && brew install protobuf
-
-      - name: Install QT using homebrew
-        id: brew_install_qt
-        continue-on-error: true
-        shell: bash
+        env:
+          qt_version: 'qt@${{matrix.qt_version}}'
         run: |
-          brew install qt@6 --force-bottle
-          brew link qt
+          brew update
+          brew install protobuf
+          brew install "$qt_version" --force-bottle
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
+        id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
+          MAKE_TEST: '${{matrix.do_tests}}'
+          MAKE_PACKAGE: '${{matrix.make_package}}'
+          PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
+          # set QTDIR to find qt5, qt6 can be found without this
+          QTDIR: '/usr/local/opt/qt5'
         # Mac machines actually have 3 cores
         run: .ci/compile.sh --server --parallel 3
-
-      - name: Test
-        if: matrix.do_tests == 1
-        shell: bash
-        working-directory: build
-        run: cmake --build . --target test
-
-      - name: Package for ${{matrix.target}}
-        id: package
-        if: matrix.make_package
-        shell: bash
-        working-directory: build
-        run: |
-          cmake --build . --target package
-          ../.ci/name_build.sh "-macOS-${{matrix.target}}"
 
       - name: Upload artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v2
         with:
           name: macOS-${{matrix.target}}-dmg
-          path: ${{steps.package.outputs.path}}
+          path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
       - name: Upload to release
@@ -294,8 +286,8 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.configure.outputs.upload_url}}
-          asset_path: ${{steps.package.outputs.path}}
-          asset_name: ${{steps.package.outputs.name}}
+          asset_path: ${{steps.build.outputs.path}}
+          asset_name: ${{steps.build.outputs.name}}
           asset_content_type: application/octet-stream
 
   build-windows:
@@ -366,7 +358,6 @@ jobs:
           PACKAGE_SUFFIX: '-win${{matrix.arch}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
-          CMAKE_PREFIX_PATH: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
