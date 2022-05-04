@@ -340,16 +340,14 @@ jobs:
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10.2
+        id: run_vcpkg
         with:
           runVcpkgInstall: true
           appendedCacheKey: ${{matrix.arch}}-bit
         env:
+          VCPKG_INSTALLED_DIR: 'C:/vcpkg_installed'
           VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
           VCPKG_DISABLE_METRICS: 1
-
-      - name: Install OpenSSL (${{matrix.arch}}-bit)
-        shell: bash
-        run: .ci/download_openssl.sh --arch ${{matrix.arch}}
 
       - name: Build Cockatrice (${{matrix.arch}}-bit)
         id: build
@@ -359,6 +357,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
+          VCPKG_PACKAGES_DIR: 'C:/vcpkg_installed'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Setup tmate session
