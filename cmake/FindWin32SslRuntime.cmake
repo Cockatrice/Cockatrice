@@ -1,37 +1,33 @@
 # Find the OpenSSL runtime libraries (.dll) for Windows that
 # will be needed by Qt in order to access https urls.
-if (WIN32)
-  if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
-    message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
-    set(_OPENSSL_ROOT_HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
-    file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
-    set(_OPENSSL_ROOT_PATHS
-            "$ENV{VCPKG_PACKAGES_DIR}/x64-windows/bin"
-            "C:/OpenSSL-Win64/bin"
-            "C:/OpenSSL-Win64"
-            "C:/Tools/vcpkg/installed/x64-windows/bin"
-            "${_programfiles}/OpenSSL-Win64"
-            )
-    unset(_programfiles)
-  elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
-    message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
-    set(_OPENSSL_ROOT_HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
-    file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
-    set(_OPENSSL_ROOT_PATHS
-            "$ENV{VCPKG_PACKAGES_DIR}/x86-windows/bin"
-            "C:/OpenSSL-Win32/bin"
-            "C:/OpenSSL-Win32"
-            "C:/OpenSSL"
-            "C:/Tools/vcpkg/installed/x86-windows/bin"
-            "${_programfiles}/OpenSSL"
-            "${_programfiles}/OpenSSL-Win32"
-            )
-    unset(_programfiles)
-  else()
-    message(WARNING "Unknown OS_PATH: $ENV{OS_PATH}, Can't find OpenSSL correctly")
-  endif()
-else ()
-  set(_OPENSSL_ROOT_HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
+if(NOT DEFINED WIN32 OR NOT ${WIN32})
+  return()
+endif()
+
+if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
+  message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
+  file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
+  set(_OPENSSL_ROOT_PATHS
+          "$ENV{VCPKG_PACKAGES_DIR}/x64-windows/bin"
+          "C:/OpenSSL-Win64/bin"
+          "C:/OpenSSL-Win64"
+          "C:/Tools/vcpkg/installed/x64-windows/bin"
+          "${_programfiles}/OpenSSL-Win64"
+          )
+  unset(_programfiles)
+elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
+  message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
+  file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
+  set(_OPENSSL_ROOT_PATHS
+          "$ENV{VCPKG_PACKAGES_DIR}/x86-windows/bin"
+          "C:/OpenSSL-Win32/bin"
+          "C:/OpenSSL-Win32"
+          "C:/OpenSSL"
+          "C:/Tools/vcpkg/installed/x86-windows/bin"
+          "${_programfiles}/OpenSSL"
+          "${_programfiles}/OpenSSL-Win32"
+          )
+  unset(_programfiles)
 endif()
 
 message(STATUS "Looking for OpenSSL @ ${CMAKE_GENERATOR_PLATFORM} in ${_OPENSSL_ROOT_PATHS}")
