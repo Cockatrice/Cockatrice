@@ -4,7 +4,6 @@
   "dependencies": [
     "gtest",
     "liblzma",
-    "openssl",
     "protobuf",
     "pthreads",
     "zlib"
