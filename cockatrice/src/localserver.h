@@ -27,6 +27,7 @@ protected:
 
 public:
     LocalServer_DatabaseInterface(LocalServer *_localServer);
+    ~LocalServer_DatabaseInterface() = default;
     AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler,
                                            const QString &user,
                                            const QString &password,

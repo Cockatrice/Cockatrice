@@ -13,24 +13,25 @@ SET(dbconverter_SOURCES
     ${VERSION_STRING_CPP}
 )
 
-# Qt5
-find_package(Qt5 COMPONENTS Network Widgets REQUIRED)
-set(dbconverter_QT_MODULES Qt5::Core Qt5::Network Qt5::Widgets)
+
 SET(QT_DONT_USE_QTGUI TRUE)
 
-QT5_WRAP_CPP(dbconverter_SOURCES
-    ../cockatrice/src/settingscache.h
-    ../cockatrice/src/settings/carddatabasesettings.h
-)
+IF(Qt6_FOUND)
+    Qt6_WRAP_CPP(dbconverter_SOURCES
+        ../cockatrice/src/settingscache.h
+        ../cockatrice/src/settings/carddatabasesettings.h
+    )
+ELSEIF(Qt5_FOUND)
+    Qt5_WRAP_CPP(dbconverter_SOURCES
+            ../cockatrice/src/settingscache.h
+            ../cockatrice/src/settings/carddatabasesettings.h
+            )
+ENDIF()
 
 # Build servatrice binary and link it
 ADD_EXECUTABLE(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES} ${dbconverter_MOC_SRCS})
 
-if(MSVC)
-    TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES} Qt5::WinMain)
-else()
-    TARGET_LINK_LIBRARIES(dbconverter ${dbconverter_QT_MODULES})
-endif()
+TARGET_LINK_LIBRARIES(dbconverter ${DB_CONVERTER_QT_MODULES})
 
 # install rules
 if(UNIX)
@@ -55,9 +56,8 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir dbconverter.app/Contents/Plugins)
     set(qtconf_dest_dir dbconverter.app/Contents/Resources)
-    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -87,10 +87,12 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: platforms, sqldrivers/mysql
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(platforms/.*)\\.dll"
-        REGEX ".*d\\.dll" EXCLUDE)
+    # Qt plugins: platforms
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
+            PATTERN "platforms/qdirect2d.dll"
+            PATTERN "platforms/qminimal.dll"
+            PATTERN "platforms/qoffscreen.dll"
+            PATTERN "platforms/qwindows.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

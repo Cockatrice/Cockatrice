@@ -14,7 +14,7 @@
 RNG_SFMT::RNG_SFMT(QObject *parent) : RNG_Abstract(parent)
 {
     // initialize the random number generator with a 32bit integer seed (timestamp)
-    sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toTime_t());
+    sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toSecsSinceEpoch());
 }
 
 /**

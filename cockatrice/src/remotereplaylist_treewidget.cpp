@@ -111,7 +111,7 @@ QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) co
                         return playerList.join(", ");
                     }
                     case 4:
-                        return QDateTime::fromTime_t(matchInfo.time_started());
+                        return QDateTime::fromSecsSinceEpoch(matchInfo.time_started());
                     case 5:
                         return matchInfo.length();
                     default:

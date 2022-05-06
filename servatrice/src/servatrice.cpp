@@ -76,6 +76,7 @@ Servatrice_GameServer::~Servatrice_GameServer()
         QThread *poolThread = connectionPools[i]->thread();
         connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
         poolThread->wait();
+        poolThread->deleteLater();
     }
 }
 
@@ -84,6 +85,7 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
+    connect(ssi, SIGNAL(incTxBytes), this, SLOT(incTxBytes));
     ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
@@ -144,6 +146,7 @@ Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
         QThread *poolThread = connectionPools[i]->thread();
         connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
         poolThread->wait();
+        poolThread->deleteLater();
     }
 }
 
@@ -152,6 +155,7 @@ void Servatrice_WebsocketGameServer::onNewConnection()
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
+    connect(ssi, SIGNAL(incTxBytes), this, SLOT(incTxBytes));
     /*
      * Due to a Qt limitation, websockets can't be moved to another thread.
      * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
@@ -195,7 +199,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 
 Servatrice::Servatrice(QObject *parent)
     : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), txBytes(0), rxBytes(0),
-      shutdownTimer(nullptr), isFirstShutdownMessage(true)
+      shutdownTimer(nullptr)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -204,21 +208,16 @@ Servatrice::~Servatrice()
 {
     gameServer->close();
 
-    // clients live in other threads, we need to lock them
-    clientsLock.lockForRead();
+    // we are destroying the clients outside their thread!
     for (auto *client : clients) {
-        QMetaObject::invokeMethod(client, "prepareDestroy", Qt::QueuedConnection);
-    }
-    clientsLock.unlock();
-
-    // client destruction is asynchronous, wait for all clients to be gone
-    for (;;) {
-        QThread::usleep(10);
-        QReadLocker locker(&clientsLock);
-        if (clients.isEmpty())
-            break;
+        client->prepareDestroy();
     }
 
+    if (shutdownTimer) {
+        shutdownTimer->deleteLater();
+    }
+
+    servatriceDatabaseInterface->deleteLater();
     prepareDestroy();
 }
 
@@ -559,7 +558,7 @@ void Servatrice::updateLoginMessage()
         }
 }
 
-void Servatrice::setRequiredFeatures(const QString featureList)
+void Servatrice::setRequiredFeatures(const QString &featureList)
 {
     FeatureSet features;
     serverRequiredFeatureList.clear();
@@ -570,8 +569,9 @@ void Servatrice::setRequiredFeatures(const QString featureList)
     QStringList listReqFeatures = featureList.split(",", QString::SkipEmptyParts);
 #endif
     if (!listReqFeatures.isEmpty())
-        foreach (QString reqFeature, listReqFeatures)
+        for (const QString &reqFeature : listReqFeatures) {
             features.enableRequiredFeature(serverRequiredFeatureList, reqFeature);
+        }
 
     qDebug() << "Set required client features to:" << serverRequiredFeatureList;
 }
@@ -715,8 +715,9 @@ void Servatrice::shutdownTimeout()
         clientsLock.unlock();
         delete se;
 
-        if (!shutdownMinutes)
+        if (!shutdownMinutes) {
             deleteLater();
+        }
     }
     shutdownMinutes--;
 }

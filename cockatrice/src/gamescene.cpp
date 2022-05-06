@@ -13,7 +13,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QSet>
-#include <math.h>
+#include <QtMath>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
     : QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize()), playerRotation(0)
@@ -97,7 +97,7 @@ void GameScene::rearrange()
 
     const int playersCount = playersPlaying.size();
     const int columns = playersCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
-    const int rows = ceil((qreal)playersCount / columns);
+    const int rows = qCeil((qreal)playersCount / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 

@@ -41,11 +41,12 @@ if(APPLE)
     set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-# Qt5
-find_package(Qt5 COMPONENTS Network Sql WebSockets REQUIRED)
-set(SERVATRICE_QT_MODULES Qt5::Core Qt5::Network Qt5::Sql Qt5::WebSockets)
+IF(Qt6_FOUND)
+    Qt6_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
+ELSEIF(Qt5_FOUND)
+    Qt5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
+ENDIF()
 
-QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 SET(QT_DONT_USE_QTGUI TRUE)
 
 # Mysql connector
@@ -59,15 +60,15 @@ elseif(WIN32)
     SET(MYSQLCLIENT_DEFAULT_PATHS "C:\\Program Files\\MySQL\\MySQL Server 5.7\\lib" "C:\\Program Files (x86)\\MySQL\\MySQL Server 5.7\\lib")
 endif()
 
-find_library(MYSQLCLIENT_LIBRARIES NAMES mysqlclient PATHS ${MYSQLCLIENT_DEFAULT_PATHS} PATH_SUFFIXES mysql mariadb)
-if(${MYSQLCLIENT_LIBRARIES} MATCHES "NOTFOUND")
+find_library(MYSQL_CLIENT_LIBRARIES NAMES mysqlclient PATHS ${MYSQLCLIENT_DEFAULT_PATHS} PATH_SUFFIXES mysql mariadb)
+if(${MYSQL_CLIENT_LIBRARIES} MATCHES "NOTFOUND")
   set(MYSQLCLIENT_FOUND FALSE CACHE INTERNAL "")
-  MESSAGE(STATUS "Mysql connector NOT FOUND: servatrice won't be able to connect to a mysql server")
-  unset(MYSQLCLIENT_LIBRARIES)
+  MESSAGE(STATUS "MySQL connector NOT FOUND: Servatrice won't be able to connect to a MySQL server")
+  unset(MYSQL_CLIENT_LIBRARIES)
 else()
   set(MYSQLCLIENT_FOUND TRUE CACHE INTERNAL "")
-  get_filename_component(MYSQLCLIENT_LIBRARY_DIR ${MYSQLCLIENT_LIBRARIES} PATH)
-  MESSAGE(STATUS "Mysql connector found at: ${MYSQLCLIENT_LIBRARY_DIR}")
+  get_filename_component(MYSQLCLIENT_LIBRARY_DIR ${MYSQL_CLIENT_LIBRARIES} PATH)
+  MESSAGE(STATUS "Found MySQL connector at: ${MYSQL_CLIENT_LIBRARIES}")
 endif()
 
 # Declare path variables
@@ -83,9 +84,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build servatrice binary and link it
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOURCES_RCC} ${servatrice_MOC_SRCS})
 
-if(MSVC)
-    TARGET_LINK_LIBRARIES(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} Qt5::WinMain)
-elseif(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
+if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY})
 else()
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES})
@@ -124,15 +123,15 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir servatrice.app/Contents/Plugins)
     set(qtconf_dest_dir servatrice.app/Contents/Resources)
-    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: platforms, sqldrivers/mysql
+    # Qt plugins: platforms, sqldrivers/mysql, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
         PATTERN "*_debug.dylib" EXCLUDE
         PATTERN "platforms/*.dylib"
         PATTERN "sqldrivers/libqsqlmysql*.dylib"
+        PATTERN "tls/*.dylib"
     )
 
     install(CODE "
@@ -157,10 +156,18 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: platforms, sqldrivers/mysql
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(platforms/.*|sqldrivers/qsqlmysql)\\.dll"
-        REGEX ".*d\\.dll" EXCLUDE)
+    # Qt plugins: platforms, sqldrivers, tls (Qt6)
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
+            PATTERN "platforms/qdirect2d.dll"
+            PATTERN "platforms/qminimal.dll"
+            PATTERN "platforms/qoffscreen.dll"
+            PATTERN "platforms/qwindows.dll"
+            PATTERN "tls/qcertonlybackend.dll"
+            PATTERN "tls/qopensslbackend.dll"
+            PATTERN "tls/qschannelbackend.dll"
+            PATTERN "sqldrivers/qsqlite.dll"
+            PATTERN "sqldrivers/qsqlodbc.dll"
+            PATTERN "sqldrivers/qsqlpsql.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

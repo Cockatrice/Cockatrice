@@ -21,13 +21,13 @@
 #define SERVER_CARD_H
 
 #include "pb/card_attributes.pb.h"
+#include "pb/serverinfo_card.pb.h"
 #include "server_arrowtarget.h"
 
 #include <QMap>
 #include <QString>
 
 class Server_CardZone;
-class ServerInfo_Card;
 
 class Server_Card : public Server_ArrowTarget
 {
@@ -52,7 +52,7 @@ private:
 
 public:
     Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
-    ~Server_Card();
+    ~Server_Card() override;
 
     Server_CardZone *getZone() const
     {

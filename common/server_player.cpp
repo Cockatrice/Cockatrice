@@ -120,6 +120,7 @@ Server_Player::~Server_Player() = default;
 void Server_Player::prepareDestroy()
 {
     delete deck;
+    deck = nullptr;
 
     playerMutex.lock();
     if (userInterface) {
@@ -1234,7 +1235,6 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    // Get all arrows pointing to or originating from the card being attached and delete them.
     QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
     while (playerIterator.hasNext()) {
         Server_Player *p = playerIterator.next().value();
