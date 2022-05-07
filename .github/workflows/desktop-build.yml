@@ -126,7 +126,6 @@ jobs:
       # cache size over the entire repo is 10Gi link:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 200M
-      OS: ${{runner.os}}
 
     steps:
       - name: Checkout
@@ -243,7 +242,6 @@ jobs:
     env:
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
-      OS: ${{runner.os}}
 
     steps:
       - name: Checkout
@@ -314,7 +312,6 @@ jobs:
     runs-on: windows-2019
     env:
       CMAKE_GENERATOR: 'Visual Studio 16 2019'
-      OS: ${{runner.os}}
 
     steps:
       - name: Add msbuild to PATH
