@@ -161,8 +161,8 @@ echo "::endgroup::"
 
 echo "::group::Build project"
 if [[ $PARALLEL_COUNT && $RUNNER_OS == Windows ]]; then
-  # parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
-  cmake --build . "${buildflags[@]}" -- /p:CL_MPcount="$PARALLEL_COUNT"
+  # --parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
+  cmake --build . "${buildflags[@]}" -- /p:UseMultiToolTask=true -m /p:EnforceProcessCountAcrossBuilds=true
 else
   cmake --build . "${buildflags[@]}"
 fi
