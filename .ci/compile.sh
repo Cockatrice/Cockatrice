@@ -183,7 +183,13 @@ fi
 
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
-  cmake --build . --target package --config "$BUILDTYPE"
+
+  if [[ $PARALLEL_COUNT && ${OS} == Windows ]]; then
+  # parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
+    cmake --build . --target package --config "$BUILDTYPE" -- /p:CL_MPcount="$PARALLEL_COUNT"
+  else
+    cmake --build . --target package --config "$BUILDTYPE"
+  fi
   echo "::endgroup::"
 
   if [[ $PACKAGE_SUFFIX ]]; then
