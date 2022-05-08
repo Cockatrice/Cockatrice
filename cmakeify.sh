@@ -11,4 +11,4 @@ if ! hash $cmake_format_cmd 2>/dev/null; then
   return
 fi
 
-$cmake_format_cmd -i cmake/*.cmake */CMakeLists.txt
+$cmake_format_cmd -i cmake/*.cmake */CMakeLists.txt CMakeLists.txt
