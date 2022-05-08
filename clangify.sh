@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script will run clang-format on all modified, non-3rd-party C++/Header files.
-# Never, ever, should this recieve a path with a newline in it. Don't bother proofing it for that.
+# Never, ever, should this receive a path with a newline in it. Don't bother proofing it for that.
 
 
 # go to the project root directory, this file should be located in the project root directory
