@@ -132,6 +132,9 @@ if [[ $PARALLEL_COUNT ]]; then
     echo "this version of cmake does not support --parallel, using native build tool -j instead"
     buildflags+=(-- -j "$PARALLEL_COUNT")
     # note, no normal build flags should be added after this
+  elif [[ $RUNNER_OS == Windows ]]; then
+    # comment
+    :
   else
     buildflags+=(--parallel "$PARALLEL_COUNT")
   fi
@@ -160,12 +163,7 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-if [[ $PARALLEL_COUNT && $RUNNER_OS == Windows ]]; then
-  # --parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
-  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:CL_MPcount=4
-else
-  cmake --build . "${buildflags[@]}"
-fi
+cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
