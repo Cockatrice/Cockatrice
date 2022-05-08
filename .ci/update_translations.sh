@@ -2,9 +2,9 @@
 
 # ci script to update translation files
 # usage:
-# $0 cockatrice/translations/cockatrice_en@source.ts cockatrice/src common
+# $0 cockatrice/cockatrice_en@source.ts cockatrice/src common
 # or
-# FILE="cockatrice/translations/cockatrice_en@source.ts"
+# FILE="cockatrice/cockatrice_en@source.ts"
 # DIRS="cockatrice/src common"
 # $0
 # note: directories can't contain spaces
