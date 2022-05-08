@@ -2,18 +2,15 @@
 #
 # add sounds subfolders
 
-SET(defsounds
-    Default
-    Legacy
-)
+set(defsounds Default Legacy)
 
 if(UNIX)
-    if(APPLE)
-        INSTALL(DIRECTORY ${defsounds} DESTINATION Cockatrice.app/Contents/Resources/sounds/)
-    else()
-        # Assume linux
-        INSTALL(DIRECTORY ${defsounds} DESTINATION share/cockatrice/sounds/)
-    endif()
+  if(APPLE)
+    install(DIRECTORY ${defsounds} DESTINATION Cockatrice.app/Contents/Resources/sounds/)
+  else()
+    # Assume linux
+    install(DIRECTORY ${defsounds} DESTINATION share/cockatrice/sounds/)
+  endif()
 elseif(WIN32)
-    INSTALL(DIRECTORY ${defsounds} DESTINATION sounds/)
+  install(DIRECTORY ${defsounds} DESTINATION sounds/)
 endif()
