@@ -31,7 +31,7 @@ jobs:
         id: cockatrice
         shell: bash
         env:
-          FILE: 'cockatrice/translations/cockatrice_en@source.ts'
+          FILE: 'cockatrice/cockatrice_en@source.ts'
           DIRS: 'cockatrice/src common'
         run: .ci/update_translations.sh
 
@@ -39,7 +39,7 @@ jobs:
         id: oracle
         shell: bash
         env:
-          FILE: 'oracle/translations/oracle_en@source.ts'
+          FILE: 'oracle/oracle_en@source.ts'
           DIRS: 'oracle/src'
         run: .ci/update_translations.sh
 
@@ -59,8 +59,8 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           add-paths: |
-            cockatrice/translations/cockatrice_en@source.ts
-            oracle/translations/oracle_en@source.ts
+            cockatrice/cockatrice_en@source.ts
+            oracle/oracle_en@source.ts
           commit-message: Update translation source strings
           # author is the owner of the commit
           author: github-actions <github-actions@github.com>
