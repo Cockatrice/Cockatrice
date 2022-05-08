@@ -1,4 +1,0 @@
-protobuf
-liblzma
-zlib
-gtest

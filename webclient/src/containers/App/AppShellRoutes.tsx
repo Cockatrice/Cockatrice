@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { RouteEnum } from 'types';
 import {
@@ -10,24 +10,27 @@ import {
   Room,
   Server,
   Login,
-  Logs
+  Logs,
+  Initialize,
+  Unsupported
 } from 'containers';
 
-const Routes = () => (
+const AppShellRoutes = () => (
   <div className="AppShell-routes overflow-scroll">
-    <Switch>
-      <Route path={RouteEnum.ACCOUNT} render={() => <Account />} />
-      <Route path={RouteEnum.DECKS} render={() => <Decks />} />
-      <Route path={RouteEnum.GAME} render={() => <Game />} />
-      <Route path={RouteEnum.LOGS} render={() => <Logs />} />
-      <Route path={RouteEnum.PLAYER} render={() => <Player />} />
-      {<Route path={RouteEnum.ROOM} render={() => <Room />} />}
-      <Route path={RouteEnum.SERVER} render={() => <Server />} />
-      <Route path={RouteEnum.LOGIN} render={() => <Login />} />
+    <Routes>
+      <Route path='*' element={<Initialize />} />
 
-      <Redirect from="*" to={RouteEnum.LOGIN} />
-    </Switch>
+      <Route path={RouteEnum.ACCOUNT} element={<Account />} />
+      <Route path={RouteEnum.DECKS} element={<Decks />} />
+      <Route path={RouteEnum.GAME} element={<Game />} />
+      <Route path={RouteEnum.LOGS} element={<Logs />} />
+      <Route path={RouteEnum.PLAYER} element={<Player />} />
+      {<Route path={RouteEnum.ROOM} element={<Room />} />}
+      <Route path={RouteEnum.SERVER} element={<Server />} />
+      <Route path={RouteEnum.LOGIN} element={<Login />} />
+      <Route path={RouteEnum.UNSUPPORTED} element={<Unsupported />} />
+    </Routes>
   </div>
 );
 
-export default Routes;
+export default AppShellRoutes;

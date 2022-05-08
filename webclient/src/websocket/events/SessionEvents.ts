@@ -3,6 +3,7 @@ import { Room, StatusEnum, User, WebSocketConnectReason } from 'types';
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import { ProtobufEvents } from '../services/ProtobufService';
+import { generateSalt, passwordSaltSupported } from '../utils';
 import webClient from '../WebClient';
 
 export const SessionEvents: ProtobufEvents = {
@@ -78,7 +79,7 @@ function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
 function listRooms({ roomList }: ListRoomsData) {
   RoomPersistence.updateRooms(roomList);
 
-  if (webClient.options.autojoinrooms) {
+  if (webClient.clientOptions.autojoinrooms) {
     roomList.forEach(({ autoJoin, roomId }) => {
       if (autoJoin) {
         SessionCommands.joinRoom(roomId);
@@ -119,37 +120,49 @@ function serverIdentification(info: ServerIdentificationData) {
     return;
   }
 
-  switch (webClient.options.reason) {
+  const getPasswordSalt = passwordSaltSupported(serverOptions, webClient);
+  const { options } = webClient;
+
+  switch (options.reason) {
     case WebSocketConnectReason.LOGIN:
       SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
-      // Intentional use of Bitwise operator b/c of how Servatrice Enums work
-      if (serverOptions & webClient.protobuf.controller.Event_ServerIdentification.ServerOptions.SupportsPasswordHash) {
-        SessionCommands.requestPasswordSalt();
+      if (getPasswordSalt) {
+        SessionCommands.requestPasswordSalt(options);
       } else {
-        SessionCommands.login();
+        SessionCommands.login(options);
       }
       break;
     case WebSocketConnectReason.REGISTER:
-      SessionCommands.register();
+      const passwordSalt = getPasswordSalt ? generateSalt() : null;
+      SessionCommands.register(options, passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-      SessionCommands.activateAccount();
+      if (getPasswordSalt) {
+        SessionCommands.requestPasswordSalt(options);
+      } else {
+        SessionCommands.activateAccount(options);
+      }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
-      SessionCommands.resetPasswordRequest();
+      SessionCommands.resetPasswordRequest(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
-      SessionCommands.resetPasswordChallenge();
+      SessionCommands.resetPasswordChallenge(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
-      SessionCommands.resetPassword();
+      if (getPasswordSalt) {
+        SessionCommands.requestPasswordSalt(options);
+      } else {
+        SessionCommands.resetPassword(options);
+      }
       break;
     default:
-      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + webClient.options.reason);
+      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + options.reason);
       SessionCommands.disconnect();
       break;
   }
 
+  webClient.options = {};
   SessionPersistence.updateInfo(serverName, serverVersion);
 }
 

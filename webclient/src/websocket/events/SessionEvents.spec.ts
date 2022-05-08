@@ -216,7 +216,7 @@ describe('SessionEvents', () => {
 
   describe('.Event_ListRooms.ext', () => {
     beforeEach(() => {
-      webClient.options.autojoinrooms = false;
+      webClient.clientOptions.autojoinrooms = false;
       jest.spyOn(RoomPersistence, 'updateRooms').mockImplementation(() => {});
     });
 
@@ -229,7 +229,7 @@ describe('SessionEvents', () => {
     });
 
     it('should call SessionCommands.joinRoom if webClient and room is configured for autojoin', () => {
-      webClient.options.autojoinrooms = true;
+      webClient.clientOptions.autojoinrooms = true;
       jest.spyOn(SessionCommands, 'joinRoom').mockImplementation(() => {});
       const data: ListRoomsData = { roomList: [{ roomId, autoJoin: true } as any, { roomId: 2, autoJoin: false } as any] };
 
@@ -291,6 +291,7 @@ describe('SessionEvents', () => {
 
       jest.spyOn(SessionPersistence, 'updateInfo').mockImplementation(() => {});
       webClient.protobuf.controller.Event_ServerIdentification = { ServerOptions: { SupportsPasswordHash: 1 } };
+      webClient.options = {};
     });
 
     it('update status/info and login', () => {

@@ -1,14 +1,24 @@
-// eslint-disable-next-line
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, MenuItem } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Images } from 'images/Images';
-import './CountryDropdown.css';
-import { CountryLabel } from 'types';
+import { useTranslation } from 'react-i18next';
 
-const CountryDropdown = ({ onChange }) => {
-  const [state, setState] = useState('');
+import { useLocaleSort } from 'hooks';
+import { Images } from 'images/Images';
+import { countryCodes } from 'types';
+
+
+import './CountryDropdown.css';
+
+const CountryDropdown = ({ input: { onChange } }) => {
+  const [value, setValue] = useState('');
+  const { t } = useTranslation();
+
+  useEffect(() => onChange(value), [value]);
+
+  const translateCountry = country => t(`Common.countries.${country}`);
+  const sortedCountries = useLocaleSort(countryCodes, translateCountry);
 
   return (
     <FormControl variant='outlined' className='CountryDropdown'>
@@ -18,9 +28,9 @@ const CountryDropdown = ({ onChange }) => {
         labelId='CountryDropdown-label'
         label='Country'
         margin='dense'
-        value={state}
+        value={value}
         fullWidth={true}
-        onChange={e => setState(e.target.value as string)}
+        onChange={e => setValue(e.target.value as string)}
       >
         <MenuItem value={''} key={-1}>
           <div className="CountryDropdown-item">
@@ -29,11 +39,11 @@ const CountryDropdown = ({ onChange }) => {
         </MenuItem>
 
         {
-          Object.keys(CountryLabel).map((country, index:number) => (
+          sortedCountries.map((country, index:number) => (
             <MenuItem value={country} key={index}>
               <div className="CountryDropdown-item">
-                <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} alt={CountryLabel[country]} />
-                <span className="CountryDropdown-item__label">{CountryLabel[country.toUpperCase()] || country.toUpperCase()}</span>
+                <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} />
+                <span className="CountryDropdown-item__label">{translateCountry(country)}</span>
               </div>
             </MenuItem>
           ))

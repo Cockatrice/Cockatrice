@@ -1,0 +1,11 @@
+{
+  "name": "cockatrice",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "gtest",
+    "liblzma",
+    "protobuf",
+    "pthreads",
+    "zlib"
+  ]
+}

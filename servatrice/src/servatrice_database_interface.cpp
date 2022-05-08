@@ -56,7 +56,7 @@ bool Servatrice_DatabaseInterface::openDatabase()
         sqlDatabase.close();
 
     const QString poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
-    qDebug() << QString("[%1] Opening database...").arg(poolStr);
+    qDebug().noquote() << QString("[%1] Opening database...").arg(poolStr);
     if (!sqlDatabase.open()) {
         qCritical() << QString("[%1] Error opening database: %2").arg(poolStr).arg(sqlDatabase.lastError().text());
         return false;
@@ -113,12 +113,13 @@ bool Servatrice_DatabaseInterface::checkSql()
 
 QSqlQuery *Servatrice_DatabaseInterface::prepareQuery(const QString &queryText)
 {
-    if (preparedStatements.contains(queryText))
+    if (preparedStatements.contains(queryText)) {
         return preparedStatements.value(queryText);
+    }
 
     QString prefixedQueryText = queryText;
     prefixedQueryText.replace("{prefix}", server->getDbPrefix());
-    QSqlQuery *query = new QSqlQuery(sqlDatabase);
+    auto *query = new QSqlQuery(sqlDatabase);
     query->prepare(prefixedQueryText);
 
     preparedStatements.insert(queryText, query);

@@ -5,8 +5,25 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# Cmake 3.1 is required to enable C++11 support correctly
+# cmake 3.16 is required if using qt6
 cmake_minimum_required(VERSION 3.10)
+
+# Early detect ccache
+option(USE_CCACHE "Cache the build results with ccache" ON)
+# Treat warnings as errors (Debug builds only)
+option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
+# Check for translation updates
+option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
+# Compile servatrice
+option(WITH_SERVER "build servatrice" OFF)
+# Compile cockatrice
+option(WITH_CLIENT "build cockatrice" ON)
+# Compile oracle
+option(WITH_ORACLE "build oracle" ON)
+# Compile dbconverter
+option(WITH_DBCONVERTER "build dbconverter" ON)
+# Compile tests
+option(TEST "build tests" OFF)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -16,8 +33,6 @@ ELSE()
    SET(CMAKE_BUILD_TYPE Release CACHE STRING "Type of build")
 ENDIF()
 
-# Early detect ccache
-OPTION(USE_CCACHE "Cache the build results with ccache" ON)
 if(USE_CCACHE)
     find_program(CCACHE_PROGRAM ccache)
     if(CCACHE_PROGRAM)
@@ -41,22 +56,23 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-PROJECT("Cockatrice" VERSION 2.8.1)
+project("Cockatrice" VERSION 2.8.1)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
     set(GIT_TAG_RELEASENAME "Prismatic Bridge")
 endif()
 
-# Use c++11 for all targets
-set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
+# Use c++17 for all targets
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ ISO Standard")
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # Search path for cmake modules
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+list(INSERT CMAKE_MODULE_PATH 0 "${COCKATRICE_CMAKE_PATH}")
 
 include(getversion)
 
@@ -76,8 +92,8 @@ if(UNIX)
         if(RULE_LAUNCH_COMPILE)
             MESSAGE(STATUS "Force enabling CCache usage under macOS")
             # Set up wrapper scripts
-            configure_file(${CMAKE_MODULE_PATH}/launch-c.in   launch-c)
-            configure_file(${CMAKE_MODULE_PATH}/launch-cxx.in launch-cxx)
+            configure_file("${COCKATRICE_CMAKE_PATH}/launch-c.in"   launch-c)
+            configure_file("${COCKATRICE_CMAKE_PATH}/launch-cxx.in" launch-cxx)
             execute_process(COMMAND chmod a+rx
                 "${CMAKE_BINARY_DIR}/launch-c"
                 "${CMAKE_BINARY_DIR}/launch-cxx")
@@ -103,13 +119,10 @@ elseif(WIN32)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
-# Treat warnings as errors (Debug builds only)
-option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
-
 # Define proper compilation flags
 IF(MSVC)
-    # Visual Studio: Maximum optimization, disable warning C4251
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 ")
+    # Visual Studio: Maximum optimization, disable warning C4251, establish C++17 compatibility
+    SET(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive-")
     # Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
@@ -122,6 +135,10 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     else()
         set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
     endif()
+
+    IF(APPLE)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+    ENDIF()
 
     set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=missing-declarations)
 
@@ -148,7 +165,7 @@ ENDIF()
 
 FIND_PACKAGE(Threads REQUIRED)
 
-# Find Qt5
+# Determine 32 or 64 bit build
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(_lib_suffix 64)
 else()
@@ -165,28 +182,9 @@ elseif(DEFINED ENV{QTDIR})
     list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
 
-FIND_PACKAGE(Qt5Core 5.5.0 REQUIRED)
+MESSAGE(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
-IF(Qt5Core_FOUND)
-    MESSAGE(STATUS "Found Qt ${Qt5Core_VERSION_STRING}")
-
-    # FIX: Qt was built with -reduce-relocations
-    if (Qt5_POSITION_INDEPENDENT_CODE)
-        SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    endif()
-
-    # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${Qt5Core_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
-    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
-
-ELSE()
-    MESSAGE(FATAL_ERROR "No Qt5 found!")
-ENDIF()
-
-# Check for translation updates
-OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+include(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
 
@@ -195,7 +193,7 @@ FIND_PACKAGE(Protobuf REQUIRED)
 IF(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
     MESSAGE(FATAL_ERROR "No protoc command found!")
 ELSE()
-    MESSAGE(STATUS "Protoc version ${Protobuf_VERSION} found!")
+    MESSAGE(STATUS "Found Protobuf ${Protobuf_VERSION} at: ${Protobuf_LIBRARIES}")
 ENDIF()
 
 #Find OpenSSL
@@ -209,8 +207,8 @@ IF(MSVC)
 ENDIF()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Zach Halpern <zahalpern+github@gmail.com>")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
+set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
@@ -231,15 +229,33 @@ if(UNIX)
         # linux
         IF(CPACK_GENERATOR STREQUAL "RPM")
             set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-            set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
+            set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
+            IF(Qt6_FOUND)
+                SET(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia")
+            ELSEIF(Qt5_FOUND)
+                SET(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
+            ENDIF()
             set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
             set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
+            # stop directories from making package conflicts
+            set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+              /usr/share/applications
+              /usr/share/icons
+              /usr/share/icons/hicolor
+              /usr/share/icons/hicolor/48x48
+              /usr/share/icons/hicolor/48x48/apps
+              /usr/share/icons/hicolor/scalable
+              /usr/share/icons/hicolor/scalable/apps)
         ELSE()
             set(CPACK_GENERATOR DEB)
             set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
             set(CPACK_DEBIAN_PACKAGE_SECTION "games")
             set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-            set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
+            IF(Qt6_FOUND)
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins")
+            ELSEIF(Qt5_FOUND)
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
+            ENDIF()
         ENDIF()
     endif()
 elseif(WIN32)
@@ -252,8 +268,8 @@ elseif(WIN32)
 
     # Configure file with custom definitions for NSIS.
     configure_file(
-        ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
-        ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
+        "${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in"
+        "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh"
     )
 
     # include vcredist into the package; NSIS will take care of running it
@@ -264,38 +280,33 @@ endif()
 
 include(CPack)
 
-# Compile servatrice (default off)
-option(WITH_SERVER "build servatrice" OFF)
 add_subdirectory(common)
 if(WITH_SERVER)
     add_subdirectory(servatrice)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile cockatrice (default on)
-option(WITH_CLIENT "build cockatrice" ON)
 if(WITH_CLIENT)
     add_subdirectory(cockatrice)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile oracle (default on)
-option(WITH_ORACLE "build oracle" ON)
 if(WITH_ORACLE)
     add_subdirectory(oracle)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile dbconverter (default on)
-option(WITH_DBCONVERTER "build dbconverter" ON)
 if(WITH_DBCONVERTER)
     add_subdirectory(dbconverter)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Dbconverter;Dbconverter;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
-# Compile tests (default off)
-option(TEST "build tests" OFF)
 if(TEST)
     include(CTest)
     add_subdirectory(tests)
+endif()
+
+if(Qt6Found AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
+    # Qt6.3+ requires project finalization to support translations
+    qt6_finalize_project()
 endif()

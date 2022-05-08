@@ -2,14 +2,24 @@
 
 # This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
 
+# Compiles cockatrice inside of a ci environment
+# --install runs make install
+# --package [<package type>] runs make package, optionally force the type
+# --suffix <suffix> renames package with this suffix, requires arg
+# --server compiles servatrice
+# --test runs tests
+# --debug or --release sets the build type ie CMAKE_BUILD_TYPE
+# --ccache [<size>] uses ccache and shows stats, optionally provide size
+# --dir <dir> sets the name of the build dir, default is "build"
+# --parallel <core count> sets how many cores cmake should build with in parallel
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count>)
+# exitcode: 1 for failure, 3 for invalid arguments
+
 # Read arguments
-while [[ "$@" ]]; do
+while [[ $# != 0 ]]; do
   case "$1" in
     '--')
-      shift
-      ;;
-    '--format')
-      CHECK_FORMAT=1
       shift
       ;;
     '--install')
@@ -19,7 +29,7 @@ while [[ "$@" ]]; do
     '--package')
       MAKE_PACKAGE=1
       shift
-      if [[ $# != 0 && $1 != -* ]]; then
+      if [[ $# != 0 && ${1:0:1} != - ]]; then
         PACKAGE_TYPE="$1"
         shift
       fi
@@ -28,7 +38,7 @@ while [[ "$@" ]]; do
       shift
       if [[ $# == 0 ]]; then
         echo "::error file=$0::--suffix expects an argument"
-        exit 1
+        exit 3
       fi
       PACKAGE_SUFFIX="$1"
       shift
@@ -52,101 +62,134 @@ while [[ "$@" ]]; do
     '--ccache')
       USE_CCACHE=1
       shift
+      if [[ $# != 0 && ${1:0:1} != - ]]; then
+        CCACHE_SIZE="$1"
+        shift
+      fi
       ;;
-    *)
-      if [[ $1 == -* ]]; then
-        echo "::error file=$0::unrecognized option: $1"
+    '--dir')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--dir expects an argument"
         exit 3
       fi
-      BUILDTYPE="$1"
+      BUILD_DIR="$1"
       shift
+      ;;
+    '--parallel')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--parallel expects an argument"
+        exit 3
+      fi
+      PARALLEL_COUNT="$1"
+      shift
+      ;;
+    *)
+      echo "::error file=$0::unrecognized option: $1"
+      exit 3
       ;;
   esac
 done
-
-# Check formatting using clang-format
-if [[ $CHECK_FORMAT ]]; then
-  echo "::group::Run linter"
-  source ./.ci/lint.sh
-  echo "::endgroup::"
-fi
 
 set -e
 
 # Setup
 ./servatrice/check_schema_version.sh
-mkdir -p build
-cd build
-
-if [[ ! $CMAKE_BUILD_PARALLEL_LEVEL ]]; then
-  CMAKE_BUILD_PARALLEL_LEVEL=2 # default machines have 2 cores
+if [[ ! $BUILDTYPE ]]; then
+  BUILDTYPE=Release
 fi
+if [[ ! $BUILD_DIR ]]; then
+  BUILD_DIR="build"
+fi
+mkdir -p "$BUILD_DIR"
+cd "$BUILD_DIR"
 
 # Add cmake flags
+flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
-  flags+=" -DWITH_SERVER=1"
+  flags+=("-DWITH_SERVER=1")
 fi
 if [[ $MAKE_TEST ]]; then
-  flags+=" -DTEST=1"
+  flags+=("-DTEST=1")
 fi
-if [[ $BUILDTYPE ]]; then
-  flags+=" -DCMAKE_BUILD_TYPE=$BUILDTYPE"
+if [[ $USE_CCACHE ]]; then
+  flags+=("-DUSE_CCACHE=1")
+  if [[ $CCACHE_SIZE ]]; then
+    # note, this setting persists after running the script
+    ccache --max-size "$CCACHE_SIZE"
+  fi
 fi
 if [[ $PACKAGE_TYPE ]]; then
-  flags+=" -DCPACK_GENERATOR=$PACKAGE_TYPE"
+  flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
-if [[ $(uname) == "Darwin" ]]; then
-  if [[ $USE_CCACHE ]]; then
-    # prepend ccache compiler binaries to path
-    PATH="/usr/local/opt/ccache/libexec:$PATH"
+# Add cmake --build flags
+buildflags=(--config "$BUILDTYPE")
+if [[ $PARALLEL_COUNT ]]; then
+  if [[ $(cmake --build /not_a_dir --parallel |& head -1) =~ parallel ]]; then
+    # workaround for bionic having an old cmake
+    echo "this version of cmake does not support --parallel, using native build tool -j instead"
+    buildflags+=(-- -j "$PARALLEL_COUNT")
+    # note, no normal build flags should be added after this
+  else
+    buildflags+=(--parallel "$PARALLEL_COUNT")
   fi
-  # Add qt install location when using homebrew
-  flags+=" -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/"
 fi
+
+function ccachestatsverbose() {
+  # note, verbose only works on newer ccache, discard the error
+  local got
+  if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
+    echo "$got"
+  else
+    ccache --show-stats
+  fi
+}
 
 # Compile
 if [[ $USE_CCACHE ]]; then
   echo "::group::Show ccache stats"
-  ccache --show-stats
+  ccachestatsverbose
   echo "::endgroup::"
 fi
 
 echo "::group::Configure cmake"
 cmake --version
-cmake .. $flags
+cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-cmake --build .
+cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
   echo "::group::Show ccache stats again"
-  ccache --show-stats
+  ccachestatsverbose
   echo "::endgroup::"
 fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  cmake --build . --target test
+  ctest -C "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
-  cmake --build . --target install
+  cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
-  cmake --build . --target package
+  cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
   if [[ $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
-    ../.ci/name_build.sh "$PACKAGE_SUFFIX"
+    cd ..
+    BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
 fi

@@ -78,7 +78,7 @@ class ReleaseChannel : public QObject
 {
     Q_OBJECT
 public:
-    ReleaseChannel();
+    explicit ReleaseChannel();
     ~ReleaseChannel() override;
 
 protected:
@@ -117,7 +117,7 @@ class StableReleaseChannel : public ReleaseChannel
 {
     Q_OBJECT
 public:
-    StableReleaseChannel() = default;
+    explicit StableReleaseChannel() = default;
     ~StableReleaseChannel() override = default;
 
     QString getManualDownloadUrl() const override;

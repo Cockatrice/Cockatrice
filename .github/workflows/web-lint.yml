@@ -2,8 +2,6 @@ name: Code Style (TypeScript)
 
 on:
   pull_request:
-    branches:
-    - master
     paths:
       - '.github/workflows/web-*.yml'
       - 'webclient/**'

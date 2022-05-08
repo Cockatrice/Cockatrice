@@ -18,7 +18,7 @@ QString SettingsCache::getDataPath()
     if (isPortableBuild)
         return qApp->applicationDirPath() + "/data";
     else
-        return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 }
 
 QString SettingsCache::getSettingsPath()
@@ -692,6 +692,7 @@ QStringList SettingsCache::getCountries() const
                                                  << "er"
                                                  << "es"
                                                  << "et"
+                                                 << "eu"
                                                  << "fi"
                                                  << "fj"
                                                  << "fk"
@@ -867,6 +868,7 @@ QStringList SettingsCache::getCountries() const
                                                  << "vu"
                                                  << "wf"
                                                  << "ws"
+                                                 << "xk"
                                                  << "ye"
                                                  << "yt"
                                                  << "za"

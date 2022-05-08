@@ -6,6 +6,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QRegularExpression>
 #include <QStringList>
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
@@ -208,7 +209,7 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
     }
 
     if (!getComments().isEmpty()) {
-        QStringList commentRows = getComments().split(QRegExp("\n|\r\n|\r"));
+        QStringList commentRows = getComments().split(QRegularExpression("\n|\r\n|\r"));
         foreach (QString row, commentRows) {
             out << "// " << row << "\n";
         }

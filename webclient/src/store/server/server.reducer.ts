@@ -6,6 +6,7 @@ import { ServerState } from './server.interfaces'
 import { Types } from './server.types';
 
 const initialState: ServerState = {
+  initialized: false,
   buddyList: [],
   ignoreList: [],
 
@@ -28,11 +29,33 @@ const initialState: ServerState = {
   sortUsersBy: {
     field: UserSortField.NAME,
     order: SortDirection.ASC
-  }
+  },
+  connectOptions: {},
 };
 
 export const serverReducer = (state = initialState, action: any) => {
   switch (action.type) {
+    case Types.INITIALIZED: {
+      return {
+        ...initialState,
+        initialized: true
+      }
+    }
+    case Types.ACCOUNT_AWAITING_ACTIVATION: {
+      return {
+        ...state,
+        connectOptions: {
+          ...action.options
+        }
+      }
+    }
+    case Types.ACCOUNT_ACTIVATION_FAILED:
+    case Types.ACCOUNT_ACTIVATION_SUCCESS: {
+      return {
+        ...state,
+        connectOptions: {}
+      }
+    }
     case Types.CLEAR_STORE: {
       return {
         ...initialState,

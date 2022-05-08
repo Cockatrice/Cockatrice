@@ -5,6 +5,7 @@
 add_subdirectory(pb)
 
 SET(common_SOURCES
+    debug_pb_message.cpp
     decklist.cpp
     expression.cpp
     featureset.cpp
@@ -35,8 +36,8 @@ set(ORACLE_LIBS)
 INCLUDE_DIRECTORIES(pb)
 INCLUDE_DIRECTORIES(sfmt)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
-include_directories(${Qt5Core_INCLUDE_DIRS})
+include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(cockatrice_common ${common_SOURCES} ${common_MOC_SRCS})
-target_link_libraries(cockatrice_common cockatrice_protocol)
+target_link_libraries(cockatrice_common PUBLIC cockatrice_protocol)

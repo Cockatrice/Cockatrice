@@ -34,7 +34,6 @@
 #include <QMetaType>
 #include <QTextCodec>
 #include <QtGlobal>
-#include <google/protobuf/stubs/common.h>
 #include <iostream>
 
 RNG_Abstract *rng;
@@ -70,17 +69,17 @@ void testRNG()
     }
     for (int i = 0; i <= maxMax - min; ++i) {
         std::cerr << (min + i);
-        for (int j = 0; j < numbers.size(); ++j) {
-            if (i < numbers[j].size())
-                std::cerr << "\t" << numbers[j][i];
+        for (auto &number : numbers) {
+            if (i < number.size())
+                std::cerr << "\t" << number[i];
             else
                 std::cerr << "\t";
         }
         std::cerr << std::endl;
     }
     std::cerr << std::endl << "Chi^2 =";
-    for (int j = 0; j < chisq.size(); ++j)
-        std::cerr << "\t" << QString::number(chisq[j], 'f', 3).toStdString();
+    for (double j : chisq)
+        std::cerr << "\t" << QString::number(j, 'f', 3).toStdString();
     std::cerr << std::endl << "k =";
     for (int j = 0; j < chisq.size(); ++j)
         std::cerr << "\t" << (j - min + minMax);
@@ -112,9 +111,9 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    app.setOrganizationName("Cockatrice");
-    app.setApplicationName("Servatrice");
-    app.setApplicationVersion(VERSION_STRING);
+    QCoreApplication::setOrganizationName("Cockatrice");
+    QCoreApplication::setApplicationName("Servatrice");
+    QCoreApplication::setApplicationVersion(VERSION_STRING);
 
     QCommandLineParser parser;
     parser.addHelpOption();
@@ -183,7 +182,7 @@ int main(int argc, char *argv[])
 
     smtpClient = new SmtpClient();
 
-    Servatrice *server = new Servatrice();
+    auto *server = new Servatrice();
     QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
     int retval = 0;
     if (server->initServer()) {
@@ -192,7 +191,7 @@ int main(int argc, char *argv[])
 
         qInstallMessageHandler(myMessageOutput);
 
-        retval = app.exec();
+        retval = QCoreApplication::exec();
 
         std::cerr << "Server quit." << std::endl;
         std::cerr << "-------------------------" << std::endl;
@@ -210,5 +209,6 @@ int main(int argc, char *argv[])
     // Delete all global objects allocated by libprotobuf.
     google::protobuf::ShutdownProtobufLibrary();
 
+    QCoreApplication::quit();
     return retval;
 }

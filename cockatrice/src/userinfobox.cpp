@@ -141,7 +141,7 @@ QString UserInfoBox::getAgeString(int ageSeconds)
     if (ageSeconds == 0)
         return accountAgeString;
 
-    auto date = QDateTime::fromTime_t(QDateTime::currentSecsSinceEpoch() - ageSeconds).date();
+    auto date = QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch() - ageSeconds).date();
     if (!date.isValid())
         return accountAgeString;
 

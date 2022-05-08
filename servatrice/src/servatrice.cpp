@@ -76,6 +76,7 @@ Servatrice_GameServer::~Servatrice_GameServer()
         QThread *poolThread = connectionPools[i]->thread();
         connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
         poolThread->wait();
+        poolThread->deleteLater();
     }
 }
 
@@ -84,6 +85,7 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
+    connect(ssi, SIGNAL(incTxBytes), this, SLOT(incTxBytes));
     ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
@@ -104,7 +106,7 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
         }
         debugStr.append(QString::number(clientCount));
     }
-    qDebug() << "Pool utilisation:" << debugStr;
+    qDebug().noquote() << "Pool utilisation:" << debugStr.join(", ");
     return connectionPools[poolIndex];
 }
 
@@ -144,6 +146,7 @@ Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
         QThread *poolThread = connectionPools[i]->thread();
         connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
         poolThread->wait();
+        poolThread->deleteLater();
     }
 }
 
@@ -152,6 +155,7 @@ void Servatrice_WebsocketGameServer::onNewConnection()
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
+    connect(ssi, SIGNAL(incTxBytes), this, SLOT(incTxBytes));
     /*
      * Due to a Qt limitation, websockets can't be moved to another thread.
      * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
@@ -176,7 +180,7 @@ Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnecti
         }
         debugStr.append(QString::number(clientCount));
     }
-    qDebug() << "Pool utilisation:" << debugStr;
+    qDebug().noquote() << "Pool utilisation:" << debugStr.join(", ");
     return connectionPools[poolIndex];
 }
 
@@ -194,8 +198,8 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), shutdownTimer(nullptr),
-      isFirstShutdownMessage(true)
+    : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), txBytes(0), rxBytes(0),
+      shutdownTimer(nullptr)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -204,21 +208,16 @@ Servatrice::~Servatrice()
 {
     gameServer->close();
 
-    // clients live in other threads, we need to lock them
-    clientsLock.lockForRead();
+    // we are destroying the clients outside their thread!
     for (auto *client : clients) {
-        QMetaObject::invokeMethod(client, "prepareDestroy", Qt::QueuedConnection);
-    }
-    clientsLock.unlock();
-
-    // client destruction is asynchronous, wait for all clients to be gone
-    for (;;) {
-        QThread::usleep(10);
-        QReadLocker locker(&clientsLock);
-        if (clients.isEmpty())
-            break;
+        client->prepareDestroy();
     }
 
+    if (shutdownTimer) {
+        shutdownTimer->deleteLater();
+    }
+
+    servatriceDatabaseInterface->deleteLater();
     prepareDestroy();
 }
 
@@ -241,18 +240,18 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationNone;
     }
 
-    qDebug() << "Store Replays: " << getStoreReplaysEnabled();
-    qDebug() << "Client ID Required: " << getClientIDRequiredEnabled();
-    qDebug() << "Maximum user limit enabled: " << getMaxUserLimitEnabled();
+    qDebug() << "Store Replays:" << getStoreReplaysEnabled();
+    qDebug() << "Client ID Required:" << getClientIDRequiredEnabled();
+    qDebug() << "Maximum user limit enabled:" << getMaxUserLimitEnabled();
 
     if (getMaxUserLimitEnabled()) {
-        qDebug() << "Maximum total user limit: " << getMaxUserTotal();
-        qDebug() << "Maximum tcp user limit: " << getMaxTcpUserLimit();
-        qDebug() << "Maximum websocket user limit: " << getMaxWebSocketUserLimit();
+        qDebug() << "Maximum total user limit:" << getMaxUserTotal();
+        qDebug() << "Maximum tcp user limit:" << getMaxTcpUserLimit();
+        qDebug() << "Maximum websocket user limit:" << getMaxWebSocketUserLimit();
     }
 
-    qDebug() << "Accept registered users only: " << getRegOnlyServerEnabled();
-    qDebug() << "Registration enabled: " << getRegistrationEnabled();
+    qDebug() << "Accept registered users only:" << getRegOnlyServerEnabled();
+    qDebug() << "Registration enabled:" << getRegistrationEnabled();
     if (getRegistrationEnabled()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         QStringList emailBlackListFilters = getEmailBlackList().split(",", Qt::SkipEmptyParts);
@@ -261,32 +260,32 @@ bool Servatrice::initServer()
         QStringList emailBlackListFilters = getEmailBlackList().split(",", QString::SkipEmptyParts);
         QStringList emailWhiteListFilters = getEmailWhiteList().split(",", QString::SkipEmptyParts);
 #endif
-        qDebug() << "Email blacklist: " << emailBlackListFilters;
-        qDebug() << "Email whitelist: " << emailWhiteListFilters;
-        qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
-        qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
+        qDebug() << "Email blacklist:" << emailBlackListFilters;
+        qDebug() << "Email whitelist:" << emailWhiteListFilters;
+        qDebug() << "Require email address to register:" << getRequireEmailForRegistrationEnabled();
+        qDebug() << "Require email activation via token:" << getRequireEmailActivationEnabled();
         if (getMaxAccountsPerEmail()) {
-            qDebug() << "Maximum number of accounts per email: " << getMaxAccountsPerEmail();
+            qDebug() << "Maximum number of accounts per email:" << getMaxAccountsPerEmail();
         } else {
             qDebug() << "Maximum number of accounts per email: unlimited";
         }
-        qDebug() << "Enable Internal SMTP Client: " << getEnableInternalSMTPClient();
+        qDebug() << "Enable Internal SMTP Client:" << getEnableInternalSMTPClient();
         if (!getEnableInternalSMTPClient()) {
             qDebug() << "WARNING: Registrations are enabled but internal SMTP client is disabled.  Users activation "
                         "emails will not be automatically mailed to users!";
         }
     }
 
-    qDebug() << "Reset password enabled: " << getEnableForgotPassword();
+    qDebug() << "Reset password enabled:" << getEnableForgotPassword();
     if (getEnableForgotPassword()) {
-        qDebug() << "Reset password token life (in minutes): " << getForgotPasswordTokenLife();
-        qDebug() << "Reset password challenge on: " << getEnableForgotPasswordChallenge();
+        qDebug() << "Reset password token life (in minutes):" << getForgotPasswordTokenLife();
+        qDebug() << "Reset password challenge on:" << getEnableForgotPasswordChallenge();
     }
 
-    qDebug() << "Auditing enabled: " << getEnableAudit();
+    qDebug() << "Auditing enabled:" << getEnableAudit();
     if (getEnableAudit()) {
-        qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
-        qDebug() << "Audit reset password attepts enabled: " << getEnableForgotPasswordAudit();
+        qDebug() << "Audit registration attempts enabled:" << getEnableRegistrationAudit();
+        qDebug() << "Audit reset password attepts enabled:" << getEnableForgotPasswordAudit();
     }
 
     if (getDBTypeString() == "mysql") {
@@ -423,7 +422,7 @@ bool Servatrice::initServer()
     statusUpdateClock = new QTimer(this);
     connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
     if (getServerStatusUpdateTime() != 0) {
-        qDebug() << "Starting status update clock, interval " << getServerStatusUpdateTime() << " ms";
+        qDebug() << "Starting status update clock, interval" << getServerStatusUpdateTime() << "ms";
         statusUpdateClock->start(getServerStatusUpdateTime());
     }
 
@@ -459,7 +458,7 @@ bool Servatrice::initServer()
     }
 
     if (getIdleClientTimeout() > 0) {
-        qDebug() << "Idle client timeout value: " << getIdleClientTimeout();
+        qDebug() << "Idle client timeout value:" << getIdleClientTimeout();
         if (getIdleClientTimeout() < 300)
             qDebug() << "WARNING: It is not recommended to set the IdleClientTimeout value very low.  Doing so will "
                         "cause clients to very quickly be disconnected.  Many players when connected may be searching "
@@ -559,7 +558,7 @@ void Servatrice::updateLoginMessage()
         }
 }
 
-void Servatrice::setRequiredFeatures(const QString featureList)
+void Servatrice::setRequiredFeatures(const QString &featureList)
 {
     FeatureSet features;
     serverRequiredFeatureList.clear();
@@ -570,10 +569,11 @@ void Servatrice::setRequiredFeatures(const QString featureList)
     QStringList listReqFeatures = featureList.split(",", QString::SkipEmptyParts);
 #endif
     if (!listReqFeatures.isEmpty())
-        foreach (QString reqFeature, listReqFeatures)
+        for (const QString &reqFeature : listReqFeatures) {
             features.enableRequiredFeature(serverRequiredFeatureList, reqFeature);
+        }
 
-    qDebug() << "Set required client features to: " << serverRequiredFeatureList;
+    qDebug() << "Set required client features to:" << serverRequiredFeatureList;
 }
 
 void Servatrice::statusUpdate()
@@ -715,8 +715,9 @@ void Servatrice::shutdownTimeout()
         clientsLock.unlock();
         delete se;
 
-        if (!shutdownMinutes)
+        if (!shutdownMinutes) {
             deleteLater();
+        }
     }
     shutdownMinutes--;
 }

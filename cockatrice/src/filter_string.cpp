@@ -4,7 +4,6 @@
 
 #include <QByteArray>
 #include <QString>
-#include <cmath>
 #include <functional>
 
 peg::parser search(R"(
@@ -337,7 +336,7 @@ static void setupParserRules()
 
 FilterString::FilterString(const QString &expr)
 {
-    QByteArray ba = expr.simplified().toLocal8Bit();
+    QByteArray ba = expr.simplified().toUtf8();
 
     std::call_once(init, setupParserRules);
 

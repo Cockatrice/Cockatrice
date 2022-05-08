@@ -162,8 +162,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     previousHostButton->setChecked(true);
 
-    connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this,
-            SLOT(updateDisplayInfo(const QString &)));
+    connect(previousHosts, SIGNAL(currentTextChanged(const QString &)), this, SLOT(updateDisplayInfo(const QString &)));
 
     playernameEdit->setFocus();
 }

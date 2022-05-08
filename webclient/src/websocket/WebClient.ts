@@ -11,8 +11,9 @@ export class WebClient {
 
   public protocolVersion = 14;
   public clientConfig = {
-    'clientver': 'webclient-1.0 (2019-10-31)',
-    'clientfeatures': [
+    clientid: 'webatrice',
+    clientver: 'webclient-1.0 (2019-10-31)',
+    clientfeatures: [
       'client_id',
       'client_ver',
       'feature_set',
@@ -30,21 +31,12 @@ export class WebClient {
     ]
   };
 
-  public options: WebSocketConnectOptions = {
-    host: '',
-    port: '',
-    userName: '',
-    password: '',
-    hashedPassword: '',
-    newPassword: '',
-    email: '',
-    realName: '',
-    country: '',
-    clientid: null,
-    reason: null,
+  public clientOptions = {
     autojoinrooms: true,
     keepalive: 5000
   };
+
+  public options: WebSocketConnectOptions;
 
   public connectionAttemptMade = false;
 
@@ -57,13 +49,19 @@ export class WebClient {
       this.handleStatusChange(status);
     });
 
-    console.log(this);
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(this);
+    }
   }
 
   public connect(options: WebSocketConnectOptions) {
     this.connectionAttemptMade = true;
-    this.options = { ...this.options, ...options };
-    this.socket.connect(this.options);
+    this.options = options;
+    this.socket.connect(options);
+  }
+
+  public testConnect(options: WebSocketConnectOptions) {
+    this.socket.testConnect(options);
   }
 
   public disconnect() {

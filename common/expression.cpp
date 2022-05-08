@@ -4,7 +4,7 @@
 
 #include <QByteArray>
 #include <QString>
-#include <cmath>
+#include <QtMath>
 #include <functional>
 
 peg::parser math(R"(
@@ -32,19 +32,17 @@ Expression::Expression(double initial) : value(initial)
 {
     if (default_functions == nullptr) {
         default_functions = new QMap<QString, std::function<double(double)>>();
-        default_functions->insert("sin", [](double a) { return sin(a); });
-        default_functions->insert("cos", [](double a) { return cos(a); });
-        default_functions->insert("tan", [](double a) { return tan(a); });
-        default_functions->insert("sqrt", [](double a) { return sqrt(a); });
-        default_functions->insert("log", [](double a) { return log(a); });
-        default_functions->insert("log10", [](double a) { return log(a); });
-        default_functions->insert("trunc", [](double a) { return trunc(a); });
-        default_functions->insert("abs", [](double a) { return fabs(a); });
-
-        default_functions->insert("floor", [](double a) { return floor(a); });
-        default_functions->insert("ceil", [](double a) { return ceil(a); });
-        default_functions->insert("round", [](double a) { return round(a); });
-        default_functions->insert("trunc", [](double a) { return trunc(a); });
+        default_functions->insert("abs", [](double a) { return qFabs(a); });
+        default_functions->insert("ceil", [](double a) { return qCeil(a); });
+        default_functions->insert("cos", [](double a) { return qCos(a); });
+        default_functions->insert("floor", [](double a) { return qFloor(a); });
+        default_functions->insert("log", [](double a) { return qLn(a); });
+        default_functions->insert("log10", [](double a) { return qLn(a); });
+        default_functions->insert("round", [](double a) { return qRound(a); });
+        default_functions->insert("sin", [](double a) { return qSin(a); });
+        default_functions->insert("sqrt", [](double a) { return qSqrt(a); });
+        default_functions->insert("tan", [](double a) { return qTan(a); });
+        default_functions->insert("trunc", [](double a) { return std::trunc(a); });
     }
     fns = QMap<QString, std::function<double(double)>>(*default_functions);
 }
@@ -80,7 +78,7 @@ double Expression::eval(const peg::Ast &ast)
                     result /= arg;
                     break;
                 case '^':
-                    result = pow(result, arg);
+                    result = qPow(result, arg);
                     break;
                 default:
                     result = 0;
@@ -95,7 +93,7 @@ double Expression::eval(const peg::Ast &ast)
 
 double Expression::parse(const QString &expr)
 {
-    QByteArray ba = expr.toLocal8Bit();
+    QByteArray ba = expr.toUtf8();
 
     math.enable_ast();
 

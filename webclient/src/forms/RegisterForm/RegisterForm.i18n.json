@@ -1,0 +1,10 @@
+{
+  "RegisterForm": {
+    "label": {
+      "register": "Register"
+    },
+    "toast": {
+      "registerSuccess": "Registration Successful!"
+    }
+  }
+}

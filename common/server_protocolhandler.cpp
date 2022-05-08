@@ -1,5 +1,6 @@
 #include "server_protocolhandler.h"
 
+#include "debug_pb_message.h"
 #include "featureset.h"
 #include "get_pb_extension.h"
 #include "pb/commands.pb.h"
@@ -24,8 +25,8 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QtMath>
 #include <google/protobuf/descriptor.h>
-#include <math.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
@@ -43,6 +44,7 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 }
 
 // This function must only be called from the thread this object lives in.
+// Except when the server is shutting down.
 // The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
 void Server_ProtocolHandler::prepareDestroy()
 {
@@ -134,17 +136,8 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const SessionCommand &sc = cont.session_command(i);
         const int num = getPbExtension(sc);
-        if (num != SessionCommand::PING) {      // don't log ping commands
-            if (num == SessionCommand::LOGIN) { // log login commands, but hide passwords
-                SessionCommand debugSc(sc);
-                debugSc.MutableExtension(Command_Login::ext)->clear_password();
-                logDebugMessage(QString::fromStdString(debugSc.ShortDebugString()));
-            } else if (num == SessionCommand::REGISTER) {
-                SessionCommand logSc(sc);
-                logSc.MutableExtension(Command_Register::ext)->clear_password();
-                logDebugMessage(QString::fromStdString(logSc.ShortDebugString()));
-            } else
-                logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
+        if (num != SessionCommand::PING) { // don't log ping commands
+            logDebugMessage(getSafeDebugString(sc));
         }
         switch ((SessionCommand::SessionCommandType)num) {
             case SessionCommand::PING:
@@ -198,7 +191,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const RoomCommand &sc = cont.room_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
+        logDebugMessage(getSafeDebugString(sc));
         switch ((RoomCommand::RoomCommandType)num) {
             case RoomCommand::LEAVE_ROOM:
                 resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc);
@@ -277,7 +270,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     for (int i = cont.game_command_size() - 1; i >= 0; --i) {
         const GameCommand &sc = cont.game_command(i);
         logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) +
-                        QString::fromStdString(sc.ShortDebugString()));
+                        getSafeDebugString(sc));
 
         if (commandCountingInterval > 0) {
             int totalCount = 0;
@@ -321,7 +314,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const ModeratorCommand &sc = cont.moderator_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
+        logDebugMessage(getSafeDebugString(sc));
 
         resp = processExtendedModeratorCommand(num, sc, rc);
         if (resp != Response::RespOk)
@@ -345,7 +338,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const AdminCommand &sc = cont.admin_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
+        logDebugMessage(getSafeDebugString(sc));
 
         resp = processExtendedAdminCommand(num, sc, rc);
         if (resp != Response::RespOk)
@@ -420,7 +413,7 @@ void Server_ProtocolHandler::pingClockTimeout()
             }
         }
 
-        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() * .9)) &&
+        if (((timeRunning - lastActionReceived) >= qCeil(server->getIdleClientTimeout() * .9)) &&
             (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
@@ -497,7 +490,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             Response_Login *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             if (banSecondsLeft != 0)
-                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toTime_t());
+                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toSecsSinceEpoch());
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
         }

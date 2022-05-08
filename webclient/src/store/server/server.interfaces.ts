@@ -1,4 +1,4 @@
-import { Log, SortBy, User, UserSortField } from 'types';
+import { Log, SortBy, User, UserSortField, WebSocketConnectOptions } from 'types';
 
 export interface ServerConnectParams {
   host: string;
@@ -39,6 +39,7 @@ export interface AccountActivationParams extends ServerRegisterParams {
 }
 
 export interface ServerState {
+  initialized: boolean;
   buddyList: User[];
   ignoreList: User[];
   info: ServerStateInfo;
@@ -47,6 +48,7 @@ export interface ServerState {
   user: User;
   users: User[];
   sortUsersBy: ServerStateSortUsersBy;
+  connectOptions: WebSocketConnectOptions;
 }
 
 export interface ServerStateStatus {

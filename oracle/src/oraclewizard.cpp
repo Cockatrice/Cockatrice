@@ -54,6 +54,9 @@
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
+    // define a dummy context that will be used where needed
+    QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
+
     settings = new QSettings(SettingsCache::instance().getSettingsPath() + "global.ini", QSettings::IniFormat, this);
     connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
@@ -140,16 +143,19 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     languageLabel = new QLabel(this);
     versionLabel = new QLabel(this);
     languageBox = new QComboBox(this);
-    QString setLanguage = SettingsCache::instance().getLang();
 
-    QStringList qmFiles = findQmFiles();
-    for (int i = 0; i < qmFiles.size(); i++) {
-        QString langName = languageName(qmFiles[i]);
-        languageBox->addItem(langName, qmFiles[i]);
-        if ((qmFiles[i] == setLanguage) ||
-            (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME))) {
-            languageBox->setCurrentIndex(i);
-        }
+    QStringList languageCodes = findQmFiles();
+    for (const QString &code : languageCodes) {
+        QString langName = languageName(code);
+        languageBox->addItem(langName, code);
+    }
+
+    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
+    int index = languageBox->findText(setLanguage, Qt::MatchExactly);
+    if (index == -1) {
+        qWarning() << "could not find language" << setLanguage;
+    } else {
+        languageBox->setCurrentIndex(index);
     }
 
     connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
@@ -167,20 +173,21 @@ QStringList IntroPage::findQmFiles()
 {
     QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
+    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
     return fileNames;
 }
 
-QString IntroPage::languageName(const QString &qmFile)
+QString IntroPage::languageName(const QString &lang)
 {
-    if (qmFile == DEFAULT_LANG_CODE) {
-        return DEFAULT_LANG_NAME;
+    QTranslator qTranslator;
+
+    QString appNameHint = translationPrefix + "_" + lang;
+    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
+    if (!appTranslationLoaded) {
+        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
     }
 
-    QTranslator translator;
-    translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
-
-    return translator.translate("i18n", DEFAULT_LANG_NAME);
+    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void IntroPage::languageBoxChanged(int index)
@@ -455,8 +462,10 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
             zipDownloadFailed(tr("Xz extraction failed."));
             return;
         }
+        const auto &outBufferData = outBuffer->data();
 
-        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        future = QtConcurrent::run(
+            [this, &outBufferData] { return wizard()->importer->readSetsFromByteArray(outBufferData); });
         watcher.setFuture(future);
         return;
 #else
@@ -496,8 +505,10 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
             uz.closeArchive();
             return;
         }
+        const auto &outBufferData = outBuffer->data();
 
-        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        future = QtConcurrent::run(
+            [this, &outBufferData] { return wizard()->importer->readSetsFromByteArray(outBufferData); });
         watcher.setFuture(future);
         return;
 #else
@@ -511,7 +522,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 #endif
     }
     // Start the computation.
-    future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, data);
+    future = QtConcurrent::run([this, &data] { return wizard()->importer->readSetsFromByteArray(data); });
     watcher.setFuture(future);
 }
 

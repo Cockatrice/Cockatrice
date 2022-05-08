@@ -5,12 +5,15 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
+import { useTranslation } from 'react-i18next';
 
 import { ResetPasswordForm } from 'forms';
 
 import './ResetPasswordDialog.css';
 
 const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit, userName }: any) => {
+  const { t } = useTranslation();
+
   const handleOnClose = () => {
     handleClose();
   }
@@ -18,7 +21,7 @@ const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit, userName 
   return (
     <Dialog onClose={handleOnClose} open={isOpen}>
       <DialogTitle disableTypography className="dialog-title">
-        <Typography variant="h6">Reset Password</Typography>
+        <Typography variant="h6">{t('ResetPasswordDialog.title')}</Typography>
 
         {handleOnClose ? (
           <IconButton onClick={handleOnClose}>

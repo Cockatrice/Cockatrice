@@ -69,6 +69,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
       spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0),
       secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()),
+      pingClock(nullptr),
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
 #else
@@ -97,7 +98,7 @@ Server_Game::~Server_Game()
 
     gameClosed = true;
     sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
-    for (Server_Player *player : players.values()) {
+    for (auto *player : players.values()) {
         player->prepareDestroy();
     }
     players.clear();
@@ -112,10 +113,22 @@ Server_Game::~Server_Game()
     replayList.append(currentReplay);
     storeGameInformation();
 
-    for (int i = 0; i < replayList.size(); ++i)
-        delete replayList[i];
+    for (auto *replay : replayList) {
+        delete replay;
+    }
+    replayList.clear();
+
+    room = nullptr;
+    currentReplay = nullptr;
+    creatorInfo = nullptr;
+
+    if (pingClock) {
+        delete pingClock;
+        pingClock = nullptr;
+    }
 
     qDebug() << "Server_Game destructor: gameId=" << gameId;
+    deleteLater();
 }
 
 void Server_Game::storeGameInformation()
@@ -126,7 +139,7 @@ void Server_Game::storeGameInformation()
     ServerInfo_ReplayMatch *replayMatchInfo = replayEvent.mutable_match_info();
     replayMatchInfo->set_game_id(gameInfo.game_id());
     replayMatchInfo->set_room_name(room->getName().toStdString());
-    replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toTime_t());
+    replayMatchInfo->set_time_started(QDateTime::currentDateTime().addSecs(-secondsElapsed).toSecsSinceEpoch());
     replayMatchInfo->set_length(secondsElapsed);
     replayMatchInfo->set_game_name(gameInfo.description());
 
@@ -769,6 +782,6 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_spectators_can_chat(spectatorsCanTalk);
         result.set_spectators_omniscient(spectatorsSeeEverything);
         result.set_spectators_count(getSpectatorCount());
-        result.set_start_time(startTime.toTime_t());
+        result.set_start_time(startTime.toSecsSinceEpoch());
     }
 }

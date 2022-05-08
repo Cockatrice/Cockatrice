@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "server.h"
 
+#include "debug_pb_message.h"
 #include "featureset.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -117,7 +118,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                 Event_ConnectionClosed event;
                 event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
                 event.set_reason_str("You have been logged out due to logging in at another location.");
-                event.set_end_time(QDateTime::currentDateTime().toTime_t());
+                event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
 
                 SessionEvent *se = users.value(name)->prepareSessionEvent(event);
                 users.value(name)->sendProtocolItem(*se);
@@ -229,6 +230,11 @@ void Server::addClient(Server_ProtocolHandler *client)
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
+    int clientIndex = clients.indexOf(client);
+    if (clientIndex == -1) {
+        qWarning() << "tried to remove non existing client";
+        return;
+    }
 
     if (client->getConnectionType() == "tcp")
         tcpUserCount--;
@@ -237,7 +243,7 @@ void Server::removeClient(Server_ProtocolHandler *client)
         webSocketUserCount--;
 
     QWriteLocker locker(&clientsLock);
-    clients.removeAt(clients.indexOf(client));
+    clients.removeAt(clientIndex);
     ServerInfo_User *data = client->getUserInfo();
     if (data) {
         Event_UserLeft event;
@@ -486,7 +492,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
         GameEventStorage ges;
         for (int i = cont.game_command_size() - 1; i >= 0; --i) {
             const GameCommand &sc = cont.game_command(i);
-            qDebug() << "[ISL]" << QString::fromStdString(sc.ShortDebugString());
+            qDebug() << "[ISL]" << getSafeDebugString(sc);
 
             Response::ResponseCode resp = player->processGameCommand(sc, responseContainer, ges);
 

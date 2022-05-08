@@ -6,13 +6,9 @@
 #include "main.h"
 
 #include <QApplication>
-#include <utility>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
 #include <QScreen>
-#else
-#include <QDesktopWidget>
-#endif
 #include <QVBoxLayout>
+#include <utility>
 
 CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
     : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH), info(nullptr)
@@ -34,12 +30,7 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
 
     setFrameStyle(QFrame::Panel | QFrame::Raised);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
-    int pixmapHeight = qApp->primaryScreen()->geometry().height() / 3;
-#else
-    QDesktopWidget desktopWidget;
-    int pixmapHeight = desktopWidget.screenGeometry().height() / 3;
-#endif
+    int pixmapHeight = QGuiApplication::primaryScreen()->geometry().height() / 3;
     int pixmapWidth = static_cast<int>(pixmapHeight / aspectRatio);
     pic->setFixedWidth(pixmapWidth);
     pic->setFixedHeight(pixmapHeight);

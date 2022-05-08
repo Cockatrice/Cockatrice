@@ -3,7 +3,6 @@
 #define STRINGSIZES_H
 
 #include <QString>
-#include <QtMath>
 
 // max size for short strings, like names and things that are generally a single phrase
 constexpr int MAX_NAME_LENGTH = 0xff;

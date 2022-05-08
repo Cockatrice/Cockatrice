@@ -138,7 +138,7 @@ IF(UPDATE_TRANSLATIONS)
     FILE(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp ${CMAKE_SOURCE_DIR}/cockatrice/src/*.h)
     FILE(GLOB_RECURSE translate_common_SRCS ${CMAKE_SOURCE_DIR}/common/*.cpp ${CMAKE_SOURCE_DIR}/common/*.h)
     SET(translate_SRCS ${translate_cockatrice_SRCS} ${translate_common_SRCS})
-    SET(cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/cockatrice_en.ts")
+    SET(cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice_en@source.ts")
 ELSE()
     FILE(GLOB cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 ENDIF(UPDATE_TRANSLATIONS)
@@ -153,30 +153,11 @@ if(APPLE)
     set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-# Qt5
-find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg WebSockets Widgets REQUIRED)
-set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets Qt5::WebSockets)
-
-# Qt5LinguistTools
-find_package(Qt5LinguistTools)
-if(Qt5LinguistTools_FOUND)
-    list(APPEND COCKATRICE_LIBS Qt5::LinguistTools)
-
-    if(NOT Qt5_LRELEASE_EXECUTABLE)
-        MESSAGE(WARNING "Qt's lrelease not found.")
-    endif()
-
-    if(UPDATE_TRANSLATIONS)
-        if(NOT Qt5_LUPDATE_EXECUTABLE)
-            MESSAGE(WARNING "Qt's lupdate not found.")
-        endif()
-        QT5_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
-    else()
-        QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
-    endif()
-endif()
-
-QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+IF(Qt6_FOUND)
+    Qt6_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+ELSEIF(Qt5_FOUND)
+    Qt5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+ENDIF()
 
 # Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
@@ -188,10 +169,38 @@ INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/common)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-# Build cockatrice binary and link it
-ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
+set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
+set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
+set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
-TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
+if(Qt6_FOUND)
+    qt6_add_executable(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS} MANUAL_FINALIZATION)
+elseif(Qt5_FOUND)
+    # Qt5 Translations need to be linked at executable creation time
+    if(Qt5LinguistTools_FOUND)
+        if(UPDATE_TRANSLATIONS)
+            qt5_create_translation(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
+        else()
+            qt5_add_translation(cockatrice_QM ${cockatrice_TS})
+        endif()
+    endif()
+    add_executable(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
+    if(UNIX)
+        if(APPLE)
+            install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_MAC_QM_INSTALL_DIR})
+        else()
+            install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_UNIX_QM_INSTALL_DIR})
+        endif()
+    elseif(WIN32)
+        install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
+    endif()
+endif()
+
+if(Qt5_FOUND)
+    target_link_libraries(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
+else()
+    target_link_libraries(cockatrice PUBLIC cockatrice_common ${COCKATRICE_QT_MODULES})
+endif()
 
 if(UNIX)
     if(APPLE)
@@ -205,27 +214,23 @@ if(UNIX)
         set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
-        INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION bin/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
-        INSTALL(FILES ${cockatrice_QM} DESTINATION share/cockatrice/translations)
     endif()
 elseif(WIN32)
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION ./)
-        INSTALL(FILES ${cockatrice_QM} DESTINATION ./translations)
 endif()
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
-    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
+    # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
@@ -236,6 +241,7 @@ if(APPLE)
         PATTERN "platforms/*.dylib"
         PATTERN "printsupport/*.dylib"
         PATTERN "styles/*.dylib"
+        PATTERN "tls/*.dylib"
     )
 
     install(CODE "
@@ -261,9 +267,32 @@ if(WIN32)
 
     install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
-    # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
-    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport|styles)/.*[^d]\\.dll")
+    # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
+    install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime FILES_MATCHING
+            PATTERN "audio/qtaudio_wasapi.dll"
+            PATTERN "audio/qtaudio_windows.dll"
+            PATTERN "iconengines/qsvgicon.dll"
+            PATTERN "imageformats/qgif.dll"
+            PATTERN "imageformats/qicns.dll"
+            PATTERN "imageformats/qico.dll"
+            PATTERN "imageformats/qjpeg.dll"
+            PATTERN "imageformats/qsvg.dll"
+            PATTERN "imageformats/qtga.dll"
+            PATTERN "imageformats/qtiff.dll"
+            PATTERN "imageformats/qwbmp.dll"
+            PATTERN "imageformats/qwebp.dll"
+            PATTERN "platforms/qdirect2d.dll"
+            PATTERN "platforms/qminimal.dll"
+            PATTERN "platforms/qoffscreen.dll"
+            PATTERN "platforms/qwindows.dll"
+            PATTERN "printsupport/windowsprintersupport.dll"
+            PATTERN "styles/qcertonlybackend.dll"
+            PATTERN "styles/qopensslbackend.dll"
+            PATTERN "styles/qschannelbackend.dll"
+            PATTERN "styles/qwindowsvistastyle.dll"
+            PATTERN "tls/qcertonlybackend.dll"
+            PATTERN "tls/qopensslbackend.dll"
+            PATTERN "tls/qschannelbackend.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -283,4 +312,27 @@ Data = Resources\")
     if(WIN32SSLRUNTIME_FOUND)
         install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
     endif()
+endif()
+
+if(Qt6LinguistTools_FOUND)
+    #Qt6 Translations happen after the executable is built up
+    if(UPDATE_TRANSLATIONS)
+        qt6_add_translations(cockatrice TS_FILES ${cockatrice_TS} SOURCES ${translate_SRCS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
+    else()
+        qt6_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
+    endif()
+
+    if(UNIX)
+        if(APPLE)
+            install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_MAC_QM_INSTALL_DIR})
+        else()
+            install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_UNIX_QM_INSTALL_DIR})
+        endif()
+    elseif(WIN32)
+        install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
+    endif()
+endif()
+
+if(Qt6_FOUND)
+    qt6_finalize_target(cockatrice)
 endif()
