@@ -113,12 +113,13 @@ bool Servatrice_DatabaseInterface::checkSql()
 
 QSqlQuery *Servatrice_DatabaseInterface::prepareQuery(const QString &queryText)
 {
-    if (preparedStatements.contains(queryText))
+    if (preparedStatements.contains(queryText)) {
         return preparedStatements.value(queryText);
+    }
 
     QString prefixedQueryText = queryText;
     prefixedQueryText.replace("{prefix}", server->getDbPrefix());
-    QSqlQuery *query = new QSqlQuery(sqlDatabase);
+    auto *query = new QSqlQuery(sqlDatabase);
     query->prepare(prefixedQueryText);
 
     preparedStatements.insert(queryText, query);

@@ -16,7 +16,7 @@ ServerInfo_User_Container::ServerInfo_User_Container(const ServerInfo_User_Conta
     if (other.userInfo)
         userInfo = new ServerInfo_User(*other.userInfo);
     else
-        userInfo = 0;
+        userInfo = nullptr;
 }
 
 ServerInfo_User_Container::~ServerInfo_User_Container()

@@ -21,9 +21,7 @@ on:
 jobs:
   configure:
     name: Configure
-
     runs-on: ubuntu-latest
-
     outputs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
@@ -57,7 +55,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare release paramaters
+      - name: Prepare release parameters
         id: prepare
         if: steps.configure.outputs.tag != null
         shell: bash
@@ -90,6 +88,7 @@ jobs:
 
           - distro: Debian10
             package: DEB
+            test: skip # running tests on all distros is superfluous
 
           - distro: Debian11
             package: DEB
@@ -100,6 +99,10 @@ jobs:
 
           - distro: Fedora35
             package: RPM
+            test: skip
+
+          - distro: Fedora36
+            package: RPM
 
           - distro: UbuntuBionic
             package: DEB
@@ -108,24 +111,23 @@ jobs:
             package: DEB
             test: skip # UbuntuFocal has a broken qt for debug builds
 
-          - distro: UbuntuHirsute
+          - distro: UbuntuImpish
             package: DEB
             test: skip
 
-          - distro: UbuntuImpish
+          - distro: UbuntuJammy
             package: DEB
 
     name: ${{matrix.distro}}
-
     needs: configure
-
     runs-on: ubuntu-latest
-
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
-
     env:
       NAME: ${{matrix.distro}}
       CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
+      # cache size over the entire repo is 10Gi link:
+      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      CCACHE_SIZE: 200M
 
     steps:
       - name: Checkout
@@ -153,27 +155,31 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
+        env:
+          distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 2
 
       - name: Build release package
         id: package
         if: matrix.package != 'skip'
         shell: bash
         env:
-          PACKAGE_SUFFIX: '-${{matrix.distro}}'
-          CPACK_GENERATOR: '${{matrix.package}}'
+          suffix: '-${{matrix.distro}}'
+          type: '${{matrix.package}}'
+          distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package
+          RUN --server --release --package "$type" --suffix "$suffix" \
+                  --ccache "$CCACHE_SIZE" --parallel 2
 
       - name: Upload artifact
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v2
         with:
           name: ${{matrix.distro}}-package
-          path: ./build/${{steps.package.outputs.name}}
+          path: ${{steps.package.outputs.path}}
           if-no-files-found: error
 
       - name: Upload to release
@@ -183,7 +189,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.configure.outputs.upload_url}}
-          asset_path: ./build/${{steps.package.outputs.name}}
+          asset_path: ${{steps.package.outputs.path}}
           asset_name: ${{steps.package.outputs.name}}
           asset_content_type: application/octet-stream
 
@@ -195,39 +201,46 @@ jobs:
           - target: Debug # tests only
             os: macos-latest
             xcode: 12.5.1
+            qt_version: 6
             type: Debug
-            do_tests: 0 # tests do not work yet on mac
-            make_package: false
+            do_tests: 1
 
           - target: 10.14_Mojave
             os: macos-10.15 # runs on Catalina
             xcode: 10.3 # allows compatibility with macOS 10.14
+            qt_version: 5
             type: Release
-            do_tests: 0
-            make_package: true
+            # do_tests: 1 # tests do not work on qt5?
+            make_package: 1
 
           - target: 10.15_Catalina
             os: macos-10.15
-            xcode: 12.1
+            xcode: 12.4
+            qt_version: 6
             type: Release
-            do_tests: 0
-            make_package: true
+            do_tests: 1
+            make_package: 1
 
           - target: 11_Big_Sur
             os: macos-11
-            xcode: 12.5.1
+            xcode: 13.2
+            qt_version: 6
             type: Release
-            do_tests: 0
-            make_package: true
+            do_tests: 1
+            make_package: 1
+
+#          - target: 12_Monterey
+#            os: macos-12
+#            xcode: 13.3
+#            qt_version: 6
+#            type: Release
+#            do_tests: 1
+#            make_package: 1
 
     name: macOS ${{matrix.target}}
-
     needs: configure
-
     runs-on: ${{matrix.os}}
-
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
-
     env:
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
@@ -240,45 +253,32 @@ jobs:
         shell: bash
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
-        run: brew update && brew install protobuf
-
-      - name: Install QT using homebrew
-        id: brew_install_qt
-        continue-on-error: true
-        shell: bash
-        run: brew install qt@5 --force-bottle
-
-      - name: Install QT using actions
-        if: steps.brew_install_qt.outcome != 'success'
-        uses: jurplel/install-qt-action@v2
+        env:
+          qt_version: 'qt@${{matrix.qt_version}}'
+        run: |
+          brew update
+          brew install protobuf
+          brew install "$qt_version" --force-bottle
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
+        id: build
         env:
-          CMAKE_BUILD_PARALLEL_LEVEL: 3  # mac machines actually have 3 cores
-        run: .ci/compile.sh ${{matrix.type}} --server
-
-      - name: Test
-        if: matrix.do_tests == 1
-        shell: bash
-        working-directory: build
-        run: cmake --build . --target test
-
-      - name: Package for ${{matrix.target}}
-        id: package
-        if: matrix.make_package
-        shell: bash
-        working-directory: build
-        run: |
-          cmake --build . --target package
-          ../.ci/name_build.sh "-macOS-${{matrix.target}}"
+          BUILDTYPE: '${{matrix.type}}'
+          MAKE_TEST: '${{matrix.do_tests}}'
+          MAKE_PACKAGE: '${{matrix.make_package}}'
+          PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
+          # set QTDIR to find qt5, qt6 can be found without this
+          QTDIR: '/usr/local/opt/qt5'
+        # Mac machines actually have 3 cores
+        run: .ci/compile.sh --server --parallel 3
 
       - name: Upload artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v2
         with:
           name: macOS-${{matrix.target}}-dmg
-          path: ${{steps.package.outputs.path}}
+          path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
       - name: Upload to release
@@ -288,8 +288,8 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.configure.outputs.upload_url}}
-          asset_path: ${{steps.package.outputs.path}}
-          asset_name: ${{steps.package.outputs.name}}
+          asset_path: ${{steps.build.outputs.path}}
+          asset_name: ${{steps.build.outputs.name}}
           asset_content_type: application/octet-stream
 
   build-windows:
@@ -298,24 +298,22 @@ jobs:
       matrix:
         include:
           - arch: 32
-            triplet: x86
-            cmake: Win32
-
+            vcpkg_default_triplet: x86
+            qt_version: '5.15.2'
+            cmake_generator_platform: Win32
+            qt_arch: msvc2019
           - arch: 64
-            triplet: x64
-            cmake: x64
-            append: _64
+            vcpkg_default_triplet: x64
+            qt_version: '6.3.0'
+            cmake_generator_platform: x64
+            qt_arch: msvc2019_64
+            qt_modules: "qt5compat qtmultimedia qtwebsockets"
 
-    name: Windows ${{matrix.arch}}-bit
-
+    name: Windows (${{matrix.arch}}-bit)
     needs: configure
-
-    runs-on: windows-latest
-
+    runs-on: windows-2019
     env:
-      QT_VERSION: '5.15.2'
-      QT_ARCH: msvc2022${{matrix.append}}
-      CMAKE_GENERATOR: 'Visual Studio 17 2022'
+      CMAKE_GENERATOR: 'Visual Studio 16 2019'
 
     steps:
       - name: Add msbuild to PATH
@@ -323,46 +321,57 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - name: Restore Qt ${{env.QT_VERSION}} ${{matrix.arch}}-bit from cache
+      - name: Restore Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit) from cache
         id: cache-qt
-        uses: actions/cache@v2
+        uses: actions/cache@v1 # Intentionally v1, based on jurplel documentation
         with:
-          key: ${{runner.os}}-QtCache-${{env.QT_VERSION}}-${{matrix.arch}}
-          path: ${{runner.workspace}}/Qt
+          key: ${{runner.os}}-QtCache-${{matrix.qt_version}}-${{matrix.arch}}
+          path: '${{github.workspace}}/../Qt'
 
-      - name: Install ${{matrix.arch}}-bit Qt
-        uses: jurplel/install-qt-action@v2
+      - name: Install Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit)
+        uses: jurplel/install-qt-action@v3
         with:
           cached: ${{steps.cache-qt.outputs.cache-hit}}
-          version: ${{env.QT_VERSION}}
-          arch: win${{matrix.arch}}_${{env.QT_ARCH}}
+          version: ${{matrix.qt_version}}
+          arch: win${{matrix.arch}}_${{matrix.qt_arch}}
+          modules: ${{matrix.qt_modules}}
 
-      - name: Restore or setup vcpkg
-        uses: lukka/run-vcpkg@v6
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v10.2
         with:
-          vcpkgArguments: '@${{github.workspace}}/vcpkg.txt'
-          vcpkgDirectory: ${{github.workspace}}/vcpkg
-          appendedCacheKey: ${{hashFiles('**/vcpkg.txt')}}
-          vcpkgTriplet: ${{matrix.triplet}}-windows
+          runVcpkgInstall: true
+          appendedCacheKey: ${{matrix.arch}}-bit
+        env:
+          VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
+          VCPKG_DISABLE_METRICS: 1
 
-      - name: Build Cockatrice ${{matrix.arch}}-bit
+      - name: Install OpenSSL (${{matrix.arch}}-bit)
+        shell: bash
+        run: .ci/download_openssl.sh --arch ${{matrix.arch}}
+
+      - name: Build Cockatrice (${{matrix.arch}}-bit)
         id: build
         shell: bash
         env:
           PACKAGE_SUFFIX: '-win${{matrix.arch}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake}}'
-        run: ./.ci/compile.sh --server --release --test --package
+          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
+        run: .ci/compile.sh --server --release --test --package --parallel 2
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Windows-${{matrix.arch}}bit-installer
-          path: ./build/${{steps.build.outputs.name}}
+          path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
       - name: Upload to release
@@ -372,6 +381,6 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.configure.outputs.upload_url}}
-          asset_path: ./build/${{steps.build.outputs.name}}
+          asset_path: ${{steps.build.outputs.path}}
           asset_name: ${{steps.build.outputs.name}}
           asset_content_type: application/octet-stream

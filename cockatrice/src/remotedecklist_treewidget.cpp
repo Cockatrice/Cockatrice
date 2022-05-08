@@ -221,7 +221,7 @@ void RemoteDeckList_TreeModel::addFileToTree(const ServerInfo_DeckStorage_TreeIt
 {
     const ServerInfo_DeckStorage_File &fileInfo = file.file();
     QDateTime time;
-    time.setTime_t(fileInfo.creation_time());
+    time.setSecsSinceEpoch(fileInfo.creation_time());
 
     beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
     parent->append(new FileNode(QString::fromStdString(file.name()), file.id(), time, parent));

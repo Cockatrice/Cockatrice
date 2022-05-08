@@ -25,8 +25,8 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QtMath>
 #include <google/protobuf/descriptor.h>
-#include <math.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
@@ -44,6 +44,7 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 }
 
 // This function must only be called from the thread this object lives in.
+// Except when the server is shutting down.
 // The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
 void Server_ProtocolHandler::prepareDestroy()
 {
@@ -412,7 +413,7 @@ void Server_ProtocolHandler::pingClockTimeout()
             }
         }
 
-        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() * .9)) &&
+        if (((timeRunning - lastActionReceived) >= qCeil(server->getIdleClientTimeout() * .9)) &&
             (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
@@ -489,7 +490,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             Response_Login *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             if (banSecondsLeft != 0)
-                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toTime_t());
+                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toSecsSinceEpoch());
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
         }

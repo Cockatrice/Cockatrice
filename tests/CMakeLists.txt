@@ -44,10 +44,6 @@ if(NOT GTEST_FOUND)
     add_dependencies(password_hash_test gtest)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-set(TEST_QT_MODULES Qt5::Widgets)
-
-
 include_directories(${GTEST_INCLUDE_DIRS})
 target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(expression_test cockatrice_common Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})

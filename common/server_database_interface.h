@@ -147,7 +147,12 @@ public:
                             LogMessage_TargetType /* targetType */,
                             const int /* targetId */,
                             const QString & /* targetName */){};
-    bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
+    virtual bool checkUserIsBanned(Server_ProtocolHandler * /* session */,
+                                   QString & /* banReason */,
+                                   int & /* banSecondsRemaining */)
+    {
+        return false;
+    };
     virtual int checkNumberOfUserAccounts(const QString & /* email */)
     {
         return 0;

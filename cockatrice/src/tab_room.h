@@ -75,7 +75,7 @@ private slots:
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
     void focusTab();
-    void actShowMentionPopup(QString &sender);
+    void actShowMentionPopup(const QString &sender);
     void actShowPopup(const QString &message);
     void actCompleterChanged();
 

@@ -45,7 +45,7 @@ void ServerLogger::startLog(const QString &logFileName)
     connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
-void ServerLogger::logMessage(QString message, void *caller)
+void ServerLogger::logMessage(const QString &message, void *caller)
 {
     if (!logFile)
         return;

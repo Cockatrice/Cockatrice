@@ -8,6 +8,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegExp>
+#include <QRegularExpression>
 #include <QUrlQuery>
 
 TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent)
@@ -53,7 +54,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
 
             int captures = rx2.captureCount();
             for (int i = 1; i <= captures; i++) {
-                errorMessage += QString("\n") + rx2.cap(i).remove(QRegExp("<[^>]*>")).simplified();
+                errorMessage += QString("\n") + rx2.cap(i).remove(QRegularExpression("<[^>]*>")).simplified();
             }
         }
 

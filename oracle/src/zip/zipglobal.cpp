@@ -27,7 +27,7 @@
 
 #include "zipglobal.h"
 
-#if defined(Q_OS_WIN) || defined(Q_OS_WINCE) || defined(Q_OS_LINUX) || defined (Q_OS_MACX)
+#if defined(Q_OS_WIN) || defined(Q_OS_WINCE) || defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #define OSDAB_ZIP_HAS_UTC
 #include <ctime>
 #else
@@ -55,9 +55,9 @@ int OSDAB_ZIP_MANGLE(currentUtcOffset)()
 
 #if defined Q_OS_WIN
     struct tm _tm_struct;
-    struct tm* tm_struct = &_tm_struct;
+    struct tm *tm_struct = &_tm_struct;
 #else
-    struct tm* tm_struct = 0;
+    struct tm *tm_struct = 0;
 #endif
 
 #if !defined(QT_NO_THREAD) && defined(_POSIX_THREAD_SAFE_FUNCTIONS)
@@ -92,14 +92,14 @@ int OSDAB_ZIP_MANGLE(currentUtcOffset)()
 
     const time_t local_time_t = mktime(tm_struct);
 
-    const int utcOffset = - qRound(difftime(global_time_t, local_time_t));
+    const int utcOffset = -qRound(difftime(global_time_t, local_time_t));
     return tm_struct->tm_isdst > 0 ? utcOffset + 3600 : utcOffset;
 #endif // No UTC
 
     return 0;
 }
 
-QDateTime OSDAB_ZIP_MANGLE(fromFileTimestamp)(const QDateTime& dateTime)
+QDateTime OSDAB_ZIP_MANGLE(fromFileTimestamp)(const QDateTime &dateTime)
 {
 #if !defined OSDAB_ZIP_NO_UTC && defined OSDAB_ZIP_HAS_UTC
     const int utc = OSDAB_ZIP_MANGLE(currentUtcOffset)();
@@ -109,14 +109,14 @@ QDateTime OSDAB_ZIP_MANGLE(fromFileTimestamp)(const QDateTime& dateTime)
 #endif // OSDAB_ZIP_NO_UTC
 }
 
-bool OSDAB_ZIP_MANGLE(setFileTimestamp)(const QString& fileName, const QDateTime& dateTime)
+bool OSDAB_ZIP_MANGLE(setFileTimestamp)(const QString &fileName, const QDateTime &dateTime)
 {
     if (fileName.isEmpty())
         return true;
 
 #ifdef Q_OS_WIN
-    HANDLE hFile = CreateFileW(fileName.toStdWString().c_str(),
-        GENERIC_WRITE, FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+    HANDLE hFile =
+        CreateFileW(fileName.toStdWString().c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
     if (hFile == INVALID_HANDLE_VALUE) {
         return false;
     }
@@ -143,7 +143,7 @@ bool OSDAB_ZIP_MANGLE(setFileTimestamp)(const QString& fileName, const QDateTime
 #elif defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 
     struct utimbuf t_buffer;
-    t_buffer.actime = t_buffer.modtime = dateTime.toTime_t();
+    t_buffer.actime = t_buffer.modtime = dateTime.toSecsSinceEpoch();
     return utime(fileName.toLocal8Bit().constData(), &t_buffer) == 0;
 #endif
 

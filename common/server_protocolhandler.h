@@ -63,7 +63,6 @@ protected:
 private:
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
     int timeRunning, lastDataReceived, lastActionReceived;
-    QTimer *pingClock;
 
     virtual void transmitProtocolItem(const ServerMessage &item) = 0;
 
