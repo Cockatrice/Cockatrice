@@ -135,7 +135,9 @@ int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt)
     if (wasLookedAt && cardsBeingLookedAt > 0) {
         cardsBeingLookedAt -= 1;
     }
-    cards.removeAt(index);
+    if (index != -1) {
+        cards.removeAt(index);
+    }
     if (has_coords) {
         removeCardFromCoordMap(card, card->getX(), card->getY());
     }

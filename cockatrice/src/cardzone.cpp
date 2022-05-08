@@ -187,7 +187,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 
 void CardZone::removeCard(CardItem *card)
 {
-    cards.removeAt(cards.indexOf(card));
+    cards.removeOne(card);
     reorganizeCards();
     emit cardCountChanged();
     player->deleteCard(card);

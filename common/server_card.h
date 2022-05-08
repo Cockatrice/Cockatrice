@@ -181,7 +181,7 @@ public:
     }
     void removeAttachedCard(Server_Card *card)
     {
-        attachedCards.removeAt(attachedCards.indexOf(card));
+        attachedCards.removeOne(card);
     }
 
     void resetState();

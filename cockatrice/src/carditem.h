@@ -131,7 +131,7 @@ public:
     }
     void removeAttachedCard(CardItem *card)
     {
-        attachedCards.removeAt(attachedCards.indexOf(card));
+        attachedCards.removeOne(card);
     }
     const QList<CardItem *> &getAttachedCards() const
     {

@@ -442,7 +442,7 @@ void TabSupervisor::replayLeft(TabGame *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    replayTabs.removeAt(replayTabs.indexOf(tab));
+    replayTabs.removeOne(tab);
 }
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
@@ -508,7 +508,7 @@ void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    deckEditorTabs.removeAt(deckEditorTabs.indexOf(tab));
+    deckEditorTabs.removeOne(tab);
     removeTab(indexOf(tab));
 }
 

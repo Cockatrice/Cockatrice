@@ -216,7 +216,7 @@ void DeckViewCardContainer::addCard(DeckViewCard *card)
 
 void DeckViewCardContainer::removeCard(DeckViewCard *card)
 {
-    cards.removeAt(cards.indexOf(card));
+    cards.removeOne(card);
     cardsByType.remove(card->getInfo() ? card->getInfo()->getMainCardType() : "", card);
 }
 
