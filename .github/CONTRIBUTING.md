@@ -323,7 +323,7 @@ https://doc.qt.io/qt-5/i18n-source-translation.html#handling-plurals)
 If you're about to propose a change that adds or modifies any translatable
 string in the code, you don't need to take care of adding the new strings to
 the translation files.<br>
-We have an automted process setup to update our language source files accordingly
+We have an automated process to update our language source files on a schedule
 and provide the translators on Transifex with the new contents.<br>
 Maintainers can also manually trigger this on demand.
 
