@@ -332,7 +332,7 @@ Maintainers can also manually trigger this on demand.
 When new translatable strings have been added to the code, a maintainer has to
 make them available to translators on Transifex.
 
-To help with that, we have an automated CI run setup, that regularly looks at the
+To help with that, we have an automated CI workflow, that regularly looks at the
 code in the master branch, extracts all strings and updates dedicated source string
 files with any changes. These updates are not commited right away, the CI creates a
 PR for reviewing instead.<br>
