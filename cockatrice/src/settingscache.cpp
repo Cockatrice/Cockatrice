@@ -181,7 +181,7 @@ SettingsCache::SettingsCache()
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
     lang = settings->value("personal/lang").toString();
-    keepalive = settings->value("personal/keepalive", 5).toInt();database
+    keepalive = settings->value("personal/keepalive", 5).toInt();
 
     // tip of the day settings
     showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
