@@ -18,7 +18,7 @@ QString SettingsCache::getDataPath()
     if (isPortableBuild)
         return qApp->applicationDirPath() + "/data";
     else
-        return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 }
 
 QString SettingsCache::getSettingsPath()
