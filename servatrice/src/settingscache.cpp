@@ -45,6 +45,6 @@ QString SettingsCache::guessConfigurationPath()
         return guessFileName;
 #endif
 
-    guessFileName = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/" + fileName;
+    guessFileName = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/" + fileName;
     return guessFileName;
 }
