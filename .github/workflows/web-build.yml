@@ -30,13 +30,17 @@ jobs:
         node_version:
           - 12
           - lts/*
+          - current
+
+    # Allow failues for most recent Node release
+    continue-on-error: ${{matrix.node_version == 'current'}}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{matrix.node_version}}
           cache: 'npm'
