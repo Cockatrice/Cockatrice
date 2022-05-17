@@ -20,6 +20,7 @@ signals:
     void onCtrlAltLBracket();
     void onCtrlAltRBracket();
     void onShiftS();
+    void onCtrlC();
 
 protected:
     virtual bool eventFilter(QObject *, QEvent *event);
