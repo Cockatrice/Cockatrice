@@ -31,7 +31,8 @@ if(NOT GTEST_FOUND)
   # Add gtest directly to our build
   add_subdirectory(${CMAKE_BINARY_DIR}/gtest-src ${CMAKE_BINARY_DIR}/gtest-build EXCLUDE_FROM_ALL)
 
-  # Add the gtest include directory, since gtest doesn't add that dependency to its gtest target
+  # Add the gtest include directory, since gtest
+  # doesn't add that dependency to its gtest target
   target_include_directories(gtest INTERFACE "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/gtest-src/include>")
 
   set(GTEST_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/gtest-src/include")
