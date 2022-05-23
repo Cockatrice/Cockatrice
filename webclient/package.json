@@ -10,7 +10,7 @@
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.3",
     "crypto-js": "^4.1.1",
-    "dexie": "^3.2.1",
+    "dexie": "^3.2.2",
     "final-form": "^4.20.6",
     "final-form-set-field-touched": "^1.0.1",
     "i18next": "^21.6.13",
