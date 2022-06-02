@@ -793,7 +793,6 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
 
     // extract data
     qint64 read;
-    quint64 tot = 0;
 
     /* Allocate inflate state */
     z_stream zstr;
@@ -826,7 +825,6 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
             decryptBytes(*keys, buffer1, read);
 
         cur++;
-        tot += read;
 
         zstr.avail_in = (uInt) read;
         zstr.next_in = (Bytef*) buffer1;
