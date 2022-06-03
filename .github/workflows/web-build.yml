@@ -29,6 +29,7 @@ jobs:
       matrix:
         node_version:
           - 12
+          - lts/-1
           - lts/*
           - current
 
