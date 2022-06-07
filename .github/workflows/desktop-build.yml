@@ -295,19 +295,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: 32
+          - target: Win-32bit
+            arch: 32
             vcpkg_default_triplet: x86
             qt_version: '5.15.2'
             cmake_generator_platform: Win32
             qt_arch: msvc2019
-          - arch: 64
+
+          - target: Win7+-64bit
+            arch: 64
+            vcpkg_default_triplet: x64
+            qt_version: '5.15.2'
+            cmake_generator_platform: x64
+            qt_arch: msvc2019_64
+
+          - target: Win10+-64bit
+            arch: 64
             vcpkg_default_triplet: x64
             qt_version: '6.3.0'
             cmake_generator_platform: x64
             qt_arch: msvc2019_64
             qt_modules: "qt5compat qtmultimedia qtwebsockets"
 
-    name: Windows (${{matrix.arch}}-bit)
+    name: ${{matrix.target}}
     needs: configure
     runs-on: windows-2019
     env:
@@ -323,14 +333,14 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Restore Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit) from cache
+      - name: Restore Qt ${{matrix.qt_version}} for ${{matrix.target}} from cache
         id: cache-qt
         uses: actions/cache@v1 # Intentionally v1, based on jurplel documentation
         with:
-          key: ${{runner.os}}-QtCache-${{matrix.qt_version}}-${{matrix.arch}}
+          key: QtCache-${{matrix.qt_version}}-${{matrix.target}}
           path: '${{github.workspace}}/../Qt'
 
-      - name: Install Qt ${{matrix.qt_version}} (${{matrix.arch}}-bit)
+      - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
         uses: jurplel/install-qt-action@v3
         with:
           cached: ${{steps.cache-qt.outputs.cache-hit}}
@@ -347,28 +357,24 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
           VCPKG_DISABLE_METRICS: 1
 
-      - name: Install OpenSSL (${{matrix.arch}}-bit)
+      - name: Install OpenSSL ${{matrix.arch}}-bit
         shell: bash
         run: .ci/download_openssl.sh --arch ${{matrix.arch}}
 
-      - name: Build Cockatrice (${{matrix.arch}}-bit)
+      - name: Build Cockatrice
         id: build
         shell: bash
         env:
-          PACKAGE_SUFFIX: '-win${{matrix.arch}}'
+          PACKAGE_SUFFIX: '-${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Windows-${{matrix.arch}}bit-installer
+          name: ${{matrix.target}}-installer
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
