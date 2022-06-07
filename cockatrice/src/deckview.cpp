@@ -272,16 +272,11 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
 {
     currentRowsAndCols = rowsAndCols;
 
-    int totalCols = 0, totalRows = 0;
     qreal yUntilNow = separatorY + paddingY;
     qreal x = (qreal)getCardTypeTextWidth();
     for (int i = 0; i < rowsAndCols.size(); ++i) {
         const int tempRows = rowsAndCols[i].first;
         const int tempCols = rowsAndCols[i].second;
-        totalRows += tempRows;
-        if (tempCols > totalCols)
-            totalCols = tempCols;
-
         QList<QString> cardTypeList = cardsByType.uniqueKeys();
         QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
         std::sort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
