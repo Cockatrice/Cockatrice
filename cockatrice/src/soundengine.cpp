@@ -9,7 +9,7 @@
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
 
-SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(0)
+SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(nullptr)
 {
     ensureThemeDirectoryExists();
     connect(&SettingsCache::instance(), SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
@@ -30,7 +30,7 @@ SoundEngine::~SoundEngine()
 void SoundEngine::soundEnabledChanged()
 {
     if (SettingsCache::instance().getSoundEnabled()) {
-        qDebug("SoundEngine: enabling sound");
+        qDebug() << "SoundEngine: enabling sound with" << audioData.size() << "sounds";
         if (!player) {
             player = new QMediaPlayer;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -39,11 +39,11 @@ void SoundEngine::soundEnabledChanged()
 #endif
         }
     } else {
-        qDebug("SoundEngine: disabling sound");
+        qDebug() << "SoundEngine: disabling sound";
         if (player) {
             player->stop();
             player->deleteLater();
-            player = 0;
+            player = nullptr;
         }
     }
 }
@@ -54,28 +54,16 @@ void SoundEngine::playSound(QString fileName)
         return;
     }
 
-    // still playing the previous sound?
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    if (player->playbackState() == QMediaPlayer::PlaybackState::PlayingState) {
-#else
-    if (player->state() == QMediaPlayer::PlayingState) {
-#endif
-        return;
-    }
-
     if (!audioData.contains(fileName)) {
         return;
     }
 
-    qDebug() << "playing" << fileName;
-
+    player->stop();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     player->audioOutput()->setVolume(SettingsCache::instance().getMasterVolume());
-    player->stop();
     player->setSource(QUrl::fromLocalFile(audioData[fileName]));
 #else
     player->setVolume(SettingsCache::instance().getMasterVolume());
-    player->stop();
     player->setMedia(QUrl::fromLocalFile(audioData[fileName]));
 #endif
     player->play();
@@ -137,50 +125,29 @@ void SoundEngine::themeChangedSlot()
 
     audioData.clear();
 
-    static const QStringList fileNames = QStringList()
-                                         // Phases
-                                         << "untap_step"
-                                         << "upkeep_step"
-                                         << "draw_step"
-                                         << "main_1"
-                                         << "start_combat"
-                                         << "attack_step"
-                                         << "block_step"
-                                         << "damage_step"
-                                         << "end_combat"
-                                         << "main_2"
-                                         << "end_step"
-                                         // Game Actions
-                                         << "draw_card"
-                                         << "play_card"
-                                         << "tap_card"
-                                         << "untap_card"
-                                         << "shuffle"
-                                         << "roll_dice"
-                                         << "life_change"
-                                         // Player
-                                         << "player_join"
-                                         << "player_leave"
-                                         << "player_disconnect"
-                                         << "player_reconnect"
-                                         << "player_concede"
-                                         // Spectator
-                                         << "spectator_join"
-                                         << "spectator_leave"
-                                         // Buddy
-                                         << "buddy_join"
-                                         << "buddy_leave"
-                                         // Chat & UI
-                                         << "chat_mention"
-                                         << "all_mention"
-                                         << "private_message";
+    static const QStringList extensions = {".wav", ".mp3", ".ogg"};
+    static const QStringList fileNames = {
+        // Phases
+        "untap_step", "upkeep_step", "draw_step", "main_1", "start_combat", "attack_step", "block_step", "damage_step",
+        "end_combat", "main_2", "end_step",
+        // Game Actions
+        "draw_card", "play_card", "tap_card", "untap_card", "shuffle", "roll_dice", "life_change",
+        // Player
+        "player_join", "player_leave", "player_disconnect", "player_reconnect", "player_concede",
+        // Spectator
+        "spectator_join", "spectator_leave",
+        // Buddy
+        "buddy_join", "buddy_leave",
+        // Chat & UI
+        "chat_mention", "all_mention", "private_message"};
 
-    for (int i = 0; i < fileNames.size(); ++i) {
-        if (!dir.exists(fileNames[i] + ".wav"))
-            continue;
-
-        QFile file(dir.filePath(fileNames[i] + ".wav"));
-        audioData.insert(fileNames[i], file.fileName());
+    for (const QString &extension : extensions) {
+        for (const QString &name : fileNames) {
+            QFile file(dir.filePath(name + extension));
+            if (file.exists()) {
+                audioData.insert(name, file.fileName());
+            }
+        }
     }
 
     soundEnabledChanged();
