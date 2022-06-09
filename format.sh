@@ -1,15 +1,20 @@
 #!/bin/bash
 
 # This script will run clang-format on all modified, non-3rd-party C++/Header files.
+# Optionally runs cmake-format on all modified cmake files.
+# Uses clang-format cmake-format git diff find
 # Never, ever, should this receive a path with a newline in it. Don't bother proofing it for that.
 
+set -o pipefail
 
 # go to the project root directory, this file should be located in the project root directory
+olddir="$PWD"
 cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with special links etc.
 
 # defaults
 include=("common" \
 "cockatrice/src" \
+"dbconverter/src" \
 "oracle/src" \
 "servatrice/src" \
 "tests")
@@ -22,22 +27,30 @@ exclude=("servatrice/src/smtp" \
 exts=("cpp" "h" "proto")
 cf_cmd="clang-format"
 branch="origin/master"
+cmakefile="CMakeLists.txt"
+cmakedir="cmake/.*\\.cmake"
+cmakeinclude=("cmake/gtest-CMakeLists.txt.in")
+color="--"
 
 # parse options
-while [[ $@ ]]; do
+while [[ $* ]]; do
   case "$1" in
     '-b'|'--branch')
       branch=$2
       set_branch=1
       shift 2
       ;;
+    '--cmake')
+      do_cmake=1
+      shift
+      ;;
     '-c'|'--color-diff')
-      color=" --color=always"
-      mode=diff
+      color="--color=always"
+      mode="diff"
       shift
       ;;
     '-d'|'--diff')
-      mode=diff
+      mode="diff"
       shift
       ;;
     '-h'|'--help')
@@ -49,7 +62,6 @@ If <dir>s are given, all source files in those directories of the project root
 path are formatted. To only format changed files in these directories use the
 --branch option in combination. <dir> has to be a path relative to the project
 root path or a full path inside $PWD.
-. can not be specified as a dir, if you really want to format everything use */.
 
 USAGE: $0 [option] [--branch <git branch or object>] [<dir> ...]
 
@@ -67,6 +79,9 @@ OPTIONS:
         To not compare to a branch this has to be explicitly set to "".
         When not comparing to a branch, git will not be used at all and every
         source file in the entire project will be parsed.
+
+    --cmake
+        Use cmake-format to format cmake files as well.
 
     -c, --color-diff
         Display a colored diff. Implies --diff.
@@ -94,22 +109,25 @@ EXIT CODES:
     3 if clang-format could not be found.
 
 EXAMPLES:
-    $0 --test \$PWD || echo "code requires formatting"
-        Tests if the source files in the current directory are correctly
-        formatted and prints an error message if formatting is required.
-
     $0 --branch $USER/patch-2 ${include[0]}
         Formats all changed files compared to the git branch "$USER/patch-2"
         in the directory ${include[0]}.
+
+    $0 --test . || echo "code requires formatting"
+        Tests if the source files in the current directory are correctly
+        formatted and prints an error message if formatting is required.
+
+    $0 --cmake --branch "" ""
+        Unconditionally format all cmake files and no source files.
 EOM
       exit 0
       ;;
     '-n'|'--names')
-      mode=name
+      mode="name"
       shift
       ;;
     '-t'|'--test')
-      mode=code
+      mode="code"
       shift
       ;;
     '--cf-version')
@@ -117,20 +135,28 @@ EOM
       shift
       ;;
     '--')
+      dashdash=1
       shift
       ;;
     *)
-      if next_dir=$(cd "$1" && pwd); then
-        if [[ ${next_dir#$PWD/} == /* ]]; then
-          echo "error in parsing arguments of $0: $next_dir is not in $PWD" >&2
-          exit 2 # input error
-        elif ! [[ $set_include ]]; then
+      if [[ ! $dashdash && $1 =~ ^-- ]]; then
+        echo "error in parsing arguments of $0: $1 is an unrecognized option" >&2
+        exit 2 # input error
+      fi
+      if [[ ! $1 ]] || next_dir=$(cd "$olddir" && cd -- "$1" && pwd); then
+        if ! [[ $set_include ]]; then
           include=() # remove default includes
           set_include=1
         fi
-        include+=("${next_dir#$PWD/}")
+        if [[ $1 ]]; then
+          if [[ $next_dir != $PWD/* ]]; then
+            echo "error in parsing arguments of $0: $next_dir is not in $PWD" >&2
+            exit 2 # input error
+          fi
+          include+=("$next_dir")
+        fi
       else
-        echo "error in parsing arguments of $0: $PWD/$1 is not a directory" >&2
+        echo "error in parsing arguments of $0: $1 is not a directory" >&2
         exit 2 # input error
       fi
       if ! [[ $set_branch ]]; then
@@ -153,37 +179,93 @@ if ! hash $cf_cmd 2>/dev/null; then
   fi
 fi
 
+# check availability of cmake-format
+if [[ $do_cmake ]] && ! hash cmake-format 2>/dev/null; then
+  echo "could not find cmake-format" >&2
+  exit 3
+fi
+
 if [[ $branch ]]; then
   # get all dirty files through git
-  if ! base=$(git merge-base ${branch} HEAD); then
+  if ! base=$(git merge-base "$branch" HEAD); then
     echo "could not find git merge base" >&2
     exit 2 # input error
   fi
-  declare -a reg
-  for ex in ${exts[@]}; do
-    reg+=(${include[@]/%/.*\\.$ex\$})
+  mapfile -t basenames < <(git diff --diff-filter=d --name-only "$base")
+  names=()
+  for ex in "${exts[@]}"; do
+    for path in "${include[@]}"; do
+      for name in "${basenames[@]}"; do
+        rx="^$path/.$ex$"
+        if [[ $name =~ $rx ]]; then
+          names+=("$name")
+        fi
+      done
+    done
   done
-  names=$(git diff --diff-filter=d --name-only $base | grep ${reg[@]/#/-e ^})
+  if [[ $do_cmake ]]; then
+    cmake_names=()
+    for name in "${basenames[@]}"; do
+      dirrx="^$cmakedir$"
+      filerx="(^|/)$cmakefile$"
+      if [[ $name =~ $dirrx || $name =~ $filerx ]]; then
+        cmake_names+=("$name")
+      fi
+      for include in "${cmakeinclude[@]}"; do
+        if [[ $name == "$include" ]]; then
+          cmake_names+=("$name")
+        fi
+      done
+    done
+  fi
 else
-  names=$(find ${include[@]} -type f -false ${exts[@]/#/-o -name *\\.})
+  exts_o=()
+  for ext in "${exts[@]}"; do
+    exts_o+=(-o -name "*\\.$ext")
+  done
+  unset "exts_o[0]" # remove first -o
+  mapfile -t names < <(find "${include[@]}" -type f "${exts_o[@]}")
+  if [[ $do_cmake ]]; then
+    mapfile -t cmake_names < <(find . -maxdepth 2 -type f -name "$cmakefile" -o -path "./${cmakedir/.}")
+    cmake_names+=("${cmakeinclude[@]}")
+  fi
 fi
 
 # filter excludes
-names=$(<<<"$names" grep -v ${exclude[@]/#/-e ^})
-
-if ! [[ $names ]]; then
-  exit 0 # nothing to format means format is successful!
-fi
+for path in "${exclude[@]}"; do
+  for i in "${!names[@]}"; do
+    rx="^$path/"
+    if [[ ${names[$i]} =~ $rx ]]; then
+      unset "names[$i]"
+    fi
+  done
+done
 
 # optionally print version
-[[ $print_version ]] && $cf_cmd -version
+if [[ $print_version ]]; then
+  $cf_cmd -version
+  [[ $do_cmake ]] && echo "cmake-format $(cmake-format --version)"
+  echo "----------"
+fi
+
+if [[ ! ${cmake_names[*]} ]]; then
+  unset do_cmake
+fi
+if [[ ! ( ${names[*]} || $do_cmake ) ]]; then
+  exit 0 # nothing to format means format is successful!
+fi
 
 # format
 case $mode in
   diff)
     declare -i code=0
-    for name in ${names[@]}; do
-      if ! $cf_cmd "$name" | diff "$name" - -p $color; then
+    for name in "${names[@]}"; do
+      if ! $cf_cmd "$name" | diff "$name" - -p "$color"; then
+        code=1
+      fi
+    done
+    for name in "${cmake_names[@]}"; do
+      if ! cmake-format "$name" | diff "$name" - -p "$color"; then
         code=1
       fi
     done
@@ -191,8 +273,14 @@ case $mode in
     ;;
   name)
     declare -i code=0
-    for name in ${names[@]}; do
+    for name in "${names[@]}"; do
       if ! $cf_cmd "$name" | diff "$name" - -q >/dev/null; then
+        echo "$name"
+        code=1
+      fi
+    done
+    for name in "${cmake_names[@]}"; do
+      if ! cmake-format "$name" --check; then
         echo "$name"
         code=1
       fi
@@ -200,11 +288,19 @@ case $mode in
     exit $code
     ;;
   code)
-    for name in ${names[@]}; do
+    for name in "${names[@]}"; do
       $cf_cmd "$name" | diff "$name" - -q >/dev/null || exit 1
+    done
+    for name in "${cmake_names[@]}"; do
+      cmake-format "$name" --check || exit 1
     done
     ;;
   *)
-    $cf_cmd -i $names
+    if [[ "${names[*]}" ]]; then
+      $cf_cmd -i "${names[@]}"
+    fi
+    if [[ $do_cmake ]]; then
+      cmake-format -i "${cmake_names[@]}"
+    fi
     ;;
 esac

@@ -10,10 +10,10 @@ if ! git merge-base origin/master HEAD; then
   git fetch --unshallow
 fi
 
-# Check formatting using clangify
-echo "Checking your code using clang-format..."
+# Check formatting using format.sh
+echo "Checking your code using clang-format/cmake-format..."
 
-diff="$(./clangify.sh --diff --cf-version --branch origin/master)"
+diff="$(./format.sh --diff --cmake --cf-version --branch origin/master)"
 err=$?
 
 case $err in
@@ -24,7 +24,7 @@ case $err in
 ***                                                     ***
 ***   Your code does not comply with our style guide.   ***
 ***                                                     ***
-***  Please correct it or run the "clangify.sh" script. ***
+***   Please correct it or run the "format.sh" script.  ***
 ***  Then commit and push those changes to this branch. ***
 ***   Check our CONTRIBUTING.md file for more details.  ***
 ***                                                     ***
@@ -32,12 +32,14 @@ case $err in
 ***                                                     ***
 ***********************************************************
 
-Used clang-format version:
+Used version:
 ${diff%%
+----------
 *}
 
 The following changes should be made:
 ${diff#*
+----------
 }
 
 Exiting...
@@ -62,8 +64,6 @@ EOM
     ;;
 
   *)
-    echo ""
-    echo "Something went wrong in our formatting checks: clangify returned $err" >&2
-    echo ""
+    echo "Something went wrong in our formatting checks: format.sh returned $err" >&2
     ;;
 esac

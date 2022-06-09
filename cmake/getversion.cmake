@@ -71,7 +71,9 @@ function(get_tag_name commit)
   string(REPLACE "\n" "" GIT_TAG "${GIT_TAG}")
   message(STATUS "Commit is a release or prerelease, git tag: ${GIT_TAG}")
 
-  # Extract information from tag: YYYY-MM-DD-Release-MAJ.MIN.PATCH YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
+  # Extract information from tag:
+  # YYYY-MM-DD-Release-MAJ.MIN.PATCH
+  # YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
   string(REPLACE "-" ";" GIT_TAG_EXPLODED "${GIT_TAG}")
   string(REPLACE "." ";" GIT_TAG_EXPLODED "${GIT_TAG_EXPLODED}")
 
@@ -131,8 +133,10 @@ function(get_tag_name commit)
     return()
   endif()
 
-  # Label 7 = Stable release 8 = Dev release, first beta so only "beta" attached 9 = Dev release, subsequent beta so
-  # "beta.N" attached (N>=2)
+  # Label
+  # 7 = Stable release
+  # 8 = Dev release, first beta so only "beta" attached
+  # 9 = Dev release, subsequent beta so "beta.N" attached (N>=2)
   if(${GIT_TAG_LISTCOUNT} EQUAL 8)
     list(GET GIT_TAG_EXPLODED 7 GIT_TAG_LABEL)
   elseif(${GIT_TAG_LISTCOUNT} EQUAL 9)

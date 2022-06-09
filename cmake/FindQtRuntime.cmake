@@ -1,7 +1,13 @@
-# Find a compatible Qt version Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5 Optional
-# Input: QT6_DIR -- Hint as to where Qt6 lives on the system Optional Input: QT5_DIR -- Hint as to where Qt5 lives on
-# the system Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6 Outputs: SERVATRICE_QT_MODULES,
-# COCKATRICE_QT_MODULES, ORACLE_QT_MODULES, DBCONVERTER_QT_MODULES, TEST_QT_MODULES
+# Find a compatible Qt version
+# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5
+# Optional Input: QT6_DIR -- Hint as to where Qt6 lives on the system
+# Optional Input: QT5_DIR -- Hint as to where Qt5 lives on the system
+# Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6
+# Output: SERVATRICE_QT_MODULES
+# Output: COCKATRICE_QT_MODULES
+# Output: ORACLE_QT_MODULES
+# Output: DBCONVERTER_QT_MODULES
+# Output: TEST_QT_MODULES
 
 set(REQUIRED_QT_COMPONENTS Core)
 if(WITH_SERVER)

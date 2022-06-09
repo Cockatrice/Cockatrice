@@ -1,7 +1,9 @@
 # Cockatrice's main CMakeLists.txt
 #
-# This is basically a wrapper to enable/disable the compilation of the different projects: servatrice, cockatrice, test
-# This file sets all the variables shared between the projects like the installation path, compilation flags etc..
+# This is basically a wrapper to enable/disable the compilation
+# of the different projects: servatrice, cockatrice, test
+# This file sets all the variables shared between the projects
+# like the installation path, compilation flags etc..
 
 # cmake 3.16 is required if using qt6
 cmake_minimum_required(VERSION 3.10)
@@ -23,7 +25,8 @@ option(WITH_DBCONVERTER "build dbconverter" ON)
 # Compile tests
 option(TEST "build tests" OFF)
 
-# Default to "Release" build type User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
+# Default to "Release" build type
+# User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
 if(DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
       ${CMAKE_BUILD_TYPE}
@@ -69,7 +72,8 @@ if(WIN32)
   endif()
 endif()
 
-# A project name is needed for CPack Version can be overriden by git tags, see cmake/getversion.cmake
+# A project name is needed for CPack
+# Version can be overriden by git tags, see cmake/getversion.cmake
 project("Cockatrice" VERSION 2.8.1)
 
 # Set release name if not provided via env/cmake var
@@ -99,7 +103,9 @@ include(createversionfile)
 # Define a proper install path
 if(UNIX)
   if(APPLE)
-    # macOS Due to the special bundle structure ignore the prefix eventually set by the user.
+    # macOS
+    # Due to the special bundle structure ignore
+    # the prefix eventually set by the user.
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 
     # Force ccache usage if available
@@ -120,7 +126,7 @@ if(UNIX)
   else()
     # Linux / BSD
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-      # fix package build
+      #fix package build
       if(PREFIX)
         set(CMAKE_INSTALL_PREFIX ${PREFIX})
       else()
@@ -136,7 +142,8 @@ endif()
 if(MSVC)
   # Visual Studio: Maximum optimization, disable warning C4251, establish C++17 compatibility
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive-")
-  # Generate complete debugging information set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
+  # Generate complete debugging information
+  #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   # linux/gcc, bsd/gcc, windows/mingw
   include(CheckCXXCompilerFlag)
@@ -216,12 +223,12 @@ else()
   message(STATUS "Found Protobuf ${Protobuf_VERSION} at: ${Protobuf_LIBRARIES}")
 endif()
 
-# Find OpenSSL
+#Find OpenSSL
 if(WIN32)
   find_package(Win32SslRuntime)
 endif()
 
-# Find VCredist
+#Find VCredist
 if(MSVC)
   find_package(VCredistRuntime)
 endif()

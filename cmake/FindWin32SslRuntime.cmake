@@ -1,4 +1,5 @@
-# Find the OpenSSL runtime libraries (.dll) for Windows that will be needed by Qt in order to access https urls.
+# Find the OpenSSL runtime libraries (.dll) for Windows that
+# will be needed by Qt in order to access https urls.
 if(NOT DEFINED WIN32 OR NOT ${WIN32})
   message(STATUS "Non-Windows device trying to execute FindWin32SslRuntime, skipping")
   return()

@@ -102,5 +102,8 @@
       "decisions. See the documentation for more information."
     ],
     "layout_passes": {}
+  },
+  "markup": {
+    "enable_markup": false
   }
 }
