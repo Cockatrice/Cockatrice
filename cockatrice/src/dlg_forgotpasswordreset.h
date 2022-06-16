@@ -14,18 +14,6 @@ class DlgForgotPasswordReset : public QDialog
     Q_OBJECT
 public:
     DlgForgotPasswordReset(QWidget *parent = nullptr);
-    QString getHost() const
-    {
-        return hostEdit->text();
-    }
-    int getPort() const
-    {
-        return portEdit->text().toInt();
-    }
-    QString getPlayerName() const
-    {
-        return playernameEdit->text();
-    }
     QString getToken() const
     {
         return tokenEdit->text();
@@ -38,9 +26,8 @@ private slots:
     void actOk();
 
 private:
-    QLabel *infoLabel, *hostLabel, *portLabel, *playernameLabel, *tokenLabel, *newpasswordLabel,
-        *newpasswordverifyLabel;
-    QLineEdit *hostEdit, *portEdit, *playernameEdit, *tokenEdit, *newpasswordEdit, *newpasswordverifyEdit;
+    QLabel *infoLabel, *tokenLabel, *newpasswordLabel, *newpasswordverifyLabel;
+    QLineEdit *tokenEdit, *newpasswordEdit, *newpasswordverifyEdit;
 };
 
 #endif

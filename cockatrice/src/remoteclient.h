@@ -20,8 +20,11 @@ signals:
     void activateError();
     void socketError(const QString &errorString);
     void protocolVersionMismatch(int clientVersion, int serverVersion);
-    void
-    sigConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
+    void sigConnectToServer(const QString &hostname,
+                            unsigned int port,
+                            const QString &_userName,
+                            const QString &_password,
+                            const QString &_hashedPassword);
     void sigRegisterToServer(const QString &hostname,
                              unsigned int port,
                              const QString &_userName,
@@ -59,8 +62,11 @@ private slots:
     void loginResponse(const Response &response);
     void registerResponse(const Response &response);
     void activateResponse(const Response &response);
-    void
-    doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
+    void doConnectToServer(const QString &hostname,
+                           unsigned int port,
+                           const QString &_userName,
+                           const QString &_password,
+                           const QString &_hashedPassword);
     void doRegisterToServer(const QString &hostname,
                             unsigned int port,
                             const QString &_userName,
@@ -124,6 +130,10 @@ public:
     }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
+    void connectToServerSecurely(const QString &hostname,
+                                 unsigned int port,
+                                 const QString &_userName,
+                                 const QString &_hashedPassword);
     void registerToServer(const QString &hostname,
                           unsigned int port,
                           const QString &_userName,

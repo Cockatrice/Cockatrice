@@ -3,7 +3,6 @@
 
 #include "userconnection_information.h"
 
-class QNetworkReply;
 class QNetworkAccessManager;
 
 /**
@@ -16,7 +15,7 @@ class HandlePublicServers : public QObject
     Q_OBJECT
 signals:
     void sigPublicServersDownloadedSuccessfully();
-    void sigPublicServersDownloadedUnsuccessfully(int);
+    void sigPublicServersDownloadedUnsuccessfully(int err);
 
 public:
     explicit HandlePublicServers(QObject *parent = nullptr);
@@ -29,12 +28,9 @@ private slots:
     void actFinishParsingDownloadedData();
 
 private:
-    void updateServerINISettings(QMap<QString, QVariant>);
+    void updateServerINISettings(const QMap<QString, QVariant> &jsonMap);
 
-    QStringList publicServersToRemove;
-    QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     QNetworkAccessManager *nam;
-    QNetworkReply *reply;
 };
 
 #endif // COCKATRICE_HANDLE_PUBLIC_SERVERS_H

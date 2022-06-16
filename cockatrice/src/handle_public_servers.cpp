@@ -10,28 +10,23 @@
 
 #define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 
-HandlePublicServers::HandlePublicServers(QObject *parent)
-    : QObject(parent), nam(new QNetworkAccessManager(this)), reply(nullptr)
+HandlePublicServers::HandlePublicServers(QObject *parent) : QObject(parent), nam(new QNetworkAccessManager(this))
 {
 }
 
 void HandlePublicServers::downloadPublicServers()
 {
     QUrl url(QString(PUBLIC_SERVERS_JSON));
-    reply = nam->get(QNetworkRequest(url));
+    QNetworkReply *reply = nam->get(QNetworkRequest(url)); // reply is to be deleted by its signal
     connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
 }
 
 void HandlePublicServers::actFinishParsingDownloadedData()
 {
-    reply = dynamic_cast<QNetworkReply *>(sender());
+    auto *reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
 
     if (errorCode == QNetworkReply::NoError) {
-        // Get current saved hosts
-        UserConnection_Information uci;
-        savedHostList = uci.getServerInfo();
-
         // Downloaded data from GitHub
         QJsonParseError parseError{};
         QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
@@ -39,70 +34,46 @@ void HandlePublicServers::actFinishParsingDownloadedData()
             QVariantMap jsonMap = jsonResponse.toVariant().toMap();
             updateServerINISettings(jsonMap);
         } else {
-            qDebug() << "[PUBLIC SERVER HANDLER]"
-                     << "JSON Parsing Error:" << parseError.errorString();
+            qCritical() << "Error while fetching public servers, json parsing error:" << parseError.errorString();
             emit sigPublicServersDownloadedUnsuccessfully(errorCode);
         }
     } else {
-        qDebug() << "[PUBLIC SERVER HANDLER]"
-                 << "Error Downloading Public Servers" << errorCode;
+        qCritical() << "Error while fetching public servers, code:" << errorCode;
         emit sigPublicServersDownloadedUnsuccessfully(errorCode);
     }
 
     reply->deleteLater(); // After an emit() occurs, this object will be deleted
 }
 
-void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMap)
+void HandlePublicServers::updateServerINISettings(const QMap<QString, QVariant> &jsonMap)
 {
-    // Servers available
-    auto publicServersJSONList = jsonMap["servers"].toList();
+    const auto &publicServersJSONList = jsonMap["servers"].toList();
+    auto &servers = SettingsCache::instance().servers();
 
     for (const auto &server : publicServersJSONList) {
         // Data inside one server at a time
         // server: [{ ... }, ..., { ... }]
-        const auto serverMap = server.toMap();
+        const auto &serverMap = server.toMap();
 
-        QString serverAddress = serverMap["host"].toString();
+        QString hostName = serverMap["host"].toString();
 
         if (serverMap["isInactive"].toBool()) {
-            publicServersToRemove.append(serverAddress);
+            servers.removeHostName(hostName);
             continue;
         }
 
-        QString serverName = serverMap["name"].toString();
-        QString serverPort = serverMap["port"].toString();
-        QString serverSite = serverMap["site"].toString();
-
+        QString saveName = serverMap["name"].toString();
+        unsigned int port;
         if (serverMap.contains("websocketPort")) {
-            serverPort = serverMap["websocketPort"].toString();
-        }
-
-        bool serverFound = false;
-        for (const auto &iter : savedHostList) {
-            // If the URL/IP matches
-            if (iter.second.getServer() == serverAddress) {
-                serverFound = true;
-                break;
-            }
-        }
-
-        if (serverFound) {
-            SettingsCache::instance().servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort,
-                                                                                serverSite);
+            port = serverMap["websocketPort"].toUInt();
         } else {
-            SettingsCache::instance().servers().addNewServer(serverName, serverAddress, serverPort, "", "", false,
-                                                             serverSite);
+            port = serverMap["port"].toUInt();
         }
-    }
 
-    // If a server was removed from the public list,
-    // we will delete it from the local system.
-    // Will not delete "unofficial" servers
-    for (const auto &pair : savedHostList) {
-        QString serverAddr = pair.first;
-
-        if (publicServersToRemove.indexOf(serverAddr) != -1) {
-            SettingsCache::instance().servers().removeServer(serverAddr);
+        int index = servers.addNewServer(saveName, hostName, port);
+        if (serverMap.contains("site")) {
+            QString site = serverMap["site"].toString();
+            servers.setSite(index, site);
         }
     }
 

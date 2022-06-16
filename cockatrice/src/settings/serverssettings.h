@@ -4,8 +4,10 @@
 #include "settingsmanager.h"
 
 #include <QObject>
+
+#define SERVERSETTINGS_DEFAULT_NAME "Rooster Ranges"
 #define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
-#define SERVERSETTINGS_DEFAULT_PORT "4748"
+#define SERVERSETTINGS_DEFAULT_PORT 4748
 
 class ServersSettings : public SettingsManager
 {
@@ -13,55 +15,47 @@ class ServersSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    int getPreviousHostLogin();
-    int getPrevioushostindex(const QString &);
-    QStringList getPreviousHostList();
-    QString getPrevioushostName();
-    QString getHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST);
-    QString getPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT);
-    QString getPlayerName(QString defaultName = "");
-    QString getFPHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST);
-    QString getFPPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT);
-    QString getFPPlayerName(QString defaultName = "");
-    QString getPassword();
-    QString getSaveName(QString defaultname = "");
-    QString getSite(QString defaultName = "");
-    bool getSavePassword();
+    inline int start() const
+    {
+        return 1; // the first entry will have 1 appended to it in the ini, not 0
+    }
+    int end();
+    int getIndex(const QString &saveName);
+    QString getPreviousHostName(const QString &defaultHostName = SERVERSETTINGS_DEFAULT_NAME);
+    QString getSaveName(int index);
+    QString getHostName(int index, const QString &defaultHost = SERVERSETTINGS_DEFAULT_HOST);
+    unsigned int getPort(int index, unsigned int defaultPort = SERVERSETTINGS_DEFAULT_PORT);
+    QString getPlayerName(int index, const QString &defaultName = "");
+    QString getPassword(int index);
+    QString getSecurePassword(int index);
+    QString getSite(int index, const QString &defaultName = "");
+    bool getSavePassword(int index);
     int getAutoConnect();
-
-    void setPreviousHostLogin(int previous);
-    void setPrevioushostName(const QString &);
-    void setPreviousHostList(QStringList list);
-    void setAutoConnect(int autoconnect);
-    void setSite(QString site);
-    void setFPHostName(QString hostname);
-    void setFPPort(QString port);
-    void setFPPlayerName(QString playerName);
-    void addNewServer(const QString &saveName,
-                      const QString &serv,
-                      const QString &port,
-                      const QString &username,
-                      const QString &password,
-                      bool savePassword,
-                      const QString &site = QString());
-    void removeServer(QString servAddr);
-    bool updateExistingServer(QString saveName,
-                              QString serv,
-                              QString port,
-                              QString username,
-                              QString password,
-                              bool savePassword,
-                              QString site = QString());
-
-    bool updateExistingServerWithoutLoss(QString saveName,
-                                         QString serv = QString(),
-                                         QString port = QString(),
-                                         QString site = QString());
-    void setClearDebugLogStatus(bool abIsChecked);
     bool getClearDebugLogStatus(bool abDefaultValue);
+    QString getFPHostname(const QString &defaultHost = SERVERSETTINGS_DEFAULT_HOST);              // deprecated
+    QString getFPPort(const QString &defaultPort = QString::number(SERVERSETTINGS_DEFAULT_PORT)); // deprecated
+    QString getFPPlayerName(const QString &defaultName = "");                                     // deprecated
+
+    void setPreviousHostName(const QString &name);
+    void setAutoConnect(int autoconnect);
+    void setSite(int index, const QString &site);
+    void setSaveName(int index, const QString &saveName);
+    void setHostName(int index, const QString &host);
+    void setPort(int index, unsigned int port);
+    void setPlayerName(int index, const QString &playerName);
+    void setPassword(int index, const QString &password);
+    void setSecurePassword(int index, const QString &securePassword);
+    void setSavePassword(int index, bool savePassword);
+    void setClearDebugLogStatus(bool abIsChecked);
+    void setFPHostName(const QString &hostname);     // deprecated
+    void setFPPort(const QString &port);             // deprecated
+    void setFPPlayerName(const QString &playerName); // deprecated
+
+    int addNewServer(const QString &saveName, const QString &hostName, unsigned int port);
+    int removeHostName(const QString &hostName);
 
 private:
-    explicit ServersSettings(QString settingPath, QObject *parent = nullptr);
+    explicit ServersSettings(const QString &settingPath, QObject *parent = nullptr);
     ServersSettings(const ServersSettings & /*other*/);
 };
 
