@@ -458,13 +458,15 @@ private:
     bool isCreateAllExclusion;
     bool isVariableCount;
     int defaultCount;
+	bool isConjured;
 
 public:
     explicit CardRelation(const QString &_name = QString(),
                           bool _doesAttach = false,
                           bool _isCreateAllExclusion = false,
                           bool _isVariableCount = false,
-                          int _defaultCount = 1);
+                          int _defaultCount = 1,
+						  bool _isConjured = false);
 
     inline const QString &getName() const
     {
@@ -489,6 +491,10 @@ public:
     int getDefaultCount() const
     {
         return defaultCount;
+    }
+    bool getIsConjured() const
+    {
+        return isConjured;
     }
 };
 #endif

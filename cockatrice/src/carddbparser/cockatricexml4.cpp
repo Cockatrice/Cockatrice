@@ -185,6 +185,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     bool attach = false;
                     bool exclude = false;
                     bool variable = false;
+					bool conjured = false;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
@@ -211,7 +212,11 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         exclude = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count);
+					if (attrs.hasAttribute("conjured")) {
+						conjured = true;
+					}
+
+                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count, conjured);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {

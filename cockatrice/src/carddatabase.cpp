@@ -675,9 +675,10 @@ CardRelation::CardRelation(const QString &_name,
                            bool _doesAttach,
                            bool _isCreateAllExclusion,
                            bool _isVariableCount,
-                           int _defaultCount)
+                           int _defaultCount,
+						   bool _isConjured)
     : name(_name), doesAttach(_doesAttach), isCreateAllExclusion(_isCreateAllExclusion),
-      isVariableCount(_isVariableCount), defaultCount(_defaultCount)
+      isVariableCount(_isVariableCount), defaultCount(_defaultCount), isConjured(_isConjured)
 {
 }
 

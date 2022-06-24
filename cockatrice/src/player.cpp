@@ -1700,6 +1700,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
     QString dbName = cardRelation->getName();
     if (cardRelation->getIsVariable()) {
         bool ok;
+		bool conjured = cardRelation->getIsConjured();
         dialogSemaphore = true;
         int count = QInputDialog::getInt(game, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1,
                                          MAX_TOKENS_PER_DIALOG, 1, &ok);
@@ -1708,23 +1709,23 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
             return false;
         }
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, false, conjured);
         }
     } else if (cardRelation->getDefaultCount() > 1) {
         for (int i = 0; i < cardRelation->getDefaultCount(); ++i) {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, false, conjured);
         }
     } else {
         if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName);
+            createAttachedCard(sourceCard, dbName, false, conjured);
         } else {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, false, conjured);
         }
     }
     return true;
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)
+void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach, bool conjured)
 {
     CardInfoPtr cardInfo = db->getCard(dbCardName);
 
@@ -1758,7 +1759,11 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     } else {
         cmd.set_annotation("");
     }
-    cmd.set_destroy_on_zone_change(true);
+    if (conjured) {
+		cmd.set_destroy_on_zone_change(false);
+	} else {
+		cmd.set_destroy_on_zone_change(true);
+	}
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
@@ -1770,9 +1775,9 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     sendGameCommand(cmd);
 }
 
-void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName)
+void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool conjured)
 {
-    createCard(sourceCard, dbCardName, true);
+    createCard(sourceCard, dbCardName, true, conjured);
 }
 
 void Player::actSayMessage()
