@@ -1698,9 +1698,9 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
         return false;
     }
     QString dbName = cardRelation->getName();
+	bool conjured = cardRelation->getIsConjured();
     if (cardRelation->getIsVariable()) {
         bool ok;
-		bool conjured = cardRelation->getIsConjured();
         dialogSemaphore = true;
         int count = QInputDialog::getInt(game, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1,
                                          MAX_TOKENS_PER_DIALOG, 1, &ok);
@@ -1717,7 +1717,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
         }
     } else {
         if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName, false, conjured);
+            createAttachedCard(sourceCard, dbName, conjured);
         } else {
             createCard(sourceCard, dbName, false, conjured);
         }
