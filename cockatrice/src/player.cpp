@@ -1700,7 +1700,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
         return false;
     }
     QString dbName = cardRelation->getName();
-	bool conjured = cardRelation->getIsConjured();
+    bool conjured = cardRelation->getIsConjured();
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;

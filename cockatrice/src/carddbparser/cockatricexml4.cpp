@@ -212,9 +212,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         exclude = true;
                     }
 
-					if (attrs.hasAttribute("conjured")) {
-						conjured = true;
-					}
+                    if (attrs.hasAttribute("conjured")) {
+                        conjured = true;
+                    }
 
                     auto *relation = new CardRelation(cardName, attach, exclude, variable, count, conjured);
                     if (xmlName == "reverse-related") {
