@@ -377,7 +377,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 }
                 name = faceName;
             }
-
+			// support for array of cards this conjures
+			if (card.contains("spellbook")) {
+				auto spellbook = card.value("spellbook").toMap();
+				for (const QString &sbkName : spellbook.keys()) {
+					relatedCards.append(new CardRelation(sbkName, false, false, false, 1, true))
+				}
+			}
             CardInfoPtr newCard = addCard(name + numComponent, text, isToken, properties, relatedCards, setInfo);
             numCards++;
         }
