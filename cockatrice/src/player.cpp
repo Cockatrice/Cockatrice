@@ -1655,8 +1655,9 @@ void Player::actCreateAllRelatedCards()
                 for (CardRelation *cardRelationAll : relatedCards) {
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
                         dbName = cardRelationAll->getName();
+                        bool conjured = cardRelationAll->getIsConjured();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName);
+                            createCard(sourceCard, dbName, false, conjured);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1669,8 +1670,9 @@ void Player::actCreateAllRelatedCards()
                 for (CardRelation *cardRelationNotExcluded : nonExcludedRelatedCards) {
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
                         dbName = cardRelationNotExcluded->getName();
+                        bool conjured = cardRelationNotExcluded->getIsConjured();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName);
+                            createCard(sourceCard, dbName, false, conjured);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {

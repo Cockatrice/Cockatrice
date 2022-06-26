@@ -185,7 +185,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     bool attach = false;
                     bool exclude = false;
                     bool variable = false;
-					bool conjured = false;
+                    bool conjured = false;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
@@ -299,7 +299,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         if (i->getIsCreateAllExclusion()) {
             xml.writeAttribute("exclude", "exclude");
         }
-
+        if (i->getIsConjured()) {
+            xml.writeAttribute("conjured", "conjured");
+        }
         if (i->getIsVariable()) {
             if (1 == i->getDefaultCount()) {
                 xml.writeAttribute("count", "x");
@@ -323,6 +325,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
             xml.writeAttribute("exclude", "exclude");
         }
 
+        if (i->getIsConjured()) {
+            xml.writeAttribute("conjured", "conjured");
+        }
         if (i->getIsVariable()) {
             if (1 == i->getDefaultCount()) {
                 xml.writeAttribute("count", "x");
