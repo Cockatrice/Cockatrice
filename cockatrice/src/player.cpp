@@ -1761,11 +1761,7 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     } else {
         cmd.set_annotation("");
     }
-    if (conjured) {
-		cmd.set_destroy_on_zone_change(false);
-	} else {
-		cmd.set_destroy_on_zone_change(true);
-	}
+    cmd.set_destroy_on_zone_change(!conjured);
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
