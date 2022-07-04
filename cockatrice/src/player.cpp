@@ -66,10 +66,12 @@
 
 #include <QDebug>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMetaType>
 #include <QPainter>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QTimer>
 
 PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QObject(), QGraphicsItem(parentItem)
 {
@@ -253,6 +255,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveTopCardsToGraveyard, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave()));
         aMoveTopCardsToExile = new QAction(this);
         connect(aMoveTopCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile()));
+        aMoveTopCardsUntil = new QAction(this);
+        connect(aMoveTopCardsUntil, SIGNAL(triggered()), this, SLOT(actMoveTopCardsUntil()));
         aMoveTopCardToBottom = new QAction(this);
         connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
 
@@ -325,6 +329,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         topLibraryMenu->addAction(aMoveTopCardsToGraveyard);
         topLibraryMenu->addAction(aMoveTopCardToExile);
         topLibraryMenu->addAction(aMoveTopCardsToExile);
+        topLibraryMenu->addAction(aMoveTopCardsUntil);
 
         bottomLibraryMenu->addAction(aDrawBottomCard);
         bottomLibraryMenu->addAction(aDrawBottomCards);
@@ -744,11 +749,12 @@ void Player::retranslateUi()
 
         aMoveTopToPlay->setText(tr("&Play top card"));
         aMoveTopToPlayFaceDown->setText(tr("Play top card &face down"));
+        aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
         aMoveTopCardToGraveyard->setText(tr("Move top card to grave&yard"));
         aMoveTopCardToExile->setText(tr("Move top card to e&xile"));
         aMoveTopCardsToGraveyard->setText(tr("Move top cards to &graveyard..."));
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
-        aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
+        aMoveTopCardsUntil->setText(tr("Take top cards &until..."));
 
         aDrawBottomCard->setText(tr("&Draw bottom card"));
         aDrawBottomCards->setText(tr("D&raw bottom cards..."));
@@ -928,6 +934,7 @@ void Player::setShortcutsActive()
     aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
     aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
     aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
+    aMoveTopCardsUntil->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsUntil"));
     aMoveTopCardToBottom->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToBottom"));
     aDrawBottomCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawBottomCard"));
     aDrawBottomCards->setShortcut(shortcuts.getSingleShortcut("Player/aDrawBottomCards"));
@@ -968,6 +975,7 @@ void Player::setShortcutsInactive()
     aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
     aMoveTopCardToExile->setShortcut(QKeySequence());
     aMoveTopCardsToExile->setShortcut(QKeySequence());
+    aMoveTopCardsUntil->setShortcut(QKeySequence());
     aDrawBottomCard->setShortcut(QKeySequence());
     aDrawBottomCards->setShortcut(QKeySequence());
     aMoveBottomToPlay->setShortcut(QKeySequence());
@@ -1269,6 +1277,45 @@ void Player::actMoveTopCardsToExile()
     }
 
     sendGameCommand(cmd);
+}
+
+void Player::actMoveTopCardsUntil()
+{
+    QString expr = previousMovingCardsUntilExpr;
+    for (;;) {
+        bool ok;
+        expr =
+            QInputDialog::getText(game, "Take top cards until", "Select card (accepts search syntax)", {}, expr, &ok);
+        if (!ok) {
+            return;
+        }
+        movingCardsUntilFilter = FilterString(expr);
+        if (movingCardsUntilFilter.valid()) {
+            break;
+        } else {
+            auto button = QMessageBox::warning(game, "Invalid filter", movingCardsUntilFilter.error());
+            if (button != QMessageBox::Ok) {
+                return;
+            }
+        }
+    }
+    previousMovingCardsUntilExpr = expr;
+    if (zones.value("deck")->getCards().empty()) {
+        movingCardsUntil = false;
+    } else {
+        movingCardsUntil = true;
+        actMoveTopCardToPlay();
+    }
+}
+
+void Player::moveOneCardUntil(const QString &cardName)
+{
+    auto card = db->getCard(cardName);
+    if (zones.value("deck")->getCards().empty() || card.isNull() || movingCardsUntilFilter.check(card)) {
+        movingCardsUntil = false;
+    } else {
+        QTimer::singleShot(100, [this]() { actMoveTopCardToPlay(); });
+    }
 }
 
 void Player::actMoveTopCardToBottom()
@@ -2012,7 +2059,8 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (!startPlayer) {
         return;
     }
-    CardZone *startZone = startPlayer->getZones().value(QString::fromStdString(event.start_zone()), 0);
+    QString startZoneString = QString::fromStdString(event.start_zone());
+    CardZone *startZone = startPlayer->getZones().value(startZoneString, 0);
     Player *targetPlayer = game->getPlayers().value(event.target_player_id());
     if (!targetPlayer) {
         return;
@@ -2104,6 +2152,10 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
         }
     }
     updateCardMenu(card);
+
+    if (movingCardsUntil && startZoneString == "deck" && targetZone->getName() == "stack") {
+        moveOneCardUntil(card->getName());
+    }
 }
 
 void Player::eventFlipCard(const Event_FlipCard &event)
