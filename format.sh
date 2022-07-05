@@ -196,7 +196,7 @@ if [[ $branch ]]; then
   for ex in "${exts[@]}"; do
     for path in "${include[@]}"; do
       for name in "${basenames[@]}"; do
-        rx="^$path/.$ex$"
+        rx="^$path/.*\\.$ex$"
         if [[ $name =~ $rx ]]; then
           names+=("$name")
         fi
