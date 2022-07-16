@@ -285,8 +285,8 @@ private:
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
-    void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false, bool conjured = false);
-    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool conjured = false);
+    void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false, bool persistent = false);
+    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
 
     QRectF bRect;
