@@ -379,7 +379,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                                int xCoord,
                                                int yCoord,
                                                bool fixFreeSpaces,
-                                               bool undoingDraw)
+                                               bool undoingDraw,
+                                               bool shuffleAttached)
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
@@ -409,7 +410,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
         if (card->getParentCard()) {
             continue;
         }
-        if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
+        if (!shuffleAttached && !card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
             continue;
         }
 
@@ -419,7 +420,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
     if (cardsToMove.empty()) {
         return Response::RespContextError;
     }
-
     int xIndex = -1;
     bool revealTopStart = false;
     bool revealTopTarget = false;
@@ -457,7 +457,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
             }
         }
-
         if (startzone != targetzone) {
             // Delete all arrows from and to the card
             const QList<Server_Player *> &players = game->getPlayers().values();
@@ -523,6 +522,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             }
             eventOthers.set_y(yCoord);
             eventOthers.set_face_down(faceDown);
+            eventOthers.set_shuffle_attached(shuffleAttached);
 
             Event_MoveCard eventPrivate(eventOthers);
             if (sourceBeingLookedAt || targetzone->getType() != ServerInfo_Zone::HiddenZone ||
@@ -1089,7 +1089,6 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if (conceded) {
         return Response::RespContextError;
     }
-
     Server_Player *startPlayer = game->getPlayers().value(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
     if (!startPlayer) {
         return Response::RespNameNotFound;
@@ -1115,13 +1114,12 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if ((startPlayer != this) && (targetPlayer != this) && !judge) {
         return Response::RespContextError;
     }
-
     QList<const CardToMove *> cardsToMove;
     for (int i = 0; i < cmd.cards_to_move().card_size(); ++i) {
         cardsToMove.append(&cmd.cards_to_move().card(i));
     }
 
-    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y());
+    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y(), true, false, cmd.shuffle_attached());
 }
 
 Response::ResponseCode

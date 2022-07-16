@@ -477,6 +477,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     aFlip = new QAction(this);
     aFlip->setData(cmFlip);
     connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    aShuffleAttached = new QAction(this);
+    aShuffleAttached->setData(cmShuffleAttached);
+    connect(aShuffleAttached, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     aPeek = new QAction(this);
     aPeek->setData(cmPeek);
     connect(aPeek, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -801,6 +804,7 @@ void Player::retranslateUi()
                                       // All code and proto bits are still unchanged (flip) for compatibility reasons
                                       // A protocol rewrite with v3 could incorporate that, see #3100
     aPeek->setText(tr("&Peek at card face"));
+    aShuffleAttached->setText(tr("Shuffle attached cards"));
     aClone->setText(tr("&Clone"));
     aAttach->setText(tr("Attac&h to card..."));
     aUnattach->setText(tr("Unattac&h"));
@@ -2026,7 +2030,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (!startZone || !targetZone) {
         return;
     }
-
+	
     int position = event.position();
     int x = event.x();
     int y = event.y();
@@ -2057,6 +2061,8 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
 
     card->setId(event.new_card_id());
     card->setFaceDown(event.face_down());
+    if(event.shuffle_attached())
+        card->shuffleAttachedCards();
     if (startZone != targetZone) {
         card->setBeingPointedAt(false);
         card->setHovered(false);
@@ -2076,7 +2082,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (context.HasExtension(Context_UndoDraw::ext)) {
         emit logUndoDraw(this, card->getName());
     } else {
-        emit logMoveCard(this, card, startZone, logPosition, targetZone, logX);
+        emit logMoveCard(this, card, startZone, logPosition, targetZone, logX, event.shuffle_attached());
     }
 
     targetZone->addCard(card, true, x, y);
@@ -2655,7 +2661,7 @@ void Player::rearrangeCounters()
 
 PendingCommand *Player::prepareGameCommand(const google::protobuf::Message &cmd)
 {
-
+	
     if (judge && !local) {
         Command_Judge base;
         GameCommand *c = base.add_game_command();
@@ -2921,6 +2927,21 @@ void Player::cardMenuAction()
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
+                break;
+            }
+            case cmShuffleAttached: {
+                for (const auto &card : cardList) {
+                    auto *cmd = new Command_MoveCard;
+                    cmd->set_start_player_id(startPlayerId);
+                    cmd->set_start_zone(startZone.toStdString());
+                    cmd->mutable_cards_to_move()->CopyFrom(idList);
+                    cmd->set_target_player_id(startPlayerId);
+                    cmd->set_target_zone(startZone.toStdString());
+                    cmd->set_x(card->getGridPoint().x());
+                    cmd->set_y(card->getGridPoint().y());
+                    cmd->set_shuffle_attached(true);
+                    commandList.append(cmd);
+                }
                 break;
             }
             default:
@@ -3373,7 +3394,9 @@ void Player::updateCardMenu(const CardItem *card)
                 if (card->getFaceDown()) {
                     cardMenu->addAction(aPeek);
                 }
-
+                if(card->getAttachedCards().size()) {
+		    cardMenu->addAction(aShuffleAttached);
+		}
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
 

@@ -122,7 +122,7 @@ signals:
     void logCreateToken(Player *player, QString cardName, QString pt);
     void logDrawCards(Player *player, int number);
     void logUndoDraw(Player *player, QString cardName);
-    void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
+    void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX, bool shuffleAttached = false);
     void logFlipCard(Player *player, QString cardName, bool faceDown);
     void logDestroyCard(Player *player, QString cardName);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
@@ -241,7 +241,7 @@ private:
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
-        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
+        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aShuffleAttached,
         *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
@@ -332,6 +332,7 @@ public:
         cmFlip,
         cmPeek,
         cmClone,
+        cmShuffleAttached,
         cmMoveToTopLibrary,
         cmMoveToBottomLibrary,
         cmMoveToHand,

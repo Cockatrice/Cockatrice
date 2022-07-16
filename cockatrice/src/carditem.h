@@ -2,6 +2,7 @@
 #define CARDITEM_H
 
 #include "abstractcarditem.h"
+#include "rng_abstract.h"
 #include "server_card.h"
 
 class CardDatabase;
@@ -136,6 +137,21 @@ public:
     const QList<CardItem *> &getAttachedCards() const
     {
         return attachedCards;
+    }
+    void shuffleAttachedCards()
+    {
+        if (attachedCards.size() < 2)
+        {
+            return; //cards are already sorted
+        }
+        for (int i = attachedCards.size()-1; i > 0; i--) {
+            int j = rng->rand(0, i);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+            attachedCards.swapItemsAt(j, i);
+#else
+            attachedCards.swap(j, i);
+#endif
+        }
     }
     void resetState();
     void processCardInfo(const ServerInfo_Card &info);

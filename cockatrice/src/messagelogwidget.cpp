@@ -280,7 +280,8 @@ void MessageLogWidget::logMoveCard(Player *player,
                                    CardZone *startZone,
                                    int oldX,
                                    CardZone *targetZone,
-                                   int newX)
+                                   int newX,
+                                   bool shuffleAttached)
 {
     if (currentContext == MessageContext_Mulligan) {
         return;
@@ -290,10 +291,10 @@ void MessageLogWidget::logMoveCard(Player *player,
     QString targetZoneName = targetZone->getName();
     bool ownerChanged = startZone->getPlayer() != targetZone->getPlayer();
 
-    // do not log if moved within the same zone
-    if ((startZoneName == tableConstant() && targetZoneName == tableConstant() && !ownerChanged) ||
+    // do not log if moved within the same zone unless we're shuffling
+    if (!shuffleAttached && ((startZoneName == tableConstant() && targetZoneName == tableConstant() && !ownerChanged) ||
         (startZoneName == handConstant() && targetZoneName == handConstant()) ||
-        (startZoneName == exileConstant() && targetZoneName == exileConstant())) {
+        (startZoneName == exileConstant() && targetZoneName == exileConstant()))) {
         return;
     }
 
@@ -311,7 +312,14 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else {
         cardStr = cardLink(cardName);
     }
-
+    
+    // log shuffled attached cards
+    if (shuffleAttached) {
+        appendHtmlServerMessage(tr("%1 shuffles %2's attachments.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(cardStr));
+        return;
+    }
     if (ownerChanged && (startZone->getPlayer() == player)) {
         appendHtmlServerMessage(tr("%1 gives %2 control over %3.")
                                     .arg(sanitizeHtml(player->getName()))
@@ -809,8 +817,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logSetPT(Player *, CardItem *, QString)));
     connect(player, SIGNAL(logSetAnnotation(Player *, CardItem *, QString)), this,
             SLOT(logSetAnnotation(Player *, CardItem *, QString)));
-    connect(player, SIGNAL(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)), this,
-            SLOT(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)));
+    connect(player, SIGNAL(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int, bool)), this,
+            SLOT(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int, bool)));
     connect(player, SIGNAL(logFlipCard(Player *, QString, bool)), this, SLOT(logFlipCard(Player *, QString, bool)));
     connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
     connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this,
