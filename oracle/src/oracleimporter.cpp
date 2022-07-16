@@ -378,7 +378,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 name = faceName;
             }
 
-
             CardInfoPtr newCard = addCard(name + numComponent, text, isToken, properties, relatedCards, setInfo);
             numCards++;
         }
