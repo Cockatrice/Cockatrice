@@ -293,8 +293,8 @@ void MessageLogWidget::logMoveCard(Player *player,
 
     // do not log if moved within the same zone unless we're shuffling
     if (!shuffleAttached && ((startZoneName == tableConstant() && targetZoneName == tableConstant() && !ownerChanged) ||
-        (startZoneName == handConstant() && targetZoneName == handConstant()) ||
-        (startZoneName == exileConstant() && targetZoneName == exileConstant()))) {
+                            (startZoneName == handConstant() && targetZoneName == handConstant()) ||
+                            (startZoneName == exileConstant() && targetZoneName == exileConstant()))) {
         return;
     }
 
@@ -312,12 +312,10 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else {
         cardStr = cardLink(cardName);
     }
-    
+
     // log shuffled attached cards
     if (shuffleAttached) {
-        appendHtmlServerMessage(tr("%1 shuffles %2's attachments.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(cardStr));
+        appendHtmlServerMessage(tr("%1 shuffles %2's attachments.").arg(sanitizeHtml(player->getName())).arg(cardStr));
         return;
     }
     if (ownerChanged && (startZone->getPlayer() == player)) {

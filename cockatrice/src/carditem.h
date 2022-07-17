@@ -140,8 +140,7 @@ public:
     }
     void shuffleAttachedCards()
     {
-        if (attachedCards.size() < 2)
-        {
+        if (attachedCards.size() < 2) {
             return; //cards are already sorted
         }
         for (int i = attachedCards.size()-1; i > 0; i--) {

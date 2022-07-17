@@ -2030,7 +2030,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (!startZone || !targetZone) {
         return;
     }
-	
+
     int position = event.position();
     int x = event.x();
     int y = event.y();
@@ -2061,8 +2061,9 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
 
     card->setId(event.new_card_id());
     card->setFaceDown(event.face_down());
-    if(event.shuffle_attached())
+    if(event.shuffle_attached()) {
         card->shuffleAttachedCards();
+	}
     if (startZone != targetZone) {
         card->setBeingPointedAt(false);
         card->setHovered(false);
@@ -2661,7 +2662,7 @@ void Player::rearrangeCounters()
 
 PendingCommand *Player::prepareGameCommand(const google::protobuf::Message &cmd)
 {
-	
+
     if (judge && !local) {
         Command_Judge base;
         GameCommand *c = base.add_game_command();
@@ -3395,8 +3396,8 @@ void Player::updateCardMenu(const CardItem *card)
                     cardMenu->addAction(aPeek);
                 }
                 if(card->getAttachedCards().size()) {
-		    cardMenu->addAction(aShuffleAttached);
-		}
+                    cardMenu->addAction(aShuffleAttached);
+                }
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
 

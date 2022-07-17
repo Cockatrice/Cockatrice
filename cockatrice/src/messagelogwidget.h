@@ -67,7 +67,13 @@ public slots:
     void logLeave(Player *player, QString reason);
     void logLeaveSpectator(QString name, QString reason);
     void logNotReadyStart(Player *player);
-    void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX, bool shuffleAttached = false);
+    void logMoveCard(Player *player,
+                        CardItem *card,
+                        CardZone *startZone,
+                        int oldX,
+                        CardZone *targetZone,
+                        int newX,
+                        bool shuffleAttached = false);
     void logMulligan(Player *player, int number);
     void logReplayStarted(int gameId);
     void logReadyStart(Player *player);
