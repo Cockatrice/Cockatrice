@@ -3186,7 +3186,7 @@ void Player::actAttach()
         return;
     }
 
-    game->getActiveCard()->drawAttachArrow();
+    card->drawAttachArrow();
 }
 
 void Player::actUnattach()
@@ -3196,8 +3196,7 @@ void Player::actUnattach()
     }
 
     QList<const ::google::protobuf::Message *> commandList;
-    auto sel = scene()->selectedItems();
-    for (const auto &item : sel) {
+    for (QGraphicsItem *item : scene()->selectedItems()) {
         auto *card = static_cast<CardItem *>(item);
         auto *cmd = new Command_AttachCard;
         cmd->set_start_zone(card->getZone()->getName().toStdString());

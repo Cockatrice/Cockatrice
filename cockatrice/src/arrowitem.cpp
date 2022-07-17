@@ -138,8 +138,8 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 
     QList<QGraphicsItem *> colliding = scene()->items(event->scenePos());
-    for (int i = 0; i < colliding.size(); ++i) {
-        if (qgraphicsitem_cast<CardItem *>(colliding[i])) {
+    for (QGraphicsItem *item : colliding) {
+        if (qgraphicsitem_cast<CardItem *>(item)) {
             event->ignore();
             return;
         }
@@ -205,8 +205,8 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }
     update();
 
-    for (int i = 0; i < childArrows.size(); ++i) {
-        childArrows[i]->mouseMoveEvent(event);
+    for (ArrowDragItem *child : childArrows) {
+        child->mouseMoveEvent(event);
     }
 }
 
@@ -251,8 +251,9 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     delArrow();
 
-    for (int i = 0; i < childArrows.size(); ++i)
-        childArrows[i]->mouseReleaseEvent(event);
+    for (ArrowDragItem *child : childArrows) {
+        child->mouseReleaseEvent(event);
+    }
 }
 
 ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
@@ -300,9 +301,9 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         updatePath();
     }
     update();
-    
-    for (int i = 0; i < childArrows.size(); ++i) {
-        childArrows[i]->mouseMoveEvent(event);
+
+    for (ArrowAttachItem *child : childArrows) {
+        child->mouseMoveEvent(event);
     }
 }
 
@@ -328,8 +329,8 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 
     delArrow();
-    
-    for (int i = 0; i < childArrows.size(); ++i) {
-        childArrows[i]->mouseReleaseEvent(event);
+
+    for (ArrowAttachItem *child : childArrows) {
+        child->mouseReleaseEvent(event);
     }
 }

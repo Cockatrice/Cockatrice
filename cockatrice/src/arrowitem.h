@@ -87,6 +87,7 @@ class ArrowAttachItem : public ArrowItem
     Q_OBJECT
 private:
     QList<ArrowAttachItem *> childArrows;
+
 public:
     ArrowAttachItem(ArrowTarget *_startItem);
     void addChildArrow(ArrowAttachItem *childArrow);
