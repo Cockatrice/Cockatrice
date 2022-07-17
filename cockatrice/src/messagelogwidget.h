@@ -102,7 +102,7 @@ public slots:
 
 public:
     void connectToPlayer(Player *player);
-    MessageLogWidget(const TabSupervisor *_tabSupervisor,
+    MessageLogWidget(TabSupervisor *_tabSupervisor,
                      const UserlistProxy *_userlistProxy,
                      TabGame *_game,
                      QWidget *parent = nullptr);

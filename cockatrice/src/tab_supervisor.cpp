@@ -735,3 +735,16 @@ const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) con
 
     return nullptr;
 };
+
+bool TabSupervisor::switchToGameTabIfAlreadyExists(const int gameId)
+{
+    bool isGameTabExists = false;
+    if (gameTabs.contains(gameId)) {
+        isGameTabExists = true;
+        TabGame *tabGame = gameTabs[gameId];
+        const int gameTabIndex = indexOf(tabGame);
+        setCurrentIndex(gameTabIndex);
+    }
+
+    return isGameTabExists;
+}

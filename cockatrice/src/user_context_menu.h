@@ -21,7 +21,7 @@ class UserContextMenu : public QObject
     Q_OBJECT
 private:
     AbstractClient *client;
-    const TabSupervisor *tabSupervisor;
+    TabSupervisor *tabSupervisor;
     TabGame *game;
 
     QAction *aUserName;
@@ -49,7 +49,7 @@ private slots:
     void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 
 public:
-    UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);
+    UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);
     void retranslateUi();
     void showContextMenu(const QPoint &pos,
                          const QString &userName,

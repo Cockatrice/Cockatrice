@@ -10,6 +10,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
 #include "tab_account.h"
+#include "tab_game.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
 
@@ -26,7 +27,7 @@
 #include <QVBoxLayout>
 
 GameSelector::GameSelector(AbstractClient *_client,
-                           const TabSupervisor *_tabSupervisor,
+                           TabSupervisor *_tabSupervisor,
                            TabRoom *_room,
                            const QMap<int, QString> &_rooms,
                            const QMap<int, GameTypeMap> &_gameTypes,
@@ -239,32 +240,34 @@ void GameSelector::actJoin()
     if (!ind.isValid())
         return;
     const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
-    bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
-    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
-    QString password;
-    if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
-        bool ok;
-        password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
-        if (!ok)
+    if (!tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
+        bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
+        bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+        QString password;
+        if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
+            bool ok;
+            password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
+            if (!ok)
+                return;
+        }
+
+        Command_JoinGame cmd;
+        cmd.set_game_id(game.game_id());
+        cmd.set_password(password.toStdString());
+        cmd.set_spectator(spectator);
+        cmd.set_override_restrictions(overrideRestrictions);
+        cmd.set_join_as_judge((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
+
+        TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
+        if (!r) {
+            QMessageBox::critical(this, tr("Error"), tr("Please join the respective room first."));
             return;
+        }
+
+        PendingCommand *pend = r->prepareRoomCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
+        r->sendRoomCommand(pend);
     }
-
-    Command_JoinGame cmd;
-    cmd.set_game_id(game.game_id());
-    cmd.set_password(password.toStdString());
-    cmd.set_spectator(spectator);
-    cmd.set_override_restrictions(overrideRestrictions);
-    cmd.set_join_as_judge((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
-
-    TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
-    if (!r) {
-        QMessageBox::critical(this, tr("Error"), tr("Please join the respective room first."));
-        return;
-    }
-
-    PendingCommand *pend = r->prepareRoomCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
-    r->sendRoomCommand(pend);
 
     if (createButton)
         createButton->setEnabled(false);
