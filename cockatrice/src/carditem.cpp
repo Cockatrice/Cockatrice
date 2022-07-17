@@ -300,6 +300,29 @@ void CardItem::drawArrow(const QColor &arrowColor)
     }
 }
 
+void CardItem::drawAttachArrow()
+{
+    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+        return;
+
+    auto *arrow = new ArrowAttachItem(this);
+    scene()->addItem(arrow);
+    arrow->grabMouse();
+
+    QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
+    while(itemIterator.hasNext()) {
+        CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
+        if (!c)
+            continue;
+        if (c->getZone() != zone)
+            continue;
+
+        ArrowAttachItem *childArrow = new ArrowAttachItem(c);
+        scene()->addItem(childArrow);
+        arrow->addChildArrow(childArrow);
+    }
+}
+
 void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->buttons().testFlag(Qt::RightButton)) {

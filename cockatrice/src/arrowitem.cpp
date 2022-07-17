@@ -260,6 +260,11 @@ ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
 {
 }
 
+void ArrowAttachItem::addChildArrow(ArrowAttachItem *childArrow)
+{
+    childArrows.append(childArrow);
+}
+
 void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem)
@@ -295,9 +300,13 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         updatePath();
     }
     update();
+    
+    for (int i = 0; i < childArrows.size(); ++i) {
+        childArrows[i]->mouseMoveEvent(event);
+    }
 }
 
-void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
+void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem)
         return;
@@ -319,4 +328,8 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
     }
 
     delArrow();
+    
+    for (int i = 0; i < childArrows.size(); ++i) {
+        childArrows[i]->mouseReleaseEvent(event);
+    }
 }
