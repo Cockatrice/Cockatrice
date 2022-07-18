@@ -2044,6 +2044,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (card == nullptr) {
         return;
     }
+
     if (startZone != targetZone) {
         card->deleteCardInfoPopup();
     }
@@ -2061,9 +2062,11 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
 
     card->setId(event.new_card_id());
     card->setFaceDown(event.face_down());
-    if(event.shuffle_attached()) {
-        card->shuffleAttachedCards();
-	}
+
+    if (event.swap_indexes_size()) {
+        card->shuffleAttachedCards(event);
+    }
+
     if (startZone != targetZone) {
         card->setBeingPointedAt(false);
         card->setHovered(false);
@@ -2083,7 +2086,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (context.HasExtension(Context_UndoDraw::ext)) {
         emit logUndoDraw(this, card->getName());
     } else {
-        emit logMoveCard(this, card, startZone, logPosition, targetZone, logX, event.shuffle_attached());
+        emit logMoveCard(this, card, startZone, logPosition, targetZone, logX, event.swap_indexes_size() > 0);
     }
 
     targetZone->addCard(card, true, x, y);
@@ -3395,9 +3398,10 @@ void Player::updateCardMenu(const CardItem *card)
                 if (card->getFaceDown()) {
                     cardMenu->addAction(aPeek);
                 }
-                if(card->getAttachedCards().size()) {
+                if (card->getAttachedCards().size() > 1) {
                     cardMenu->addAction(aShuffleAttached);
                 }
+
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
 

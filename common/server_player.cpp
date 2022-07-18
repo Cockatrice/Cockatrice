@@ -420,6 +420,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
     if (cardsToMove.empty()) {
         return Response::RespContextError;
     }
+
     int xIndex = -1;
     bool revealTopStart = false;
     bool revealTopTarget = false;
@@ -457,6 +458,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
             }
         }
+
         if (startzone != targetzone) {
             // Delete all arrows from and to the card
             const QList<Server_Player *> &players = game->getPlayers().values();
@@ -522,7 +524,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             }
             eventOthers.set_y(yCoord);
             eventOthers.set_face_down(faceDown);
-            eventOthers.set_shuffle_attached(shuffleAttached);
 
             Event_MoveCard eventPrivate(eventOthers);
             if (sourceBeingLookedAt || targetzone->getType() != ServerInfo_Zone::HiddenZone ||
@@ -570,6 +571,14 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                     eventOthers.set_card_name(publicCardName.toStdString());
                 }
                 eventOthers.set_new_card_id(card->getId());
+            }
+
+            if (shuffleAttached) {
+                for (int i = card->getAttachedCards().size() - 1; i > 0; i--) {
+                    int j = rng->rand(0, i);
+                    eventOthers.add_swap_indexes(j);
+                    eventPrivate.add_swap_indexes(j);
+                }
             }
 
             ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
@@ -1089,6 +1098,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if (conceded) {
         return Response::RespContextError;
     }
+
     Server_Player *startPlayer = game->getPlayers().value(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
     if (!startPlayer) {
         return Response::RespNameNotFound;
@@ -1114,6 +1124,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if ((startPlayer != this) && (targetPlayer != this) && !judge) {
         return Response::RespContextError;
     }
+
     QList<const CardToMove *> cardsToMove;
     for (int i = 0; i < cmd.cards_to_move().card_size(); ++i) {
         cardsToMove.append(&cmd.cards_to_move().card(i));

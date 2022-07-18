@@ -293,8 +293,8 @@ void MessageLogWidget::logMoveCard(Player *player,
 
     // do not log if moved within the same zone unless we're shuffling
     if (!shuffleAttached && ((startZoneName == tableConstant() && targetZoneName == tableConstant() && !ownerChanged) ||
-                            (startZoneName == handConstant() && targetZoneName == handConstant()) ||
-                            (startZoneName == exileConstant() && targetZoneName == exileConstant()))) {
+                             (startZoneName == handConstant() && targetZoneName == handConstant()) ||
+                             (startZoneName == exileConstant() && targetZoneName == exileConstant()))) {
         return;
     }
 
@@ -318,6 +318,7 @@ void MessageLogWidget::logMoveCard(Player *player,
         appendHtmlServerMessage(tr("%1 shuffles %2's attachments.").arg(sanitizeHtml(player->getName())).arg(cardStr));
         return;
     }
+
     if (ownerChanged && (startZone->getPlayer() == player)) {
         appendHtmlServerMessage(tr("%1 gives %2 control over %3.")
                                     .arg(sanitizeHtml(player->getName()))

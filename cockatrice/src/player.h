@@ -123,12 +123,12 @@ signals:
     void logDrawCards(Player *player, int number);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player,
-                        CardItem *card,
-                        CardZone *startZone,
-                        int oldX,
-                        CardZone *targetZone,
-                        int newX,
-                        bool shuffleAttached = false);
+                     CardItem *card,
+                     CardZone *startZone,
+                     int oldX,
+                     CardZone *targetZone,
+                     int newX,
+                     bool shuffleAttached = false);
     void logFlipCard(Player *player, QString cardName, bool faceDown);
     void logDestroyCard(Player *player, QString cardName);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);

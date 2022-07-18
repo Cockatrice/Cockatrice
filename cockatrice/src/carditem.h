@@ -2,7 +2,7 @@
 #define CARDITEM_H
 
 #include "abstractcarditem.h"
-#include "rng_abstract.h"
+#include "pb/event_move_card.pb.h"
 #include "server_card.h"
 
 class CardDatabase;
@@ -138,17 +138,15 @@ public:
     {
         return attachedCards;
     }
-    void shuffleAttachedCards()
+    void shuffleAttachedCards(const Event_MoveCard &event)
     {
-        if (attachedCards.size() < 2) {
-            return; //cards are already sorted
-        }
-        for (int i = attachedCards.size()-1; i > 0; i--) {
-            int j = rng->rand(0, i);
+        int indCount = event.swap_indexes_size();
+        for (int i = indCount; i > 0; i--) {
+            int temp = event.swap_indexes(indCount - i);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
-            attachedCards.swapItemsAt(j, i);
+            attachedCards.swapItemsAt(temp, i);
 #else
-            attachedCards.swap(j, i);
+            attachedCards.swap(temp, i);
 #endif
         }
     }
