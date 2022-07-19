@@ -574,6 +574,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             }
 
             if (shuffleAttached) {
+                // send swap instructions to each player to stay in sync
                 for (int i = card->getAttachedCards().size() - 1; i > 0; i--) {
                     int j = rng->rand(0, i);
                     eventOthers.add_swap_indexes(j);

@@ -200,6 +200,8 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 {
     if (attachedTo != nullptr) {
         attachedTo->removeAttachedCard(this);
+    } else {
+        setObscured(false);
     }
 
     gridPoint.setX(-1);
@@ -216,6 +218,25 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 
     if (zone != nullptr) {
         zone->reorganizeCards();
+    }
+}
+
+void CardItem::swapAttachedCards(int ind1, int ind2, bool last)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+    attachedCards.swapItemsAt(ind1, ind2);
+#else
+    attachedCards.swap(ind1, ind2);
+#endif
+    attachedCards[ind1]->setObscured(true);
+    if (attachedCards[ind1]->getFaceDown()) {
+        attachedCards[ind1]->setName("");
+    }
+    if (last) {
+        attachedCards[0]->setObscured(true);
+        if (attachedCards[0]->getFaceDown()) {
+            attachedCards[0]->setName("");
+        }
     }
 }
 

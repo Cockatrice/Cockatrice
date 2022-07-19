@@ -19,6 +19,7 @@ AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
+    setObscured(false);
 
     connect(&SettingsCache::instance(), SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
     cardInfoUpdated();
@@ -139,7 +140,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->setBackgroundMode(Qt::OpaqueMode);
         QString nameStr;
         if (facedown)
-            nameStr = "# " + QString::number(id);
+            nameStr = "# " + (obscured ? "???" : QString::number(id));
         else
             nameStr = name;
         painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
@@ -270,6 +271,11 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 {
     facedown = _facedown;
     update();
+}
+
+void AbstractCardItem::setObscured(bool _obscured)
+{
+    obscured = _obscured;
 }
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

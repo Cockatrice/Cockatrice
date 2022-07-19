@@ -2,7 +2,6 @@
 #define CARDITEM_H
 
 #include "abstractcarditem.h"
-#include "pb/event_move_card.pb.h"
 #include "server_card.h"
 
 class CardDatabase;
@@ -133,23 +132,14 @@ public:
     void removeAttachedCard(CardItem *card)
     {
         attachedCards.removeOne(card);
+        card->setObscured(false);
     }
     const QList<CardItem *> &getAttachedCards() const
     {
         return attachedCards;
     }
-    void shuffleAttachedCards(const Event_MoveCard &event)
-    {
-        int indCount = event.swap_indexes_size();
-        for (int i = indCount; i > 0; i--) {
-            int temp = event.swap_indexes(indCount - i);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
-            attachedCards.swapItemsAt(temp, i);
-#else
-            attachedCards.swap(temp, i);
-#endif
-        }
-    }
+    void swapAttachedCards(int ind1, int ind2, bool last = false);
+
     void resetState();
     void processCardInfo(const ServerInfo_Card &info);
 

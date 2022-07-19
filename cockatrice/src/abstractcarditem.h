@@ -18,6 +18,7 @@ protected:
     QString name;
     bool tapped;
     bool facedown;
+    bool obscured;
     int tapAngle;
     QString color;
     QColor bgColor;
@@ -95,6 +96,11 @@ public:
         return facedown;
     }
     void setFaceDown(bool _facedown);
+    bool getObscured() const
+    {
+        return obscured;
+    }
+    void setObscured(bool _obscured);
     void processHoverEvent();
     void deleteCardInfoPopup()
     {

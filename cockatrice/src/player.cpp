@@ -2063,8 +2063,11 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     card->setId(event.new_card_id());
     card->setFaceDown(event.face_down());
 
-    if (event.swap_indexes_size()) {
-        card->shuffleAttachedCards(event);
+    if (event.swap_indexes_size() > 0 && event.swap_indexes_size() <= card->getAttachedCards().size()) {
+        int indCount = event.swap_indexes_size();
+        for (int i = indCount; i > 0; i--) {
+            card->swapAttachedCards(i, event.swap_indexes(indCount - i), i == 1);
+        }
     }
 
     if (startZone != targetZone) {
