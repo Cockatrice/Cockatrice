@@ -13,13 +13,12 @@
 #include <algorithm>
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id, QGraphicsItem *parent)
-    : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0),
+    : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), obscured(false), tapAngle(0),
       bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
-    setObscured(false);
 
     connect(&SettingsCache::instance(), SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
     cardInfoUpdated();
