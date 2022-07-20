@@ -19,7 +19,6 @@ include different targets -->
  - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")
  - <kbd>Debian 10</kbd> ("Buster")
  - <kbd>Debian 11</kbd> ("Bullseye")
- - <kbd>Fedora 34</kbd>
  - <kbd>Fedora 35</kbd>
  - <kbd>Fedora 36</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
