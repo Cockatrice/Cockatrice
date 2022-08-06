@@ -339,6 +339,7 @@ jobs:
           cache: true
           version: ${{matrix.qt_version}}
           arch: win${{matrix.arch}}_${{matrix.qt_arch}}
+          setup-python: false
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
