@@ -91,10 +91,6 @@ jobs:
           - distro: Debian11
             package: DEB
 
-          - distro: Fedora34
-            package: RPM
-            test: skip # gtest does not compile for some reason
-
           - distro: Fedora35
             package: RPM
             test: skip
@@ -108,10 +104,6 @@ jobs:
           - distro: UbuntuFocal
             package: DEB
             test: skip # UbuntuFocal has a broken qt for debug builds
-
-          - distro: UbuntuImpish
-            package: DEB
-            test: skip
 
           - distro: UbuntuJammy
             package: DEB
