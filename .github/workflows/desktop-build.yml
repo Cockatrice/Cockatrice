@@ -298,21 +298,21 @@ jobs:
           - target: Win-32bit
             arch: 32
             vcpkg_default_triplet: x86
-            qt_version: "5.15"
+            qt_version: 5.15
             cmake_generator_platform: Win32
             qt_arch: msvc2019
 
           - target: Win7+-64bit
             arch: 64
             vcpkg_default_triplet: x64
-            qt_version: "5.15"
+            qt_version: 5.15
             cmake_generator_platform: x64
             qt_arch: msvc2019_64
 
           - target: Win10+-64bit
             arch: 64
             vcpkg_default_triplet: x64
-            qt_version: "6.3"
+            qt_version: 6.3
             cmake_generator_platform: x64
             qt_arch: msvc2019_64
             qt_modules: "qt5compat qtmultimedia qtwebsockets"
