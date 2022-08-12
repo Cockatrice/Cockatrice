@@ -800,7 +800,6 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
 void DeckList::updateDeckHash()
 {
     QStringList cardList;
-    bool isValidDeckList = true;
     QSet<QString> hashZones, optionalZones;
 
     hashZones << DECK_ZONE_MAIN << DECK_ZONE_SIDE; // Zones in deck to be included in hashing process
@@ -815,9 +814,6 @@ void DeckList::updateDeckHash()
                 for (int k = 0; k < card->getNumber(); ++k) {
                     cardList.append((node->getName() == DECK_ZONE_SIDE ? "SB:" : "") + card->getName().toLower());
                 }
-            } else if (!optionalZones.contains(node->getName())) // Not a valid zone -> cheater?
-            {
-                isValidDeckList = false; // Deck is invalid
             }
         }
     }
@@ -827,8 +823,7 @@ void DeckList::updateDeckHash()
                      (((quint64)(unsigned char)deckHashArray[1]) << 24) +
                      (((quint64)(unsigned char)deckHashArray[2] << 16)) +
                      (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
-    QString hash = QString::number(number, 32).rightJustified(8, '0');
-    deckHash = (isValidDeckList) ? hash : hash.prepend("INVALID ");
+    deckHash = QString::number(number, 32).rightJustified(8, '0');
 
     emit deckHashChanged();
 }
