@@ -157,6 +157,7 @@ public:
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);
+    void drawAttachArrow();
     void playCard(bool faceDown);
 
 protected:

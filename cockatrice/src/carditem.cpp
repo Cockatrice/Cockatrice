@@ -286,15 +286,36 @@ void CardItem::drawArrow(const QColor &arrowColor)
     scene()->addItem(arrow);
     arrow->grabMouse();
 
-    QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
-    while (itemIterator.hasNext()) {
-        CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
-        if (!c || (c == this))
+    for (const auto &item : scene()->selectedItems()) {
+        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card == nullptr || card == this)
             continue;
-        if (c->getZone() != zone)
+        if (card->getZone() != zone)
             continue;
 
-        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, c, arrowColor);
+        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor);
+        scene()->addItem(childArrow);
+        arrow->addChildArrow(childArrow);
+    }
+}
+
+void CardItem::drawAttachArrow()
+{
+    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+        return;
+
+    auto *arrow = new ArrowAttachItem(this);
+    scene()->addItem(arrow);
+    arrow->grabMouse();
+
+    for (const auto &item : scene()->selectedItems()) {
+        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card == nullptr)
+            continue;
+        if (card->getZone() != zone)
+            continue;
+
+        ArrowAttachItem *childArrow = new ArrowAttachItem(card);
         scene()->addItem(childArrow);
         arrow->addChildArrow(childArrow);
     }
@@ -332,19 +353,19 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         createDragItem(id, event->pos(), event->scenePos(), facedown || forceFaceDown);
         dragItem->grabMouse();
 
-        QList<QGraphicsItem *> sel = scene()->selectedItems();
-        int j = 0;
-        for (int i = 0; i < sel.size(); i++) {
-            CardItem *c = static_cast<CardItem *>(sel.at(i));
-            if ((c == this) || (c->getZone() != zone))
+        int childIndex = 0;
+        for (const auto &item : scene()->selectedItems()) {
+            CardItem *card = static_cast<CardItem *>(item);
+            if ((card == this) || (card->getZone() != zone))
                 continue;
-            ++j;
+            ++childIndex;
             QPointF childPos;
             if (zone->getHasCardAttr())
-                childPos = c->pos() - pos();
+                childPos = card->pos() - pos();
             else
-                childPos = QPointF(j * CARD_WIDTH / 2, 0);
-            CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, c->getFaceDown() || forceFaceDown, dragItem);
+                childPos = QPointF(childIndex * CARD_WIDTH / 2, 0);
+            CardDragItem *drag =
+                new CardDragItem(card, card->getId(), childPos, card->getFaceDown() || forceFaceDown, dragItem);
             drag->setPos(dragItem->pos() + childPos);
             scene()->addItem(drag);
         }

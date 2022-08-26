@@ -3186,9 +3186,7 @@ void Player::actAttach()
         return;
     }
 
-    auto *arrow = new ArrowAttachItem(card);
-    scene()->addItem(arrow);
-    arrow->grabMouse();
+    card->drawAttachArrow();
 }
 
 void Player::actUnattach()
@@ -3197,10 +3195,15 @@ void Player::actUnattach()
         return;
     }
 
-    Command_AttachCard cmd;
-    cmd.set_start_zone(game->getActiveCard()->getZone()->getName().toStdString());
-    cmd.set_card_id(game->getActiveCard()->getId());
-    sendGameCommand(cmd);
+    QList<const ::google::protobuf::Message *> commandList;
+    for (QGraphicsItem *item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        auto *cmd = new Command_AttachCard;
+        cmd->set_start_zone(card->getZone()->getName().toStdString());
+        cmd->set_card_id(card->getId());
+        commandList.append(cmd);
+    }
+    sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actCardCounterTrigger()
