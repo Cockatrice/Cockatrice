@@ -352,10 +352,6 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
           VCPKG_DISABLE_METRICS: 1
 
-      #- name: Install OpenSSL ${{matrix.arch}}-bit
-      #  shell: bash
-      #  run: .ci/download_openssl.sh --arch ${{matrix.arch}}
-
       - name: Build Cockatrice
         id: build
         shell: bash
