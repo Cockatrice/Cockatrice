@@ -14,7 +14,7 @@ if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
       "C:/OpenSSL-Win64"
       "C:/Tools/vcpkg/installed/x64-windows/bin"
       "${_programfiles}/OpenSSL-Win64"
-      "D:/a/Cockatrice/Qt/*/Tools/OpenSSL/*/bin"
+      "D:/a/Cockatrice/Qt/Tools/OpenSSL/*/bin"
   )
   unset(_programfiles)
 elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
@@ -28,7 +28,7 @@ elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
       "C:/Tools/vcpkg/installed/x86-windows/bin"
       "${_programfiles}/OpenSSL"
       "${_programfiles}/OpenSSL-Win32"
-      "D:/a/Cockatrice/Qt/*/Tools/OpenSSL/*/bin"
+      "D:/a/Cockatrice/Qt/Tools/OpenSSL/*/bin"
   )
   unset(_programfiles)
 endif()
