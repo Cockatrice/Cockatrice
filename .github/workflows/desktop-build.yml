@@ -341,6 +341,7 @@ jobs:
           arch: win${{matrix.arch}}_${{matrix.qt_arch}}
           setup-python: false
           modules: ${{matrix.qt_modules}}
+          tools: tools_openssl_${{matrix.arch == 64 && 'x64' || 'x86'}}  # ternary operator styled workaround to get correct arch for openssl
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10.2
@@ -351,9 +352,9 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
           VCPKG_DISABLE_METRICS: 1
 
-      - name: Install OpenSSL ${{matrix.arch}}-bit
-        shell: bash
-        run: .ci/download_openssl.sh --arch ${{matrix.arch}}
+      #- name: Install OpenSSL ${{matrix.arch}}-bit
+      #  shell: bash
+      #  run: .ci/download_openssl.sh --arch ${{matrix.arch}}
 
       - name: Build Cockatrice
         id: build
