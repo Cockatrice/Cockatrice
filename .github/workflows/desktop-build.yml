@@ -341,7 +341,7 @@ jobs:
           arch: win${{matrix.arch}}_${{matrix.qt_arch}}
           setup-python: false
           modules: ${{matrix.qt_modules}}
-          tools: tools_openssl_${{matrix.arch == 64 && 'x64' || 'x86'}}  # ternary operator styled workaround to get correct arch for openssl
+          tools: tools_openssl_${{matrix.arch == 64 && 'x64' || 'x86'}}   # ${{ <if> && <then> || <else> }}
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10.2
