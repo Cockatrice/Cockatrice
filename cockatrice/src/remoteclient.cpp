@@ -541,10 +541,9 @@ void RemoteClient::ping()
         }
     }
 
-    int keepalive = SettingsCache::instance().getKeepAlive();
     int maxTime = timeRunning - lastDataReceived;
     emit maxPingTime(maxTime, maxTimeout);
-    if (maxTime >= (keepalive * maxTimeout)) {
+    if (maxTime >= maxTimeout) {
         disconnectFromServer();
         emit serverTimeout();
     } else {
