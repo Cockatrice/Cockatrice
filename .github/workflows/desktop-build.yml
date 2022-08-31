@@ -296,25 +296,28 @@ jobs:
       matrix:
         include:
           - target: Win-32bit
-            arch: 32
-            vcpkg_default_triplet: x86
-            qt_version: 5.15.*
+            bit: 32
+            arch: x86
             cmake_generator_platform: Win32
+            qt_version: 5.15.*
             qt_arch: msvc2019
+            qt_tools: "tools_openssl_x86"
 
           - target: Win7+-64bit
-            arch: 64
-            vcpkg_default_triplet: x64
-            qt_version: 5.15.*
+            bit: 64
+            arch: x64
             cmake_generator_platform: x64
+            qt_version: 5.15.*
             qt_arch: msvc2019_64
+            qt_tools: "tools_openssl_x64"
 
           - target: Win10+-64bit
-            arch: 64
-            vcpkg_default_triplet: x64
-            qt_version: 6.3.*
+            bit: 64
+            arch: x64
             cmake_generator_platform: x64
+            qt_version: 6.3.*
             qt_arch: msvc2019_64
+            qt_tools: "tools_openssl_x64"
             qt_modules: "qt5compat qtmultimedia qtwebsockets"
 
     name: ${{matrix.target}}
@@ -337,19 +340,19 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
-          version: ${{matrix.qt_version}}
-          arch: win${{matrix.arch}}_${{matrix.qt_arch}}
           setup-python: false
+          version: ${{matrix.qt_version}}
+          arch: win${{matrix.bit}}_${{matrix.qt_arch}}
+          tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
-          tools: tools_openssl_${{matrix.arch == 64 && 'x64' || 'x86'}}   # ${{ <if> && <then> || <else> }}
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10.2
         with:
           runVcpkgInstall: true
-          appendedCacheKey: ${{matrix.arch}}-bit
+          appendedCacheKey: ${{matrix.bit}}-bit
         env:
-          VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
+          VCPKG_DEFAULT_TRIPLET: '${{matrix.arch}}-windows'
           VCPKG_DISABLE_METRICS: 1
 
       - name: Build Cockatrice
@@ -359,7 +362,7 @@ jobs:
           PACKAGE_SUFFIX: '-${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
-          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.bit}}_${{matrix.qt_arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
