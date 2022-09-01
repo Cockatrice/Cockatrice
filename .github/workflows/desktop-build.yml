@@ -195,17 +195,9 @@ jobs:
             type: Debug
             do_tests: 1
 
-          - target: 10.14_Mojave
-            os: macos-10.15 # runs on Catalina
-            xcode: 10.3 # allows compatibility with macOS 10.14
-            qt_version: 5
-            type: Release
-            # do_tests: 1 # tests do not work on qt5?
-            make_package: 1
-
           - target: 10.15_Catalina
-            os: macos-10.15
-            xcode: 12.4
+            os: macos-11
+            xcode: 11.7
             qt_version: 6
             type: Release
             do_tests: 1
