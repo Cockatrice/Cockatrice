@@ -59,11 +59,12 @@ void SoundEngine::playSound(QString fileName)
     }
 
     player->stop();
+    int volumeSliderValue = SettingsCache::instance().getMasterVolume();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    player->audioOutput()->setVolume(SettingsCache::instance().getMasterVolume());
+    player->audioOutput()->setVolume(qreal(volumeSliderValue) / 100);
     player->setSource(QUrl::fromLocalFile(audioData[fileName]));
 #else
-    player->setVolume(SettingsCache::instance().getMasterVolume());
+    player->setVolume(volumeSliderValue);
     player->setMedia(QUrl::fromLocalFile(audioData[fileName]));
 #endif
     player->play();
