@@ -185,6 +185,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     bool attach = false;
                     bool exclude = false;
                     bool variable = false;
+                    bool persistent = false;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
@@ -211,7 +212,11 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         exclude = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count);
+                    if (attrs.hasAttribute("persistent")) {
+                        persistent = true;
+                    }
+
+                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count, persistent);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -294,7 +299,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         if (i->getIsCreateAllExclusion()) {
             xml.writeAttribute("exclude", "exclude");
         }
-
+        if (i->getIsPersistent()) {
+            xml.writeAttribute("persistent", "persistent");
+        }
         if (i->getIsVariable()) {
             if (1 == i->getDefaultCount()) {
                 xml.writeAttribute("count", "x");
@@ -318,6 +325,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
             xml.writeAttribute("exclude", "exclude");
         }
 
+        if (i->getIsPersistent()) {
+            xml.writeAttribute("persistent", "persistent");
+        }
         if (i->getIsVariable()) {
             if (1 == i->getDefaultCount()) {
                 xml.writeAttribute("count", "x");
