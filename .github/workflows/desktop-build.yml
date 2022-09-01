@@ -190,14 +190,14 @@ jobs:
         include:
           - target: Debug # tests only
             os: macos-latest
-            xcode: 12.5.1
+            xcode: 13.0
             qt_version: 6
             type: Debug
             do_tests: 1
 
           - target: 10.15_Catalina
             os: macos-11
-            xcode: 11.7
+            xcode: 11.7 # allows using macOS 10.15 SDK
             qt_version: 6
             type: Release
             do_tests: 1
@@ -205,7 +205,7 @@ jobs:
 
           - target: 11_Big_Sur
             os: macos-11
-            xcode: 13.2
+            xcode: 13.0
             qt_version: 6
             type: Release
             do_tests: 1
