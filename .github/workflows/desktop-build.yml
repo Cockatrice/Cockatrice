@@ -288,25 +288,28 @@ jobs:
       matrix:
         include:
           - target: Win-32bit
-            arch: 32
-            vcpkg_default_triplet: x86
-            qt_version: '5.15.2'
+            bit: 32
+            arch: x86
             cmake_generator_platform: Win32
+            qt_version: 5.15.*
             qt_arch: msvc2019
+            qt_tools: "tools_openssl_x86"
 
           - target: Win7+-64bit
-            arch: 64
-            vcpkg_default_triplet: x64
-            qt_version: '5.15.2'
+            bit: 64
+            arch: x64
             cmake_generator_platform: x64
+            qt_version: 5.15.*
             qt_arch: msvc2019_64
+            qt_tools: "tools_openssl_x64"
 
           - target: Win10+-64bit
-            arch: 64
-            vcpkg_default_triplet: x64
-            qt_version: '6.3.0'
+            bit: 64
+            arch: x64
             cmake_generator_platform: x64
+            qt_version: 6.3.*
             qt_arch: msvc2019_64
+            qt_tools: "tools_openssl_x64"
             qt_modules: "qt5compat qtmultimedia qtwebsockets"
 
     name: ${{matrix.target}}
@@ -325,33 +328,24 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Restore Qt ${{matrix.qt_version}} for ${{matrix.target}} from cache
-        id: cache-qt
-        uses: actions/cache@v1 # Intentionally v1, based on jurplel documentation
-        with:
-          key: QtCache-${{matrix.qt_version}}-${{matrix.target}}
-          path: '${{github.workspace}}/../Qt'
-
       - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
         uses: jurplel/install-qt-action@v3
         with:
-          cached: ${{steps.cache-qt.outputs.cache-hit}}
+          cache: true
+          setup-python: false
           version: ${{matrix.qt_version}}
-          arch: win${{matrix.arch}}_${{matrix.qt_arch}}
+          arch: win${{matrix.bit}}_${{matrix.qt_arch}}
+          tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10.2
         with:
           runVcpkgInstall: true
-          appendedCacheKey: ${{matrix.arch}}-bit
+          appendedCacheKey: ${{matrix.bit}}-bit
         env:
-          VCPKG_DEFAULT_TRIPLET: '${{matrix.vcpkg_default_triplet}}-windows'
+          VCPKG_DEFAULT_TRIPLET: '${{matrix.arch}}-windows'
           VCPKG_DISABLE_METRICS: 1
-
-      - name: Install OpenSSL ${{matrix.arch}}-bit
-        shell: bash
-        run: .ci/download_openssl.sh --arch ${{matrix.arch}}
 
       - name: Build Cockatrice
         id: build
@@ -360,7 +354,7 @@ jobs:
           PACKAGE_SUFFIX: '-${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
-          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.arch}}_${{matrix.qt_arch}}'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.bit}}_${{matrix.qt_arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
