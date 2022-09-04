@@ -239,16 +239,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install dependencies using homebrew
+      - name: Install Qt ${{matrix.qt_version}}
+        uses: jurplel/install-qt-action@v3
+        with:
+          cache: true
+          setup-python: false
+          version: ${{matrix.qt_version}}
+
+      - name: Install protobuf using homebrew
         shell: bash
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
-        env:
-          qt_version: 'qt@${{matrix.qt_version}}'
         run: |
           brew update
           brew install protobuf
-          brew install "$qt_version" --force-bottle
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
