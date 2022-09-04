@@ -263,7 +263,7 @@ jobs:
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
           # set QTDIR to find qt5, qt6 can be found without this
-          QTDIR: '/Users/runner/work/Cockatrice/Qt'
+          QTDIR: '/usr/local/opt/qt5'
         # Mac machines actually have 3 cores
         run: .ci/compile.sh --server --parallel 3
 
