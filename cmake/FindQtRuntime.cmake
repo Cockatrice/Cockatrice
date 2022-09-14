@@ -53,19 +53,25 @@ function(have_qt6)
     # Copy all new variables to parent scope, as if we weren't in a function
     # A bit of an ugly hack, but I don't think there's a nicer way
     get_cmake_property(_vars VARIABLES)
-    foreach (_var ${_vars})
+    foreach(_var ${_vars})
       list(FIND _parent_vars ${_var} _idx)
       # FIND gives the index which starts at 0, or -1 for not found
       # Add 1 so we have a truthy value for every index and 0 for not found
       math(EXPR _in_list "${_idx} + 1")
       # if not in parent_scope (i.e. newly set)
       if(NOT ${_in_list})
-        set(${_var} ${${_var}} PARENT_SCOPE)
+        set(${_var}
+            ${${_var}}
+            PARENT_SCOPE
+        )
       endif()
     endforeach()
   else()
     # Only add Qt6_FOUND to parent scope to avoid misconfiguring Qt5 when Qt6 is partially present
-    set(Qt6_FOUND ${Qt6_FOUND} PARENT_SCOPE)
+    set(Qt6_FOUND
+        ${Qt6_FOUND}
+        PARENT_SCOPE
+    )
   endif()
 endfunction()
 
