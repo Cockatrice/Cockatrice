@@ -141,7 +141,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // DETECT CARD POSITIONING INFO
 
     // cards that enter the field tapped
-    bool cipt = text.contains("Hideaway") || text.contains(" it enters the battlefield tapped") ||
+    bool cipt = text.contains(" it enters the battlefield tapped") ||
                 (text.contains(name + " enters the battlefield tapped") &&
                  !text.contains(name + " enters the battlefield tapped unless"));
 
