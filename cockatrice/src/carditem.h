@@ -37,9 +37,6 @@ private:
     QMenu *cardMenu, *ptMenu, *moveMenu;
 
     void prepareDelete();
-    void resetCursor();
-signals:
-    void resetCursorSignal();
 public slots:
     void deleteLater();
 

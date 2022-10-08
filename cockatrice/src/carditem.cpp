@@ -33,8 +33,6 @@ CardItem::CardItem(Player *_owner,
     ptMenu = new QMenu;
     moveMenu = new QMenu;
 
-    connect(this, SIGNAL(resetCursorSignal()), this, SLOT(resetCursor()));
-
     retranslateUi();
 }
 
@@ -392,7 +390,8 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
         if (cardMenu != nullptr && !cardMenu->isEmpty() && owner != nullptr) {
-            cardMenu->exec(event->screenPos());
+            cardMenu->popup(event->screenPos());
+            return;
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
                (!SettingsCache::instance().getDoubleClickToPlay())) {
@@ -409,15 +408,10 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    emit resetCursorSignal();
-    AbstractCardItem::mouseReleaseEvent(event);
-}
-
-void CardItem::resetCursor()
-{
     if (owner != nullptr) { // cards without owner will be deleted
         setCursor(Qt::OpenHandCursor);
     }
+    AbstractCardItem::mouseReleaseEvent(event);
 }
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
