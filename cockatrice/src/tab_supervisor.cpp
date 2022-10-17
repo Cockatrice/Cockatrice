@@ -687,12 +687,12 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 
 bool TabSupervisor::isOwnUserRegistered() const
 {
-    return static_cast<bool>(getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
+    return userInfo != nullptr && (userInfo->user_level() & ServerInfo_User::IsRegistered) != 0;
 }
 
 QString TabSupervisor::getOwnUsername() const
 {
-    return userInfo ? QString::fromStdString(userInfo->name()) : QString();
+    return userInfo != nullptr ? QString::fromStdString(userInfo->name()) : QString();
 }
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
