@@ -68,7 +68,7 @@ public:
     }
     void setCardsBeingLookedAt(int _cardsBeingLookedAt)
     {
-        cardsBeingLookedAt = _cardsBeingLookedAt;
+        cardsBeingLookedAt = qMax(0, _cardsBeingLookedAt);
     }
     bool isCardAtPosLookedAt(int pos) const;
     bool hasCoords() const

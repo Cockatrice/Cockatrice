@@ -337,7 +337,11 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
     ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
     ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 
-    revealTopCardIfNeeded(deckZone, ges);
+    if (number > 0) {
+        revealTopCardIfNeeded(deckZone, ges);
+        int currentKnownCards = deckZone->getCardsBeingLookedAt();
+        deckZone->setCardsBeingLookedAt(currentKnownCards - number);
+    }
 
     return Response::RespOk;
 }
