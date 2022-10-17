@@ -15,7 +15,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="../src/oraclewizard.cpp" line="195"/>
         <source>Interface language:</source>
-        <translation type="unfinished"/>
+        <translation>Lingua dell&apos;interfaccia:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="196"/>
