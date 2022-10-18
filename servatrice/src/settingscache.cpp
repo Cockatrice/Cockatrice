@@ -19,7 +19,7 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
 #endif
     disallowedRegExpStr.removeDuplicates();
     for (const QString &regExpStr : disallowedRegExpStr) {
-        disallowedRegExp.append(QRegularExpression(QRegularExpression::anchoredPattern(regExpStr)));
+        disallowedRegExp.append(QRegularExpression(QString("\\A%1\\z").arg(regExpStr)));
     }
 }
 
