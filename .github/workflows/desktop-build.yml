@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.6.0
+        uses: styfle/cancel-workflow-action@0.9.1
         with:
           access_token: ${{github.token}} # needs other token https://github.com/styfle/cancel-workflow-action/issues/7
 
@@ -49,7 +49,7 @@ jobs:
 
       - name: Checkout
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -121,7 +121,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get cache timestamp
         id: cache_timestamp
@@ -129,7 +129,7 @@ jobs:
         run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
 
       - name: Restore cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
         with:
@@ -166,7 +166,7 @@ jobs:
 
       - name: Upload artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{matrix.distro}}-package
           path: ${{steps.package.outputs.path}}
@@ -237,7 +237,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies using homebrew
         shell: bash
@@ -265,7 +265,7 @@ jobs:
 
       - name: Upload artifact
         if: matrix.make_package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: macOS-${{matrix.target}}-dmg
           path: ${{steps.build.outputs.path}}
