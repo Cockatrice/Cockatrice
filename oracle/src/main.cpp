@@ -8,7 +8,6 @@
 #include <QCommandLineParser>
 #include <QIcon>
 #include <QLibraryInfo>
-#include <QTextCodec>
 #include <QTranslator>
 
 QTranslator *translator, *qtTranslator;

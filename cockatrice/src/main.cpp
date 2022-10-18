@@ -43,7 +43,6 @@
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QSystemTrayIcon>
-#include <QTextCodec>
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>

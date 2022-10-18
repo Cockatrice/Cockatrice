@@ -32,7 +32,6 @@
 #include <QDateTime>
 #include <QFile>
 #include <QMetaType>
-#include <QTextCodec>
 #include <QtGlobal>
 #include <iostream>
 

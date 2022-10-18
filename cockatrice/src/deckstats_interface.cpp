@@ -7,7 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrlQuery>
 
 DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent)
@@ -20,7 +20,7 @@ DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *par
 void DeckStatsInterface::queryFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::critical(0, tr("Error"), reply->errorString());
+        QMessageBox::critical(nullptr, tr("Error"), reply->errorString());
         reply->deleteLater();
         deleteLater();
         return;
@@ -29,14 +29,15 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     QString data(reply->readAll());
     reply->deleteLater();
 
-    QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
-    if (-1 == rx.indexIn(data)) {
-        QMessageBox::critical(0, tr("Error"), tr("The reply from the server could not be parsed."));
+    static const QRegularExpression rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
+    auto match = rx.match(data);
+    if (!match.hasMatch()) {
+        QMessageBox::critical(nullptr, tr("Error"), tr("The reply from the server could not be parsed."));
         deleteLater();
         return;
     }
 
-    QString deckUrl = rx.cap(1);
+    QString deckUrl = match.captured(1);
     QDesktopServices::openUrl(deckUrl);
 
     deleteLater();
