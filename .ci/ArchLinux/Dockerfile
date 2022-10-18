@@ -8,7 +8,6 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         gtest \
         mariadb-libs \
         protobuf \
-        qt6-5compat \
         qt6-base \
         qt6-multimedia \
         qt6-svg \
