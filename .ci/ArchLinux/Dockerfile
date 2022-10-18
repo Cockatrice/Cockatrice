@@ -8,9 +8,11 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         gtest \
         mariadb-libs \
         protobuf \
-        qt5-base \
-        qt5-multimedia \
-        qt5-svg \
-        qt5-tools \
-        qt5-websockets \
+        qt6-5compat \
+        qt6-base \
+        qt6-multimedia \
+        qt6-svg \
+        qt6-tools \
+        qt6-translations \
+        qt6-websockets \
     && pacman --sync --clean --clean --noconfirm
