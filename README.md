@@ -93,18 +93,16 @@ Oracle can optionally use zlib and xz to load compressed files:
 
 To compile:
 
-    mkdir build
-    cd build
-    cmake ..
-    make
+    cmake -S . -B build
+    cmake --build build
 
 You can then run
 
-    make install
+    cmake --build build --target install
 
 to get a cockatrice installation inside the `release` folder, or:
 
-    make package
+    cmake --build build --target package
 
 to create a system-specific installation package.
 
