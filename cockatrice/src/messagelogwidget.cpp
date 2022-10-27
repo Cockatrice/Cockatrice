@@ -364,11 +364,12 @@ void MessageLogWidget::logMoveCard(Player *player,
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
 {
+    int deckSize = player->getZones().value("deck")->getCards().size();
     soundEngine->playSound("draw_card");
     if (currentContext == MessageContext_Mulligan) {
         logMulligan(player, number);
     } else {
-        if (number == 0 && player->getZones().find()) {
+        if (deckSize == 0) {
             appendHtmlServerMessage(tr("%1 had no cards left to draw.", "")
                                     .arg(sanitizeHtml(player->getName())));
         }
