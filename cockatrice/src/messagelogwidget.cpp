@@ -368,9 +368,15 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
     if (currentContext == MessageContext_Mulligan) {
         logMulligan(player, number);
     } else {
-        appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
+        if (number == 0) {
+            appendHtmlServerMessage(tr("%1 had no cards left to draw.", "")
+                                    .arg(sanitizeHtml(player->getName())));
+        }
+        else {
+            appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg("<font class=\"blue\">" + QString::number(number) + "</font>"));
+        }
     }
 }
 
