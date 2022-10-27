@@ -368,7 +368,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
     if (currentContext == MessageContext_Mulligan) {
         logMulligan(player, number);
     } else {
-        if (number == 0) {
+        if (number == 0 && player->getZones().find()) {
             appendHtmlServerMessage(tr("%1 had no cards left to draw.", "")
                                     .arg(sanitizeHtml(player->getName())));
         }
