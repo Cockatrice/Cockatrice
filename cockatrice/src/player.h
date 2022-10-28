@@ -120,7 +120,7 @@ signals:
                         QString targetCard,
                         bool _playerTarget);
     void logCreateToken(Player *player, QString cardName, QString pt);
-    void logDrawCards(Player *player, int number);
+    void logDrawCards(Player *player, int number, bool deckIsEmpty);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
     void logFlipCard(Player *player, QString cardName, bool faceDown);

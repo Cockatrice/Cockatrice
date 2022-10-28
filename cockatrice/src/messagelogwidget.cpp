@@ -362,15 +362,14 @@ void MessageLogWidget::logMoveCard(Player *player,
     }
 }
 
-void MessageLogWidget::logDrawCards(Player *player, int number)
+void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty)
 {
-    int deckSize = player->getZones().value("deck")->getCards().size();
     soundEngine->playSound("draw_card");
     if (currentContext == MessageContext_Mulligan) {
         logMulligan(player, number);
     } else {
-        if (deckSize == 0  && number == 0) {
-            appendHtmlServerMessage(tr("%1 has no cards left to draw.")
+        if (deckIsEmpty && number == 0) {
+            appendHtmlServerMessage(tr("%1 tries to draw from an empty library", "")
                                     .arg(sanitizeHtml(player->getName())));
         }
         else {
@@ -824,7 +823,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logAttachCard(Player *, QString, Player *, QString)));
     connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));
     connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
-    connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
+    connect(player, SIGNAL(logDrawCards(Player *, int, bool)), this, SLOT(logDrawCards(Player *, int, bool)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
     connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)), this,
             SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)));
