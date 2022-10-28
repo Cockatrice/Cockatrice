@@ -370,7 +370,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
         logMulligan(player, number);
     } else {
         if (deckSize == 0  && number == 0) {
-            appendHtmlServerMessage(tr("%1 had no cards left to draw.", "")
+            appendHtmlServerMessage(tr("%1 has no cards left to draw.")
                                     .arg(sanitizeHtml(player->getName())));
         }
         else {
