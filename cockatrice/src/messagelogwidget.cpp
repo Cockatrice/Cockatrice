@@ -369,13 +369,11 @@ void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty
         logMulligan(player, number);
     } else {
         if (deckIsEmpty && number == 0) {
-            appendHtmlServerMessage(tr("%1 tries to draw from an empty library", "")
-                                    .arg(sanitizeHtml(player->getName())));
-        }
-        else {
+            appendHtmlServerMessage(tr("%1 tries to draw from an empty library").arg(sanitizeHtml(player->getName())));
+        } else {
             appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font class=\"blue\">" + QString::number(number) + "</font>"));
+                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg("<font class=\"blue\">" + QString::number(number) + "</font>"));
         }
     }
 }
