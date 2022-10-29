@@ -30,9 +30,9 @@ export const ToastProvider: FC<ReactNode> = (props) => {
   const providerState = {
     toasts: state.toasts,
     addToast: (key, children) => dispatch({ type: ACTIONS.ADD_TOAST, payload: { key, children } }),
-    openToast: key => dispatch({ type: ACTIONS.OPEN_TOAST, payload: key }),
-    closeToast: key => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: key }),
-    removeToast: key => dispatch({ type: ACTIONS.REMOVE_TOAST, payload: key }),
+    openToast: key => dispatch({ type: ACTIONS.OPEN_TOAST, payload: { key } }),
+    closeToast: key => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } }),
+    removeToast: key => dispatch({ type: ACTIONS.REMOVE_TOAST, payload: { key } }),
   }
   return (
     <ToastContext.Provider value={providerState}>
@@ -41,7 +41,7 @@ export const ToastProvider: FC<ReactNode> = (props) => {
         {Array.from(state.toasts).map(([key, value]) => {
           const { isOpen, children } = value;
           return (
-            <Toast key={key} open={isOpen} onClose={() => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: key })}>
+            <Toast key={key} open={isOpen} onClose={() => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } })}>
               {children}
             </Toast>
           )
