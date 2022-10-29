@@ -2216,7 +2216,7 @@ void Player::eventDrawCards(const Event_DrawCards &event)
 
     hand->reorganizeCards();
     deck->reorganizeCards();
-    emit logDrawCards(this, event.number());
+    emit logDrawCards(this, event.number(), deck->getCards().size() == 0);
 }
 
 void Player::eventRevealCards(const Event_RevealCards &event)
