@@ -26,7 +26,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
-UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
+UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
 {
     aUserName = new QAction(QString(), this);

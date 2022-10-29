@@ -831,7 +831,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logAlwaysLookAtTopCard(Player *, CardZone *, bool)));
 }
 
-MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor,
+MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor,
                                    const UserlistProxy *_userlistProxy,
                                    TabGame *_game,
                                    QWidget *parent)

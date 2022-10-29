@@ -10,6 +10,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
 #include "tab_account.h"
+#include "tab_game.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
 
@@ -26,7 +27,7 @@
 #include <QVBoxLayout>
 
 GameSelector::GameSelector(AbstractClient *_client,
-                           const TabSupervisor *_tabSupervisor,
+                           TabSupervisor *_tabSupervisor,
                            TabRoom *_room,
                            const QMap<int, QString> &_rooms,
                            const QMap<int, GameTypeMap> &_gameTypes,
@@ -239,6 +240,9 @@ void GameSelector::actJoin()
     if (!ind.isValid())
         return;
     const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+    if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
+        return;
+    }
     bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
