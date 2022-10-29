@@ -4,6 +4,7 @@
 # where SUFFIX is either available in the environment or as the first arg
 # if MAKE_ZIP is set instead a zip is made
 # expected to be run in the build directory unless BUILD_DIR is set
+# adds output to GITHUB_OUTPUT
 builddir="${BUILD_DIR:=.}"
 findrx="Cockatrice-*.*"
 
@@ -50,5 +51,5 @@ fi
 cd "$oldpwd"
 relative_path="$path/$filename"
 ls -l "$relative_path"
-echo "::set-output name=path::$relative_path"
-echo "::set-output name=name::$filename"
+echo "path=$relative_path" >>"$GITHUB_OUTPUT"
+echo "name=$filename" >>"$GITHUB_OUTPUT"

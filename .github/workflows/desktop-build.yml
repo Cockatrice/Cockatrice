@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.9.1
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{github.token}} # needs other token https://github.com/styfle/cancel-workflow-action/issues/7
 
@@ -41,11 +41,11 @@ jobs:
           elif [[ $GITHUB_REF =~ $tag_regex ]]; then # release
             sha="$GITHUB_SHA"
             tag="${GITHUB_REF/refs\/tags\//}"
-            echo "::set-output name=tag::$tag"
+            echo "tag=$tag" >>"$GITHUB_OUTPUT"
           else # push to branch
             sha="$GITHUB_SHA"
           fi
-          echo "::set-output name=sha::$sha"
+          echo "sha=$sha" >>"$GITHUB_OUTPUT"
 
       - name: Checkout
         if: steps.configure.outputs.tag != null
@@ -126,7 +126,7 @@ jobs:
       - name: Get cache timestamp
         id: cache_timestamp
         shell: bash
-        run: echo "::set-output name=timestamp::$(date -u '+%Y%m%d%H%M%S')"
+        run: echo "timestamp=$(date -u '+%Y%m%d%H%M%S')" >>"$GITHUB_OUTPUT"
 
       - name: Restore cache
         uses: actions/cache@v3
@@ -156,13 +156,15 @@ jobs:
         if: matrix.package != 'skip'
         shell: bash
         env:
-          suffix: '-${{matrix.distro}}'
-          type: '${{matrix.package}}'
+          BUILD_DIR: build
+          SUFFIX: '-${{matrix.distro}}'
           distro: '${{matrix.distro}}'
+          type: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --suffix "$suffix" \
+          RUN --server --release --package "$type" --dir "$BUILD_DIR" \
                   --ccache "$CCACHE_SIZE" --parallel 2
+          .ci/name_build.sh
 
       - name: Upload artifact
         if: matrix.package != 'skip'
@@ -339,7 +341,7 @@ jobs:
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@v10.2
+        uses: lukka/run-vcpkg@v10.6
         with:
           runVcpkgInstall: true
           appendedCacheKey: ${{matrix.bit}}-bit
