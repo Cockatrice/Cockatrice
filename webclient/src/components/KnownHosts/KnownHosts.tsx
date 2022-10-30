@@ -23,6 +23,12 @@ import Toast from 'components/Toast/Toast';
 
 import './KnownHosts.css';
 
+enum TestConnection {
+  TESTING = 'testing',
+  FAILED = 'failed',
+  SUCCESS = 'success',
+}
+
 const PREFIX = 'KnownHosts';
 
 const classes = {
@@ -52,12 +58,6 @@ const Root = styled('div')(({ theme }) => ({
     }
   }
 }));
-
-enum TestConnection {
-  TESTING = 'testing',
-  FAILED = 'failed',
-  SUCCESS = 'success',
-}
 
 const KnownHosts = (props) => {
   const { input: { onChange }, meta, disabled } = props;
