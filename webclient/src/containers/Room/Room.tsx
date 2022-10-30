@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useParams, generatePath } from 'react-router-dom';
 
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { RoomsService } from 'api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';

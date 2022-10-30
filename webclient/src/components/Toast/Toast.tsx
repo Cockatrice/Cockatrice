@@ -1,10 +1,10 @@
 import * as React from 'react'
 import ReactDOM from 'react-dom'
 
-import Alert, { AlertProps } from '@material-ui/lab/Alert';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import Slide, { SlideProps } from '@material-ui/core/Slide';
-import Snackbar from '@material-ui/core/Snackbar';
+import Alert, { AlertProps } from '@mui/material/Alert';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Slide, { SlideProps } from '@mui/material/Slide';
+import Snackbar from '@mui/material/Snackbar';
 
 const iconMapping = {
   success: <CheckCircleIcon />

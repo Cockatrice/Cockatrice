@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useNavigate, generatePath } from 'react-router-dom';
-import AppBar from '@material-ui/core/AppBar';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import Toolbar from '@material-ui/core/Toolbar';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import CloseIcon from '@material-ui/icons/Close';
-import MailOutlineRoundedIcon from '@material-ui/icons/MailOutline';
-import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
+import AppBar from '@mui/material/AppBar';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Toolbar from '@mui/material/Toolbar';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CloseIcon from '@mui/icons-material/Close';
+import MailOutlineRoundedIcon from '@mui/icons-material/MailOutline';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import * as _ from 'lodash';
 
 import { AuthenticationService, RoomsService } from 'api';
@@ -128,12 +128,12 @@ const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
               </nav>
               <div className="Header-nav__actions">
                 <div className="Header-nav__action">
-                  <IconButton>
+                  <IconButton size="large">
                     <MailOutlineRoundedIcon style={{ color: 'inherit' }} />
                   </IconButton>
                 </div>
                 <div className="Header-nav__action">
-                  <IconButton onClick={handleMenuOpen}>
+                  <IconButton onClick={handleMenuOpen} size="large">
                     <MenuRoundedIcon style={{ color: 'inherit' }} />
                   </IconButton>
                   <Menu
@@ -170,7 +170,7 @@ const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
         handleClose={closeImportCardWizard}
       ></CardImportDialog>
     </AppBar>
-  )
+  );
 }
 
 interface HeaderProps {

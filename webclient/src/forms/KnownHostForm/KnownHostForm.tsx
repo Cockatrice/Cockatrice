@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form'
 import { useTranslation } from 'react-i18next';
 
-import Button from '@material-ui/core/Button';
-import AnchorLink from '@material-ui/core/Link';
+import Button from '@mui/material/Button';
+import AnchorLink from '@mui/material/Link';
 
 import { InputField } from 'components';
 

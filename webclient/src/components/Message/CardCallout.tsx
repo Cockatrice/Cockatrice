@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { useMemo, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Popover from '@material-ui/core/Popover';
+import makeStyles from '@mui/styles/makeStyles';
+import Popover from '@mui/material/Popover';
 
 import { CardDTO, TokenDTO } from 'services';
 
