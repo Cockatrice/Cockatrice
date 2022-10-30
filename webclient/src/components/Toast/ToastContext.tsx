@@ -1,4 +1,4 @@
-import { createContext, FC, ReactChild, ReactNode, useContext, useEffect, useReducer, ContextType, Context } from 'react'
+import { createContext, FC, PropsWithChildren, ReactChild, ReactNode, useContext, useEffect, useReducer, ContextType, Context } from 'react'
 
 import { ACTIONS, initialState, reducer } from './reducer';
 import Toast from './Toast'
@@ -24,7 +24,7 @@ const ToastContext: Context<any> = createContext<ToastState>({
   removeToast: (key) => {},
 });
 
-export const ToastProvider: FC<ReactNode> = (props) => {
+export const ToastProvider: FC<PropsWithChildren> = (props) => {
   const { children } = props
   const [state, dispatch] = useReducer(reducer, initialState)
   const providerState = {
