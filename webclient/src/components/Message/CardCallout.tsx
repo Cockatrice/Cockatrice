@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import React, { useMemo, useState } from 'react';
-import makeStyles from '@mui/styles/makeStyles';
+import { styled } from '@mui/material/styles';
 import Popover from '@mui/material/Popover';
 
 import { CardDTO, TokenDTO } from 'services';
@@ -10,17 +10,24 @@ import TokenDetails from '../TokenDetails/TokenDetails';
 
 import './CardCallout.css';
 
-const useStyles = makeStyles(theme => ({
-  popover: {
+const PREFIX = 'CardCallout';
+
+const classes = {
+  popover: `${PREFIX}-popover`,
+  popoverContent: `${PREFIX}-popoverContent`
+};
+
+const Root = styled('span')(({ theme }) => ({
+  [`& .${classes.popover}`]: {
     pointerEvents: 'none',
   },
-  popoverContent: {
+
+  [`& .${classes.popoverContent}`]: {
     pointerEvents: 'none',
-  },
+  }
 }));
 
 const CardCallout = ({ name }) => {
-  const classes = useStyles();
   const [card, setCard] = useState<CardDTO>(null);
   const [token, setToken] = useState<TokenDTO>(null);
   const [anchorEl, setAnchorEl] = useState<Element>(null);
@@ -48,7 +55,7 @@ const CardCallout = ({ name }) => {
   const open = Boolean(anchorEl);
 
   return (
-    <span className='callout'>
+    <Root className='callout'>
       <span
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
@@ -80,7 +87,7 @@ const CardCallout = ({ name }) => {
           </Popover>
         )
       }
-    </span>
+    </Root>
   );
 };
 

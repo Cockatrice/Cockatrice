@@ -10,11 +10,6 @@ import './i18n';
 
 import './index.css';
 
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
-
 const AppWithMaterialTheme = () => (
   <StyledEngineProvider injectFirst>
     <ThemeProvider theme={materialTheme}>

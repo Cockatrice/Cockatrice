@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { styled } from '@mui/material/styles';
 import { useTranslation, Trans } from 'react-i18next';
 import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import makeStyles from '@mui/styles/makeStyles';
 import Typography from '@mui/material/Typography';
 
 import { Images } from 'images';
@@ -11,8 +11,14 @@ import { RouteEnum } from 'types';
 
 import './Initialize.css';
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const PREFIX = 'Initialize';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& .Initialize-graphics': {
       color: theme.palette.primary.contrastText,
     },
@@ -20,17 +26,16 @@ const useStyles = makeStyles(theme => ({
     '& .Initialize-graphics__bar': {
       backgroundColor: theme.palette.primary.contrastText,
     },
-  },
+  }
 }));
 
 const Initialize = ({ initialized }: InitializeProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   return initialized
     ? <Navigate to={RouteEnum.LOGIN} />
     : (
-      <div className={'Initialize ' + classes.root}>
+      <Root className={'Initialize ' + classes.root}>
         <div className='Initialize-content'>
           <img src={Images.Logo} alt="logo" />
           <Typography variant="subtitle1" className='subtitle'>{ t('InitializeContainer.title') }</Typography>
@@ -48,7 +53,7 @@ const Initialize = ({ initialized }: InitializeProps) => {
           <div className="topBar Initialize-graphics__bar" />
           <div className="bottomBar Initialize-graphics__bar" />
         </div>
-      </div>
+      </Root>
     );
 }
 

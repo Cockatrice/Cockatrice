@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
+import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import makeStyles from '@mui/styles/makeStyles';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -20,8 +20,14 @@ import { ServerSelectors, ServerTypes } from 'store';
 import './Login.css';
 import { useToast } from 'components/Toast';
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const PREFIX = 'Login';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& .login-content__header': {
       color: theme.palette.success.light
     },
@@ -54,11 +60,10 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
       },
     },
-  },
+  }
 }));
 
 const Login = ({ state, description, connectOptions }: LoginProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const isConnected = AuthenticationService.isConnected(state);
@@ -220,7 +225,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
   };
 
   return (
-    <div className={'login overflow-scroll ' + classes.root}>
+    <Root className={'login overflow-scroll ' + classes.root}>
       { isConnected && <Navigate to={RouteEnum.SERVER} />}
 
       <div className="login__wrapper">
@@ -333,7 +338,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
         onSubmit={handleAccountActivationDialogSubmit}
         handleClose={closeActivateAccountDialog}
       />
-    </div>
+    </Root>
   );
 }
 

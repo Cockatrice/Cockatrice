@@ -1,9 +1,9 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import makeStyles from '@mui/styles/makeStyles';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
@@ -13,16 +13,21 @@ import { KnownHostForm } from 'forms';
 
 import './KnownHostDialog.css';
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const PREFIX = 'KnownHostDialog';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& .dialog-title__wrapper': {
       borderColor: theme.palette.grey[300]
     }
-  },
+  }
 }));
 
 const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const mode = host ? 'edit' : 'add';
@@ -34,7 +39,7 @@ const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any)
   };
 
   return (
-    <Dialog className={'KnownHostDialog ' + classes.root} onClose={handleOnClose} open={isOpen}>
+    <StyledDialog className={'KnownHostDialog ' + classes.root} onClose={handleOnClose} open={isOpen}>
       <DialogTitle className='dialog-title'>
         <div className='dialog-title__wrapper'>
           <Typography variant='h2'>{ t('KnownHostDialog.title', { mode }) }</Typography>
@@ -52,7 +57,7 @@ const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any)
         </Typography>
         <KnownHostForm onRemove={onRemove} onSubmit={onSubmit} host={host}></KnownHostForm>
       </DialogContent>
-    </Dialog>
+    </StyledDialog>
   );
 };
 
