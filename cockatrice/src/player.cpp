@@ -594,7 +594,7 @@ void Player::removePlayer(Player *player)
 void Player::playerListActionTriggered()
 {
     auto *action = static_cast<QAction *>(sender());
-    auto *menu = static_cast<QMenu *>(action->parentWidget());
+    auto *menu = static_cast<QMenu *>(action->parent());
 
     Command_RevealCards cmd;
     const int otherPlayerId = action->data().toInt();
