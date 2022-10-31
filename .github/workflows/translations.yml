@@ -50,7 +50,7 @@ jobs:
         run: |
           set +e # do not fail, just save the exit state
           git diff --exit-code
-          echo "::set-output name=deploy::$?"
+          echo "deploy=$?" >>"$GITHUB_OUTPUT"
 
       - name: Commit changes
         if: steps.check.outputs.deploy == '1'
