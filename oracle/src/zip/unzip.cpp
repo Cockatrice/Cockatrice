@@ -465,7 +465,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
     quint16 commentLength = getUShort((const unsigned char*)buffer1, UNZIP_EOCD_OFF_COMMLEN + 4);
     if (commentLength != 0) {
         QByteArray c = device->read(commentLength);
-        if (c.count() != commentLength)
+        if (c.size() != commentLength)
             return UnZip::ReadFailed;
 
         comment = c;

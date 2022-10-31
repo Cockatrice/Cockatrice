@@ -310,7 +310,7 @@ jobs:
             qt_version: 6.3.*
             qt_arch: msvc2019_64
             qt_tools: "tools_openssl_x64"
-            qt_modules: "qt5compat qtmultimedia qtwebsockets"
+            qt_modules: "qtmultimedia qtwebsockets"
 
     name: ${{matrix.target}}
     needs: configure
