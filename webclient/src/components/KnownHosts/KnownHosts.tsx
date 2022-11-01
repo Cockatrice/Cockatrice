@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { Select, MenuItem } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -7,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 import WifiTetheringIcon from '@mui/icons-material/WifiTethering';
 import PortableWifiOffIcon from '@mui/icons-material/PortableWifiOff';
 import InputLabel from '@mui/material/InputLabel';
-import makeStyles from '@mui/styles/makeStyles';
 import Check from '@mui/icons-material/Check';
 import AddIcon from '@mui/icons-material/Add';
 import EditRoundedIcon from '@mui/icons-material/Edit';
@@ -29,8 +29,14 @@ enum TestConnection {
   SUCCESS = 'success',
 }
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const PREFIX = 'KnownHosts';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& .KnownHosts-error': {
       color: theme.palette.error.main
     },
@@ -50,13 +56,13 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.success.main
       }
     }
-  },
+  }
 }));
 
 const KnownHosts = (props) => {
   const { input: { onChange }, meta, disabled } = props;
   const { touched, error, warning } = meta;
-  const classes = useStyles();
+
   const { t } = useTranslation();
 
   const [hostsState, setHostsState] = useState({
@@ -195,7 +201,7 @@ const KnownHosts = (props) => {
   }
 
   return (
-    <div className={'KnownHosts ' + classes.root}>
+    <Root className={'KnownHosts ' + classes.root}>
       <FormControl className='KnownHosts-form' size='small' variant='outlined'>
         { touched && (
           <div className='KnownHosts-validation'>
@@ -272,8 +278,8 @@ const KnownHosts = (props) => {
       <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>{ t('KnownHosts.toast', { mode: 'created' }) }</Toast>
       <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>{ t('KnownHosts.toast', { mode: 'deleted' }) }</Toast>
       <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>{ t('KnownHosts.toast', { mode: 'edited' }) }</Toast>
-    </div>
-  )
+    </Root>
+  );
 };
 
 export default KnownHosts;

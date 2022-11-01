@@ -215,7 +215,10 @@ export const materialTheme = createTheme({
       lineHeight: 1.4,
       color: palette.grey[500],
     },
-    // body1: {},
+    body1: {
+      fontSize: '.75rem',
+      lineHeight: 1.4,
+    },
     // body2: {},
     // button: {},
     // caption: {},
