@@ -426,7 +426,7 @@ void AppearanceSettingsPage::retranslateUi()
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
 
     handGroupBox->setTitle(tr("Hand layout"));
-    horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
+    horizontalHandCheckBox.setText(tr("Display hand horizontally (requires more space)"));
     leftJustifiedHandCheckBox.setText(tr("Enable left justification"));
 
     tableGroupBox->setTitle(tr("Table grid layout"));
@@ -810,6 +810,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
+    mentionColor->setPlaceholderText(tr("Enter HEX code"));
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
@@ -831,29 +832,36 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
-    chatGrid->addWidget(&invertMentionForeground, 0, 1);
+    chatGrid->addWidget(&mentionColorStringLabel, 0, 1, Qt::AlignRight);
     chatGrid->addWidget(mentionColor, 0, 2);
-    chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0);
-    chatGrid->addWidget(&hexLabel, 1, 2);
-    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
-    chatGrid->addWidget(&messagePopups, 4, 0);
-    chatGrid->addWidget(&mentionPopups, 5, 0);
-    chatGrid->addWidget(&roomHistory, 6, 0);
+    chatGrid->addWidget(&invertMentionForeground, 0, 3);
+    chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0, 1, -1);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0, 1, -1);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0, 1, -1);
+    chatGrid->addWidget(&messagePopups, 4, 0, 1, -1);
+    chatGrid->addWidget(&mentionPopups, 5, 0, 1, -1);
+    chatGrid->addWidget(&roomHistory, 6, 0, 1, -1);
+    // Expand first column more than following ones
+    chatGrid->setColumnStretch(0, 3);
+    chatGrid->setColumnStretch(1, 1);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
+    highlightColor->setPlaceholderText(tr("Enter HEX code"));
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
     connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
 
     auto *highlightNotice = new QGridLayout;
-    highlightNotice->addWidget(highlightColor, 0, 2);
-    highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
-    highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
     highlightNotice->addWidget(customAlertString, 0, 0);
-    highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    highlightNotice->addWidget(&highlightColorStringLabel, 0, 1, Qt::AlignRight);
+    highlightNotice->addWidget(highlightColor, 0, 2);
+    highlightNotice->addWidget(&invertHighlightForeground, 0, 3);
+    highlightNotice->addWidget(&customAlertStringLabel, 1, 0, 1, -1);
+    // Expand first column more than following ones
+    highlightNotice->setColumnStretch(0, 3);
+    highlightNotice->setColumnStretch(1, 1);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
@@ -998,11 +1006,11 @@ void MessagesSettingsPage::retranslateUi()
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
     invertHighlightForeground.setText(tr("Invert text color"));
+    mentionColorStringLabel.setText(tr("Color"));
+    highlightColorStringLabel.setText(tr("Color"));
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
-    hexLabel.setText(tr("(Color is hexadecimal)"));
-    hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
 }
 
