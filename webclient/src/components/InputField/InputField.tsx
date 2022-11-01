@@ -23,34 +23,38 @@ const Root = styled('div')(({ theme }) => ({
   },
 }));
 
-const InputField = ({ input, meta: { touched, error, warning }, ...args }) => (
-  <Root className={'InputField ' + classes.root}>
-    { touched && (
-      <div className="InputField-validation">
-        {
-          (error &&
-            <div className="InputField-error">
-              {error}
-              <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
-            </div>
-          ) ||
+const InputField = ({ input, meta, ...args }) => {
+  const { touched, error, warning } = meta;
 
-          (warning && <div className="InputField-warning">{warning}</div>)
-        }
-      </div>
-    ) }
+  return (
+    <Root className={'InputField ' + classes.root}>
+      { touched && (
+        <div className="InputField-validation">
+          {
+            (error &&
+              <div className="InputField-error">
+                {error}
+                <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
+              </div>
+            ) ||
 
-    <TextField
-      autoComplete='off'
-      { ...input }
-      { ...args }
-      className="rounded"
-      variant="outlined"
-      margin="dense"
-      size="small"
-      fullWidth={true}
-    />
-  </Root>
-);
+            (warning && <div className="InputField-warning">{warning}</div>)
+          }
+        </div>
+      ) }
+
+      <TextField
+        autoComplete='off'
+        { ...input }
+        { ...args }
+        className="rounded"
+        variant="outlined"
+        margin="dense"
+        size="small"
+        fullWidth={true}
+      />
+    </Root>
+  );
+};
 
 export default InputField;
