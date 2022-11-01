@@ -19,8 +19,8 @@ const Root = styled('div')(({ theme }) => ({
 
     '& .InputField-warning': {
       color: theme.palette.warning.main
-    }
-  }
+    },
+  },
 }));
 
 const InputField = ({ input, meta: { touched, error, warning }, ...args }) => (
