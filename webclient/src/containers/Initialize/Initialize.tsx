@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { Images } from 'images';
 import { ServerSelectors } from 'store';
 import { RouteEnum } from 'types';
+import Layout from 'containers/Layout/Layout';
 
 import './Initialize.css';
 

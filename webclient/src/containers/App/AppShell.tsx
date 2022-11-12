@@ -3,7 +3,6 @@ import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { store } from 'store';
-import { Header } from 'components';
 import Routes from './AppShellRoutes';
 import FeatureDetection from './FeatureDetection';
 
@@ -29,8 +28,6 @@ class AppShell extends Component {
           <ToastProvider>
             <div className="AppShell" onContextMenu={this.handleContextMenu}>
               <Router>
-                <Header />
-
                 <FeatureDetection />
                 <Routes />
               </Router>

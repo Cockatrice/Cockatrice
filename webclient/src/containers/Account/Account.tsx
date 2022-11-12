@@ -11,6 +11,7 @@ import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from 'component
 import { AuthenticationService, SessionService } from 'api';
 import { ServerSelectors } from 'store';
 import { User } from 'types';
+import Layout from 'containers/Layout/Layout';
 
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';

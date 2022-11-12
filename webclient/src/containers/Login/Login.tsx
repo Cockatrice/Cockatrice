@@ -16,6 +16,7 @@ import { Images } from 'images';
 import { HostDTO, serverProps } from 'services';
 import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
+import Layout from 'containers/Layout/Layout';
 
 import './Login.css';
 import { useToast } from 'components/Toast';
