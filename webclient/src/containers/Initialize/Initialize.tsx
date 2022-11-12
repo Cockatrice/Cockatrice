@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { styled } from '@mui/material/styles';
+import { useTranslation, Trans } from 'react-i18next';
 import { connect } from 'react-redux';
-import { Redirect, withRouter } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import { Navigate } from 'react-router-dom';
+import Typography from '@mui/material/Typography';
 
 import { Images } from 'images';
 import { ServerSelectors } from 'store';
@@ -10,8 +11,14 @@ import { RouteEnum } from 'types';
 
 import './Initialize.css';
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const PREFIX = 'Initialize';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& .Initialize-graphics': {
       color: theme.palette.primary.contrastText,
     },
@@ -19,21 +26,23 @@ const useStyles = makeStyles(theme => ({
     '& .Initialize-graphics__bar': {
       backgroundColor: theme.palette.primary.contrastText,
     },
-  },
+  }
 }));
 
 const Initialize = ({ initialized }: InitializeProps) => {
-  const classes = useStyles();
+  const { t } = useTranslation();
 
   return initialized
-    ? <Redirect from="*" to={RouteEnum.LOGIN} />
+    ? <Navigate to={RouteEnum.LOGIN} />
     : (
-      <div className={'Initialize ' + classes.root}>
+      <Root className={'Initialize ' + classes.root}>
         <div className='Initialize-content'>
           <img src={Images.Logo} alt="logo" />
-          <Typography variant="subtitle1" className='subtitle'>DID YOU KNOW</Typography>
-          <Typography variant="subtitle2">Cockatrice is run by volunteers</Typography>
-          <Typography variant="subtitle2">that love card games!</Typography>
+          <Typography variant="subtitle1" className='subtitle'>{ t('InitializeContainer.title') }</Typography>
+          <Trans i18nKey="InitializeContainer.subtitle">
+            <Typography variant="subtitle2"></Typography>
+            <Typography variant="subtitle2"></Typography>
+          </Trans>
         </div>
 
         <div className="Initialize-graphics">
@@ -44,7 +53,7 @@ const Initialize = ({ initialized }: InitializeProps) => {
           <div className="topBar Initialize-graphics__bar" />
           <div className="bottomBar Initialize-graphics__bar" />
         </div>
-      </div>
+      </Root>
     );
 }
 
@@ -56,4 +65,4 @@ const mapStateToProps = state => ({
   initialized: ServerSelectors.getInitialized(state),
 });
 
-export default withRouter(connect(mapStateToProps)(Initialize));
+export default connect(mapStateToProps)(Initialize);

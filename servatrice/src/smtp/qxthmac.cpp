@@ -167,7 +167,11 @@ bool QxtHmac::verify(const QByteArray& otherInner)
 void QxtHmac::addData(const char* data, int length)
 {
     Q_ASSERT(qxt_d().opad.size());
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
+    qxt_d().ihash->addData(QByteArrayView(data, length));
+#else
     qxt_d().ihash->addData(data, length);
+#endif
     qxt_d().result.clear();
 }
 

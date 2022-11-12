@@ -3,8 +3,9 @@
 # renames the file to [original name][SUFFIX].[original extension]
 # where SUFFIX is either available in the environment or as the first arg
 # if MAKE_ZIP is set instead a zip is made
-# expected to be run in the build directory
-builddir="."
+# expected to be run in the build directory unless BUILD_DIR is set
+# adds output to GITHUB_OUTPUT
+builddir="${BUILD_DIR:=.}"
 findrx="Cockatrice-*.*"
 
 if [[ $1 ]]; then
@@ -27,6 +28,7 @@ if [[ ! $file ]]; then
   echo "::error file=$0::could not find package"
   exit 1
 fi
+oldpwd="$PWD"
 if ! cd "$path"; then
   echo "::error file=$0::could not get file path"
   exit 1
@@ -45,6 +47,9 @@ else
   echo "renaming '$file' to '$filename'"
   mv "$file" "$filename"
 fi
-ls -l "$PWD/$filename"
-echo "::set-output name=path::$PWD/$filename"
-echo "::set-output name=name::$filename"
+
+cd "$oldpwd"
+relative_path="$path/$filename"
+ls -l "$relative_path"
+echo "path=$relative_path" >>"$GITHUB_OUTPUT"
+echo "name=$filename" >>"$GITHUB_OUTPUT"

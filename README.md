@@ -18,7 +18,7 @@
 <br><pre>
 <b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
 <b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development, see how to [get involved](#get-involved-)</b>
+<b>To help with development, see how to [get involved](#get-involved--)</b>
 </pre><br>
 
 
@@ -117,6 +117,7 @@ The following flags can be passed to `cmake`:
 - `-DWARNING_AS_ERROR=0` Whether to treat compilation warnings as errors in debug mode (default 1 = yes).
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
+- `-DFORCE_USE_QT5=1` Skip looking for Qt6 before trying to find Qt5
 
 
 # Run

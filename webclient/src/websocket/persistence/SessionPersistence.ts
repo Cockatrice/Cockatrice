@@ -29,6 +29,14 @@ export class SessionPersistence {
     ServerDispatch.connectionFailed();
   }
 
+  static testConnectionSuccessful() {
+    ServerDispatch.testConnectionSuccessful();
+  }
+
+  static testConnectionFailed() {
+    ServerDispatch.testConnectionFailed();
+  }
+
   static updateBuddyList(buddyList) {
     ServerDispatch.updateBuddyList(buddyList);
   }
@@ -89,8 +97,8 @@ export class SessionPersistence {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
 
-  static accountAwaitingActivation() {
-    ServerDispatch.accountAwaitingActivation();
+  static accountAwaitingActivation(options: WebSocketConnectOptions) {
+    ServerDispatch.accountAwaitingActivation(options);
   }
 
   static accountActivationSuccess() {
@@ -103,6 +111,10 @@ export class SessionPersistence {
 
   static registrationRequiresEmail() {
     ServerDispatch.registrationRequiresEmail();
+  }
+
+  static registrationSuccess() {
+    ServerDispatch.registrationSuccess();
   }
 
   static registrationFailed(error: string) {

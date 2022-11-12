@@ -1,27 +1,30 @@
 import React from 'react';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
 
 import { ResetPasswordForm } from 'forms';
 
 import './ResetPasswordDialog.css';
 
 const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit, userName }: any) => {
+  const { t } = useTranslation();
+
   const handleOnClose = () => {
     handleClose();
   }
 
   return (
     <Dialog onClose={handleOnClose} open={isOpen}>
-      <DialogTitle disableTypography className="dialog-title">
-        <Typography variant="h6">Reset Password</Typography>
+      <DialogTitle className="dialog-title">
+        <Typography variant="h6">{t('ResetPasswordDialog.title')}</Typography>
 
         {handleOnClose ? (
-          <IconButton onClick={handleOnClose}>
+          <IconButton onClick={handleOnClose} size="large">
             <CloseIcon />
           </IconButton>
         ) : null}

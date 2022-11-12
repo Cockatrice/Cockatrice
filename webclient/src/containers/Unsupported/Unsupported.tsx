@@ -1,20 +1,22 @@
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import { useTranslation } from 'react-i18next';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 import './Unsupported.css';
 
 const Unsupported = () => {
+  const { t } = useTranslation();
+
   return (
     <div className='Unsupported'>
       <Paper className='Unsupported-paper'>
         <div className='Unsupported-paper__header'>
-          <Typography variant="h1">Unsupported Browser</Typography>
-          <Typography variant="subtitle1">Please update your browser and/or check your permissions.</Typography>
+          <Typography variant="h1">{ t('UnsupportedContainer.title') }</Typography>
+          <Typography variant="subtitle1">{ t('UnsupportedContainer.subtitle1') }</Typography>
         </div>
 
-        <Typography variant="subtitle2">Note: Private browsing causes some browsers to disable certain permissions or features.</Typography>
+        <Typography variant="subtitle2">{ t('UnsupportedContainer.subtitle2') }</Typography>
       </Paper>
     </div>
   );
@@ -24,4 +26,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default withRouter(connect(mapStateToProps)(Unsupported));
+export default connect(mapStateToProps)(Unsupported);

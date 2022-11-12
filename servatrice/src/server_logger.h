@@ -18,7 +18,7 @@ public:
     ~ServerLogger();
 public slots:
     void startLog(const QString &logFileName);
-    void logMessage(QString message, void *caller = 0);
+    void logMessage(const QString &message, void *caller = 0);
     void rotateLogs();
 private slots:
     void flushBuffer();

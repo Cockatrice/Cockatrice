@@ -19,6 +19,7 @@ export interface WebSocketConnectOptions {
   password?: string;
   hashedPassword?: string;
   newPassword?: string;
+  token?: string;
   email?: string;
   realName?: string;
   country?: string;
@@ -34,7 +35,8 @@ export enum WebSocketConnectReason {
   ACTIVATE_ACCOUNT,
   PASSWORD_RESET_REQUEST,
   PASSWORD_RESET_CHALLENGE,
-  PASSWORD_RESET
+  PASSWORD_RESET,
+  TEST_CONNECTION,
 }
 
 export class Host {
@@ -52,6 +54,13 @@ export class Host {
 }
 
 export const DefaultHosts: Host[] = [
+  {
+    name: 'Chickatrice',
+    host: 'mtg.chickatrice.net',
+    port: '443',
+    localPort: '4748',
+    editable: false,
+  },
   {
     name: 'Rooster',
     host: 'server.cockatrice.us/servatrice',

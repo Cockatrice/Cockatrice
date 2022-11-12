@@ -19,7 +19,7 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
 #endif
     disallowedRegExpStr.removeDuplicates();
     for (const QString &regExpStr : disallowedRegExpStr) {
-        disallowedRegExp.append(QRegExp(regExpStr));
+        disallowedRegExp.append(QRegularExpression(QString("\\A%1\\z").arg(regExpStr)));
     }
 }
 
@@ -45,6 +45,6 @@ QString SettingsCache::guessConfigurationPath()
         return guessFileName;
 #endif
 
-    guessFileName = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + fileName;
+    guessFileName = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/" + fileName;
     return guessFileName;
 }

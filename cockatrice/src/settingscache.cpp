@@ -18,7 +18,7 @@ QString SettingsCache::getDataPath()
     if (isPortableBuild)
         return qApp->applicationDirPath() + "/data";
     else
-        return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 }
 
 QString SettingsCache::getSettingsPath()
@@ -181,7 +181,7 @@ SettingsCache::SettingsCache()
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
     lang = settings->value("personal/lang").toString();
-    keepalive = settings->value("personal/keepalive", 5).toInt();
+    keepalive = settings->value("personal/keepalive", 3).toInt();
 
     // tip of the day settings
     showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
@@ -692,6 +692,7 @@ QStringList SettingsCache::getCountries() const
                                                  << "er"
                                                  << "es"
                                                  << "et"
+                                                 << "eu"
                                                  << "fi"
                                                  << "fj"
                                                  << "fk"
@@ -867,6 +868,7 @@ QStringList SettingsCache::getCountries() const
                                                  << "vu"
                                                  << "wf"
                                                  << "ws"
+                                                 << "xk"
                                                  << "ye"
                                                  << "yt"
                                                  << "za"

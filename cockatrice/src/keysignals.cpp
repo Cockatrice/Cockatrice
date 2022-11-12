@@ -61,6 +61,11 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)
                 emit onShiftS();
 
             break;
+        case Qt::Key_C:
+            if (kevent->modifiers() & Qt::ControlModifier)
+                emit onCtrlC();
+
+            break;
         default:
             return false;
     }

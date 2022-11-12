@@ -8,18 +8,19 @@ git push -d origin --REPLACE-WITH-BETA-LIST--
 include different targets -->
 <pre>
 <b>Pre-compiled binaries we serve:</b>
- - <kbd>Windows 7/8/10 (32-bit)</kbd></i>
- - <kbd>Windows 7/8/10 (64-bit)</kbd></i>
- - <kbd>macOS 10.14</kbd> ("Mojave")</i>
- - <kbd>macOS 10.15</kbd> ("Catalina")</i>
- - <kbd>macOS 11.0</kbd> ("Big Sur")</i>
- - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")</i>
- - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")</i>
- - <kbd>Ubuntu 20.10</kbd> ("Groovy Gorilla")</i>
- - <kbd>Ubuntu 21.04</kbd> ("Hirsute Hippo")</i>
- - <kbd>Debian 10</kbd> ("Buster")</i>
- - <kbd>Fedora 33</kbd></i>
- - <kbd>Fedora 34</kbd></i>
+ - <kbd>Windows 7/8/10/11 (32-bit)</kbd>
+ - <kbd>Windows 7/8 (64-bit)</kbd>
+ - <kbd>Windows 10/11 (64-bit)</kbd>
+ - <kbd>macOS 10.14</kbd> ("Mojave")
+ - <kbd>macOS 10.15</kbd> ("Catalina")
+ - <kbd>macOS 11.0+</kbd> ("Big Sur")
+ - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")
+ - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")
+ - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")
+ - <kbd>Debian 10</kbd> ("Buster")
+ - <kbd>Debian 11</kbd> ("Bullseye")
+ - <kbd>Fedora 35</kbd>
+ - <kbd>Fedora 36</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
@@ -27,7 +28,6 @@ include different targets -->
 
 ## General Notes
 
-<!-- --REPLACE-WITH-RELEASE-TITLE-- should be placed here by the ci -->
 We're pleased to announce the newest official release: <kbd>--REPLACE-WITH-RELEASE-TITLE--</kbd>
 
 We hope you enjoy the changes made and we have listed all changes, with their corresponding tickets, since the last version of Cockatrice was released for your convenience.

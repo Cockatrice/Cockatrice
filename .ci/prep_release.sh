@@ -4,6 +4,7 @@
 # the releases are first made as drafts and will be vetted by a human
 # it just has to provide a template
 # this requires the repo to be unshallowed
+# adds output to GITHUB_OUTPUT
 template_path=".ci/release_template.md"
 body_path="/tmp/release.md"
 beta_regex='beta'
@@ -22,22 +23,22 @@ fi
 
 # create title
 if [[ $TAG =~ $beta_regex ]]; then
-  echo "::set-output name=is_beta::yes"
+  echo "is_beta=yes" >>"$GITHUB_OUTPUT"
   title="$TAG"
   echo "creating beta release '$title'"
 elif [[ ! $(cat CMakeLists.txt) =~ $name_regex ]]; then
   echo "::error file=$0::could not find releasename in CMakeLists.txt"
   exit 1
 else
-  echo "::set-output name=is_beta::no"
+  echo "is_beta=no" >>"$GITHUB_OUTPUT"
   name="${BASH_REMATCH[1]}"
   version="${TAG##*-}"
   title="Cockatrice $version: $name"
   no_beta=1
-  echo "::set-output name=friendly_name::$name"
+  echo "friendly_name=$name" >>"$GITHUB_OUTPUT"
   echo "creating full release '$title'"
 fi
-echo "::set-output name=title::$title"
+echo "title=$title" >>"$GITHUB_OUTPUT"
 
 # add release notes template
 if [[ $no_beta ]]; then
@@ -60,9 +61,9 @@ fi
 all_tags="
 $(git tag)" # tags are ordered alphabetically
 before="${all_tags%%
-$TAG*}" # strip line with current tag an all lines after it
+"$TAG"*}" # strip line with current tag an all lines after it
 # note the extra newlines are needed to always have a last line
-if [[ $all_tags == $before ]]; then
+if [[ $all_tags == "$before" ]]; then
   echo "::warning file=$0::could not find current tag"
 else
   while
@@ -74,7 +75,7 @@ else
     beta_list+=" $previous" # add to list of skipped betas
     next_before="${before%
 *}" # strip the last line
-    if [[ $next_before == $before ]]; then
+    if [[ $next_before == "$before" ]]; then
       unset previous
       break
     fi
@@ -108,5 +109,5 @@ else
 fi
 
 # write to file
-echo "::set-output name=body_path::$body_path"
+echo "body_path=$body_path" >>"$GITHUB_OUTPUT"
 echo "$body" >"$body_path"

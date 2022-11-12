@@ -1,14 +1,14 @@
 // eslint-disable-next-line
 import React from "react";
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import * as _ from 'lodash';
 
-import Button from '@material-ui/core/Button';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import Button from '@mui/material/Button';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 
 import { RoomsService } from 'api';
@@ -16,10 +16,12 @@ import { RouteEnum } from 'types';
 
 import './Rooms.css';
 
-const Rooms = ({ rooms, joinedRooms, history }) => {
+const Rooms = ({ rooms, joinedRooms }) => {
+  const navigate = useNavigate();
+
   function onClick(roomId) {
     if (_.find(joinedRooms, room => room.roomId === roomId)) {
-      history.push(generatePath(RouteEnum.ROOM, { roomId }));
+      navigate(generatePath(RouteEnum.ROOM, { roomId }));
     } else {
       RoomsService.joinRoom(roomId);
     }

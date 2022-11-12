@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+# generated ./src files
+/src/proto-files.json
+/src/server-props.json
+
 # testing
 /coverage
 

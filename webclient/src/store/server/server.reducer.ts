@@ -29,7 +29,8 @@ const initialState: ServerState = {
   sortUsersBy: {
     field: UserSortField.NAME,
     order: SortDirection.ASC
-  }
+  },
+  connectOptions: {},
 };
 
 export const serverReducer = (state = initialState, action: any) => {
@@ -38,6 +39,21 @@ export const serverReducer = (state = initialState, action: any) => {
       return {
         ...initialState,
         initialized: true
+      }
+    }
+    case Types.ACCOUNT_AWAITING_ACTIVATION: {
+      return {
+        ...state,
+        connectOptions: {
+          ...action.options
+        }
+      }
+    }
+    case Types.ACCOUNT_ACTIVATION_FAILED:
+    case Types.ACCOUNT_ACTIVATION_SUCCESS: {
+      return {
+        ...state,
+        connectOptions: {}
       }
     }
     case Types.CLEAR_STORE: {

@@ -1,0 +1,7 @@
+{
+  "KnownHosts": {
+    "label": "Host",
+    "add": "Add new host",
+    "toast": "Host successfully {mode, select, created {created} deleted {deleted} other {edited}}."
+  }
+}

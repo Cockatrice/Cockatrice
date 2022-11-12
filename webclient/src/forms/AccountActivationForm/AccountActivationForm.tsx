@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { useTranslation } from 'react-i18next';
 
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import { InputField, KnownHosts } from 'components';
 import { FormKey } from 'types';
@@ -16,6 +17,7 @@ import { ServerTypes } from 'store';
 
 const AccountActivationForm = ({ onSubmit }) => {
   const [errorMessage, setErrorMessage] = useState(false);
+  const { t } = useTranslation();
 
   useReduxEffect(() => {
     setErrorMessage(true);
@@ -33,7 +35,7 @@ const AccountActivationForm = ({ onSubmit }) => {
     const errors: any = {};
 
     if (!values.token) {
-      errors.token = 'Required';
+      errors.token = t('Common.validation.required');
     }
 
     return errors;
@@ -45,17 +47,17 @@ const AccountActivationForm = ({ onSubmit }) => {
         return (
           <form className="AccountActivationForm" onSubmit={handleSubmit}>
             <div className="AccountActivationForm-item">
-              <Field label="Token" name="token" component={InputField} />
+              <Field label={t('Common.label.token')} name="token" component={InputField} />
             </div>
 
             {errorMessage && (
               <div className="AccountActivationForm-error">
-                <Typography color="error">Account activation failed</Typography>
+                <Typography color="error">{ t('AccountActivationForm.error.failed') }</Typography>
               </div>
             )}
 
             <Button className="AccountActivationForm-submit rounded tall" color="primary" variant="contained" type="submit">
-              Activate Account
+              { t('AccountActivationForm.label.activate') }
             </Button>
           </form>
         );

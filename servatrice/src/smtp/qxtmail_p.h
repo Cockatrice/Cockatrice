@@ -28,7 +28,8 @@
 #include <QByteArray>
 
 #define QXT_MUST_QP(x) (x < char(32) || x > char(126) || x == '=' || x == '?')
-QByteArray qxt_fold_mime_header(const QString& key, const QString& value, QTextCodec* latin1,
-                                const QByteArray& prefix = QByteArray());
+QByteArray qxt_fold_mime_header(const QString &key,
+                                const QString &value,
+                                const QByteArray &prefix = QByteArray());
 
 #endif // QXTMAIL_P_H

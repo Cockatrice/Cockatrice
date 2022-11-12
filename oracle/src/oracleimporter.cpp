@@ -116,7 +116,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
         QStringList symbols = manacost.split("}");
         QString formattedCardCost;
         for (QString symbol : symbols) {
-            if (symbol.contains(QRegExp("[0-9WUBGRP]/[0-9WUBGRP]"))) {
+            if (symbol.contains(QRegularExpression("[0-9WUBGRP]/[0-9WUBGRP]"))) {
                 symbol.append("}");
             } else {
                 symbol.remove(QChar('{'));
@@ -141,7 +141,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // DETECT CARD POSITIONING INFO
 
     // cards that enter the field tapped
-    bool cipt = text.contains("Hideaway") || text.contains(" it enters the battlefield tapped") ||
+    bool cipt = text.contains(" it enters the battlefield tapped") ||
                 (text.contains(name + " enters the battlefield tapped") &&
                  !text.contains(name + " enters the battlefield tapped unless"));
 

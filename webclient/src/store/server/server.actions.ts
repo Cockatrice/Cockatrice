@@ -24,6 +24,12 @@ export const Actions = {
   connectionFailed: () => ({
     type: Types.CONNECTION_FAILED,
   }),
+  testConnectionSuccessful: () => ({
+    type: Types.TEST_CONNECTION_SUCCESSFUL,
+  }),
+  testConnectionFailed: () => ({
+    type: Types.TEST_CONNECTION_FAILED,
+  }),
   serverMessage: message => ({
     type: Types.SERVER_MESSAGE,
     message
@@ -86,6 +92,9 @@ export const Actions = {
   registrationRequiresEmail: () => ({
     type: Types.REGISTRATION_REQUIRES_EMAIL,
   }),
+  registrationSuccess: () => ({
+    type: Types.REGISTRATION_SUCCES,
+  }),
   registrationFailed: (error) => ({
     type: Types.REGISTRATION_FAILED,
     error
@@ -102,8 +111,9 @@ export const Actions = {
     type: Types.REGISTRATION_USERNAME_ERROR,
     error
   }),
-  accountAwaitingActivation: () => ({
+  accountAwaitingActivation: (options: WebSocketConnectOptions) => ({
     type: Types.ACCOUNT_AWAITING_ACTIVATION,
+    options
   }),
   accountActivationSuccess: () => ({
     type: Types.ACCOUNT_ACTIVATION_SUCCESS,

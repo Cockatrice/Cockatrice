@@ -52,7 +52,11 @@ public:
     }
 
 protected:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void enterEvent(QEnterEvent *event);
+#else
     void enterEvent(QEvent *event);
+#endif
     void leaveEvent(QEvent *event);
     void paintEvent(QPaintEvent *event);
 };
@@ -116,6 +120,7 @@ public:
     bool isUserBuddy(const QString &userName) const;
     bool isUserIgnored(const QString &userName) const;
     const ServerInfo_User *getOnlineUser(const QString &userName) const;
+    bool switchToGameTabIfAlreadyExists(const int gameId);
     void actShowPopup(const QString &message);
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());

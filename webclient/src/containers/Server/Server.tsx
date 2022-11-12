@@ -1,59 +1,62 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
-
-import { RoomsSelectors, ServerSelectors } from 'store';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from 'components';
-import { Room, User } from 'types';
+import { useReduxEffect } from 'hooks';
+import { RoomsSelectors, RoomsTypes, ServerSelectors } from 'store';
+import { Room, RouteEnum, User } from 'types';
 import Rooms from './Rooms';
 
 import './Server.css';
 
-class Server extends Component<ServerProps, ServerState> {
-  render() {
-    const { message, rooms, joinedRooms, history, users } = this.props;
+const Server = ({ message, rooms, joinedRooms, users }: ServerProps) => {
+  const navigate = useNavigate();
 
-    return (
-      <div className="server-rooms">
-        <AuthGuard />
+  useReduxEffect((action: any) => {
+    const roomId = action.roomInfo.roomId.toString();
+    navigate(generatePath(RouteEnum.ROOM, { roomId }));
+  }, RoomsTypes.JOIN_ROOM, []);
 
-        <ThreePaneLayout
-          top={(
-            <Paper className="serverRoomWrapper overflow-scroll">
-              <Rooms rooms={rooms} joinedRooms={joinedRooms} history={history} />
-            </Paper>
-          )}
+  return (
+    <div className="server-rooms">
+      <AuthGuard />
 
-          bottom={(
-            <Paper className="serverMessage overflow-scroll">
-              <div className="serverMessage__content" dangerouslySetInnerHTML={{ __html: message }} />
-            </Paper>
-          )}
+      <ThreePaneLayout
+        top={(
+          <Paper className="serverRoomWrapper overflow-scroll">
+            <Rooms rooms={rooms} joinedRooms={joinedRooms} />
+          </Paper>
+        )}
 
-          side={(
-            <Paper className="server-rooms__side overflow-scroll">
-              <div className="server-rooms__side-label">
-                Users connected to server: {users.length}
-              </div>
-              <VirtualList
-                itemKey={(index) => users[index].name }
-                items={ users.map(user => (
-                  <ListItem button dense>
-                    <UserDisplay user={user} />
-                  </ListItem>
-                )) }
-              />
-            </Paper>
-          )}
-        />
-      </div>
-    );
-  }
+        bottom={(
+          <Paper className="serverMessage overflow-scroll">
+            <div className="serverMessage__content" dangerouslySetInnerHTML={{ __html: message }} />
+          </Paper>
+        )}
+
+        side={(
+          <Paper className="server-rooms__side overflow-scroll">
+            <div className="server-rooms__side-label">
+              Users connected to server: {users.length}
+            </div>
+            <VirtualList
+              itemKey={(index) => users[index].name }
+              items={ users.map(user => (
+                <ListItem button dense>
+                  <UserDisplay user={user} />
+                </ListItem>
+              )) }
+            />
+          </Paper>
+        )}
+      />
+    </div>
+  );
 }
 
 interface ServerProps {
@@ -61,11 +64,6 @@ interface ServerProps {
   rooms: Room[];
   joinedRooms: Room[];
   users: User[];
-  history: any;
-}
-
-interface ServerState {
-
 }
 
 const mapStateToProps = state => ({
@@ -75,4 +73,4 @@ const mapStateToProps = state => ({
   users: ServerSelectors.getUsers(state)
 });
 
-export default withRouter(connect(mapStateToProps)(Server));
+export default connect(mapStateToProps)(Server);

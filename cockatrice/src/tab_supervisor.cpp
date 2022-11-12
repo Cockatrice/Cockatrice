@@ -58,7 +58,11 @@ QSize CloseButton::sizeHint() const
     return QSize(width, height);
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void CloseButton::enterEvent(QEnterEvent *event)
+#else
 void CloseButton::enterEvent(QEvent *event)
+#endif
 {
     update();
     QAbstractButton::enterEvent(event);
@@ -74,7 +78,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 {
     QPainter p(this);
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this);
     opt.state |= QStyle::State_AutoRaise;
     if (isEnabled() && underMouse() && !isChecked() && !isDown())
         opt.state |= QStyle::State_Raised;
@@ -438,7 +442,7 @@ void TabSupervisor::replayLeft(TabGame *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    replayTabs.removeAt(replayTabs.indexOf(tab));
+    replayTabs.removeOne(tab);
 }
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
@@ -504,7 +508,7 @@ void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    deckEditorTabs.removeAt(deckEditorTabs.indexOf(tab));
+    deckEditorTabs.removeOne(tab);
     removeTab(indexOf(tab));
 }
 
@@ -683,12 +687,12 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 
 bool TabSupervisor::isOwnUserRegistered() const
 {
-    return static_cast<bool>(getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
+    return userInfo != nullptr && (userInfo->user_level() & ServerInfo_User::IsRegistered) != 0;
 }
 
 QString TabSupervisor::getOwnUsername() const
 {
-    return userInfo ? QString::fromStdString(userInfo->name()) : QString();
+    return userInfo != nullptr ? QString::fromStdString(userInfo->name()) : QString();
 }
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
@@ -731,3 +735,16 @@ const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) con
 
     return nullptr;
 };
+
+bool TabSupervisor::switchToGameTabIfAlreadyExists(const int gameId)
+{
+    bool isGameTabExists = false;
+    if (gameTabs.contains(gameId)) {
+        isGameTabExists = true;
+        TabGame *tabGame = gameTabs[gameId];
+        const int gameTabIndex = indexOf(tabGame);
+        setCurrentIndex(gameTabIndex);
+    }
+
+    return isGameTabExists;
+}

@@ -34,7 +34,6 @@
 
 #include "qxtmailattachment.h"
 #include "qxtmail_p.h"
-#include <QTextCodec>
 #include <QBuffer>
 #include <QPointer>
 #include <QFile>
@@ -187,11 +186,10 @@ QByteArray QxtMailAttachment::mimeData()
         return QByteArray();
     }
 
-    QTextCodec* latin1 = QTextCodec::codecForName("latin1");
     QByteArray rv = "Content-Type: " + qxt_d->contentType.toLatin1() + "\r\nContent-Transfer-Encoding: base64\r\n";
     foreach(const QString& r, qxt_d->extraHeaders.keys())
     {
-        rv += qxt_fold_mime_header(r.toLatin1(), extraHeader(r), latin1);
+        rv += qxt_fold_mime_header(r.toLatin1(), extraHeader(r));
     }
     rv += "\r\n";
 

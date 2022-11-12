@@ -1,10 +1,10 @@
 import protobuf from 'protobufjs';
 
-import ProtoFiles from '../ProtoFiles';
-import { WebClient } from '../WebClient';
-
 import { RoomEvents, SessionEvents } from '../events';
 import { SessionPersistence } from '../persistence';
+import { WebClient } from '../WebClient';
+
+import ProtoFiles from '../../proto-files.json';
 
 export interface ProtobufEvents {
   [event: string]: Function;

@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         qt5-default \
         qtbase5-dev \
         qtmultimedia5-dev \
+        qttools5-dev \
         qttools5-dev-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

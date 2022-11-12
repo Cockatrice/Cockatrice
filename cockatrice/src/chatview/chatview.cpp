@@ -21,7 +21,7 @@ UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
     relativePosition = cursor.position() - block.position();
 }
 
-ChatView::ChatView(const TabSupervisor *_tabSupervisor,
+ChatView::ChatView(TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
                    TabGame *_game,
                    bool _showTimestamps,
@@ -321,7 +321,7 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
 
 void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString &userName, UserLevelFlags userLevel)
 {
-    const QRegExp notALetterOrNumber = QRegExp("[^a-zA-Z0-9]");
+    const static auto notALetterOrNumber = QRegularExpression("[^a-zA-Z0-9]");
 
     int firstSpace = message.indexOf(' ');
     QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
@@ -510,7 +510,11 @@ void ChatView::redactMessages(const QString &userName, int amount)
     }
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void ChatView::enterEvent(QEnterEvent * /*event*/)
+#else
 void ChatView::enterEvent(QEvent * /*event*/)
+#endif
 {
     setMouseTracking(true);
 }
@@ -566,7 +570,11 @@ void ChatView::mousePressEvent(QMouseEvent *event)
     switch (hoveredItemType) {
         case HoveredCard: {
             if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+                emit showCardInfoPopup(event->globalPosition().toPoint(), hoveredContent);
+#else
                 emit showCardInfoPopup(event->globalPos(), hoveredContent);
+#endif
             break;
         }
         case HoveredUser: {
@@ -576,7 +584,11 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                 switch (event->button()) {
                     case Qt::RightButton: {
                         UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+                        userContextMenu->showContextMenu(event->globalPosition().toPoint(), userName, userLevel, this);
+#else
                         userContextMenu->showContextMenu(event->globalPos(), userName, userLevel, this);
+#endif
                         break;
                     }
                     case Qt::LeftButton: {

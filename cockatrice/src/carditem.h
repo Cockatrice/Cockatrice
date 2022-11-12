@@ -2,6 +2,7 @@
 #define CARDITEM_H
 
 #include "abstractcarditem.h"
+#include "server_card.h"
 
 class CardDatabase;
 class CardDragItem;
@@ -130,7 +131,7 @@ public:
     }
     void removeAttachedCard(CardItem *card)
     {
-        attachedCards.removeAt(attachedCards.indexOf(card));
+        attachedCards.removeOne(card);
     }
     const QList<CardItem *> &getAttachedCards() const
     {
@@ -156,6 +157,7 @@ public:
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);
+    void drawAttachArrow();
     void playCard(bool faceDown);
 
 protected:

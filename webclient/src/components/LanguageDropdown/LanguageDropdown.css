@@ -1,0 +1,19 @@
+.LanguageDropdown {
+}
+
+.LanguageDropdown-item {
+  display: flex;
+  align-items: center;
+}
+
+.LanguageDropdown-item__image {
+  width: 1.5em;
+}
+
+.MuiSelect-select .LanguageDropdown-item__label {
+  display: none;
+}
+
+.MuiList-root .LanguageDropdown-item__image {
+  margin-right: 1em;
+}

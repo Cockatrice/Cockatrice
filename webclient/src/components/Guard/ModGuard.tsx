@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { ServerSelectors } from 'store';
 import { User } from 'types';
@@ -11,7 +11,7 @@ import { RouteEnum } from 'types';
 class ModGuard extends Component<ModGuardProps> {
   render() {
     return !AuthenticationService.isModerator(this.props.user)
-      ? <Redirect from="*" to={RouteEnum.SERVER} />
+      ? <Navigate to={RouteEnum.SERVER} />
       : '';
   }
 };

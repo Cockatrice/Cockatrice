@@ -28,12 +28,12 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - 12
+          - 16
           - lts/*
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v2

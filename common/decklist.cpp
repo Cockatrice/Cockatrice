@@ -292,7 +292,7 @@ bool AbstractDecklistCardNode::readElement(QXmlStreamReader *xml)
 {
     while (!xml->atEnd()) {
         xml->readNext();
-        if (xml->isEndElement() && xml->name() == "card")
+        if (xml->isEndElement() && xml->name().toString() == "card")
             return false;
     }
     return true;
@@ -435,7 +435,7 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
     while (!xml->atEnd()) {
         xml->readNext();
         if (xml->isStartElement()) {
-            if (xml->name() != "cockatrice_deck")
+            if (xml->name().toString() != "cockatrice_deck")
                 return false;
             while (!xml->atEnd()) {
                 xml->readNext();
@@ -602,7 +602,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         int amount = 1;
         match = reMultiplier.match(cardName);
         if (match.hasMatch()) {
-            amount = match.capturedRef(1).toInt();
+            amount = match.captured(1).toInt();
             cardName = match.captured(2);
         }
 

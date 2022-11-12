@@ -38,7 +38,7 @@ signals:
 
 private:
     AbstractClient *client;
-    const TabSupervisor *tabSupervisor;
+    TabSupervisor *tabSupervisor;
     TabRoom *room;
 
     QTreeView *gameListView;
@@ -52,7 +52,7 @@ private:
 
 public:
     GameSelector(AbstractClient *_client,
-                 const TabSupervisor *_tabSupervisor,
+                 TabSupervisor *_tabSupervisor,
                  TabRoom *_room,
                  const QMap<int, QString> &_rooms,
                  const QMap<int, GameTypeMap> &_gameTypes,

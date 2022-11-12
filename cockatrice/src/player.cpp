@@ -66,6 +66,7 @@
 
 #include <QDebug>
 #include <QMenu>
+#include <QMetaType>
 #include <QPainter>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -593,7 +594,7 @@ void Player::removePlayer(Player *player)
 void Player::playerListActionTriggered()
 {
     auto *action = static_cast<QAction *>(sender());
-    auto *menu = static_cast<QMenu *>(action->parentWidget());
+    auto *menu = static_cast<QMenu *>(action->parent());
 
     Command_RevealCards cmd;
     const int otherPlayerId = action->data().toInt();
@@ -1654,8 +1655,9 @@ void Player::actCreateAllRelatedCards()
                 for (CardRelation *cardRelationAll : relatedCards) {
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
                         dbName = cardRelationAll->getName();
+                        bool persistent = cardRelationAll->getIsPersistent();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName);
+                            createCard(sourceCard, dbName, false, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1668,8 +1670,9 @@ void Player::actCreateAllRelatedCards()
                 for (CardRelation *cardRelationNotExcluded : nonExcludedRelatedCards) {
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
                         dbName = cardRelationNotExcluded->getName();
+                        bool persistent = cardRelationNotExcluded->getIsPersistent();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName);
+                            createCard(sourceCard, dbName, false, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1697,6 +1700,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
         return false;
     }
     QString dbName = cardRelation->getName();
+    bool persistent = cardRelation->getIsPersistent();
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;
@@ -1707,23 +1711,23 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
             return false;
         }
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, false, persistent);
         }
     } else if (cardRelation->getDefaultCount() > 1) {
         for (int i = 0; i < cardRelation->getDefaultCount(); ++i) {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, false, persistent);
         }
     } else {
         if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName);
+            createAttachedCard(sourceCard, dbName, persistent);
         } else {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, false, persistent);
         }
     }
     return true;
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)
+void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach, bool persistent)
 {
     CardInfoPtr cardInfo = db->getCard(dbCardName);
 
@@ -1757,7 +1761,7 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     } else {
         cmd.set_annotation("");
     }
-    cmd.set_destroy_on_zone_change(true);
+    cmd.set_destroy_on_zone_change(!persistent);
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
@@ -1769,9 +1773,9 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     sendGameCommand(cmd);
 }
 
-void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName)
+void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool persistent)
 {
-    createCard(sourceCard, dbCardName, true);
+    createCard(sourceCard, dbCardName, true, persistent);
 }
 
 void Player::actSayMessage()
@@ -1846,11 +1850,32 @@ void Player::eventShuffle(const Event_Shuffle &event)
     if (!zone) {
         return;
     }
+    auto &cardList = zone->getCards();
+    int absStart = event.start();
+    if (absStart < 0) { // negative indexes start from the end
+        absStart += cardList.length();
+    }
+
+    // close all views that contain shuffled cards
     for (auto *view : zone->getViews()) {
         if (view != nullptr) {
-            emit view->beingDeleted();
+            int length = view->getCards().length();
+            // we want to close empty views as well
+            if (length == 0 || length > absStart) { // note this assumes views always start at the top of the library
+                view->deleteLater();
+                break;
+            }
+        } else {
+            qWarning() << zone->getName() << "of" << getName() << "holds empty zoneview!";
         }
     }
+
+    // remove revealed card name on top of decks
+    if (absStart == 0 && !cardList.isEmpty()) {
+        cardList.first()->setName("");
+        zone->update();
+    }
+
     emit logShuffle(this, zone, event.start(), event.end());
 }
 
@@ -1926,7 +1951,7 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventCon
     } else {
         CardItem *card = zone->getCard(event.card_id(), QString());
         if (!card) {
-            qDebug() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
+            qWarning() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
         }
         setCardAttrHelper(context, card, event.attribute(), QString::fromStdString(event.attr_value()), false);
@@ -1947,6 +1972,7 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
+    updateCardMenu(card);
     emit logSetCardCounter(this, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
@@ -2190,7 +2216,7 @@ void Player::eventDrawCards(const Event_DrawCards &event)
 
     hand->reorganizeCards();
     deck->reorganizeCards();
-    emit logDrawCards(this, event.number());
+    emit logDrawCards(this, event.number(), deck->getCards().size() == 0);
 }
 
 void Player::eventRevealCards(const Event_RevealCards &event)
@@ -2326,7 +2352,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
             eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext));
             break;
         default: {
-            qDebug() << "unhandled game event" << type;
+            qWarning() << "unhandled game event" << type;
         }
     }
 }
@@ -2501,7 +2527,6 @@ AbstractCounter *Player::addCounter(const ServerInfo_Counter &counter)
 
 AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
 {
-    qDebug() << "addCounter:" << getName() << counterId << name;
     if (counters.contains(counterId)) {
         return nullptr;
     }
@@ -3046,7 +3071,11 @@ void Player::actSetPT()
             const auto oldpt = parsePT(card->getPT());
             int ptIter = 0;
             for (const auto &item : ptList) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+                if (item.typeId() == QMetaType::Type::Int) {
+#else
                 if (item.type() == QVariant::Int) {
+#endif
                     int oldItem = ptIter < oldpt.size() ? oldpt.at(ptIter).toInt() : 0;
                     newpt += '/' + QString::number(oldItem + item.toInt());
                 } else {
@@ -3161,9 +3190,7 @@ void Player::actAttach()
         return;
     }
 
-    auto *arrow = new ArrowAttachItem(card);
-    scene()->addItem(arrow);
-    arrow->grabMouse();
+    card->drawAttachArrow();
 }
 
 void Player::actUnattach()
@@ -3172,10 +3199,15 @@ void Player::actUnattach()
         return;
     }
 
-    Command_AttachCard cmd;
-    cmd.set_start_zone(game->getActiveCard()->getZone()->getName().toStdString());
-    cmd.set_card_id(game->getActiveCard()->getId());
-    sendGameCommand(cmd);
+    QList<const ::google::protobuf::Message *> commandList;
+    for (QGraphicsItem *item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        auto *cmd = new Command_AttachCard;
+        cmd->set_start_zone(card->getZone()->getName().toStdString());
+        cmd->set_card_id(card->getId());
+        commandList.append(cmd);
+    }
+    sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actCardCounterTrigger()

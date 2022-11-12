@@ -7,7 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrlQuery>
 
 TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent)
@@ -20,7 +20,7 @@ TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *par
 void TappedOutInterface::queryFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::critical(0, tr("Error"), reply->errorString());
+        QMessageBox::critical(nullptr, tr("Error"), reply->errorString());
         reply->deleteLater();
         deleteLater();
         return;
@@ -41,26 +41,26 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
          * from the html. Css pseudo selector for errors: $("div.alert-danger > ul > li")
          */
         QString data(reply->readAll());
-        QString errorMessage = tr("Unable to analyze the deck.");
+        QStringList errorMessageList = {tr("Unable to analyze the deck.")};
 
-        QRegExp rx("<div class=\"alert alert-danger.*<ul>(.*)</ul>");
-        rx.setMinimal(true);
-        int found = rx.indexIn(data);
-        if (found >= 0) {
-            QString errors = rx.cap(1);
-            QRegExp rx2("<li>(.*)</li>");
-            rx2.setMinimal(true);
-
-            int captures = rx2.captureCount();
-            for (int i = 1; i <= captures; i++) {
-                errorMessage += QString("\n") + rx2.cap(i).remove(QRegExp("<[^>]*>")).simplified();
+        static const QRegularExpression rx("<div class=\"alert alert-danger.*?<ul>(.*?)</ul>");
+        auto match = rx.match(data);
+        if (match.hasMatch()) {
+            QString errors = match.captured(1);
+            static const QRegularExpression rx2("<li>(.*?)</li>");
+            static const QRegularExpression rxremove("<[^>]*>");
+            auto matchIterator = rx2.globalMatch(errors);
+            while (matchIterator.hasNext()) {
+                auto match2 = matchIterator.next();
+                errorMessageList.append(match2.captured(1).remove(rxremove).simplified());
             }
         }
 
+        QString errorMessage = errorMessageList.join("\n");
         qDebug() << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size() << "message"
                  << errorMessage;
 
-        QMessageBox::critical(0, tr("Error"), errorMessage);
+        QMessageBox::critical(nullptr, tr("Error"), errorMessage);
     }
 
     reply->deleteLater();

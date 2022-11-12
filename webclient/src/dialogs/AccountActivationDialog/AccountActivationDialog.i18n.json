@@ -1,0 +1,7 @@
+{
+  "AccountActivationDialog": {
+    "title": "Account Activation",
+    "subtitle1": "Your account has not been activated yet.",
+    "subtitle2": "You need to provide the activation token received in the activation email."
+  }
+}

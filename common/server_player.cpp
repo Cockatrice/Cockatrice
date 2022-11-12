@@ -120,6 +120,7 @@ Server_Player::~Server_Player() = default;
 void Server_Player::prepareDestroy()
 {
     delete deck;
+    deck = nullptr;
 
     playerMutex.lock();
     if (userInterface) {
@@ -336,7 +337,11 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
     ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
     ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 
-    revealTopCardIfNeeded(deckZone, ges);
+    if (number > 0) {
+        revealTopCardIfNeeded(deckZone, ges);
+        int currentKnownCards = deckZone->getCardsBeingLookedAt();
+        deckZone->setCardsBeingLookedAt(currentKnownCards - number);
+    }
 
     return Response::RespOk;
 }
@@ -1234,7 +1239,6 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    // Get all arrows pointing to or originating from the card being attached and delete them.
     QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
     while (playerIterator.hasNext()) {
         Server_Player *p = playerIterator.next().value();

@@ -9,8 +9,8 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
+#include <QtMath>
 #include <algorithm>
-#include <math.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -216,7 +216,7 @@ void DeckViewCardContainer::addCard(DeckViewCard *card)
 
 void DeckViewCardContainer::removeCard(DeckViewCard *card)
 {
-    cards.removeAt(cards.indexOf(card));
+    cards.removeOne(card);
     cardsByType.remove(card->getInfo() ? card->getInfo()->getMainCardType() : "", card);
 }
 
@@ -238,11 +238,9 @@ int DeckViewCardContainer::getCardTypeTextWidth() const
     QFontMetrics fm(f);
 
     int maxCardTypeWidth = 0;
-    QMapIterator<QString, DeckViewCard *> i(cardsByType);
-    while (i.hasNext()) {
-        int cardTypeWidth = fm.size(Qt::TextSingleLine, i.next().key()).width();
-        if (cardTypeWidth > maxCardTypeWidth)
-            maxCardTypeWidth = cardTypeWidth;
+    for (const auto &key : cardsByType.keys()) {
+        int cardTypeWidth = fm.size(Qt::TextSingleLine, key).width();
+        maxCardTypeWidth = qMax(maxCardTypeWidth, cardTypeWidth);
     }
 
     return maxCardTypeWidth + 15;
@@ -274,16 +272,11 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
 {
     currentRowsAndCols = rowsAndCols;
 
-    int totalCols = 0, totalRows = 0;
     qreal yUntilNow = separatorY + paddingY;
     qreal x = (qreal)getCardTypeTextWidth();
     for (int i = 0; i < rowsAndCols.size(); ++i) {
         const int tempRows = rowsAndCols[i].first;
         const int tempCols = rowsAndCols[i].second;
-        totalRows += tempRows;
-        if (tempCols > totalCols)
-            totalCols = tempCols;
-
         QList<QString> cardTypeList = cardsByType.uniqueKeys();
         QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
         std::sort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
@@ -440,7 +433,7 @@ void DeckViewScene::rearrangeItems()
         const int maxRows = rowsAndColsList[maxIndex1][maxIndex2].first;
         const int maxCardCount = cardCountList[maxIndex1][maxIndex2];
         rowsAndColsList[maxIndex1][maxIndex2] =
-            QPair<int, int>(maxRows + 1, (int)ceil((qreal)maxCardCount / (qreal)(maxRows + 1)));
+            QPair<int, int>(maxRows + 1, (int)qCeil((qreal)maxCardCount / (qreal)(maxRows + 1)));
     }
 
     totalHeight = -spacing;

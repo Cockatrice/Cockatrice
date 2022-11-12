@@ -16,7 +16,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <cmath>
+#include <QtMath>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
     : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color),
@@ -71,7 +71,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     const double arrowWidth = 15.0;
     const double headWidth = 40.0;
     const double headLength =
-        headWidth / pow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
+        headWidth / qPow(2, 0.5); // aka headWidth / sqrt (2) but this produces a compile error with MSVC++
     const double phi = 15;
 
     if (!startItem)
@@ -86,7 +86,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     if (lineLength < 30)
         path = QPainterPath();
     else {
-        QPointF c(lineLength / 2, tan(phi * M_PI / 180) * lineLength);
+        QPointF c(lineLength / 2, qTan(phi * M_PI / 180) * lineLength);
 
         QPainterPath centerLine;
         centerLine.moveTo(0, 0);
@@ -97,22 +97,22 @@ void ArrowItem::updatePath(const QPointF &endPoint)
         QLineF testLine(arrowBodyEndPoint, centerLine.pointAtPercent(percentage + 0.001));
         qreal alpha = testLine.angle() - 90;
         QPointF endPoint1 =
-            arrowBodyEndPoint + arrowWidth / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+            arrowBodyEndPoint + arrowWidth / 2 * QPointF(qCos(alpha * M_PI / 180), -qSin(alpha * M_PI / 180));
         QPointF endPoint2 =
-            arrowBodyEndPoint + arrowWidth / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+            arrowBodyEndPoint + arrowWidth / 2 * QPointF(-qCos(alpha * M_PI / 180), qSin(alpha * M_PI / 180));
         QPointF point1 =
-            endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(cos(alpha * M_PI / 180), -sin(alpha * M_PI / 180));
+            endPoint1 + (headWidth - arrowWidth) / 2 * QPointF(qCos(alpha * M_PI / 180), -qSin(alpha * M_PI / 180));
         QPointF point2 =
-            endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-cos(alpha * M_PI / 180), sin(alpha * M_PI / 180));
+            endPoint2 + (headWidth - arrowWidth) / 2 * QPointF(-qCos(alpha * M_PI / 180), qSin(alpha * M_PI / 180));
 
-        path = QPainterPath(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
+        path = QPainterPath(-arrowWidth / 2 * QPointF(qCos((phi - 90) * M_PI / 180), qSin((phi - 90) * M_PI / 180)));
         path.quadTo(c, endPoint1);
         path.lineTo(point1);
         path.lineTo(QPointF(lineLength, 0));
         path.lineTo(point2);
         path.lineTo(endPoint2);
-        path.quadTo(c, arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
-        path.lineTo(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
+        path.quadTo(c, arrowWidth / 2 * QPointF(qCos((phi - 90) * M_PI / 180), qSin((phi - 90) * M_PI / 180)));
+        path.lineTo(-arrowWidth / 2 * QPointF(qCos((phi - 90) * M_PI / 180), qSin((phi - 90) * M_PI / 180)));
     }
 
     setPos(startPoint);
@@ -138,8 +138,8 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 
     QList<QGraphicsItem *> colliding = scene()->items(event->scenePos());
-    for (int i = 0; i < colliding.size(); ++i) {
-        if (qgraphicsitem_cast<CardItem *>(colliding[i])) {
+    for (QGraphicsItem *item : colliding) {
+        if (qgraphicsitem_cast<CardItem *>(item)) {
             event->ignore();
             return;
         }
@@ -205,8 +205,8 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }
     update();
 
-    for (int i = 0; i < childArrows.size(); ++i) {
-        childArrows[i]->mouseMoveEvent(event);
+    for (ArrowDragItem *child : childArrows) {
+        child->mouseMoveEvent(event);
     }
 }
 
@@ -251,13 +251,19 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     delArrow();
 
-    for (int i = 0; i < childArrows.size(); ++i)
-        childArrows[i]->mouseReleaseEvent(event);
+    for (ArrowDragItem *child : childArrows) {
+        child->mouseReleaseEvent(event);
+    }
 }
 
 ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
     : ArrowItem(_startItem->getOwner(), -1, _startItem, 0, Qt::green)
 {
+}
+
+void ArrowAttachItem::addChildArrow(ArrowAttachItem *childArrow)
+{
+    childArrows.append(childArrow);
 }
 
 void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -295,9 +301,13 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         updatePath();
     }
     update();
+
+    for (ArrowAttachItem *child : childArrows) {
+        child->mouseMoveEvent(event);
+    }
 }
 
-void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
+void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem)
         return;
@@ -319,4 +329,8 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
     }
 
     delArrow();
+
+    for (ArrowAttachItem *child : childArrows) {
+        child->mouseReleaseEvent(event);
+    }
 }

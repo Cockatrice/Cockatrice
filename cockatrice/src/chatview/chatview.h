@@ -33,7 +33,7 @@ class ChatView : public QTextBrowser
 {
     Q_OBJECT
 protected:
-    const TabSupervisor *const tabSupervisor;
+    TabSupervisor *const tabSupervisor;
     TabGame *const game;
 
 private:
@@ -83,7 +83,7 @@ private slots:
     void actMessageClicked();
 
 public:
-    ChatView(const TabSupervisor *_tabSupervisor,
+    ChatView(TabSupervisor *_tabSupervisor,
              const UserlistProxy *_userlistProxy,
              TabGame *_game,
              bool _showTimestamps,
@@ -103,7 +103,11 @@ public:
     void redactMessages(const QString &userName, int amount);
 
 protected:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void enterEvent(QEnterEvent *event);
+#else
     void enterEvent(QEvent *event);
+#endif
     void leaveEvent(QEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);

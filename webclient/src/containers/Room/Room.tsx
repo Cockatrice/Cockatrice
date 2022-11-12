@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, generatePath } from 'react-router-dom';
+import { useNavigate, useParams, generatePath } from 'react-router-dom';
 
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { RoomsService } from 'api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
@@ -17,25 +17,27 @@ import SayMessage from './SayMessage';
 import './Room.css';
 
 // @TODO (3)
-function Room(props) {
+const Room = (props) => {
+  const { joined, rooms, messages } = props;
+  const navigate = useNavigate();
+  const params = useParams();
 
-  const { joined, match, history, rooms, messages } = props;
-  const roomId = parseInt(match.params.roomId, 0);
+  const roomId = parseInt(params.roomId, 0);
+  const room = rooms[roomId];
+  const roomMessages = messages[roomId];
+  const users = room.userList;
 
-  if (!joined.find(({ roomId: id }) => id === roomId)) {
-    history.push(generatePath(RouteEnum.SERVER));
-  }
+  useEffect(() => {
+    if (!joined.find(({ roomId: id }) => id === roomId)) {
+      navigate(generatePath(RouteEnum.SERVER));
+    }
+  }, [joined]);
 
-  function handleRoomSay({ message }) {
+  const handleRoomSay = ({ message }) => {
     if (message) {
       RoomsService.roomSay(roomId, message);
     }
   }
-
-  const room = rooms[roomId];
-
-  const roomMessages = messages[roomId];
-  const users = room.userList;
 
   return (
     <div className="room-view">
@@ -98,4 +100,4 @@ const mapStateToProps = state => ({
   joined: RoomsSelectors.getJoinedRooms(state),
 });
 
-export default withRouter(connect(mapStateToProps)(Room));
+export default connect(mapStateToProps)(Room);

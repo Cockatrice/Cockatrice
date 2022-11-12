@@ -1,77 +1,74 @@
 # Find the OpenSSL runtime libraries (.dll) for Windows that
 # will be needed by Qt in order to access https urls.
+if(NOT DEFINED WIN32 OR NOT ${WIN32})
+  message(STATUS "Non-Windows device trying to execute FindWin32SslRuntime, skipping")
+  return()
+endif()
 
-if (WIN32)
-  # Get standard installation paths for OpenSSL under Windows
-
-  # http://www.slproweb.com/products/Win32OpenSSL.html
-
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    # target win64
-    set(_OPENSSL_ROOT_HINTS
-      ${OPENSSL_ROOT_DIR}
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (64-bit)_is1;Inno Setup: App Path]"
-      ENV OPENSSL_ROOT_DIR
-      )
-    file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
-    set(_OPENSSL_ROOT_PATHS
-      "C:/Tools/vcpkg/installed/x64-windows/bin"
-      "${_programfiles}/OpenSSL-Win64"
-      "C:/OpenSSL-Win64/"
-      )
-    unset(_programfiles)
-  else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    # target win32
-    set(_OPENSSL_ROOT_HINTS
-      ${OPENSSL_ROOT_DIR}
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (32-bit)_is1;Inno Setup: App Path]"
-      ENV OPENSSL_ROOT_DIR
-      )
-    file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
-    set(_OPENSSL_ROOT_PATHS
+if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
+  message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
+  file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
+  set(_OPENSSL_ROOT_PATHS
+      "$ENV{VCPKG_PACKAGES_DIR}/x64-windows/bin" "C:/OpenSSL-Win64/bin" "C:/OpenSSL-Win64"
+      "C:/Tools/vcpkg/installed/x64-windows/bin" "${_programfiles}/OpenSSL-Win64"
+      "D:/a/Cockatrice/Qt/Tools/OpenSSL/Win_x64/bin"
+  )
+  unset(_programfiles)
+elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
+  message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
+  file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
+  set(_OPENSSL_ROOT_PATHS
+      "$ENV{VCPKG_PACKAGES_DIR}/x86-windows/bin"
+      "C:/OpenSSL-Win32/bin"
+      "C:/OpenSSL-Win32"
+      "C:/OpenSSL"
       "C:/Tools/vcpkg/installed/x86-windows/bin"
       "${_programfiles}/OpenSSL"
       "${_programfiles}/OpenSSL-Win32"
-      "C:/OpenSSL/"
-      "C:/OpenSSL-Win32/"
-      )
-    unset(_programfiles)
-  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
-else ()
-  set(_OPENSSL_ROOT_HINTS
-    ${OPENSSL_ROOT_DIR}
-    ENV OPENSSL_ROOT_DIR
-    )
-endif ()
-
-set(_OPENSSL_ROOT_HINTS_AND_PATHS
-    HINTS ${_OPENSSL_ROOT_HINTS}
-    PATHS ${_OPENSSL_ROOT_PATHS}
-    )
-
-# For OpenSSL < 1.1, they are named libeay32 and ssleay32 and even if the dll is 64bit, it's still suffixed as *32.dll
-# For OpenSSL >= 1.1, they are named libcrypto and libssl with no suffix
-if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-  # target win64
-  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1-x64.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1-x64.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-  # target win32
-  FIND_FILE(WIN32SSLRUNTIME_LIBEAY NAMES libcrypto-1_1.dll libcrypto.dll libeay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-  FIND_FILE(WIN32SSLRUNTIME_SSLEAY NAMES libssl-1_1.dll libssl.dll ssleay32.dll ${_OPENSSL_ROOT_HINTS_AND_PATHS})
-endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
-IF(WIN32SSLRUNTIME_LIBEAY AND WIN32SSLRUNTIME_SSLEAY)
-  SET(WIN32SSLRUNTIME_LIBRARIES "${WIN32SSLRUNTIME_LIBEAY}" "${WIN32SSLRUNTIME_SSLEAY}")
-  SET(WIN32SSLRUNTIME_FOUND "YES")
-  message(STATUS "Found OpenSSL ${WIN32SSLRUNTIME_LIBRARIES}")
-ELSE()
-  SET(WIN32SSLRUNTIME_FOUND "NO")
-  message(WARNING "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime.")
-ENDIF()
-
-MARK_AS_ADVANCED(
-  WIN32SSLRUNTIME_LIBEAY
-  WIN32SSLRUNTIME_SSLEAY
+      "D:/a/Cockatrice/Qt/Tools/OpenSSL/Win_x86/bin"
   )
+  unset(_programfiles)
+endif()
+
+message(STATUS "Looking for OpenSSL @ $ENV{CMAKE_GENERATOR_PLATFORM} in ${_OPENSSL_ROOT_PATHS}")
+if("$ENV{CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
+  find_file(
+    WIN32SSLRUNTIME_LIBEAY
+    NAMES libcrypto-1_1-x64.dll libcrypto.dll
+    PATHS ${_OPENSSL_ROOT_PATHS}
+    NO_DEFAULT_PATH
+  )
+  find_file(
+    WIN32SSLRUNTIME_SSLEAY
+    NAMES libssl-1_1-x64.dll libssl.dll
+    PATHS ${_OPENSSL_ROOT_PATHS}
+    NO_DEFAULT_PATH
+  )
+elseif("$ENV{CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
+  find_file(
+    WIN32SSLRUNTIME_LIBEAY
+    NAMES libcrypto-1_1.dll libcrypto.dll
+    PATHS ${_OPENSSL_ROOT_PATHS}
+    NO_DEFAULT_PATH
+  )
+  find_file(
+    WIN32SSLRUNTIME_SSLEAY
+    NAMES libssl-1_1.dll libssl.dll
+    PATHS ${_OPENSSL_ROOT_PATHS}
+    NO_DEFAULT_PATH
+  )
+endif()
+
+if(WIN32SSLRUNTIME_LIBEAY AND WIN32SSLRUNTIME_SSLEAY)
+  set(WIN32SSLRUNTIME_LIBRARIES "${WIN32SSLRUNTIME_LIBEAY}" "${WIN32SSLRUNTIME_SSLEAY}")
+  set(WIN32SSLRUNTIME_FOUND "YES")
+  message(STATUS "Found OpenSSL ${WIN32SSLRUNTIME_LIBRARIES}")
+else()
+  set(WIN32SSLRUNTIME_FOUND "NO")
+  message(
+    WARNING
+      "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
+  )
+endif()
+
+mark_as_advanced(WIN32SSLRUNTIME_LIBEAY WIN32SSLRUNTIME_SSLEAY)

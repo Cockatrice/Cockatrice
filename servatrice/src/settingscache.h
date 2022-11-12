@@ -2,7 +2,7 @@
 #define SERVATRICE_SETTINGSCACHE_H
 
 #include <QList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QString>
 
@@ -17,7 +17,7 @@ public:
                   QSettings::Format format = QSettings::IniFormat,
                   QObject *parent = 0);
     static QString guessConfigurationPath();
-    QList<QRegExp> disallowedRegExp;
+    QList<QRegularExpression> disallowedRegExp;
     bool getIsPortableBuild() const
     {
         return isPortableBuild;

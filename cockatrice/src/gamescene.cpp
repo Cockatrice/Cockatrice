@@ -13,7 +13,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QSet>
-#include <math.h>
+#include <QtMath>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
     : QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize()), playerRotation(0)
@@ -53,7 +53,7 @@ void GameScene::removePlayer(Player *player)
             zone->close();
         }
     }
-    players.removeAt(players.indexOf(player));
+    players.removeOne(player);
     removeItem(player);
     rearrange();
 }
@@ -97,7 +97,7 @@ void GameScene::rearrange()
 
     const int playersCount = playersPlaying.size();
     const int columns = playersCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
-    const int rows = ceil((qreal)playersCount / columns);
+    const int rows = qCeil((qreal)playersCount / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 
@@ -178,7 +178,7 @@ void GameScene::addRevealedZoneView(Player *player,
 
 void GameScene::removeZoneView(ZoneViewWidget *item)
 {
-    zoneViews.removeAt(zoneViews.indexOf(item));
+    zoneViews.removeOne(item);
     removeItem(item);
 }
 
