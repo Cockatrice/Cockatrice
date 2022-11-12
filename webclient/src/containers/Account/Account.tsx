@@ -34,7 +34,7 @@ const Account = (props: AccountProps) => {
   };
 
   return (
-    <div className="account">
+    <Layout className="account">
       <AuthGuard />
       <div className="account-column">
         <Paper className="account-list">
@@ -97,7 +97,7 @@ const Account = (props: AccountProps) => {
           </div>
         </Paper>
       </div>
-    </div>
+    </Layout>
   )
 }
 
