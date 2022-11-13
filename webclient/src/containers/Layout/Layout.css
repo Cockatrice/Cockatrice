@@ -1,0 +1,26 @@
+.layout {
+    height: 100vh;
+    max-height: 100vh;
+    width: 100vw;
+    max-width: 100vw;
+    display: flex;
+    flex-flow: row nowrap;
+    overflow: hidden;
+}
+
+.bottom-bar__container {
+    background: #555;
+    height: 50px;
+    width: 100%;
+}
+
+.page__body {
+    flex: 1;
+    max-height: calc(100% - 50px);
+}
+
+.page {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+}

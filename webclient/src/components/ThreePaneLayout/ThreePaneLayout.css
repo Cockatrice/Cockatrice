@@ -33,4 +33,5 @@
 .three-pane-layout .grid-main__bottom.fixedHeight {
   height: 50%;
   overflow: visible;
+  padding: 0 0 16px;
 }
