@@ -66,7 +66,7 @@
   height: 100%;
   width: 100%;
   align-items: center;
-  padding: 5px 10px;
+  padding: 5px 20px;
   font-weight: bold;
 }
 
@@ -99,6 +99,7 @@
 
 .LeftNav-nav__actions {
   display: flex;
+  justify-content: center;
 }
 
 .LeftNav-nav__action {
