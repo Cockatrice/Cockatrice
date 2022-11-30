@@ -890,14 +890,14 @@ MessagesSettingsPage::MessagesSettingsPage()
     messageListLayout->addWidget(messageToolBar);
     messageListLayout->addWidget(messageList);
 
-    auto *messagesLayout = new QVBoxLayout; //combines the explainer label with the actual messages widget pieces
+    auto *messagesLayout = new QVBoxLayout; // combines the explainer label with the actual messages widget pieces
     messagesLayout->addLayout(messageListLayout);
     messagesLayout->addWidget(&explainMessagesLabel);
 
-    messageGroupBox = new QGroupBox; //draws a box around the above layout and allows it to be titled
+    messageGroupBox = new QGroupBox; // draws a box around the above layout and allows it to be titled
     messageGroupBox->setLayout(messagesLayout);
 
-    auto *mainLayout = new QVBoxLayout; //combines the messages groupbox with the rest of the menu
+    auto *mainLayout = new QVBoxLayout; // combines the messages groupbox with the rest of the menu
     mainLayout->addWidget(messageGroupBox);
     mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(highlightGroupBox);
@@ -1000,7 +1000,8 @@ void MessagesSettingsPage::retranslateUi()
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     chatMentionCompleterCheckbox.setText(tr("Enable mention completer"));
     messageGroupBox->setTitle(tr("In-game message macros"));
-    explainMessagesLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to use in-game message macros")));
+    explainMessagesLabel.setText(
+        QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to use in-game message macros")));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
