@@ -25,12 +25,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="406"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="406"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile creare la cartella dei temi in &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="412"/>
@@ -45,7 +45,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="414"/>
         <source>Open themes folder</source>
-        <translation type="unfinished"/>
+        <translation>Apri cartella temi</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="416"/>
@@ -165,7 +165,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>Redact all messages from this user in all rooms</source>
-        <translation type="unfinished"/>
+        <translation>Elimina tutti i messaggi di questo utente in tutte le stanze</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="106"/>
@@ -326,7 +326,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/cardfilter.cpp" line="35"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valore di Mana</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="37"/>
@@ -580,12 +580,12 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="564"/>
         <source>Add New URL</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi indirizzo URL</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="572"/>
         <source>Remove URL</source>
-        <translation type="unfinished"/>
+        <translation>Elimina indirizzo URL</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="712"/>
@@ -804,7 +804,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/dlg_connect.cpp" line="97"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Resetta Password</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="101"/>
@@ -937,7 +937,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="88"/>
         <source>Create game as spectator</source>
-        <translation type="unfinished"/>
+        <translation>Crea partita come spettatore</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="95"/>
@@ -1135,7 +1135,7 @@ Per rimuovere il tuo avatar attuale, conferma senza scegliere una nuova immagine
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="64"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>La nuova password è troppo corta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="67"/>
@@ -1272,32 +1272,32 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="20"/>
         <source>no limit</source>
-        <translation type="unfinished"/>
+        <translation>nessun limite</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="21"/>
         <source>5 minutes</source>
-        <translation type="unfinished"/>
+        <translation>5 minuti</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="22"/>
         <source>10 minutes</source>
-        <translation type="unfinished"/>
+        <translation>10 minuti</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="23"/>
         <source>30 minutes</source>
-        <translation type="unfinished"/>
+        <translation>30 minuti</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="24"/>
         <source>1 hour</source>
-        <translation type="unfinished"/>
+        <translation>1 ora</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="25"/>
         <source>2 hours</source>
-        <translation type="unfinished"/>
+        <translation>2 ore</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="27"/>
@@ -1307,12 +1307,12 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="30"/>
         <source>Show &amp;full games</source>
-        <translation type="unfinished"/>
+        <translation>Visualizza &amp;tutte le partite</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="33"/>
         <source>Show games &amp;that have started</source>
-        <translation type="unfinished"/>
+        <translation>Visualizza &amp;tutte le partite iniziate</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="36"/>
@@ -1322,12 +1322,12 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="39"/>
         <source>Hide &apos;&amp;ignored user&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Nascondi &apos;&amp;ignored user&apos; partite</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="47"/>
         <source>&amp;Newer than:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Più nuovo di:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="52"/>
@@ -1372,27 +1372,27 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="120"/>
         <source>Show games only if &amp;spectators can watch</source>
-        <translation type="unfinished"/>
+        <translation>Mostra le partite solo se &amp;gli spettatori possono guardare</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="124"/>
         <source>Show spectator password p&amp;rotected games</source>
-        <translation type="unfinished"/>
+        <translation>Mostra partite protette da password</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="126"/>
         <source>Show only if spectators can ch&amp;at</source>
-        <translation type="unfinished"/>
+        <translation>Mostra le partite solo se gli spettatori possono guardare</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="128"/>
         <source>Show only if spectators can see &amp;hands</source>
-        <translation type="unfinished"/>
+        <translation>Mostra le partite solo se gli spettatori possono guardare le mani</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="138"/>
         <source>Spectators</source>
-        <translation type="unfinished"/>
+        <translation>Spettatori</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="171"/>
@@ -1405,17 +1405,17 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="31"/>
         <source>Reset Password Challenge Warning</source>
-        <translation type="unfinished"/>
+        <translation>Avviso di reimpostazione della password di verifica della sfida</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation type="unfinished"/>
+        <translation>Si è verificato un problema. Prova a richiedere di nuovo una nuova password.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>Enter the information of the server and the account you&apos;d like to request a new password for.</source>
-        <translation type="unfinished"/>
+        <translation>Inserisci le informazioni del server e dell&apos;account per cui desideri richiedere una nuova password.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="40"/>
@@ -1440,12 +1440,12 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="89"/>
         <source>Reset Password Challenge</source>
-        <translation type="unfinished"/>
+        <translation>Reimposta password sfida</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="97"/>
         <source>Reset Password Challenge Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore di reimpostazione della password di verifica della sfida</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="97"/>
@@ -1458,7 +1458,7 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="30"/>
         <source>Enter the information of the server you&apos;d like to request a new password for.</source>
-        <translation type="unfinished"/>
+        <translation>Inserisci le informazioni del server per il quale desideri richiedere una nuova password.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="33"/>
@@ -1478,12 +1478,12 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="66"/>
         <source>Reset Password Request</source>
-        <translation type="unfinished"/>
+        <translation>Richiesta di reimpostazione della password</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="74"/>
         <source>Reset Password Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore di ripristino della password</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="74"/>
@@ -1496,17 +1496,17 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="31"/>
         <source>Reset Password Warning</source>
-        <translation type="unfinished"/>
+        <translation>Avviso di reimpostazione della password</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation type="unfinished"/>
+        <translation>Si è verificato un problema. Prova a richiedere di nuovo una nuova password.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="36"/>
         <source>Enter the received token and the new password in order to set your new password.</source>
-        <translation type="unfinished"/>
+        <translation>Inserisci il token ricevuto e la nuova password per impostare la tua nuova password.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="39"/>
@@ -1537,7 +1537,7 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="104"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Resetta la password</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
@@ -1550,7 +1550,7 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="122"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="131"/>
         <source>Reset Password Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore di ripristino della password</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="117"/>
@@ -1565,12 +1565,12 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="128"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="128"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>La tua password è troppo corta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="131"/>
@@ -1617,7 +1617,8 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Organizza
         <location filename="../src/dlg_register.cpp" line="18"/>
         <source>Enter your information and the information of the server you'd like to register to.
 Your email will be used to verify your account.</source>
-        <translation type="unfinished"/>
+        <translation>Inserisci le tue informazioni e le informazioni del server a cui desideri registrarti.
+La tua email verrà utilizzata per verificare il tuo account.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="22"/>
@@ -1685,7 +1686,7 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="../src/dlg_register.cpp" line="361"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>La tua password è troppo corta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="364"/>
@@ -1751,7 +1752,10 @@ Vuoi modificare le impostazioni della posizione del database della carte?</trans
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Il caricamento del database delle tue carte non è terminato
+
+Per favore crea un ticket di assistenza su https://github.com/Cockatrice/Cockatrice/issues with your cards.xml in allegato
+Desideri modificare l&apos;impostazione della posizione del database?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1384"/>
@@ -1778,7 +1782,11 @@ Vuoi modificare le impostazioni della posizione del database della carte?</trans
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Stato di caricamento del database delle carte sconosciuto
+
+Per favore crea un ticket di assistenza su:
+https://github.com/Cockatrice/Cockatrice/issues
+Desideri modificare l&apos;impostazione della posizione del database?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1400"/>
@@ -1881,7 +1889,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="55"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>Verifica la presenza di aggiornamenti del client</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="63"/>
@@ -2156,24 +2164,24 @@ Potresti dover creare dal codice sorgente da solo.</translation>
     <message>
         <location filename="../src/gamesmodel.cpp" line="48"/>
         <source>&gt;1 day</source>
-        <translation type="unfinished"/>
+        <translation>&gt;1 giorno</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/gamesmodel.cpp" line="57"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1%2 ora</numerusform><numerusform>%1%2 ore</numerusform><numerusform>%1%2 ora(e)</numerusform></translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="59"/>
         <source>new</source>
-        <translation type="unfinished"/>
+        <translation>nuovo</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/gamesmodel.cpp" line="62"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform></translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="158"/>
@@ -2257,12 +2265,12 @@ Potresti dover creare dal codice sorgente da solo.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="145"/>
         <source>Reset all paths</source>
-        <translation type="unfinished"/>
+        <translation>Reimposta tutti gli indirizzi di download</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="147"/>
         <source>All paths have been reset</source>
-        <translation type="unfinished"/>
+        <translation>Gli indirizzi di download sono stati resettati</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="203"/>
@@ -2317,7 +2325,7 @@ Potresti dover creare dal codice sorgente da solo.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Custom database directory:</source>
-        <translation type="unfinished"/>
+        <translation>Cartella database personalizzata.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="295"/>
@@ -2412,6 +2420,8 @@ Ragione: %1</translation>
 All running games will be lost.
 Reason for shutdown: %1</source>
         <translation><numerusform>Il server si riavvierà in un minuto.
+Tutti le partite saranno perse.
+Ragione dello spegnimento: %1</numerusform><numerusform>Il server si riavvierà in %n minuti.
 Tutti le partite saranno perse.
 Ragione dello spegnimento: %1</numerusform><numerusform>Il server si riavvierà in %n minuti.
 Tutti le partite saranno perse.
@@ -2846,7 +2856,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="637"/>
         <source>&amp;Restore password...</source>
-        <translation type="unfinished"/>
+        <translation>Recupera Password...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="638"/>
@@ -2922,12 +2932,12 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="659"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Cerca Aggiornamenti Carte...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="660"/>
         <source>View &amp;Debug Log</source>
-        <translation type="unfinished"/>
+        <translation>Vedi Log %Debug</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="888"/>
@@ -2995,6 +3005,8 @@ Se è la prima volta che usi Cockatrice o non sei sicuro, scegli &quot;Sì&quot;
 Set code(s): %1
 Do you want to enable it/them?</source>
         <translation><numerusform>%n nuovi set trovati nel database delle carte.
+Codici dei set: %1
+Desideri attivarli?</numerusform><numerusform>%n nuovi set trovati nel database delle carte.
 Codici dei set: %1
 Desideri attivarli?</numerusform><numerusform>%n nuovi set trovati nel database delle carte.
 Codici dei set: %1
@@ -3117,7 +3129,7 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="../src/window_main.cpp" line="1336"/>
         <location filename="../src/window_main.cpp" line="1345"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Reimposta Password</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1327"/>
@@ -3230,12 +3242,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="157"/>
         <source>%1 can now look at top card %2 at any time.</source>
-        <translation type="unfinished"/>
+        <translation>%1 può guardare la prima carta %2 della libreria in qualunque momento.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="158"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
-        <translation type="unfinished"/>
+        <translation>%1 non può più guardare la prima carta %2 del mazzo in qualunque momento.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="165"/>
@@ -3335,7 +3347,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 puts %2 into play%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 mette %2 in gioco %3 a faccia in giù.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="330"/>
@@ -3365,7 +3377,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="342"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
-        <translation type="unfinished"/>
+        <translation>%1 mette %2%3 in fondo alla propria libreria.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="344"/>
@@ -3390,7 +3402,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="371"/>
         <source>%1 draws %2 card(s).</source>
-        <translation><numerusform>%1 pesca una carta.</numerusform><numerusform>%1 pesca %2 carte.</numerusform></translation>
+        <translation><numerusform>%1 pesca una carta.</numerusform><numerusform>%1 pesca %2 carte.</numerusform><numerusform>%1 pesca %2 carte.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="380"/>
@@ -3401,7 +3413,7 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="../src/messagelogwidget.cpp" line="385"/>
         <source>%1 is looking at the top %3 card(s) %2.</source>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation><numerusform>%1 sta guardando la prima carta %2.</numerusform><numerusform>%1 sta guardando le prime %3 carte %2.</numerusform></translation>
+        <translation><numerusform>%1 sta guardando la prima carta %2.</numerusform><numerusform>%1 sta guardando le prime %3 carte %2.</numerusform><numerusform>%1 sta guardando le prime %3 carte %2.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="396"/>
@@ -3456,7 +3468,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
-        <translation><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carta.</numerusform><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carte.</numerusform></translation>
+        <translation><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carta.</numerusform><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carte.</numerusform><numerusform>%1 mischia il proprio mazzo e pesca una nuova mano di %2 carte.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="460"/>
@@ -3483,7 +3495,7 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="../src/messagelogwidget.cpp" line="498"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
-        <translation><numerusform>una carta</numerusform><numerusform>%1 carte</numerusform></translation>
+        <translation><numerusform>una carta</numerusform><numerusform>%1 carte</numerusform><numerusform>%1 carte</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="506"/>
@@ -3583,17 +3595,17 @@ Il database delle carte verrà ricaricato.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="617"/>
         <source>red counter(s)</source>
-        <translation><numerusform>segnalino rosso</numerusform><numerusform>segnalini rossi</numerusform></translation>
+        <translation><numerusform>segnalino rosso</numerusform><numerusform>segnalini rossi</numerusform><numerusform>segnalini rossi</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="620"/>
         <source>yellow counter(s)</source>
-        <translation><numerusform>segnalino giallo</numerusform><numerusform>segnalini gialli</numerusform></translation>
+        <translation><numerusform>segnalino giallo</numerusform><numerusform>segnalini gialli</numerusform><numerusform>segnalini gialli</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="623"/>
         <source>green counter(s)</source>
-        <translation><numerusform>segnalino verde</numerusform><numerusform>segnalini verdi</numerusform></translation>
+        <translation><numerusform>segnalino verde</numerusform><numerusform>segnalini verdi</numerusform><numerusform>segnalini verdi</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
@@ -3701,17 +3713,17 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>Add New Message</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Nuovo Messaggio</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="864"/>
         <source>Edit Message</source>
-        <translation type="unfinished"/>
+        <translation>Modifica Messaggio</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="868"/>
         <source>Remove Message</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Messaggio</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="953"/>
@@ -3807,7 +3819,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/game_specific_terms.h" line="31"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valore di Mana</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="33"/>
@@ -4379,12 +4391,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/player.cpp" line="2707"/>
         <source>Which position should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>In che posizione dovrebbe essere messa questa carta:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2707"/>
         <source>(max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>(max. %1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1120"/>
@@ -4394,7 +4406,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/player.cpp" line="1122"/>
         <source>0 and lower are in comparison to current hand size</source>
-        <translation type="unfinished"/>
+        <translation>0 e inferiore sono relativi al numero attuale di carte in mano</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1146"/>
@@ -4415,82 +4427,82 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>Reveal &amp;top cards to...</source>
-        <translation type="unfinished"/>
+        <translation>Rivela le &amp;prime carte a...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="732"/>
         <source>&amp;Top of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;In cima alla libreria...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="733"/>
         <source>&amp;Bottom of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;In fondo alla libreria...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="735"/>
         <source>&amp;Always look at top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Vedi sempre la prima carta</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="736"/>
         <source>&amp;Open deck in deck editor</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Apri il mazzo nell&apos;editor dei mazzi</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="744"/>
         <source>&amp;Play top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Gioca la prima carta</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="752"/>
         <source>&amp;Draw bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Pesca l&apos;ultima carta dal fondo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="753"/>
         <source>D&amp;raw bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>P&amp;esca carte dal fondo...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="754"/>
         <source>&amp;Play bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Gioca l&apos;ultima carta dal fondo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="755"/>
         <source>Play bottom card &amp;face down</source>
-        <translation type="unfinished"/>
+        <translation>Gioca l&apos;ultima carta dal fondo a &amp;faccia in giù</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="756"/>
         <source>Move bottom card to grave&amp;yard</source>
-        <translation type="unfinished"/>
+        <translation>Metti l&apos;ultima carta nel cimitero</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="757"/>
         <source>Move bottom card to e&amp;xile</source>
-        <translation type="unfinished"/>
+        <translation>Metti l&apos;ultima carta in esilio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="758"/>
         <source>Move bottom cards to &amp;graveyard...</source>
-        <translation type="unfinished"/>
+        <translation>Metti le ultime carte nel cimitero...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="759"/>
         <source>Move bottom cards to &amp;exile...</source>
-        <translation type="unfinished"/>
+        <translation>Metti le ultime carte in esilio...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="760"/>
         <source>Put bottom card on &amp;top</source>
-        <translation type="unfinished"/>
+        <translation>Metti l&apos;ultima carta in cima</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="781"/>
         <source>Selec&amp;ted cards</source>
-        <translation type="unfinished"/>
+        <translation>Carte selezionate</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1250"/>
@@ -4500,17 +4512,17 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/player.cpp" line="1361"/>
         <source>Move bottom cards to grave</source>
-        <translation type="unfinished"/>
+        <translation>Metti le ultime care nel cimitero</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1393"/>
         <source>Move bottom cards to exile</source>
-        <translation type="unfinished"/>
+        <translation>Metti le ultime care in esilio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1454"/>
         <source>Draw bottom cards</source>
-        <translation type="unfinished"/>
+        <translation>Pesca le ultime carte</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1528"/>
@@ -5316,7 +5328,7 @@ Vuoi salvare i cambiamenti?</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="805"/>
         <source>Could not save remote deck</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile salvare mazzo remoto</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="827"/>
@@ -5391,12 +5403,12 @@ Controlla se la cartella è valida e prova ancora.</translation>
         <location filename="../src/tab_deck_storage.cpp" line="187"/>
         <location filename="../src/tab_deck_storage.cpp" line="219"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="187"/>
         <source>Invalid deck file</source>
-        <translation type="unfinished"/>
+        <translation>File mazzo non valido</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="194"/>
@@ -5417,7 +5429,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="219"/>
         <source>Failed to upload deck to server</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile caricare il mazzo sul server</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="235"/>
@@ -5554,7 +5566,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="551"/>
         <source>&amp;Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>Focus sulla Chat</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="554"/>
@@ -5625,12 +5637,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="1209"/>
         <source>A player has joined game #%1</source>
-        <translation type="unfinished"/>
+        <translation>Un giocatore si è unito alla partita #%1</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1210"/>
         <source>%1 has joined the game</source>
-        <translation type="unfinished"/>
+        <translation>%1 si è unito alla partita</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1221"/>
@@ -5912,7 +5924,7 @@ Più informazioni inserisci, più specifici saranno i risultati.</translation>
     <message>
         <location filename="../src/tab_replays.cpp" line="200"/>
         <source>Folder download is not yet supported. Please download replays individually.</source>
-        <translation type="unfinished"/>
+        <translation>Il download di cartelle non è ancora supportato. Per faovre scarica i replay uno alla volta.</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="268"/>
@@ -5991,22 +6003,22 @@ Più informazioni inserisci, più specifici saranno i risultati.</translation>
     <message>
         <location filename="../src/tab_server.cpp" line="210"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile unirsi alla stanza: non esiste sul server.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="215"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
-        <translation type="unfinished"/>
+        <translation>Il server pensa che tu sia nella stanza ma il tuo client non è in grado di mostrarlo. Prova a riavviare il client.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="220"/>
         <source>You do not have the required permission to join this server room.</source>
-        <translation type="unfinished"/>
+        <translation>Non hai i requisiti necessari per unirti a questa stanza.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="225"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile unirsi alla stanza a causa di un errore sconosciuto: %1.</translation>
     </message>
 </context>
 <context>
@@ -6262,7 +6274,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/user_context_menu.cpp" line="70"/>
         <source>Promote user to &amp;judge</source>
-        <translation type="unfinished"/>
+        <translation>Promuovi utente a &amp;giudice</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="71"/>
@@ -6358,7 +6370,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/user_context_menu.cpp" line="336"/>
         <source>Remove this user&apos;s messages</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi i messaggi di questo utente</translation>
     </message>
 </context>
 <context>
@@ -6422,7 +6434,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/userinfobox.cpp" line="309"/>
         <source>The entered password does not match your account.</source>
-        <translation type="unfinished"/>
+        <translation>La password inserita non corrisponde al tuo accound.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="302"/>
@@ -6453,46 +6465,46 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/userinfobox.cpp" line="66"/>
         <source>User Information</source>
-        <translation type="unfinished"/>
+        <translation>Informazioni Utente</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="73"/>
         <source>Real Name:</source>
-        <translation type="unfinished"/>
+        <translation>Nome Reale:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="75"/>
         <source>User Level:</source>
-        <translation type="unfinished"/>
+        <translation>Livello dell&apos;Utente:</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/userinfobox.cpp" line="150"/>
         <source>%n Year(s), </source>
         <comment>amount of years (only shown if more than 0)</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>1 Anno.</numerusform><numerusform>%n Anni.</numerusform><numerusform>%n Anno(i).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/userinfobox.cpp" line="153"/>
         <source>%10%n Day(s) %20</source>
         <comment>amount of years (if more than 0), amount of days, date in local short format</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%10%n Giorno %20</numerusform><numerusform>%10%n Giorni %20</numerusform><numerusform>%10%n Giorno(i) %20</numerusform></translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="211"/>
         <source>Enter Password</source>
-        <translation type="unfinished"/>
+        <translation>Inserisci Password</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="212"/>
         <source>Password verification is required in order to change your email address</source>
-        <translation type="unfinished"/>
+        <translation>La verifica della password è necessaria per cambiare il tuo indirizzo email</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="253"/>
         <location filename="../src/userinfobox.cpp" line="314"/>
         <location filename="../src/userinfobox.cpp" line="337"/>
         <source>An error occurred while trying to update your user information.</source>
-        <translation type="unfinished"/>
+        <translation>E&apos; stato riscontrato un errore durante l&apos;aggiornamento delle tue informazioni utente.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="306"/>
@@ -6560,7 +6572,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/dlg_settings.cpp" line="514"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
-        <translation type="unfinished"/>
+        <translation>Usa menù-a-strappo, permettendo ai menù del tasto destro del mouse di rimanere sullo schermo</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="515"/>
@@ -6580,7 +6592,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/dlg_settings.cpp" line="518"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
-        <translation type="unfinished"/>
+        <translation>Notifca nella barra delle applicazioni quando degli utenti nella tua lista amici si connetto</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="519"/>
@@ -6626,7 +6638,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/userlist.cpp" line="142"/>
         <source>Redact all messages from this user in all rooms</source>
-        <translation type="unfinished"/>
+        <translation>Ottieni tutti i messaggi di questo utente in tutte le stanze</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="144"/>
@@ -6725,23 +6737,23 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="132"/>
         <source>Use CTRL+A to select all sets in the view.</source>
-        <translation type="unfinished"/>
+        <translation>Usa CTRL+A per selezionare le espansioni nella visuale.</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="133"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor.</source>
-        <translation type="unfinished"/>
+        <translation>Solo carte in espansioni abilitate appariranno nella lista carte dell&apos;editor di mazzo.</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="134"/>
         <source>Image priority is decided in the following order:</source>
-        <translation type="unfinished"/>
+        <translation>La priorità di immagine è decisa nell&apos;ordine seguente:</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="135"/>
         <source>first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)</source>
         <comment>%1 is a link to the wiki</comment>
-        <translation type="unfinished"/>
+        <translation>innanzitutto la cartella CUSTOM (%1), poi le Espansioni Abilitate in questo dialogo (da Cima a Fondo)</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="134"/>
@@ -6854,12 +6866,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="44"/>
         <source>Card Counters</source>
-        <translation type="unfinished"/>
+        <translation>Segnalini Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="46"/>
         <source>Player Counters</source>
-        <translation type="unfinished"/>
+        <translation>Segnalini Giocatore</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="48"/>
@@ -6994,7 +7006,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="183"/>
         <source>Manage Sets...</source>
-        <translation type="unfinished"/>
+        <translation>Gestisci Espansioni...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="186"/>
@@ -7019,7 +7031,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="199"/>
         <source>Load Deck from Clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Carica Mazzo da Appunti...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="202"/>
@@ -7029,7 +7041,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="206"/>
         <source>Open Custom Pictures Folder</source>
-        <translation type="unfinished"/>
+        <translation>Apri Cartella Immagini Personalizzate</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="209"/>
@@ -7045,7 +7057,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="../src/shortcutssettings.h" line="215"/>
         <location filename="../src/shortcutssettings.h" line="580"/>
         <source>Reset Layout</source>
-        <translation type="unfinished"/>
+        <translation>Reimposta Layout</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="218"/>
@@ -7060,113 +7072,113 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="225"/>
         <source>Save Deck to Clipboard, Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Salva Mazzo in Appunti, Annotato</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="229"/>
         <source>Save Deck to Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Salva Mazzo in Appunti</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="232"/>
         <source>Load Local Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Carica Mazzo Locale...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="235"/>
         <source>Load Remote Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Carica Mazzo da Remoto...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="238"/>
         <source>Set Ready to Start</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Pronto a Iniziare</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="242"/>
         <source>Toggle Sideboard Lock</source>
-        <translation type="unfinished"/>
+        <translation>Attiva Blocco della Sideboard</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="245"/>
         <location filename="../src/shortcutssettings.h" line="317"/>
         <source>Add Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Verde</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="248"/>
         <location filename="../src/shortcutssettings.h" line="320"/>
         <source>Remove Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Verde</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="251"/>
         <location filename="../src/shortcutssettings.h" line="323"/>
         <source>Set Green Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Verdi...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="254"/>
         <source>Add Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Giallo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="257"/>
         <source>Remove Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Giallo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="260"/>
         <source>Set Yellow Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Gialli</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="263"/>
         <location filename="../src/shortcutssettings.h" line="308"/>
         <source>Add Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Rosso</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="266"/>
         <location filename="../src/shortcutssettings.h" line="311"/>
         <source>Remove Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Rosso</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="269"/>
         <location filename="../src/shortcutssettings.h" line="314"/>
         <source>Set Red Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Rossi...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="272"/>
         <source>Add Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Vita</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="275"/>
         <source>Remove Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Vita</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="278"/>
         <source>Set Life Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Vita...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="281"/>
         <source>Add White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Bianco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="284"/>
         <source>Remove White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Bianco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="287"/>
         <source>Set White Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Bianchi</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="290"/>
@@ -7176,107 +7188,107 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="293"/>
         <source>Remove Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Blu</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="296"/>
         <source>Set Blue Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Blu...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="299"/>
         <source>Add Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Nero</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="302"/>
         <source>Remove Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Nero</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="305"/>
         <source>Set Black Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalino Nero...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="326"/>
         <source>Add Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Segnalino Incolore</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="329"/>
         <source>Remove Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Segnalino Incolore</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="332"/>
         <source>Set Colorless Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Segnalini Incolore...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="335"/>
         <source>Add Other Counter</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Altro Segnalino</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="338"/>
         <source>Remove Other Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Altro Segnalino</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="341"/>
         <source>Set Other Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Altri Segnalini...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="344"/>
         <source>Add Power (+1/+0)</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Forza (+1/+0)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="347"/>
         <source>Remove Power (-1/-0)</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Forza (-1/-0)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="350"/>
         <source>Move Toughness to Power (+1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Sposta Costituzione a Forza (+1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="353"/>
         <source>Add Toughness (+0/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Costituzione (+0/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="356"/>
         <source>Remove Toughness (-0/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Costituzione (-0/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="359"/>
         <source>Move Power to Toughness (-1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Sposta Forza a Costituzione (-1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="362"/>
         <source>Add Power and Toughness (+1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Aggiungi Forza e Costituzione (+1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="365"/>
         <source>Remove Power and Toughness (-1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi Forza e Costituzione (-1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="368"/>
         <source>Set Power and Toughness...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta Forza e Costituzione...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="371"/>
         <source>Reset Power and Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Resetta Forza e Costituzione</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="374"/>
@@ -7341,7 +7353,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="404"/>
         <source>Next Phase Action</source>
-        <translation type="unfinished"/>
+        <translation>Nuova Fase</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="407"/>
@@ -7361,17 +7373,17 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="416"/>
         <source>Toggle Untap</source>
-        <translation type="unfinished"/>
+        <translation>Abilita STAPpa</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="419"/>
         <source>Turn Card Over</source>
-        <translation type="unfinished"/>
+        <translation>Gira Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="422"/>
         <source>Peek Card</source>
-        <translation type="unfinished"/>
+        <translation>Osserva Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="425"/>
@@ -7381,12 +7393,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="428"/>
         <source>Attach Card...</source>
-        <translation type="unfinished"/>
+        <translation>Attacca Carta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="431"/>
         <source>Unattach Card</source>
-        <translation type="unfinished"/>
+        <translation>Stacca Carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="434"/>
@@ -7396,28 +7408,28 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="437"/>
         <source>Create Token...</source>
-        <translation type="unfinished"/>
+        <translation>Crea Pedina...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="440"/>
         <source>Create All Related Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Crea Tutte le Pedine Correlate</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="443"/>
         <source>Create Another Token</source>
-        <translation type="unfinished"/>
+        <translation>Crea un&apos;Altra Pedina</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="446"/>
         <source>Set Annotation...</source>
-        <translation type="unfinished"/>
+        <translation>Imposta annotazione...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="449"/>
         <location filename="../src/shortcutssettings.h" line="502"/>
         <source>Bottom of Library</source>
-        <translation type="unfinished"/>
+        <translation>Fondo del mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="452"/>
@@ -7445,19 +7457,19 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="../src/shortcutssettings.h" line="460"/>
         <location filename="../src/shortcutssettings.h" line="521"/>
         <source>Top of Library</source>
-        <translation type="unfinished"/>
+        <translation>Vedi Cima della Libreria</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="463"/>
         <location filename="../src/shortcutssettings.h" line="489"/>
         <location filename="../src/shortcutssettings.h" line="507"/>
         <source>Battlefield, Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Campo di battaglia, faccia in giù</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="466"/>
         <source>Battlefield</source>
-        <translation type="unfinished"/>
+        <translation>Campo di battaglia</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="474"/>
@@ -7472,12 +7484,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="480"/>
         <source>Top Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Vedi Prime Carte della Libreria</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="483"/>
         <source>Close Recent View</source>
-        <translation type="unfinished"/>
+        <translation>Chiudi Viste di Recente</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="486"/>
@@ -7489,33 +7501,33 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="../src/shortcutssettings.h" line="494"/>
         <location filename="../src/shortcutssettings.h" line="513"/>
         <source>Graveyard (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Cimitero (multiplo)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="499"/>
         <location filename="../src/shortcutssettings.h" line="518"/>
         <source>Exile (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Esilia (multiplo)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="524"/>
         <source>Draw Bottom Card</source>
-        <translation type="unfinished"/>
+        <translation>Pesca la carta in fondo al mazzo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="527"/>
         <source>Draw Multiple Cards from Bottom...</source>
-        <translation type="unfinished"/>
+        <translation>Pesca più carte dal fondo del mazzo...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="530"/>
         <source>Draw Arrow...</source>
-        <translation type="unfinished"/>
+        <translation>Disegna freccia...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="533"/>
         <source>Remove Local Arrows</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi frecce locali</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="536"/>
@@ -7550,47 +7562,47 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="../src/shortcutssettings.h" line="553"/>
         <source>Draw Multiple Cards...</source>
-        <translation type="unfinished"/>
+        <translation>Pesca più carte...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="556"/>
         <source>Undo Draw</source>
-        <translation type="unfinished"/>
+        <translation>Annulla Disegno</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="559"/>
         <source>Always Reveal Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Rivela sempre la carta in cima</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="562"/>
         <source>Always Look At Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Guarda sempre la carta in cima</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="565"/>
         <source>Rotate View Clockwise</source>
-        <translation type="unfinished"/>
+        <translation>Ruota la vista in senso orario</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="568"/>
         <source>Rotate View Counterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Ruota la vista in senso antiorario</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="571"/>
         <source>Unfocus Text Box</source>
-        <translation type="unfinished"/>
+        <translation>Non focalizzare il Blocco di Testo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="574"/>
         <source>Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>Focus sulla Chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="577"/>
         <source>Clear Chat</source>
-        <translation type="unfinished"/>
+        <translation>Cancella chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="583"/>
