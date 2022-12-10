@@ -680,11 +680,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     room->addClient(this);
     rooms.insert(room->getId(), room);
 
-    Event_RoomSay joinMessageEvent;
-    joinMessageEvent.set_message(room->getJoinMessage().toStdString());
-    joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
-    rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
-
     QReadLocker chatHistoryLocker(&room->historyLock);
     QList<ServerInfo_ChatMessage> chatHistory = room->getChatHistory();
     ServerInfo_ChatMessage chatMessage;
@@ -697,6 +692,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
             QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
     }
+  
+    Event_RoomSay joinMessageEvent;
+    joinMessageEvent.set_message(room->getJoinMessage().toStdString());
+    joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
+    rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
 
     Response_JoinRoom *re = new Response_JoinRoom;
     room->getInfo(*re->mutable_room_info(), true);
