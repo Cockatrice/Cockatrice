@@ -692,7 +692,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
             QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
     }
-  
+
     Event_RoomSay joinMessageEvent;
     joinMessageEvent.set_message(room->getJoinMessage().toStdString());
     joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
