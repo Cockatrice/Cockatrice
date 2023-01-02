@@ -1,10 +1,13 @@
-const fse = require('fs-extra');
-const path = require('path');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const fse = require("fs-extra");
+const fs = require("fs");
+const path = require("path");
+const util = require("util");
+const pbjs = require("protobufjs-cli/pbjs");
+const pbts = require("protobufjs-cli/pbts");
+const exec = util.promisify(require("child_process").exec);
 
-const ROOT_DIR = './src';
-const PUBLIC_DIR = './public';
+const ROOT_DIR = "./src";
+const PUBLIC_DIR = "./public";
 
 const protoFilesDir = `${PUBLIC_DIR}/pb`;
 const i18nDefaultFile = `${ROOT_DIR}/i18n-default.json`;
@@ -12,13 +15,13 @@ const serverPropsFile = `${ROOT_DIR}/server-props.json`;
 const masterProtoFile = `${ROOT_DIR}/proto-files.json`;
 
 const sharedFiles = [
-  ['../common/pb', protoFilesDir],
-  ['../cockatrice/resources/countries', `${ROOT_DIR}/images/countries`],
+  ["../common/pb", protoFilesDir],
+  ["../cockatrice/resources/countries", `${ROOT_DIR}/images/countries`],
 ];
 
 const i18nFileRegex = /\.i18n\.json$/;
 
-const i18nOnly = process.argv.indexOf('-i18nOnly') > -1;
+const i18nOnly = process.argv.indexOf("-i18nOnly") > -1;
 
 (async () => {
   if (i18nOnly) {
@@ -36,7 +39,9 @@ const i18nOnly = process.argv.indexOf('-i18nOnly') > -1;
 
 async function copySharedFiles() {
   try {
-    return await Promise.all(sharedFiles.map(([src, dest]) => fse.copy(src, dest, { overwrite: true })));
+    return await Promise.all(
+      sharedFiles.map(([src, dest]) => fse.copy(src, dest, { overwrite: true }))
+    );
   } catch (e) {
     console.error(e);
     process.exitCode = 1;
@@ -44,11 +49,35 @@ async function copySharedFiles() {
 }
 
 async function createMasterProtoFile() {
+  pbjs.main([
+    ...fs
+      .readdirSync("../common/pb")
+      .filter((file) => file.endsWith(".proto"))
+      .map((name) => `../common/pb/${name}`),
+    "-t",
+    "static-module",
+    "-o",
+    "src/protoFiles.js",
+    "--no-verify",
+    "--no-convert",
+    "--no-delimited",
+    "--no-beautify",
+  ]);
+  removeExportsTags('src/protoFiles.js')
+  pbts.main([
+    "-o",
+    "src/protoFiles.d.ts",
+    "--no-comments",
+    "src/protoFiles.js",
+  ]);
   try {
     fse.readdir(protoFilesDir, (err, files) => {
       if (err) throw err;
 
-      fse.outputFile(masterProtoFile, JSON.stringify(files.filter(file => /\.proto$/.test(file))));
+      fse.outputFile(
+        masterProtoFile,
+        JSON.stringify(files.filter((file) => /\.proto$/.test(file)))
+      );
     });
   } catch (e) {
     console.error(e);
@@ -58,9 +87,12 @@ async function createMasterProtoFile() {
 
 async function createServerProps() {
   try {
-    fse.outputFile(serverPropsFile, JSON.stringify({
-      REACT_APP_VERSION: await getCommitHash(),
-    }));
+    fse.outputFile(
+      serverPropsFile,
+      JSON.stringify({
+        REACT_APP_VERSION: await getCommitHash(),
+      })
+    );
   } catch (e) {
     console.error(e);
     process.exitCode = 1;
@@ -70,14 +102,16 @@ async function createServerProps() {
 async function createI18NDefault() {
   try {
     const files = getAllFiles(ROOT_DIR, i18nFileRegex);
-    const allJson = await Promise.all(files.map(file => fse.readJson(file)));
+    const allJson = await Promise.all(files.map((file) => fse.readJson(file)));
 
     const rollup = allJson.reduce((acc, json) => {
       const newKeys = Object.keys(json);
 
-      newKeys.forEach(key => {
+      newKeys.forEach((key) => {
         if (acc[key]) {
-          throw new Error(`i18n key collision: ${key}\n${JSON.stringify(json)}`);
+          throw new Error(
+            `i18n key collision: ${key}\n${JSON.stringify(json)}`
+          );
         }
 
         acc[key] = json[key];
@@ -94,7 +128,7 @@ async function createI18NDefault() {
 }
 
 async function getCommitHash() {
-  return (await exec('git rev-parse HEAD')).stdout.trim();
+  return (await exec("git rev-parse HEAD")).stdout.trim();
 }
 
 function getAllFiles(dirPath, regex = /./, allFiles = []) {
@@ -109,4 +143,13 @@ function getAllFiles(dirPath, regex = /./, allFiles = []) {
 
     return files;
   }, allFiles);
+}
+/** @param {string[]} files */
+function removeExportsTags(file) {
+  const content = fs
+    .readFileSync(file, { encoding: "utf-8" })
+    .split("\n")
+    .map((s) => s.replace("@exports", "@name"))
+    .join("\n");
+  fs.writeFileSync(file, content, { encoding: "utf-8" });
 }

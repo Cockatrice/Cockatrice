@@ -1,109 +1,95 @@
-import { Room, StatusEnum, User, WebSocketConnectReason } from 'types';
+import {
+  Event_ConnectionClosed,
+  IEvent_AddToList,
+  IEvent_ConnectionClosed,
+  IEvent_ListRooms,
+  IEvent_RemoveFromList,
+  IEvent_ServerIdentification,
+  IEvent_ServerMessage,
+  IEvent_UserJoined,
+  IEvent_UserLeft,
+} from 'protoFiles';
+import { StatusEnum, WebSocketConnectReason } from 'types';
+import type { Handlers } from 'websocket/services/ProtobufService';
 
 import { SessionCommands } from '../commands';
 import { RoomPersistence, SessionPersistence } from '../persistence';
-import { ProtobufEvents } from '../services/ProtobufService';
 import { generateSalt, passwordSaltSupported } from '../utils';
 import webClient from '../WebClient';
 
-export const SessionEvents: ProtobufEvents = {
+export const SessionHandlers: Handlers = {
   '.Event_AddToList.ext': addToList,
   '.Event_ConnectionClosed.ext': connectionClosed,
   '.Event_ListRooms.ext': listRooms,
-  '.Event_NotifyUser.ext': notifyUser,
-  '.Event_PlayerPropertiesChanges.ext': playerPropertiesChanges,
   '.Event_RemoveFromList.ext': removeFromList,
   '.Event_ServerIdentification.ext': serverIdentification,
   '.Event_ServerMessage.ext': serverMessage,
-  '.Event_ServerShutdown.ext': serverShutdown,
   '.Event_UserJoined.ext': userJoined,
   '.Event_UserLeft.ext': userLeft,
-  '.Event_UserMessage.ext': userMessage,
-}
+};
 
-function addToList({ listName, userInfo }: AddToListData) {
+function addToList({ listName, userInfo }: IEvent_AddToList) {
   switch (listName) {
-    case 'buddy': {
-      SessionPersistence.addToBuddyList(userInfo);
+    case 'buddy':
+      SessionPersistence.addToBuddyList(userInfo!);
       break;
-    }
-    case 'ignore': {
-      SessionPersistence.addToIgnoreList(userInfo);
+    case 'ignore':
+      SessionPersistence.addToIgnoreList(userInfo!);
       break;
-    }
-    default: {
+    default:
       console.log(`Attempted to add to unknown list: ${listName}`);
-    }
   }
 }
 
-function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
-  let message;
-
+let r = Event_ConnectionClosed.CloseReason;
+export const messageMap = {
+  [r.USER_LIMIT_REACHED]: 'The server has reached its maximum user capacity',
+  [r.TOO_MANY_CONNECTIONS]:
+    'There are too many concurrent connections from your address',
+  [r.BANNED]: 'You are banned',
+  [r.DEMOTED]: 'You were demoted',
+  [r.SERVER_SHUTDOWN]: 'Scheduled server shutdown',
+  [r.USERNAMEINVALID]: 'Invalid username',
+  [r.LOGGEDINELSEWERE]:
+    'You have been logged out due to logging in at another location',
+  [r.OTHER]: 'Unkown reason',
+};
+export function connectionClosed({ reason, reasonStr }: IEvent_ConnectionClosed) {
+  let message: string
   // @TODO (5)
   if (reasonStr) {
     message = reasonStr;
+  } else if (reason && reason in messageMap) {
+    message = messageMap[reason];
   } else {
-    switch (reason) {
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USER_LIMIT_REACHED:
-        message = 'The server has reached its maximum user capacity';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.TOO_MANY_CONNECTIONS:
-        message = 'There are too many concurrent connections from your address';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.BANNED:
-        message = 'You are banned';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.DEMOTED:
-        message = 'You were demoted';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.SERVER_SHUTDOWN:
-        message = 'Scheduled server shutdown';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.USERNAMEINVALID:
-        message = 'Invalid username';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.LOGGEDINELSEWERE:
-        message = 'You have been logged out due to logging in at another location';
-        break;
-      case webClient.protobuf.controller.Event_ConnectionClosed.CloseReason.OTHER:
-      default:
-        message = 'Unknown reason';
-        break;
-    }
+    message = 'Unknown reason';
   }
-
   SessionCommands.updateStatus(StatusEnum.DISCONNECTED, message);
 }
 
-function listRooms({ roomList }: ListRoomsData) {
+function listRooms({ roomList }: IEvent_ListRooms) {
+  if (!roomList) {
+    throw new Error();
+  }
   RoomPersistence.updateRooms(roomList);
 
   if (webClient.clientOptions.autojoinrooms) {
     roomList.forEach(({ autoJoin, roomId }) => {
       if (autoJoin) {
-        SessionCommands.joinRoom(roomId);
+        SessionCommands.joinRoom(roomId!);
       }
     });
   }
 }
 
-function notifyUser(payload) {
-  // console.info('Event_NotifyUser', payload);
-}
-
-function playerPropertiesChanges(payload) {
-  // console.info('Event_PlayerPropertiesChanges', payload);
-}
-
-function removeFromList({ listName, userName }: RemoveFromListData) {
+function removeFromList({ listName, userName }: IEvent_RemoveFromList) {
   switch (listName) {
     case 'buddy': {
-      SessionPersistence.removeFromBuddyList(userName);
+      SessionPersistence.removeFromBuddyList(userName!);
       break;
     }
     case 'ignore': {
-      SessionPersistence.removeFromIgnoreList(userName);
+      SessionPersistence.removeFromIgnoreList(userName!);
       break;
     }
     default: {
@@ -112,10 +98,13 @@ function removeFromList({ listName, userName }: RemoveFromListData) {
   }
 }
 
-function serverIdentification(info: ServerIdentificationData) {
+function serverIdentification(info: IEvent_ServerIdentification) {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;
   if (protocolVersion !== webClient.protocolVersion) {
-    SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
+    SessionCommands.updateStatus(
+      StatusEnum.DISCONNECTED,
+      `Protocol version mismatch: ${protocolVersion}`
+    );
     SessionCommands.disconnect();
     return;
   }
@@ -157,74 +146,26 @@ function serverIdentification(info: ServerIdentificationData) {
       }
       break;
     default:
-      SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + options.reason);
+      SessionCommands.updateStatus(
+        StatusEnum.DISCONNECTED,
+        'Unknown Connection Reason: ' + options.reason
+      );
       SessionCommands.disconnect();
       break;
   }
 
   webClient.options = {};
-  SessionPersistence.updateInfo(serverName, serverVersion);
+  SessionPersistence.updateInfo(serverName!, serverVersion!);
 }
 
-function serverMessage({ message }: ServerMessageData) {
-  SessionPersistence.serverMessage(message);
+function serverMessage({ message }: IEvent_ServerMessage) {
+  SessionPersistence.serverMessage(message!);
 }
 
-function serverShutdown(payload) {
-  // console.info('Event_ServerShutdown', payload);
+function userJoined({ userInfo }: IEvent_UserJoined) {
+  SessionPersistence.userJoined(userInfo!);
 }
 
-function userJoined({ userInfo }: UserJoinedData) {
-  SessionPersistence.userJoined(userInfo);
-}
-
-function userLeft({ name }: UserLeftData) {
-  SessionPersistence.userLeft(name);
-}
-
-function userMessage(payload) {
-  // console.info('Event_UserMessage', payload);
-}
-
-export interface SessionEvent {
-  sessionEvent: {}
-}
-
-export interface AddToListData {
-  listName: string;
-  userInfo: User;
-}
-
-export interface ConnectionClosedData {
-  endTime: number;
-  reason: number;
-  reasonStr: string;
-}
-
-export interface ListRoomsData {
-  roomList: Room[];
-}
-
-export interface RemoveFromListData {
-  listName: string;
-  userName: string;
-}
-
-export interface ServerIdentificationData {
-  protocolVersion: number;
-  serverName: string;
-  serverVersion: string;
-  serverOptions: number;
-}
-
-export interface ServerMessageData {
-  message: string;
-}
-
-export interface UserJoinedData {
-  userInfo: User;
-}
-
-export interface UserLeftData {
-  name: string;
+function userLeft({ name }: IEvent_UserLeft) {
+  SessionPersistence.userLeft(name!);
 }

@@ -4,6 +4,7 @@ import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 
 import { RoomPersistence, SessionPersistence } from './persistence';
+import { SessionHandlers } from './events';
 
 export class WebClient {
   public socket = new WebSocketService(this);
@@ -52,6 +53,7 @@ export class WebClient {
     if (process.env.NODE_ENV !== 'test') {
       console.log(this);
     }
+    this.protobuf.AddHandlers(SessionHandlers)
   }
 
   public connect(options: WebSocketConnectOptions) {

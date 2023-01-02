@@ -1,5 +1,9 @@
 import { HostDTO } from 'services';
-import { StatusEnum, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
+import {
+  StatusEnum,
+  WebSocketConnectReason,
+  WebSocketConnectOptions,
+} from 'types';
 
 import { RoomPersistence, SessionPersistence } from '../persistence';
 import webClient from '../WebClient';
@@ -10,12 +14,33 @@ import {
   ForgotPasswordParams,
   ForgotPasswordResetParams,
   RequestPasswordSaltParams,
-  ServerRegisterParams
+  ServerRegisterParams,
 } from '../../store';
 import NormalizeService from '../utils/NormalizeService';
+import {
+  Response,
+  Command_Login,
+  SessionCommand,
+  Command_RequestPasswordSalt,
+  Command_Register,
+  Command_Activate,
+  Command_ForgotPasswordRequest,
+  Command_ForgotPasswordChallenge,
+  Command_ForgotPasswordReset,
+  Command_ListUsers,
+  Command_ListRooms,
+  Command_JoinRoom,
+  Command_AddToList,
+  Command_RemoveFromList,
+  Command_ViewLogHistory,
+  ModeratorCommand,
+} from 'protoFiles';
 
 export class SessionCommands {
-  static connect(options: WebSocketConnectOptions, reason: WebSocketConnectReason): void {
+  static connect(
+    options: WebSocketConnectOptions,
+    reason: WebSocketConnectReason
+  ): void {
     switch (reason) {
       case WebSocketConnectReason.LOGIN:
       case WebSocketConnectReason.REGISTER:
@@ -29,7 +54,10 @@ export class SessionCommands {
         webClient.testConnect({ ...options });
         return;
       default:
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Attempt: ' + reason);
+        SessionCommands.updateStatus(
+          StatusEnum.DISCONNECTED,
+          'Unknown Connection Attempt: ' + reason
+        );
         return;
     }
 
@@ -50,21 +78,22 @@ export class SessionCommands {
     };
 
     if (passwordSalt) {
-      loginConfig.hashedPassword = hashedPassword || hashPassword(passwordSalt, password);
+      loginConfig.hashedPassword =
+        hashedPassword || hashPassword(passwordSalt, password);
     } else {
       loginConfig.password = password;
     }
 
-    const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
+    const CmdLogin = Command_Login.create(loginConfig);
 
-    const command = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_Login.ext': CmdLogin
+    const command = SessionCommand.create({
+      '.Command_Login.ext': CmdLogin,
     });
 
-    webClient.protobuf.sendSessionCommand(command, raw => {
+    webClient.protobuf.sendSessionCommand(command, (raw) => {
       const resp = raw['.Response_Login.ext'];
 
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+      if (raw.responseCode === Response.ResponseCode.RespOk) {
         const { buddyList, ignoreList, userInfo } = resp;
 
         SessionPersistence.updateBuddyList(buddyList);
@@ -81,42 +110,69 @@ export class SessionCommands {
       }
 
       switch (raw.responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespClientUpdateRequired:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing features');
+        case Response.ResponseCode.RespClientUpdateRequired:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: missing features'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespWrongPassword:
-        case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: incorrect username or password');
+        case Response.ResponseCode.RespWrongPassword:
+        case Response.ResponseCode.RespUsernameInvalid:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: incorrect username or password'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespWouldOverwriteOldSession:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: duplicated user session');
+        case Response.ResponseCode.RespWouldOverwriteOldSession:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: duplicated user session'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: banned user');
+        case Response.ResponseCode.RespUserIsBanned:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: banned user'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
+        case Response.ResponseCode.RespRegistrationRequired:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: registration required'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespClientIdRequired:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: missing client ID');
+        case Response.ResponseCode.RespClientIdRequired:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: missing client ID'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespContextError:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: server error');
+        case Response.ResponseCode.RespContextError:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: server error'
+          );
           break;
 
-        case webClient.protobuf.controller.Response.ResponseCode.RespAccountNotActivated:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: account not activated');
+        case Response.ResponseCode.RespAccountNotActivated:
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: account not activated'
+          );
           SessionPersistence.accountAwaitingActivation(options);
           break;
 
         default:
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, `Login failed: unknown error: ${raw.responseCode}`);
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            `Login failed: unknown error: ${raw.responseCode}`
+          );
       }
 
       SessionPersistence.loginFailed();
@@ -132,15 +188,16 @@ export class SessionCommands {
       userName,
     };
 
-    const CmdRequestPasswordSalt = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
+    const CmdRequestPasswordSalt =
+      Command_RequestPasswordSalt.create(registerConfig);
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_RequestPasswordSalt.ext': CmdRequestPasswordSalt
+    const sc = SessionCommand.create({
+      '.Command_RequestPasswordSalt.ext': CmdRequestPasswordSalt,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
       switch (raw.responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
+        case Response.ResponseCode.RespOk: {
           const passwordSalt = raw['.Response_PasswordSalt.ext']?.passwordSalt;
 
           switch (options.reason) {
@@ -162,12 +219,18 @@ export class SessionCommands {
 
           return;
         }
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
+        case Response.ResponseCode.RespRegistrationRequired: {
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: registration required'
+          );
           break;
         }
         default: {
-          SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
+          SessionCommands.updateStatus(
+            StatusEnum.DISCONNECTED,
+            'Login failed: Unknown Reason'
+          );
         }
       }
 
@@ -192,8 +255,12 @@ export class SessionCommands {
     });
   }
 
-  static register(options: WebSocketConnectOptions, passwordSalt?: string): void {
-    const { userName, password, email, country, realName } = options as ServerRegisterParams;
+  static register(
+    options: WebSocketConnectOptions,
+    passwordSalt: string | null
+  ): void {
+    const { userName, password, email, country, realName } =
+      options as ServerRegisterParams;
 
     const registerConfig: any = {
       ...webClient.clientConfig,
@@ -209,59 +276,77 @@ export class SessionCommands {
       registerConfig.password = password;
     }
 
-    const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
+    const CmdRegister = Command_Register.create(registerConfig);
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_Register.ext': CmdRegister
+    const sc = SessionCommand.create({
+      '.Command_Register.ext': CmdRegister,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted) {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
+      if (raw.responseCode === Response.ResponseCode.RespRegistrationAccepted) {
         SessionCommands.login(options, passwordSalt);
-        SessionPersistence.registrationSuccess()
+        SessionPersistence.registrationSuccess();
         return;
       }
 
       switch (raw.responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAcceptedNeedsActivation:
+        case Response.ResponseCode.RespRegistrationAcceptedNeedsActivation:
           SessionPersistence.accountAwaitingActivation(options);
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespUserAlreadyExists:
+        case Response.ResponseCode.RespUserAlreadyExists:
           SessionPersistence.registrationUserNameError('Username is taken');
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
+        case Response.ResponseCode.RespUsernameInvalid:
           console.error('ResponseCode.RespUsernameInvalid', raw.reasonStr);
           SessionPersistence.registrationUserNameError('Invalid username');
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort:
-          SessionPersistence.registrationPasswordError('Your password was too short');
+        case Response.ResponseCode.RespPasswordTooShort:
+          SessionPersistence.registrationPasswordError(
+            'Your password was too short'
+          );
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespEmailRequiredToRegister:
+        case Response.ResponseCode.RespEmailRequiredToRegister:
           SessionPersistence.registrationRequiresEmail();
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespEmailBlackListed:
-          SessionPersistence.registrationEmailError('This email provider has been blocked');
+        case Response.ResponseCode.RespEmailBlackListed:
+          SessionPersistence.registrationEmailError(
+            'This email provider has been blocked'
+          );
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespTooManyRequests:
-          SessionPersistence.registrationEmailError('Max accounts reached for this email');
+        case Response.ResponseCode.RespTooManyRequests:
+          SessionPersistence.registrationEmailError(
+            'Max accounts reached for this email'
+          );
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationDisabled:
-          SessionPersistence.registrationFailed('Registration is currently disabled');
+        case Response.ResponseCode.RespRegistrationDisabled:
+          SessionPersistence.registrationFailed(
+            'Registration is currently disabled'
+          );
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
-          SessionPersistence.registrationFailed(NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime));
+        case Response.ResponseCode.RespUserIsBanned:
+          SessionPersistence.registrationFailed(
+            NormalizeService.normalizeBannedUserError(
+              raw.reasonStr,
+              raw.endTime
+            )
+          );
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed:
+        case Response.ResponseCode.RespRegistrationFailed:
         default:
-          SessionPersistence.registrationFailed('Registration failed due to a server issue');
+          SessionPersistence.registrationFailed(
+            'Registration failed due to a server issue'
+          );
           break;
       }
 
       SessionCommands.disconnect();
     });
-  };
+  }
 
-  static activateAccount(options: WebSocketConnectOptions, passwordSalt?: string): void {
+  static activateAccount(
+    options: WebSocketConnectOptions,
+    passwordSalt?: string
+  ): void {
     const { userName, token } = options as unknown as AccountActivationParams;
 
     const accountActivationConfig = {
@@ -270,18 +355,21 @@ export class SessionCommands {
       token,
     };
 
-    const CmdActivate = webClient.protobuf.controller.Command_Activate.create(accountActivationConfig);
+    const CmdActivate = Command_Activate.create(accountActivationConfig);
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_Activate.ext': CmdActivate
+    const sc = SessionCommand.create({
+      '.Command_Activate.ext': CmdActivate,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
+      if (raw.responseCode === Response.ResponseCode.RespActivationAccepted) {
         SessionPersistence.accountActivationSuccess();
         SessionCommands.login(options, passwordSalt);
       } else {
-        SessionCommands.updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');
+        SessionCommands.updateStatus(
+          StatusEnum.DISCONNECTED,
+          'Account Activation Failed'
+        );
         SessionCommands.disconnect();
         SessionPersistence.accountActivationFailed();
       }
@@ -296,14 +384,15 @@ export class SessionCommands {
       userName,
     };
 
-    const CmdForgotPasswordRequest = webClient.protobuf.controller.Command_ForgotPasswordRequest.create(forgotPasswordConfig);
+    const CmdForgotPasswordRequest =
+      Command_ForgotPasswordRequest.create(forgotPasswordConfig);
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ForgotPasswordRequest.ext': CmdForgotPasswordRequest
+    const sc = SessionCommand.create({
+      '.Command_ForgotPasswordRequest.ext': CmdForgotPasswordRequest,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
+      if (raw.responseCode === Response.ResponseCode.RespOk) {
         const resp = raw['.Response_ForgotPasswordRequest.ext'];
 
         if (resp.challengeEmail) {
@@ -323,7 +412,8 @@ export class SessionCommands {
   }
 
   static resetPasswordChallenge(options: WebSocketConnectOptions): void {
-    const { userName, email } = options as unknown as ForgotPasswordChallengeParams;
+    const { userName, email } =
+      options as unknown as ForgotPasswordChallengeParams;
 
     const forgotPasswordChallengeConfig = {
       ...webClient.clientConfig,
@@ -331,14 +421,16 @@ export class SessionCommands {
       email,
     };
 
-    const CmdForgotPasswordChallenge = webClient.protobuf.controller.Command_ForgotPasswordChallenge.create(forgotPasswordChallengeConfig);
+    const CmdForgotPasswordChallenge = Command_ForgotPasswordChallenge.create(
+      forgotPasswordChallengeConfig
+    );
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ForgotPasswordChallenge.ext': CmdForgotPasswordChallenge
+    const sc = SessionCommand.create({
+      '.Command_ForgotPasswordChallenge.ext': CmdForgotPasswordChallenge,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
+      if (raw.responseCode === Response.ResponseCode.RespOk) {
         SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPassword();
       } else {
@@ -350,8 +442,12 @@ export class SessionCommands {
     });
   }
 
-  static resetPassword(options: WebSocketConnectOptions, passwordSalt?: string): void {
-    const { userName, token, newPassword } = options as unknown as ForgotPasswordResetParams;
+  static resetPassword(
+    options: WebSocketConnectOptions,
+    passwordSalt?: string
+  ): void {
+    const { userName, token, newPassword } =
+      options as unknown as ForgotPasswordResetParams;
 
     const forgotPasswordResetConfig: any = {
       ...webClient.clientConfig,
@@ -360,19 +456,24 @@ export class SessionCommands {
     };
 
     if (passwordSalt) {
-      forgotPasswordResetConfig.hashedNewPassword = hashPassword(passwordSalt, newPassword);
+      forgotPasswordResetConfig.hashedNewPassword = hashPassword(
+        passwordSalt,
+        newPassword
+      );
     } else {
       forgotPasswordResetConfig.newPassword = newPassword;
     }
 
-    const CmdForgotPasswordReset = webClient.protobuf.controller.Command_ForgotPasswordReset.create(forgotPasswordResetConfig);
+    const CmdForgotPasswordReset = Command_ForgotPasswordReset.create(
+      forgotPasswordResetConfig
+    );
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ForgotPasswordReset.ext': CmdForgotPasswordReset
+    const sc = SessionCommand.create({
+      '.Command_ForgotPasswordReset.ext': CmdForgotPasswordReset,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
-      if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
+      if (raw.responseCode === Response.ResponseCode.RespOk) {
         SessionCommands.updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordSuccess();
       } else {
@@ -385,44 +486,46 @@ export class SessionCommands {
   }
 
   static listUsers(): void {
-    const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();
+    const CmdListUsers = Command_ListUsers.create();
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ListUsers.ext': CmdListUsers
+    const sc = SessionCommand.create({
+      '.Command_ListUsers.ext': CmdListUsers,
     });
 
-    webClient.protobuf.sendSessionCommand(sc, raw => {
+    webClient.protobuf.sendSessionCommand(sc, (raw) => {
       const { responseCode } = raw;
       const response = raw['.Response_ListUsers.ext'];
 
       if (response) {
         switch (responseCode) {
-          case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+          case Response.ResponseCode.RespOk:
             SessionPersistence.updateUsers(response.userList);
             break;
           default:
-            console.log(`Failed to fetch Server Rooms [${responseCode}] : `, raw);
+            console.log(
+              `Failed to fetch Server Rooms [${responseCode}] : `,
+              raw
+            );
         }
       }
-
     });
   }
 
   static listRooms(): void {
-    const CmdListRooms = webClient.protobuf.controller.Command_ListRooms.create();
+    const CmdListRooms = Command_ListRooms.create();
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_ListRooms.ext': CmdListRooms
+    const sc = SessionCommand.create({
+      '.Command_ListRooms.ext': CmdListRooms,
     });
 
     webClient.protobuf.sendSessionCommand(sc);
   }
 
   static joinRoom(roomId: number): void {
-    const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({ roomId });
+    const CmdJoinRoom = Command_JoinRoom.create({ roomId });
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_JoinRoom.ext': CmdJoinRoom
+    const sc = SessionCommand.create({
+      '.Command_JoinRoom.ext': CmdJoinRoom,
     });
 
     webClient.protobuf.sendSessionCommand(sc, (raw) => {
@@ -431,18 +534,19 @@ export class SessionCommands {
       let error;
 
       switch (responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+        case Response.ResponseCode.RespOk:
           const { roomInfo } = raw['.Response_JoinRoom.ext'];
 
           RoomPersistence.joinRoom(roomInfo);
           return;
-        case webClient.protobuf.controller.Response.ResponseCode.RespNameNotFound:
-          error = 'Failed to join the room: it doesn\'t exist on the server.';
+        case Response.ResponseCode.RespNameNotFound:
+          error = "Failed to join the room: it doesn't exist on the server.";
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespContextError:
-          error = 'The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.';
+        case Response.ResponseCode.RespContextError:
+          error =
+            'The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.';
           break;
-        case webClient.protobuf.controller.Response.ResponseCode.RespUserLevelTooLow:
+        case Response.ResponseCode.RespUserLevelTooLow:
           error = 'You do not have the required permission to join this room.';
           break;
         default:
@@ -473,10 +577,10 @@ export class SessionCommands {
   }
 
   static addToList(list: string, userName: string): void {
-    const CmdAddToList = webClient.protobuf.controller.Command_AddToList.create({ list, userName });
+    const CmdAddToList = Command_AddToList.create({ list, userName });
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_AddToList.ext': CmdAddToList
+    const sc = SessionCommand.create({
+      '.Command_AddToList.ext': CmdAddToList,
     });
 
     webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
@@ -485,10 +589,10 @@ export class SessionCommands {
   }
 
   static removeFromList(list: string, userName: string): void {
-    const CmdRemoveFromList = webClient.protobuf.controller.Command_RemoveFromList.create({ list, userName });
+    const CmdRemoveFromList = Command_RemoveFromList.create({ list, userName });
 
-    const sc = webClient.protobuf.controller.SessionCommand.create({
-      '.Command_RemoveFromList.ext': CmdRemoveFromList
+    const sc = SessionCommand.create({
+      '.Command_RemoveFromList.ext': CmdRemoveFromList,
     });
 
     webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
@@ -497,10 +601,10 @@ export class SessionCommands {
   }
 
   static viewLogHistory(filters): void {
-    const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
+    const CmdViewLogHistory = Command_ViewLogHistory.create(filters);
 
-    const sc = webClient.protobuf.controller.ModeratorCommand.create({
-      '.Command_ViewLogHistory.ext': CmdViewLogHistory
+    const sc = ModeratorCommand.create({
+      '.Command_ViewLogHistory.ext': CmdViewLogHistory,
     });
 
     webClient.protobuf.sendModeratorCommand(sc, (raw) => {
@@ -509,9 +613,9 @@ export class SessionCommands {
       let error;
 
       switch (responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+        case Response.ResponseCode.RespOk:
           const { logMessage } = raw['.Response_ViewLogHistory.ext'];
-          SessionPersistence.viewLogs(logMessage)
+          SessionPersistence.viewLogs(logMessage);
           return;
         default:
           error = 'Failed to retrieve log history.';
