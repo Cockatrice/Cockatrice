@@ -334,6 +334,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         power = getStringPropertyFromMap(card, "power");
         toughness = getStringPropertyFromMap(card, "toughness");
+        if (power.isEmpty() || power == "" || toughness.isEmpty() || toughness == ""){
+            ptSeparator = "";
+        }
         if (!(power.isEmpty() && toughness.isEmpty())) {
             properties.insert("pt", power + ptSeparator + toughness);
         }
