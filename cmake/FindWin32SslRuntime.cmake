@@ -8,7 +8,7 @@ endif()
 if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
   message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
   file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
-  if (_OPENSSL_ROOT_PATHS STREQUAL "")
+  if(_OPENSSL_ROOT_PATHS STREQUAL "")
     set(_OPENSSL_ROOT_PATHS
         "$ENV{VCPKG_PACKAGES_DIR}/x64-windows/bin" "C:/OpenSSL-Win64/bin" "C:/OpenSSL-Win64"
         "C:/Tools/vcpkg/installed/x64-windows/bin" "${_programfiles}/OpenSSL-Win64"
@@ -19,8 +19,8 @@ if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
 elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
   message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
   file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
-  if (_OPENSSL_ROOT_PATHS STREQUAL "")
-      set(_OPENSSL_ROOT_PATHS
+  if(_OPENSSL_ROOT_PATHS STREQUAL "")
+    set(_OPENSSL_ROOT_PATHS
         "$ENV{VCPKG_PACKAGES_DIR}/x86-windows/bin"
         "C:/OpenSSL-Win32/bin"
         "C:/OpenSSL-Win32"
