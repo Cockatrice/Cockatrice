@@ -9,7 +9,7 @@ if(WIN32)
     set(REDIST_ARCH x86)
   endif()
 
-  set(REDIST_FILE vcredist_${REDIST_ARCH}.exe)
+  set(REDIST_FILE vc_redist.${REDIST_ARCH}.exe)
 
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
@@ -32,7 +32,8 @@ if(WIN32)
     message(STATUS "Found VCredist ${VCREDISTRUNTIME_FILE}")
   else()
     message(
-      WARNING "Could not find VCredist package. It's not required for compiling, but needs to be available at runtime."
+      WARNING
+        "Could not find VCredist package in \"${_path}/${REDIST_FILE}\". It's not required for compiling, but needs to be available at runtime."
     )
   endif()
 endif()
