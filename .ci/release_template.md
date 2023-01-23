@@ -17,10 +17,11 @@ include different targets -->
  - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")
  - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")
  - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")
+ - <kbd>Ubuntu 22.10</kbd> ("Kinetic Kudu")
  - <kbd>Debian 10</kbd> ("Buster")
  - <kbd>Debian 11</kbd> ("Bullseye")
- - <kbd>Fedora 35</kbd>
  - <kbd>Fedora 36</kbd>
+ - <kbd>Fedora 37</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
