@@ -5,6 +5,10 @@
 #include <QDir>
 #include <QMediaPlayer>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QAudioOutput>
+#endif
+
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
 
