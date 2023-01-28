@@ -58,7 +58,8 @@ protected:
                                     QList<DecklistCardNode *> cards,
                                     bool addComments = true);
     virtual QString getCardZoneFromName(QString cardName, QString currentZoneName);
-    virtual QString getCompleteCardName(const QString cardName) const;
+    virtual QString getCompleteCardName(const QString &cardName) const;
+    virtual bool cardExists(const QString &cardName) const;
 };
 
 #endif

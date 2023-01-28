@@ -289,7 +289,7 @@ QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneNam
     return currentZoneName;
 }
 
-QString DeckLoader::getCompleteCardName(const QString cardName) const
+QString DeckLoader::getCompleteCardName(const QString &cardName) const
 {
     if (db) {
         CardInfoPtr temp = db->guessCard(cardName);
@@ -299,4 +299,12 @@ QString DeckLoader::getCompleteCardName(const QString cardName) const
     }
 
     return cardName;
+}
+
+bool DeckLoader::cardExists(const QString &cardName) const
+{
+    if (db) {
+        return db->getCard(cardName) != nullptr;
+    }
+    return false;
 }

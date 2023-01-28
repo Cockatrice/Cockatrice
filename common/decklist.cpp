@@ -488,21 +488,21 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
-    const QRegularExpression reCardLine("^\\s*[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
+    const QRegularExpression reCardLine(R"(^\s*[\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
     const QRegularExpression reEmpty("^\\s*$");
-    const QRegularExpression reComment("[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
+    const QRegularExpression reComment(R"([\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
     const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
     const QRegularExpression reSBComment("^sideboard\\b.*$", QRegularExpression::CaseInsensitiveOption);
     const QRegularExpression reDeckComment("^((main)?deck(list)?|mainboard)\\b",
                                            QRegularExpression::CaseInsensitiveOption);
 
     // simplified matches
-    const QRegularExpression reMultiplier("^[xX\\(\\[]*(\\d+)[xX\\*\\)\\]]* ?(.+)");
-    const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
-    const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
-    const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
-    const QRegularExpression reBraceDigit(
-        " ?\\([\\dA-Z]+\\) *\\d+$"); // () are matched if containing setcode then a number
+    const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
+    const QRegularExpression reBrace(R"( ?[\[\{][^\]\}]*[\]\}] ?)"); // not nested
+    const QRegularExpression reRoundBrace(R"(^\([^\)]*\) ?)");       // () are only matched at start of string
+    const QRegularExpression reDigitBrace(R"( ?\(\d*\) ?)");         // () are matched if containing digits
+                                                             // () are matched if containing setcode then a number
+    const QRegularExpression reBraceDigit(R"( ?\([\dA-Z]+\) *\d+$)");
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
                                                          {QRegularExpression("æ"), QString("ae")},
@@ -511,11 +511,11 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
     cleanList();
 
-    QStringList inputs = in.readAll().trimmed().split('\n');
-    int max_line = inputs.size();
+    auto inputs = in.readAll().trimmed().split('\n');
+    auto max_line = inputs.size();
 
     // start at the first empty line before the first cardline
-    int deckStart = inputs.indexOf(reCardLine);
+    auto deckStart = inputs.indexOf(reCardLine);
     if (deckStart == -1) { // there are no cards?
         if (inputs.indexOf(reComment) == -1) {
             return false; // input is empty
@@ -529,7 +529,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     }
 
     // find sideboard position, if marks are used this won't be needed
-    int sBStart = -1;
+    qsizetype sBStart = -1;
     if (inputs.indexOf(reSBMark, deckStart) == -1) {
         sBStart = inputs.indexOf(reSBComment, deckStart);
         if (sBStart == -1) {
@@ -537,7 +537,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             if (sBStart == -1) {
                 sBStart = max_line;
             }
-            int nextCard = inputs.indexOf(reCardLine, sBStart + 1);
+            auto nextCard = inputs.indexOf(reCardLine, sBStart + 1);
             if (inputs.indexOf(reEmpty, nextCard + 1) != -1) {
                 sBStart = max_line; // if there is another empty line all cards are mainboard
             }
@@ -549,7 +549,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
     // parse name and comments
     while (index < deckStart) {
-        const QString current = inputs.at(index++);
+        const auto &current = inputs.at(index++);
         if (!current.contains(reEmpty)) {
             match = reComment.match(current);
             name = match.captured();
@@ -557,7 +557,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         }
     }
     while (index < deckStart) {
-        const QString current = inputs.at(index++);
+        const auto &current = inputs.at(index++);
         if (!current.contains(reEmpty)) {
             match = reComment.match(current);
             comments += match.captured() + '\n';
@@ -614,6 +614,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
         // replace common differences in cardnames
         for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
+            if (cardExists(cardName)) {
+                break;
+            }
             cardName.replace(diff.key(), diff.value());
         }
 
@@ -631,7 +634,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     return true;
 }
 
-InnerDecklistNode *DeckList::getZoneObjFromName(const QString zoneName)
+InnerDecklistNode *DeckList::getZoneObjFromName(const QString &zoneName)
 {
     for (int i = 0; i < root->size(); i++) {
         auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));

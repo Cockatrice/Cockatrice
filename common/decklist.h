@@ -178,17 +178,21 @@ private:
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
-    InnerDecklistNode *getZoneObjFromName(QString zoneName);
+    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
 protected:
     virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
     {
         return currentZoneName;
     };
-    virtual QString getCompleteCardName(const QString cardName) const
+    virtual QString getCompleteCardName(const QString &cardName) const
     {
         return cardName;
     };
+    virtual bool cardExists(const QString &cardName) const
+    {
+        return false;
+    }
 
 signals:
     void deckHashChanged();
