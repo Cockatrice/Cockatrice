@@ -2,7 +2,6 @@
 
 #include "settingscache.h"
 
-#include <QAudioOutput>
 #include <QDir>
 #include <QMediaPlayer>
 
@@ -23,7 +22,7 @@ SoundEngine::~SoundEngine()
 {
     if (player) {
         player->deleteLater();
-        player = 0;
+        player = nullptr;
     }
 }
 
@@ -48,7 +47,7 @@ void SoundEngine::soundEnabledChanged()
     }
 }
 
-void SoundEngine::playSound(QString fileName)
+void SoundEngine::playSound(const QString &fileName)
 {
     if (!player) {
         return;
