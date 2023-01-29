@@ -300,11 +300,3 @@ QString DeckLoader::getCompleteCardName(const QString &cardName) const
 
     return cardName;
 }
-
-bool DeckLoader::cardExists(const QString &cardName) const
-{
-    if (db) {
-        return db->getCard(cardName) != nullptr;
-    }
-    return false;
-}

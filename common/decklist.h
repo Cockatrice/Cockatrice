@@ -189,10 +189,6 @@ protected:
     {
         return cardName;
     };
-    virtual bool cardExists(const QString &cardName) const
-    {
-        return false;
-    }
 
 signals:
     void deckHashChanged();

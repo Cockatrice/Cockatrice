@@ -505,9 +505,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reBraceDigit(R"( ?\([\dA-Z]+\) *\d+$)");
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
-                                                         {QRegularExpression("æ"), QString("ae")},
-                                                         {QRegularExpression(" ?[|/]+ ?"), QString(" // ")},
-                                                         {QRegularExpression("(?<![A-Z]) ?& ?"), QString(" // ")}};
+                                                         {QRegularExpression("æ"), QString("ae")}};
 
     cleanList();
 
@@ -614,9 +612,6 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
         // replace common differences in cardnames
         for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
-            if (cardExists(cardName)) {
-                break;
-            }
             cardName.replace(diff.key(), diff.value());
         }
 
