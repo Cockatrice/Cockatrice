@@ -52,8 +52,6 @@ We maintain two tags for contributors to find issues to work on:
 
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.
 
-Read the long-term project **roadmap** to see planned edits and milestones [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
-
 We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
 Cockatrice uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.

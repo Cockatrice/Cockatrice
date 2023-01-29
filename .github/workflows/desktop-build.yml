@@ -91,11 +91,11 @@ jobs:
           - distro: Debian11
             package: DEB
 
-          - distro: Fedora35
+          - distro: Fedora36
             package: RPM
             test: skip
 
-          - distro: Fedora36
+          - distro: Fedora37
             package: RPM
 
           - distro: UbuntuBionic
@@ -106,6 +106,10 @@ jobs:
             test: skip # UbuntuFocal has a broken qt for debug builds
 
           - distro: UbuntuJammy
+            package: DEB
+            test: skip # running tests on all distros is superfluous
+
+          - distro: UbuntuKinetic
             package: DEB
 
     name: ${{matrix.distro}}

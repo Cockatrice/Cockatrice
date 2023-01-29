@@ -202,13 +202,14 @@ private:
     QCheckBox roomHistory;
     QGroupBox *chatGroupBox;
     QGroupBox *highlightGroupBox;
-    QGroupBox *messageShortcuts;
+    QGroupBox *messageGroupBox;
     QLineEdit *mentionColor;
     QLineEdit *highlightColor;
     QLineEdit *customAlertString;
     QLabel hexLabel;
     QLabel hexHighlightLabel;
     QLabel customAlertStringLabel;
+    QLabel explainMessagesLabel;
 
     void storeSettings();
     void updateMentionPreview();
