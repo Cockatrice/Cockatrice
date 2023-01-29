@@ -18,7 +18,7 @@ elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32")
   message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
   file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
   set(_OPENSSL_ROOT_PATHS
-      ${OPEN_SSL_PATH_32}
+      ${OPEN_SSL_PATH}
       "$ENV{VCPKG_PACKAGES_DIR}/x86-windows/bin"
       "C:/OpenSSL-Win32/bin"
       "C:/OpenSSL-Win32"
