@@ -505,7 +505,8 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reBraceDigit(R"( ?\([\dA-Z]+\) *\d+$)");
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
-                                                         {QRegularExpression("æ"), QString("ae")}};
+                                                         {QRegularExpression("æ"), QString("ae")},
+                                                         {QRegularExpression(" ?[|/]+ ?"), QString(" // ")}};
 
     cleanList();
 
