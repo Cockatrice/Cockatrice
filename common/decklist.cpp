@@ -528,7 +528,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     }
 
     // find sideboard position, if marks are used this won't be needed
-    qsizetype sBStart = -1;
+    int sBStart = -1;
     if (inputs.indexOf(reSBMark, deckStart) == -1) {
         sBStart = inputs.indexOf(reSBComment, deckStart);
         if (sBStart == -1) {
