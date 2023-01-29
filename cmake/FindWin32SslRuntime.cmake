@@ -9,8 +9,12 @@ if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
   message(STATUS "Looking for OpenSSL for ${CMAKE_GENERATOR_PLATFORM}")
   file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
   set(_OPENSSL_ROOT_PATHS
-      ${OPEN_SSL_PATH} "$ENV{VCPKG_PACKAGES_DIR}/x64-windows/bin" "C:/OpenSSL-Win64/bin" "C:/OpenSSL-Win64"
-      "C:/Tools/vcpkg/installed/x64-windows/bin" "${_programfiles}/OpenSSL-Win64"
+      ${OPEN_SSL_PATH}
+      "$ENV{VCPKG_PACKAGES_DIR}/x64-windows/bin"
+      "C:/OpenSSL-Win64/bin"
+      "C:/OpenSSL-Win64"
+      "C:/Tools/vcpkg/installed/x64-windows/bin"
+      "${_programfiles}/OpenSSL-Win64"
       "D:/a/Cockatrice/Qt/Tools/OpenSSL/Win_x64/bin"
   )
   unset(_programfiles)
