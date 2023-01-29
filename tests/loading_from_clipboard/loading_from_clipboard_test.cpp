@@ -146,7 +146,11 @@ TEST(LoadingFromClipboardTest, EdgeCaseTesting)
 )");
 
     Result result("DeckName", "Comment 1\n\nComment [two]\n(test) Æ ’ | / (3)",
-                  {{"Aether Adept", 1}, {"Fire // Ice", 2}, {"Minsc & Boo, Timeless Heroes", 1}, {"Pain // Suffering", 3}, {"Forest", 4}},
+                  {{"Aether Adept", 1},
+                   {"Fire // Ice", 2},
+                   {"Minsc & Boo, Timeless Heroes", 1},
+                   {"Pain // Suffering", 3},
+                   {"Forest", 4}},
                   {{"Nature's Resurgence", 5}, {"Gaea's Skyfolk", 6}, {"B.F.M. (Big Furry Monster)", 7}});
     testDeck(clipboard, result);
 }
