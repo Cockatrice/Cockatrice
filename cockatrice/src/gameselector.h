@@ -49,6 +49,9 @@ private:
     GameTypeMap gameTypeMap;
 
     void updateTitle();
+    void disableButtons();
+    void enableButtons();
+    void enableButtonsForIndex(const QModelIndex &current);
 
 public:
     GameSelector(AbstractClient *_client,
