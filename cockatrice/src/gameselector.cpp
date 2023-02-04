@@ -295,7 +295,7 @@ void GameSelector::disableButtons()
 void GameSelector::enableButtons()
 {
     if (createButton)
-        createButton->setEnabled(false);
+        createButton->setEnabled(true);
 
     // Enable buttons for the currently selected game
     enableButtonsForIndex(gameListView->currentIndex());
