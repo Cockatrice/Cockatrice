@@ -275,12 +275,9 @@ void GameSelector::actJoin()
 
     PendingCommand *pend = r->prepareRoomCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
-
-    // Disable the buttons before sending the command to avoid unlikely but
-    // possible race conditions if the response is received before we disable
-    // the buttons.
-    disableButtons();
     r->sendRoomCommand(pend);
+
+    disableButtons();
 }
 
 void GameSelector::disableButtons()
