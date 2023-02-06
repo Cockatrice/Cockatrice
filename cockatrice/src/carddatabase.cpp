@@ -589,7 +589,8 @@ void CardDatabase::refreshCachedReverseRelatedCards()
 
             auto *newCardRelation = new CardRelation(card->getName(), cardRelation->getDoesAttach(),
                                                      cardRelation->getIsCreateAllExclusion(),
-                                                     cardRelation->getIsVariable(), cardRelation->getDefaultCount());
+                                                     cardRelation->getIsVariable(), cardRelation->getDefaultCount(),
+                                                     cardRelation->getIsPersistent());
             cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
         }
     }
