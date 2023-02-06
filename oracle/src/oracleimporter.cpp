@@ -334,7 +334,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         power = getStringPropertyFromMap(card, "power");
         toughness = getStringPropertyFromMap(card, "toughness");
-        if (power.isEmpty() || toughness.isEmpty()){
+        if (power.isEmpty() || toughness.isEmpty()) {
             ptSeparator = "";
         }
         if (!(power.isEmpty() && toughness.isEmpty())) {
@@ -380,7 +380,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 }
                 name = faceName;
             }
-            
+
             // mtgjon related cards
             if (card.contains("relatedCards")) {
                 QVariantMap givenRelated = card.value("relatedCards").toMap();
