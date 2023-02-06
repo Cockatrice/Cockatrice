@@ -320,6 +320,8 @@ if(WIN32)
     PATTERN "imageformats/qtiff.dll"
     PATTERN "imageformats/qwbmp.dll"
     PATTERN "imageformats/qwebp.dll"
+    PATTERN "mediaservice/dsengine.dll"
+    PATTERN "mediaservice/wmfengine.dll"
     PATTERN "platforms/qdirect2d.dll"
     PATTERN "platforms/qminimal.dll"
     PATTERN "platforms/qoffscreen.dll"
