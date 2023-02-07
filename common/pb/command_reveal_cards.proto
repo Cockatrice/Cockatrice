@@ -5,7 +5,7 @@ message Command_RevealCards {
         optional Command_RevealCards ext = 1026;
     }
     optional string zone_name = 1;
-    optional sint32 card_id = 2 [default = -1];
+    repeated sint32 card_id = 2 [packed = false];
     optional sint32 player_id = 3 [default = -1];
     optional bool grant_write_access = 4;
     optional sint32 top_cards = 5 [default = -1];

@@ -217,6 +217,7 @@ private slots:
     void actPlay();
     void actHide();
     void actPlayFacedown();
+    void actReveal(QAction *action);
     void refreshShortcuts();
 
 private:
@@ -227,6 +228,7 @@ private:
         *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
+    QList<QPair<QString, int>> playersInfo;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
@@ -297,6 +299,7 @@ private:
     void rearrangeCounters();
 
     void initSayMenu();
+    void initContextualPlayersMenu(QMenu *menu);
 
     // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
     void eventGameSay(const Event_GameSay &event);
