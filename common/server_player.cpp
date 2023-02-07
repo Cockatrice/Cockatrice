@@ -354,7 +354,7 @@ void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorag
     if (zone->getAlwaysRevealTopCard()) {
         Event_RevealCards revealEvent;
         revealEvent.set_zone_name(zone->getName().toStdString());
-        revealEvent.set_card_id(0);
+        revealEvent.add_card_id(0);
         zone->getCards().first()->getInfo(revealEvent.add_cards());
 
         ges.enqueueGameEvent(revealEvent, playerId);
@@ -370,7 +370,7 @@ void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorag
         Event_RevealCards revealEvent;
         revealEvent.set_zone_name(zone->getName().toStdString());
         revealEvent.set_number_of_cards(1);
-        revealEvent.set_card_id(0);
+        revealEvent.add_card_id(0);
         zone->getCards().first()->getInfo(revealEvent.add_cards());
         ges.enqueueGameEvent(revealEvent, playerId, GameEventStorageItem::SendToPrivate, playerId);
     }
@@ -1843,27 +1843,35 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
             }
             cardsToReveal.append(card);
         }
-    } else if (!cmd.has_card_id()) {
+    } else if (cmd.card_id_size() == 0) {
         cardsToReveal = zone->getCards();
-    } else if (cmd.card_id() == -2) {
+    } else if (cmd.card_id_size() == 1 && cmd.card_id(0) == -2) {
+        // If there is a single card_id with value -2 (ie
+        // Player::RANDOM_CARD_FROM_ZONE), pick a random card.
+        //
+        // This is to be compatible with clients supporting a single card_id
+        // value, which send value -2 to request a random card.
         if (zone->getCards().isEmpty()) {
             return Response::RespContextError;
         }
+
         cardsToReveal.append(zone->getCards().at(rng->rand(0, zone->getCards().size() - 1)));
     } else {
-        Server_Card *card = zone->getCard(cmd.card_id());
-        if (!card) {
-            return Response::RespNameNotFound;
+        for (auto cardId : cmd.card_id()) {
+            Server_Card *card = zone->getCard(cardId);
+            if (!card) {
+                return Response::RespNameNotFound;
+            }
+            cardsToReveal.append(card);
         }
-        cardsToReveal.append(card);
     }
 
     Event_RevealCards eventOthers;
     eventOthers.set_grant_write_access(cmd.grant_write_access());
     eventOthers.set_zone_name(zone->getName().toStdString());
     eventOthers.set_number_of_cards(cardsToReveal.size());
-    if (cmd.has_card_id()) {
-        eventOthers.set_card_id(cmd.card_id());
+    for (auto cardId : cmd.card_id()) {
+        eventOthers.add_card_id(cardId);
     }
     if (cmd.has_player_id()) {
         eventOthers.set_other_player_id(cmd.player_id());
