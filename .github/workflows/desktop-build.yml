@@ -65,6 +65,7 @@ jobs:
         id: create_release
         shell: bash
         env:
+          GH_TOKEN: ${{github.token}}
           tag_name: ${{github.ref}}
           release_name: ${{steps.prepare.outputs.title}}
           body_path: ${{steps.prepare.outputs.body_path}}
@@ -184,6 +185,7 @@ jobs:
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
+          GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
           asset_path: ${{steps.package.outputs.path}}
           asset_name: ${{steps.package.outputs.name}}
@@ -273,6 +275,7 @@ jobs:
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
+          GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
           asset_path: ${{steps.package.outputs.path}}
           asset_name: ${{steps.package.outputs.name}}
@@ -364,6 +367,7 @@ jobs:
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
+          GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
           asset_path: ${{steps.package.outputs.path}}
           asset_name: ${{steps.package.outputs.name}}
