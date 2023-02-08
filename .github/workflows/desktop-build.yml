@@ -66,7 +66,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
-          tag_name: ${{github.ref}}
+          tag_name: ${{steps.configure.outputs.tag}}
           release_name: ${{steps.prepare.outputs.title}}
           body_path: ${{steps.prepare.outputs.body_path}}
           prerelease: ${{steps.prepare.outputs.is_beta}}
