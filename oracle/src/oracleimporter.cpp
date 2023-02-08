@@ -203,7 +203,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, maintype, power, toughness, faceName;
+    QString layout, name, text, colors, colorIdentity, maintype, faceName;
     static const bool isToken = false;
     QVariantHash properties;
     CardInfoPerSet setInfo;
@@ -332,12 +332,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             properties.insert("maintype", mainCardType);
         }
 
-        power = getStringPropertyFromMap(card, "power");
-        toughness = getStringPropertyFromMap(card, "toughness");
-        if (power.isEmpty() || toughness.isEmpty()) {
-            ptSeparator = "";
-        }
-        if (!(power.isEmpty() && toughness.isEmpty())) {
+        // Depending on whether power and/or toughness are present, the format
+        // is either P/T (most common), P (no toughness), or /T (no power).
+        QString power = getStringPropertyFromMap(card, "power");
+        QString toughness = getStringPropertyFromMap(card, "toughness");
+        if (toughness.isEmpty() && !power.isEmpty()) {
+            properties.insert("pt", power);
+        } else if (!toughness.isEmpty()) {
             properties.insert("pt", power + ptSeparator + toughness);
         }
 
