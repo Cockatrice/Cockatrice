@@ -204,7 +204,7 @@ jobs:
           - target: 10.15_Catalina
             os: macos-11
             xcode: 11.7 # allows using macOS 10.15 SDK
-            qt_version: 6
+            qt_version: 6.2 # LTS (is compatible with 10.14 and 10.15)
             type: Release
             do_tests: 1
             make_package: 1
