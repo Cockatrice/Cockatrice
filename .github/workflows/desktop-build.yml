@@ -198,7 +198,7 @@ jobs:
         include:
           - target: Debug # tests only
             os: macos-latest
-            xcode: 12.5.1
+            xcode: 14.2
             qt_version: 6.*
             qt_modules: "qtmultimedia qtwebsockets"
             type: Debug
@@ -252,6 +252,8 @@ jobs:
           brew install protobuf
           if [[ $install_qt == homebrew ]]; then
             brew install qt --force-bottle
+          else # for some reason the tests fail with the action installed qt?
+            brew install googletest
           fi
 
       - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
