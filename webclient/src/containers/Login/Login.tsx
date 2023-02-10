@@ -226,7 +226,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
   };
 
   return (
-    <Layout showNav={false}>
+    <Layout showNav={false} noHeightLimit={true}>
       <Root className={'login overflow-scroll ' + classes.root}>
         { isConnected && <Navigate to={RouteEnum.SERVER} />}
 
