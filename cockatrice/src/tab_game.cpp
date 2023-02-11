@@ -10,6 +10,7 @@
 #include "dlg_creategame.h"
 #include "dlg_load_remote_deck.h"
 #include "dlg_manage_sets.h"
+#include "featureset.h"
 #include "gamescene.h"
 #include "gameview.h"
 #include "get_pb_extension.h"
@@ -843,11 +844,24 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 
 void TabGame::processGameEventContainer(const GameEventContainer &cont, AbstractClient *client)
 {
+    static QMap<QString, bool> clientFeatures = FeatureSet().getDefaultFeatureList();
+
     const GameEventContext &context = cont.context();
     messageLog->containerProcessingStarted(context);
-    const int eventListSize = cont.event_list_size();
-    for (int i = 0; i < eventListSize; ++i) {
-        const GameEvent &event = cont.event_list(i);
+
+    const auto *eventList = &cont.event_list();
+    for (const auto &upgrade : cont.upgrades()) {
+        bool hasAllFeatures = true;
+        for (const auto &feature : upgrade.features()) {
+            hasAllFeatures &= clientFeatures.contains(QString::fromStdString(feature));
+        }
+
+        if (hasAllFeatures) {
+            eventList = &upgrade.events();
+        }
+    }
+
+    for (const GameEvent &event : *eventList) {
         const int playerId = event.player_id();
         const auto eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
 

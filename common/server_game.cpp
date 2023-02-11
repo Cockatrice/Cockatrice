@@ -752,27 +752,30 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
 }
 
-void Server_Game::sendGameEventContainer(GameEventContainer *cont,
-                                         GameEventStorageItem::EventRecipients recipients,
-                                         int privatePlayerId)
+void Server_Game::sendGameEventContainer(GameEventContainer *cont)
+{
+    sendGameEvents({std::move(*cont)});
+    delete cont;
+}
+
+void Server_Game::sendGameEvents(GameEvents &&events)
 {
     QMutexLocker locker(&gameMutex);
 
-    cont->set_game_id(gameId);
+    events.setGameId(gameId);
+
     for (Server_Player *player : players.values()) {
-        const bool playerPrivate =
-            (player->getPlayerId() == privatePlayerId) || (player->getSpectator() && spectatorsSeeEverything);
-        if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
-            (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
-            player->sendGameEvent(*cont);
-    }
-    if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
-        cont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
-        cont->clear_game_id();
-        currentReplay->add_event_list()->CopyFrom(*cont);
+        if (player->getSpectator() && spectatorsSeeEverything) {
+            player->sendGameEvent(events.getReplayEvents());
+        } else {
+            player->sendGameEvent(events.getEventsForPlayer(player->getPlayerId()));
+        }
     }
 
-    delete cont;
+    GameEventContainer *replayEvents{currentReplay->add_event_list()};
+    replayEvents->CopyFrom(events.getReplayEvents());
+    replayEvents->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
+    replayEvents->clear_game_id();
 }
 
 GameEventContainer *

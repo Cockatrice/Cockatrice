@@ -210,10 +210,8 @@ public:
     GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
 
     void sendGameStateToPlayers();
-    void sendGameEventContainer(GameEventContainer *cont,
-                                GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
-                                                                                   GameEventStorageItem::SendToOthers,
-                                int privatePlayerId = -1);
+    void sendGameEventContainer(GameEventContainer *cont);
+    void sendGameEvents(GameEvents &&events);
 
     // Object-finding utilities
     std::shared_ptr<Server_CardZone> findZoneRef(const ZoneRef &ref) const;

@@ -1,9 +1,11 @@
 #ifndef SERVER_RESPONSE_CONTAINERS_H
 #define SERVER_RESPONSE_CONTAINERS_H
 
+#include "pb/game_event_container.pb.h"
 #include "pb/server_message.pb.h"
 
 #include <QList>
+#include <QMap>
 #include <QPair>
 
 namespace google
@@ -15,40 +17,122 @@ class Message;
 } // namespace google
 class Server_Game;
 
-class GameEventStorageItem
+class GameEventBuilder final
 {
 public:
-    enum EventRecipient
+    GameEventBuilder(const ::google::protobuf::Message &event, int playerId);
+
+    GameEventBuilder withPrivateEvent(int playerId, const ::google::protobuf::Message &event);
+
+    const GameEvent &getPublicEvent() const
     {
-        SendToPrivate = 0x01,
-        SendToOthers = 0x02
-    };
-    Q_DECLARE_FLAGS(EventRecipients, EventRecipient)
+        return publicEvent;
+    }
+
+    const GameEvent &getReplayEvent() const
+    {
+        if (privatePlayerId == -1) {
+            return publicEvent;
+        }
+
+        return privateEvent;
+    }
+
+    int getPrivatePlayerId() const
+    {
+        return privatePlayerId;
+    }
+
+    const GameEvent &getEventForPlayer(int playerId) const
+    {
+        if (playerId == privatePlayerId) {
+            return privateEvent;
+        }
+
+        return publicEvent;
+    }
+
 private:
-    GameEvent *event;
-    EventRecipients recipients;
+    GameEvent publicEvent;
+    int privatePlayerId = -1;
+    GameEvent privateEvent;
+};
+
+class GameEvents final
+{
+private:
+    GameEventContainer publicEvents;
+    GameEventContainer replayEvents;
+    QMap<int, GameEventContainer> privateEvents;
 
 public:
-    GameEventStorageItem(const ::google::protobuf::Message &_event, int _playerId, EventRecipients _recipients);
-    ~GameEventStorageItem();
+    GameEvents(const GameEventContainer &events) : publicEvents(events), replayEvents(events)
+    {
+    }
 
-    const GameEvent &getGameEvent() const
+    GameEvents(const GameEventContainer &_publicEvents,
+               const GameEventContainer &_replayEvents,
+               const QMap<int, GameEventContainer> &_privateEvents)
+        : publicEvents(_publicEvents), replayEvents(_replayEvents), privateEvents(_privateEvents)
     {
-        return *event;
     }
-    EventRecipients getRecipients() const
+
+    const GameEventContainer &getEventsForPlayer(int playerId) const;
+    const GameEventContainer &getReplayEvents() const
     {
-        return recipients;
-    }
+        return replayEvents;
+    };
+
+    void setGameEventContext(const GameEventContext &gameEventContext);
+    void setForcedByJudge(int judgeId);
+    void setGameId(int gameId);
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(GameEventStorageItem::EventRecipients)
+
+class GameEventsBuilder final
+{
+    using Message = ::google::protobuf::Message;
+
+private:
+    QList<GameEventBuilder> gameEvents;
+    QList<std::pair<QSet<QString>, QList<GameEventBuilder>>> upgrades;
+
+public:
+    void append(const GameEventBuilder &builder);
+
+    /** Append the events in [other] to the builder, taking into consideration
+     * feature sets.
+     *
+     * For any combination of player ID and feature sets, the events seen by
+     * the corresponding player with that feature set after [append]ing is the
+     * concatenation of the events seen before [append]ing and the events in
+     * [other].
+     * */
+    void append(const GameEventsBuilder &other);
+
+    /** Add the events in [other] as alternatives for the current set of events stored by the builder.
+     *
+     * Clients that have all the [features] will see the events for [other],
+     * clients that lack any of the [features] will see the current events.
+     *
+     * Events that are added through [enqueueGameEvent] after the call to
+     * [upgrade] will be seen by *all* clients, whether they have the
+     * [features] or not.
+     */
+    void upgrade(const QSet<QString> &features, const GameEventsBuilder &other);
+
+    bool hasEvents() const
+    {
+        return !gameEvents.isEmpty();
+    }
+
+    GameEvents build() const;
+};
 
 class GameEventStorage
 {
 private:
-    ::google::protobuf::Message *gameEventContext;
-    QList<GameEventStorageItem *> gameEventList;
-    int privatePlayerId;
+    GameEventContext *gameEventContext;
+    GameEventsBuilder gameEventsBuilder;
     int forcedByJudge = -1;
 
 public:
@@ -56,28 +140,14 @@ public:
     ~GameEventStorage();
 
     void setGameEventContext(const ::google::protobuf::Message &_gameEventContext);
-    ::google::protobuf::Message *getGameEventContext() const
-    {
-        return gameEventContext;
-    }
-    const QList<GameEventStorageItem *> &getGameEventList() const
-    {
-        return gameEventList;
-    }
-    int getPrivatePlayerId() const
-    {
-        return privatePlayerId;
-    }
     void setForcedByJudge(int playerId)
     {
         forcedByJudge = playerId;
     }
 
-    void enqueueGameEvent(const ::google::protobuf::Message &event,
-                          int playerId,
-                          GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
-                                                                             GameEventStorageItem::SendToOthers,
-                          int _privatePlayerId = -1);
+    void enqueueGameEvent(const ::google::protobuf::Message &event, int playerId);
+    void enqueueGameEvent(const GameEventBuilder &builder);
+    void enqueueGameEvents(const GameEventsBuilder &builder);
     void sendToGame(Server_Game *game);
 };
 

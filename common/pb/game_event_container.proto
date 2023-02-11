@@ -2,10 +2,27 @@ syntax = "proto2";
 import "game_event.proto";
 import "game_event_context.proto";
 
+// More informative events that can only be understood by clients that support
+// all the corresponding features.
+message GameEventUpgrade {
+    repeated string features = 1;
+    repeated GameEvent events = 2;
+}
+
 message GameEventContainer {
     optional uint32 game_id = 1;
     repeated GameEvent event_list = 2;
     optional GameEventContext context = 3;
     optional uint32 seconds_elapsed = 4;
     optional uint32 forced_by_judge = 5;
+    // Contains more informative versions of the events in the `event_list`
+    // field.  The upgrades are alternatives, not additions: only one set of
+    // events, from either the `event_list` or the `upgrades` field, must be
+    // used.
+    //
+    // In case multiple `GameEventUpgrade` are provided, they are given in
+    // order of the least descriptive to the most descriptive; hence, clients
+    // should use the latest element in the list that they have all the
+    // features for.
+    repeated GameEventUpgrade upgrades = 6;
 }

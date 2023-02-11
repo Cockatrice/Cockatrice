@@ -323,8 +323,7 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
         cardInfo->set_name(card->getName().toStdString());
     }
 
-    ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
-    ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
+    ges.enqueueGameEvent(GameEventBuilder(eventOthers, playerId).withPrivateEvent(playerId, eventPrivate));
 
     if (number > 0) {
         revealTopCardIfNeeded(deckZone, ges);
@@ -354,14 +353,13 @@ void Server_Player::revealTopCardIfNeeded(const std::shared_ptr<Server_CardZone>
         dumpEvent.set_zone_owner_id(playerId);
         dumpEvent.set_zone_name(zone->getName().toStdString());
         dumpEvent.set_number_cards(1);
-        ges.enqueueGameEvent(dumpEvent, playerId, GameEventStorageItem::SendToOthers);
 
         Event_RevealCards revealEvent;
         revealEvent.set_zone_name(zone->getName().toStdString());
         revealEvent.set_number_of_cards(1);
         revealEvent.add_card_id(0);
         zone->getCards().first()->getInfo(revealEvent.add_cards());
-        ges.enqueueGameEvent(revealEvent, playerId, GameEventStorageItem::SendToPrivate, playerId);
+        ges.enqueueGameEvent(GameEventBuilder(dumpEvent, playerId).withPrivateEvent(playerId, revealEvent));
     }
 }
 
@@ -480,9 +478,8 @@ void Server_Player::moveCards(GameEventStorage &ges,
             Event_MoveCard othersEvent = makeMoveCardEvent(sourceZone, sourceId, sourcePosition, sourceKnownToOthers,
                                                            card, targetKnownToOthers, targetY, targetY);
 
-            ges.enqueueGameEvent(privateEvent, sourcePlayer->getPlayerId(), GameEventStorageItem::SendToPrivate,
-                                 sourcePlayer->getPlayerId());
-            ges.enqueueGameEvent(othersEvent, sourcePlayer->getPlayerId(), GameEventStorageItem::SendToOthers);
+            ges.enqueueGameEvent(GameEventBuilder(othersEvent, sourcePlayer->getPlayerId())
+                                     .withPrivateEvent(sourcePlayer->getPlayerId(), privateEvent));
 
             if (targetX == 0) {
                 zonesToReveal.append(targetZone);
@@ -2031,8 +2028,7 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
             zone->addWritePermission(cmd.player_id());
         }
 
-        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, cmd.player_id());
-        ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
+        ges.enqueueGameEvent(GameEventBuilder(eventOthers, playerId).withPrivateEvent(cmd.player_id(), eventPrivate));
     } else {
         if (cmd.grant_write_access()) {
             const QList<int> &playerIds = game->getPlayers().keys();
