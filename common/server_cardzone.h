@@ -35,32 +35,40 @@ class GameEventStorage;
 class Server_CardZone : public std::enable_shared_from_this<Server_CardZone>
 {
 public:
+    enum ZoneFlag
+    {
+        NoFlag = 0x0,
+        HasCoords = 0x1 << 0,  // having coords means this zone has x and y coordinates
+        CanShuffle = 0x1 << 1, // enable the "shuffle" command
+        AlwaysLookAtTopCard = 0x1 << 2,
+        AlwaysRevealTopCard = 0x1 << 3,
+    };
+    Q_DECLARE_FLAGS(ZoneFlags, ZoneFlag);
+
     std::shared_ptr<Server_CardZone> getPtr()
     {
         return shared_from_this();
     }
 
     [[nodiscard]] static std::shared_ptr<Server_CardZone>
-    create(Server_Player *player, const QString &name, bool hasCoords, ZoneType type)
+    create(Server_Player *player, const QString &name, ZoneType type, ZoneFlags flags = {})
     {
-        return std::shared_ptr<Server_CardZone>(new Server_CardZone(player, name, hasCoords, type));
+        return std::shared_ptr<Server_CardZone>(new Server_CardZone(player, name, type, flags));
     }
 
 private:
-    Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
+    Server_CardZone(Server_Player *_player, const QString &_name, ZoneType _type, ZoneFlags flags);
 
     Server_Player *player;
     QString name;
-    bool has_coords; // having coords means this zone has x and y coordinates
     ZoneType type;
     int cardsBeingLookedAt;
     QSet<int> playersWithWritePermission;
-    bool alwaysRevealTopCard;
-    bool alwaysLookAtTopCard;
     QList<Server_Card *> cards;
     QMap<int, QMap<int, Server_Card *>> coordinateMap; // y -> (x -> card)
     QMap<int, QMultiMap<QString, int>> freePilesMap;   // y -> (cardName -> x)
     QMap<int, int> freeSpaceMap;                       // y -> x
+    ZoneFlags flags;
     void removeCardFromCoordMap(Server_Card *card, int oldX, int oldY);
     void insertCardIntoCoordMap(Server_Card *card, int x, int y);
 
@@ -86,7 +94,11 @@ public:
     bool isCardAtPosLookedAt(int pos) const;
     bool hasCoords() const
     {
-        return has_coords;
+        return flags.testFlag(HasCoords);
+    }
+    bool canShuffle() const
+    {
+        return flags.testFlag(CanShuffle);
     }
     ZoneType getType() const
     {
@@ -118,20 +130,22 @@ public:
     }
     bool getAlwaysRevealTopCard() const
     {
-        return alwaysRevealTopCard;
+        return flags.testFlag(AlwaysRevealTopCard);
     }
     void setAlwaysRevealTopCard(bool _alwaysRevealTopCard)
     {
-        alwaysRevealTopCard = _alwaysRevealTopCard;
+        flags.setFlag(AlwaysRevealTopCard, _alwaysRevealTopCard);
     }
     bool getAlwaysLookAtTopCard() const
     {
-        return alwaysLookAtTopCard;
+        return flags.testFlag(AlwaysLookAtTopCard);
     }
     void setAlwaysLookAtTopCard(bool _alwaysLookAtTopCard)
     {
-        alwaysLookAtTopCard = _alwaysLookAtTopCard;
+        flags.setFlag(AlwaysLookAtTopCard, _alwaysLookAtTopCard);
     }
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Server_CardZone::ZoneFlags);
 
 #endif

@@ -27,12 +27,8 @@
 #include <QDebug>
 #include <QSet>
 
-Server_CardZone::Server_CardZone(Server_Player *_player,
-                                 const QString &_name,
-                                 bool _has_coords,
-                                 ZoneType _type)
-    : player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0),
-      alwaysRevealTopCard(false), alwaysLookAtTopCard(false)
+Server_CardZone::Server_CardZone(Server_Player *_player, const QString &_name, ZoneType _type, ZoneFlags _flags)
+    : player(_player), name(_name), type(_type), cardsBeingLookedAt(0), flags(_flags)
 {
 }
 
@@ -136,7 +132,7 @@ int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt)
         cardsBeingLookedAt -= 1;
     }
     cards.removeAt(index);
-    if (has_coords) {
+    if (hasCoords()) {
         removeCardFromCoordMap(card, card->getX(), card->getY());
     }
     card->setZone(nullptr);
@@ -223,7 +219,7 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bo
 
 bool Server_CardZone::isColumnStacked(int x, int y) const
 {
-    if (!has_coords)
+    if (!hasCoords())
         return false;
 
     return coordinateMap[y].contains((x / 3) * 3 + 1);
@@ -231,7 +227,7 @@ bool Server_CardZone::isColumnStacked(int x, int y) const
 
 bool Server_CardZone::isColumnEmpty(int x, int y) const
 {
-    if (!has_coords)
+    if (!hasCoords())
         return true;
 
     return !coordinateMap[y].contains((x / 3) * 3);
@@ -247,7 +243,7 @@ void Server_CardZone::moveCardInRow(GameEventStorage &ges, Server_Card *card, in
 
 void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
 {
-    if (!has_coords)
+    if (!hasCoords())
         return;
 
     QSet<QPair<int, int>> placesToLook;
@@ -276,7 +272,7 @@ void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
 
 void Server_CardZone::updateCardCoordinates(Server_Card *card, int oldX, int oldY)
 {
-    if (!has_coords)
+    if (!hasCoords())
         return;
 
     if (oldX != -1)
@@ -322,10 +318,10 @@ void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAs
 {
     info->set_name(name.toStdString());
     info->set_type(type);
-    info->set_with_coords(has_coords);
+    info->set_with_coords(hasCoords());
     info->set_card_count(cards.size());
-    info->set_always_reveal_top_card(alwaysRevealTopCard);
-    info->set_always_look_at_top_card(alwaysLookAtTopCard);
+    info->set_always_reveal_top_card(getAlwaysRevealTopCard());
+    info->set_always_look_at_top_card(getAlwaysLookAtTopCard());
     if ((((playerWhosAsking == player) || omniscient) && (type != ZoneType::HiddenZone)) ||
         ((playerWhosAsking != player) && (type == ZoneType::PublicZone))) {
         QListIterator<Server_Card *> cardIterator(cards);

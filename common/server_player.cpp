@@ -168,15 +168,15 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Create zones
-    auto deckZone = Server_CardZone::create(this, "deck", false, ZoneType::HiddenZone);
+    auto deckZone = Server_CardZone::create(this, "deck", ZoneType::HiddenZone, Server_CardZone::CanShuffle);
     addZone(deckZone);
-    auto sbZone = Server_CardZone::create(this, "sb", false, ZoneType::HiddenZone);
+    auto sbZone = Server_CardZone::create(this, "sb", ZoneType::HiddenZone);
     addZone(sbZone);
-    addZone(Server_CardZone::create(this, "table", true, ZoneType::PublicZone));
-    addZone(Server_CardZone::create(this, "hand", false, ZoneType::PrivateZone));
-    addZone(Server_CardZone::create(this, "stack", false, ZoneType::PublicZone));
-    addZone(Server_CardZone::create(this, "grave", false, ZoneType::PublicZone));
-    addZone(Server_CardZone::create(this, "rfg", false, ZoneType::PublicZone));
+    addZone(Server_CardZone::create(this, "table", ZoneType::PublicZone, Server_CardZone::HasCoords));
+    addZone(Server_CardZone::create(this, "hand", ZoneType::PrivateZone));
+    addZone(Server_CardZone::create(this, "stack", ZoneType::PublicZone));
+    addZone(Server_CardZone::create(this, "grave", ZoneType::PublicZone));
+    addZone(Server_CardZone::create(this, "rfg", ZoneType::PublicZone));
 
     addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
@@ -952,13 +952,13 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
         return Response::RespContextError;
     }
 
-    if (cmd.has_zone_name() && cmd.zone_name() != "deck") {
-        return Response::RespFunctionNotAllowed;
-    }
-
-    auto zone = zones.value("deck");
+    auto zone = zones.value(nameFromStdString(cmd.has_zone_name() ? cmd.zone_name() : "deck"));
     if (!zone) {
         return Response::RespNameNotFound;
+    }
+
+    if (!zone->canShuffle()) {
+        return Response::RespFunctionNotAllowed;
     }
 
     zone->shuffle(cmd.start(), cmd.end());
