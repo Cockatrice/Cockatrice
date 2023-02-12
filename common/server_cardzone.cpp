@@ -30,7 +30,7 @@
 Server_CardZone::Server_CardZone(Server_Player *_player,
                                  const QString &_name,
                                  bool _has_coords,
-                                 ServerInfo_Zone::ZoneType _type)
+                                 ZoneType _type)
     : player(_player), name(_name), has_coords(_has_coords), type(_type), cardsBeingLookedAt(0),
       alwaysRevealTopCard(false), alwaysLookAtTopCard(false)
 {
@@ -146,7 +146,7 @@ int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt)
 
 Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
 {
-    if (type != ServerInfo_Zone::HiddenZone) {
+    if (type != ZoneType::HiddenZone) {
         for (int i = 0; i < cards.size(); ++i) {
             Server_Card *tmp = cards[i];
             if (tmp->getId() == id) {
@@ -176,7 +176,7 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
 
 bool Server_CardZone::isCardAtPosLookedAt(int pos) const
 {
-    return type == ServerInfo_Zone::HiddenZone && (cardsBeingLookedAt == -1 || cardsBeingLookedAt > pos);
+    return type == ZoneType::HiddenZone && (cardsBeingLookedAt == -1 || cardsBeingLookedAt > pos);
 }
 
 int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const
@@ -326,8 +326,8 @@ void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAs
     info->set_card_count(cards.size());
     info->set_always_reveal_top_card(alwaysRevealTopCard);
     info->set_always_look_at_top_card(alwaysLookAtTopCard);
-    if ((((playerWhosAsking == player) || omniscient) && (type != ServerInfo_Zone::HiddenZone)) ||
-        ((playerWhosAsking != player) && (type == ServerInfo_Zone::PublicZone))) {
+    if ((((playerWhosAsking == player) || omniscient) && (type != ZoneType::HiddenZone)) ||
+        ((playerWhosAsking != player) && (type == ZoneType::PublicZone))) {
         QListIterator<Server_Card *> cardIterator(cards);
         while (cardIterator.hasNext())
             cardIterator.next()->getInfo(info->add_card_list());

@@ -168,15 +168,15 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Create zones
-    auto deckZone = Server_CardZone::create(this, "deck", false, ServerInfo_Zone::HiddenZone);
+    auto deckZone = Server_CardZone::create(this, "deck", false, ZoneType::HiddenZone);
     addZone(deckZone);
-    auto sbZone = Server_CardZone::create(this, "sb", false, ServerInfo_Zone::HiddenZone);
+    auto sbZone = Server_CardZone::create(this, "sb", false, ZoneType::HiddenZone);
     addZone(sbZone);
-    addZone(Server_CardZone::create(this, "table", true, ServerInfo_Zone::PublicZone));
-    addZone(Server_CardZone::create(this, "hand", false, ServerInfo_Zone::PrivateZone));
-    addZone(Server_CardZone::create(this, "stack", false, ServerInfo_Zone::PublicZone));
-    addZone(Server_CardZone::create(this, "grave", false, ServerInfo_Zone::PublicZone));
-    addZone(Server_CardZone::create(this, "rfg", false, ServerInfo_Zone::PublicZone));
+    addZone(Server_CardZone::create(this, "table", true, ZoneType::PublicZone));
+    addZone(Server_CardZone::create(this, "hand", false, ZoneType::PrivateZone));
+    addZone(Server_CardZone::create(this, "stack", false, ZoneType::PublicZone));
+    addZone(Server_CardZone::create(this, "grave", false, ZoneType::PublicZone));
+    addZone(Server_CardZone::create(this, "rfg", false, ZoneType::PublicZone));
 
     addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
@@ -383,7 +383,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                                bool undoingDraw)
 {
     // Disallow controller change to other zones than the table.
-    if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
+    if (((targetzone->getType() != ZoneType::PublicZone) || !targetzone->hasCoords()) &&
         (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
         return Response::RespContextError;
     }
@@ -497,7 +497,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             targetzone->insertCard(card, newX, yCoord);
             int targetLookedCards = targetzone->getCardsBeingLookedAt();
             bool sourceKnownToPlayer = sourceBeingLookedAt && !card->getFaceDown();
-            if (targetzone->getType() == ServerInfo_Zone::HiddenZone && targetLookedCards >= newX) {
+            if (targetzone->getType() == ZoneType::HiddenZone && targetLookedCards >= newX) {
                 if (sourceKnownToPlayer) {
                     targetLookedCards += 1;
                 } else {
@@ -506,8 +506,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 targetzone->setCardsBeingLookedAt(targetLookedCards);
             }
 
-            bool targetHiddenToOthers = faceDown || (targetzone->getType() != ServerInfo_Zone::PublicZone);
-            bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ServerInfo_Zone::PublicZone);
+            bool targetHiddenToOthers = faceDown || (targetzone->getType() != ZoneType::PublicZone);
+            bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ZoneType::PublicZone);
 
             int oldCardId = card->getId();
             if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer())) {
@@ -526,19 +526,19 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             eventOthers.set_face_down(faceDown);
 
             Event_MoveCard eventPrivate(eventOthers);
-            if (sourceBeingLookedAt || targetzone->getType() != ServerInfo_Zone::HiddenZone ||
-                startzone->getType() != ServerInfo_Zone::HiddenZone) {
+            if (sourceBeingLookedAt || targetzone->getType() != ZoneType::HiddenZone ||
+                startzone->getType() != ZoneType::HiddenZone) {
                 eventPrivate.set_card_id(oldCardId);
                 eventPrivate.set_new_card_id(card->getId());
             } else {
                 eventPrivate.set_card_id(-1);
                 eventPrivate.set_new_card_id(-1);
             }
-            if (sourceKnownToPlayer || !(faceDown || targetzone->getType() == ServerInfo_Zone::HiddenZone)) {
+            if (sourceKnownToPlayer || !(faceDown || targetzone->getType() == ZoneType::HiddenZone)) {
                 QString privateCardName = card->getName();
                 eventPrivate.set_card_name(privateCardName.toStdString());
             }
-            if (startzone->getType() == ServerInfo_Zone::HiddenZone) {
+            if (startzone->getType() == ZoneType::HiddenZone) {
                 eventPrivate.set_position(position);
             } else {
                 eventPrivate.set_position(-1);
@@ -549,22 +549,22 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             // Other players do not get to see the start and/or target position of the card if the respective
             // part of the zone is being looked at. The information is not needed anyway because in hidden zones,
             // all cards are equal.
-            if (((startzone->getType() == ServerInfo_Zone::HiddenZone) &&
+            if (((startzone->getType() == ZoneType::HiddenZone) &&
                  ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1))) ||
-                (startzone->getType() == ServerInfo_Zone::PublicZone)) {
+                (startzone->getType() == ZoneType::PublicZone)) {
                 eventOthers.set_position(-1);
             } else {
                 eventOthers.set_position(position);
             }
-            if ((targetzone->getType() == ServerInfo_Zone::HiddenZone) &&
+            if ((targetzone->getType() == ZoneType::HiddenZone) &&
                 ((targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1))) {
                 eventOthers.set_x(-1);
             } else {
                 eventOthers.set_x(newX);
             }
 
-            if ((startzone->getType() == ServerInfo_Zone::PublicZone) ||
-                (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
+            if ((startzone->getType() == ZoneType::PublicZone) ||
+                (targetzone->getType() == ZoneType::PublicZone)) {
                 eventOthers.set_card_id(oldCardId);
                 if (!(sourceHiddenToOthers && targetHiddenToOthers)) {
                     QString publicCardName = card->getName();
@@ -1391,7 +1391,7 @@ Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer 
     if (!startZone || (!targetZone && !playerTarget)) {
         return Response::RespNameNotFound;
     }
-    if (startZone->getType() != ServerInfo_Zone::PublicZone) {
+    if (startZone->getType() != ZoneType::PublicZone) {
         return Response::RespContextError;
     }
     Server_Card *startCard = startZone->getCard(cmd.start_card_id());
@@ -1400,7 +1400,7 @@ Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer 
     }
     Server_Card *targetCard = nullptr;
     if (!playerTarget) {
-        if (targetZone->getType() != ServerInfo_Zone::PublicZone) {
+        if (targetZone->getType() != ZoneType::PublicZone) {
             return Response::RespContextError;
         }
         targetCard = targetZone->getCard(cmd.target_card_id());
@@ -1745,7 +1745,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
     if (!zone) {
         return Response::RespNameNotFound;
     }
-    if (!((zone->getType() == ServerInfo_Zone::PublicZone) || (this == otherPlayer))) {
+    if (!((zone->getType() == ZoneType::PublicZone) || (this == otherPlayer))) {
         return Response::RespContextError;
     }
 
@@ -1764,7 +1764,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
         ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
         cardInfo->set_name(displayedName.toStdString());
-        if (zone->getType() == ServerInfo_Zone::HiddenZone) {
+        if (zone->getType() == ZoneType::HiddenZone) {
             cardInfo->set_id(i);
         } else {
             cardInfo->set_id(card->getId());
@@ -1794,7 +1794,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
             }
         }
     }
-    if (zone->getType() == ServerInfo_Zone::HiddenZone) {
+    if (zone->getType() == ZoneType::HiddenZone) {
         zone->setCardsBeingLookedAt(numberCards);
 
         Event_DumpZone event;

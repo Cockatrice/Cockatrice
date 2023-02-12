@@ -41,18 +41,18 @@ public:
     }
 
     [[nodiscard]] static std::shared_ptr<Server_CardZone>
-    create(Server_Player *player, const QString &name, bool hasCoords, ServerInfo_Zone::ZoneType type)
+    create(Server_Player *player, const QString &name, bool hasCoords, ZoneType type)
     {
         return std::shared_ptr<Server_CardZone>(new Server_CardZone(player, name, hasCoords, type));
     }
 
 private:
-    Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
+    Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ZoneType _type);
 
     Server_Player *player;
     QString name;
     bool has_coords; // having coords means this zone has x and y coordinates
-    ServerInfo_Zone::ZoneType type;
+    ZoneType type;
     int cardsBeingLookedAt;
     QSet<int> playersWithWritePermission;
     bool alwaysRevealTopCard;
@@ -88,7 +88,7 @@ public:
     {
         return has_coords;
     }
-    ServerInfo_Zone::ZoneType getType() const
+    ZoneType getType() const
     {
         return type;
     }

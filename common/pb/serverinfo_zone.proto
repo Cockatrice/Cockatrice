@@ -1,21 +1,8 @@
 syntax = "proto2";
 import "serverinfo_card.proto";
+import "zone_type.proto";
 
 message ServerInfo_Zone {
-    enum ZoneType {
-        // PrivateZone: Contents of the zone are always visible to the owner,
-        // but not to anyone else.
-        // PublicZone: Contents of the zone are always visible to anyone.
-        // HiddenZone: Contents of the zone are never visible to anyone.
-        // However, the owner of the zone can issue a dump_zone command,
-        // setting beingLookedAt to true.
-        // Cards in a zone with the type HiddenZone are referenced by their
-        // list index, whereas cards in any other zone are referenced by their ids.
-
-        PrivateZone = 0;
-        PublicZone = 1;
-        HiddenZone = 2;
-    }
     optional string name = 1;
     optional ZoneType type = 2;
     optional bool with_coords = 3;

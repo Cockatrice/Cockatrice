@@ -158,6 +158,7 @@ set(PROTO_FILES
     server_message.proto
     session_commands.proto
     session_event.proto
+    zone_type.proto
 )
 
 include_directories(${PROTOBUF_INCLUDE_DIRS})
