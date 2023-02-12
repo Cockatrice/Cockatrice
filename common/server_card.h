@@ -33,7 +33,7 @@ class Server_Card : public Server_ArrowTarget
 {
     Q_OBJECT
 private:
-    Server_CardZone *zone;
+    std::weak_ptr<Server_CardZone> zone;
     int id;
     int coord_x, coord_y;
     QString name;
@@ -51,14 +51,14 @@ private:
     QList<Server_Card *> attachedCards;
 
 public:
-    Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
+    Server_Card(QString _name, int _id, int _coord_x, int _coord_y, std::weak_ptr<Server_CardZone> _zone = {});
     ~Server_Card() override;
 
-    Server_CardZone *getZone() const
+    std::shared_ptr<Server_CardZone> getZone() const
     {
-        return zone;
+        return zone.lock();
     }
-    void setZone(Server_CardZone *_zone)
+    void setZone(std::shared_ptr<Server_CardZone> _zone)
     {
         zone = _zone;
     }

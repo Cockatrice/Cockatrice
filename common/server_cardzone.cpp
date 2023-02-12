@@ -241,7 +241,7 @@ void Server_CardZone::moveCardInRow(GameEventStorage &ges, Server_Card *card, in
 {
     auto *cardToMove = new CardToMove;
     cardToMove->set_card_id(card->getId());
-    player->moveCard(ges, this, QList<const CardToMove *>() << cardToMove, this, x, y, false, false);
+    player->moveCard(ges, getPtr(), QList<const CardToMove *>() << cardToMove, getPtr(), x, y, false, false);
     delete cardToMove;
 }
 
@@ -298,7 +298,7 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
             cards.append(card);
         }
     }
-    card->setZone(this);
+    card->setZone(getPtr());
 }
 
 void Server_CardZone::clear()

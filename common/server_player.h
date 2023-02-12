@@ -71,7 +71,7 @@ private:
     Server_Game *game;
     Server_AbstractUserInterface *userInterface;
     DeckList *deck;
-    QMap<QString, Server_CardZone *> zones;
+    QMap<QString, std::shared_ptr<Server_CardZone>> zones;
     QMap<int, Server_Counter *> counters;
     QMap<int, Server_Arrow *> arrows;
     QList<int> lastDrawList;
@@ -83,7 +83,7 @@ private:
     bool readyStart;
     bool conceded;
     bool sideboardLocked;
-    void revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorage &ges);
+    void revealTopCardIfNeeded(const std::shared_ptr<Server_CardZone> &zone, GameEventStorage &ges);
 
 public:
     mutable QMutex playerMutex;
@@ -135,7 +135,7 @@ public:
     {
         return game;
     }
-    const QMap<QString, Server_CardZone *> &getZones() const
+    const QMap<QString, std::shared_ptr<Server_CardZone>> &getZones() const
     {
         return zones;
     }
@@ -162,7 +162,7 @@ public:
     int newCounterId() const;
     int newArrowId() const;
 
-    void addZone(Server_CardZone *zone);
+    void addZone(const std::shared_ptr<Server_CardZone> &zone);
     void addArrow(Server_Arrow *arrow);
     bool deleteArrow(int arrowId);
     void addCounter(Server_Counter *counter);
@@ -172,9 +172,9 @@ public:
 
     Response::ResponseCode drawCards(GameEventStorage &ges, int number);
     Response::ResponseCode moveCard(GameEventStorage &ges,
-                                    Server_CardZone *startzone,
+                                    std::shared_ptr<Server_CardZone> startzone,
                                     const QList<const CardToMove *> &_cards,
-                                    Server_CardZone *targetzone,
+                                    std::shared_ptr<Server_CardZone> targetzone,
                                     int xCoord,
                                     int yCoord,
                                     bool fixFreeSpaces = true,

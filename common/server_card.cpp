@@ -23,7 +23,7 @@
 #include "server_cardzone.h"
 #include "server_player.h"
 
-Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
+Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, std::weak_ptr<Server_CardZone> _zone)
     : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false),
       facedown(false), color(), ptString(), annotation(), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
 {
