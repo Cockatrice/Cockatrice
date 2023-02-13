@@ -65,6 +65,7 @@ class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
 class Command_CreateZone;
+class Command_DestroyCard;
 
 struct CardAttributes
 {
@@ -222,6 +223,7 @@ public:
     Response::ResponseCode cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode cmdDestroyCard(const Command_DestroyCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdDeleteArrow(const Command_DeleteArrow &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdSetCardAttr(const Command_SetCardAttr &cmd, ResponseContainer &rc, GameEventStorage &ges);

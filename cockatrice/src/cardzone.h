@@ -13,6 +13,7 @@ class QMenu;
 class QAction;
 class QPainter;
 class CardDragItem;
+class ZoneRef;
 
 class CardZone : public AbstractGraphicsItem
 {
@@ -36,6 +37,7 @@ signals:
 public slots:
     void moveAllToZone();
     bool showContextMenu(const QPoint &screenPos);
+    void toggleView();
 
 public:
     enum
@@ -116,6 +118,8 @@ public:
     {
         alwaysRevealTopCard = _alwaysRevealTopCard;
     }
+
+    void copyRef(ZoneRef *ref) const;
 };
 
 #endif

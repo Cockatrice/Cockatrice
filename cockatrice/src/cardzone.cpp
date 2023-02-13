@@ -1,8 +1,10 @@
 #include "cardzone.h"
 
 #include "carditem.h"
+#include "gamescene.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/zone_ref.pb.h"
 #include "player.h"
 #include "zoneviewzone.h"
 
@@ -33,6 +35,7 @@ CardZone::~CardZone()
             view->deleteLater();
         }
     }
+    views.clear();
     clearContents();
 }
 
@@ -93,6 +96,9 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
             default:
                 break;
         }
+    else {
+        return theirOwn ? tr("their custom zone") : tr("%1's custom zone").arg(ownerName);
+    }
     return QString();
 }
 
@@ -109,6 +115,11 @@ bool CardZone::showContextMenu(const QPoint &screenPos)
         return true;
     }
     return false;
+}
+
+void CardZone::toggleView()
+{
+    static_cast<GameScene *>(scene())->toggleZoneView(getPlayer(), getName(), -1);
 }
 
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -214,4 +225,10 @@ void CardZone::moveAllToZone()
 QPointF CardZone::closestGridPoint(const QPointF &point)
 {
     return point;
+}
+
+void CardZone::copyRef(ZoneRef *ref) const
+{
+    ref->set_player_id(player->getId());
+    ref->set_name(name.toStdString());
 }

@@ -20,6 +20,7 @@
 #include "server_game.h"
 
 #include "decklist.h"
+#include "pb/card_ref.pb.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
 #include "pb/event_delete_arrow.pb.h"
@@ -36,6 +37,7 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/serverinfo_playerping.pb.h"
+#include "pb/zone_ref.pb.h"
 #include "server.h"
 #include "server_arrow.h"
 #include "server_card.h"
@@ -817,4 +819,32 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
     }
+}
+
+std::shared_ptr<Server_CardZone> Server_Game::findZoneRef(const ZoneRef &ref) const
+{
+    if (!ref.has_player_id() || !ref.has_name()) {
+        return nullptr;
+    }
+
+    Server_Player *player = players.value(ref.player_id());
+    if (!player) {
+        return nullptr;
+    }
+
+    return player->getZones().value(QString::fromStdString(ref.name()));
+}
+
+Server_Card *Server_Game::findCardRef(const CardRef &ref) const
+{
+    if (!ref.has_zone() || !ref.has_card_id()) {
+        return nullptr;
+    }
+
+    auto cardZone = findZoneRef(ref.zone());
+    if (!cardZone) {
+        return nullptr;
+    }
+
+    return cardZone->getCard(ref.card_id());
 }

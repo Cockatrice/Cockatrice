@@ -12,6 +12,7 @@
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_del_counter.pb.h"
 #include "pb/command_delete_arrow.pb.h"
+#include "pb/command_destroy_card.pb.h"
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_flip_card.pb.h"
@@ -1566,6 +1567,28 @@ void Server_Player::destroyCard(GameEventStorage &ges,
 }
 
 Response::ResponseCode
+Server_Player::cmdDestroyCard(const Command_DestroyCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    if (spectator)
+        return Response::RespFunctionNotAllowed;
+    if (!game->getGameStarted())
+        return Response::RespGameNotStarted;
+    if (conceded)
+        return Response::RespContextError;
+
+    Server_Card *card = game->findCardRef(cmd.card());
+    if (!card)
+        return Response::RespNameNotFound;
+    if (card->getZone()->getPlayer() != this)
+        return Response::RespFunctionNotAllowed;
+    if (!card->getDestroyOnZoneChange())
+        return Response::RespFunctionNotAllowed;
+
+    destroyCard(ges, card);
+    return Response::RespOk;
+}
+
+Response::ResponseCode
 Server_Player::cmdSetCardAttr(const Command_SetCardAttr &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator) {
@@ -2219,6 +2242,8 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
         case GameCommand::REVERSE_TURN:
             return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
             break;
+        case GameCommand::DESTROY_CARD:
+            return cmdDestroyCard(command.GetExtension(Command_DestroyCard::ext), rc, ges);
         default:
             return Response::RespInvalidCommand;
     }

@@ -224,18 +224,16 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     sets.insert(setName, setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    bool attach = false;
-                    bool exclude = false;
-                    bool variable = false;
+                    CardRelation::RelationFlags flags;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     if (attrs.hasAttribute("count")) {
                         if (attrs.value("count").toString().indexOf("x=") == 0) {
-                            variable = true;
+                            flags |= CardRelation::IsVariableCount;
                             count = attrs.value("count").toString().remove(0, 2).toInt();
                         } else if (attrs.value("count").toString().indexOf("x") == 0) {
-                            variable = true;
+                            flags |= CardRelation::IsVariableCount;
                         } else {
                             count = attrs.value("count").toString().toInt();
                         }
@@ -246,14 +244,14 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = true;
+                        flags |= CardRelation::DoesAttach;
                     }
 
                     if (attrs.hasAttribute("exclude")) {
-                        exclude = true;
+                        flags |= CardRelation::IsCreateAllExclusion;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count);
+                    auto *relation = new CardRelation(cardName, flags, count);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {

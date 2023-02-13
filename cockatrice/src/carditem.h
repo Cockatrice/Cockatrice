@@ -6,6 +6,7 @@
 
 class CardDatabase;
 class CardDragItem;
+class CardRef;
 class CardZone;
 class ServerInfo_Card;
 class Player;
@@ -167,6 +168,8 @@ public:
     void drawArrow(const QColor &arrowColor);
     void drawAttachArrow();
     void playCard(bool faceDown);
+
+    void copyRef(CardRef *ref) const;
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

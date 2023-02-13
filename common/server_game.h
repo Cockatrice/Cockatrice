@@ -33,16 +33,20 @@
 #include <QStringList>
 
 class QTimer;
+class CardRef;
 class GameEventContainer;
 class GameReplay;
 class Server_Card;
 class Server_Room;
 class Server_Player;
+class Server_Card;
+class Server_CardZone;
 class ServerInfo_User;
 class ServerInfo_Player;
 class ServerInfo_Game;
 class Server_AbstractUserInterface;
 class Event_GameStateChanged;
+class ZoneRef;
 
 class Server_Game : public QObject
 {
@@ -210,6 +214,10 @@ public:
                                 GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
                                                                                    GameEventStorageItem::SendToOthers,
                                 int privatePlayerId = -1);
+
+    // Object-finding utilities
+    std::shared_ptr<Server_CardZone> findZoneRef(const ZoneRef &ref) const;
+    Server_Card *findCardRef(const CardRef &ref) const;
 };
 
 #endif

@@ -370,12 +370,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
-                        relatedCards.append(new CardRelation(additionalName, true));
+                        relatedCards.append(new CardRelation(additionalName, CardRelation::Transform));
                     }
                 } else {
                     for (const QString &additionalName : name.split(" // ")) {
                         if (additionalName != faceName) {
-                            relatedCards.append(new CardRelation(additionalName, true));
+                            relatedCards.append(new CardRelation(additionalName, CardRelation::Transform));
                         }
                     }
                 }
@@ -389,7 +389,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                 if (givenRelated.contains("spellbook")) {
                     auto spbk = givenRelated.value("spellbook").toStringList();
                     for (const QString &spbkName : spbk) {
-                        relatedCards.append(new CardRelation(spbkName, false, false, false, 1, true));
+                        relatedCards.append(new CardRelation(spbkName, CardRelation::IsPersistent, 1));
                     }
                 }
             }

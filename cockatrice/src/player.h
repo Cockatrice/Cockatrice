@@ -223,6 +223,16 @@ private slots:
     void actReveal(QAction *action);
     void refreshShortcuts();
 
+public:
+    enum CardCreationFlag
+    {
+        NoCreationFlags = 0x0,
+        AttachSource = 0x1 << 0,
+        CreatePersistentCard = 0x1 << 1,
+        CreateWithPile = 0x1 << 2,
+    };
+    Q_DECLARE_FLAGS(CardCreationFlags, CardCreationFlag);
+
 private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
@@ -290,9 +300,8 @@ private:
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
-    void
-    createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false, bool persistent = false);
-    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool persistent = false);
+    void createCard(const CardItem *sourceCard, const QString &dbCardName, CardCreationFlags flags = {});
+
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
 
     QRectF bRect;
@@ -472,5 +481,7 @@ public:
 
     void setLastToken(CardInfoPtr cardInfo);
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Player::CardCreationFlags);
 
 #endif

@@ -6,6 +6,7 @@
 #include "cardzone.h"
 #include "gamescene.h"
 #include "main.h"
+#include "pb/card_ref.pb.h"
 #include "pb/serverinfo_card.pb.h"
 #include "player.h"
 #include "settingscache.h"
@@ -480,4 +481,10 @@ CardZone *CardItem::getAttachedZone(const QString &name) const
 void CardItem::removeAttachedZone(const QString &name)
 {
     attachedZones.remove(name);
+}
+
+void CardItem::copyRef(CardRef *ref) const
+{
+    getZone()->copyRef(ref->mutable_zone());
+    ref->set_card_id(getId());
 }

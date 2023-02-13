@@ -22,6 +22,7 @@ set(PROTO_FILES
     command_deck_upload.proto
     command_del_counter.proto
     command_delete_arrow.proto
+    command_destroy_card.proto
     command_draw_cards.proto
     command_dump_zone.proto
     command_flip_card.proto

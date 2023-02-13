@@ -182,19 +182,16 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    bool attach = false;
-                    bool exclude = false;
-                    bool variable = false;
-                    bool persistent = false;
+                    CardRelation::RelationFlags flags;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     if (attrs.hasAttribute("count")) {
                         if (attrs.value("count").toString().indexOf("x=") == 0) {
-                            variable = true;
+                            flags |= CardRelation::IsVariableCount;
                             count = attrs.value("count").toString().remove(0, 2).toInt();
                         } else if (attrs.value("count").toString().indexOf("x") == 0) {
-                            variable = true;
+                            flags |= CardRelation::IsVariableCount;
                         } else {
                             count = attrs.value("count").toString().toInt();
                         }
@@ -205,18 +202,22 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = true;
+                        flags |= CardRelation::DoesAttach;
+
+                        if (attrs.value("attach").toString() == "transform") {
+                            flags |= CardRelation::Transform;
+                        }
                     }
 
                     if (attrs.hasAttribute("exclude")) {
-                        exclude = true;
+                        flags |= CardRelation::IsCreateAllExclusion;
                     }
 
                     if (attrs.hasAttribute("persistent")) {
-                        persistent = true;
+                        flags |= CardRelation::IsPersistent;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count, persistent);
+                    auto *relation = new CardRelation(cardName, flags, count);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -293,8 +294,8 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     const QList<CardRelation *> related = info->getRelatedCards();
     for (auto i : related) {
         xml.writeStartElement("related");
-        if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
+        if (i->hasFlag(CardRelation::DoesAttach)) {
+            xml.writeAttribute("attach", i->hasFlag(CardRelation::Transform) ? "transform" : "attach");
         }
         if (i->getIsCreateAllExclusion()) {
             xml.writeAttribute("exclude", "exclude");
@@ -317,8 +318,8 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     const QList<CardRelation *> reverseRelated = info->getReverseRelatedCards();
     for (auto i : reverseRelated) {
         xml.writeStartElement("reverse-related");
-        if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
+        if (i->hasFlag(CardRelation::DoesAttach)) {
+            xml.writeAttribute("attach", i->hasFlag(CardRelation::Transform) ? "transform" : "attach");
         }
 
         if (i->getIsCreateAllExclusion()) {

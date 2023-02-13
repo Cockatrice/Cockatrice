@@ -19,6 +19,7 @@
 #include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_concede.pb.h"
 #include "pb/command_create_token.pb.h"
+#include "pb/command_destroy_card.pb.h"
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_flip_card.pb.h"
 #include "pb/command_game_say.pb.h"
@@ -1683,7 +1684,7 @@ void Player::actCreateAllRelatedCards()
                         dbName = cardRelationAll->getName();
                         bool persistent = cardRelationAll->getIsPersistent();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, false, persistent);
+                            createCard(sourceCard, dbName, persistent ? CreatePersistentCard : NoCreationFlags);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1698,7 +1699,7 @@ void Player::actCreateAllRelatedCards()
                         dbName = cardRelationNotExcluded->getName();
                         bool persistent = cardRelationNotExcluded->getIsPersistent();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, false, persistent);
+                            createCard(sourceCard, dbName, persistent ? CreatePersistentCard : NoCreationFlags);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1726,7 +1727,9 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
         return false;
     }
     QString dbName = cardRelation->getName();
-    bool persistent = cardRelation->getIsPersistent();
+    CardCreationFlags flags;
+    flags.setFlag(CreatePersistentCard, cardRelation->getIsPersistent());
+
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;
@@ -1737,23 +1740,27 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
             return false;
         }
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName, false, persistent);
+            createCard(sourceCard, dbName, flags);
         }
     } else if (cardRelation->getDefaultCount() > 1) {
         for (int i = 0; i < cardRelation->getDefaultCount(); ++i) {
-            createCard(sourceCard, dbName, false, persistent);
+            createCard(sourceCard, dbName, flags);
         }
     } else {
-        if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName, persistent);
-        } else {
-            createCard(sourceCard, dbName, false, persistent);
+        if (cardRelation->hasFlag(CardRelation::DoesAttach)) {
+            flags |= AttachSource;
+
+            if (cardRelation->hasFlag(CardRelation::Transform)) {
+                flags |= CreateWithPile;
+            }
         }
+
+        createCard(sourceCard, dbName, flags);
     }
     return true;
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach, bool persistent)
+void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, Player::CardCreationFlags flags)
 {
     CardInfoPtr cardInfo = db->getCard(dbCardName);
 
@@ -1787,21 +1794,27 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     } else {
         cmd.set_annotation("");
     }
-    cmd.set_destroy_on_zone_change(!persistent);
+    cmd.set_destroy_on_zone_change(!flags.testFlag(CreatePersistentCard));
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
-    if (attach) {
+    if (flags.testFlag(AttachSource)) {
         cmd.set_target_card_id(sourceCard->getId());
+
+        if (sourceCard->getZone() == table && flags.testFlag(CreateWithPile)) {
+            cmd.set_x(sourceCard->getGridPos().x());
+            cmd.set_y(sourceCard->getGridPos().y());
+        }
+    }
+
+    if (flags.testFlag(CreateWithPile)) {
+        ZoneConfig *zoneConfig = cmd.mutable_target_pile();
+        zoneConfig->set_name("frontfaces");
+        zoneConfig->set_type(ZoneType::PublicZone);
     }
 
     sendGameCommand(cmd);
-}
-
-void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool persistent)
-{
-    createCard(sourceCard, dbCardName, true, persistent);
 }
 
 void Player::actSayMessage()
@@ -3543,6 +3556,16 @@ void Player::updateCardMenu(const CardItem *card)
             cardMenu->addAction(aClone);
         }
     }
+
+    CardZone *frontFaces = card->getAttachedZone("frontfaces");
+    if (frontFaces && frontFaces->getCards().size() > 0) {
+        const auto &cards = frontFaces->getCards();
+
+        cardMenu->addSeparator();
+
+        QAction *aShow = cardMenu->addAction(tr("Show front face(s)", "", cards.size()));
+        connect(aShow, &QAction::triggered, frontFaces, &CardZone::toggleView);
+    }
 }
 
 void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
@@ -3601,6 +3624,27 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
         if (relatedCard == nullptr)
             continue;
+
+        CardZone *frontFaces = card->getAttachedZone("frontfaces");
+        if (frontFaces &&
+            std::any_of(frontFaces->getCards().begin(), frontFaces->getCards().end(),
+                        [relatedCard](CardItem *item) { return item->getName() == relatedCard->getName(); })) {
+            const auto &cards = frontFaces->getCards();
+
+            QString revertLabel;
+            if (cards.size() == 1 && cards.getContentsKnown()) {
+                revertLabel = tr("Transform back into %1").arg(cards.first()->getName());
+            } else {
+                revertLabel = tr("Transform back into %n card(s)", "", cards.size());
+            }
+            QAction *aRevert = cardMenu->addAction(revertLabel);
+            Command_DestroyCard cmd;
+            card->copyRef(cmd.mutable_card());
+            connect(aRevert, &QAction::triggered, this, [this, cmd]() { sendGameCommand(cmd); });
+
+            continue;
+        }
+
         QString relatedCardName;
         if (relatedCard->getPowTough().size() > 0) {
             relatedCardName = relatedCard->getPowTough() + " " + relatedCard->getName(); // "n/n name"
@@ -3610,7 +3654,8 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
         QString text = tr("Token: ");
         if (cardRelation->getDoesAttach()) {
-            text += tr("Attach to ") + "\"" + relatedCardName + "\"";
+            text += tr(cardRelation->hasFlag(CardRelation::Transform) ? "Transform into " : "Attach to ") + "\"" +
+                    relatedCardName + "\"";
         } else if (cardRelation->getIsVariable()) {
             text += "X " + relatedCardName;
         } else if (cardRelation->getDefaultCount() != 1) {

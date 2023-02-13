@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "game_commands.proto";
+import "card_ref.proto";
+
+message Command_DestroyCard {
+    extend GameCommand {
+        optional Command_DestroyCard ext = 1035;
+    }
+
+    optional CardRef card = 1;
+}

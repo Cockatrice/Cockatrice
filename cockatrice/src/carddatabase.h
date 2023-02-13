@@ -452,41 +452,59 @@ signals:
 class CardRelation : public QObject
 {
     Q_OBJECT
+public:
+    enum RelationFlag
+    {
+        NoFlag = 0x0,
+        DoesAttach = 0x1 << 0,
+        IsCreateAllExclusion = 0x1 << 1,
+        IsVariableCount = 0x1 << 2,
+        IsPersistent = 0x1 << 3,
+        Transform = 0x1 << 4,
+    };
+    Q_DECLARE_FLAGS(RelationFlags, RelationFlag);
+
 private:
     QString name;
-    bool doesAttach;
-    bool isCreateAllExclusion;
-    bool isVariableCount;
+    RelationFlags flags;
     int defaultCount;
-    bool isPersistent;
 
 public:
-    explicit CardRelation(const QString &_name = QString(),
-                          bool _doesAttach = false,
-                          bool _isCreateAllExclusion = false,
-                          bool _isVariableCount = false,
-                          int _defaultCount = 1,
-                          bool _isPersistent = false);
+    explicit CardRelation(const QString &_name = QString(), RelationFlags _flags = {}, int _defaultCount = 1)
+        : name(_name), flags(_flags), defaultCount(_defaultCount)
+    {
+    }
 
     inline const QString &getName() const
     {
         return name;
     }
+
+    RelationFlags getFlags() const
+    {
+        return flags;
+    }
+
+    bool hasFlag(RelationFlag flag) const
+    {
+        return flags.testFlag(flag);
+    }
+
     bool getDoesAttach() const
     {
-        return doesAttach;
+        return flags.testFlag(DoesAttach);
     }
     bool getCanCreateAnother() const
     {
-        return !doesAttach;
+        return !flags.testFlag(DoesAttach);
     }
     bool getIsCreateAllExclusion() const
     {
-        return isCreateAllExclusion;
+        return flags.testFlag(IsCreateAllExclusion);
     }
     bool getIsVariable() const
     {
-        return isVariableCount;
+        return flags.testFlag(IsVariableCount);
     }
     int getDefaultCount() const
     {
@@ -494,7 +512,10 @@ public:
     }
     bool getIsPersistent() const
     {
-        return isPersistent;
+        return flags.testFlag(IsPersistent);
     }
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(CardRelation::RelationFlags);
+
 #endif
