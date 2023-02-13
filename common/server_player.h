@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QString>
+#include <optional>
 
 class DeckList;
 class Server_Game;
@@ -27,6 +28,7 @@ class GameEventContainer;
 class GameEventStorage;
 class ResponseContainer;
 class GameCommand;
+class ZoneConfig;
 
 class Command_KickFromGame;
 class Command_LeaveGame;
@@ -62,6 +64,12 @@ class Command_SetSideboardPlan;
 class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
+class Command_CreateZone;
+
+struct CardAttributes
+{
+    std::optional<bool> faceDown;
+};
 
 class Server_Player : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -163,6 +171,7 @@ public:
     int newArrowId() const;
 
     void addZone(const std::shared_ptr<Server_CardZone> &zone);
+    void destroyZone(QString zoneName);
     void addArrow(Server_Arrow *arrow);
     bool deleteArrow(int arrowId);
     void addCounter(Server_Counter *counter);
@@ -171,14 +180,18 @@ public:
     void setupZones();
 
     Response::ResponseCode drawCards(GameEventStorage &ges, int number);
-    Response::ResponseCode moveCard(GameEventStorage &ges,
-                                    std::shared_ptr<Server_CardZone> startzone,
-                                    const QList<const CardToMove *> &_cards,
-                                    std::shared_ptr<Server_CardZone> targetzone,
-                                    int xCoord,
-                                    int yCoord,
-                                    bool fixFreeSpaces = true,
-                                    bool undoingDraw = false);
+    void moveCards(GameEventStorage &ges,
+                   const QList<Server_Card *> &cards,
+                   std::shared_ptr<Server_CardZone> targetZone,
+                   int targetX,
+                   int targetY,
+                   const QMap<int, CardAttributes> &cardsAttributes = {});
+    void destroyCard(GameEventStorage &ges, Server_Card *card);
+    void destroyCard(GameEventStorage &ges,
+                     Server_Card *card,
+                     const std::shared_ptr<Server_CardZone> &targetZone,
+                     int targetX = -1,
+                     int targetY = 0);
     void unattachCard(GameEventStorage &ges, Server_Card *card);
     Response::ResponseCode setCardAttrHelper(GameEventStorage &ges,
                                              int targetPlayerId,
@@ -235,6 +248,7 @@ public:
     void sendGameEvent(const GameEventContainer &event);
 
     void getInfo(ServerInfo_Player *info, Server_Player *playerWhosAsking, bool omniscient, bool withUserInfo);
+    std::shared_ptr<Server_CardZone> createZone(const ZoneConfig &zoneConfig);
 };
 
 #endif

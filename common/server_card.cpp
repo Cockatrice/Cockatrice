@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "server_card.h"
 
+#include "pb/card_ref.pb.h"
 #include "pb/serverinfo_card.pb.h"
 #include "server_cardzone.h"
 #include "server_player.h"
@@ -141,4 +142,24 @@ void Server_Card::getInfo(ServerInfo_Card *info)
         info->set_attach_zone(parentCard->getZone()->getName().toStdString());
         info->set_attach_card_id(parentCard->getId());
     }
+}
+
+void Server_Card::copyRef(CardRef *ref)
+{
+    getZone()->copyRef(ref->mutable_zone());
+    ref->set_card_id(getId());
+}
+
+QList<std::shared_ptr<Server_CardZone>> Server_Card::takeAttachedZones()
+{
+    QList<std::shared_ptr<Server_CardZone>> liveZones;
+    while (!attachedZones.isEmpty()) {
+        auto attachedZone = attachedZones.takeLast().lock();
+        if (attachedZone) {
+            attachedZone->detach();
+            liveZones.append(attachedZone);
+        }
+    }
+
+    return liveZones;
 }

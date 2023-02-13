@@ -16,6 +16,7 @@
 #include "lineeditcompleter.h"
 #include "main.h"
 #include "messagelogwidget.h"
+#include "pb/card_ref.pb.h"
 #include "pb/command_concede.pb.h"
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_delete_arrow.pb.h"
@@ -45,6 +46,7 @@
 #include "pb/game_event_container.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/response_deck_download.pb.h"
+#include "pb/zone_ref.pb.h"
 #include "pending_command.h"
 #include "phasestoolbar.h"
 #include "pictureloader.h"
@@ -1999,4 +2001,27 @@ void TabGame::dockTopLevelChanged(bool topLevel)
         aReplayDockFloating->setChecked(topLevel);
         return;
     }
+}
+
+Player *TabGame::findPlayer(int playerId) const
+{
+    return players.value(playerId);
+}
+
+CardZone *TabGame::findZone(const ZoneRef &zoneRef) const
+{
+    auto player = findPlayer(zoneRef.player_id());
+    if (!player)
+        return nullptr;
+
+    return player->getZones().value(QString::fromStdString(zoneRef.name()));
+}
+
+CardItem *TabGame::findCard(const CardRef &cardRef) const
+{
+    auto zone = findZone(cardRef.zone());
+    if (!zone)
+        return nullptr;
+
+    return zone->getCard(cardRef.card_id(), QString());
 }

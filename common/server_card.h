@@ -29,6 +29,8 @@
 
 class Server_CardZone;
 
+class CardRef;
+
 class Server_Card : public Server_ArrowTarget
 {
     Q_OBJECT
@@ -49,10 +51,17 @@ private:
 
     Server_Card *parentCard;
     QList<Server_Card *> attachedCards;
+    QList<std::weak_ptr<Server_CardZone>> attachedZones;
 
 public:
     Server_Card(QString _name, int _id, int _coord_x, int _coord_y, std::weak_ptr<Server_CardZone> _zone = {});
     ~Server_Card() override;
+
+    void attachZone(std::weak_ptr<Server_CardZone> attachedZone)
+    {
+        attachedZones.append(attachedZone);
+    }
+    QList<std::shared_ptr<Server_CardZone>> takeAttachedZones();
 
     std::shared_ptr<Server_CardZone> getZone() const
     {
@@ -183,11 +192,27 @@ public:
     {
         attachedCards.removeOne(card);
     }
+    void removeAttachedZone(std::shared_ptr<Server_CardZone> zone)
+    {
+        for (auto it = attachedZones.begin(), end = attachedZones.end(); it != end;) {
+            auto attachedZone = it->lock();
+            if (!attachedZone || attachedZone == zone) {
+                it = attachedZones.erase(it);
+            } else {
+                ++it;
+            }
+
+            if (attachedZone == zone) {
+                return;
+            }
+        }
+    }
 
     void resetState();
     QString setAttribute(CardAttribute attribute, const QString &avalue, bool allCards);
 
     void getInfo(ServerInfo_Card *info);
+    void copyRef(CardRef *ref);
 };
 
 #endif

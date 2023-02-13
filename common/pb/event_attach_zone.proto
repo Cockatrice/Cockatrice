@@ -1,0 +1,13 @@
+syntax = "proto2";
+import "card_ref.proto";
+import "game_event.proto";
+import "zone_ref.proto";
+
+message Event_AttachZone {
+    extend GameEvent {
+        optional Event_AttachZone ext = 2024;
+    }
+    optional ZoneRef ref = 1;
+    optional CardRef parent = 2;
+    optional string name = 3;
+}

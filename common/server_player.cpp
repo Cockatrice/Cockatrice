@@ -44,13 +44,16 @@
 #include "pb/context_set_sideboard_lock.pb.h"
 #include "pb/context_undo_draw.pb.h"
 #include "pb/event_attach_card.pb.h"
+#include "pb/event_attach_zone.pb.h"
 #include "pb/event_change_zone_properties.pb.h"
 #include "pb/event_create_arrow.pb.h"
 #include "pb/event_create_counter.pb.h"
 #include "pb/event_create_token.pb.h"
+#include "pb/event_create_zone.pb.h"
 #include "pb/event_del_counter.pb.h"
 #include "pb/event_delete_arrow.pb.h"
 #include "pb/event_destroy_card.pb.h"
+#include "pb/event_destroy_zone.pb.h"
 #include "pb/event_draw_cards.pb.h"
 #include "pb/event_dump_zone.pb.h"
 #include "pb/event_flip_card.pb.h"
@@ -69,6 +72,7 @@
 #include "pb/response_dump_zone.pb.h"
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/zone_config.pb.h"
 #include "rng_abstract.h"
 #include "server.h"
 #include "server_abstractuserinterface.h"
@@ -82,26 +86,8 @@
 #include "stringsizes.h"
 
 #include <QDebug>
+#include <QMultiMap>
 #include <algorithm>
-
-struct MoveCardStruct
-{
-    Server_Card *card;
-    int position;
-    const CardToMove *cardToMove;
-    int xCoord, yCoord;
-    MoveCardStruct(Server_Card *_card, int _position, const CardToMove *_cardToMove)
-        : card(_card), position(_position), cardToMove(_cardToMove), xCoord(_card->getX()), yCoord(_card->getY())
-
-    {
-    }
-    bool operator<(const MoveCardStruct &other) const
-    {
-        return (yCoord == other.yCoord &&
-                ((xCoord == other.xCoord && position < other.position) || xCoord < other.xCoord)) ||
-               yCoord < other.yCoord;
-    }
-};
 
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
@@ -288,6 +274,11 @@ void Server_Player::addZone(const std::shared_ptr<Server_CardZone> &zone)
     zones.insert(zone->getName(), zone);
 }
 
+void Server_Player::destroyZone(QString zoneName)
+{
+    zones.remove(zoneName);
+}
+
 void Server_Player::addArrow(Server_Arrow *arrow)
 {
     arrows.insert(arrow->getId(), arrow);
@@ -373,244 +364,140 @@ void Server_Player::revealTopCardIfNeeded(const std::shared_ptr<Server_CardZone>
     }
 }
 
-Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
-                                               std::shared_ptr<Server_CardZone> startzone,
-                                               const QList<const CardToMove *> &_cards,
-                                               std::shared_ptr<Server_CardZone> targetzone,
-                                               int xCoord,
-                                               int yCoord,
-                                               bool fixFreeSpaces,
-                                               bool undoingDraw)
+static Event_MoveCard makeMoveCardEvent(std::shared_ptr<Server_CardZone> sourceZone,
+                                        int sourceId,
+                                        int sourcePosition,
+                                        bool sourceKnown,
+                                        Server_Card *card,
+                                        bool targetKnown,
+                                        int targetX,
+                                        int targetY)
 {
-    // Disallow controller change to other zones than the table.
-    if (((targetzone->getType() != ZoneType::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
-        return Response::RespContextError;
+    auto targetZone = card->getZone();
+
+    Event_MoveCard event;
+    event.set_start_player_id(sourceZone->getPlayer()->getPlayerId());
+    event.set_start_zone(sourceZone->getName().toStdString());
+    event.set_target_player_id(targetZone->getPlayer()->getPlayerId());
+    event.set_target_zone(targetZone->getName().toStdString());
+    event.set_x(targetX);
+    event.set_y(targetY);
+    event.set_face_down(card->getFaceDown());
+
+    if (sourceZone->getType() == ZoneType::PublicZone || sourceKnown) {
+        event.set_card_id(sourceId);
     }
 
-    if (!targetzone->hasCoords() && (xCoord <= -1)) {
-        xCoord = targetzone->getCards().size();
+    if (sourceZone->getType() == ZoneType::HiddenZone || !sourceKnown) {
+        event.set_position(sourcePosition);
     }
 
-    std::set<MoveCardStruct> cardsToMove;
-    QSet<int> cardIdsToMove;
-    for (auto _card : _cards) {
-        // The same card being moved twice would lead to undefined behaviour.
-        if (cardIdsToMove.contains(_card->card_id())) {
-            continue;
-        }
-        cardIdsToMove.insert(_card->card_id());
-
-        // Consistency checks. In case the command contains illegal moves, try to resolve the legal ones still.
-        int position;
-        Server_Card *card = startzone->getCard(_card->card_id(), &position);
-        if (!card) {
-            return Response::RespNameNotFound;
-        }
-        if (card->getParentCard()) {
-            continue;
-        }
-        if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
-            continue;
-        }
-
-        cardsToMove.insert(MoveCardStruct{card, position, _card});
-    }
-    // In case all moves were filtered out, abort.
-    if (cardsToMove.empty()) {
-        return Response::RespContextError;
+    if (targetZone->getType() == ZoneType::PublicZone || targetKnown) {
+        event.set_new_card_id(card->getId());
     }
 
-    int xIndex = -1;
-    bool revealTopStart = false;
-    bool revealTopTarget = false;
+    if (sourceKnown || targetKnown) {
+        event.set_card_name(card->getName().toStdString());
+    }
 
-    for (auto cardStruct : cardsToMove) {
-        Server_Card *card = cardStruct.card;
-        const CardToMove *thisCardProperties = cardStruct.cardToMove;
-        int originalPosition = cardStruct.position;
-        bool faceDown = targetzone->hasCoords() &&
-                        (thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown());
+    return event;
+}
 
-        bool sourceBeingLookedAt;
-        int position = startzone->removeCard(card, sourceBeingLookedAt);
+void Server_Player::moveCards(GameEventStorage &ges,
+                              const QList<Server_Card *> &cards,
+                              std::shared_ptr<Server_CardZone> targetZone,
+                              int targetX,
+                              int targetY,
+                              const QMap<int, CardAttributes> &cardsAttributes)
+{
+    if (!targetZone->hasCoords()) {
+        targetY = 0;
 
-        // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
-        // reorder their hand). If a just-drawn card leaves the hand then remove cards before it from the list
-        // (Ignore the case where the card is currently being un-drawn.)
-        if (startzone->getName() == "hand" && targetzone->getName() != "hand" && !undoingDraw) {
-            int index = lastDrawList.lastIndexOf(card->getId());
-            if (index != -1) {
-                lastDrawList.erase(lastDrawList.begin(), lastDrawList.begin() + index);
-            }
+        if (targetX < 0) {
+            targetX = targetZone->getCards().size();
         }
+    }
 
-        // Attachment relationships can be retained when moving a card onto the opponent's table
-        if (startzone->getName() != targetzone->getName()) {
-            // Delete all attachment relationships
-            if (card->getParentCard()) {
-                card->setParentCard(nullptr);
-            }
+    if (targetY < 0)
+        targetY = 0;
 
-            // Make a copy of the list because the original one gets modified during the loop
-            QList<Server_Card *> attachedCards = card->getAttachedCards();
-            for (auto &attachedCard : attachedCards) {
-                attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
-            }
-        }
+    Server_Player *targetPlayer = targetZone->getPlayer();
 
-        if (startzone != targetzone) {
-            // Delete all arrows from and to the card
-            const QList<Server_Player *> &players = game->getPlayers().values();
-            for (auto player : players) {
-                QList<int> arrowsToDelete;
-                QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
-                while (arrowIterator.hasNext()) {
-                    Server_Arrow *arrow = arrowIterator.next().value();
-                    if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
-                        arrowsToDelete.append(arrow->getId());
-                }
-                for (int j : arrowsToDelete) {
-                    player->deleteArrow(j);
-                }
-            }
-        }
+    QList<std::shared_ptr<Server_CardZone>> zonesToReveal;
+    for (auto *card : cards) {
+        const CardAttributes cardAttributes = cardsAttributes.value(card->getId());
+        bool faceDown = cardAttributes.faceDown.value_or(card->getFaceDown());
 
-        if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
-            Event_DestroyCard event;
-            event.set_zone_name(startzone->getName().toStdString());
-            event.set_card_id(static_cast<google::protobuf::uint32>(card->getId()));
-            ges.enqueueGameEvent(event, playerId);
+        auto sourceZone = card->getZone();
+        Server_Player *sourcePlayer = sourceZone->getPlayer();
 
-            card->deleteLater();
+        bool controllerChanges = targetPlayer != sourcePlayer;
+        bool zoneChanges = targetZone->getName() != sourceZone->getName();
+
+        int sourcePosition;
+        sourceZone->getCard(card->getId(), &sourcePosition);
+
+        if (zoneChanges && card->getDestroyOnZoneChange()) {
+            destroyCard(ges, card, targetZone, targetX, targetY);
         } else {
-            ++xIndex;
-            int newX = xCoord + xIndex;
+            if (zoneChanges || controllerChanges) {
+                game->removeArrowsRelatedToCard(ges, card);
+            }
 
-            if (targetzone->hasCoords()) {
-                newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
+            if (zoneChanges) {
+                game->unattachCardsRelatedToCard(ges, card);
+            }
+
+            // Remove the card from its zone on the server and determine who knew its name
+            int sourceId = card->getId();
+            bool sourceBeingLookedAt;
+            sourceZone->removeCard(card, sourceBeingLookedAt);
+
+            bool sourceKnownToPlayer =
+                sourceZone->getType() == ZoneType::HiddenZone ? sourceBeingLookedAt : !card->getFaceDown();
+            bool sourceKnownToOthers = sourceZone->getType() == ZoneType::PublicZone && !card->getFaceDown();
+
+            if (targetZone->hasCoords()) {
+                targetX = targetZone->getFreeGridColumn(targetX, targetY, card->getName(), faceDown);
             } else {
-                yCoord = 0;
                 card->resetState();
             }
+            targetZone->insertCard(card, targetX, targetY, sourceKnownToPlayer && !controllerChanges);
 
-            targetzone->insertCard(card, newX, yCoord);
-            int targetLookedCards = targetzone->getCardsBeingLookedAt();
-            bool sourceKnownToPlayer = sourceBeingLookedAt && !card->getFaceDown();
-            if (targetzone->getType() == ZoneType::HiddenZone && targetLookedCards >= newX) {
-                if (sourceKnownToPlayer) {
-                    targetLookedCards += 1;
-                } else {
-                    targetLookedCards = newX;
-                }
-                targetzone->setCardsBeingLookedAt(targetLookedCards);
-            }
-
-            bool targetHiddenToOthers = faceDown || (targetzone->getType() != ZoneType::PublicZone);
-            bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ZoneType::PublicZone);
-
-            int oldCardId = card->getId();
-            if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer())) {
-                card->setId(targetzone->getPlayer()->newCardId());
-            }
             card->setFaceDown(faceDown);
-
-            Event_MoveCard eventOthers;
-            eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
-            eventOthers.set_start_zone(startzone->getName().toStdString());
-            eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
-            if (startzone != targetzone) {
-                eventOthers.set_target_zone(targetzone->getName().toStdString());
-            }
-            eventOthers.set_y(yCoord);
-            eventOthers.set_face_down(faceDown);
-
-            Event_MoveCard eventPrivate(eventOthers);
-            if (sourceBeingLookedAt || targetzone->getType() != ZoneType::HiddenZone ||
-                startzone->getType() != ZoneType::HiddenZone) {
-                eventPrivate.set_card_id(oldCardId);
-                eventPrivate.set_new_card_id(card->getId());
-            } else {
-                eventPrivate.set_card_id(-1);
-                eventPrivate.set_new_card_id(-1);
-            }
-            if (sourceKnownToPlayer || !(faceDown || targetzone->getType() == ZoneType::HiddenZone)) {
-                QString privateCardName = card->getName();
-                eventPrivate.set_card_name(privateCardName.toStdString());
-            }
-            if (startzone->getType() == ZoneType::HiddenZone) {
-                eventPrivate.set_position(position);
-            } else {
-                eventPrivate.set_position(-1);
+            if (controllerChanges || (zoneChanges && faceDown)) {
+                card->setId(targetPlayer->newCardId());
             }
 
-            eventPrivate.set_x(newX);
+            bool targetKnownToOthers = targetZone->getType() == ZoneType::PublicZone && !faceDown;
+            bool targetKnownToPlayer =
+                targetKnownToOthers || (targetZone->getType() == ZoneType::PrivateZone && !controllerChanges);
 
-            // Other players do not get to see the start and/or target position of the card if the respective
-            // part of the zone is being looked at. The information is not needed anyway because in hidden zones,
-            // all cards are equal.
-            if (((startzone->getType() == ZoneType::HiddenZone) &&
-                 ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1))) ||
-                (startzone->getType() == ZoneType::PublicZone)) {
-                eventOthers.set_position(-1);
-            } else {
-                eventOthers.set_position(position);
-            }
-            if ((targetzone->getType() == ZoneType::HiddenZone) &&
-                ((targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1))) {
-                eventOthers.set_x(-1);
-            } else {
-                eventOthers.set_x(newX);
-            }
+            // Our job is done, we just need to emit the relevant events
+            Event_MoveCard privateEvent = makeMoveCardEvent(sourceZone, sourceId, sourcePosition, sourceKnownToPlayer,
+                                                            card, targetKnownToPlayer, targetX, targetY);
+            Event_MoveCard othersEvent = makeMoveCardEvent(sourceZone, sourceId, sourcePosition, sourceKnownToOthers,
+                                                           card, targetKnownToOthers, targetY, targetY);
 
-            if ((startzone->getType() == ZoneType::PublicZone) ||
-                (targetzone->getType() == ZoneType::PublicZone)) {
-                eventOthers.set_card_id(oldCardId);
-                if (!(sourceHiddenToOthers && targetHiddenToOthers)) {
-                    QString publicCardName = card->getName();
-                    eventOthers.set_card_name(publicCardName.toStdString());
-                }
-                eventOthers.set_new_card_id(card->getId());
+            ges.enqueueGameEvent(privateEvent, sourcePlayer->getPlayerId(), GameEventStorageItem::SendToPrivate,
+                                 sourcePlayer->getPlayerId());
+            ges.enqueueGameEvent(othersEvent, sourcePlayer->getPlayerId(), GameEventStorageItem::SendToOthers);
+
+            if (targetX == 0) {
+                zonesToReveal.append(targetZone);
             }
 
-            ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
-            ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
+            targetX++;
+        }
 
-            if (thisCardProperties->tapped()) {
-                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
-                                  AttrTapped, "1");
-            }
-            QString ptString = QString::fromStdString(thisCardProperties->pt());
-            if (!ptString.isEmpty()) {
-                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
-                                  AttrPT, ptString);
-            }
-
-            if (originalPosition == 0) {
-                revealTopStart = true;
-            }
-            if (newX == 0) {
-                revealTopTarget = true;
-            }
+        if (sourcePosition == 0) {
+            zonesToReveal.append(sourceZone);
         }
     }
-    if (revealTopStart) {
-        revealTopCardIfNeeded(startzone, ges);
-    }
-    if (targetzone != startzone && revealTopTarget) {
-        revealTopCardIfNeeded(targetzone, ges);
-    }
-    if (undoingDraw) {
-        ges.setGameEventContext(Context_UndoDraw());
-    } else {
-        ges.setGameEventContext(Context_MoveCard());
-    }
 
-    if (startzone->hasCoords() && fixFreeSpaces) {
-        startzone->fixFreeSpaces(ges);
+    for (const auto &zoneToReveal : zonesToReveal) {
+        revealTopCardIfNeeded(zoneToReveal, ges);
     }
-
-    return Response::RespOk;
 }
 
 void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
@@ -624,10 +511,10 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
     event.set_card_id(card->getId());
     ges.enqueueGameEvent(event, playerId);
 
-    auto *cardToMove = new CardToMove;
-    cardToMove->set_card_id(card->getId());
-    moveCard(ges, zone, QList<const CardToMove *>() << cardToMove, zone, -1, card->getY(), card->getFaceDown());
-    delete cardToMove;
+    moveCards(ges, {card}, zone, -1, card->getY());
+    if (card->getFaceDown()) {
+        zone->fixFreeSpaces(ges);
+    }
 
     if (parentCard->getZone()) {
         parentCard->getZone()->updateCardCoordinates(parentCard, parentCard->getX(), parentCard->getY());
@@ -992,14 +879,8 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
     int number = cmd.number();
 
     if (!hand->getCards().isEmpty()) {
-        auto cardsToMove = QList<const CardToMove *>();
-        for (auto &card : hand->getCards()) {
-            auto *cardToMove = new CardToMove;
-            cardToMove->set_card_id(card->getId());
-            cardsToMove.append(cardToMove);
-        }
-        moveCard(ges, hand, cardsToMove, deck, -1, 0, false);
-        qDeleteAll(cardsToMove);
+        lastDrawList.clear();
+        moveCards(ges, hand->getCards(), deck, -1, 0);
     }
 
     deck->shuffle();
@@ -1067,14 +948,17 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
         return Response::RespContextError;
     }
 
-    Response::ResponseCode retVal;
-    auto *cardToMove = new CardToMove;
-    cardToMove->set_card_id(lastDrawList.takeLast());
-    retVal = moveCard(ges, zones.value("hand"), QList<const CardToMove *>() << cardToMove, zones.value("deck"), 0, 0,
-                      false, true);
-    delete cardToMove;
+    auto handZone = zones.value("hand");
+    auto deckZone = zones.value("deck");
 
-    return retVal;
+    Server_Card *card = handZone->getCard(lastDrawList.takeLast());
+    if (!card) {
+        return Response::RespNameNotFound;
+    }
+
+    ges.setGameEventContext(Context_UndoDraw());
+    moveCards(ges, {card}, deckZone, 0, 0);
+    return Response::RespOk;
 }
 
 Response::ResponseCode
@@ -1117,12 +1001,91 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         return Response::RespContextError;
     }
 
-    QList<const CardToMove *> cardsToMove;
-    for (int i = 0; i < cmd.cards_to_move().card_size(); ++i) {
-        cardsToMove.append(&cmd.cards_to_move().card(i));
+    // Disallow controller changes to other zones than the table.
+    bool targetIsTable = targetZone->getType() == ZoneType::PublicZone && targetZone->hasCoords();
+    bool controllerChanges = startZone->getPlayer() != targetZone->getPlayer();
+    if (controllerChanges && !targetIsTable && !judge) {
+        return Response::RespContextError;
     }
 
-    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y());
+    QList<Server_Card *> cards;
+    QSet<int> cardIdsToMove;
+    QMap<int, CardAttributes> cardsAttributes;
+    QMultiMap<int, std::pair<CardAttribute, QString>> cardsExtraAttributes;
+    for (int i = 0; i < cmd.cards_to_move().card_size(); ++i) {
+        const CardToMove *cardToMove = &cmd.cards_to_move().card(i);
+
+        // The same card being moved twice would lead to undefined behaviour.
+        if (cardIdsToMove.contains(cardToMove->card_id())) {
+            continue;
+        }
+        cardIdsToMove.insert(cardToMove->card_id());
+
+        // Consistency checks. In case the command contains illegal moves, try
+        // to resolve the legal ones still.
+        Server_Card *card = startZone->getCard(cardToMove->card_id());
+        if (!card) {
+            return Response::RespNameNotFound;
+        }
+
+        // Can't move attached cards
+        if (card->getParentCard()) {
+            continue;
+        }
+
+        // Can't move cards with attachments to a non-empty slot
+        if (!card->getAttachedCards().isEmpty() && !targetZone->isColumnEmpty(cmd.x(), cmd.y())) {
+            continue;
+        }
+
+        cards.append(card);
+
+        // Face-down information is needed to determine visibility.
+        if (cardToMove->has_face_down()) {
+            cardsAttributes.insert(card->getId(), {cardToMove->face_down()});
+        }
+
+        if (cardToMove->has_pt()) {
+            QString ptString = QString::fromStdString(cardToMove->pt());
+            if (!ptString.isEmpty()) {
+                cardsExtraAttributes.insert(card->getId(), {AttrPT, ptString});
+            }
+        }
+
+        if (cardToMove->has_tapped()) {
+            cardsExtraAttributes.insert(card->getId(), {AttrTapped, cardToMove->tapped() ? "1" : "0"});
+        }
+    }
+
+    // In case all moves were filtered out, abort.
+    if (cardIdsToMove.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
+    // reorder their hand). If a just-drawn card leaves the hand then remove cards before it from the list
+    if (startZone->getName() == "hand" && targetZone != startZone) {
+        for (const auto *card : cards) {
+            int index = lastDrawList.lastIndexOf(card->getId());
+            if (index != -1) {
+                lastDrawList.erase(lastDrawList.begin(), lastDrawList.begin() + index);
+            }
+        }
+    }
+
+    ges.setGameEventContext(Context_MoveCard());
+    moveCards(ges, cards, targetZone, cmd.x(), cmd.y(), cardsAttributes);
+
+    for (const auto *card : cards) {
+        for (auto [it, end] = cardsExtraAttributes.equal_range(card->getId()); it != end; ++it) {
+            setCardAttrHelper(ges, card->getZone()->getPlayer()->getPlayerId(), card->getZone()->getName(),
+                              card->getId(), it.value().first, it.value().second);
+        }
+    }
+
+    startZone->fixFreeSpaces(ges);
+    targetZone->fixFreeSpaces(ges);
+    return Response::RespOk;
 }
 
 Response::ResponseCode
@@ -1269,12 +1232,13 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         startzone->updateCardCoordinates(card, oldX, card->getY());
 
         if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
-            auto *cardToMove = new CardToMove;
-            cardToMove->set_card_id(targetCard->getId());
-            targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone,
-                                   targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName(), false),
-                                   targetCard->getY(), targetCard->getFaceDown());
-            delete cardToMove;
+            targetPlayer->moveCards(ges, {targetCard}, targetzone,
+                                    targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName(), false),
+                                    targetCard->getY());
+
+            if (targetCard->getFaceDown()) {
+                targetzone->fixFreeSpaces(ges);
+            }
         }
 
         Event_AttachCard event;
@@ -1313,16 +1277,58 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     }
 
     QString cardName = nameFromStdString(cmd.card_name());
-    int xCoord = cmd.x();
-    int yCoord = cmd.y();
+    // If the token is a replacement for an existing card that must be moved
+    // into a new zone, move the old card to the zone first to make space for
+    // the token.
+    std::shared_ptr<Server_CardZone> pileZone;
+    Server_Card *parentCard = nullptr;
+    QList<Server_Card *> cardsToAttach;
+    if (cmd.has_target_pile()) {
+        auto targetZone = cmd.has_target_zone() ? zones.value(nameFromStdString(cmd.target_zone())) : zone;
+        if (!targetZone) {
+            return Response::RespNameNotFound;
+        }
+
+        pileZone = createZone(cmd.target_pile());
+
+        Event_CreateZone event;
+        pileZone->copyConfig(event.mutable_config());
+        ges.enqueueGameEvent(event, playerId);
+
+        // If we have both a pile and a target card, put the card onto the pile.
+        if (cmd.has_target_card_id()) {
+            auto *targetCard = targetZone->getCard(cmd.target_card_id());
+            if (!targetCard) {
+                return Response::RespNameNotFound;
+            }
+
+            if (targetZone == zone) {
+                parentCard = targetCard->getParentCard();
+                QList<Server_Card *> attachedCards{targetCard->getAttachedCards()};
+                for (auto *attachedCard : attachedCards) {
+                    attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
+                }
+
+                cardsToAttach.append(attachedCards);
+            }
+
+            moveCards(ges, {targetCard}, pileZone, -1, 0);
+        }
+    }
+
+    int xCoord = cmd.has_x() ? cmd.x() : -1;
+    int yCoord = cmd.has_y() ? cmd.y() : -1;
+
+    if (yCoord < 0) {
+        yCoord = 0;
+    }
+
     if (zone->hasCoords()) {
         xCoord = zone->getFreeGridColumn(xCoord, yCoord, cardName, false);
     }
+
     if (xCoord < 0) {
         xCoord = 0;
-    }
-    if (yCoord < 0) {
-        yCoord = 0;
     }
 
     auto *card = new Server_Card(cardName, newCardId(), xCoord, yCoord);
@@ -1345,6 +1351,42 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     event.set_x(xCoord);
     event.set_y(yCoord);
     ges.enqueueGameEvent(event, playerId);
+
+    if (pileZone) {
+        pileZone->attachToCard(card);
+
+        Event_AttachZone event;
+        pileZone->copyRef(event.mutable_ref());
+        card->copyRef(event.mutable_parent());
+        event.set_name(cmd.target_pile().name());
+        ges.enqueueGameEvent(event, playerId);
+
+        if (parentCard) {
+            card->setParentCard(parentCard);
+
+            Event_AttachCard event;
+            event.set_start_zone(card->getZone()->getName().toStdString());
+            event.set_card_id(card->getId());
+            event.set_target_player_id(parentCard->getZone()->getPlayer()->getPlayerId());
+            event.set_target_zone(parentCard->getZone()->getName().toStdString());
+            event.set_target_card_id(parentCard->getId());
+            ges.enqueueGameEvent(event, card->getZone()->getPlayer()->getPlayerId());
+        }
+
+        for (auto *cardToAttach : cardsToAttach) {
+            cardToAttach->setParentCard(card);
+
+            Event_AttachCard event;
+            event.set_start_zone(cardToAttach->getZone()->getName().toStdString());
+            event.set_card_id(cardToAttach->getId());
+            event.set_target_player_id(card->getZone()->getPlayer()->getPlayerId());
+            event.set_target_zone(card->getZone()->getName().toStdString());
+            event.set_target_card_id(card->getId());
+            ges.enqueueGameEvent(event, cardToAttach->getZone()->getPlayer()->getPlayerId());
+        }
+
+        return Response::RespOk;
+    }
 
     // check if the token is a replacement for an existing card
     if (cmd.target_card_id() < 0) {
@@ -1467,6 +1509,60 @@ Server_Player::cmdDeleteArrow(const Command_DeleteArrow &cmd, ResponseContainer 
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;
+}
+
+void Server_Player::destroyCard(GameEventStorage &ges, Server_Card *card)
+{
+    destroyCard(ges, card, card->getZone(), card->getX(), card->getY());
+}
+
+void Server_Player::destroyCard(GameEventStorage &ges,
+                                Server_Card *card,
+                                const std::shared_ptr<Server_CardZone> &targetZone,
+                                int targetX,
+                                int targetY)
+{
+    auto sourceZone = card->getZone();
+    Server_Player *sourcePlayer = sourceZone->getPlayer();
+
+    game->removeArrowsRelatedToCard(ges, card);
+    game->unattachCardsRelatedToCard(ges, card);
+
+    // Emit the DestroyCard event first, because we may be moving another card
+    // to the space it occupies and that could confuse clients.
+    Event_DestroyCard event;
+    event.set_zone_name(sourceZone->getName().toStdString());
+    event.set_card_id(card->getId());
+    ges.enqueueGameEvent(event, sourcePlayer->getPlayerId());
+
+    sourceZone->removeCard(card);
+
+    // Note: a card could be moved to its own attached zone, either directly or
+    // because it moves to an attached zone of a card in its attached zone etc.
+    //
+    // Let's try not to unintentionally lose cards in this situation...
+    auto attachedZones = card->takeAttachedZones();
+    for (const auto &attachedZone : attachedZones) {
+        if (attachedZone == targetZone) {
+            continue;
+        }
+
+        moveCards(ges, attachedZone->getCards(), targetZone, targetX, targetY);
+    }
+
+    for (const auto &attachedZone : attachedZones) {
+        if (!attachedZone->getCards().isEmpty()) {
+            moveCards(ges, attachedZone->getCards(), attachedZone->getPlayer()->zones.value("table"), -1, 0);
+        }
+
+        Event_DestroyZone event;
+        attachedZone->copyRef(event.mutable_ref());
+        ges.enqueueGameEvent(event, playerId);
+
+        attachedZone->getPlayer()->destroyZone(attachedZone->getName());
+    }
+
+    card->deleteLater();
 }
 
 Response::ResponseCode
@@ -1989,6 +2085,32 @@ Server_Player::cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseConta
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;
+}
+
+std::shared_ptr<Server_CardZone> Server_Player::createZone(const ZoneConfig &zoneConfig)
+{
+    // Make sure we use a name that doesn't already exist
+    QString originalName = nameFromStdString(zoneConfig.has_name() ? zoneConfig.name() : "pile");
+    QString name{originalName};
+    int counter = zones.size();
+    while (zones.value(name)) {
+        name = originalName + QString::number(counter++);
+    }
+
+    Server_CardZone::ZoneFlags flags{Server_CardZone::DynamicZone};
+    if (zoneConfig.flags() & ZoneConfig::SHUFFLE_FLAG) {
+        flags |= Server_CardZone::CanShuffle;
+    }
+
+    auto zoneController = game->getPlayers().value(zoneConfig.player_id());
+    if (!zoneController) {
+        zoneController = this;
+    }
+
+    auto zone = Server_CardZone::create(this, name, zoneConfig.type(), flags);
+    addZone(zone);
+
+    return zone;
 }
 
 Response::ResponseCode

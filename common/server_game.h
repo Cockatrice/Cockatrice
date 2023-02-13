@@ -35,6 +35,7 @@
 class QTimer;
 class GameEventContainer;
 class GameReplay;
+class Server_Card;
 class Server_Room;
 class Server_Player;
 class ServerInfo_User;
@@ -173,6 +174,8 @@ public:
     void removePlayer(Server_Player *player, Event_Leave::LeaveReason reason);
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
     void unattachCards(GameEventStorage &ges, Server_Player *player);
+    void removeArrowsRelatedToCard(GameEventStorage &ges, Server_Card *card);
+    void unattachCardsRelatedToCard(GameEventStorage &ges, Server_Card *card);
     bool kickPlayer(int playerId);
     void startGameIfReady();
     void stopGameIfFinished();

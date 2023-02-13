@@ -14,6 +14,7 @@
 #include "handcounter.h"
 #include "handzone.h"
 #include "main.h"
+#include "pb/card_ref.pb.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_concede.pb.h"
@@ -32,13 +33,16 @@
 #include "pb/context_move_card.pb.h"
 #include "pb/context_undo_draw.pb.h"
 #include "pb/event_attach_card.pb.h"
+#include "pb/event_attach_zone.pb.h"
 #include "pb/event_change_zone_properties.pb.h"
 #include "pb/event_create_arrow.pb.h"
 #include "pb/event_create_counter.pb.h"
 #include "pb/event_create_token.pb.h"
+#include "pb/event_create_zone.pb.h"
 #include "pb/event_del_counter.pb.h"
 #include "pb/event_delete_arrow.pb.h"
 #include "pb/event_destroy_card.pb.h"
+#include "pb/event_destroy_zone.pb.h"
 #include "pb/event_draw_cards.pb.h"
 #include "pb/event_dump_zone.pb.h"
 #include "pb/event_flip_card.pb.h"
@@ -53,6 +57,8 @@
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_zone.pb.h"
+#include "pb/zone_config.pb.h"
+#include "pb/zone_ref.pb.h"
 #include "pilezone.h"
 #include "playertarget.h"
 #include "settingscache.h"
@@ -2017,6 +2023,42 @@ void Player::eventDelCounter(const Event_DelCounter &event)
     delCounter(event.counter_id());
 }
 
+void Player::eventCreateZone(const Event_CreateZone &event)
+{
+    const auto &config = event.config();
+    auto *player = game->findPlayer(config.player_id());
+    if (!player)
+        return;
+
+    bool isShufflable = config.flags() & ZoneConfig::SHUFFLE_FLAG;
+    bool contentsKnown =
+        config.type() == ZoneType::PublicZone || (config.type() == ZoneType::PrivateZone && player == this);
+    PileZone *pile =
+        new PileZone(player, QString::fromStdString(config.name()), isShufflable, contentsKnown, playerArea);
+    pile->setVisible(false);
+}
+
+void Player::eventAttachZone(const Event_AttachZone &event)
+{
+    auto *zone = game->findZone(event.ref());
+    auto *parentCard = game->findCard(event.parent());
+    QString name = QString::fromStdString(event.name());
+
+    if (!zone || !parentCard || name.isEmpty())
+        return;
+
+    parentCard->addAttachedZone(name, zone);
+}
+
+void Player::eventDestroyZone(const Event_DestroyZone &event)
+{
+    auto *zone = game->findZone(event.ref());
+    if (!zone)
+        return;
+
+    zone->getPlayer()->zones.take(zone->getName())->deleteLater();
+}
+
 void Player::eventDumpZone(const Event_DumpZone &event)
 {
     Player *zoneOwner = game->getPlayers().value(event.zone_owner_id(), 0);
@@ -2371,6 +2413,15 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
             break;
         case GameEvent::CHANGE_ZONE_PROPERTIES:
             eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext));
+            break;
+        case GameEvent::CREATE_ZONE:
+            eventCreateZone(event.GetExtension(Event_CreateZone::ext));
+            break;
+        case GameEvent::DESTROY_ZONE:
+            eventDestroyZone(event.GetExtension(Event_DestroyZone::ext));
+            break;
+        case GameEvent::ATTACH_ZONE:
+            eventAttachZone(event.GetExtension(Event_AttachZone::ext));
             break;
         default: {
             qWarning() << "unhandled game event" << type;

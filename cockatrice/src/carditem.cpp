@@ -466,3 +466,18 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
     }
     return QGraphicsItem::itemChange(change, value);
 }
+
+void CardItem::addAttachedZone(const QString &name, CardZone *zone)
+{
+    attachedZones.insert(name, QPointer<CardZone>(zone));
+}
+
+CardZone *CardItem::getAttachedZone(const QString &name) const
+{
+    return attachedZones.value(name);
+}
+
+void CardItem::removeAttachedZone(const QString &name)
+{
+    attachedZones.remove(name);
+}

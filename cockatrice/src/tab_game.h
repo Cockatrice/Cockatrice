@@ -61,6 +61,8 @@ class PendingCommand;
 class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
+class CardRef;
+class ZoneRef;
 
 class ToggleButton : public QPushButton
 {
@@ -273,6 +275,9 @@ public:
         return players;
     }
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
+    Player *findPlayer(int playerId) const;
+    CardZone *findZone(const ZoneRef &zoneRef) const;
+    CardItem *findCard(const CardRef &cardRef) const;
     bool isHost() const
     {
         return hostId == localPlayerId;

@@ -5,6 +5,7 @@
 set(PROTO_FILES
     admin_commands.proto
     card_attributes.proto
+    card_ref.proto
     color.proto
     command_attach_card.proto
     command_change_zone_properties.proto
@@ -60,13 +61,16 @@ set(PROTO_FILES
     context_undo_draw.proto
     event_add_to_list.proto
     event_attach_card.proto
+    event_attach_zone.proto
     event_change_zone_properties.proto
     event_connection_closed.proto
     event_create_arrow.proto
     event_create_counter.proto
     event_create_token.proto
+    event_create_zone.proto
     event_del_counter.proto
     event_delete_arrow.proto
+    event_destroy_zone.proto
     event_destroy_card.proto
     event_draw_cards.proto
     event_dump_zone.proto
@@ -158,7 +162,9 @@ set(PROTO_FILES
     server_message.proto
     session_commands.proto
     session_event.proto
+    zone_config.proto
     zone_type.proto
+    zone_ref.proto
 )
 
 include_directories(${PROTOBUF_INCLUDE_DIRS})

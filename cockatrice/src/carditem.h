@@ -33,6 +33,7 @@ private:
     CardDragItem *dragItem;
     CardItem *attachedTo;
     QList<CardItem *> attachedCards;
+    QMap<QString, QPointer<CardZone>> attachedZones;
 
     QMenu *cardMenu, *ptMenu, *moveMenu;
 
@@ -136,6 +137,13 @@ public:
     const QList<CardItem *> &getAttachedCards() const
     {
         return attachedCards;
+    }
+    void addAttachedZone(const QString &name, CardZone *zone);
+    void removeAttachedZone(const QString &name);
+    CardZone *getAttachedZone(const QString &name) const;
+    const QMap<QString, QPointer<CardZone>> &getAttachedZones() const
+    {
+        return attachedZones;
     }
     void resetState();
     void processCardInfo(const ServerInfo_Card &info);

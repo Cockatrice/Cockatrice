@@ -24,6 +24,7 @@
 
 #include <QList>
 #include <QMap>
+#include <QPointer>
 #include <QSet>
 #include <QString>
 
@@ -31,6 +32,8 @@ class Server_Card;
 class Server_Player;
 class Server_Game;
 class GameEventStorage;
+class ZoneConfig;
+class ZoneRef;
 
 class Server_CardZone : public std::enable_shared_from_this<Server_CardZone>
 {
@@ -42,6 +45,7 @@ public:
         CanShuffle = 0x1 << 1, // enable the "shuffle" command
         AlwaysLookAtTopCard = 0x1 << 2,
         AlwaysRevealTopCard = 0x1 << 3,
+        DynamicZone = 0x1 << 4, // dynamic zones can be destroyed
     };
     Q_DECLARE_FLAGS(ZoneFlags, ZoneFlag);
 
@@ -69,6 +73,7 @@ private:
     QMap<int, QMultiMap<QString, int>> freePilesMap;   // y -> (cardName -> x)
     QMap<int, int> freeSpaceMap;                       // y -> x
     ZoneFlags flags;
+    QPointer<Server_Card> parentCard;
     void removeCardFromCoordMap(Server_Card *card, int oldX, int oldY);
     void insertCardIntoCoordMap(Server_Card *card, int x, int y);
 
@@ -100,6 +105,10 @@ public:
     {
         return flags.testFlag(CanShuffle);
     }
+    bool isDynamic() const
+    {
+        return flags.testFlag(DynamicZone);
+    }
     ZoneType getType() const
     {
         return type;
@@ -119,7 +128,7 @@ public:
     bool isColumnStacked(int x, int y) const;
     void fixFreeSpaces(GameEventStorage &ges);
     void moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y);
-    void insertCard(Server_Card *card, int x, int y);
+    void insertCard(Server_Card *card, int x, int y, bool visible = false);
     void updateCardCoordinates(Server_Card *card, int oldX, int oldY);
     void shuffle(int start = 0, int end = -1);
     void clear();
@@ -144,6 +153,14 @@ public:
     {
         flags.setFlag(AlwaysLookAtTopCard, _alwaysLookAtTopCard);
     }
+    void attachToCard(Server_Card *card);
+    void detach()
+    {
+        attachToCard(nullptr);
+    }
+
+    void copyConfig(ZoneConfig *config);
+    void copyRef(ZoneRef *ref);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Server_CardZone::ZoneFlags);

@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "game_event.proto";
+import "zone_config.proto";
+
+message Event_CreateZone {
+    extend GameEvent {
+        optional Event_CreateZone ext = 2022;
+    }
+    optional sint32 player_id = 1;
+    optional ZoneConfig config = 2;
+}

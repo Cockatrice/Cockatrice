@@ -31,6 +31,9 @@ message GameEvent {
         // STOP_DUMP_ZONE = 2019; // obsolete
         CHANGE_ZONE_PROPERTIES = 2020;
         REVERSE_TURN = 2021;
+        CREATE_ZONE = 2022;
+        DESTROY_ZONE = 2023;
+        ATTACH_ZONE = 2024;
     }
     optional sint32 player_id = 1 [default = -1];
     extensions 100 to max;

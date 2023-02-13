@@ -352,6 +352,8 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else if (targetZoneName == stackConstant()) {
         soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
+    } else {
+        finalStr = tr("%1 moves %2%3 somewhere.");
     }
 
     if (usesNewX) {

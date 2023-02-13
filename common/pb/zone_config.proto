@@ -1,0 +1,24 @@
+syntax = "proto2";
+import "zone_type.proto";
+
+message ZoneConfig {
+    enum Flag {
+        NO_FLAG = 0x0;
+        // When the Shuffle flag is present, cards in a hidden zone can be
+        // shuffled (with the Shuffle command).
+        SHUFFLE_FLAG = 0x1;
+    }
+
+    // The owner of the zone.
+    optional sint32 player_id = 1;
+
+    // Name of the zone. When used in a command, the server may ignore or
+    // modify the requested name to avoid duplicates.
+    optional string name = 2;
+
+    // Type of the zone.
+    optional ZoneType type = 3;
+
+    // Bitwise-OR of Flags
+    optional uint32 flags = 4;
+}

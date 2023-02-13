@@ -20,6 +20,8 @@
 #include "server_cardzone.h"
 
 #include "pb/command_move_card.pb.h"
+#include "pb/zone_config.pb.h"
+#include "pb/zone_ref.pb.h"
 #include "rng_abstract.h"
 #include "server_card.h"
 #include "server_player.h"
@@ -235,10 +237,7 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 
 void Server_CardZone::moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y)
 {
-    auto *cardToMove = new CardToMove;
-    cardToMove->set_card_id(card->getId());
-    player->moveCard(ges, getPtr(), QList<const CardToMove *>() << cardToMove, getPtr(), x, y, false, false);
-    delete cardToMove;
+    player->moveCards(ges, {card}, getPtr(), x, y);
 }
 
 void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
@@ -280,7 +279,7 @@ void Server_CardZone::updateCardCoordinates(Server_Card *card, int oldX, int old
     insertCardIntoCoordMap(card, card->getX(), card->getY());
 }
 
-void Server_CardZone::insertCard(Server_Card *card, int x, int y)
+void Server_CardZone::insertCard(Server_Card *card, int x, int y, bool visible)
 {
     if (hasCoords()) {
         card->setCoords(x, y);
@@ -290,6 +289,14 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
         card->setCoords(0, 0);
         if (0 <= x && x < cards.length()) {
             cards.insert(x, card);
+
+            if (getType() == ZoneType::HiddenZone && cardsBeingLookedAt >= x) {
+                if (visible) {
+                    cardsBeingLookedAt += 1;
+                } else {
+                    cardsBeingLookedAt = x;
+                }
+            }
         } else {
             cards.append(card);
         }
@@ -327,5 +334,34 @@ void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAs
         QListIterator<Server_Card *> cardIterator(cards);
         while (cardIterator.hasNext())
             cardIterator.next()->getInfo(info->add_card_list());
+    }
+}
+
+void Server_CardZone::copyConfig(ZoneConfig *config)
+{
+    config->set_player_id(getPlayer()->getPlayerId());
+    config->set_name(name.toStdString());
+    config->set_type(type);
+    uint32_t flags = 0;
+    if (canShuffle()) {
+        flags |= ZoneConfig::SHUFFLE_FLAG;
+    }
+    config->set_flags(flags);
+}
+
+void Server_CardZone::copyRef(ZoneRef *ref)
+{
+    ref->set_player_id(player->getPlayerId());
+    ref->set_name(name.toStdString());
+}
+
+void Server_CardZone::attachToCard(Server_Card *card)
+{
+    if (parentCard) {
+        parentCard->removeAttachedZone(getPtr());
+    }
+    parentCard = card;
+    if (card) {
+        card->attachZone(getPtr());
     }
 }

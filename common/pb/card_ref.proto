@@ -1,0 +1,7 @@
+syntax = "proto2";
+import "zone_ref.proto";
+
+message CardRef {
+    optional ZoneRef zone = 1;
+    optional sint32 card_id = 2;
+}

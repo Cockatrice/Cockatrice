@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message ZoneRef {
+    optional sint32 player_id = 1;
+    optional string name = 2;
+}

@@ -584,6 +584,27 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
     }
 }
 
+void Server_Game::removeArrowsRelatedToCard(GameEventStorage &ges, Server_Card *card)
+{
+    for (auto *player : getPlayers().values()) {
+        QList<int> arrowsToDelete;
+        QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
+        while (arrowIterator.hasNext()) {
+            Server_Arrow *arrow = arrowIterator.next().value();
+            if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card)) {
+                Event_DeleteArrow event;
+                event.set_arrow_id(arrow->getId());
+                ges.enqueueGameEvent(event, player->getPlayerId());
+
+                arrowsToDelete.append(arrow->getId());
+            }
+        }
+        for (int j : arrowsToDelete) {
+            player->deleteArrow(j);
+        }
+    }
+}
+
 void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
 {
     QMutexLocker locker(&gameMutex);
@@ -603,6 +624,18 @@ void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
                 }
             }
         }
+    }
+}
+
+void Server_Game::unattachCardsRelatedToCard(GameEventStorage &ges, Server_Card *card)
+{
+    if (card->getParentCard()) {
+        card->getZone()->getPlayer()->unattachCard(ges, card);
+    }
+
+    // Make a copy of the list because the original one gets modified during the loop
+    for (Server_Card *attachedCard : QList<Server_Card *>(card->getAttachedCards())) {
+        attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
     }
 }
 
