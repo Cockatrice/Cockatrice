@@ -402,6 +402,30 @@ static Event_MoveCard makeMoveCardEvent(std::shared_ptr<Server_CardZone> sourceZ
     return event;
 }
 
+static Event_CreateToken makeCreateCardEvent(Server_Card *card, bool known)
+{
+    auto zone = card->getZone();
+
+    Event_CreateToken event;
+    event.set_zone_name(zone->getName().toStdString());
+    event.set_destroy_on_zone_change(card->getDestroyOnZoneChange());
+    event.set_x(card->getX());
+    event.set_y(card->getY());
+
+    if (zone->getType() == ZoneType::PublicZone || known) {
+        event.set_card_id(card->getId());
+    }
+
+    if (known) {
+        event.set_card_name(card->getName().toStdString());
+        event.set_color(card->getColor().toStdString());
+        event.set_pt(card->getPT().toStdString());
+        event.set_annotation(card->getAnnotation().toStdString());
+    }
+
+    return event;
+}
+
 void Server_Player::moveCards(GameEventStorage &ges,
                               const QList<Server_Card *> &cards,
                               std::shared_ptr<Server_CardZone> targetZone,
@@ -473,13 +497,47 @@ void Server_Player::moveCards(GameEventStorage &ges,
                 targetKnownToOthers || (targetZone->getType() == ZoneType::PrivateZone && !controllerChanges);
 
             // Our job is done, we just need to emit the relevant events
+            GameEventsBuilder builder;
             Event_MoveCard privateEvent = makeMoveCardEvent(sourceZone, sourceId, sourcePosition, sourceKnownToPlayer,
                                                             card, targetKnownToPlayer, targetX, targetY);
             Event_MoveCard othersEvent = makeMoveCardEvent(sourceZone, sourceId, sourcePosition, sourceKnownToOthers,
                                                            card, targetKnownToOthers, targetY, targetY);
 
-            ges.enqueueGameEvent(GameEventBuilder(othersEvent, sourcePlayer->getPlayerId())
-                                     .withPrivateEvent(sourcePlayer->getPlayerId(), privateEvent));
+            builder.append(GameEventBuilder(othersEvent, sourcePlayer->getPlayerId())
+                               .withPrivateEvent(sourcePlayer->getPlayerId(), privateEvent));
+
+            if (targetZone->isDynamic() || sourceZone->isDynamic()) {
+                GameEventsBuilder legacy;
+                if (!sourceZone->isDynamic()) {
+                    Event_DestroyCard event;
+                    event.set_zone_name(sourceZone->getName().toStdString());
+                    event.set_card_id(sourceId);
+
+                    legacy.append({event, sourcePlayer->getPlayerId()});
+                }
+
+                if (!targetZone->isDynamic()) {
+                    Event_CreateToken privateEvent = makeCreateCardEvent(card, targetKnownToPlayer);
+                    Event_CreateToken othersEvent = makeCreateCardEvent(card, targetKnownToOthers);
+
+                    legacy.append(GameEventBuilder(othersEvent, targetPlayer->getPlayerId())
+                                      .withPrivateEvent(targetPlayer->getPlayerId(), privateEvent));
+
+                    if (faceDown) {
+                        Event_SetCardAttr event;
+                        event.set_zone_name(targetZone->getName().toStdString());
+                        event.set_card_id(card->getId());
+                        event.set_attribute(AttrFaceDown);
+                        event.set_attr_value("1");
+                        legacy.append({event, targetZone->getPlayer()->getPlayerId()});
+                    }
+                }
+
+                legacy.upgrade({"dynamic_zone"}, builder);
+                builder = legacy;
+            }
+
+            ges.enqueueGameEvents(builder);
 
             if (targetX == 0) {
                 zonesToReveal.append(targetZone);
