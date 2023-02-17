@@ -182,7 +182,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    bool attach = false;
+                    CardRelation::AttachType attachType = CardRelation::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     bool persistent = false;
@@ -205,7 +205,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = true;
+                        attachType = attrs.value("attach").toString() == "transform" ? CardRelation::TransformInto
+                                                                                     : CardRelation::AttachTo;
                     }
 
                     if (attrs.hasAttribute("exclude")) {
@@ -216,7 +217,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         persistent = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count, persistent);
+                    auto *relation = new CardRelation(cardName, attachType, exclude, variable, count, persistent);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -294,7 +295,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     for (auto i : related) {
         xml.writeStartElement("related");
         if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
+            xml.writeAttribute("attach", i->getAttachTypeAsString());
         }
         if (i->getIsCreateAllExclusion()) {
             xml.writeAttribute("exclude", "exclude");
@@ -318,7 +319,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     for (auto i : reverseRelated) {
         xml.writeStartElement("reverse-related");
         if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
+            xml.writeAttribute("attach", i->getAttachTypeAsString());
         }
 
         if (i->getIsCreateAllExclusion()) {

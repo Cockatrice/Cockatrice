@@ -224,7 +224,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     sets.insert(setName, setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    bool attach = false;
+                    CardRelation::AttachType attach = CardRelation::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     int count = 1;
@@ -246,7 +246,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = true;
+                        attach = CardRelation::AttachTo;
                     }
 
                     if (attrs.hasAttribute("exclude")) {

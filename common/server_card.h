@@ -28,6 +28,8 @@
 #include <QString>
 
 class Server_CardZone;
+class Event_SetCardCounter;
+class Event_SetCardAttr;
 
 class Server_Card : public Server_ArrowTarget
 {
@@ -49,6 +51,7 @@ private:
 
     Server_Card *parentCard;
     QList<Server_Card *> attachedCards;
+    Server_Card *stashedCard;
 
 public:
     Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
@@ -141,7 +144,7 @@ public:
     {
         name = _name;
     }
-    void setCounter(int id, int value);
+    void setCounter(int id, int value, Event_SetCardCounter *event = nullptr);
     void setTapped(bool _tapped)
     {
         tapped = _tapped;
@@ -183,9 +186,30 @@ public:
     {
         attachedCards.removeOne(card);
     }
+    void setStashedCard(Server_Card *card)
+    {
+        // setStashedCard should only be called on creation of a new card, so
+        // there should never be an already existing stashed card.
+        Q_ASSERT(!stashedCard);
+
+        // Stashed cards can't themselves have stashed cards
+        if (card->stashedCard) {
+            stashedCard = card->takeStashedCard();
+            card->deleteLater();
+        } else {
+            stashedCard = card;
+        }
+    }
+    Server_Card *takeStashedCard()
+    {
+        Server_Card *oldStashedCard = stashedCard;
+        stashedCard = nullptr;
+        return oldStashedCard;
+    }
 
     void resetState();
     QString setAttribute(CardAttribute attribute, const QString &avalue, bool allCards);
+    QString setAttribute(CardAttribute attribute, const QString &avalue, Event_SetCardAttr *event = nullptr);
 
     void getInfo(ServerInfo_Card *info);
 };
