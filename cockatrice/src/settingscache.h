@@ -137,6 +137,8 @@ public:
     SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
+    QString getCachePath() const;
+    QString getNetworkCachePath() const;
     const QByteArray &getMainWindowGeometry() const
     {
         return mainWindowGeometry;

@@ -3,6 +3,7 @@
 #include "carddatabase.h"
 #include "gettextwithmax.h"
 #include "main.h"
+#include "pictureloader.h"
 #include "releasechannel.h"
 #include "sequenceEdit/sequenceedit.h"
 #include "settingscache.h"
@@ -635,6 +636,11 @@ void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 
 void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
+    PictureLoader::clearNetworkCache();
+
+    // These are not used anymore, but we don't delete them automatically, so
+    // we should do it here lest we leave pictures hanging around on users'
+    // machines.
     QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
@@ -662,6 +668,7 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
     }
     if (outerSuccessRemove) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
+        QDir(SettingsCache::instance().getPicsPath()).rmdir("downloadedPics");
     } else {
         QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
     }

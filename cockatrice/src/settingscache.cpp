@@ -26,6 +26,16 @@ QString SettingsCache::getSettingsPath()
     return getDataPath() + "/settings/";
 }
 
+QString SettingsCache::getCachePath() const
+{
+    return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+}
+
+QString SettingsCache::getNetworkCachePath() const
+{
+    return getCachePath() + "/downloaded/";
+}
+
 void SettingsCache::translateLegacySettings()
 {
     if (isPortableBuild)
