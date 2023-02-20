@@ -115,11 +115,12 @@ PictureLoaderWorker::PictureLoaderWorker()
     connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
     connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, this,
+            &PictureLoaderWorker::networkCacheSizeChanged);
 
     networkManager = new QNetworkAccessManager(this);
     auto cache = new QNetworkDiskCache(this);
-    // Cache size of 4GB should be enough to hold 25-30k of Scryfall's "large" card images
-    cache->setMaximumCacheSize(1024L * 1024L * 1024L * 4L);
+    cache->setMaximumCacheSize(1024L * 1024L * SettingsCache::instance().getNetworkCacheSizeInMB());
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     networkManager->setCache(cache);
     // Note: This is the default for Qt 6
@@ -513,6 +514,12 @@ void PictureLoaderWorker::picsPathChanged()
     QMutexLocker locker(&mutex);
     picsPath = SettingsCache::instance().getPicsPath();
     customPicsPath = SettingsCache::instance().getCustomPicsPath();
+}
+
+void PictureLoaderWorker::networkCacheSizeChanged(int newSizeInMB)
+{
+    QMutexLocker locker(&mutex);
+    qobject_cast<QNetworkDiskCache *>(networkManager->cache())->setMaximumCacheSize(1024L * 1024L * newSizeInMB);
 }
 
 void PictureLoaderWorker::clearNetworkCache()

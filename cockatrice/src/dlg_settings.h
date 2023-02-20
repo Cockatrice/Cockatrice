@@ -168,6 +168,7 @@ private:
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+    QLabel networkCacheLabel;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage

@@ -592,12 +592,21 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     messageListLayout->addWidget(messageToolBar);
     messageListLayout->addWidget(urlList);
 
+    auto networkCacheEdit = new QSpinBox;
+    networkCacheEdit->setMinimum(NETWORK_CACHE_SIZE_MIN);
+    networkCacheEdit->setMaximum(NETWORK_CACHE_SIZE_MAX);
+    networkCacheEdit->setSingleStep(1);
+    networkCacheEdit->setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
+    networkCacheEdit->setSuffix(tr(" MB"));
+
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
-    lpGeneralGrid->addWidget(&urlLinkLabel, 2, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 2, 1);
+    lpGeneralGrid->addWidget(&networkCacheLabel, 2, 0);
+    lpGeneralGrid->addWidget(networkCacheEdit, 2, 1);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 3, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 3, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -612,6 +621,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
             SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
+    connect(networkCacheEdit, &QSpinBox::valueChanged, &SettingsCache::instance(),
+            &SettingsCache::setNetworkCacheSizeInMB);
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -792,6 +803,7 @@ void DeckEditorSettingsPage::retranslateUi()
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
+    networkCacheLabel.setText(tr("Maximum image cache size:"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

@@ -96,6 +96,7 @@ private slots:
 
     void picDownloadChanged();
     void picsPathChanged();
+    void networkCacheSizeChanged(int newSizeInMB);
 public slots:
     void processLoadQueue();
 signals:
