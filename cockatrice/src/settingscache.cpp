@@ -28,7 +28,10 @@ QString SettingsCache::getSettingsPath()
 
 QString SettingsCache::getCachePath() const
 {
-    return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+	if (isPortableBuild)
+        return qApp->applicationDirPath() + "/cache";
+    else
+        return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
 }
 
 QString SettingsCache::getNetworkCachePath() const
