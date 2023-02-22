@@ -119,12 +119,17 @@ PictureLoaderWorker::PictureLoaderWorker()
             &PictureLoaderWorker::networkCacheSizeChanged);
 
     networkManager = new QNetworkAccessManager(this);
+    // We need a timeout to ensure requests don't hang indefinitely in case of
+    // cache corruption, see related Qt bug: https://bugreports.qt.io/browse/QTBUG-111397
+    // Use Qt's default timeout (30s, as of 2023-02-22)
+    networkManager->setTransferTimeout();
     auto cache = new QNetworkDiskCache(this);
     cache->setMaximumCacheSize(1024L * 1024L * SettingsCache::instance().getNetworkCacheSizeInMB());
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     networkManager->setCache(cache);
-    // Note: This is the default for Qt 6
-    networkManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
+    // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
+    // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
+    networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
     pictureLoaderThread = new QThread;
@@ -377,15 +382,11 @@ void PictureLoaderWorker::startNextPicDownload()
         picDownloadFailed();
     } else {
         QUrl url(picUrl);
-        QNetworkRequest req(url);
-        if (!picDownload) {
-            req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
-        }
         qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
                  << " set: " << cardBeingDownloaded.getSetName()
                  << QString("]: Trying to download picture from %1:").arg(picDownload ? "url" : "cache")
                  << url.toDisplayString();
-        networkManager->get(req);
+        makeRequest(url);
     }
 }
 
@@ -416,28 +417,41 @@ bool PictureLoaderWorker::imageIsBlackListed(const QByteArray &picData)
     return md5Blacklist.contains(md5sum);
 }
 
+QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
+{
+    QNetworkRequest req(url);
+    if (!picDownload) {
+        req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
+    }
+    return networkManager->get(req);
+}
+
 void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 {
     if (reply->error()) {
         qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
                  << " set: " << cardBeingDownloaded.getSetName() << "]:  Download failed:" << reply->errorString();
+
+        if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
+            qDebug() << "Removing bad URL from cache and retrying: " << reply->url().toDisplayString();
+            networkManager->cache()->remove(reply->url());
+
+            makeRequest(reply->url());
+            reply->deleteLater();
+
+            return;
+        }
     }
 
     // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
-    // Note: Our use of NoLessSafeRedirectPolicy means that this is usually
-    // unused, but the redirect policy doesn't seem to be applied with
-    // AlwaysCache.
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
         statusCode == 308) {
         QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
-        QNetworkRequest req(redirectUrl);
-        if (!picDownload) {
-            req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
-        }
+        makeRequest(redirectUrl);
         qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: following redirect:" << req.url().toString();
-        networkManager->get(req);
+                 << " set: " << cardBeingDownloaded.getSetName()
+                 << "]: following redirect:" << redirectUrl.toDisplayString();
         reply->deleteLater();
         return;
     }

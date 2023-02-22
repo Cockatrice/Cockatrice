@@ -90,6 +90,7 @@ private:
     void startNextPicDownload();
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
     bool imageIsBlackListed(const QByteArray &);
+    QNetworkReply *makeRequest(const QUrl &url);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
