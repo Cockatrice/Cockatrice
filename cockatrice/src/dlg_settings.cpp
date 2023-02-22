@@ -621,8 +621,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
             SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
-    connect(networkCacheEdit, &QSpinBox::valueChanged, &SettingsCache::instance(),
-            &SettingsCache::setNetworkCacheSizeInMB);
+    connect(networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+            SLOT(setNetworkCacheSizeInMB(int)));
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
