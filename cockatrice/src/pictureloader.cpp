@@ -165,14 +165,15 @@ void PictureLoaderWorker::processLoadQueue()
         QString cardName = cardBeingLoaded.getCard()->getName();
         QString correctedCardName = cardBeingLoaded.getCard()->getCorrectedName();
 
-        qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Trying to load picture";
+        qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+                           << "]: Trying to load picture";
 
         if (cardImageExistsOnDisk(setName, correctedCardName)) {
             continue;
         }
 
-        qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
-                 << "]: No custom picture, trying to download";
+        qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+                           << "]: No custom picture, trying to download";
         cardsToDownload.append(cardBeingLoaded);
         cardBeingLoaded.clear();
         if (!downloadRunning) {
@@ -214,22 +215,22 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     for (const auto &picsPath : picsPaths) {
         imgReader.setFileName(picsPath);
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                     << "]: Picture found on disk.";
+            qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                               << "]: Picture found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(picsPath + ".full");
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                     << "]: Picture.full found on disk.";
+            qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                               << "]: Picture.full found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(picsPath + ".xlhq");
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                     << "]: Picture.xlhq found on disk.";
+            qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                               << "]: Picture.xlhq found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
@@ -384,9 +385,10 @@ void PictureLoaderWorker::startNextPicDownload()
         picDownloadFailed();
     } else {
         QUrl url(picUrl);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << (picDownload ? "download picture from url" : "load picture from cache") << url.toDisplayString();
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Trying to "
+                           << (picDownload ? "download picture from url" : "load picture from cache")
+                           << url.toDisplayString();
         makeRequest(url);
     }
 }
@@ -402,10 +404,10 @@ void PictureLoaderWorker::picDownloadFailed()
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << "]:  Picture NOT found, download failed, no more url combinations "
-                    "to try: BAILING OUT";
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                           << " set: " << cardBeingDownloaded.getSetName()
+                           << "]:  Picture NOT found, download failed, no more url combinations "
+                              "to try: BAILING OUT";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
     }
@@ -433,18 +435,19 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 
     if (reply->error()) {
         if (isFromCache) {
-            qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                     << " set: " << cardBeingDownloaded.getSetName() << "]: Removing corrupted cache file for url "
-                     << reply->url().toDisplayString() << " and retrying (" << reply->errorString() << ")";
+            qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                               << " set: " << cardBeingDownloaded.getSetName()
+                               << "]: Removing corrupted cache file for url " << reply->url().toDisplayString()
+                               << " and retrying (" << reply->errorString() << ")";
 
             networkManager->cache()->remove(reply->url());
 
             makeRequest(reply->url());
             reply->deleteLater();
         } else {
-            qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                     << " set: " << cardBeingDownloaded.getSetName() << "]: Download failed for url "
-                     << reply->url().toDisplayString() << "(" << reply->errorString() << ")";
+            qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                               << " set: " << cardBeingDownloaded.getSetName() << "]: Download failed for url "
+                               << reply->url().toDisplayString() << "(" << reply->errorString() << ")";
 
             picDownloadFailed();
             reply->deleteLater();
@@ -459,9 +462,9 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
         statusCode == 308) {
         QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: following "
-                 << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: following "
+                           << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
         makeRequest(redirectUrl);
         reply->deleteLater();
         return;
@@ -471,10 +474,10 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     const QByteArray &picData = reply->peek(reply->size());
 
     if (imageIsBlackListed(picData)) {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << "]:Picture downloaded, but blacklisted, will consider it as "
-                    "not found";
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName()
+                           << "]: Picture downloaded, but blacklisted, will consider it as "
+                              "not found";
 
         picDownloadFailed();
         reply->deleteLater();
@@ -490,14 +493,15 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 
     if (imgReader.read(&testImage)) {
         imageLoaded(cardBeingDownloaded.getCard(), testImage);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully "
-                 << (isFromCache ? "loaded from cached url at" : "downloaded from") << reply->url().toDisplayString();
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully "
+                           << (isFromCache ? "loaded from cached url at" : "downloaded from")
+                           << reply->url().toDisplayString();
     } else {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: Possible "
-                 << (isFromCache ? "cached" : "downloaded") << " picture at " << reply->url().toDisplayString()
-                 << " could not be loaded";
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Possible "
+                           << (isFromCache ? "cached" : "downloaded") << " picture at "
+                           << reply->url().toDisplayString() << " could not be loaded";
 
         picDownloadFailed();
     }
