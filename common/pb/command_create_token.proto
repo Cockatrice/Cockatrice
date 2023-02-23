@@ -4,9 +4,9 @@ import "game_commands.proto";
 message Command_CreateToken {
     enum TargetMode {
         // Attach the target to the token
-        REVERSE_ATTACH = 0;
+        ATTACH_TO = 0;
         // Transform the target into the token
-        TRANSFORM_FROM = 1;
+        TRANSFORM_INTO = 1;
     }
 
     extend GameCommand {

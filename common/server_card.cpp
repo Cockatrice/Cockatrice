@@ -57,7 +57,6 @@ void Server_Card::resetState()
     setPT(QString());
     setAnnotation(QString());
     setDoesntUntap(false);
-    setFaceDown(false);
 }
 
 QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, bool allCards)

@@ -519,6 +519,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 stashedCard->setId(newCardId());
                 ges.enqueueGameEvent(makeCreateTokenEvent(startzone, stashedCard, card->getX(), card->getY()),
                                      playerId);
+                card->deleteLater();
                 card = stashedCard;
             } else {
                 card->deleteLater();
@@ -1354,7 +1355,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         Server_CardZone *targetZone = zones.value(nameFromStdString(cmd.target_zone()));
         if (targetZone) {
             targetCard = targetZone->getCard(cmd.target_card_id());
-            if (targetCard && cmd.target_mode() == Command_CreateToken::TRANSFORM_FROM) {
+            if (targetCard && cmd.target_mode() == Command_CreateToken::TRANSFORM_INTO) {
                 if (targetCard->getParentCard()) {
                     ges.enqueueGameEvent(makeAttachCardEvent(targetCard), playerId);
                 }
@@ -1375,6 +1376,12 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                 event.set_zone_name(targetZone->getName().toStdString());
                 event.set_card_id(static_cast<::google::protobuf::uint32>(cmd.target_card_id()));
                 ges.enqueueGameEvent(event, playerId);
+
+                if (targetCard->getDestroyOnZoneChange()) {
+                    auto stashedCard = targetCard->takeStashedCard();
+                    targetCard->deleteLater();
+                    targetCard = stashedCard;
+                }
             }
         }
     }
@@ -1406,7 +1413,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     }
 
     switch (cmd.target_mode()) {
-        case Command_CreateToken::REVERSE_ATTACH: {
+        case Command_CreateToken::ATTACH_TO: {
             Command_AttachCard cmd2;
             cmd2.set_start_zone(cmd.target_zone());
             cmd2.set_card_id(cmd.target_card_id());
@@ -1418,7 +1425,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
             return cmdAttachCard(cmd2, rc, ges);
         }
 
-        case Command_CreateToken::TRANSFORM_FROM: {
+        case Command_CreateToken::TRANSFORM_INTO: {
             // Copy attributes that are not present in the CreateToken event
             Event_SetCardAttr event;
             event.set_zone_name(card->getZone()->getName().toStdString());
@@ -1468,7 +1475,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
             // Copy attachments
             while (!targetCard->getAttachedCards().isEmpty()) {
                 Server_Card *attachedCard = targetCard->getAttachedCards().last();
-                targetCard->removeAttachedCard(attachedCard);
+                attachedCard->setParentCard(card);
 
                 ges.enqueueGameEvent(makeAttachCardEvent(attachedCard, card),
                                      attachedCard->getZone()->getPlayer()->getPlayerId());

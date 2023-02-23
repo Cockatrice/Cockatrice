@@ -1791,12 +1791,12 @@ void Player::createCard(const CardItem *sourceCard,
 
         case CardRelation::AttachTo:
             cmd.set_target_card_id(sourceCard->getId());
-            cmd.set_target_mode(Command_CreateToken::REVERSE_ATTACH);
+            cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
             break;
 
         case CardRelation::TransformInto:
             cmd.set_target_card_id(sourceCard->getId());
-            cmd.set_target_mode(Command_CreateToken::TRANSFORM_FROM);
+            cmd.set_target_mode(Command_CreateToken::TRANSFORM_INTO);
             break;
     }
 
