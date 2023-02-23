@@ -67,6 +67,7 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
           tag_name: ${{steps.configure.outputs.tag}}
+          target: ${{github.ref}}
           release_name: ${{steps.prepare.outputs.title}}
           body_path: ${{steps.prepare.outputs.body_path}}
           prerelease: ${{steps.prepare.outputs.is_beta}}
@@ -75,7 +76,8 @@ jobs:
             args="--prerelease"
           fi
           gh release create "$tag_name" --draft --verify-tag $args \
-              --title "$release_name" --notes-file "$body_path"
+              --target "$target" --title "$release_name" \
+              --notes-file "$body_path"
 
   build-linux:
     strategy:
