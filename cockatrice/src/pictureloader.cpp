@@ -384,10 +384,11 @@ void PictureLoaderWorker::startNextPicDownload()
         picDownloadFailed();
     } else {
         QUrl url(picUrl);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << QString("]: Trying to download picture from %1:").arg(picDownload ? "url" : "cache")
-                 << url.toDisplayString();
+        qDebug() << qPrintable(QString("PictureLoader: [card: %1 set: %2]: Trying to %3: %4")
+                                   .arg(cardBeingDownloaded.getCard()->getCorrectedName())
+                                   .arg(cardBeingDownloaded.getSetName())
+                                   .arg(picDownload ? "download picture from url" : "load picture from cache")
+                                   .arg(url.toDisplayString()));
         makeRequest(url);
     }
 }
@@ -430,19 +431,34 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
 
 void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 {
-    if (reply->error()) {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]:  Download failed:" << reply->errorString();
+    bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
 
-        if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
-            qDebug() << "Removing bad URL from cache and retrying: " << reply->url().toDisplayString();
+    if (reply->error()) {
+        if (isFromCache) {
+            qDebug() << qPrintable(
+                QString("PictureLoader: [card: %1 set: %2]: Removing corrupted cache file for url %3 and retrying (%4)")
+                    .arg(cardBeingDownloaded.getCard()->getName())
+                    .arg(cardBeingDownloaded.getSetName())
+                    .arg(reply->url().toDisplayString())
+                    .arg(reply->errorString()));
+
             networkManager->cache()->remove(reply->url());
 
             makeRequest(reply->url());
             reply->deleteLater();
+        } else {
+            qDebug() << qPrintable(QString("PictureLoader: [card: %1 set: %2]: Download failed for url %3 (%4)")
+                                       .arg(cardBeingDownloaded.getCard()->getName())
+                                       .arg(cardBeingDownloaded.getSetName())
+                                       .arg(reply->url().toDisplayString())
+                                       .arg(reply->errorString()));
 
-            return;
+            picDownloadFailed();
+            reply->deleteLater();
+            startNextPicDownload();
         }
+
+        return;
     }
 
     // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
@@ -450,10 +466,12 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
         statusCode == 308) {
         QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
+        qDebug() << qPrintable(QString("PictureLoader: [card: %1 set: %2]: Following %3 to %4")
+                                   .arg(cardBeingDownloaded.getCard()->getName())
+                                   .arg(cardBeingDownloaded.getSetName())
+                                   .arg(isFromCache ? "cached redirect" : "redirect")
+                                   .arg(redirectUrl.toDisplayString()));
         makeRequest(redirectUrl);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << "]: following redirect:" << redirectUrl.toDisplayString();
         reply->deleteLater();
         return;
     }
@@ -466,6 +484,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
                  << " set: " << cardBeingDownloaded.getSetName()
                  << "]:Picture downloaded, but blacklisted, will consider it as "
                     "not found";
+
         picDownloadFailed();
         reply->deleteLater();
         startNextPicDownload();
@@ -479,16 +498,20 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     imgReader.setDevice(reply);
 
     if (imgReader.read(&testImage)) {
-        QString setName = cardBeingDownloaded.getSetName();
-
         imageLoaded(cardBeingDownloaded.getCard(), testImage);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully downloaded from "
-                 << reply->url().toDisplayString();
+        qDebug() << qPrintable(QString("PictureLoader: [card: %1 set: %2]: Image successfully %3 %4")
+                                   .arg(cardBeingDownloaded.getCard()->getName())
+                                   .arg(cardBeingDownloaded.getSetName())
+                                   .arg(isFromCache ? "loaded from cached url at" : "downloaded from")
+                                   .arg(reply->url().toDisplayString()));
     } else {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: Possible picture at "
-                 << reply->request().url().toDisplayString() << " could not be loaded";
+        qDebug() << qPrintable(
+            QString("PictureLoader: [card: %1 set: %2]: Possible %3 picture at %4 could not be loaded")
+                .arg(cardBeingDownloaded.getCard()->getName())
+                .arg(cardBeingDownloaded.getSetName())
+                .arg(isFromCache ? "cached" : "downloaded")
+                .arg(reply->url().toDisplayString()));
+
         picDownloadFailed();
     }
 
