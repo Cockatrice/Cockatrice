@@ -599,14 +599,18 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkCacheEdit->setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
     networkCacheEdit->setSuffix(tr(" MB"));
 
+    auto networkCacheLayout = new QHBoxLayout;
+    networkCacheLayout->addWidget(&networkCacheLabel);
+    networkCacheLayout->addWidget(networkCacheEdit);
+    networkCacheLayout->addWidget(&clearDownloadedPicsButton);
+    networkCacheLayout->addStretch();
+
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
-    lpGeneralGrid->addWidget(&networkCacheLabel, 2, 0);
-    lpGeneralGrid->addWidget(networkCacheEdit, 2, 1);
+    lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
     lpGeneralGrid->addWidget(&urlLinkLabel, 3, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 3, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -623,6 +627,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
     connect(networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
             SLOT(setNetworkCacheSizeInMB(int)));
+    connect(&SettingsCache::instance(), SIGNAL(networkCacheSizeChanged(int)), networkCacheEdit, SLOT(setValue(int)));
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -801,9 +806,9 @@ void DeckEditorSettingsPage::retranslateUi()
                                 tr("Do not close settings until manual update is complete"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
-    clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
+    clearDownloadedPicsButton.setText(tr("Clear", "Delete Downloaded Images"));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
-    networkCacheLabel.setText(tr("Maximum image cache size:"));
+    networkCacheLabel.setText(tr("Size of the downloaded images directory:"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

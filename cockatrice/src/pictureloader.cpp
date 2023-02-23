@@ -115,8 +115,6 @@ PictureLoaderWorker::PictureLoaderWorker()
     connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
     connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, this,
-            &PictureLoaderWorker::networkCacheSizeChanged);
 
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -126,8 +124,10 @@ PictureLoaderWorker::PictureLoaderWorker()
     networkManager->setTransferTimeout();
 #endif
     auto cache = new QNetworkDiskCache(this);
-    cache->setMaximumCacheSize(1024L * 1024L * SettingsCache::instance().getNetworkCacheSizeInMB());
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
+    // Note: the settings is in MB, but QNetworkDiskCache uses bytes
+    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache,
+            [cache](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
     networkManager->setCache(cache);
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
@@ -553,12 +553,6 @@ void PictureLoaderWorker::picsPathChanged()
     QMutexLocker locker(&mutex);
     picsPath = SettingsCache::instance().getPicsPath();
     customPicsPath = SettingsCache::instance().getCustomPicsPath();
-}
-
-void PictureLoaderWorker::networkCacheSizeChanged(int newSizeInMB)
-{
-    QMutexLocker locker(&mutex);
-    qobject_cast<QNetworkDiskCache *>(networkManager->cache())->setMaximumCacheSize(1024L * 1024L * newSizeInMB);
 }
 
 void PictureLoaderWorker::clearNetworkCache()

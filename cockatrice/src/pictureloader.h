@@ -97,9 +97,9 @@ private slots:
 
     void picDownloadChanged();
     void picsPathChanged();
-    void networkCacheSizeChanged(int newSizeInMB);
 public slots:
     void processLoadQueue();
+
 signals:
     void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
@@ -130,10 +130,14 @@ public:
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfoPtr> cards);
+
+public slots:
     static void clearNetworkCache();
+
 private slots:
     void picDownloadChanged();
     void picsPathChanged();
+
 public slots:
     void imageLoaded(CardInfoPtr card, const QImage &image);
 };
