@@ -192,8 +192,8 @@ public:
         // there should never be an already existing stashed card.
         Q_ASSERT(!stashedCard);
 
-	// Stashed cards can't themselves have stashed cards, and tokens can't
-	// be stashed.
+        // Stashed cards can't themselves have stashed cards, and tokens can't
+        // be stashed.
         if (card->stashedCard || card->getDestroyOnZoneChange()) {
             stashedCard = card->takeStashedCard();
             card->deleteLater();
