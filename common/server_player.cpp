@@ -1376,12 +1376,6 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                 event.set_zone_name(targetZone->getName().toStdString());
                 event.set_card_id(static_cast<::google::protobuf::uint32>(cmd.target_card_id()));
                 ges.enqueueGameEvent(event, playerId);
-
-                if (targetCard->getDestroyOnZoneChange()) {
-                    auto stashedCard = targetCard->takeStashedCard();
-                    targetCard->deleteLater();
-                    targetCard = stashedCard;
-                }
             }
         }
     }
