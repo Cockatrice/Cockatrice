@@ -405,7 +405,7 @@ void PictureLoaderWorker::picDownloadFailed()
     } else {
         qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
                            << " set: " << cardBeingDownloaded.getSetName() << "]: Picture NOT found, "
-                           << (picDownload ? "downloads disabled" : "download failed")
+                           << (picDownload ? "download failed" : "downloads disabled")
                            << ", no more url combinations to try: BAILING OUT";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
