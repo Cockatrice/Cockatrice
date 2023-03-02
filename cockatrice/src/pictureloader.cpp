@@ -404,8 +404,9 @@ void PictureLoaderWorker::picDownloadFailed()
         mutex.unlock();
     } else {
         qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                           << " set: " << cardBeingDownloaded.getSetName()
-                           << "]: Picture NOT found, " << (picDownload ? "downloads disabled" : "download failed") << ", no more url combinations to try: BAILING OUT";
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Picture NOT found, "
+                           << (picDownload ? "downloads disabled" : "download failed")
+                           << ", no more url combinations to try: BAILING OUT";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
     }
@@ -443,7 +444,8 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
             makeRequest(reply->url());
         } else {
             qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                               << " set: " << cardBeingDownloaded.getSetName() << "]: " << (picDownload ? "Download": "Cache search") << " failed for url "
+                               << " set: " << cardBeingDownloaded.getSetName()
+                               << "]: " << (picDownload ? "Download" : "Cache search") << " failed for url "
                                << reply->url().toDisplayString() << " (" << reply->errorString() << ")";
 
             picDownloadFailed();
