@@ -58,7 +58,6 @@ private:
     QLineEdit *tokenDatabasePathEdit;
     QPushButton *resetAllPathsButton;
     QLabel *allPathsResetLabel;
-    QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox;
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
@@ -66,7 +65,6 @@ private:
     QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
-    QLabel pixmapCacheLabel;
     QLabel deckPathLabel;
     QLabel replaysPathLabel;
     QLabel picsPathLabel;
@@ -168,6 +166,10 @@ private:
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+    QLabel networkCacheLabel;
+    QSpinBox networkCacheEdit;
+    QSpinBox pixmapCacheEdit;
+    QLabel pixmapCacheLabel;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage

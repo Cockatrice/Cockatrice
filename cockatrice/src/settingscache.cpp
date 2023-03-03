@@ -26,6 +26,19 @@ QString SettingsCache::getSettingsPath()
     return getDataPath() + "/settings/";
 }
 
+QString SettingsCache::getCachePath() const
+{
+    if (isPortableBuild)
+        return qApp->applicationDirPath() + "/cache";
+    else
+        return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+}
+
+QString SettingsCache::getNetworkCachePath() const
+{
+    return getCachePath() + "/downloaded/";
+}
+
 void SettingsCache::translateLegacySettings()
 {
     if (isPortableBuild)
@@ -205,6 +218,8 @@ SettingsCache::SettingsCache()
     // sanity check
     if (pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+
+    networkCacheSize = settings->value("personal/networkCacheSize", NETWORK_CACHE_SIZE_DEFAULT).toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
 
@@ -607,6 +622,13 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     pixmapCacheSize = _pixmapCacheSize;
     settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
     emit pixmapCacheSizeChanged(pixmapCacheSize);
+}
+
+void SettingsCache::setNetworkCacheSizeInMB(const int _networkCacheSize)
+{
+    networkCacheSize = _networkCacheSize;
+    settings->setValue("personal/networkCacheSize", networkCacheSize);
+    emit networkCacheSizeChanged(networkCacheSize);
 }
 
 void SettingsCache::setClientID(const QString &_clientID)

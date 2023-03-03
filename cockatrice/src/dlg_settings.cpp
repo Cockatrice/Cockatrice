@@ -3,6 +3,7 @@
 #include "carddatabase.h"
 #include "gettextwithmax.h"
 #include "main.h"
+#include "pictureloader.h"
 #include "releasechannel.h"
 #include "sequenceEdit/sequenceedit.h"
 #include "settingscache.h"
@@ -68,18 +69,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
     newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
 
-    // pixmap cache
-    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
-    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
-    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
-    pixmapCacheEdit.setSingleStep(64);
-    pixmapCacheEdit.setValue(settings.getPixmapCacheSize());
-    pixmapCacheEdit.setSuffix(" MB");
-
     showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setPixmapCacheSize(int)));
     connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setNotifyAboutUpdate(int)));
     connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setNotifyAboutNewVersion(int)));
@@ -90,8 +82,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&languageBox, 0, 1);
     personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
-    personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
-    personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0, 1, 2);
     personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0, 1, 2);
     personalGrid->addWidget(&showTipsOnStartup, 5, 0, 1, 2);
@@ -301,7 +291,6 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     customCardDatabasePathLabel.setText(tr("Custom database directory:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
-    pixmapCacheLabel.setText(tr("Picture cache size:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
@@ -591,12 +580,38 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     messageListLayout->addWidget(messageToolBar);
     messageListLayout->addWidget(urlList);
 
+    // pixmap cache
+    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
+    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
+    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
+    pixmapCacheEdit.setSingleStep(64);
+    pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
+    pixmapCacheEdit.setSuffix(" MB");
+
+    networkCacheEdit.setMinimum(NETWORK_CACHE_SIZE_MIN);
+    networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
+    networkCacheEdit.setSingleStep(1);
+    networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
+    networkCacheEdit.setSuffix(tr(" MB"));
+
+    auto networkCacheLayout = new QHBoxLayout;
+    networkCacheLayout->addStretch();
+    networkCacheLayout->addWidget(&networkCacheLabel);
+    networkCacheLayout->addWidget(&networkCacheEdit);
+
+    auto pixmapCacheLayout = new QHBoxLayout;
+    pixmapCacheLayout->addStretch();
+    pixmapCacheLayout->addWidget(&pixmapCacheLabel);
+    pixmapCacheLayout->addWidget(&pixmapCacheEdit);
+
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
-    lpGeneralGrid->addWidget(&urlLinkLabel, 2, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 2, 1);
+    lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
+    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 0, 1, 2);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 4, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 4, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -611,6 +626,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
             SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
+    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
+    connect(&networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+            SLOT(setNetworkCacheSizeInMB(int)));
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -635,6 +653,11 @@ void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 
 void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
+    PictureLoader::clearNetworkCache();
+
+    // These are not used anymore, but we don't delete them automatically, so
+    // we should do it here lest we leave pictures hanging around on users'
+    // machines.
     QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
@@ -662,6 +685,7 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
     }
     if (outerSuccessRemove) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
+        QDir(SettingsCache::instance().getPicsPath()).rmdir("downloadedPics");
     } else {
         QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
     }
@@ -785,6 +809,10 @@ void DeckEditorSettingsPage::retranslateUi()
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
+    networkCacheLabel.setText(tr("Downloaded images directory size:"));
+    networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
+    pixmapCacheLabel.setText(tr("Picture cache size:"));
+    pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

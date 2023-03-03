@@ -73,6 +73,7 @@ public:
     ~PictureLoaderWorker() override;
 
     void enqueueImageLoad(CardInfoPtr card);
+    void clearNetworkCache();
 
 private:
     static QStringList md5Blacklist;
@@ -87,8 +88,9 @@ private:
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
-    bool cardImageExistsOnDisk(QString &, QString &);
+    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
     bool imageIsBlackListed(const QByteArray &);
+    QNetworkReply *makeRequest(const QUrl &url);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
@@ -97,6 +99,7 @@ private slots:
     void picsPathChanged();
 public slots:
     void processLoadQueue();
+
 signals:
     void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
@@ -127,9 +130,14 @@ public:
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfoPtr> cards);
+
+public slots:
+    static void clearNetworkCache();
+
 private slots:
     void picDownloadChanged();
     void picsPathChanged();
+
 public slots:
     void imageLoaded(CardInfoPtr card, const QImage &image);
 };

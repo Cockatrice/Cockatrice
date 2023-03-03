@@ -202,6 +202,9 @@ void SettingsCache::setTokenDialogGeometry(const QByteArray & /* _tokenDialogGeo
 void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
 {
 }
+void SettingsCache::setNetworkCacheSizeInMB(const int /* _networkCacheSize */)
+{
+}
 void SettingsCache::setClientID(const QString & /* _clientID */)
 {
 }
