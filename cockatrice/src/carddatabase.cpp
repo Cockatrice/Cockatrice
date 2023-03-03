@@ -588,7 +588,7 @@ void CardDatabase::refreshCachedReverseRelatedCards()
             }
 
             auto *newCardRelation = new CardRelation(
-                card->getName(), cardRelation->getDoesAttach(), cardRelation->getIsCreateAllExclusion(),
+                card->getName(), cardRelation->getAttachType(), cardRelation->getIsCreateAllExclusion(),
                 cardRelation->getIsVariable(), cardRelation->getDefaultCount(), cardRelation->getIsPersistent());
             cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
         }
@@ -672,12 +672,12 @@ bool CardDatabase::saveCustomTokensToFile()
 }
 
 CardRelation::CardRelation(const QString &_name,
-                           bool _doesAttach,
+                           AttachType _attachType,
                            bool _isCreateAllExclusion,
                            bool _isVariableCount,
                            int _defaultCount,
                            bool _isPersistent)
-    : name(_name), doesAttach(_doesAttach), isCreateAllExclusion(_isCreateAllExclusion),
+    : name(_name), attachType(_attachType), isCreateAllExclusion(_isCreateAllExclusion),
       isVariableCount(_isVariableCount), defaultCount(_defaultCount), isPersistent(_isPersistent)
 {
 }

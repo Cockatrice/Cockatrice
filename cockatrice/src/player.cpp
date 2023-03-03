@@ -1677,7 +1677,7 @@ void Player::actCreateAllRelatedCards()
                         dbName = cardRelationAll->getName();
                         bool persistent = cardRelationAll->getIsPersistent();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, false, persistent);
+                            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1692,7 +1692,7 @@ void Player::actCreateAllRelatedCards()
                         dbName = cardRelationNotExcluded->getName();
                         bool persistent = cardRelationNotExcluded->getIsPersistent();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, false, persistent);
+                            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1731,23 +1731,22 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
             return false;
         }
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName, false, persistent);
+            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
         }
     } else if (cardRelation->getDefaultCount() > 1) {
         for (int i = 0; i < cardRelation->getDefaultCount(); ++i) {
-            createCard(sourceCard, dbName, false, persistent);
+            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
         }
     } else {
-        if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName, persistent);
-        } else {
-            createCard(sourceCard, dbName, false, persistent);
-        }
+        createCard(sourceCard, dbName, cardRelation->getAttachType(), persistent);
     }
     return true;
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach, bool persistent)
+void Player::createCard(const CardItem *sourceCard,
+                        const QString &dbCardName,
+                        CardRelation::AttachType attachType,
+                        bool persistent)
 {
     CardInfoPtr cardInfo = db->getCard(dbCardName);
 
@@ -1786,16 +1785,22 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
-    if (attach) {
-        cmd.set_target_card_id(sourceCard->getId());
+    switch (attachType) {
+        case CardRelation::DoesNotAttach:
+            break;
+
+        case CardRelation::AttachTo:
+            cmd.set_target_card_id(sourceCard->getId());
+            cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
+            break;
+
+        case CardRelation::TransformInto:
+            cmd.set_target_card_id(sourceCard->getId());
+            cmd.set_target_mode(Command_CreateToken::TRANSFORM_INTO);
+            break;
     }
 
     sendGameCommand(cmd);
-}
-
-void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName, bool persistent)
-{
-    createCard(sourceCard, dbCardName, true, persistent);
 }
 
 void Player::actSayMessage()
@@ -3550,6 +3555,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
         if (relatedCard == nullptr)
             continue;
+
         QString relatedCardName;
         if (relatedCard->getPowTough().size() > 0) {
             relatedCardName = relatedCard->getPowTough() + " " + relatedCard->getName(); // "n/n name"
@@ -3559,7 +3565,8 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
         QString text = tr("Token: ");
         if (cardRelation->getDoesAttach()) {
-            text += tr("Attach to ") + "\"" + relatedCardName + "\"";
+            text +=
+                tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
         } else if (cardRelation->getIsVariable()) {
             text += "X " + relatedCardName;
         } else if (cardRelation->getDefaultCount() != 1) {
