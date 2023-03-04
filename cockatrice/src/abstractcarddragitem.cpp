@@ -50,7 +50,7 @@ void AbstractCardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     item->paint(painter, option, widget);
 
     // adds a mask to the card so it looks like the card hasnt been placed yet
-    painter->fillRect(boundingRect(), GHOST_MASK);
+    painter->fillPath(shape(), GHOST_MASK);
 }
 
 void AbstractCardDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
