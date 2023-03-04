@@ -89,8 +89,8 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    qreal cardRadius = 0.05 * CARD_WIDTH;
-    painter->drawRoundedRect(QRectF(1.5, 1.5, CARD_WIDTH - 1.5, CARD_HEIGHT - 1.5), cardRadius, cardRadius);
+    qreal cardRadius = 0.05 * (CARD_WIDTH - 3);
+    painter->drawRoundedRect(QRectF(1.5, 1.5, CARD_WIDTH - 3., CARD_HEIGHT - 3.), cardRadius, cardRadius);
     painter->restore();
 }
 
