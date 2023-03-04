@@ -19,6 +19,7 @@ public:
              bool _contentsKnown,
              QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const;
+    QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void reorganizeCards();
     void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
