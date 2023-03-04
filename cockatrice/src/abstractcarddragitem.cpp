@@ -45,6 +45,13 @@ AbstractCardDragItem::~AbstractCardDragItem()
         delete childDrags[i];
 }
 
+QPainterPath AbstractCardDragItem::shape() const
+{
+    QPainterPath shape;
+    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    return shape;
+}
+
 void AbstractCardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     item->paint(painter, option, widget);

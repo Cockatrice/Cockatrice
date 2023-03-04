@@ -31,6 +31,7 @@ public:
     {
         return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
     }
+    QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     AbstractCardItem *getItem() const
     {
