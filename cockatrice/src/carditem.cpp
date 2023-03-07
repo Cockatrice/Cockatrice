@@ -141,21 +141,19 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     if (getBeingPointedAt()) {
-        painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
+        painter->fillPath(shape(), QBrush(QColor(255, 0, 0, 100)));
     }
 
     if (doesntUntap) {
         painter->save();
 
         painter->setRenderHint(QPainter::Antialiasing, false);
-        transformPainter(painter, translatedSize, tapAngle);
 
         QPen pen;
         pen.setColor(Qt::magenta);
-        const int penWidth = 1;
-        pen.setWidth(penWidth);
+        pen.setWidth(0); // Cosmetic pen
         painter->setPen(pen);
-        painter->drawRect(QRectF(0, 0, translatedSize.width() + penWidth, translatedSize.height() - penWidth));
+        painter->drawPath(shape());
 
         painter->restore();
     }

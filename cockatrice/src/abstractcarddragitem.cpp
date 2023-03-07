@@ -45,12 +45,19 @@ AbstractCardDragItem::~AbstractCardDragItem()
         delete childDrags[i];
 }
 
+QPainterPath AbstractCardDragItem::shape() const
+{
+    QPainterPath shape;
+    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    return shape;
+}
+
 void AbstractCardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     item->paint(painter, option, widget);
 
     // adds a mask to the card so it looks like the card hasnt been placed yet
-    painter->fillRect(boundingRect(), GHOST_MASK);
+    painter->fillPath(shape(), GHOST_MASK);
 }
 
 void AbstractCardDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
