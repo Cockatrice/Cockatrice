@@ -1880,12 +1880,10 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
 
     for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
         Server_card *card;
-        if (cmd.bottom_of_deck())
-        {
+        if (cmd.bottom_of_deck()){
             card = cards[(cards.size() - 1) - i];
         }
-        else
-        {
+        else{
             card = cards[i];
         }
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
