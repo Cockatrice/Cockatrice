@@ -1879,7 +1879,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
     zoneInfo->set_card_count(numberCards < cards.size() ? cards.size() : numberCards);
 
     for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
-        Server_card *card;
+        Server_Card *card;
         if (cmd.bottom_of_deck()){
             card = cards[(cards.size() - 1) - i];
         }
