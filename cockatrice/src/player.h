@@ -176,6 +176,7 @@ public slots:
     void actViewLibrary();
     void actViewHand();
     void actViewTopCards();
+    void actViewBottomCards();
     void actAlwaysRevealTopCard();
     void actAlwaysLookAtTopCard();
     void actViewGraveyard();

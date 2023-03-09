@@ -209,6 +209,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         aViewTopCards = new QAction(this);
         connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
+        aViewBottomCards = new QAction(this);
+        connect(aViewBottomCards, SIGNAL(triggered()), this, SLOT(actViewBottomCards()));
         aAlwaysRevealTopCard = new QAction(this);
         aAlwaysRevealTopCard->setCheckable(true);
         connect(aAlwaysRevealTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysRevealTopCard()));
@@ -1066,6 +1068,19 @@ void Player::actViewTopCards()
     if (ok) {
         defaultNumberTopCards = number;
         static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
+    }
+}
+
+void Player::actViewBottomCards()
+{
+    int deckSize = zones.value("deck")->getCards().size();
+    bool ok;
+    int number =
+        QInputDialog::getInt(game, tr("View bottom cards of library"), tr("Number of cards: (max. %1)").arg(deckSize)
+                            defaultNumberBottomCards, 1, deckSize, 1, &ok);
+    if (ok) {
+        defaultNumberBottomCards = number;
+        static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number, true);
     }
 }
 

@@ -1879,7 +1879,15 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
     zoneInfo->set_card_count(numberCards < cards.size() ? cards.size() : numberCards);
 
     for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
-        Server_Card *card = cards[i];
+        Server_card *card;
+        if (cmd.bottom_of_deck())
+        {
+            card = cards[(cards.size() - 1) - i];
+        }
+        else
+        {
+            card = cards[i];
+        }
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
         ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
         cardInfo->set_name(displayedName.toStdString());
@@ -1913,6 +1921,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
             }
         }
     }
+    
     if (zone->getType() == ServerInfo_Zone::HiddenZone) {
         zone->setCardsBeingLookedAt(numberCards);
 
