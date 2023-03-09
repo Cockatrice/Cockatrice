@@ -1921,7 +1921,6 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
             }
         }
     }
-    
     if (zone->getType() == ServerInfo_Zone::HiddenZone) {
         zone->setCardsBeingLookedAt(numberCards);
 
