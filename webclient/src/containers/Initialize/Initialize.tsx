@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { Images } from 'images';
 import { ServerSelectors } from 'store';
 import { RouteEnum } from 'types';
+import Layout from 'containers/Layout/Layout';
 
 import './Initialize.css';
 
@@ -35,25 +36,27 @@ const Initialize = ({ initialized }: InitializeProps) => {
   return initialized
     ? <Navigate to={RouteEnum.LOGIN} />
     : (
-      <Root className={'Initialize ' + classes.root}>
-        <div className='Initialize-content'>
-          <img src={Images.Logo} alt="logo" />
-          <Typography variant="subtitle1" className='subtitle'>{ t('InitializeContainer.title') }</Typography>
-          <Trans i18nKey="InitializeContainer.subtitle">
-            <Typography variant="subtitle2"></Typography>
-            <Typography variant="subtitle2"></Typography>
-          </Trans>
-        </div>
+      <Layout>
+        <Root className={'Initialize ' + classes.root}>
+          <div className='Initialize-content'>
+            <img src={Images.Logo} alt="logo" />
+            <Typography variant="subtitle1" className='subtitle'>{ t('InitializeContainer.title') }</Typography>
+            <Trans i18nKey="InitializeContainer.subtitle">
+              <Typography variant="subtitle2"></Typography>
+              <Typography variant="subtitle2"></Typography>
+            </Trans>
+          </div>
 
-        <div className="Initialize-graphics">
-          <div className="topLeft Initialize-graphics__square" />
-          <div className="topRight Initialize-graphics__square" />
-          <div className="bottomRight Initialize-graphics__square" />
-          <div className="bottomLeft Initialize-graphics__square" />
-          <div className="topBar Initialize-graphics__bar" />
-          <div className="bottomBar Initialize-graphics__bar" />
-        </div>
-      </Root>
+          <div className="Initialize-graphics">
+            <div className="topLeft Initialize-graphics__square" />
+            <div className="topRight Initialize-graphics__square" />
+            <div className="bottomRight Initialize-graphics__square" />
+            <div className="bottomLeft Initialize-graphics__square" />
+            <div className="topBar Initialize-graphics__bar" />
+            <div className="bottomBar Initialize-graphics__bar" />
+          </div>
+        </Root>
+      </Layout>
     );
 }
 
