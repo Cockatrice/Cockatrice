@@ -239,6 +239,79 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     return false;
 }
 
+static int parse(const QString &urlTemplate,
+                 const QString &propType,
+                 const QString &cardName,
+                 const QString &setName,
+                 std::function<QString(const QString &)> getProperty,
+                 QMap<QString, QString> &transformMap)
+{
+    static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
+    static const QRegularExpression rxSubStr("^(.+)_substr_(\\d+)_(\\d+)$");
+
+    const QRegularExpression rxCardProp("!" + propType + ":([^!]+)!");
+
+    auto matches = rxCardProp.globalMatch(urlTemplate);
+    while (matches.hasNext()) {
+        auto match = matches.next();
+        QString templatePropertyName = match.captured(1);
+        auto fillMatch = rxFillWith.match(templatePropertyName);
+        QString cardPropertyName;
+        QString fillWith;
+        int subStrPos = 0;
+        int subStrLen = -1;
+        if (fillMatch.hasMatch()) {
+            cardPropertyName = fillMatch.captured(1);
+            fillWith = fillMatch.captured(2);
+        } else {
+            fillWith = QString();
+            auto subStrMatch = rxSubStr.match(templatePropertyName);
+            if (subStrMatch.hasMatch()) {
+                cardPropertyName = subStrMatch.captured(1);
+                subStrPos = subStrMatch.captured(2).toInt();
+                subStrLen = subStrMatch.captured(3).toInt();
+            } else {
+                cardPropertyName = templatePropertyName;
+            }
+        }
+        QString propertyValue = getProperty(cardPropertyName);
+        if (propertyValue.isEmpty()) {
+            qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                               << propType << "property (" << cardPropertyName << ") for Url template (" << urlTemplate
+                               << ") is not available";
+            return 1;
+        } else {
+            int propLength = propertyValue.length();
+            if (subStrLen > 0 && subStrPos + subStrLen > propLength) {
+                qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                                   << propType << " property (" << cardPropertyName << ") for Url template ("
+                                   << urlTemplate << ") is smaller than substr specification (" << subStrPos << " + "
+                                   << subStrLen << " > " << propLength << ")";
+                return 1;
+            } else {
+                propertyValue = propertyValue.mid(subStrPos, subStrLen);
+                propLength = subStrLen;
+            }
+
+            if (!fillWith.isEmpty()) {
+                int fillLength = fillWith.length();
+                if (fillLength < propLength) {
+                    qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                                       << propType << " property (" << cardPropertyName << ") for Url template ("
+                                       << urlTemplate << ") is longer than fill specification (" << fillWith << ")";
+                    return 1;
+                } else {
+
+                    propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
+                }
+            }
+
+            transformMap["!" + propType + ":" + templatePropertyName + "!"] = propertyValue;
+        }
+    }
+    return 0;
+}
+
 QString PictureToLoad::transformUrl(const QString &urlTemplate) const
 {
     /* This function takes Url templates and substitutes actual card details
@@ -246,56 +319,23 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
        for downloading images.  If information is requested by the template that is
        not populated for this specific card/set combination, an empty string is returned.*/
 
-    static const QRegularExpression rxCardProp("!prop:([^!]+)!");
-    static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
-    static const QRegularExpression rxSetProp("!set:([^!]+)!");
-
-    QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
 
     QMap<QString, QString> transformMap = QMap<QString, QString>();
+    QString setName = getSetName();
+
     // name
-    transformMap["!name!"] = card->getName();
+    QString cardName = card->getName();
+    transformMap["!name!"] = cardName;
     transformMap["!name_lower!"] = card->getName().toLower();
     transformMap["!corrected_name!"] = card->getCorrectedName();
     transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
 
     // card properties
-    auto matches = rxCardProp.globalMatch(transformedUrl);
-    while (matches.hasNext()) {
-        auto match = matches.next();
-        QString propertyName = match.captured(1);
-        auto fillMatch = rxFillWith.match(propertyName);
-        QString fillPropertyName;
-        QString fillWith;
-        if (fillMatch.hasMatch()) {
-            fillPropertyName = fillMatch.captured(1);
-            fillWith = fillMatch.captured(2);
-        } else {
-            fillPropertyName = propertyName;
-            fillWith = QString();
-        }
-        QString propertyValue = card->getProperty(fillPropertyName);
-        if (propertyValue.isEmpty()) {
-            qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                     << "]: Requested property (" << fillPropertyName << ") for Url template (" << urlTemplate
-                     << ") is not available";
-            return QString();
-        } else {
-            if (!fillWith.isEmpty()) {
-                int fillLength = fillWith.length();
-                int propLength = propertyValue.length();
-                if (fillLength < propLength) {
-                    qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                             << "]: Requested property (" << fillPropertyName << ") for Url template (" << urlTemplate
-                             << ") is longer than fill specification (" << fillWith << ")";
-                    return QString();
-                } else {
-                    propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
-                }
-            }
-            transformMap["!prop:" + propertyName + "!"] = propertyValue;
-        }
+    if (parse(
+            urlTemplate, "prop", cardName, setName, [&](const QString &name) { return card->getProperty(name); },
+            transformMap)) {
+        return QString();
     }
 
     if (set) {
@@ -304,41 +344,10 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
         transformMap["!setname!"] = set->getLongName();
         transformMap["!setname_lower!"] = set->getLongName().toLower();
 
-        auto matches = rxSetProp.globalMatch(transformedUrl);
-        while (matches.hasNext()) {
-            auto match = matches.next();
-            QString propertyName = match.captured(1);
-            auto fillMatch = rxFillWith.match(propertyName);
-            QString fillPropertyName;
-            QString fillWith;
-            if (fillMatch.hasMatch()) {
-                fillPropertyName = fillMatch.captured(1);
-                fillWith = fillMatch.captured(2);
-            } else {
-                fillPropertyName = propertyName;
-                fillWith = QString();
-            }
-            QString propertyValue = card->getSetProperty(set->getShortName(), fillPropertyName);
-            if (propertyValue.isEmpty()) {
-                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                         << "]: Requested set property (" << fillPropertyName << ") for Url template (" << urlTemplate
-                         << ") is not available";
-                return QString();
-            } else {
-                if (!fillWith.isEmpty()) {
-                    int fillLength = fillWith.length();
-                    int propLength = propertyValue.length();
-                    if (fillLength < propLength) {
-                        qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                                 << "]: Requested set property (" << fillPropertyName << ") for Url template ("
-                                 << urlTemplate << ") is longer than fill specification (" << fillWith << ")";
-                        return QString();
-                    } else {
-                        propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
-                    }
-                }
-                transformMap["!set:" + propertyName + "!"] = propertyValue;
-            }
+        if (parse(
+                urlTemplate, "set", cardName, setName,
+                [&](const QString &name) { return card->getSetProperty(set->getShortName(), name); }, transformMap)) {
+            return QString();
         }
     }
 
@@ -346,6 +355,7 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
     transformMap["!sflang!"] = QString(QCoreApplication::translate(
         "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
 
+    QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {
         if (transformedUrl.contains(prop)) {
             if (!transformMap[prop].isEmpty()) {
@@ -355,9 +365,9 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
                  * populated in this card, so it should return an empty string,
                  * indicating an invalid Url.
                  */
-                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                         << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
-                         << ") is not available";
+                qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+                                   << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
+                                   << ") is not available";
                 return QString();
             }
         }
