@@ -116,6 +116,9 @@ jobs:
 
           - distro: UbuntuKinetic
             package: DEB
+            
+          - distro: UbuntuLunar
+            package: DEB
 
     name: ${{matrix.distro}}
     needs: configure
