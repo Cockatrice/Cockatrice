@@ -255,7 +255,7 @@ if(UNIX)
     
     #specify where the applescript and the background is to CPack
     set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/CMakeDMGSetup.script")
-    set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/background.jpg")
+    set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/background.tif")
   else()
     # linux
     if(CPACK_GENERATOR STREQUAL "RPM")
