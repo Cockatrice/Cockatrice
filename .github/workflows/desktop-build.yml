@@ -103,6 +103,9 @@ jobs:
           - distro: Fedora37
             package: RPM
 
+          - distro: Fedora38
+            package: RPM
+
           - distro: UbuntuBionic
             package: DEB
 
