@@ -38,12 +38,12 @@ tell disk image_name
       set sidebar width to 0
       set statusbar visible to false
       set toolbar visible to false
-      set the bounds to { 400, 100, 1400, 900 }
-      set position of item "Cockatrice.app" to { 75, 150 }
-      set position of item "Oracle.app" to { 75, 350}
-      set position of item "Servatrice.app" to { 75, 550 }
+      set the bounds to { 400, 100, 1400, 922 }
+      set position of item "Cockatrice.app" to { 139, 214 }
+      set position of item "Oracle.app" to { 139, 414 }
+      set position of item "Servatrice.app" to { 139, 614 }
       set position of item "dbconverter.app" to { 1400, 1400 }
-      set position of item "Applications" to { 797, 350 }
+      set position of item "Applications" to { 861, 414 }
     end tell
     update without registering applications
     delay 5
