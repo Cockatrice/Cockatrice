@@ -89,10 +89,6 @@ jobs:
             package: skip # we are packaged in arch already
             allow-failure: yes
 
-          - distro: Debian10
-            package: DEB
-            test: skip # running tests on all distros is superfluous
-
           - distro: Debian11
             package: DEB
 
