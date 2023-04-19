@@ -18,7 +18,6 @@ include different targets -->
  - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")
  - <kbd>Ubuntu 22.10</kbd> ("Kinetic Kudu")
  - <kbd>Ubuntu 23.04</kbd> ("Lunar Lobster")
- - <kbd>Debian 10</kbd> ("Buster")
  - <kbd>Debian 11</kbd> ("Bullseye")
  - <kbd>Fedora 36</kbd>
  - <kbd>Fedora 37</kbd>
