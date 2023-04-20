@@ -68,6 +68,16 @@ void LayoutsSettings::setDeckEditorDbHeaderState(const QByteArray &value)
     setValue(value, "layouts/deckEditorDbHeader_state");
 }
 
+const QByteArray LayoutsSettings::getSetsDialogHeaderState()
+{
+    return getValue("layouts/setsDialogHeader_state").toByteArray();
+}
+
+void LayoutsSettings::setSetsDialogHeaderState(const QByteArray &value)
+{
+    setValue(value, "layouts/setsDialogHeader_state");
+}
+
 void LayoutsSettings::setGamePlayAreaGeometry(const QByteArray &value)
 {
     setValue(value, "layouts/gameplayarea_geometry");

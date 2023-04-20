@@ -225,6 +225,7 @@ SettingsCache::SettingsCache()
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
+    setsDialogGeometry = settings->value("interface/sets_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
@@ -615,6 +616,12 @@ void SettingsCache::setTokenDialogGeometry(const QByteArray &_tokenDialogGeometr
 {
     tokenDialogGeometry = _tokenDialogGeometry;
     settings->setValue("interface/token_dialog_geometry", tokenDialogGeometry);
+}
+
+void SettingsCache::setSetsDialogGeometry(const QByteArray &_setsDialogGeometry)
+{
+    setsDialogGeometry = _setsDialogGeometry;
+    settings->setValue("interface/sets_dialog_geometry", setsDialogGeometry);
 }
 
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
