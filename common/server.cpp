@@ -30,7 +30,6 @@
 #include "server_counter.h"
 #include "server_database_interface.h"
 #include "server_game.h"
-#include "server_metatypes.h"
 #include "server_player.h"
 #include "server_protocolhandler.h"
 #include "server_remoteuserinterface.h"
