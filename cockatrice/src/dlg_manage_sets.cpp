@@ -194,6 +194,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     auto &headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
     if (!headerState.isEmpty()) {
         view->header()->restoreState(headerState);
+        view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
     } else {
         view->header()->resizeSections(QHeaderView::ResizeToContents);
     }
