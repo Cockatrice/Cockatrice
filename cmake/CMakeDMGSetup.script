@@ -24,7 +24,7 @@ tell disk image_name
   open
     set current view of container window to icon view
     set theViewOptions to the icon view options of container window
-    set background picture of theViewOptions to file ".background:dmgBackground.tif"
+    set background picture of theViewOptions to file ".background:background.tif"
     set arrangement of theViewOptions to not arranged
     set icon size of theViewOptions to 128
     delay 5
