@@ -320,6 +320,8 @@ if(WIN32)
     PATTERN "imageformats/qtiff.dll"
     PATTERN "imageformats/qwbmp.dll"
     PATTERN "imageformats/qwebp.dll"
+    PATTERN "mediaservice/dsengine.dll"
+    PATTERN "mediaservice/wmfengine.dll"
     PATTERN "platforms/qdirect2d.dll"
     PATTERN "platforms/qminimal.dll"
     PATTERN "platforms/qoffscreen.dll"
@@ -360,8 +362,8 @@ Data = Resources\")
   endif()
 endif()
 
-if(Qt6LinguistTools_FOUND)
-  # Qt6 Translations happen after the executable is built up
+if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+  #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
       cockatrice

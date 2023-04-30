@@ -17,15 +17,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "main.h"
+
+#include "mocks.h"
+#include "version_string.h"
+
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QFileInfo>
 #include <QtGlobal>
-#include <QDebug>
-
-#include "version_string.h"
-#include "mocks.h"
-#include "main.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,8 +45,7 @@ int main(int argc, char *argv[])
     QString oldDbPath;
     QString newDbPath;
     QStringList args = parser.positionalArguments();
-    if (args.count() == 2)
-    {
+    if (args.count() == 2) {
         oldDbPath = QFileInfo(args.at(0)).absoluteFilePath();
         newDbPath = QFileInfo(args.at(1)).absoluteFilePath();
     } else {

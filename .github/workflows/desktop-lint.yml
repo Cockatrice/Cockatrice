@@ -8,21 +8,21 @@ on:
       - '.github/workflows/web-*.yml'
 
 jobs:
-  clang-format:
-    runs-on: ubuntu-latest
+  format:
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 20 # should be enough to find merge base
 
-    - name: Install clang-format
+    - name: Install dependencies
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends clang-format
+        sudo apt-get install -y --no-install-recommends clang-format cmake-format
 
-    - name: Run clangify
+    - name: Check code formatting
       shell: bash
       run: ./.ci/lint_cpp.sh

@@ -1,27 +1,33 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import ErrorOutlinedIcon from '@material-ui/icons/ErrorOutlined';
+import { styled } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
 import './InputField.css';
 
-const useStyles = makeStyles(theme => ({
-  root: {
+const PREFIX = 'InputField';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.root}`]: {
     '& .InputField-error': {
       color: theme.palette.error.main
     },
 
     '& .InputField-warning': {
       color: theme.palette.warning.main
-    }
+    },
   },
 }));
 
-const InputField = ({ input, meta: { touched, error, warning }, ...args }) => {
-  const classes = useStyles();
+const InputField = ({ input, meta, ...args }) => {
+  const { touched, error, warning } = meta;
 
   return (
-    <div className={'InputField ' + classes.root}>
+    <Root className={'InputField ' + classes.root}>
       { touched && (
         <div className="InputField-validation">
           {
@@ -44,9 +50,10 @@ const InputField = ({ input, meta: { touched, error, warning }, ...args }) => {
         className="rounded"
         variant="outlined"
         margin="dense"
+        size="small"
         fullWidth={true}
       />
-    </div>
+    </Root>
   );
 };
 

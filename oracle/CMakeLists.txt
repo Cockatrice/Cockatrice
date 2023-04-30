@@ -252,8 +252,8 @@ Translations = Resources/translations\")
   )
 endif()
 
-if(Qt6LinguistTools_FOUND)
-  # Qt6 Translations happen after the executable is built up
+if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+  #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
       oracle

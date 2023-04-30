@@ -3,7 +3,7 @@ import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
 
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 
 import { AuthenticationService } from 'api';
 import { CheckboxField, InputField, KnownHosts } from 'components';

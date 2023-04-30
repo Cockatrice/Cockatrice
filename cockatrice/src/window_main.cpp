@@ -936,7 +936,7 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
             showMinimized();
         } else {
             showNormal();
-            QApplication::setActiveWindow(this);
+            activateWindow();
         }
     }
 }

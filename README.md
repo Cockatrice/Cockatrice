@@ -18,7 +18,7 @@
 <br><pre>
 <b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
 <b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development, see how to [get involved](#get-involved-)</b>
+<b>To help with development, see how to [get involved](#get-involved--)</b>
 </pre><br>
 
 
@@ -51,8 +51,6 @@ We maintain two tags for contributors to find issues to work on:
 - [Help wanted](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Help%20Wanted%22%20): This tag is used for issues that we are looking for a contributor to work on. Often this is for feature suggestions we are willing to accept, but don't have the time to work on ourselves.
 
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.
-
-Read the long-term project **roadmap** to see planned edits and milestones [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
 
 We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
@@ -118,6 +116,7 @@ The following flags can be passed to `cmake`:
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
 - `-DFORCE_USE_QT5=1` Skip looking for Qt6 before trying to find Qt5
+- `-DOPEN_SSL_PATH=C:/Path/To/Tools/OpenSSL/Win_x64/bin"` Designate the OpenSSL Path if you're using non-standard directives
 
 
 # Run

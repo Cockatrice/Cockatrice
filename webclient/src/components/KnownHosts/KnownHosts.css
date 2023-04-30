@@ -36,7 +36,6 @@
 }
 
 .KnownHosts-item__status svg {
-  display: none;
   margin-left: -5px;
   margin-right: 5px;
 }
@@ -58,15 +57,14 @@
   margin-left: 4px;
 }
 
-.KnownHosts .MuiSelect-selectMenu .KnownHosts-item__status,
-.KnownHosts .MuiSelect-selectMenu .KnownHosts-item__status svg {
-  display: block;
+.KnownHosts .MuiSelect-select .KnownHosts-item__status {
+  display: flex;
 }
 
 .Mui-selected .KnownHosts-item__label svg {
   display: block;
 }
 
-.MuiSelect-selectMenu .KnownHosts-item__edit {
+.MuiSelect-select .KnownHosts-item__edit {
   display: none;
 }

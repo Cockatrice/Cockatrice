@@ -24,7 +24,7 @@ void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     AbstractCardDragItem::paint(painter, option, widget);
 
     if (occupied)
-        painter->fillRect(boundingRect(), QColor(200, 0, 0, 100));
+        painter->fillPath(shape(), QColor(200, 0, 0, 100));
 }
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)

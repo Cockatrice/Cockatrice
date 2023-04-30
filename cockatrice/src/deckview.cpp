@@ -89,7 +89,8 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2.5));
+    qreal cardRadius = 0.05 * (CARD_WIDTH - 3);
+    painter->drawRoundedRect(QRectF(1.5, 1.5, CARD_WIDTH - 3., CARD_HEIGHT - 3.), cardRadius, cardRadius);
     painter->restore();
 }
 
@@ -272,16 +273,11 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
 {
     currentRowsAndCols = rowsAndCols;
 
-    int totalCols = 0, totalRows = 0;
     qreal yUntilNow = separatorY + paddingY;
     qreal x = (qreal)getCardTypeTextWidth();
     for (int i = 0; i < rowsAndCols.size(); ++i) {
         const int tempRows = rowsAndCols[i].first;
         const int tempCols = rowsAndCols[i].second;
-        totalRows += tempRows;
-        if (tempCols > totalCols)
-            totalCols = tempCols;
-
         QList<QString> cardTypeList = cardsByType.uniqueKeys();
         QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
         std::sort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);

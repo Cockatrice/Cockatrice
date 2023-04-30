@@ -40,6 +40,8 @@ private:
     QHBoxLayout *filterBox;
     int sortIndex;
     Qt::SortOrder sortOrder;
+    void closeEvent(QCloseEvent *ev) override;
+    void saveHeaderState();
     void rebuildMainLayout(int actionToTake);
     bool setOrderIsSorted;
     enum

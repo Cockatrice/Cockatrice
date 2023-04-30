@@ -1,7 +1,13 @@
-# Find a compatible Qt version Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5 Optional
-# Input: QT6_DIR -- Hint as to where Qt6 lives on the system Optional Input: QT5_DIR -- Hint as to where Qt5 lives on
-# the system Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6 Outputs: SERVATRICE_QT_MODULES,
-# COCKATRICE_QT_MODULES, ORACLE_QT_MODULES, DBCONVERTER_QT_MODULES, TEST_QT_MODULES
+# Find a compatible Qt version
+# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5
+# Optional Input: QT6_DIR -- Hint as to where Qt6 lives on the system
+# Optional Input: QT5_DIR -- Hint as to where Qt5 lives on the system
+# Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6
+# Output: SERVATRICE_QT_MODULES
+# Output: COCKATRICE_QT_MODULES
+# Output: ORACLE_QT_MODULES
+# Output: DBCONVERTER_QT_MODULES
+# Output: TEST_QT_MODULES
 
 set(REQUIRED_QT_COMPONENTS Core)
 if(WITH_SERVER)
@@ -15,8 +21,8 @@ if(WITH_CLIENT)
       Network
       PrintSupport
       Svg
-      Widgets
       WebSockets
+      Widgets
   )
 endif()
 if(WITH_ORACLE)
@@ -35,27 +41,24 @@ set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_CO
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
 if(NOT FORCE_USE_QT5)
-  # Core5Compat is Qt6 Only, Linguist is now a component in Qt6 instead of an external package
+  # Linguist is now a component in Qt6 instead of an external package
   find_package(
     Qt6 6.2.3
-    COMPONENTS Core5Compat ${REQUIRED_QT_COMPONENTS}
-    OPTIONAL_COMPONENTS Linguist
+    COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist
     QUIET HINTS ${Qt6_DIR}
   )
 endif()
 if(Qt6_FOUND)
   set(COCKATRICE_QT_VERSION_NAME Qt6)
 
-  if(Qt6LinguistTools_FOUND)
-    list(FIND Qt6LinguistTools_TARGETS Qt6::lrelease QT6_LRELEASE_INDEX)
-    if(QT6_LRELEASE_INDEX EQUAL -1)
-      message(WARNING "Qt6 lrelease not found.")
-    endif()
+  list(FIND Qt6LinguistTools_TARGETS Qt6::lrelease QT6_LRELEASE_INDEX)
+  if(QT6_LRELEASE_INDEX EQUAL -1)
+    message(WARNING "Qt6 lrelease not found.")
+  endif()
 
-    list(FIND Qt6LinguistTools_TARGETS Qt6::lupdate QT6_LUPDATE_INDEX)
-    if(QT6_LUPDATE_INDEX EQUAL -1)
-      message(WARNING "Qt6 lupdate not found.")
-    endif()
+  list(FIND Qt6LinguistTools_TARGETS Qt6::lupdate QT6_LUPDATE_INDEX)
+  if(QT6_LUPDATE_INDEX EQUAL -1)
+    message(WARNING "Qt6 lupdate not found.")
   endif()
 else()
   find_package(
@@ -110,10 +113,5 @@ string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" COCKATRICE_Q
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" ORACLE_QT_MODULES "${_ORACLE_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" DB_CONVERTER_QT_MODULES "${_DBCONVERTER_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" TEST_QT_MODULES "${_TEST_NEEDED}")
-if(Qt6_FOUND)
-  list(APPEND SERVATRICE_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core5Compat)
-  list(APPEND COCKATRICE_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core5Compat)
-  list(APPEND ORACLE_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Core5Compat)
-endif()
 
 message(STATUS "Found Qt ${${COCKATRICE_QT_VERSION_NAME}_VERSION} at: ${${COCKATRICE_QT_VERSION_NAME}_DIR}")

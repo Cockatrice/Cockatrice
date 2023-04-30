@@ -11,3 +11,5 @@ preferences
 compile_commands.json
 .vs/
 .vscode/
+.cache
+.gdb_history

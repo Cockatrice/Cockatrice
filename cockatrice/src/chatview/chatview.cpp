@@ -21,7 +21,7 @@ UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
     relativePosition = cursor.position() - block.position();
 }
 
-ChatView::ChatView(const TabSupervisor *_tabSupervisor,
+ChatView::ChatView(TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
                    TabGame *_game,
                    bool _showTimestamps,

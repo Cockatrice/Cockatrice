@@ -573,6 +573,8 @@ void Player::addPlayer(Player *player)
         newAction->setData(player->getId());
         connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
     }
+
+    playersInfo.append(qMakePair(player->getName(), player->getId()));
 }
 
 void Player::removePlayer(Player *player)
@@ -589,12 +591,20 @@ void Player::removePlayer(Player *player)
                 j->deleteLater();
             }
     }
+
+    for (auto it = playersInfo.begin(); it != playersInfo.end();) {
+        if (it->second == player->getId()) {
+            it = playersInfo.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void Player::playerListActionTriggered()
 {
     auto *action = static_cast<QAction *>(sender());
-    auto *menu = static_cast<QMenu *>(action->parentWidget());
+    auto *menu = static_cast<QMenu *>(action->parent());
 
     Command_RevealCards cmd;
     const int otherPlayerId = action->data().toInt();
@@ -614,14 +624,14 @@ void Player::playerListActionTriggered()
             cmd.set_zone_name("deck");
             cmd.set_top_cards(number);
             // backward compatibility: servers before #1051 only permits to reveal the first card
-            cmd.set_card_id(0);
+            cmd.add_card_id(0);
         }
 
     } else if (menu == mRevealHand) {
         cmd.set_zone_name("hand");
     } else if (menu == mRevealRandomHandCard) {
         cmd.set_zone_name("hand");
-        cmd.set_card_id(RANDOM_CARD_FROM_ZONE);
+        cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
     } else {
         return;
     }
@@ -1000,6 +1010,16 @@ void Player::initSayMenu()
     }
 }
 
+void Player::initContextualPlayersMenu(QMenu *menu)
+{
+    menu->addAction(tr("&All players"))->setData(-1);
+    menu->addSeparator();
+
+    for (const auto &playerInfo : playersInfo) {
+        menu->addAction(playerInfo.first)->setData(playerInfo.second);
+    }
+}
+
 void Player::setDeck(const DeckLoader &_deck)
 {
     deck = new DeckLoader(_deck);
@@ -1086,7 +1106,7 @@ void Player::actRevealRandomGraveyardCard()
         cmd.set_player_id(otherPlayerId);
     }
     cmd.set_zone_name("grave");
-    cmd.set_card_id(RANDOM_CARD_FROM_ZONE);
+    cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
     sendGameCommand(cmd);
 }
 
@@ -1655,8 +1675,9 @@ void Player::actCreateAllRelatedCards()
                 for (CardRelation *cardRelationAll : relatedCards) {
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
                         dbName = cardRelationAll->getName();
+                        bool persistent = cardRelationAll->getIsPersistent();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName);
+                            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1669,8 +1690,9 @@ void Player::actCreateAllRelatedCards()
                 for (CardRelation *cardRelationNotExcluded : nonExcludedRelatedCards) {
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
                         dbName = cardRelationNotExcluded->getName();
+                        bool persistent = cardRelationNotExcluded->getIsPersistent();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName);
+                            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1698,6 +1720,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
         return false;
     }
     QString dbName = cardRelation->getName();
+    bool persistent = cardRelation->getIsPersistent();
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;
@@ -1708,23 +1731,22 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
             return false;
         }
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
         }
     } else if (cardRelation->getDefaultCount() > 1) {
         for (int i = 0; i < cardRelation->getDefaultCount(); ++i) {
-            createCard(sourceCard, dbName);
+            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
         }
     } else {
-        if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName);
-        } else {
-            createCard(sourceCard, dbName);
-        }
+        createCard(sourceCard, dbName, cardRelation->getAttachType(), persistent);
     }
     return true;
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)
+void Player::createCard(const CardItem *sourceCard,
+                        const QString &dbCardName,
+                        CardRelation::AttachType attachType,
+                        bool persistent)
 {
     CardInfoPtr cardInfo = db->getCard(dbCardName);
 
@@ -1758,21 +1780,27 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     } else {
         cmd.set_annotation("");
     }
-    cmd.set_destroy_on_zone_change(true);
+    cmd.set_destroy_on_zone_change(!persistent);
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
-    if (attach) {
-        cmd.set_target_card_id(sourceCard->getId());
+    switch (attachType) {
+        case CardRelation::DoesNotAttach:
+            break;
+
+        case CardRelation::AttachTo:
+            cmd.set_target_card_id(sourceCard->getId());
+            cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
+            break;
+
+        case CardRelation::TransformInto:
+            cmd.set_target_card_id(sourceCard->getId());
+            cmd.set_target_mode(Command_CreateToken::TRANSFORM_INTO);
+            break;
     }
 
     sendGameCommand(cmd);
-}
-
-void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName)
-{
-    createCard(sourceCard, dbCardName, true);
 }
 
 void Player::actSayMessage()
@@ -1969,6 +1997,7 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
+    updateCardMenu(card);
     emit logSetCardCounter(this, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
@@ -2212,7 +2241,7 @@ void Player::eventDrawCards(const Event_DrawCards &event)
 
     hand->reorganizeCards();
     deck->reorganizeCards();
-    emit logDrawCards(this, event.number());
+    emit logDrawCards(this, event.number(), deck->getCards().size() == 0);
 }
 
 void Player::eventRevealCards(const Event_RevealCards &event)
@@ -2253,9 +2282,10 @@ void Player::eventRevealCards(const Event_RevealCards &event)
     } else {
         bool showZoneView = true;
         QString cardName;
+        auto cardId = event.card_id_size() == 0 ? -1 : event.card_id(0);
         if (cardList.size() == 1) {
             cardName = QString::fromStdString(cardList.first()->name());
-            if ((event.card_id() == 0) && dynamic_cast<PileZone *>(zone)) {
+            if ((cardId == 0) && dynamic_cast<PileZone *>(zone)) {
                 zone->getCards().first()->setName(cardName);
                 zone->update();
                 showZoneView = false;
@@ -2265,7 +2295,7 @@ void Player::eventRevealCards(const Event_RevealCards &event)
             static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
         }
 
-        emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false,
+        emit logRevealCards(this, zone, cardId, cardName, otherPlayer, false,
                             event.has_number_of_cards() ? event.number_of_cards() : cardList.size());
     }
 }
@@ -2822,7 +2852,7 @@ void Player::cardMenuAction()
                 case cmPeek: {
                     auto *cmd = new Command_RevealCards;
                     cmd->set_zone_name(card->getZone()->getName().toStdString());
-                    cmd->set_card_id(card->getId());
+                    cmd->add_card_id(card->getId());
                     cmd->set_player_id(id);
                     commandList.append(cmd);
                     break;
@@ -3186,9 +3216,7 @@ void Player::actAttach()
         return;
     }
 
-    auto *arrow = new ArrowAttachItem(card);
-    scene()->addItem(arrow);
-    arrow->grabMouse();
+    card->drawAttachArrow();
 }
 
 void Player::actUnattach()
@@ -3197,10 +3225,15 @@ void Player::actUnattach()
         return;
     }
 
-    Command_AttachCard cmd;
-    cmd.set_start_zone(game->getActiveCard()->getZone()->getName().toStdString());
-    cmd.set_card_id(game->getActiveCard()->getId());
-    sendGameCommand(cmd);
+    QList<const ::google::protobuf::Message *> commandList;
+    for (QGraphicsItem *item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        auto *cmd = new Command_AttachCard;
+        cmd->set_start_zone(card->getZone()->getName().toStdString());
+        cmd->set_card_id(card->getId());
+        commandList.append(cmd);
+    }
+    sendGameCommand(prepareGameCommand(commandList));
 }
 
 void Player::actCardCounterTrigger()
@@ -3295,6 +3328,27 @@ void Player::actPlayFacedown()
     }
 
     playCard(game->getActiveCard(), true, false);
+}
+
+void Player::actReveal(QAction *action)
+{
+    const int otherPlayerId = action->data().toInt();
+
+    Command_RevealCards cmd;
+    if (otherPlayerId != -1) {
+        cmd.set_player_id(otherPlayerId);
+    }
+
+    QList<QGraphicsItem *> sel = scene()->selectedItems();
+    while (!sel.isEmpty()) {
+        const auto *card = qgraphicsitem_cast<CardItem *>(sel.takeFirst());
+        if (!cmd.has_zone_name()) {
+            cmd.set_zone_name(card->getZone()->getName().toStdString());
+        }
+        cmd.add_card_id(card->getId());
+    }
+
+    sendGameCommand(cmd);
 }
 
 void Player::refreshShortcuts()
@@ -3422,6 +3476,11 @@ void Player::updateCardMenu(const CardItem *card)
                 // Card is in hand or a custom zone specified by server
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
+
+                QMenu *revealMenu = cardMenu->addMenu(tr("Re&veal to..."));
+                initContextualPlayersMenu(revealMenu);
+                connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
+
                 cardMenu->addMenu(moveMenu);
                 addRelatedCardView(card, cardMenu);
             }
@@ -3496,6 +3555,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
         if (relatedCard == nullptr)
             continue;
+
         QString relatedCardName;
         if (relatedCard->getPowTough().size() > 0) {
             relatedCardName = relatedCard->getPowTough() + " " + relatedCard->getName(); // "n/n name"
@@ -3505,7 +3565,8 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
         QString text = tr("Token: ");
         if (cardRelation->getDoesAttach()) {
-            text += tr("Attach to ") + "\"" + relatedCardName + "\"";
+            text +=
+                tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
         } else if (cardRelation->getIsVariable()) {
             text += "X " + relatedCardName;
         } else if (cardRelation->getDefaultCount() != 1) {
