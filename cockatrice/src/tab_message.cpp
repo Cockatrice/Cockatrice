@@ -159,7 +159,7 @@ void TabMessage::showSystemPopup(const Event_UserMessage &event)
 void TabMessage::messageClicked()
 {
     tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
-    QApplication::setActiveWindow(this);
+    activateWindow();
     emit maximizeClient();
 }
 
