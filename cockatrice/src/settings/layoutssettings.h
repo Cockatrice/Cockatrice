@@ -17,6 +17,7 @@ public:
     void setDeckEditorDeckSize(const QSize &value);
     void setDeckEditorFilterSize(const QSize &value);
     void setDeckEditorDbHeaderState(const QByteArray &value);
+    void setSetsDialogHeaderState(const QByteArray &value);
 
     void setGamePlayAreaGeometry(const QByteArray &value);
     void setGamePlayAreaState(const QByteArray &value);
@@ -37,6 +38,7 @@ public:
     const QSize getDeckEditorDeckSize();
     const QSize getDeckEditorFilterSize();
     const QByteArray getDeckEditorDbHeaderState();
+    const QByteArray getSetsDialogHeaderState();
 
     const QByteArray getGamePlayAreaLayoutState();
     const QByteArray getGamePlayAreaGeometry();

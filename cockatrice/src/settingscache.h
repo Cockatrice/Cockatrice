@@ -70,6 +70,7 @@ private:
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
+    QByteArray setsDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
@@ -153,6 +154,10 @@ public:
     const QByteArray &getTokenDialogGeometry() const
     {
         return tokenDialogGeometry;
+    }
+    const QByteArray &getSetsDialogGeometry() const
+    {
+        return setsDialogGeometry;
     }
     QString getLang() const
     {
@@ -493,6 +498,7 @@ public slots:
 
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
+    void setSetsDialogGeometry(const QByteArray &_setsDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
