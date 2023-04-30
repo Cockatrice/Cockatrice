@@ -21,6 +21,7 @@ include different targets -->
  - <kbd>Debian 11</kbd> ("Bullseye")
  - <kbd>Fedora 36</kbd>
  - <kbd>Fedora 37</kbd>
+ - <kbd>Fedora 38</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
