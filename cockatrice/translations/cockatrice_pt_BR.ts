@@ -25,12 +25,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="406"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="406"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível criar o diretório de temas em &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="412"/>
@@ -45,7 +45,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="414"/>
         <source>Open themes folder</source>
-        <translation type="unfinished"/>
+        <translation>Abra a pasta de temas</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="416"/>
@@ -165,7 +165,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/userlist.cpp" line="104"/>
         <source>Redact all messages from this user in all rooms</source>
-        <translation type="unfinished"/>
+        <translation>Remover todas mensagens deste usuário em todas as salas</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="106"/>
@@ -326,7 +326,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/cardfilter.cpp" line="35"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valor de Mana</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="37"/>
@@ -409,7 +409,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation>Mão dele</translation>
+        <translation>sua mão</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
@@ -421,7 +421,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="68"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation>Grimório dele</translation>
+        <translation>seu grimório</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
@@ -433,7 +433,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="71"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation>do grimório dele</translation>
+        <translation>do seu grimório</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="72"/>
@@ -445,7 +445,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="74"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation>grimório dele</translation>
+        <translation>seu grimório</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
@@ -457,7 +457,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="77"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation>grimório dele</translation>
+        <translation>seu grimório</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="77"/>
@@ -469,7 +469,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation>grimório dele</translation>
+        <translation>seu grimório</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="79"/>
@@ -481,7 +481,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="82"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation>cemitério dele</translation>
+        <translation>seu cemitério</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="82"/>
@@ -493,7 +493,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="84"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation>Exílio</translation>
+        <translation>seu exílio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="84"/>
@@ -505,7 +505,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="88"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
-        <translation>sideboard dele</translation>
+        <translation>seu sideboard</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="89"/>
@@ -517,7 +517,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="91"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
-        <translation>sideboard dele</translation>
+        <translation>seu sideboard</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="92"/>
@@ -580,12 +580,12 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/dlg_settings.cpp" line="564"/>
         <source>Add New URL</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar nova URL</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="572"/>
         <source>Remove URL</source>
-        <translation type="unfinished"/>
+        <translation>Remover URL</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="712"/>
@@ -804,7 +804,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/dlg_connect.cpp" line="97"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Resetar Senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="101"/>
@@ -937,7 +937,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/dlg_creategame.cpp" line="88"/>
         <source>Create game as spectator</source>
-        <translation type="unfinished"/>
+        <translation>Criar jogo como espectador</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="95"/>
@@ -1135,7 +1135,7 @@ Para remover o avatar atual, confirme sem escolher uma nova imagem.</translation
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="64"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>Sua senha é muito curta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="67"/>
@@ -1272,32 +1272,32 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="20"/>
         <source>no limit</source>
-        <translation type="unfinished"/>
+        <translation>sem limite</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="21"/>
         <source>5 minutes</source>
-        <translation type="unfinished"/>
+        <translation>5 minutos</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="22"/>
         <source>10 minutes</source>
-        <translation type="unfinished"/>
+        <translation>10 minutos</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="23"/>
         <source>30 minutes</source>
-        <translation type="unfinished"/>
+        <translation>30 minutos</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="24"/>
         <source>1 hour</source>
-        <translation type="unfinished"/>
+        <translation>1 hora</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="25"/>
         <source>2 hours</source>
-        <translation type="unfinished"/>
+        <translation>2 horas</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="27"/>
@@ -1307,12 +1307,12 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="30"/>
         <source>Show &amp;full games</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar &amp;todos os jogos</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="33"/>
         <source>Show games &amp;that have started</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar jogos &amp;que já começaram</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="36"/>
@@ -1327,7 +1327,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="47"/>
         <source>&amp;Newer than:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Mais novos que:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="52"/>
@@ -1372,27 +1372,27 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="120"/>
         <source>Show games only if &amp;spectators can watch</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar jogos apenas se &amp;espectadores puderem assistir</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="124"/>
         <source>Show spectator password p&amp;rotected games</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar jogos p&amp;rotegidos por senha para espectador</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="126"/>
         <source>Show only if spectators can ch&amp;at</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar apenas se espectadores puderem interagir com o chat</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="128"/>
         <source>Show only if spectators can see &amp;hands</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar apenas se as mãos forem visíveis para os espectadores</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="138"/>
         <source>Spectators</source>
-        <translation type="unfinished"/>
+        <translation>Espectadores</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="171"/>
@@ -1405,17 +1405,17 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="31"/>
         <source>Reset Password Challenge Warning</source>
-        <translation type="unfinished"/>
+        <translation>Aviso de redefinição de desafio de senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation type="unfinished"/>
+        <translation>Houve um problema. Por favor, tente solicitar uma nova senha novamente.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>Enter the information of the server and the account you&apos;d like to request a new password for.</source>
-        <translation type="unfinished"/>
+        <translation>Coloque a informação do servidor e a conta que você gostaria de solicitar uma nova senha.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="40"/>
@@ -1440,12 +1440,12 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="89"/>
         <source>Reset Password Challenge</source>
-        <translation type="unfinished"/>
+        <translation>Desafio de redefinir senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="97"/>
         <source>Reset Password Challenge Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro no desafio de redefinir senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="97"/>
@@ -1458,7 +1458,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="30"/>
         <source>Enter the information of the server you&apos;d like to request a new password for.</source>
-        <translation type="unfinished"/>
+        <translation>Coloque a informação do servidor que você gostaria de solicitar uma nova senha.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="33"/>
@@ -1478,12 +1478,12 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="66"/>
         <source>Reset Password Request</source>
-        <translation type="unfinished"/>
+        <translation>Pedido de redefinição de senha.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="74"/>
         <source>Reset Password Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro de redefinição de senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="74"/>
@@ -1496,17 +1496,17 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="31"/>
         <source>Reset Password Warning</source>
-        <translation type="unfinished"/>
+        <translation>Aviso de Redefinição de Senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation type="unfinished"/>
+        <translation>Um problema ocorreu. Por favor tente requisitar uma nova senha novamente.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="36"/>
         <source>Enter the received token and the new password in order to set your new password.</source>
-        <translation type="unfinished"/>
+        <translation>Insira o código recebido e a nova senha para definir sua nova senha.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="39"/>
@@ -1537,7 +1537,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="104"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Redefinir Senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
@@ -1550,7 +1550,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="122"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="131"/>
         <source>Reset Password Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro de Redefinição de Senha</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="117"/>
@@ -1565,12 +1565,12 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="128"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="128"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>Sua senha é muito curta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="131"/>
@@ -1617,7 +1617,8 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
         <location filename="../src/dlg_register.cpp" line="18"/>
         <source>Enter your information and the information of the server you'd like to register to.
 Your email will be used to verify your account.</source>
-        <translation type="unfinished"/>
+        <translation>Insira seus dados e os do servidor que você gostaria de se registrar.
+Seu e-mail será utilizado para verificar sua conta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="22"/>
@@ -1685,7 +1686,7 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="../src/dlg_register.cpp" line="361"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>Sua senha é muito curta.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="364"/>
@@ -1751,7 +1752,11 @@ Você gostaria de alterar o local da configuração de seu banco de dados?</tran
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>A base de dados não acabou de carregar
+
+Por favor, envie um ticket para https://github.com/Cockatrice/Cockatrice/issues com o arquivo cards.xml em anexo
+
+Gostaria de mudar a definição da localização da sua base de dados?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1384"/>
@@ -1778,7 +1783,11 @@ Você gostaria de alterar seu local de configuração de banco de dados?</transl
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Estado de carregamento de seu banco de dados de cartas desconhecido
+
+Por favor, crie um ticket em https://github.com/Cockatrice/Cockatrice/issues
+
+Você gostaria de alterar seu local de configuração do banco de dados?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1400"/>
@@ -1881,7 +1890,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="55"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>Procurar por atualizações do cliente</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="63"/>
@@ -2153,24 +2162,24 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="48"/>
         <source>&gt;1 day</source>
-        <translation type="unfinished"/>
+        <translation>&gt;1 dia</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/gamesmodel.cpp" line="57"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1%2 h</numerusform><numerusform>%1%2 h</numerusform><numerusform>%1%2 h</numerusform></translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="59"/>
         <source>new</source>
-        <translation type="unfinished"/>
+        <translation>novo</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/gamesmodel.cpp" line="62"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform></translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="158"/>
@@ -2254,12 +2263,12 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="145"/>
         <source>Reset all paths</source>
-        <translation type="unfinished"/>
+        <translation>Redefinir todos os diretórios</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="147"/>
         <source>All paths have been reset</source>
-        <translation type="unfinished"/>
+        <translation>Todos os caminhos para diretórios foram redefinidos</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="203"/>
@@ -2314,7 +2323,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Custom database directory:</source>
-        <translation type="unfinished"/>
+        <translation>Diretório do banco de dados de cartas customizadas</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="295"/>
@@ -2409,6 +2418,8 @@ Razão: %1</translation>
 All running games will be lost.
 Reason for shutdown: %1</source>
         <translation><numerusform>O servidor será reiniciado em %n minuto(s).
+Todos os jogos serão perdidos.
+Motivo para desligar: %1</numerusform><numerusform>O servidor será reiniciado em %n minuto(s).
 Todos os jogos serão perdidos.
 Motivo para desligar: %1</numerusform><numerusform>O servidor será reiniciado em %n minuto(s).
 Todos os jogos serão perdidos.
@@ -2843,7 +2854,7 @@ A versão local é %1 e a versão remota é %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="637"/>
         <source>&amp;Restore password...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Recuperar senha...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="638"/>
@@ -2919,12 +2930,12 @@ A versão local é %1 e a versão remota é %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="659"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Procurar por atualizações de cartas...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="660"/>
         <source>View &amp;Debug Log</source>
-        <translation type="unfinished"/>
+        <translation>Ver registro de &amp;depuração</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="888"/>
@@ -2994,6 +3005,8 @@ Do you want to enable it/them?</source>
         <translation><numerusform>%n nova coleção encontrada no repositório de cartas
 Código da coleção: %1
 Deseja ativá-la?</numerusform><numerusform>%n novas coleções encontradas no repositório de cartas
+Códigos das coleções: %1
+Deseja ativá-las?</numerusform><numerusform>%n novas coleções encontradas no repositório de cartas
 Códigos das coleções: %1
 Deseja ativá-las?</numerusform></translation>
     </message>
@@ -3114,7 +3127,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
         <location filename="../src/window_main.cpp" line="1336"/>
         <location filename="../src/window_main.cpp" line="1345"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Redefinir Senha</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1327"/>
@@ -3142,7 +3155,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="77"/>
         <source> from their graveyard</source>
-        <translation>do cemitério</translation>
+        <translation>do seu cemitério</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="79"/>
@@ -3162,7 +3175,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="88"/>
         <source>the top card of their library</source>
-        <translation>a carta do topo do grimório</translation>
+        <translation>a carta do topo do seu grimório</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="93"/>
@@ -3172,7 +3185,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="95"/>
         <source> from the top of their library</source>
-        <translation>do topo do grimório</translation>
+        <translation>do topo do seu grimório</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="101"/>
@@ -3182,7 +3195,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="103"/>
         <source>the bottom card of their library</source>
-        <translation>a carta do fundo do grimório</translation>
+        <translation>a carta do fundo do seu grimório</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="108"/>
@@ -3192,7 +3205,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="110"/>
         <source> from the bottom of their library</source>
-        <translation>do fundo do grimório</translation>
+        <translation>do fundo do seu grimório</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="115"/>
@@ -3202,7 +3215,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="117"/>
         <source> from their library</source>
-        <translation>do grimório</translation>
+        <translation>do seu grimório</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="121"/>
@@ -3227,12 +3240,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="157"/>
         <source>%1 can now look at top card %2 at any time.</source>
-        <translation type="unfinished"/>
+        <translation>%1 agora pode olhar a carta do topo de %2 a qualquer momento.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="158"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
-        <translation type="unfinished"/>
+        <translation>%1 não pode mais olhar a carta do topo de %2 a qualquer momento.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="165"/>
@@ -3332,7 +3345,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 puts %2 into play%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 coloca %2 em jogo%3 com a face voltada para baixo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="330"/>
@@ -3352,7 +3365,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="337"/>
         <source>%1 moves %2%3 to their hand.</source>
-        <translation>%1 moveu %2%3 para mão dele.</translation>
+        <translation>%1 moveu %2%3 para sua mão.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="340"/>
@@ -3362,7 +3375,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="342"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
-        <translation type="unfinished"/>
+        <translation>%1 coloca %2%3 no fundo de seu grimório.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="344"/>
@@ -3387,7 +3400,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="371"/>
         <source>%1 draws %2 card(s).</source>
-        <translation><numerusform>%1 comprou %2 carta(s).</numerusform><numerusform>%1 comprou %2 carta(s).</numerusform></translation>
+        <translation><numerusform>%1 comprou %2 carta(s).</numerusform><numerusform>%1 comprou %2 carta(s).</numerusform><numerusform>%1 comprou %2 carta(s).</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="380"/>
@@ -3398,7 +3411,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
         <location filename="../src/messagelogwidget.cpp" line="385"/>
         <source>%1 is looking at the top %3 card(s) %2.</source>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation><numerusform>%1 está olhando %3 carta %2</numerusform><numerusform>%1 está olhando as %3 carta(s) %2</numerusform></translation>
+        <translation><numerusform>%1 está olhando %3 carta %2</numerusform><numerusform>%1 está olhando as %3 carta(s) %2</numerusform><numerusform>%1 está olhando as %3 carta(s) %2</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="396"/>
@@ -3453,7 +3466,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
-        <translation><numerusform>%1 embaralhou seu grimório e comprou uma nova mão com %2 card.</numerusform><numerusform>%1 embaralhou seu grimório e comprou uma nova mão com %2 cards.</numerusform></translation>
+        <translation><numerusform>%1 embaralhou seu grimório e comprou uma nova mão com %2 card.</numerusform><numerusform>%1 embaralhou seu grimório e comprou uma nova mão com %2 cards.</numerusform><numerusform>%1 embaralhou seu grimório e comprou uma nova mão com %2 cards.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="460"/>
@@ -3480,7 +3493,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
         <location filename="../src/messagelogwidget.cpp" line="498"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
-        <translation><numerusform>%1 carta</numerusform><numerusform>%1 carta(s)</numerusform></translation>
+        <translation><numerusform>%1 carta</numerusform><numerusform>%1 carta(s)</numerusform><numerusform>%1 carta(s)</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="506"/>
@@ -3580,17 +3593,17 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="617"/>
         <source>red counter(s)</source>
-        <translation><numerusform>marcador(es) vermelho(s)</numerusform><numerusform>marcador(es) vermelho(s)</numerusform></translation>
+        <translation><numerusform>marcador(es) vermelho(s)</numerusform><numerusform>marcador(es) vermelho(s)</numerusform><numerusform>marcador(es) vermelho(s)</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="620"/>
         <source>yellow counter(s)</source>
-        <translation><numerusform>marcador(es) amarelo(s)</numerusform><numerusform>marcador(es) amarelo(s)</numerusform></translation>
+        <translation><numerusform>marcador(es) amarelo(s)</numerusform><numerusform>marcador(es) amarelo(s)</numerusform><numerusform>marcador(es) amarelo(s)</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="623"/>
         <source>green counter(s)</source>
-        <translation><numerusform>marcador(es) verde(s)</numerusform><numerusform>marcador(es) verde(s)</numerusform></translation>
+        <translation><numerusform>marcador(es) verde(s)</numerusform><numerusform>marcador(es) verde(s)</numerusform><numerusform>marcador(es) verde(s)</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
@@ -3698,17 +3711,17 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>Add New Message</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar nova mensagem</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="864"/>
         <source>Edit Message</source>
-        <translation type="unfinished"/>
+        <translation>Editar mensagem</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="868"/>
         <source>Remove Message</source>
-        <translation type="unfinished"/>
+        <translation>Remover mensagem</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="953"/>
@@ -3804,7 +3817,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/game_specific_terms.h" line="31"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valor de Mana</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="33"/>
@@ -3982,7 +3995,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="609"/>
         <source>Reveal top cards of library</source>
-        <translation>Revelar os cards do topo do grimório</translation>
+        <translation>Revelar cartas do topo do grimório</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="610"/>
@@ -4376,12 +4389,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="2707"/>
         <source>Which position should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>Em que posição esta carta deve ser colocada:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2707"/>
         <source>(max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>(máx. %1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1120"/>
@@ -4412,102 +4425,102 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>Reveal &amp;top cards to...</source>
-        <translation type="unfinished"/>
+        <translation>Revelar as cartas do &amp;topo para...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="732"/>
         <source>&amp;Top of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Topo do grimório...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="733"/>
         <source>&amp;Bottom of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Fundo do grimório...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="735"/>
         <source>&amp;Always look at top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Sempre olhar a carta do topo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="736"/>
         <source>&amp;Open deck in deck editor</source>
-        <translation type="unfinished"/>
+        <translation>Abrir no edit&amp;or de decks</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="744"/>
         <source>&amp;Play top card</source>
-        <translation type="unfinished"/>
+        <translation>Jogar a carta do to&amp;po</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="752"/>
         <source>&amp;Draw bottom card</source>
-        <translation type="unfinished"/>
+        <translation>Comprar carta do fun&amp;do</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="753"/>
         <source>D&amp;raw bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>Comprar cartas do fu&amp;ndo...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="754"/>
         <source>&amp;Play bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Jogar carta do fundo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="755"/>
         <source>Play bottom card &amp;face down</source>
-        <translation type="unfinished"/>
+        <translation>Jogar carta do fundo com a &amp;face voltada para baixo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="756"/>
         <source>Move bottom card to grave&amp;yard</source>
-        <translation type="unfinished"/>
+        <translation>Mover a carta do fundo para o cem&amp;itério</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="757"/>
         <source>Move bottom card to e&amp;xile</source>
-        <translation type="unfinished"/>
+        <translation>Mover a carta do fundo para o e&amp;xílio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="758"/>
         <source>Move bottom cards to &amp;graveyard...</source>
-        <translation type="unfinished"/>
+        <translation>Mover as cartas do fundo para &amp;cemitério</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="759"/>
         <source>Move bottom cards to &amp;exile...</source>
-        <translation type="unfinished"/>
+        <translation>Mover as cartas do fundo para o &amp;exílio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="760"/>
         <source>Put bottom card on &amp;top</source>
-        <translation type="unfinished"/>
+        <translation>Colocar carta do fundo no &amp;topo</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="781"/>
         <source>Selec&amp;ted cards</source>
-        <translation type="unfinished"/>
+        <translation>Cartas &amp;selecionadas</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1250"/>
         <source>Move top cards to exile</source>
-        <translation>Mover os cards do topo para o exílio</translation>
+        <translation>Mover as cartas do topo para o exílio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1361"/>
         <source>Move bottom cards to grave</source>
-        <translation type="unfinished"/>
+        <translation>Mover as cartas do fundo para o cemitério</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1393"/>
         <source>Move bottom cards to exile</source>
-        <translation type="unfinished"/>
+        <translation>Mover as cartas do fundo para o exílio</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1454"/>
         <source>Draw bottom cards</source>
-        <translation type="unfinished"/>
+        <translation>Comprar cards do fundo do grimório</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1528"/>
@@ -5313,7 +5326,7 @@ Você deseja salvar as alterações?</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="805"/>
         <source>Could not save remote deck</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível salvar o deck remoto</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="827"/>
@@ -5388,12 +5401,12 @@ Por favor, verifique se a pasta não é somente leitura e tente novamente.</tran
         <location filename="../src/tab_deck_storage.cpp" line="187"/>
         <location filename="../src/tab_deck_storage.cpp" line="219"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="187"/>
         <source>Invalid deck file</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo de deck inválido</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="194"/>
@@ -5415,7 +5428,7 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="219"/>
         <source>Failed to upload deck to server</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao enviar deck ao servidor</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="235"/>
@@ -5552,7 +5565,7 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="551"/>
         <source>&amp;Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Focar no chat</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="554"/>
@@ -5623,12 +5636,12 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="1209"/>
         <source>A player has joined game #%1</source>
-        <translation type="unfinished"/>
+        <translation>Um jogador entrou no jogo #%1</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1210"/>
         <source>%1 has joined the game</source>
-        <translation type="unfinished"/>
+        <translation>%1 entrou no jogo</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1221"/>
@@ -5910,7 +5923,7 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="../src/tab_replays.cpp" line="200"/>
         <source>Folder download is not yet supported. Please download replays individually.</source>
-        <translation type="unfinished"/>
+        <translation>Baixar pastas ainda não é suportado. Por favor baixe os replays individualmente.</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="268"/>
@@ -5989,22 +6002,22 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="../src/tab_server.cpp" line="210"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao entrar na sala: ela não existe no servidor.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="215"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
-        <translation type="unfinished"/>
+        <translation>O servidor pensa que você está na sala, mas seu cliente não consegue exibi-la. Tente reiniciar o seu cliente.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="220"/>
         <source>You do not have the required permission to join this server room.</source>
-        <translation type="unfinished"/>
+        <translation>Você não tem permissão para entrar nesta sala.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="225"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao entrar na sala devido a um erro desconhecido: %1.</translation>
     </message>
 </context>
 <context>
@@ -6027,7 +6040,7 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="../src/tab_supervisor.cpp" line="601"/>
         <source>Your buddy %1 has signed on!</source>
-        <translation type="unfinished"/>
+        <translation>Seu amigo %1 entrou no servidor!</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="642"/>
@@ -6260,7 +6273,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/user_context_menu.cpp" line="70"/>
         <source>Promote user to &amp;judge</source>
-        <translation type="unfinished"/>
+        <translation>Promover usuário a &amp;juiz</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="71"/>
@@ -6351,12 +6364,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/user_context_menu.cpp" line="316"/>
         <source>Copy hash to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copiar hash para área de transferência</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="336"/>
         <source>Remove this user&apos;s messages</source>
-        <translation type="unfinished"/>
+        <translation>Remover mensagens deste usuário</translation>
     </message>
 </context>
 <context>
@@ -6420,7 +6433,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/userinfobox.cpp" line="309"/>
         <source>The entered password does not match your account.</source>
-        <translation type="unfinished"/>
+        <translation>A senha inserida não coincide com de sua conta.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="302"/>
@@ -6451,46 +6464,46 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/userinfobox.cpp" line="66"/>
         <source>User Information</source>
-        <translation type="unfinished"/>
+        <translation>Informação do usuário</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="73"/>
         <source>Real Name:</source>
-        <translation type="unfinished"/>
+        <translation>Nome real:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="75"/>
         <source>User Level:</source>
-        <translation type="unfinished"/>
+        <translation>Nível do usuário:</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/userinfobox.cpp" line="150"/>
         <source>%n Year(s), </source>
         <comment>amount of years (only shown if more than 0)</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%n ano(s),</numerusform><numerusform>%n ano(s),</numerusform><numerusform>%n ano(s),</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/userinfobox.cpp" line="153"/>
         <source>%10%n Day(s) %20</source>
         <comment>amount of years (if more than 0), amount of days, date in local short format</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%10%n dia(s) %20</numerusform><numerusform>%10%n dia(s) %20</numerusform><numerusform>%10%n dia(s) %20</numerusform></translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="211"/>
         <source>Enter Password</source>
-        <translation type="unfinished"/>
+        <translation>Insira a senha</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="212"/>
         <source>Password verification is required in order to change your email address</source>
-        <translation type="unfinished"/>
+        <translation>Uma verificação de senha é obrigatória para alterar seu endereço de e-mail</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="253"/>
         <location filename="../src/userinfobox.cpp" line="314"/>
         <location filename="../src/userinfobox.cpp" line="337"/>
         <source>An error occurred while trying to update your user information.</source>
-        <translation type="unfinished"/>
+        <translation>Ocorreu um erro ao tentar atualizar suas informações de usuário.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="306"/>
@@ -6558,7 +6571,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/dlg_settings.cpp" line="514"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
-        <translation type="unfinished"/>
+        <translation>Usar menus tear-off, permitindo que menus de clique com botão direito persistam na tela</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="515"/>
@@ -6578,7 +6591,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/dlg_settings.cpp" line="518"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
-        <translation type="unfinished"/>
+        <translation>Notificar na barra de tarefas quando usuários na sua lista de amigos se conectar</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="519"/>
@@ -6624,7 +6637,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/userlist.cpp" line="142"/>
         <source>Redact all messages from this user in all rooms</source>
-        <translation type="unfinished"/>
+        <translation>Remover todas mensagens deste usuário em todas salas</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="144"/>
@@ -6723,23 +6736,23 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="132"/>
         <source>Use CTRL+A to select all sets in the view.</source>
-        <translation type="unfinished"/>
+        <translation>Use CTRL+A para selecionar todas expansões visíveis.</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="133"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor.</source>
-        <translation type="unfinished"/>
+        <translation>Apenas cartas em expansões ativadas irão aparecer na lista de cartas do editor de deck.</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="134"/>
         <source>Image priority is decided in the following order:</source>
-        <translation type="unfinished"/>
+        <translation>Prioridade da imagem é decidida na seguinte ordem:</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="135"/>
         <source>first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)</source>
         <comment>%1 is a link to the wiki</comment>
-        <translation type="unfinished"/>
+        <translation>primeiro a pasta de PERSONALIDADAS (%1), depois as expansões habilitadas neste diálogo (de cima para baixo)</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="134"/>
@@ -6852,12 +6865,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="44"/>
         <source>Card Counters</source>
-        <translation type="unfinished"/>
+        <translation>Marcadores de carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="46"/>
         <source>Player Counters</source>
-        <translation type="unfinished"/>
+        <translation>Marcadores de jogador</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="48"/>
@@ -6917,12 +6930,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="70"/>
         <source>Load Deck from Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Carregar deck da área de transferência</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="140"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Procurar por atualizações de cartas...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="143"/>
@@ -6992,12 +7005,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="183"/>
         <source>Manage Sets...</source>
-        <translation type="unfinished"/>
+        <translation>Gerenciar expansões...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="186"/>
         <source>Edit Custom Tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Editar fichas customizadas...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="189"/>
@@ -7017,7 +7030,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="199"/>
         <source>Load Deck from Clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Carregar deck da área de transferência...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="202"/>
@@ -7027,7 +7040,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="206"/>
         <source>Open Custom Pictures Folder</source>
-        <translation type="unfinished"/>
+        <translation>Abrir pasta de imagens customizadas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="209"/>
@@ -7037,13 +7050,13 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="212"/>
         <source>Delete Card</source>
-        <translation type="unfinished"/>
+        <translation>Deletar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="215"/>
         <location filename="../src/shortcutssettings.h" line="580"/>
         <source>Reset Layout</source>
-        <translation type="unfinished"/>
+        <translation>Redefinir layout</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="218"/>
@@ -7058,173 +7071,173 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="225"/>
         <source>Save Deck to Clipboard, Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Salvar deck na área de transferência, anotado</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="229"/>
         <source>Save Deck to Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Salvar deck na área de transferência</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="232"/>
         <source>Load Local Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Carregar deck local...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="235"/>
         <source>Load Remote Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Carregar deck remoto...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="238"/>
         <source>Set Ready to Start</source>
-        <translation type="unfinished"/>
+        <translation>Preparade para começar</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="242"/>
         <source>Toggle Sideboard Lock</source>
-        <translation type="unfinished"/>
+        <translation>Alternar trava de sideboard</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="245"/>
         <location filename="../src/shortcutssettings.h" line="317"/>
         <source>Add Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador verde</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="248"/>
         <location filename="../src/shortcutssettings.h" line="320"/>
         <source>Remove Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador verde</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="251"/>
         <location filename="../src/shortcutssettings.h" line="323"/>
         <source>Set Green Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores verde...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="254"/>
         <source>Add Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador amarelo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="257"/>
         <source>Remove Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador amarelo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="260"/>
         <source>Set Yellow Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores amarelos...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="263"/>
         <location filename="../src/shortcutssettings.h" line="308"/>
         <source>Add Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador vermelho</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="266"/>
         <location filename="../src/shortcutssettings.h" line="311"/>
         <source>Remove Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador vermelho</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="269"/>
         <location filename="../src/shortcutssettings.h" line="314"/>
         <source>Set Red Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores vermelhos</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="272"/>
         <source>Add Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar ponto de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="275"/>
         <source>Remove Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover ponto de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="278"/>
         <source>Set Life Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir pontos de vida...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="281"/>
         <source>Add White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador branco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="284"/>
         <source>Remove White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador branco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="287"/>
         <source>Set White Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores brancos...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="290"/>
         <source>Add Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador azul</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="293"/>
         <source>Remove Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador azul</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="296"/>
         <source>Set Blue Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores azul</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="299"/>
         <source>Add Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador preto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="302"/>
         <source>Remove Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador preto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="305"/>
         <source>Set Black Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores pretos...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="326"/>
         <source>Add Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador incolor</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="329"/>
         <source>Remove Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador incolor</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="332"/>
         <source>Set Colorless Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores incolor...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="335"/>
         <source>Add Other Counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar outro marcador</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="338"/>
         <source>Remove Other Counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover outro marcador</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="341"/>
         <source>Set Other Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Definir outros marcadores...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="344"/>
@@ -7269,12 +7282,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="368"/>
         <source>Set Power and Toughness...</source>
-        <translation type="unfinished"/>
+        <translation>Definir poder e resistência...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="371"/>
         <source>Reset Power and Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Redefinir poder e resistência</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="374"/>
@@ -7339,7 +7352,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="404"/>
         <source>Next Phase Action</source>
-        <translation type="unfinished"/>
+        <translation>Ação de Próxima Etapa</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="407"/>
@@ -7359,17 +7372,17 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="416"/>
         <source>Toggle Untap</source>
-        <translation type="unfinished"/>
+        <translation>Alternar modo de desvirar</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="419"/>
         <source>Turn Card Over</source>
-        <translation type="unfinished"/>
+        <translation>Virar carta para cima</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="422"/>
         <source>Peek Card</source>
-        <translation type="unfinished"/>
+        <translation>Olhar carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="425"/>
@@ -7379,12 +7392,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="428"/>
         <source>Attach Card...</source>
-        <translation type="unfinished"/>
+        <translation>Anexar carta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="431"/>
         <source>Unattach Card</source>
-        <translation type="unfinished"/>
+        <translation>Desanexar carta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="434"/>
@@ -7399,7 +7412,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="440"/>
         <source>Create All Related Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Criar todas as fichas relacionadas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="443"/>
@@ -7409,7 +7422,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="446"/>
         <source>Set Annotation...</source>
-        <translation type="unfinished"/>
+        <translation>Definir anotação</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="449"/>
@@ -7450,7 +7463,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
         <location filename="../src/shortcutssettings.h" line="489"/>
         <location filename="../src/shortcutssettings.h" line="507"/>
         <source>Battlefield, Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Campo de batalha, Voltada para baixo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="466"/>
@@ -7470,55 +7483,55 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="480"/>
         <source>Top Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Cartas do topo do grimório</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="483"/>
         <source>Close Recent View</source>
-        <translation type="unfinished"/>
+        <translation>Fechar visualização recente</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="486"/>
         <location filename="../src/shortcutssettings.h" line="506"/>
         <source>Stack</source>
-        <translation type="unfinished"/>
+        <translation>Pilha</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="494"/>
         <location filename="../src/shortcutssettings.h" line="513"/>
         <source>Graveyard (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Cemitério (Vários)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="499"/>
         <location filename="../src/shortcutssettings.h" line="518"/>
         <source>Exile (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Exílio (Vários)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="524"/>
         <source>Draw Bottom Card</source>
-        <translation type="unfinished"/>
+        <translation>Comprar carta do fundo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="527"/>
         <source>Draw Multiple Cards from Bottom...</source>
-        <translation type="unfinished"/>
+        <translation>Comprar várias cartas do fundo...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="530"/>
         <source>Draw Arrow...</source>
-        <translation type="unfinished"/>
+        <translation>Desenhar seta...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="533"/>
         <source>Remove Local Arrows</source>
-        <translation type="unfinished"/>
+        <translation>Remover setas locais</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="536"/>
         <source>Leave Game</source>
-        <translation type="unfinished"/>
+        <translation>Sair do jogo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="540"/>
@@ -7528,12 +7541,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="541"/>
         <source>Roll Dice...</source>
-        <translation type="unfinished"/>
+        <translation>Rolar dados...</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="544"/>
         <source>Shuffle Library</source>
-        <translation type="unfinished"/>
+        <translation>Embaralhar grimório</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="547"/>
@@ -7543,52 +7556,52 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="550"/>
         <source>Draw a Card</source>
-        <translation type="unfinished"/>
+        <translation>Comprar uma carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="553"/>
         <source>Draw Multiple Cards...</source>
-        <translation type="unfinished"/>
+        <translation>Comprar várias cartas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="556"/>
         <source>Undo Draw</source>
-        <translation type="unfinished"/>
+        <translation>Desfazer compra</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="559"/>
         <source>Always Reveal Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Sempre revelar a carta do topo do grimório</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="562"/>
         <source>Always Look At Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Sempre olhar para a carta do topo do grimório</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="565"/>
         <source>Rotate View Clockwise</source>
-        <translation type="unfinished"/>
+        <translation>Rotacionar visão no sentido horário</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="568"/>
         <source>Rotate View Counterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Rotacionar visão no sentido anti-horário</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="571"/>
         <source>Unfocus Text Box</source>
-        <translation type="unfinished"/>
+        <translation>Desfocar caixa de texto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="574"/>
         <source>Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>Focar no chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="577"/>
         <source>Clear Chat</source>
-        <translation type="unfinished"/>
+        <translation>Limpar chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="583"/>
