@@ -153,7 +153,16 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     QStringList disallowedWords = disallowedWordsStr.split(",", QString::SkipEmptyParts);
 #endif
     disallowedWords.removeDuplicates();
-    QString disallowedRegExpStr = settingsCache->value("users/disallowedregexp", "").toString();
+    QVariant displayDisallowedWords = settingsCache->value("users/displaydisallowedwords");
+    QString disallowedRegExpStr;
+    if (displayDisallowedWords.isValid()) {
+        disallowedWordsStr = displayDisallowedWords.toString().trimmed();
+        if (!disallowedWordsStr.isEmpty()) {
+            disallowedWordsStr.prepend("\n");
+        }
+    } else {
+        disallowedRegExpStr = settingsCache->value("users/disallowedregexp", "").toString();
+    }
 
     error = QString("%1|%2|%3|%4|%5|%6|%7|%8|%9")
                 .arg(minNameLength)

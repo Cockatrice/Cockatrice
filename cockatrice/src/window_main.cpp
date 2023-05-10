@@ -476,9 +476,22 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
                "</li>";
 
         if (rules.size() == 9) {
-            if (rules.at(7).size() > 0)
-                out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) +
-                       "</li>";
+            if (rules.at(7).size() > 0) {
+                QString words = rules.at(7).toHtmlEscaped();
+                if (words.startsWith("\n")) {
+                    out += tr("no unacceptable language as specified by these server rules:",
+                              "note that the following lines will not be translated");
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+                    for (QString &line : words.split("\n", Qt::SkipEmptyParts)) {
+#else
+                    for (QString &line : words.split("\n", QString::SkipEmptyParts)) {
+#endif
+                        out += "<li>" + line + "</li>";
+                    }
+                } else {
+                    out += "<li>" + tr("can not contain any of the following words: %1").arg(words) + "</li>";
+                }
+            }
 
             if (rules.at(8).size() > 0)
                 out += "<li>" +
