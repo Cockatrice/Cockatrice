@@ -6,41 +6,54 @@ export const ACTIONS = {
 }
 
 export const initialState = {
-  toasts: new Map()
+  toasts: {}
 }
 
-export function reducer(state, action) {
-  const { type, payload } = action
+export function reducer(state, { type, payload }) {
+  const { key, children } = payload;
+
   switch (type) {
     case ACTIONS.ADD_TOAST: {
-      const newState = { ...state }
-      newState.toasts = new Map(Array.from(state.toasts))
-      const { toasts } = newState;
-      const { key, children } = payload
-      toasts.set(key, { isOpen: false, children })
-      return newState
+      return {
+        ...state,
+        toasts: {
+          ...state.toasts,
+          [key]: {
+            isOpen: false,
+            children,
+          },
+        },
+      };
     }
     case ACTIONS.OPEN_TOAST: {
-      const newState = { ...state }
-      newState.toasts = new Map(Array.from(state.toasts))
-      const { toasts } = newState;
-      const toast = toasts.get(payload)
-      toasts.set(payload, { isOpen: true, children: toast.children })
-      return newState
+      return {
+        ...state,
+        toasts: {
+          ...state.toasts,
+          [key]: {
+            ...state.toasts[key],
+            isOpen: true,
+          },
+        },
+      };
     }
     case ACTIONS.CLOSE_TOAST: {
-      const newState = { ...state }
-      newState.toasts = new Map(Array.from(state.toasts))
-      const { toasts } = newState;
-      const toast = toasts.get(payload)
-      toasts.set(payload, { isOpen: false, children: toast.children })
-      return newState
+      return {
+        ...state,
+        toasts: {
+          ...state.toasts,
+          [key]: {
+            ...state.toasts[key],
+            isOpen: false,
+          },
+        },
+      };
     }
     case ACTIONS.REMOVE_TOAST: {
-      const newState = { ...state }
-      newState.toasts = new Map(Array.from(state.toasts))
-      newState.toasts.delete(payload)
-      return newState
+      const newState = { ...state };
+      delete newState.toasts[key];
+
+      return newState;
     }
     default:
       throw Error('Please pick an available action')

@@ -41,8 +41,8 @@ albeit slightly less active.
 
 We use a separate job on the CI to check your code for formatting issues. If
 your pull request failed the test, you can check the output on the checks tab.
-It's the first job called "linter", you can click the "Run clangify" step to
-see the output of the test.
+It's the first job called "linter", you can click the "Check code formatting"
+step to see the output of the test.
 
 The message will look like this:
 ```
@@ -50,7 +50,7 @@ The message will look like this:
 ***                                                     ***
 ***   Your code does not comply with our style guide.   ***
 ***                                                     ***
-***  Please correct it or run the "clangify.sh" script. ***
+***   Please correct it or run the "format.sh" script.  ***
 ***  Then commit and push those changes to this branch. ***
 ***   Check our CONTRIBUTING.md file for more details.  ***
 ***                                                     ***
@@ -81,9 +81,9 @@ The handy tool `clang-format` can format your code for you, it is available for
 almost any environment. A special `.clang-format` configuration file is
 included in the project and is used to format your code.
 
-We've also included a bash script, `clangify.sh`, that will use clang-format to
-format all files in your pr in one go. Use `./clangify.sh --help` to show a
-full help page.
+We've also included a bash script, `format.sh`, that will use clang-format to
+format all files in your pr in one go. Use `./format.sh --help` to show a full
+help page.
 
 To run clang-format on a single source file simply use the command
 `clang-format -i <filename>` to format it in place. (Some systems install

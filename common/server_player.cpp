@@ -337,7 +337,11 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
     ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
     ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 
-    revealTopCardIfNeeded(deckZone, ges);
+    if (number > 0) {
+        revealTopCardIfNeeded(deckZone, ges);
+        int currentKnownCards = deckZone->getCardsBeingLookedAt();
+        deckZone->setCardsBeingLookedAt(currentKnownCards - number);
+    }
 
     return Response::RespOk;
 }
@@ -350,7 +354,7 @@ void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorag
     if (zone->getAlwaysRevealTopCard()) {
         Event_RevealCards revealEvent;
         revealEvent.set_zone_name(zone->getName().toStdString());
-        revealEvent.set_card_id(0);
+        revealEvent.add_card_id(0);
         zone->getCards().first()->getInfo(revealEvent.add_cards());
 
         ges.enqueueGameEvent(revealEvent, playerId);
@@ -366,10 +370,40 @@ void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorag
         Event_RevealCards revealEvent;
         revealEvent.set_zone_name(zone->getName().toStdString());
         revealEvent.set_number_of_cards(1);
-        revealEvent.set_card_id(0);
+        revealEvent.add_card_id(0);
         zone->getCards().first()->getInfo(revealEvent.add_cards());
         ges.enqueueGameEvent(revealEvent, playerId, GameEventStorageItem::SendToPrivate, playerId);
     }
+}
+
+static Event_CreateToken makeCreateTokenEvent(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord)
+{
+    Event_CreateToken event;
+    event.set_zone_name(zone->getName().toStdString());
+    event.set_card_id(card->getId());
+    event.set_card_name(card->getName().toStdString());
+    event.set_color(card->getColor().toStdString());
+    event.set_pt(card->getPT().toStdString());
+    event.set_annotation(card->getAnnotation().toStdString());
+    event.set_destroy_on_zone_change(card->getDestroyOnZoneChange());
+    event.set_x(xCoord);
+    event.set_y(yCoord);
+    return event;
+}
+
+static Event_AttachCard makeAttachCardEvent(Server_Card *attachedCard, Server_Card *parentCard = nullptr)
+{
+    Event_AttachCard event;
+    event.set_start_zone(attachedCard->getZone()->getName().toStdString());
+    event.set_card_id(attachedCard->getId());
+
+    if (parentCard) {
+        event.set_target_player_id(parentCard->getZone()->getPlayer()->getPlayerId());
+        event.set_target_zone(parentCard->getZone()->getName().toStdString());
+        event.set_target_card_id(parentCard->getId());
+    }
+
+    return event;
 }
 
 Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
@@ -481,8 +515,19 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             event.set_card_id(static_cast<google::protobuf::uint32>(card->getId()));
             ges.enqueueGameEvent(event, playerId);
 
-            card->deleteLater();
-        } else {
+            if (Server_Card *stashedCard = card->takeStashedCard()) {
+                stashedCard->setId(newCardId());
+                ges.enqueueGameEvent(makeCreateTokenEvent(startzone, stashedCard, card->getX(), card->getY()),
+                                     playerId);
+                card->deleteLater();
+                card = stashedCard;
+            } else {
+                card->deleteLater();
+                card = nullptr;
+            }
+        }
+
+        if (card) {
             ++xIndex;
             int newX = xCoord + xIndex;
 
@@ -618,10 +663,7 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
     Server_Card *parentCard = card->getParentCard();
     card->setParentCard(nullptr);
 
-    Event_AttachCard event;
-    event.set_start_zone(zone->getName().toStdString());
-    event.set_card_id(card->getId());
-    ges.enqueueGameEvent(event, playerId);
+    ges.enqueueGameEvent(makeAttachCardEvent(card), playerId);
 
     auto *cardToMove = new CardToMove;
     cardToMove->set_card_id(card->getId());
@@ -1276,13 +1318,7 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
             delete cardToMove;
         }
 
-        Event_AttachCard event;
-        event.set_start_zone(startzone->getName().toStdString());
-        event.set_card_id(card->getId());
-        event.set_target_player_id(targetPlayer->getPlayerId());
-        event.set_target_zone(targetzone->getName().toStdString());
-        event.set_target_card_id(targetCard->getId());
-        ges.enqueueGameEvent(event, playerId);
+        ges.enqueueGameEvent(makeAttachCardEvent(card, targetCard), playerId);
 
         startzone->fixFreeSpaces(ges);
     } else {
@@ -1311,9 +1347,40 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         return Response::RespNameNotFound;
     }
 
-    QString cardName = nameFromStdString(cmd.card_name());
     int xCoord = cmd.x();
     int yCoord = cmd.y();
+
+    Server_Card *targetCard = nullptr;
+    if (cmd.has_target_card_id()) {
+        Server_CardZone *targetZone = zones.value(nameFromStdString(cmd.target_zone()));
+        if (targetZone) {
+            targetCard = targetZone->getCard(cmd.target_card_id());
+            if (targetCard && cmd.target_mode() == Command_CreateToken::TRANSFORM_INTO) {
+                if (targetCard->getParentCard()) {
+                    ges.enqueueGameEvent(makeAttachCardEvent(targetCard), playerId);
+                }
+
+                for (Server_Card *attachedCard : targetCard->getAttachedCards()) {
+                    ges.enqueueGameEvent(makeAttachCardEvent(attachedCard),
+                                         attachedCard->getZone()->getPlayer()->getPlayerId());
+                }
+
+                if (zone->hasCoords() && zone == targetZone) {
+                    xCoord = targetCard->getX();
+                    yCoord = targetCard->getY();
+                }
+
+                targetZone->removeCard(targetCard);
+
+                Event_DestroyCard event;
+                event.set_zone_name(targetZone->getName().toStdString());
+                event.set_card_id(static_cast<::google::protobuf::uint32>(cmd.target_card_id()));
+                ges.enqueueGameEvent(event, playerId);
+            }
+        }
+    }
+
+    QString cardName = nameFromStdString(cmd.card_name());
     if (zone->hasCoords()) {
         xCoord = zone->getFreeGridColumn(xCoord, yCoord, cardName, false);
     }
@@ -1332,33 +1399,89 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     card->setDestroyOnZoneChange(cmd.destroy_on_zone_change());
 
     zone->insertCard(card, xCoord, yCoord);
-
-    Event_CreateToken event;
-    event.set_zone_name(zone->getName().toStdString());
-    event.set_card_id(card->getId());
-    event.set_card_name(card->getName().toStdString());
-    event.set_color(card->getColor().toStdString());
-    event.set_pt(card->getPT().toStdString());
-    event.set_annotation(card->getAnnotation().toStdString());
-    event.set_destroy_on_zone_change(card->getDestroyOnZoneChange());
-    event.set_x(xCoord);
-    event.set_y(yCoord);
-    ges.enqueueGameEvent(event, playerId);
+    ges.enqueueGameEvent(makeCreateTokenEvent(zone, card, xCoord, yCoord), playerId);
 
     // check if the token is a replacement for an existing card
-    if (cmd.target_card_id() < 0) {
+    if (!targetCard) {
         return Response::RespOk;
     }
 
-    Command_AttachCard cmd2;
-    cmd2.set_start_zone(cmd.target_zone());
-    cmd2.set_card_id(cmd.target_card_id());
+    switch (cmd.target_mode()) {
+        case Command_CreateToken::ATTACH_TO: {
+            Command_AttachCard cmd2;
+            cmd2.set_start_zone(cmd.target_zone());
+            cmd2.set_card_id(cmd.target_card_id());
 
-    cmd2.set_target_player_id(zone->getPlayer()->getPlayerId());
-    cmd2.set_target_zone(cmd.zone());
-    cmd2.set_target_card_id(card->getId());
+            cmd2.set_target_player_id(zone->getPlayer()->getPlayerId());
+            cmd2.set_target_zone(cmd.zone());
+            cmd2.set_target_card_id(card->getId());
 
-    return cmdAttachCard(cmd2, rc, ges);
+            return cmdAttachCard(cmd2, rc, ges);
+        }
+
+        case Command_CreateToken::TRANSFORM_INTO: {
+            // Copy attributes that are not present in the CreateToken event
+            Event_SetCardAttr event;
+            event.set_zone_name(card->getZone()->getName().toStdString());
+            event.set_card_id(card->getId());
+
+            if (card->getTapped() != targetCard->getTapped()) {
+                card->setAttribute(AttrTapped, QVariant(targetCard->getTapped()).toString(), &event);
+                ges.enqueueGameEvent(event, playerId);
+            }
+
+            if (card->getAttacking() != targetCard->getAttacking()) {
+                card->setAttribute(AttrAttacking, QVariant(targetCard->getAttacking()).toString(), &event);
+                ges.enqueueGameEvent(event, playerId);
+            }
+
+            if (card->getFaceDown() != targetCard->getFaceDown()) {
+                card->setAttribute(AttrFaceDown, QVariant(targetCard->getFaceDown()).toString(), &event);
+                ges.enqueueGameEvent(event, playerId);
+            }
+
+            if (card->getDoesntUntap() != targetCard->getDoesntUntap()) {
+                card->setAttribute(AttrDoesntUntap, QVariant(targetCard->getDoesntUntap()).toString(), &event);
+                ges.enqueueGameEvent(event, playerId);
+            }
+
+            // Copy counters
+            QMapIterator<int, int> i(targetCard->getCounters());
+            while (i.hasNext()) {
+                i.next();
+
+                Event_SetCardCounter event;
+                event.set_zone_name(card->getZone()->getName().toStdString());
+                event.set_card_id(card->getId());
+
+                card->setCounter(i.key(), i.value(), &event);
+                ges.enqueueGameEvent(event, playerId);
+            }
+
+            // Copy parent card
+            if (Server_Card *parentCard = targetCard->getParentCard()) {
+                targetCard->setParentCard(nullptr);
+                card->setParentCard(parentCard);
+
+                ges.enqueueGameEvent(makeAttachCardEvent(card, parentCard), playerId);
+            }
+
+            // Copy attachments
+            while (!targetCard->getAttachedCards().isEmpty()) {
+                Server_Card *attachedCard = targetCard->getAttachedCards().last();
+                attachedCard->setParentCard(card);
+
+                ges.enqueueGameEvent(makeAttachCardEvent(attachedCard, card),
+                                     attachedCard->getZone()->getPlayer()->getPlayerId());
+            }
+
+            targetCard->resetState();
+            card->setStashedCard(targetCard);
+            break;
+        }
+    }
+
+    return Response::RespOk;
 }
 
 Response::ResponseCode
@@ -1513,13 +1636,10 @@ Server_Player::cmdSetCardCounter(const Command_SetCardCounter &cmd, ResponseCont
         return Response::RespNameNotFound;
     }
 
-    card->setCounter(cmd.counter_id(), cmd.counter_value());
-
     Event_SetCardCounter event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
-    event.set_counter_id(cmd.counter_id());
-    event.set_counter_value(cmd.counter_value());
+    card->setCounter(cmd.counter_id(), cmd.counter_value(), &event);
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;
@@ -1839,27 +1959,35 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
             }
             cardsToReveal.append(card);
         }
-    } else if (!cmd.has_card_id()) {
+    } else if (cmd.card_id_size() == 0) {
         cardsToReveal = zone->getCards();
-    } else if (cmd.card_id() == -2) {
+    } else if (cmd.card_id_size() == 1 && cmd.card_id(0) == -2) {
+        // If there is a single card_id with value -2 (ie
+        // Player::RANDOM_CARD_FROM_ZONE), pick a random card.
+        //
+        // This is to be compatible with clients supporting a single card_id
+        // value, which send value -2 to request a random card.
         if (zone->getCards().isEmpty()) {
             return Response::RespContextError;
         }
+
         cardsToReveal.append(zone->getCards().at(rng->rand(0, zone->getCards().size() - 1)));
     } else {
-        Server_Card *card = zone->getCard(cmd.card_id());
-        if (!card) {
-            return Response::RespNameNotFound;
+        for (auto cardId : cmd.card_id()) {
+            Server_Card *card = zone->getCard(cardId);
+            if (!card) {
+                return Response::RespNameNotFound;
+            }
+            cardsToReveal.append(card);
         }
-        cardsToReveal.append(card);
     }
 
     Event_RevealCards eventOthers;
     eventOthers.set_grant_write_access(cmd.grant_write_access());
     eventOthers.set_zone_name(zone->getName().toStdString());
     eventOthers.set_number_of_cards(cardsToReveal.size());
-    if (cmd.has_card_id()) {
-        eventOthers.set_card_id(cmd.card_id());
+    for (auto cardId : cmd.card_id()) {
+        eventOthers.add_card_id(cardId);
     }
     if (cmd.has_player_id()) {
         eventOthers.set_other_player_id(cmd.player_id());

@@ -79,12 +79,11 @@ async function createI18NDefault() {
         if (acc[key]) {
           throw new Error(`i18n key collision: ${key}\n${JSON.stringify(json)}`);
         }
+
+        acc[key] = json[key];
       });
 
-      return {
-        ...acc,
-        ...json,
-      };
+      return acc;
     }, {});
 
     fse.outputFile(i18nDefaultFile, JSON.stringify(rollup));

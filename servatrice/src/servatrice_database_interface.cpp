@@ -177,23 +177,23 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
             return false;
     }
 
-    for (const QRegExp &regExp : settingsCache->disallowedRegExp) {
-        if (regExp.exactMatch(user))
+    for (const QRegularExpression &regExp : settingsCache->disallowedRegExp) {
+        if (regExp.match(user).hasMatch())
             return false;
     }
 
-    QString regEx("[");
+    QString regEx("\\A[");
     if (allowLowercase)
         regEx.append("a-z");
     if (allowUppercase)
         regEx.append("A-Z");
     if (allowNumerics)
         regEx.append("0-9");
-    regEx.append(QRegExp::escape(allowedPunctuation));
-    regEx.append("]+");
+    regEx.append(QRegularExpression::escape(allowedPunctuation));
+    regEx.append("]+\\z");
 
-    static QRegExp re = QRegExp(regEx);
-    return re.exactMatch(user);
+    QRegularExpression re = QRegularExpression(regEx);
+    return re.match(user).hasMatch();
 }
 
 bool Servatrice_DatabaseInterface::registerUser(const QString &userName,

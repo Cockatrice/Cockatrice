@@ -2,16 +2,17 @@
 import React, { Component } from "react";
 
 import { AuthGuard } from 'components/index';
+import Layout from 'containers/Layout/Layout';
 
 import './Decks.css';
 
 class Decks extends Component {
   render() {
     return (
-      <div>
+      <Layout>
         <AuthGuard />
         <span>"Decks"</span>
-      </div>
+      </Layout>
     )
   }
 }

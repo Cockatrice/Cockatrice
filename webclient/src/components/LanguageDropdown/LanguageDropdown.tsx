@@ -1,9 +1,9 @@
 // eslint-disable-next-line
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Select, MenuItem } from '@material-ui/core';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
+import { Select, MenuItem } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 import { Images } from 'images/Images';
 import { Language, LanguageCountry, LanguageNative } from 'types';
@@ -21,7 +21,7 @@ const LanguageDropdown = () => {
   }, [language]);
 
   return (
-    <FormControl variant='outlined' className='LanguageDropdown'>
+    <FormControl size='small' variant='outlined' className='LanguageDropdown'>
       <Select
         id='LanguageDropdown-select'
         margin='dense'

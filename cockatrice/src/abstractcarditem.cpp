@@ -34,6 +34,13 @@ QRectF AbstractCardItem::boundingRect() const
     return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
+QPainterPath AbstractCardItem::shape() const
+{
+    QPainterPath shape;
+    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    return shape;
+}
+
 void AbstractCardItem::pixmapUpdated()
 {
     update();
@@ -113,23 +120,13 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
 
     if (paintImage) {
         painter->save();
-        transformPainter(painter, translatedSize, angle);
-        painter->drawPixmap(QPointF(1, 1), translatedPixmap);
+        painter->setClipPath(shape());
+        painter->drawPixmap(boundingRect(), translatedPixmap, QRectF({0, 0}, translatedPixmap.size()));
         painter->restore();
     } else {
         painter->setBrush(bgColor);
+        painter->drawPath(shape());
     }
-
-    QPen pen(Qt::black);
-    pen.setJoinStyle(Qt::MiterJoin);
-    const int penWidth = 2;
-    pen.setWidth(penWidth);
-    painter->setPen(pen);
-
-    if (!angle)
-        painter->drawRect(QRectF(0, 0, CARD_WIDTH - 1, CARD_HEIGHT - penWidth));
-    else
-        painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 1.5));
 
     if (translatedPixmap.isNull() || SettingsCache::instance().getDisplayCardNames() || facedown) {
         painter->save();
@@ -158,9 +155,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QSizeF translatedSize = getTranslatedSize(painter);
     paintPicture(painter, translatedSize, tapAngle);
 
-    painter->save();
     painter->setRenderHint(QPainter::Antialiasing, false);
-    transformPainter(painter, translatedSize, tapAngle);
 
     if (isSelected() || isHovered) {
         QPen pen;
@@ -168,13 +163,10 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             pen.setColor(Qt::yellow);
         if (isSelected())
             pen.setColor(Qt::red);
-        const int penWidth = 1;
-        pen.setWidth(penWidth);
+        pen.setWidth(0); // Cosmetic pen
         painter->setPen(pen);
-        painter->drawRect(QRectF(0, 0, translatedSize.width() + penWidth, translatedSize.height() - penWidth));
+        painter->drawPath(shape());
     }
-
-    painter->restore();
 
     painter->restore();
 }

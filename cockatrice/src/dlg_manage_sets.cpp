@@ -4,6 +4,7 @@
 #include "main.h"
 #include "pictureloader.h"
 #include "setsmodel.h"
+#include "settingscache.h"
 
 #include <QAction>
 #include <QDebug>
@@ -84,7 +85,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     displayModel->setDynamicSortFilter(false);
     view = new QTreeView;
     view->setModel(displayModel);
-    view->setMinimumSize(QSize(500, 250));
 
     view->setAlternatingRowColors(true);
     view->setUniformRowHeights(true);
@@ -97,10 +97,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->setAcceptDrops(true);
     view->setDropIndicatorShown(true);
     view->setDragDropMode(QAbstractItemView::InternalMove);
-
-    view->header()->setSectionResizeMode(QHeaderView::Stretch);
-    view->header()->setSectionResizeMode(SetsModel::EnabledCol, QHeaderView::ResizeToContents);
-    view->header()->setSectionResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
 
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
@@ -170,7 +166,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     mainLayout = new QGridLayout;
     mainLayout->addLayout(filterBox, 0, 1, 1, 2);
-    mainLayout->addWidget(setsEditToolBar, 1, 0, 2, 1);
+    mainLayout->addWidget(setsEditToolBar, 1, 0, 4, 1);
     mainLayout->addWidget(view, 1, 1, 1, 2);
     mainLayout->addWidget(enableAllButton, 2, 1);
     mainLayout->addWidget(disableAllButton, 2, 2);
@@ -190,11 +186,33 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(centralWidget);
 
     setWindowTitle(tr("Manage sets"));
-    resize(800, 500);
+    setMinimumSize(800, 500);
+    auto &geometry = SettingsCache::instance().getSetsDialogGeometry();
+    if (!geometry.isEmpty()) {
+        restoreGeometry(geometry);
+    }
+    auto &headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
+    if (!headerState.isEmpty()) {
+        view->header()->restoreState(headerState);
+        view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
+    } else {
+        view->header()->resizeSections(QHeaderView::ResizeToContents);
+    }
+    connect(view->header(), &QHeaderView::geometriesChanged, this, &WndSets::saveHeaderState);
 }
 
 WndSets::~WndSets()
 {
+}
+
+void WndSets::closeEvent(QCloseEvent * /*ev*/)
+{
+    SettingsCache::instance().setSetsDialogGeometry(saveGeometry());
+}
+
+void WndSets::saveHeaderState()
+{
+    SettingsCache::instance().layouts().setSetsDialogHeaderState(view->header()->saveState());
 }
 
 void WndSets::rebuildMainLayout(int actionToTake)

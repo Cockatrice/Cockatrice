@@ -54,6 +54,7 @@ public:
                      QGraphicsItem *parent = nullptr);
     ~AbstractCardItem();
     QRectF boundingRect() const;
+    QPainterPath shape() const override;
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

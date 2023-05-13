@@ -1,31 +1,34 @@
-.Header {
+.LeftNav__container {
+  background: #7033DB;
+  width: 100px;
+  min-width: 100px;
+  height: 100%;
 }
 
-.Header__logo {
+.LeftNav__logo {
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 16px 0;
 }
 
-.Header__logo a {
+.LeftNav__logo a {
   line-height: 1;
 }
 
-.Header__logo img {
+.LeftNav__logo img {
   height: 32px;
 }
 
-.Header-content {
-  display: flex;
-  align-items: center;
-  width: 100%;
+.LeftNav-content {
   color: white;
 }
 
-.Header-serverDetails {
+.LeftNav-serverDetails {
   font-size: 12px;
 }
 
-.Header-server__indicator {
+.LeftNav-server__indicator {
   display: inline-block;
   height: 12px;
   width: 12px;
@@ -35,46 +38,43 @@
   margin-left: 10px;
 }
 
-.Header-nav {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+.LeftNav-nav {
 }
 
-.Header-nav__links {
-  width: 100%;
+.LeftNav-nav__links {
   display: flex;
-  padding-left: 50px;
+  flex-flow: column;
   align-items: center;
+  gap: 16px;
 }
 
-.Header-nav__link {
+.LeftNav-nav__link {
   position: relative;
   height: 100%;
 }
 
-.Header-nav__link:hover {
+.LeftNav-nav__link:hover {
   background: rgba(0, 0, 0, .125);
 }
 
-.Header-nav__link:hover .Header-nav__link-menu {
+.LeftNav-nav__link:hover .LeftNav-nav__link-menu {
   display: block;
 }
 
-.Header-nav__link-btn {
+.LeftNav-nav__link-btn {
   display: flex;
   height: 100%;
   width: 100%;
   align-items: center;
-  padding: 5px 10px;
+  padding: 5px 20px;
   font-weight: bold;
 }
 
-.Header-nav__link-btn__icon {
+.LeftNav-nav__link-btn__icon {
   margin-left: 5px;
 }
 
-.Header-nav__link-menu {
+.LeftNav-nav__link-menu {
   display: none;
   position: absolute;
   bottom: 0;
@@ -82,13 +82,14 @@
   min-width: 150px;
   background: #3f51b5;
   box-shadow: 1px 1px 2px 0px black;
+  z-index: 1;
 }
 
-.Header-nav__link-menu__item {
+.LeftNav-nav__link-menu__item {
   padding: 0 !important;
 }
 
-.Header-nav__link-menu__btn {
+.LeftNav-nav__link-menu__btn {
   padding: 6px 16px;
   width: 100%;
   color: white;
@@ -96,15 +97,16 @@
   justify-content: space-between;
 }
 
-.Header-nav__actions {
+.LeftNav-nav__actions {
   display: flex;
+  justify-content: center;
 }
 
-.Header-nav__action {
+.LeftNav-nav__action {
 
 }
 
-.Header-nav__action button {
+.LeftNav-nav__action button {
   color: white;
 }
 
@@ -124,4 +126,3 @@
 .temp-chip > div {
   cursor: inherit;
 }
-

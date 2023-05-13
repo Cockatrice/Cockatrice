@@ -1,4 +1,4 @@
-FROM ubuntu:impish
+FROM ubuntu:kinetic
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -9,16 +9,18 @@ RUN apt-get update && \
         file \
         g++ \
         git \
+        libgl-dev \
         liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
-        libqt5multimedia5-plugins \
-        libqt5sql5-mysql \
-        libqt5svg5-dev \
-        libqt5websockets5-dev \
+        libqt6multimedia6 \
+        libqt6sql6-mysql \
+        libqt6svg6-dev \
+        libqt6websockets6-dev \
         protobuf-compiler \
-        qtmultimedia5-dev \
-        qttools5-dev \
-        qttools5-dev-tools \
+        qt6-l10n-tools \
+        qt6-multimedia-dev \
+        qt6-tools-dev \
+        qt6-tools-dev-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

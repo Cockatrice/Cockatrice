@@ -394,6 +394,7 @@ void TabDeckEditor::createCentralFrame()
     connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));
     connect(help, &QAction::triggered, this, &TabDeckEditor::showSearchSyntaxHelp);
 
     databaseModel = new CardDatabaseModel(db, true, this);
@@ -1071,6 +1072,12 @@ void TabDeckEditor::actDecrementCard()
 void TabDeckEditor::actDecrementCardFromSideboard()
 {
     decrementCardHelper(DECK_ZONE_SIDE);
+}
+
+void TabDeckEditor::copyDatabaseCellContents()
+{
+    QVariant data = databaseView->selectionModel()->currentIndex().data();
+    QApplication::clipboard()->setText(data.toString());
 }
 
 void TabDeckEditor::actIncrement()

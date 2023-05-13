@@ -3,14 +3,15 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { generatePath, useNavigate } from 'react-router-dom';
 
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from 'components';
 import { useReduxEffect } from 'hooks';
 import { RoomsSelectors, RoomsTypes, ServerSelectors } from 'store';
 import { Room, RouteEnum, User } from 'types';
 import Rooms from './Rooms';
+import Layout from 'containers/Layout/Layout';
 
 import './Server.css';
 
@@ -23,7 +24,7 @@ const Server = ({ message, rooms, joinedRooms, users }: ServerProps) => {
   }, RoomsTypes.JOIN_ROOM, []);
 
   return (
-    <div className="server-rooms">
+    <Layout className="server-rooms">
       <AuthGuard />
 
       <ThreePaneLayout
@@ -55,7 +56,7 @@ const Server = ({ message, rooms, joinedRooms, users }: ServerProps) => {
           </Paper>
         )}
       />
-    </div>
+    </Layout>
   );
 }
 

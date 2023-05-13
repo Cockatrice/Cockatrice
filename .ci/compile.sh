@@ -127,7 +127,7 @@ fi
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 if [[ $PARALLEL_COUNT ]]; then
-  if [[ $(cmake --build /not_a_dir --parallel |& head -1) =~ parallel ]]; then
+  if [[ $(cmake --build /not_a_dir --parallel 2>&1 | head -1) =~ parallel ]]; then
     # workaround for bionic having an old cmake
     echo "this version of cmake does not support --parallel, using native build tool -j instead"
     buildflags+=(-- -j "$PARALLEL_COUNT")
@@ -171,7 +171,7 @@ fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  ctest -C "$BUILDTYPE"
+  ctest -C "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 

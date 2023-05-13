@@ -80,6 +80,7 @@ private slots:
     void actDecrement();
     void actDecrementCard();
     void actDecrementCardFromSideboard();
+    void copyDatabaseCellContents();
 
     void saveDeckRemoteFinished(const Response &r);
     void filterViewCustomContextMenu(const QPoint &point);

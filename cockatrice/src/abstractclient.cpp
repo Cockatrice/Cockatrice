@@ -1,6 +1,5 @@
 #include "abstractclient.h"
 
-#include "client_metatypes.h"
 #include "featureset.h"
 #include "get_pb_extension.h"
 #include "pb/commands.pb.h"

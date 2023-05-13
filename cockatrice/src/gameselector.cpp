@@ -10,6 +10,7 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
 #include "tab_account.h"
+#include "tab_game.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
 
@@ -26,7 +27,7 @@
 #include <QVBoxLayout>
 
 GameSelector::GameSelector(AbstractClient *_client,
-                           const TabSupervisor *_tabSupervisor,
+                           TabSupervisor *_tabSupervisor,
                            TabRoom *_room,
                            const QMap<int, QString> &_rooms,
                            const QMap<int, GameTypeMap> &_gameTypes,
@@ -197,9 +198,19 @@ void GameSelector::actCreate()
 
 void GameSelector::checkResponse(const Response &response)
 {
-    if (createButton)
-        createButton->setEnabled(true);
-    joinButton->setEnabled(true);
+    // NB: We re-enable buttons for the currently selected game, which may not
+    // be the same game as the one for which we are processing a response.
+    // This could lead to situations where we join a game, select a different
+    // game, join the new game, then receive the response for the original
+    // join, which would re-activate the buttons for the second game too soon.
+    // However, that is better than doing things the other ways, because then
+    // the response to the first game could lock us out of join/join as
+    // spectator for the second game!
+    //
+    // Ideally we should have a way to figure out if the current game is the
+    // same as the one we are getting a response for, but it's probably not
+    // worth the trouble.
+    enableButtons();
 
     switch (response.response_code()) {
         case Response::RespNotInRoom:
@@ -228,9 +239,6 @@ void GameSelector::checkResponse(const Response &response)
             break;
         default:;
     }
-
-    if (response.response_code() != Response::RespSpectatorsNotAllowed)
-        spectateButton->setEnabled(true);
 }
 
 void GameSelector::actJoin()
@@ -239,6 +247,9 @@ void GameSelector::actJoin()
     if (!ind.isValid())
         return;
     const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+    if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
+        return;
+    }
     bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
@@ -266,10 +277,37 @@ void GameSelector::actJoin()
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
     r->sendRoomCommand(pend);
 
+    disableButtons();
+}
+
+void GameSelector::disableButtons()
+{
     if (createButton)
         createButton->setEnabled(false);
+
     joinButton->setEnabled(false);
     spectateButton->setEnabled(false);
+}
+
+void GameSelector::enableButtons()
+{
+    if (createButton)
+        createButton->setEnabled(true);
+
+    // Enable buttons for the currently selected game
+    enableButtonsForIndex(gameListView->currentIndex());
+}
+
+void GameSelector::enableButtonsForIndex(const QModelIndex &current)
+{
+    if (!current.isValid())
+        return;
+
+    const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
+    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+
+    spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
+    joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
 }
 
 void GameSelector::retranslateUi()
@@ -292,14 +330,7 @@ void GameSelector::processGameInfo(const ServerInfo_Game &info)
 
 void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
-    if (!current.isValid())
-        return;
-
-    const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
-    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
-
-    spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
-    joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
+    enableButtonsForIndex(current);
 }
 
 void GameSelector::updateTitle()

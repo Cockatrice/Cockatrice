@@ -53,7 +53,7 @@ void GameScene::removePlayer(Player *player)
             zone->close();
         }
     }
-    players.removeAt(players.indexOf(player));
+    players.removeOne(player);
     removeItem(player);
     rearrange();
 }
@@ -178,7 +178,7 @@ void GameScene::addRevealedZoneView(Player *player,
 
 void GameScene::removeZoneView(ZoneViewWidget *item)
 {
-    zoneViews.removeAt(zoneViews.indexOf(item));
+    zoneViews.removeOne(item);
     removeItem(item);
 }
 

@@ -33,7 +33,7 @@ class ChatView : public QTextBrowser
 {
     Q_OBJECT
 protected:
-    const TabSupervisor *const tabSupervisor;
+    TabSupervisor *const tabSupervisor;
     TabGame *const game;
 
 private:
@@ -83,7 +83,7 @@ private slots:
     void actMessageClicked();
 
 public:
-    ChatView(const TabSupervisor *_tabSupervisor,
+    ChatView(TabSupervisor *_tabSupervisor,
              const UserlistProxy *_userlistProxy,
              TabGame *_game,
              bool _showTimestamps,

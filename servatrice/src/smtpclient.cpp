@@ -1,4 +1,5 @@
 #include "smtpclient.h"
+
 #include "settingscache.h"
 #include "smtp/qxtsmtp.h"
 

@@ -13,7 +13,6 @@ RUN apt-get update && \
         liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
-        libqt6core5compat6-dev \
         libqt6multimedia6 \
         libqt6sql6-mysql \
         libqt6svg6-dev \

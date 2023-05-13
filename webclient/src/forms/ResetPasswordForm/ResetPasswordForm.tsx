@@ -5,8 +5,8 @@ import { Form, Field } from 'react-final-form'
 import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
 
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import { InputField, KnownHosts } from 'components';
 import { FormKey } from 'types';

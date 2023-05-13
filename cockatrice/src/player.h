@@ -120,7 +120,7 @@ signals:
                         QString targetCard,
                         bool _playerTarget);
     void logCreateToken(Player *player, QString cardName, QString pt);
-    void logDrawCards(Player *player, int number);
+    void logDrawCards(Player *player, int number, bool deckIsEmpty);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
     void logFlipCard(Player *player, QString cardName, bool faceDown);
@@ -217,6 +217,7 @@ private slots:
     void actPlay();
     void actHide();
     void actPlayFacedown();
+    void actReveal(QAction *action);
     void refreshShortcuts();
 
 private:
@@ -227,6 +228,7 @@ private:
         *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
+    QList<QPair<QString, int>> playersInfo;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
@@ -285,8 +287,10 @@ private:
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
-    void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
-    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
+    void createCard(const CardItem *sourceCard,
+                    const QString &dbCardName,
+                    CardRelation::AttachType attach = CardRelation::DoesNotAttach,
+                    bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
 
     QRectF bRect;
@@ -296,6 +300,7 @@ private:
     void rearrangeCounters();
 
     void initSayMenu();
+    void initContextualPlayersMenu(QMenu *menu);
 
     // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
     void eventGameSay(const Event_GameSay &event);
