@@ -52,5 +52,5 @@ if [[ $output == $got ]]; then
   exit 4;
 fi
 
-# save output in ci variable
-echo "::set-output name=output::$output"
+# write output to ci environment file
+echo "output=$output" >> $GITHUB_OUTPUT
