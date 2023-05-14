@@ -2,17 +2,22 @@
 
 version: 2
 updates:
-  # Enable version updates for submodules
-  - package-ecosystem: "gitsubmodule"
-    # Look for `.gitmodules` in the `root` directory
-    directory: "/"
-    # Check for updates once a month
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 1
+ # # Enable version updates for git submodules
+ # Not yet possible to bump only on tags or releases, see:
+ # https://github.com/dependabot/dependabot-core/issues/1639
+ # https://github.com/dependabot/dependabot-core/issues/2192
+ # Alternative: Action that updates submodule and can be manually run on demand (workflow_dispatch)
+ # - package-ecosystem: "gitsubmodule"
+ #   # Look for `.gitmodules` in the `root` directory
+ #   directory: "/"
+ #   # Check for updates once a month
+ #   schedule:
+ #     interval: "monthly"
+ #   # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
+ #   open-pull-requests-limit: 1
 
  # # Enable version updates for Docker
- # Not yet possible to bump from one lts to the next and skip others, see:
+ # Not yet possible to bump from one LTS version to the next and skip others, see:
  # https://github.com/dependabot/dependabot-core/issues/2247
  # - package-ecosystem: "docker"
  #   # Look for a `Dockerfile` in the `root` directory
