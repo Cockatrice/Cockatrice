@@ -71,12 +71,7 @@ void SettingsCache::translateLegacySettings()
 
     // Servers
     legacySetting.beginGroup("server");
-    servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
-    servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
-    servers().setFPHostName(legacySetting.value("fphostname").toString());
-    servers().setFPPort(legacySetting.value("fpport").toString());
-    servers().setFPPlayerName(legacySetting.value("fpplayername").toString());
+    // saved servers are lost, not because they can't be transferred but because it's not worth doing
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {

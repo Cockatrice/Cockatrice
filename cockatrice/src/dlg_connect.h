@@ -2,80 +2,80 @@
 #define DLG_CONNECT_H
 
 #include "handle_public_servers.h"
-#include "userconnection_information.h"
 
 #include <QDialog>
-#include <QLineEdit>
 
 class QCheckBox;
+class RemoteClient;
 class QComboBox;
+class QDialogButtonBox;
 class QGridLayout;
 class QGroupBox;
 class QHBoxLayout;
 class QLabel;
+class QLineEdit;
 class QPushButton;
 class QRadioButton;
 class QVBoxLayout;
-
-class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
-{
-    Q_OBJECT
-protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
-};
 
 class DlgConnect : public QDialog
 {
     Q_OBJECT
 signals:
     void sigStartForgotPasswordRequest();
-    void sigPublicServersDownloaded();
 
 public:
-    explicit DlgConnect(QWidget *parent = nullptr);
+    explicit DlgConnect(QWidget *parent, RemoteClient *_client);
     ~DlgConnect() override;
-    QString getHost() const;
-    int getPort() const
-    {
-        return portEdit->text().toInt();
-    }
-    QString getPlayerName() const
-    {
-        return playernameEdit->text();
-    }
-    QString getPassword() const
-    {
-        return passwordEdit->text();
-    }
-
-public slots:
-    void downloadThePublicServers();
 
 private slots:
     void actOk();
 
+    void downloadThePublicServers();
     void passwordSaved(int state);
-    void previousHostSelected(bool state);
-    void newHostSelected(bool state);
+    // TODO
+    // void previousHostSelected(bool state);
+    // void newHostSelected(bool state);
     void actForgotPassword();
-    void updateDisplayInfo(const QString &saveName);
-    void preRebuildComboBoxList();
+    void selectServer(int index);
+    void updateDisplayInfo();
     void rebuildComboBoxList(int failure = -1);
+    void addServer();
+    void connected();
+    // void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    // void registerAccepted();
+    // void registerAcceptedNeedsActivate();
+    // void forgotPasswordSuccess();
+    // void forgotPasswordError();
+    // void promptForgotPasswordReset();
+    // void promptForgotPasswordChallenge();
 
 private:
-    QGridLayout *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
-    QHBoxLayout *newHolderLayout;
-    QGroupBox *loginGroupBox, *serverInfoGroupBox, *restrictionsGroupBox;
-    QVBoxLayout *mainLayout;
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *serverIssuesLabel,
-        *serverContactLabel, *serverContactLink;
-    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
+    enum Mode {
+      Login,
+      Register,
+      Restore
+    };
+
+    Mode mode;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel, *emailLabel,
+        *saveLabel, *countryLabel, *realNameLabel, *serverIssuesLabel, *serverContactLabel, *serverContactLink;
+    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit, *passwordConfirmationEdit, *emailEdit,
+        *emailConfirmationEdit, *realNameEdit;
+    QComboBox *countryEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
     QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers;
-    QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
-    HandlePublicServers *hps;
-    const QString placeHolderText = tr("Downloading...");
+    QDialogButtonBox *buttonBox;
+
+    RemoteClient *client;
+    QString currentSaveName;
+    HandlePublicServers hps;
+    bool autoConnectEnabled, savePasswordEnabled, editServerEnabled;
+
+    void setupUI();
+    void updateSavePasswordEnabled();
+    void updateEditServer();
 };
 #endif

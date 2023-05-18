@@ -56,13 +56,10 @@ private slots:
     void processServerShutdownEvent(const Event_ServerShutdown &event);
     void serverTimeout();
     void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
-    void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
     void activateError();
     void socketError(const QString &errorStr);
     void protocolVersionMismatch(int localVersion, int remoteVersion);
     void userInfoReceived(const ServerInfo_User &userInfo);
-    void registerAccepted();
-    void registerAcceptedNeedsActivate();
     void activateAccepted();
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
@@ -73,19 +70,13 @@ private slots:
     void actWatchReplay();
     void actDeckEditor();
     void actFullScreen(bool checked);
-    void actRegister();
     void actSettings();
     void actExit();
-    void actForgotPasswordRequest();
     void actAbout();
     void actTips();
     void actUpdate();
     void actViewLog();
-    void forgotPasswordSuccess();
-    void forgotPasswordError();
-    void promptForgotPasswordReset();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void promptForgotPasswordChallenge();
     void showWindowIfHidden();
 
     void cardUpdateError(QProcess::ProcessError err);
@@ -112,6 +103,7 @@ private:
     void retranslateUi();
     void createActions();
     void createMenus();
+    void handleStartup();
 
     void createTrayIcon();
     void createTrayActions();
@@ -125,8 +117,8 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *closeAction;
-    QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
+        *aAbout, *aTips, *aCheckCardUpdates, *aUpdate, *aViewLog, *closeAction, *aManageSets, *aEditTokens,
+        *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
     RemoteClient *client;
@@ -136,7 +128,6 @@ private:
     QMessageBox serverShutdownMessageBox;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;
-    DlgConnect *dlgConnect;
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
