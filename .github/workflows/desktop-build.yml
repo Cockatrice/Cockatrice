@@ -102,9 +102,6 @@ jobs:
           - distro: Fedora38
             package: RPM
 
-          - distro: UbuntuBionic
-            package: DEB
-
           - distro: UbuntuFocal
             package: DEB
             test: skip # UbuntuFocal has a broken qt for debug builds
