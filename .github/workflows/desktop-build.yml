@@ -92,6 +92,9 @@ jobs:
           - distro: Debian11
             package: DEB
 
+          - distro: Debian12
+            package: DEB
+
           - distro: Fedora37
             package: RPM
 
@@ -108,9 +111,6 @@ jobs:
           - distro: UbuntuJammy
             package: DEB
             test: skip # running tests on all distros is superfluous
-
-          - distro: UbuntuKinetic
-            package: DEB
             
           - distro: UbuntuLunar
             package: DEB
