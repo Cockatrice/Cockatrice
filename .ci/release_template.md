@@ -19,7 +19,6 @@ include different targets -->
  - <kbd>Ubuntu 23.04</kbd> ("Lunar Lobster")
  - <kbd>Debian 11</kbd> ("Bullseye")
  - <kbd>Debian 12</kbd> ("Bookworm")
- - <kbd>Fedora 36</kbd>
  - <kbd>Fedora 37</kbd>
  - <kbd>Fedora 38</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>

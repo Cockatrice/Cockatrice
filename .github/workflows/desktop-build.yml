@@ -95,10 +95,6 @@ jobs:
           - distro: Debian12
             package: DEB
 
-          - distro: Fedora36
-            package: RPM
-            test: skip
-
           - distro: Fedora37
             package: RPM
 
