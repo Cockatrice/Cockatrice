@@ -266,9 +266,14 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
 
 QString CardInfo::getCorrectedName() const
 {
+    // remove all the characters reserved in windows file paths,
+    // other oses only disallow a subset of these so it covers all
+    static const QRegularExpression rmrx(R"(( // |[*<>:"\\?\x00-\x08\x10-\x1f]))");
+    static const QRegularExpression spacerx(R"([/\x09-\x0f])");
+    static const QString space(' ');
     QString result = name;
     // Fire // Ice, Circle of Protection: Red, "Ach! Hans, Run!", Who/What/When/Where/Why, Question Elemental?
-    return result.remove(" // ").remove(':').remove('"').remove('?').replace('/', ' ');
+    return result.remove(rmrx).replace(spacerx, space);
 }
 
 void CardInfo::addToSet(const CardSetPtr &_set, const CardInfoPerSet _info)
