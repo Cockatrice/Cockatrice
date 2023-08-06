@@ -156,7 +156,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17 -Wno-unknown-warning-option")
   endif()
 
   set(ADDITIONAL_DEBUG_FLAGS
