@@ -1,66 +1,87 @@
-name: Update translation source
+name: Update Translation Source
 
 on:
   workflow_dispatch:
   schedule:
-    # runs once per month
+    # runs at the start of each month (UTC)
     - cron: '0 0 1 * *'
+  pull_request:
+    paths:
+      - '.github/workflows/translations.yml'
 
 jobs:
   translations:
     # Do not run the scheduled workflow on forks
     if: github.event_name != 'schedule' || github.repository_owner == 'Cockatrice'
 
+    name: Update translation source
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
       - name: Install lupdate
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends qttools5-dev-tools
 
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Update cockatrice translations
+      - name: Update Cockatrice translation source
+        id: cockatrice
         shell: bash
-        run: |
-          shopt -s globstar # globstar is needed for recursive **
-          lupdate -version
-          echo "reading the following source files:"
-          # note: there are three strings to translate in common right now
-          echo {cockatrice,common}/**/*.{cpp,h}
-          echo "$(echo {cockatrice,common}/**/*.{cpp,h} | wc -w) files total"
-          lupdate {cockatrice,common}/**/*.{cpp,h} -ts cockatrice/translations/cockatrice_en@source.ts
+        env:
+          FILE: 'cockatrice/cockatrice_en@source.ts'
+          DIRS: 'cockatrice/src common'
+        run: .ci/update_translations.sh
 
-      - name: Update oracle translations
+      - name: Update Oracle translation source
+        id: oracle
         shell: bash
-        run: |
-          shopt -s globstar # globstar is needed for recursive **
-          lupdate -version
-          echo "reading the following source files:"
-          echo oracle/**/*.{cpp,h}
-          echo "$(echo oracle/**/*.{cpp,h} | wc -w) files total"
-          lupdate oracle/**/*.{cpp,h} -ts oracle/translations/oracle_en@source.ts
+        env:
+          FILE: 'oracle/oracle_en@source.ts'
+          DIRS: 'oracle/src'
+        run: .ci/update_translations.sh
 
-      - name: Check for updates
-        id: check
-        shell: bash
-        run: |
-          set +e # do not fail, just save the exit state
-          git diff --exit-code
-          echo "deploy=$?" >>"$GITHUB_OUTPUT"
+      - name: Render template
+        id: template
+        uses: chuhlomin/render-template@v1.7
+        with:
+          template: .ci/update_translations_template.md
+          vars: |
+            cockatrice_output: ${{ steps.cockatrice.outputs.output }}
+            oracle_output: ${{ steps.oracle.outputs.output }}
+            commit: ${{ github.sha }}
 
-      - name: Commit changes
-        if: steps.check.outputs.deploy == '1'
+      - name: Create pull request
+        if: github.event_name != 'pull_request'
+        id: create_pr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          add-paths: |
+            cockatrice/cockatrice_en@source.ts
+            oracle/oracle_en@source.ts
+          commit-message: Update translation source strings
+          # author is the owner of the commit
+          author: github-actions <github-actions@github.com>
+          branch: ci-update_translations
+          delete-branch: true
+          title: '[Translations] Update source strings'
+          body: ${{ steps.template.outputs.result }}
+          labels: |
+            CI
+            Translation
+          draft: false
+
+      - name: PR Status
+        if: github.event_name != 'pull_request'
         shell: bash
-        working-directory: ${{env.OUTPUT_PATH}}
+        env:
+          STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add cockatrice/translations/cockatrice_en@source.ts oracle/translations/oracle_en@source.ts
-          git commit -m "Automated translation update ( $GITHUB_SHA )"
-          git push
-          deploy_commit=$(git rev-parse HEAD)
-          echo "Created commit: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$deploy_commit"
+          if [[ "$STATUS" == "" ]]; then
+            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} unchanged!"
+          else
+            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} $STATUS!"
+          fi
+          echo "URL: ${{ steps.create_pr.outputs.pull-request-url }}"
