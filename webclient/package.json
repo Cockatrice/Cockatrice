@@ -25,7 +25,7 @@
     "dexie": "^3.2.2",
     "final-form": "^4.20.6",
     "final-form-set-field-touched": "^1.0.1",
-    "i18next": "^22.0.4",
+    "i18next": "^23.4.2",
     "i18next-browser-languagedetector": "^7.0.0",
     "i18next-icu": "^2.0.3",
     "intl-messageformat": "^10.2.1",
