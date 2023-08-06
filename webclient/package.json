@@ -23,7 +23,7 @@
     "@mui/material": "^5.5.1",
     "crypto-js": "^4.1.1",
     "dexie": "^3.2.2",
-    "final-form": "^4.20.6",
+    "final-form": "^4.20.9",
     "final-form-set-field-touched": "^1.0.1",
     "i18next": "^22.0.4",
     "i18next-browser-languagedetector": "^7.0.0",
