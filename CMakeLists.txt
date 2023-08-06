@@ -156,7 +156,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17 -Wno-unknown-warning-option")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
   endif()
 
   set(ADDITIONAL_DEBUG_FLAGS
@@ -179,7 +179,7 @@ else()
   # other: osx/llvm, bsd/llvm
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
   if(WARNING_AS_ERROR)
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
