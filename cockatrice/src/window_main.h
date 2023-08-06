@@ -84,7 +84,7 @@ private slots:
     void forgotPasswordSuccess();
     void forgotPasswordError();
     void promptForgotPasswordReset();
-    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void actShow();
     void promptForgotPasswordChallenge();
     void showWindowIfHidden();
 
@@ -114,7 +114,6 @@ private:
     void createMenus();
 
     void createTrayIcon();
-    void createTrayActions();
     int getNextCustomSetPrefix(QDir dataDir);
     inline QString getCardUpdaterBinaryName()
     {
@@ -125,8 +124,8 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *closeAction;
-    QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
+        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets,
+        *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aShow;
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
     RemoteClient *client;
