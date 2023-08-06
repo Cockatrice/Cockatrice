@@ -59,7 +59,7 @@
     "@types/node": "18.11.7",
     "@types/prop-types": "^15.7.4",
     "@types/react": "18.0.24",
-    "@types/react-dom": "18.0.8",
+    "@types/react-dom": "18.2.7",
     "@types/react-redux": "^7.1.23",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
