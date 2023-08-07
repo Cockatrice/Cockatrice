@@ -252,6 +252,7 @@ jobs:
         run: |
           brew update
           brew install protobuf@21
+          brew link protobuf
           if [[ $install_qt == homebrew ]]; then
             brew install qt --force-bottle
           else # for some reason the tests fail with the action installed qt?
