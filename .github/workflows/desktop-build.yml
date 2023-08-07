@@ -201,7 +201,7 @@ jobs:
           - target: Debug # tests only
             os: macos-latest
             xcode: 14.2
-            qt_version: 6.*
+            qt_version: 6.5
             qt_modules: "qtmultimedia qtwebsockets"
             type: Debug
             do_tests: 1
