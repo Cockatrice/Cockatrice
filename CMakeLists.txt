@@ -179,7 +179,7 @@ else()
   # other: osx/llvm, bsd/llvm
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
   if(WARNING_AS_ERROR)
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
