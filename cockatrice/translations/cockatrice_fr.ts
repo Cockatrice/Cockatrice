@@ -6767,7 +6767,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="144"/>
         <source>Hints</source>
-        <translation>Astruces</translation>
+        <translation>Astuces</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="147"/>
