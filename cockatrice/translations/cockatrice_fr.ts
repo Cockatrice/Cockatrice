@@ -1387,7 +1387,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="128"/>
         <source>Show only if spectators can see &amp;hands</source>
-        <translation>Montrer uniquement si les spectateurs peuvent voir les mains</translation>
+        <translation>Montrer uniquement si les spectateurs peuvent voir les &amp;mains</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="138"/>
