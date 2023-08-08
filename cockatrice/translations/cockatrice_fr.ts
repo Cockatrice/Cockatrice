@@ -3604,7 +3604,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="623"/>
         <source>green counter(s)</source>
-        <translation><numerusform>Contrecarrer le vert</numerusform><numerusform>Marqueur(s) vert(s)</numerusform><numerusform>Marqueur(s) vert(s)</numerusform></translation>
+        <translation><numerusform>Marqueur vert</numerusform><numerusform>Marqueurs verts</numerusform><numerusform>Marqueur(s) vert(s)</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
