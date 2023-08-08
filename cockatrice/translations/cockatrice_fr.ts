@@ -6491,7 +6491,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/userinfobox.cpp" line="211"/>
         <source>Enter Password</source>
-        <translation>saisir le mot de passe</translation>
+        <translation>Saisir le mot de passe</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="212"/>
