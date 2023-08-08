@@ -2459,7 +2459,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="218"/>
         <source>Please enter the number of players.</source>
-        <translation>Entrez s&apos;il vous plait le nombre de joueurs.</translation>
+        <translation>Entrez s&apos;il vous plaît le nombre de joueurs.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="230"/>
