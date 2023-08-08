@@ -3241,7 +3241,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="157"/>
         <source>%1 can now look at top card %2 at any time.</source>
-        <translation>%1 peut maintenant regarder la carte du dessus %2 à n&apos;importe quel moment.</translation>
+        <translation>%1 peut maintenant regarder la carte du dessus de sa bibliothèque %2 à n&apos;importe quel moment.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="158"/>
