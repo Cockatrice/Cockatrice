@@ -6624,7 +6624,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/userlist.cpp" line="382"/>
         <source>Ignored users online: %1 / %2</source>
-        <translation>Joueurs sur liste noire connectés: %1 / %2</translation>
+        <translation>Joueurs sur liste noire connectés : %1 / %2</translation>
     </message>
 </context>
 <context>
@@ -6632,7 +6632,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/userlist.cpp" line="134"/>
         <source>Which warning would you like to send?</source>
-        <translation>Quel avertissement voudriez-vous envoyer?</translation>
+        <translation>Quel avertissement voudriez-vous envoyer ?</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="142"/>
