@@ -3088,9 +3088,9 @@ This is most likely not a problem, but this message might mean there is a new ve
 
 To update your client, go to Help -&gt; Check for Updates.</source>
         <translation>Le serveur supporte des fonctionnalités que votre client n&apos;a pas.
-Ce n&apos;est probablement pas un problème, mais ce message peut signifier qu&apos;il y a une nouvelle version de Cockatrice disponible ou que ce serveur utilise une version pre-release ou personnalisée.
+Ce n&apos;est probablement pas un problème, mais ce message peut signifier qu&apos;il y a une nouvelle version de Cockatrice disponible, ou que ce serveur utilise une version pre-release ou personnalisée.
 
-Pour mettre à jour votre client, allez dans Aide -&gt; Vérifier les mises à jour.</translation>
+Pour mettre à jour votre client, allez dans « Aide -&gt; Vérifier les mises à jour ».</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1236"/>
