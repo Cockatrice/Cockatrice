@@ -6609,17 +6609,17 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/userlist.cpp" line="373"/>
         <source>Users connected to server: %1</source>
-        <translation>Joueurs connectés au serveur: %1</translation>
+        <translation>Joueurs connectés au serveur : %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="376"/>
         <source>Users in this room: %1</source>
-        <translation>Joueurs dans ce salon: %1</translation>
+        <translation>Joueurs dans ce salon : %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="379"/>
         <source>Buddies online: %1 / %2</source>
-        <translation>Amis connectés: %1 / %2</translation>
+        <translation>Amis connectés : %1 / %2</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="382"/>
