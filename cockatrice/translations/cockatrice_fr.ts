@@ -128,7 +128,7 @@
     <message>
         <location filename="../src/userlist.cpp" line="63"/>
         <source>&amp;temporary ban</source>
-        <translation>&amp;bannissement temporaire</translation>
+        <translation>bannissement &amp;temporaire</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="66"/>
