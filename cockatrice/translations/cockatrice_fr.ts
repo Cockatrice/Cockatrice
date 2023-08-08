@@ -4416,7 +4416,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="../src/player.cpp" line="1703"/>
         <location filename="../src/player.cpp" line="3224"/>
         <source>Number:</source>
-        <translation>Nombre:</translation>
+        <translation>Nombre :</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1218"/>
