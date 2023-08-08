@@ -6721,12 +6721,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="115"/>
         <source>Enable selected set(s)</source>
-        <translation>Activer les éditions sélectionnées</translation>
+        <translation>Activer l(es) édition(s) sélectionnée(s)</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="116"/>
         <source>Disable selected set(s)</source>
-        <translation>Désactiver le(s) ensembles sélectionnés</translation>
+        <translation>Désactiver l(es) éditions(s) sélectionné(s)</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="132"/>
