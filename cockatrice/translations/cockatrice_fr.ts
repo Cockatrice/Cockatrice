@@ -1377,12 +1377,12 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="124"/>
         <source>Show spectator password p&amp;rotected games</source>
-        <translation>Montrer les parties où les spectateurs doivent entrer un mot de passe</translation>
+        <translation>Montrer les parties où les spectateurs doivent ent&amp;rer un mot de passe</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="126"/>
         <source>Show only if spectators can ch&amp;at</source>
-        <translation>Montrer uniquement si les spectateurs peuvent parler</translation>
+        <translation>Montrer uniquement si les spectateurs peuvent p&amp;arler</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="128"/>
