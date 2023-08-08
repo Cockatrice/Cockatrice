@@ -2780,8 +2780,8 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
         <location filename="../src/window_main.cpp" line="575"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
-        <translation>Vous tentez de vous connecter à un serveur obsolète. Chargez la nouvelle version de Cockatrice ou connectez-vous à un serveur approprié.
-La version locale est %1, la nouvelle version est %2.</translation>
+        <translation>Vous tentez de vous connecter à un serveur obsolète. Veuillez utiliser une ancienne version de Cockatrice, ou connectez-vous à un serveur approprié.
+La version locale est %1, la version distante est %2.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="581"/>
@@ -2972,9 +2972,9 @@ Oracle va maintenant se lancer pour installer la base de données de cartes init
         <source>Cockatrice is unable to load the card database.
 Do you want to update your card database now?
 If unsure or first time user, choose &quot;Yes&quot;</source>
-        <translation>Cockatrice n&apos;arrive pas à charger la base de de données de cartes.
+        <translation>Cockatrice n&apos;arrive pas à charger la base de données de cartes.
 Voulez-vous la mettre à jour maintenant ?
-Si vous n’êtes pas sûr ou si c&apos;est la première fois que vous jouez, choisissez « Oui ».</translation>
+Si vous n’êtes pas sûr, ou si c&apos;est la première fois que vous jouez, choisissez « Oui ».</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1027"/>
