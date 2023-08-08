@@ -2666,7 +2666,7 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
     <message>
         <location filename="../src/window_main.cpp" line="461"/>
         <source>Your username must respect these rules:</source>
-        <translation>Votre nom d&apos;utilisateur doit respecter ces règles:</translation>
+        <translation>Votre nom d&apos;utilisateur doit respecter ces règles :</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="463"/>
