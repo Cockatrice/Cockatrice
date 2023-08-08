@@ -113,7 +113,7 @@
     <message>
         <location filename="../src/userlist.cpp" line="45"/>
         <source>ban client I&amp;D</source>
-        <translation>bannir I&amp;D du client</translation>
+        <translation>bannir &amp;ID du client</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="59"/>
