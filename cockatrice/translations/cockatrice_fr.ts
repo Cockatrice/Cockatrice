@@ -5137,7 +5137,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="631"/>
         <source>&amp;Comments:</source>
-        <translation>&amp;Commentaires:</translation>
+        <translation>&amp;Commentaires :</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="632"/>
