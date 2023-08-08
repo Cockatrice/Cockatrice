@@ -1521,12 +1521,12 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="49"/>
         <source>Player &amp;name:</source>
-        <translation>Joueur &amp;nom:</translation>
+        <translation>&amp;Nom du joueur :</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="54"/>
         <source>Token:</source>
-        <translation>Jeton:</translation>
+        <translation>Jeton :</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="59"/>
