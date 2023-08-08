@@ -1740,7 +1740,7 @@ Would you like to change your database location setting?</source>
 
 Cela peut causer des problèmes lors du chargement des images ou des informations des cartes.
 
-Généralement il suffit de redémarrer oracle pour mettre à jour votre base de données de cartes.
+Généralement, il suffit de redémarrer oracle pour mettre à jour votre base de données de cartes.
 
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
