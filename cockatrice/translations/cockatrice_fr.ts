@@ -2023,7 +2023,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/dlg_update.cpp" line="229"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation>Essayer de mettre à jour manuellement en fermant Cockatrice et en exécutant l&apos;installateur</translation>
+        <translation>Essayer de mettre à jour manuellement en fermant Cockatrice et en exécutant l&apos;installateur.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="230"/>
