@@ -3401,7 +3401,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="371"/>
         <source>%1 draws %2 card(s).</source>
-        <translation><numerusform>%1 pioche %2 carte(s).</numerusform><numerusform>%1 pioche %2 carte(s).</numerusform><numerusform>%1 pioche %2 carte(s).</numerusform></translation>
+        <translation><numerusform>%1 pioche %2 carte.</numerusform><numerusform>%1 pioche %2 cartes.</numerusform><numerusform>%1 pioche %2 carte(s).</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="380"/>
