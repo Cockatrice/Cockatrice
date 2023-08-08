@@ -4375,7 +4375,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="835"/>
         <source>X cards from the top of library...</source>
-        <translation>X cartes du dessus de la bibliothèque...</translation>
+        <translation>X carte(s) du dessus de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="836"/>
