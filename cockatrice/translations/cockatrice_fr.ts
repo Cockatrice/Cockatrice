@@ -2442,14 +2442,14 @@ Raison de la fermeture : %1</numerusform></translation>
         <source>Registration accepted.
 Will now login.</source>
         <translation>Enregistrement accepté.
-Connexion.</translation>
+Connexion en cours.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="184"/>
         <source>Account activation accepted.
 Will now login.</source>
         <translation>Activation du compte acceptée.
-Connexion.</translation>
+Connexion en cours.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="218"/>
