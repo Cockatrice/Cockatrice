@@ -3246,12 +3246,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="158"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
-        <translation>%1 ne peut plus regarder la carte du dessus %2 à n&apos;importe quel moment.</translation>
+        <translation>%1 ne peut plus regarder la carte du dessus de sa bibliothèque %2 à n&apos;importe quel moment.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="165"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <translation>%1 attacher %2 à %3&apos;s %4.</translation>
+        <translation>%1 attache %2 à %4 de %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="175"/>
