@@ -4516,7 +4516,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="1393"/>
         <source>Move bottom cards to exile</source>
-        <translation>exiler les cartes du dessus</translation>
+        <translation>Exiler les cartes du dessus</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1454"/>
