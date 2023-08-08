@@ -3221,12 +3221,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="121"/>
         <source> from sideboard</source>
-        <translation> depuis sa réserve</translation>
+        <translation>depuis sa réserve</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="123"/>
         <source> from the stack</source>
-        <translation> depuis la pile</translation>
+        <translation>depuis la pile</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="149"/>
