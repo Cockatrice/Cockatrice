@@ -5182,7 +5182,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="642"/>
         <source>Not Annotated</source>
-        <translation>Sans annotations</translation>
+        <translation>Sans annotation</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="644"/>
