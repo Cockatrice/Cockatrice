@@ -4941,7 +4941,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="20"/>
         <source>&amp;Reason for shutdown:</source>
-        <translation>&amp;Raison de la fermeture:</translation>
+        <translation>&amp;Raison de la fermeture :</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="24"/>
