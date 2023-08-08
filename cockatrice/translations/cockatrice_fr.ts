@@ -543,7 +543,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../src/dlg_settings.cpp" line="625"/>
         <source>Download URLs have been reset.</source>
-        <translation>Les URL de téléchargement on été réinitialisées.</translation>
+        <translation>Les URLs de téléchargement ont été réinitialisées.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="656"/>
