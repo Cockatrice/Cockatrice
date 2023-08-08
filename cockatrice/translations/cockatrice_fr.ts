@@ -3494,7 +3494,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="../src/messagelogwidget.cpp" line="498"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
-        <translation><numerusform>%1 carte(s)</numerusform><numerusform>%1 card(s)</numerusform><numerusform>%1 card(s)</numerusform></translation>
+        <translation><numerusform>%1 carte</numerusform><numerusform>%1 cartes</numerusform><numerusform>%1 carte(s)</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="506"/>
