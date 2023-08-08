@@ -3674,12 +3674,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="734"/>
         <source>%1 shuffles the bottom %3 cards of %2.</source>
-        <translation>%1 mélange les %3 cartes du dessous de %2.</translation>
+        <translation>%1 mélange les %3 cartes du dessous de la bibliothèque de %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="739"/>
         <source>%1 shuffles the top %3 cards of %2.</source>
-        <translation>%1 mélange les %3 cartes du dessus de %2.</translation>
+        <translation>%1 mélange les %3 cartes du dessus de la bibliothèque de %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="744"/>
