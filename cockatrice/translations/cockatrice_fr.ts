@@ -2510,12 +2510,12 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="313"/>
         <source>Help Develop!</source>
-        <translation>Aidez à développer!</translation>
+        <translation>Aidez à développer !</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="314"/>
         <source>Translators:</source>
-        <translation>Traducteurs:</translation>
+        <translation>Traducteurs :</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="315"/>
@@ -2525,7 +2525,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="316"/>
         <source>Help Translate!</source>
-        <translation>Aidez à traduire!</translation>
+        <translation>Aidez à traduire !</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="316"/>
