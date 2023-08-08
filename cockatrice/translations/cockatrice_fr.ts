@@ -6474,7 +6474,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/userinfobox.cpp" line="75"/>
         <source>User Level:</source>
-        <translation>Rang</translation>
+        <translation>Rang :</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/userinfobox.cpp" line="150"/>
