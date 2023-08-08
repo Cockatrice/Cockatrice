@@ -1903,7 +1903,8 @@ Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
         <location filename="../src/dlg_update.cpp" line="64"/>
         <source>Cockatrice was not built with SSL support, therefore you cannot download updates automatically! 
 Please visit the download page to update manually.</source>
-        <translation>Cockatrice n&apos;as pas été construit avec le support du SSL, donc il n&apos;est pas possible de télécharger les mises à jour automatiquement. Veuillez S&apos;il vous plaît visiter la page de téléchargement pour mettre à jour manuellement.</translation>
+        <translation>Cockatrice n&apos;as pas été construit avec le support du SSL, donc il n&apos;est pas possible de télécharger les mises à jour automatiquement.
+Veuillez s&apos;il vous plaît visiter la page de téléchargement, pour mettre à jour manuellement.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="95"/>
