@@ -3004,10 +3004,10 @@ Si vous n’êtes pas sûr, ou si c&apos;est la première fois que vous jouez, c
 Set code(s): %1
 Do you want to enable it/them?</source>
         <translation><numerusform>%n nouvelle édition trouvée dans la base de données des cartes
-Code(s) d&apos;extension : %1
-En souhaitez-vous / l&apos;activation ?</numerusform><numerusform>%n nouvelle(s) édition(s) trouvée(s) dans la base de données des cartes
-Code(s) d&apos;édition(s) : %1
-Voulez-vous l&apos;(les) activer ?</numerusform><numerusform>%n nouvelle(s) édition(s) trouvée(s) dans la base de données des cartes
+Code d&apos;extension : %1
+En souhaitez-vous / l&apos;activation ?</numerusform><numerusform>%n nouvelles éditions trouvées dans la base de données des cartes
+Codes d&apos;éditions : %1
+Voulez-vous les activer ?</numerusform><numerusform>%n nouvelle(s) édition(s) trouvée(s) dans la base de données des cartes
 Code(s) d&apos;édition(s) : %1
 Voulez-vous l&apos;(les) activer ?</numerusform></translation>
     </message>
