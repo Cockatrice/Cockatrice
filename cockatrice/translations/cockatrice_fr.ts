@@ -3034,7 +3034,7 @@ Pour plus d&apos;informations sur la modification de l&apos;ordre des éditions,
         <location filename="../src/window_main.cpp" line="1084"/>
         <location filename="../src/window_main.cpp" line="1216"/>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation>Informations</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1084"/>
