@@ -3599,7 +3599,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="620"/>
         <source>yellow counter(s)</source>
-        <translation><numerusform>Contrecarrer le jaune</numerusform><numerusform>Marqueur(s) jaune(s)</numerusform><numerusform>Marqueur(s) jaune(s)</numerusform></translation>
+        <translation><numerusform>Marqueur jaune</numerusform><numerusform>Marqueurs jaunes</numerusform><numerusform>Marqueur(s) jaune(s)</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="623"/>
