@@ -4009,7 +4009,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="../src/player.cpp" line="1393"/>
         <location filename="../src/player.cpp" line="1454"/>
         <source>Number of cards: (max. %1)</source>
-        <translation>Nombre de cartes: (max. %1)</translation>
+        <translation>Nombre de cartes : (max. %1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="701"/>
