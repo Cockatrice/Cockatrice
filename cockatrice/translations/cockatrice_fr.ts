@@ -799,7 +799,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
         <location filename="../src/dlg_connect.cpp" line="87"/>
         <location filename="../src/dlg_connect.cpp" line="265"/>
         <source>Webpage</source>
-        <translation>page web</translation>
+        <translation>Page web</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="97"/>
