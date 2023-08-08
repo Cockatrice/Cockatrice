@@ -5757,7 +5757,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="../src/tab_logs.cpp" line="175"/>
         <source>Past X Days: </source>
-        <translation>Les X derniers jours:</translation>
+        <translation>Les X derniers jours :</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="176"/>
