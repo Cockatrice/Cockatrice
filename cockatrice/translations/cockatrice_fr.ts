@@ -1700,7 +1700,7 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="../src/dlg_register.cpp" line="372"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation>Le nom du joueur ne peut être vide.</translation>
+        <translation>Le nom du joueur ne peut pas être vide.</translation>
     </message>
 </context>
 <context>
