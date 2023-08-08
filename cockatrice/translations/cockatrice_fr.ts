@@ -5941,7 +5941,7 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="../src/tab_room.cpp" line="148"/>
         <source>&amp;Say:</source>
-        <translation>&amp;Dire:</translation>
+        <translation>&amp;Dire :</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="149"/>
