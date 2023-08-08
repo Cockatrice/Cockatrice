@@ -1690,7 +1690,7 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="../src/dlg_register.cpp" line="364"/>
         <source>Your passwords do not match, please try again.</source>
-        <translation>Vos mots de passe ne correspondent pas. Veuillez réessayer.</translation>
+        <translation>Vos mots de passe ne correspondent pas, veuillez réessayer.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="368"/>
