@@ -829,7 +829,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../src/dlg_connect.cpp" line="156"/>
         <source>Connect to Server</source>
-        <translation>Connecter au serveur</translation>
+        <translation>Se connecter au serveur</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="279"/>
