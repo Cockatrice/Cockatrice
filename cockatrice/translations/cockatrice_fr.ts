@@ -2588,7 +2588,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="378"/>
         <source>To update your client, go to &apos;Help -&gt; Check for Client Updates&apos;.</source>
-        <translation>Pour mettre à jour Cockatrice, allez dans &apos;Aide -&gt; Vérifier pour les mises à jours&apos;.</translation>
+        <translation>Pour mettre à jour Cockatrice, allez dans « Aide -&gt; Vérifier les mises à jour&apos; ».</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="386"/>
