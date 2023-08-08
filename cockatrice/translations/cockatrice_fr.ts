@@ -1337,7 +1337,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="56"/>
         <source>&amp;Creator name:</source>
-        <translation>Nom du &amp;créateur:</translation>
+        <translation>Nom du &amp;créateur :</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="66"/>
