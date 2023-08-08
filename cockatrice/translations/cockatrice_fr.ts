@@ -1410,7 +1410,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation>Un probleme est survenu. Veuillez réessayer de demander un nouveau mot de passe</translation>
+        <translation>Un probleme est survenu. Veuillez réessayer de demander un nouveau mot de passe.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
