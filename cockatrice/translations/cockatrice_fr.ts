@@ -1327,7 +1327,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="47"/>
         <source>&amp;Newer than:</source>
-        <translation>%Créées avant:</translation>
+        <translation>&amp;Créées avant :</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="52"/>
