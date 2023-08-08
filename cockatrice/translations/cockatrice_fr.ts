@@ -2279,7 +2279,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
         <location filename="../src/dlg_settings.cpp" line="243"/>
         <location filename="../src/dlg_settings.cpp" line="253"/>
         <source>Choose path</source>
-        <translation>Choisir chemin d&apos;accès</translation>
+        <translation>Choisir un chemin d&apos;accès</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="281"/>
