@@ -4088,7 +4088,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="728"/>
         <source>&amp;View hand</source>
-        <translation>&amp;Voir main</translation>
+        <translation>Voir &amp;main</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="729"/>
