@@ -2018,7 +2018,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/dlg_update.cpp" line="228"/>
         <source>Cockatrice is unable to open the installer.</source>
-        <translation>cockatrice n&apos;a pas pu ouvrir l&apos;installateur</translation>
+        <translation>Cockatrice n&apos;a pas pu ouvrir l&apos;installateur.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="229"/>
