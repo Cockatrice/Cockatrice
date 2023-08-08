@@ -804,7 +804,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../src/dlg_connect.cpp" line="97"/>
         <source>Reset Password</source>
-        <translation>Remettre le mot de masse à zéro </translation>
+        <translation>Réinitialiser le mot de masse</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="101"/>
