@@ -2653,7 +2653,7 @@ Vous devez activer le jeton de l&apos;activation reçu dans le mail d&apos;activ
     <message>
         <location filename="../src/window_main.cpp" line="448"/>
         <source>Unknown login error: %1</source>
-        <translation>Erreur de connexion inconnue: %1</translation>
+        <translation>Erreur de connexion inconnue : %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="449"/>
