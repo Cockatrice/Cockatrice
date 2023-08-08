@@ -2500,7 +2500,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="311"/>
         <source>Developers:</source>
-        <translation>Développeurs:</translation>
+        <translation>Développeurs :</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="312"/>
