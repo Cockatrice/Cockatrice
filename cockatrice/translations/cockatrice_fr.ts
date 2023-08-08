@@ -2764,7 +2764,7 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
     <message>
         <location filename="../src/window_main.cpp" line="551"/>
         <source>Unknown registration error: %1</source>
-        <translation>Erreur d&apos;enregistrement inconnue: %1</translation>
+        <translation>Erreur d&apos;enregistrement inconnue : %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="560"/>
@@ -2774,7 +2774,7 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
     <message>
         <location filename="../src/window_main.cpp" line="567"/>
         <source>Socket error: %1</source>
-        <translation>Erreur de socket: %1</translation>
+        <translation>Erreur de socket : %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="575"/>
