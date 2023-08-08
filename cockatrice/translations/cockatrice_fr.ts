@@ -3054,12 +3054,12 @@ Pour plus d&apos;informations sur la modification de l&apos;ordre des éditions,
     <message>
         <location filename="../src/window_main.cpp" line="1162"/>
         <source>crashed.</source>
-        <translation>planté.</translation>
+        <translation>a planté.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1165"/>
         <source>timed out.</source>
-        <translation>déconnecté.</translation>
+        <translation>s&apos;est déconnecté.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1168"/>
