@@ -1986,7 +1986,7 @@ Veuillez s&apos;il vous plaît visiter la page de téléchargement, pour mettre 
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
         <translation>Malheureusement, il n&apos;y a pas de paquetage téléchargeable pour votre système d&apos;exploitation.
-Vous devez compiler les sources vous-même.</translation>
+Vous devez probablement compiler les sources vous-même.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="170"/>
