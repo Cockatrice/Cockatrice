@@ -1496,7 +1496,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="31"/>
         <source>Reset Password Warning</source>
-        <translation>Avertissement lors de la remise a zéro du mot de passe</translation>
+        <translation>Avertissement lors de la réinitialisation du mot de passe</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="32"/>
