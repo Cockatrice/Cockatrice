@@ -2699,7 +2699,7 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
     <message>
         <location filename="../src/window_main.cpp" line="472"/>
         <source>can contain the following punctuation: %1</source>
-        <translation>peut contenir la ponctuation suivante: %1</translation>
+        <translation>peut contenir la ponctuation suivante : %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="475"/>
