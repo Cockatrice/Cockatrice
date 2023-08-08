@@ -5570,7 +5570,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="554"/>
         <source>&amp;Say:</source>
-        <translation>&amp;Dire:</translation>
+        <translation>&amp;Dire :</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="557"/>
