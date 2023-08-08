@@ -3231,12 +3231,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="149"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
-        <translation>%1 garde maintenant la carte du dessus %2 révélée.</translation>
+        <translation>%1 garde maintenant la carte du dessus de sa bibliothèque %2 révélée.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="150"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
-        <translation>%1 ne révèle plus la carte du dessus %2.</translation>
+        <translation>%1 ne révèle plus la carte du dessus de sa bibliothèque %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="157"/>
