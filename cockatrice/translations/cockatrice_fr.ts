@@ -4531,7 +4531,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="1528"/>
         <source>Number of sides:</source>
-        <translation>Nombre de faces:</translation>
+        <translation>Nombre de faces :</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1559"/>
