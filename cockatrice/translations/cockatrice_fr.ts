@@ -6706,7 +6706,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="72"/>
         <source>Restore original art priority order</source>
-        <translation>Restaurer l&apos;ordre originale de priorité artistique</translation>
+        <translation>Restaurer l&apos;ordre original de priorité artistique</translation>
     </message>
     <message>
         <location filename="../src/dlg_manage_sets.cpp" line="113"/>
