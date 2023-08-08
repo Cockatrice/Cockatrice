@@ -6056,7 +6056,7 @@ To update your client, go to Help -&gt; Check for Updates.</source>
         <translation>Le serveur vous a envoyé un message que votre client ne comprend pas.
 Ce message peut signifier qu&apos;il y a une nouvelle version de Cockatrice disponible ou que ce serveur utilise une version pre-release ou personnalisée. 
 
-Pour mettre à jour votre client, allez dans Aide -&gt; Vérifier les mise à jour.</translation>
+Pour mettre à jour votre client, allez dans « Aide -&gt; Vérifier les mises à jour ».</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="648"/>
