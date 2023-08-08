@@ -2264,7 +2264,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="145"/>
         <source>Reset all paths</source>
-        <translation>Réinitialiser tous les URL de téléchargement</translation>
+        <translation>Réinitialiser tous les chemins</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="147"/>
