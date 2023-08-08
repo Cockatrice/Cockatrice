@@ -1478,12 +1478,12 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="66"/>
         <source>Reset Password Request</source>
-        <translation>Demande de remise à zéro du mot de passe</translation>
+        <translation>Demande de réinitialisation du mot de passe</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="74"/>
         <source>Reset Password Error</source>
-        <translation>Erreur lors de la remise a zéro du mot de passe</translation>
+        <translation>Erreur lors de la réinitialisation du mot de passe</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="74"/>
