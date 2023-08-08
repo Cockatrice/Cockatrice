@@ -6663,12 +6663,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/userlist.cpp" line="169"/>
         <source>User name to send a warning to can not be blank, please specify a user to warn.</source>
-        <translation>Le nom d&apos;utilisateur du joueur à avertir ne peut être vide, merci d&apos;entrer un joueur à avertir.</translation>
+        <translation>Le nom d&apos;utilisateur du joueur à avertir ne peut pas être vide, merci d&apos;entrer un joueur à avertir.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="175"/>
         <source>Warning to use can not be blank, please select a valid warning to send.</source>
-        <translation>L&apos;avertissement à utiliser ne peut être vide, merci de sélectionner un avertissement valide à envoyer.</translation>
+        <translation>L&apos;avertissement à utiliser ne peut pas être vide, merci de sélectionner un avertissement valide à envoyer.</translation>
     </message>
 </context>
 <context>
