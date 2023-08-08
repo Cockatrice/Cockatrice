@@ -2269,7 +2269,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="147"/>
         <source>All paths have been reset</source>
-        <translation>Les URL de téléchargement on été réinitialisées.</translation>
+        <translation>Les chemins ont été réinitialisés</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="203"/>
