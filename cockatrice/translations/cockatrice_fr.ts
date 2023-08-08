@@ -5772,7 +5772,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="../src/tab_logs.cpp" line="181"/>
         <source>Maximum Results: </source>
-        <translation>Résultats maximum:</translation>
+        <translation>Résultats maximum :</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="185"/>
