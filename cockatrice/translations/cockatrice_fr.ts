@@ -4582,7 +4582,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="3481"/>
         <source>Token: </source>
-        <translation>Jeton:</translation>
+        <translation>Jeton :</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="3483"/>
