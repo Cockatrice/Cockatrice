@@ -3003,7 +3003,7 @@ Si vous n’êtes pas sûr, ou si c&apos;est la première fois que vous jouez, c
         <source>%n new set(s) found in the card database
 Set code(s): %1
 Do you want to enable it/them?</source>
-        <translation><numerusform>%n nouvelle(s) édition trouvée dans la base de données des cartes
+        <translation><numerusform>%n nouvelle édition trouvée dans la base de données des cartes
 Code(s) d&apos;extension : %1
 En souhaitez-vous / l&apos;activation ?</numerusform><numerusform>%n nouvelle(s) édition(s) trouvée(s) dans la base de données des cartes
 Code(s) d&apos;édition(s) : %1
