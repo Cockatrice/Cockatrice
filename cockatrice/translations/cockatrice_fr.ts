@@ -2475,7 +2475,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="306"/>
         <source>About Cockatrice</source>
-        <translation>A propos de Cockatrice</translation>
+        <translation>À propos de Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="308"/>
