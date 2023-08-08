@@ -3467,7 +3467,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
-        <translation><numerusform>%1 mélange son deck et pioche une nouvelle main de %2 carte(s).</numerusform><numerusform>%1 mélange sa bibliothèque et pioche une nouvelle main de %2 carte(s).</numerusform><numerusform>%1 mélange sa bibliothèque et pioche une nouvelle main de %2 carte(s).</numerusform></translation>
+        <translation><numerusform>%1 mélange son deck et pioche une nouvelle main de %2 carte.</numerusform><numerusform>%1 mélange sa bibliothèque et pioche une nouvelle main de %2 cartes.</numerusform><numerusform>%1 mélange sa bibliothèque et pioche une nouvelle main de %2 carte(s).</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="460"/>
