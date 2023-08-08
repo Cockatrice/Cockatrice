@@ -1723,7 +1723,7 @@ Would you like to change your database location setting?</source>
 
 Cockatrice peut ne pas fonctionner correctement avec une base de données invalide.
 
-Vous devrez peut-être redémarrer oracle pour mettre à jour votre base de données de cartes.
+Vous devrez peut-être redémarrer Oracle pour mettre à jour votre base de données de cartes.
 
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
