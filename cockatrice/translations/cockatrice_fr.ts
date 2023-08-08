@@ -1445,7 +1445,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="97"/>
         <source>Reset Password Challenge Error</source>
-        <translation>Erreur Challenge Remise du mot de passe à zéro</translation>
+        <translation>Erreur Réinitialisation du mot de passe Challenge</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="97"/>
