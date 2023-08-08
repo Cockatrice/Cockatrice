@@ -3281,7 +3281,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="211"/>
         <source>%1 points from their %2 to %3.</source>
-        <translation>%1 cible %3 avec %2.</translation>
+        <translation>%1 cible %3 avec son %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="215"/>
