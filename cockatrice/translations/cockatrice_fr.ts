@@ -3584,7 +3584,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="609"/>
         <source>%1 places %2 %3 on %4 (now %5).</source>
-        <translation>%1 places %2 %3 sur %4 (%5).</translation>
+        <translation>%1 place %2 %3 sur %4 (maintenant %5).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="611"/>
