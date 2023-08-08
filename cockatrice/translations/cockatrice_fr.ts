@@ -2075,7 +2075,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/gameselector.cpp" line="209"/>
         <source>Wrong password.</source>
-        <translation>Mot de passe erroné.</translation>
+        <translation>Mot de passe incorrect.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="212"/>
@@ -2085,7 +2085,7 @@ Vous devez probablement compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/gameselector.cpp" line="215"/>
         <source>The game is already full.</source>
-        <translation>Cette partie est déjà complet.</translation>
+        <translation>Cette partie est déjà complète.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="218"/>
