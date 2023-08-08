@@ -2671,7 +2671,7 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
     <message>
         <location filename="../src/window_main.cpp" line="463"/>
         <source>is %1 - %2 characters long</source>
-        <translation>est %1 - long de %2 caractères</translation>
+        <translation>est long de %1 - %2 caractères</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="464"/>
