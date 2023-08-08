@@ -1415,7 +1415,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>Enter the information of the server and the account you&apos;d like to request a new password for.</source>
-        <translation>Veuillez entrer les informations du serveur et du compte pour lesquels vous voulez demander un nouveau mot de passe</translation>
+        <translation>Veuillez entrer les informations du serveur et du compte pour lesquels vous voulez demander un nouveau mot de passe.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="40"/>
