@@ -216,7 +216,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../src/releasechannel.cpp" line="202"/>
         <source>Beta Releases</source>
-        <translation>version bêta</translation>
+        <translation>Versions bêta</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="228"/>
