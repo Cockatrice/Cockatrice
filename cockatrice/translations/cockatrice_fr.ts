@@ -6349,7 +6349,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <location filename="../src/user_context_menu.cpp" line="239"/>
         <location filename="../src/user_context_menu.cpp" line="241"/>
         <source>Failed</source>
-        <translation>Echec</translation>
+        <translation>Échec</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="239"/>
