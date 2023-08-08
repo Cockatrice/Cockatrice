@@ -3186,7 +3186,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="95"/>
         <source> from the top of their library</source>
-        <translation> du dessus de sa bibliothèque</translation>
+        <translation>du dessus de sa bibliothèque</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="101"/>
