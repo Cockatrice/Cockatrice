@@ -2530,7 +2530,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="316"/>
         <source>Support:</source>
-        <translation>Assistance:</translation>
+        <translation>Assistance :</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="317"/>
@@ -2545,7 +2545,7 @@ Connexion en cours.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="319"/>
         <source>F.A.Q.</source>
-        <translation>F.A.Q.</translation>
+        <translation>F.À.Q.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="357"/>
