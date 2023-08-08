@@ -3412,7 +3412,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="../src/messagelogwidget.cpp" line="385"/>
         <source>%1 is looking at the top %3 card(s) %2.</source>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation><numerusform>%1 regarde le(s) %3 carte(s) du dessus %2.</numerusform><numerusform>%1 regarde la / les %3 carte(s) du dessus %2.</numerusform><numerusform>%1 regarde la / les %3 carte(s) du dessus %2.</numerusform></translation>
+        <translation><numerusform>%1 regarde la %3 carte du dessus de sa bibliothèque %2.</numerusform><numerusform>%1 regarde les %3 cartes du dessus de sa bibliothèque %2.</numerusform><numerusform>%1 regarde la / les %3 carte(s) du dessus de sa bibliothèque %2.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="396"/>
