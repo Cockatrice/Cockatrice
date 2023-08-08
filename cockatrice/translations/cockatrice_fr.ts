@@ -5722,17 +5722,17 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="../src/tab_logs.cpp" line="154"/>
         <source>IP Address: </source>
-        <translation>Adresse IP:</translation>
+        <translation>Adresse IP :</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="158"/>
         <source>Game Name: </source>
-        <translation>Nom de la partie:</translation>
+        <translation>Nom de la partie :</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="162"/>
         <source>GameID: </source>
-        <translation>ID de la partie:</translation>
+        <translation>ID de la partie :</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="166"/>
