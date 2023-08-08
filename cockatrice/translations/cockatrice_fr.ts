@@ -1511,12 +1511,12 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="39"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Hôte:</translation>
+        <translation>&amp;Hôte :</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="44"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Port:</translation>
+        <translation>&amp;Port :</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="49"/>
