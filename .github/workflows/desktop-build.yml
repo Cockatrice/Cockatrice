@@ -336,7 +336,7 @@ jobs:
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -354,10 +354,10 @@ jobs:
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@v10.6
+        uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
-          appendedCacheKey: ${{matrix.bit}}-bit
+          doNotCache: false
         env:
           VCPKG_DEFAULT_TRIPLET: '${{matrix.arch}}-windows'
           VCPKG_DISABLE_METRICS: 1
