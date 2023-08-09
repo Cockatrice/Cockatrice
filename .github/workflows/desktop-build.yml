@@ -354,7 +354,7 @@ jobs:
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@v10
+        uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
           appendedCacheKey: ${{matrix.bit}}-bit
