@@ -357,7 +357,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
-          appendedCacheKey: ${{matrix.bit}}-bit
+          doNotCache: false
         env:
           VCPKG_DEFAULT_TRIPLET: '${{matrix.arch}}-windows'
           VCPKG_DISABLE_METRICS: 1
