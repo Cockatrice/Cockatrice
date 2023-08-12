@@ -592,7 +592,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
     networkCacheEdit.setSingleStep(1);
     networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
-    networkCacheEdit.setSuffix(tr(" MB"));
+    networkCacheEdit.setSuffix(" MB");
 
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
