@@ -500,7 +500,7 @@ private:
         {"Player/aMoveTopCardsToExile", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Exile (Multiple)"),
                                                     parseSequenceString(""),
                                                     ShortcutGroup::Move_top)},
-        {"Player/aMoveTopCardsUntil", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Stack"),
+        {"Player/aMoveTopCardsUntil", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Stack Until Found"),
                                                   parseSequenceString("Ctrl+Shift+Y"),
                                                   ShortcutGroup::Move_top)},
         {"Player/aMoveTopCardToBottom", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),

@@ -11,6 +11,7 @@
 #include <QInputDialog>
 #include <QMap>
 #include <QPoint>
+#include <QTimer>
 
 namespace google
 {
@@ -249,6 +250,7 @@ private:
         *aMoveToXfromTopOfLibrary;
 
     bool movingCardsUntil;
+    QTimer *moveTopCardTimer;
     QString previousMovingCardsUntilExpr = {};
     FilterString movingCardsUntilFilter;
 
@@ -298,7 +300,7 @@ private:
                     CardRelation::AttachType attach = CardRelation::DoesNotAttach,
                     bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
-    void moveOneCardUntil(const QString &cardName);
+    void moveOneCardUntil(const CardInfoPtr card);
 
     QRectF bRect;
 
