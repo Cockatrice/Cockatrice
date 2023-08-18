@@ -71,7 +71,9 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
-#include <QTimer>
+
+// milliseconds in between triggers of the move top cards until action
+static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 
 PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QObject(), QGraphicsItem(parentItem)
 {
@@ -108,9 +110,9 @@ void PlayerArea::setPlayerZoneId(int _playerZoneId)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), shortcutsActive(false), lastTokenDestroy(true), lastTokenTableRow(0), id(_id),
-      active(false), local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), zoneId(0),
-      dialogSemaphore(false), deck(nullptr)
+    : QObject(_parent), game(_parent), movingCardsUntil(false), shortcutsActive(false), lastTokenDestroy(true),
+      lastTokenTableRow(0), id(_id), active(false), local(_local), judge(_judge), mirrored(false), handVisible(false),
+      conceded(false), zoneId(0), dialogSemaphore(false), deck(nullptr)
 {
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
@@ -532,6 +534,11 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     for (const auto player : players) {
         addPlayer(player);
     }
+
+    moveTopCardTimer = new QTimer(this);
+    moveTopCardTimer->setInterval(MOVE_TOP_CARD_UNTIL_INTERVAL);
+    moveTopCardTimer->setSingleShot(true);
+    connect(moveTopCardTimer, &QTimer::timeout, [this]() { actMoveTopCardToPlay(); });
 
     rearrangeZones();
     retranslateUi();
@@ -1301,6 +1308,8 @@ void Player::actMoveTopCardsToExile()
 
 void Player::actMoveTopCardsUntil()
 {
+    moveTopCardTimer->stop();
+    movingCardsUntil = false;
     QString expr = previousMovingCardsUntilExpr;
     for (;;) {
         bool ok;
@@ -1328,13 +1337,13 @@ void Player::actMoveTopCardsUntil()
     }
 }
 
-void Player::moveOneCardUntil(const QString &cardName)
+void Player::moveOneCardUntil(const CardInfoPtr card)
 {
-    auto card = db->getCard(cardName);
+    moveTopCardTimer->stop();
     if (zones.value("deck")->getCards().empty() || card.isNull() || movingCardsUntilFilter.check(card)) {
         movingCardsUntil = false;
     } else {
-        QTimer::singleShot(100, [this]() { actMoveTopCardToPlay(); });
+        moveTopCardTimer->start();
     }
 }
 
@@ -2183,7 +2192,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     updateCardMenu(card);
 
     if (movingCardsUntil && startZoneString == "deck" && targetZone->getName() == "stack") {
-        moveOneCardUntil(card->getName());
+        moveOneCardUntil(card->getInfo());
     }
 }
 
