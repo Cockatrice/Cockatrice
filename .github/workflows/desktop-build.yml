@@ -50,7 +50,7 @@ jobs:
 
       - name: Checkout
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -130,7 +130,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get cache timestamp
         id: cache_timestamp
@@ -241,7 +241,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies using homebrew
         shell: bash
@@ -339,7 +339,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
