@@ -4170,7 +4170,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/player.cpp" line="768"/>
         <source>Play top card &amp;face down</source>
-        <translation>oberste Karte verdeckt spielen</translation>
+        <translation>Oberste Karte verdeckt spielen</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="770"/>
