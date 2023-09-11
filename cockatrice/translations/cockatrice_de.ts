@@ -4499,7 +4499,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/player.cpp" line="777"/>
         <source>D&amp;raw bottom cards...</source>
-        <translation>Untere Karten ziehen...</translation>
+        <translation>Unterste Karten ziehen...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="778"/>
