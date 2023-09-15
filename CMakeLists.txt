@@ -74,11 +74,11 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 2.8.1)
+project("Cockatrice" VERSION 2.9.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Prismatic Bridge")
+  set(GIT_TAG_RELEASENAME "Rings of the Wild")
 endif()
 
 # Use c++17 for all targets
