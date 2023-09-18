@@ -216,11 +216,19 @@ include(FindQtRuntime)
 set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
-find_package(Protobuf REQUIRED)
-if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
+find_package(Protobuf CONFIG)
+if(NOT Protobuf_FOUND)
+  find_package(Protobuf REQUIRED)
+endif()
+set(PROTOBUF_LIBRARY "protobuf::libprotobuf")
+set(PROTOBUF_PROTOC_EXECUTABLE "protobuf::protoc")
+
+if(${Protobuf_VERSION} VERSION_LESS "21.0.0" AND NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
   message(FATAL_ERROR "No protoc command found!")
-else()
+elseif(${Protobuf_VERSION} VERSION_LESS "21.0.0")
   message(STATUS "Found Protobuf ${Protobuf_VERSION} at: ${Protobuf_LIBRARIES}")
+else()
+  message(STATUS "Found Protobuf ${Protobuf_VERSION}")
 endif()
 
 #Find OpenSSL
