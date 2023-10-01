@@ -302,21 +302,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: Win-32bit
-            bit: 32
-            arch: x86
-            cmake_generator_platform: Win32
-            qt_version: 5.15.*
-            qt_arch: msvc2019
-            qt_tools: "tools_openssl_x86"
-
           - target: Win7+-64bit
             bit: 64
             arch: x64
             cmake_generator_platform: x64
             qt_version: 5.15.*
             qt_arch: msvc2019_64
-            qt_tools: "tools_openssl_x64"
+            qt_tools: "tools_opensslv3_x64"
 
           - target: Win10+-64bit
             bit: 64
@@ -324,7 +316,7 @@ jobs:
             cmake_generator_platform: x64
             qt_version: 6.3.*
             qt_arch: msvc2019_64
-            qt_tools: "tools_openssl_x64"
+            qt_tools: "tools_opensslv3_x64"
             qt_modules: "qtmultimedia qtwebsockets"
 
     name: ${{matrix.target}}

@@ -225,7 +225,16 @@ endif()
 
 #Find OpenSSL
 if(WIN32)
-  find_package(Win32SslRuntime)
+  find_package(OpenSSL REQUIRED)
+  if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIRS})
+    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
+  else()
+    message(
+      WARNING
+      "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
+    )
+  endif()
 endif()
 
 #Find VCredist
