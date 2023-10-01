@@ -10,7 +10,7 @@ if(WIN32)
   endif()
 
   # VS 2017 uses vcredist_ARCH.exe, VS 2022 uses vc_redist.ARCH.exe
-  set(REDIST_FILE_NAMES vcredist_${REDIST_ARCH}.exe vc_redist.${REDIST_ARCH}.exe)
+  set(REDIST_FILE_NAMES vcredist_${REDIST_ARCH}.exe vcredist.${REDIST_ARCH}.exe vc_redist.${REDIST_ARCH}.exe)
 
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
