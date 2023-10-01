@@ -112,7 +112,6 @@ The following flags can be passed to `cmake`:
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
 - `-DFORCE_USE_QT5=1` Skip looking for Qt6 before trying to find Qt5
-- `-DOPEN_SSL_PATH=C:/Path/To/Tools/OpenSSL/Win_x64/bin"` Designate the OpenSSL Path if you're using non-standard directives
 
 
 # Run
