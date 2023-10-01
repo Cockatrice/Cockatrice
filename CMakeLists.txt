@@ -232,7 +232,7 @@ if(WIN32)
   else()
     message(
       WARNING
-      "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
+        "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
     )
   endif()
 endif()
