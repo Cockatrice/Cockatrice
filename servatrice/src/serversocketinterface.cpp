@@ -1701,9 +1701,14 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
+            SLOT(catchSocketError(QAbstractSocket::SocketError)));
+#else
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+#endif
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
