@@ -33,8 +33,13 @@ public:
 void LimitedPrinter::PrintString(const std::string &val,
                                  ::google::protobuf::TextFormat::BaseTextGenerator *generator) const
 {
-    // auto length = val.length();
-    ::google::protobuf::TextFormat::FastFieldValuePrinter::PrintString(val, generator);
+    auto length = val.length();
+    if (length > MAX_TEXT_LENGTH) {
+        ::google::protobuf::TextFormat::FastFieldValuePrinter::PrintString(
+            val.substr(0, MAX_NAME_LENGTH) + "... ---snip--- (" + std::to_string(length) + " bytes total", generator);
+    } else {
+        ::google::protobuf::TextFormat::FastFieldValuePrinter::PrintString(val, generator);
+    }
 }
 
 void SafePrinter::PrintString(const std::string & /*val*/,
