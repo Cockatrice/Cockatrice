@@ -8,7 +8,6 @@ git push -d origin --REPLACE-WITH-BETA-LIST--
 include different targets -->
 <pre>
 <b>Pre-compiled binaries we serve:</b>
- - <kbd>Windows 7+ (32-bit)</kbd>
  - <kbd>Windows 7+</kbd>
  - <kbd>Windows 10+</kbd>
  - <kbd>macOS 10.15+</kbd> ("Catalina")
