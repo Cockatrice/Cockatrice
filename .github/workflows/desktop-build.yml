@@ -251,8 +251,8 @@ jobs:
           install_qt: ${{matrix.qt_version}}
         run: |
           brew update
-          brew install protobuf@21
-          brew link --force protobuf@21
+          brew install protobuf
+          brew link --force protobuf
           if [[ $install_qt == homebrew ]]; then
             brew install qt --force-bottle
           else # for some reason the tests fail with the action installed qt?
