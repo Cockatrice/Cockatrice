@@ -2910,7 +2910,7 @@ La versión local es %1, la versión remota es %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="664"/>
         <source>Edit custom &amp;tokens...</source>
-        <translation>Editar %fichas personalizadas...</translation>
+        <translation>Editar &amp;fichas personalizadas...</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="665"/>
