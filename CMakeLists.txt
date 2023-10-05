@@ -221,7 +221,7 @@ if(NOT Protobuf_FOUND)
   find_package(Protobuf REQUIRED)
 endif()
 
-if(${Protobuf_VERSION} VERSION_LESS "21.0.0" AND NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
+if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
