@@ -220,15 +220,9 @@ find_package(Protobuf CONFIG)
 if(NOT Protobuf_FOUND)
   find_package(Protobuf REQUIRED)
 endif()
-set(PROTOBUF_LIBRARY "protobuf::libprotobuf")
-set(PROTOBUF_PROTOC_EXECUTABLE "protobuf::protoc")
 
 if(${Protobuf_VERSION} VERSION_LESS "21.0.0" AND NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
   message(FATAL_ERROR "No protoc command found!")
-elseif(${Protobuf_VERSION} VERSION_LESS "21.0.0")
-  message(STATUS "Found Protobuf ${Protobuf_VERSION} at: ${Protobuf_LIBRARIES}")
-else()
-  message(STATUS "Found Protobuf ${Protobuf_VERSION}")
 endif()
 
 #Find OpenSSL
@@ -236,7 +230,6 @@ if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIRS})
-    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
   else()
     message(
       WARNING

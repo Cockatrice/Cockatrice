@@ -160,7 +160,8 @@ set(PROTO_FILES
     session_event.proto
 )
 
-if(${Protobuf_VERSION} VERSION_LESS "21.0.0")
+if(protobuf_MODULE_COMPATIBLE)
+  message(STATUS "Using Protobuf Legacy Mode")
   include_directories(${PROTOBUF_INCLUDE_DIRS})
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
