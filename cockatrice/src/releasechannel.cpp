@@ -67,9 +67,6 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     } else {
         return fileName.contains("Win10");
     }
-#else
-    return false;
-#endif
 }
 #else
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &)
