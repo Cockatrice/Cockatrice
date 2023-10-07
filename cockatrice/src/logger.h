@@ -7,9 +7,7 @@
 #include <QTextStream>
 #include <QVector>
 
-#if defined(Q_PROCESSOR_X86_32)
-#define BUILD_ARCHITECTURE "32-bit"
-#elif defined(Q_PROCESSOR_X86_64)
+#if defined(Q_PROCESSOR_X86_64)
 #define BUILD_ARCHITECTURE "64-bit"
 #elif defined(Q_PROCESSOR_ARM)
 #define BUILD_ARCHITECTURE "ARM"
