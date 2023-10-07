@@ -45,21 +45,13 @@ Page Custom PortableModePageCreate PortableModePageLeave
 
 Function .onInit
 
-${If} ${NSIS_IS_64_BIT} == 1    #NSIS 64bit
+${If} ${NSIS_IS_64_BIT} == 1
     ${IfNot} ${RunningX64}
         MessageBox MB_OK|MB_ICONSTOP "This version of Cockatrice requires a 64-bit Windows system."
         Abort
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
     SetRegView 64
-${Else}    #NSIS 32bit
-    ${If} ${RunningX64}
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-        "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n\
-        We advise you to use the correct 64-bit installer instead to get around potential issues.$\n$\n\
-        Download from our webpage: https://cockatrice.github.io"
-    ${EndIf}
-    StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
 ${EndIf}
 
 StrCpy $PortableDestDir "$Desktop\CockatricePortable"
