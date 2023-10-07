@@ -61,9 +61,6 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 #elif defined(Q_OS_WIN)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-#if Q_PROCESSOR_WORDSIZE == 4
-    return fileName.contains("32bit");
-#elif Q_PROCESSOR_WORDSIZE == 8
     const QString &version = QSysInfo::productVersion();
     if (version.startsWith("7") || version.startsWith("8")) {
         return fileName.contains("Win7");
