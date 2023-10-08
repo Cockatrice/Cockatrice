@@ -209,7 +209,7 @@ jobs:
           - target: 10.15_Catalina
             os: macos-11
             xcode: 11.7 # allows using macOS 10.15 SDK
-            qt_version: 6.2.* # LTS (is compatible with 10.14 and 10.15)
+            qt_version: 6.2.* # 6.2 is last LTS compatible with 10.15, see https://doc.qt.io/qt-6.5/macos.html
             qt_modules: "qtmultimedia qtwebsockets"
             type: Release
             do_tests: 1
