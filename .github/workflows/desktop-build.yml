@@ -302,19 +302,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: Win7+-64bit
-            bit: 64
-            arch: x64
-            cmake_generator_platform: x64
+          - target: Win7+
             qt_version: 5.15.*
             qt_arch: msvc2019_64
             qt_tools: "tools_opensslv3_x64"
 
-          - target: Win10+-64bit
-            bit: 64
-            arch: x64
-            cmake_generator_platform: x64
-            qt_version: 6.3.*
+          - target: Win10+
+            qt_version: 6.5.*
             qt_arch: msvc2019_64
             qt_tools: "tools_opensslv3_x64"
             qt_modules: "qtmultimedia qtwebsockets"
@@ -341,7 +335,7 @@ jobs:
           cache: true
           setup-python: false
           version: ${{matrix.qt_version}}
-          arch: win${{matrix.bit}}_${{matrix.qt_arch}}
+          arch: win64_${{matrix.qt_arch}}
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
@@ -351,7 +345,7 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
         env:
-          VCPKG_DEFAULT_TRIPLET: '${{matrix.arch}}-windows'
+          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
           VCPKG_DISABLE_METRICS: 1
 
       - name: Build Cockatrice
@@ -360,8 +354,8 @@ jobs:
         env:
           PACKAGE_SUFFIX: '-${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
-          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.bit}}_${{matrix.qt_arch}}'
+          CMAKE_GENERATOR_PLATFORM: 'x64'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
