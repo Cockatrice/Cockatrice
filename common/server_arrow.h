@@ -25,14 +25,16 @@ public:
     {
         return startCard;
     }
-    void setStartCard(Server_Card *startCard_) {
+    void setStartCard(Server_Card *startCard_)
+    {
         startCard = startCard_;
     }
     Server_ArrowTarget *getTargetItem() const
     {
         return targetItem;
     }
-    void setTargetItem(Server_ArrowTarget *targetItem_) {
+    void setTargetItem(Server_ArrowTarget *targetItem_)
+    {
         targetItem = targetItem_;
     }
     const color &getColor() const

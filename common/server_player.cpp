@@ -1489,12 +1489,12 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                         startCard = card;
                     }
                     const auto *targetItem = arrow->getTargetItem();
-                    if (targetItem == targetCard){
+                    if (targetItem == targetCard) {
                         sendGameEvent = true;
                         arrow->setTargetItem(card);
                         targetItem = card;
                     }
-                    if (sendGameEvent){
+                    if (sendGameEvent) {
                         Event_CreateArrow event;
                         ServerInfo_Arrow *arrowInfo = event.mutable_arrow_info();
                         arrowInfo->set_id(arrow->getId());
@@ -1504,7 +1504,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                         const Server_Player *arrowTargetPlayer = qobject_cast<const Server_Player *>(targetItem);
                         if (arrowTargetPlayer != nullptr) {
                             arrowInfo->set_target_player_id(arrowTargetPlayer->getPlayerId());
-                        }else{
+                        } else {
                             const Server_Card *arrowTargetCard = qobject_cast<const Server_Card *>(targetItem);
                             arrowInfo->set_target_player_id(arrowTargetCard->getZone()->getPlayer()->getPlayerId());
                             arrowInfo->set_target_zone(arrowTargetCard->getZone()->getName().toStdString());
