@@ -18,6 +18,11 @@ on:
       - '.github/workflows/web-*.yml'
       - '.github/workflows/translations.yml'
 
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  cancel-in-progress: ${{ github.ref_name != 'master' }}
+
 jobs:
   configure:
     name: Configure
@@ -26,12 +31,7 @@ jobs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
 
-    steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{github.token}} # needs other token https://github.com/styfle/cancel-workflow-action/issues/7
-
+    steps:  
       - name: Configure
         id: configure
         shell: bash
