@@ -113,7 +113,7 @@ jobs:
           - distro: UbuntuJammy
             package: DEB
             test: skip # running tests on all distros is superfluous
-            
+
           - distro: UbuntuLunar
             package: DEB
 
@@ -229,7 +229,7 @@ jobs:
             qt_version: homebrew
             type: Release
             do_tests: 1
-            make_package: 1
+            make_package: 0
 
     name: macOS ${{matrix.target}}
     needs: configure
