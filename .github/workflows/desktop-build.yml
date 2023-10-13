@@ -113,7 +113,7 @@ jobs:
           - distro: UbuntuJammy
             package: DEB
             test: skip # running tests on all distros is superfluous
-            
+
           - distro: UbuntuLunar
             package: DEB
 
@@ -215,21 +215,21 @@ jobs:
             do_tests: 1
             make_package: 1
 
-          - target: 11_Big_Sur
-            os: macos-11
-            xcode: 12.5.1
+          - target: 12_Monterey
+            os: macos-12
+            xcode: 13.3
             qt_version: homebrew
             type: Release
             do_tests: 1
             make_package: 1
 
-#          - target: 12_Monterey
-#            os: macos-12
-#            xcode: 13.3
-#            qt_version: homebrew
-#            type: Release
-#            do_tests: 1
-#            make_package: 1
+          - target: 13_Ventura
+            os: macos-13
+            xcode: 14.3.1
+            qt_version: homebrew
+            type: Release
+            do_tests: 1
+            make_package: 0
 
     name: macOS ${{matrix.target}}
     needs: configure
@@ -251,8 +251,8 @@ jobs:
           install_qt: ${{matrix.qt_version}}
         run: |
           brew update
-          brew install protobuf@21
-          brew link --force protobuf@21
+          brew install protobuf
+          brew link --force protobuf
           if [[ $install_qt == homebrew ]]; then
             brew install qt --force-bottle
           else # for some reason the tests fail with the action installed qt?
