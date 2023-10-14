@@ -571,7 +571,7 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
                 toDelete.append(a);
 
             // Don't use else here! It has to happen regardless of whether targetCard == 0.
-            if (a->getStartCard()->getZone()->getPlayer() == player)
+            if (a->getStartCard()->getZone() && a->getStartCard()->getZone()->getPlayer() == player)
                 toDelete.append(a);
         }
         for (int i = 0; i < toDelete.size(); ++i) {

@@ -1475,6 +1475,47 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                                      attachedCard->getZone()->getPlayer()->getPlayerId());
             }
 
+            // Copy Arrows
+            const QList<Server_Player *> &players = game->getPlayers().values();
+            for (auto player : players) {
+                QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
+                while (arrowIterator.hasNext()) {
+                    Server_Arrow *arrow = arrowIterator.next().value();
+                    bool sendGameEvent = false;
+                    const auto *startCard = arrow->getStartCard();
+                    if (startCard == targetCard) {
+                        sendGameEvent = true;
+                        arrow->setStartCard(card);
+                        startCard = card;
+                    }
+                    const auto *targetItem = arrow->getTargetItem();
+                    if (targetItem == targetCard) {
+                        sendGameEvent = true;
+                        arrow->setTargetItem(card);
+                        targetItem = card;
+                    }
+                    if (sendGameEvent) {
+                        Event_CreateArrow event;
+                        ServerInfo_Arrow *arrowInfo = event.mutable_arrow_info();
+                        arrowInfo->set_id(arrow->getId());
+                        arrowInfo->set_start_player_id(player->getPlayerId());
+                        arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
+                        arrowInfo->set_start_card_id(startCard->getId());
+                        const Server_Player *arrowTargetPlayer = qobject_cast<const Server_Player *>(targetItem);
+                        if (arrowTargetPlayer != nullptr) {
+                            arrowInfo->set_target_player_id(arrowTargetPlayer->getPlayerId());
+                        } else {
+                            const Server_Card *arrowTargetCard = qobject_cast<const Server_Card *>(targetItem);
+                            arrowInfo->set_target_player_id(arrowTargetCard->getZone()->getPlayer()->getPlayerId());
+                            arrowInfo->set_target_zone(arrowTargetCard->getZone()->getName().toStdString());
+                            arrowInfo->set_target_card_id(arrowTargetCard->getId());
+                        }
+                        arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
+                        ges.enqueueGameEvent(event, player->getPlayerId());
+                    }
+                }
+            }
+
             targetCard->resetState();
             card->setStashedCard(targetCard);
             break;

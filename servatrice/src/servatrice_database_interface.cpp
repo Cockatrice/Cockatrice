@@ -106,7 +106,8 @@ bool Servatrice_DatabaseInterface::checkSql()
     if (!sqlDatabase.isValid())
         return false;
 
-    if (!sqlDatabase.exec("select 1").isActive())
+    auto query = QSqlQuery(sqlDatabase);
+    if (query.exec("select 1") && query.isActive())
         return openDatabase();
     return true;
 }

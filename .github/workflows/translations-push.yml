@@ -45,7 +45,7 @@ jobs:
 
       - name: Render template
         id: template
-        uses: chuhlomin/render-template@v1.7
+        uses: chuhlomin/render-template@v1
         with:
           template: .ci/update_translation_source_strings_template.md
           vars: |
