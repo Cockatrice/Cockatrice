@@ -148,7 +148,7 @@ void Server_Game::storeGameInformation()
     for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
         _gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
 
-    for (const auto& playerName : allPlayersEver) {
+    for (const auto &playerName : allPlayersEver) {
         replayMatchInfo->add_player_names(playerName.toStdString());
     }
 

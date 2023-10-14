@@ -32,26 +32,26 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &_featureList)
     _featureList.insert("2.8.0_min_version", false);
 }
 
-void FeatureSet::enableRequiredFeature(QMap<QString, bool> &_featureList, const QString& featureName)
+void FeatureSet::enableRequiredFeature(QMap<QString, bool> &_featureList, const QString &featureName)
 {
     if (_featureList.contains(featureName))
         _featureList.insert(featureName, true);
 }
 
-void FeatureSet::disableRequiredFeature(QMap<QString, bool> &_featureList, const QString& featureName)
+void FeatureSet::disableRequiredFeature(QMap<QString, bool> &_featureList, const QString &featureName)
 {
     if (_featureList.contains(featureName))
         _featureList.insert(featureName, false);
 }
 
 QMap<QString, bool>
-FeatureSet::addFeature(QMap<QString, bool> &_featureList, const QString& featureName, bool isFeatureRequired)
+FeatureSet::addFeature(QMap<QString, bool> &_featureList, const QString &featureName, bool isFeatureRequired)
 {
     _featureList.insert(featureName, isFeatureRequired);
     return _featureList;
 }
 
-QMap<QString, bool> FeatureSet::identifyMissingFeatures(const QMap<QString, bool>& suppliedFeatures,
+QMap<QString, bool> FeatureSet::identifyMissingFeatures(const QMap<QString, bool> &suppliedFeatures,
                                                         QMap<QString, bool> requiredFeatures)
 {
     QMap<QString, bool> missingList;
@@ -64,7 +64,8 @@ QMap<QString, bool> FeatureSet::identifyMissingFeatures(const QMap<QString, bool
     return missingList;
 }
 
-bool FeatureSet::isRequiredFeaturesMissing(const QMap<QString, bool>& suppliedFeatures, QMap<QString, bool> requiredFeatures)
+bool FeatureSet::isRequiredFeaturesMissing(const QMap<QString, bool> &suppliedFeatures,
+                                           QMap<QString, bool> requiredFeatures)
 {
     QMap<QString, bool>::iterator i;
     for (i = requiredFeatures.begin(); i != requiredFeatures.end(); ++i) {
