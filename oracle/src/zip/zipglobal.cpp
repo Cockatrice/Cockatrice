@@ -96,7 +96,9 @@ int OSDAB_ZIP_MANGLE(currentUtcOffset)()
     return tm_struct->tm_isdst > 0 ? utcOffset + 3600 : utcOffset;
 #endif // No UTC
 
-    // return 0;
+#if !defined(Q_OS_WIN)
+    return 0;
+#endif
 }
 
 QDateTime OSDAB_ZIP_MANGLE(fromFileTimestamp)(const QDateTime &dateTime)
