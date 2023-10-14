@@ -105,7 +105,7 @@ public:
     static QString visibleNameFromName(const QString &_name);
     virtual QString getVisibleName() const;
     void clearTree();
-    AbstractDecklistNode *findChild(const QString &name);
+    AbstractDecklistNode *findChild(const QString &_name);
     int height() const override;
     int recursiveCount(bool countTotalCards = false) const;
     bool compare(AbstractDecklistNode *other) const override;

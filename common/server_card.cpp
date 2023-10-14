@@ -103,15 +103,15 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
     return avalue;
 }
 
-void Server_Card::setCounter(int id, int value, Event_SetCardCounter *event)
+void Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 {
     if (value)
-        counters.insert(id, value);
+        counters.insert(_id, value);
     else
-        counters.remove(id);
+        counters.remove(_id);
 
     if (event) {
-        event->set_counter_id(id);
+        event->set_counter_id(_id);
         event->set_counter_value(value);
     }
 }

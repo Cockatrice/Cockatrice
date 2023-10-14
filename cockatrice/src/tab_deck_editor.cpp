@@ -1076,8 +1076,8 @@ void TabDeckEditor::actDecrementCardFromSideboard()
 
 void TabDeckEditor::copyDatabaseCellContents()
 {
-    QVariant data = databaseView->selectionModel()->currentIndex().data();
-    QApplication::clipboard()->setText(data.toString());
+    auto _data = databaseView->selectionModel()->currentIndex().data();
+    QApplication::clipboard()->setText(_data.toString());
 }
 
 void TabDeckEditor::actIncrement()

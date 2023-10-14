@@ -54,7 +54,7 @@ private:
     Server_Card *stashedCard;
 
 public:
-    Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
+    Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = nullptr);
     ~Server_Card() override;
 
     Server_CardZone *getZone() const
@@ -86,9 +86,9 @@ public:
     {
         return counters;
     }
-    int getCounter(int id) const
+    int getCounter(int counter_id) const
     {
-        return counters.value(id, 0);
+        return counters.value(counter_id, 0);
     }
     bool getTapped() const
     {
@@ -144,7 +144,7 @@ public:
     {
         name = _name;
     }
-    void setCounter(int id, int value, Event_SetCardCounter *event = nullptr);
+    void setCounter(int _id, int value, Event_SetCardCounter *event = nullptr);
     void setTapped(bool _tapped)
     {
         tapped = _tapped;

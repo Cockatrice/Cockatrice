@@ -141,7 +141,7 @@ endif()
 # Define proper compilation flags
 if(MSVC)
   # Visual Studio: Maximum optimization, disable warning C4251, establish C++17 compatibility
-  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive-")
+  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive- /W4")
   # Generate complete debugging information
   #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 elseif(CMAKE_COMPILER_IS_GNUCXX)

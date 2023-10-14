@@ -114,8 +114,8 @@ public:
 protected:
     void initializePage() override;
     bool validatePage() override;
-    void readSetsFromByteArray(QByteArray data);
-    void readSetsFromByteArrayRef(QByteArray &data);
+    void readSetsFromByteArray(QByteArray _data);
+    void readSetsFromByteArrayRef(QByteArray &_data);
     void downloadSetsFile(const QUrl &url);
 
 private:

@@ -349,8 +349,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // split cards are considered a single card, enqueue for later merging
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
-            auto faceName = getStringPropertyFromMap(card, "faceName");
-            SplitCardPart split(faceName, text, properties, setInfo);
+            auto _faceName = getStringPropertyFromMap(card, "faceName");
+            SplitCardPart split(_faceName, text, properties, setInfo);
             auto found_iter = splitCards.find(name);
             if (found_iter == splitCards.end()) {
                 splitCards.insert(name, {split});

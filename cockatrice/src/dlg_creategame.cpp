@@ -235,13 +235,13 @@ void DlgCreateGame::actOK()
     cmd.set_join_as_judge(QApplication::keyboardModifiers() & Qt::ShiftModifier);
     cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
 
-    QString gameTypes = QString();
+    QString _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
         if (gameTypeCheckBoxIterator.value()->isChecked()) {
             cmd.add_game_type_ids(gameTypeCheckBoxIterator.key());
-            gameTypes += gameTypeCheckBoxIterator.value()->text() + ", ";
+            _gameTypes += gameTypeCheckBoxIterator.value()->text() + ", ";
         }
     }
 
@@ -256,7 +256,7 @@ void DlgCreateGame::actOK()
         SettingsCache::instance().setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
         SettingsCache::instance().setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
         SettingsCache::instance().setCreateGameAsSpectator(createGameAsSpectatorCheckBox->isChecked());
-        SettingsCache::instance().setGameTypes(gameTypes);
+        SettingsCache::instance().setGameTypes(_gameTypes);
     }
     PendingCommand *pend = room->prepareRoomCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));

@@ -326,12 +326,12 @@ void CardDatabaseDisplayModel::clearFilterAll()
     invalidateFilter();
 }
 
-void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
+void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
 {
     if (this->filterTree != nullptr)
         disconnect(this->filterTree, nullptr, this, nullptr);
 
-    this->filterTree = filterTree;
+    this->filterTree = _filterTree;
     connect(this->filterTree, SIGNAL(changed()), this, SLOT(filterTreeChanged()));
     invalidate();
 }

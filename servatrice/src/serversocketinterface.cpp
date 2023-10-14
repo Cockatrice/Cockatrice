@@ -1306,16 +1306,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
     QSqlQuery *query = sqlInterface->prepareQuery(queryText);
     if (cmd.has_real_name()) {
-        QString realName = nameFromStdString(cmd.real_name());
-        query->bindValue(":realName", realName);
+        auto _realName = nameFromStdString(cmd.real_name());
+        query->bindValue(":realName", _realName);
     }
     if (cmd.has_email()) {
-        QString emailAddress = nameFromStdString(cmd.email());
-        query->bindValue(":email", emailAddress);
+        auto _emailAddress = nameFromStdString(cmd.email());
+        query->bindValue(":email", _emailAddress);
     }
     if (cmd.has_country()) {
-        QString country = nameFromStdString(cmd.country());
-        query->bindValue(":country", country);
+        auto _country = nameFromStdString(cmd.country());
+        query->bindValue(":country", _country);
     }
     query->bindValue(":userName", userName);
 

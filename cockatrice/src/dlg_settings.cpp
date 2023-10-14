@@ -1154,28 +1154,28 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
 
     // layout
-    auto *editLayout = new QGridLayout;
-    editLayout->addWidget(currentActionGroupLabel, 0, 0);
-    editLayout->addWidget(currentActionGroupName, 0, 1);
-    editLayout->addWidget(currentActionLabel, 1, 0);
-    editLayout->addWidget(currentActionName, 1, 1);
-    editLayout->addWidget(currentShortcutLabel, 2, 0);
-    editLayout->addWidget(editTextBox, 2, 1);
+    auto *_editLayout = new QGridLayout;
+    _editLayout->addWidget(currentActionGroupLabel, 0, 0);
+    _editLayout->addWidget(currentActionGroupName, 0, 1);
+    _editLayout->addWidget(currentActionLabel, 1, 0);
+    _editLayout->addWidget(currentActionName, 1, 1);
+    _editLayout->addWidget(currentShortcutLabel, 2, 0);
+    _editLayout->addWidget(editTextBox, 2, 1);
 
     editShortcutGroupBox = new QGroupBox;
-    editShortcutGroupBox->setLayout(editLayout);
+    editShortcutGroupBox->setLayout(_editLayout);
 
-    auto *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addWidget(faqLabel);
-    buttonsLayout->addWidget(btnResetAll);
-    buttonsLayout->addWidget(btnClearAll);
+    auto *_buttonsLayout = new QHBoxLayout;
+    _buttonsLayout->addWidget(faqLabel);
+    _buttonsLayout->addWidget(btnResetAll);
+    _buttonsLayout->addWidget(btnClearAll);
 
-    auto *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(shortcutsTable);
-    mainLayout->addWidget(editShortcutGroupBox);
-    mainLayout->addLayout(buttonsLayout);
+    auto *_mainLayout = new QVBoxLayout;
+    _mainLayout->addWidget(shortcutsTable);
+    _mainLayout->addWidget(editShortcutGroupBox);
+    _mainLayout->addLayout(_buttonsLayout);
 
-    setLayout(mainLayout);
+    setLayout(_mainLayout);
 
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetShortcuts()));
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
