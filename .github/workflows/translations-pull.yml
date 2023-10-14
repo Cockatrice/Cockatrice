@@ -26,7 +26,7 @@ jobs:
         with:
           # uses config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
           # https://github.com/transifex/cli#pulling-files-from-transifex
-          token: ${{ secrets.TRANSIFEX_TOKEN }}
+          token: ${{ secrets.TX_TOKEN }}
           args: pull --all
 
       - name: Create pull request
