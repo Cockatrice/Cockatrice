@@ -1,4 +1,4 @@
-name: Update Translated Strings
+name: Update Translations
 
 on:
   workflow_dispatch:
@@ -14,17 +14,17 @@ jobs:
     # Do not run the scheduled workflow on forks
     if: github.event_name != 'schedule' || github.repository_owner == 'Cockatrice'
 
-    name: Update translated strings
+    name: Pull languages
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Pull newly translated strings from Transifex
+      - name: Pull translated strings from Transifex
         uses: transifex/cli-action@v2
         with:
-          # uses config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
+          # used config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
           # https://github.com/transifex/cli#pulling-files-from-transifex
           token: ${{ secrets.TX_TOKEN }}
           args: pull --all
