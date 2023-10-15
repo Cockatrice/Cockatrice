@@ -73,9 +73,9 @@ void SignalHandler::internalSigHupHandler()
     snHup->setEnabled(true);
 }
 
+#ifdef Q_OS_UNIX
 void SignalHandler::sigSegvHandler(int sig)
 {
-#ifdef Q_OS_UNIX
     void *array[SIGSEGV_TRACE_LINES];
     size_t size;
 
@@ -96,5 +96,9 @@ void SignalHandler::sigSegvHandler(int sig)
     delete loggerThread;
 
     raise(sig);
-#endif
 }
+#else
+void SignalHandler::sigSegvHandler(int /* sig */)
+{
+}
+#endif

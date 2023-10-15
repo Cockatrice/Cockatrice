@@ -1752,9 +1752,9 @@ void TcpServerSocketInterface::flushOutputQueue()
 
         QByteArray buf;
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-        unsigned int size = item.ByteSizeLong();
+        unsigned int size = static_cast<unsigned int>(item.ByteSizeLong());
 #else
-        unsigned int size = item.ByteSize();
+        unsigned int size = static_cast<unsigned int>(item.ByteSize());
 #endif
         buf.resize(size + 4);
         item.SerializeToArray(buf.data() + 4, size);
@@ -1955,9 +1955,9 @@ void WebsocketServerSocketInterface::flushOutputQueue()
 
         QByteArray buf;
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-        unsigned int size = item.ByteSizeLong();
+        unsigned int size = static_cast<unsigned int>(item.ByteSizeLong());
 #else
-        unsigned int size = item.ByteSize();
+        unsigned int size = static_cast<unsigned int>(item.ByteSize());
 #endif
         buf.resize(size);
         item.SerializeToArray(buf.data(), size);
