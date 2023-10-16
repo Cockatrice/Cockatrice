@@ -143,10 +143,10 @@ DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_
 {
 }
 
-AbstractDecklistNode *InnerDecklistNode::findChild(const QString &name)
+AbstractDecklistNode *InnerDecklistNode::findChild(const QString &_name)
 {
     for (int i = 0; i < size(); i++) {
-        if (at(i)->getName() == name) {
+        if (at(i)->getName() == _name) {
             return at(i);
         }
     }

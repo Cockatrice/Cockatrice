@@ -248,9 +248,9 @@ void Server::removeClient(Server_ProtocolHandler *client)
         Event_UserLeft event;
         event.set_name(data->name());
         SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
-        for (auto &client : clients)
-            if (client->getAcceptsUserListChanges())
-                client->sendProtocolItem(*se);
+        for (auto &_client : clients)
+            if (_client->getAcceptsUserListChanges())
+                _client->sendProtocolItem(*se);
         sendIsl_SessionEvent(*se);
         delete se;
 

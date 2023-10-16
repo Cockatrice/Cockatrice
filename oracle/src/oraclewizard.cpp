@@ -438,7 +438,7 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
     reply->deleteLater();
 }
 
-void LoadSetsPage::readSetsFromByteArray(QByteArray data)
+void LoadSetsPage::readSetsFromByteArray(QByteArray _data)
 {
     // show an infinite progressbar
     progressBar->setMaximum(0);
@@ -450,16 +450,16 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 
     wizard()->downloadedPlainXml = false;
     wizard()->xmlData.clear();
-    readSetsFromByteArrayRef(data);
+    readSetsFromByteArrayRef(_data);
 }
 
-void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &data)
+void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &_data)
 {
     // unzip the file if needed
-    if (data.startsWith(XZ_SIGNATURE)) {
+    if (_data.startsWith(XZ_SIGNATURE)) {
 #ifdef HAS_LZMA
         // zipped file
-        auto *inBuffer = new QBuffer(&data);
+        auto *inBuffer = new QBuffer(&_data);
         auto newData = QByteArray();
         auto *outBuffer = new QBuffer(&newData);
         inBuffer->open(QBuffer::ReadOnly);
@@ -469,7 +469,7 @@ void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &data)
             zipDownloadFailed(tr("Xz extraction failed."));
             return;
         }
-        data.clear();
+        _data.clear();
         readSetsFromByteArrayRef(newData);
         return;
 #else
@@ -481,10 +481,10 @@ void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &data)
         progressBar->hide();
         return;
 #endif
-    } else if (data.startsWith(ZIP_SIGNATURE)) {
+    } else if (_data.startsWith(ZIP_SIGNATURE)) {
 #ifdef HAS_ZLIB
         // zipped file
-        auto *inBuffer = new QBuffer(&data);
+        auto *inBuffer = new QBuffer(&_data);
         auto newData = QByteArray();
         auto *outBuffer = new QBuffer(&newData);
         QString fileName;
@@ -510,7 +510,7 @@ void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &data)
             uz.closeArchive();
             return;
         }
-        data.clear();
+        _data.clear();
         readSetsFromByteArrayRef(newData);
         return;
 #else
@@ -522,15 +522,15 @@ void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &data)
         progressBar->hide();
         return;
 #endif
-    } else if (data.startsWith("{")) {
+    } else if (_data.startsWith("{")) {
         // Start the computation.
-        jsonData = std::move(data);
+        jsonData = std::move(_data);
         future = QtConcurrent::run([this] { return wizard()->importer->readSetsFromByteArray(std::move(jsonData)); });
         watcher.setFuture(future);
-    } else if (data.startsWith("<")) {
+    } else if (_data.startsWith("<")) {
         // save xml file and don't do any processing
         wizard()->downloadedPlainXml = true;
-        wizard()->xmlData = std::move(data);
+        wizard()->xmlData = std::move(_data);
         importFinished();
     } else {
         wizard()->enableButtons();

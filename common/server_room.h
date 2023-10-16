@@ -120,7 +120,7 @@ public:
     void removeClient(Server_ProtocolHandler *client);
 
     void addExternalUser(const ServerInfo_User &userInfo);
-    void removeExternalUser(const QString &name);
+    void removeExternalUser(const QString &_name);
     const QMap<QString, ServerInfo_User_Container> &getExternalUsers() const
     {
         return externalUsers;

@@ -280,8 +280,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc)))
                 ++commandCountOverTime[0];
 
-            for (int i = 0; i < commandCountOverTime.size(); ++i) {
-                totalCount += commandCountOverTime[i];
+            for (int count : commandCountOverTime) {
+                totalCount += count;
             }
 
             if (maxCommandCountPerInterval > 0 && totalCount > maxCommandCountPerInterval) {
@@ -571,7 +571,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name()))) {
         return Response::RespInIgnoreList;
     }
-    if (!addSaidMessageSize(cmd.message().size())) {
+    if (!addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
         return Response::RespChatFlood;
     }
 
@@ -765,7 +765,7 @@ bool Server_ProtocolHandler::addSaidMessageSize(int size)
 Response::ResponseCode
 Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer & /*rc*/)
 {
-    if (!addSaidMessageSize(cmd.message().size())) {
+    if (!addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
         return Response::RespChatFlood;
     }
     QString msg = QString::fromStdString(cmd.message());

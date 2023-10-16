@@ -986,7 +986,7 @@ PendingCommand *TabGame::prepareGameCommand(const QList<const ::google::protobuf
     return new PendingCommand(cont);
 }
 
-void TabGame::startGame(bool resuming)
+void TabGame::startGame(bool _resuming)
 {
     currentPhase = -1;
 
@@ -999,7 +999,7 @@ void TabGame::startGame(bool resuming)
 
     mainWidget->setCurrentWidget(gamePlayAreaWidget);
 
-    if (!resuming) {
+    if (!_resuming) {
         QMapIterator<int, Player *> playerIterator(players);
         while (playerIterator.hasNext())
             playerIterator.next().value()->setGameStarted();

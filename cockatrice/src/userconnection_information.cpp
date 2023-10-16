@@ -28,16 +28,16 @@ QMap<QString, std::pair<QString, UserConnection_Information>> UserConnection_Inf
     int size = servers.getValue("totalServers", "server", "server_details").toInt() + 1;
 
     for (int i = 0; i < size; i++) {
-        QString saveName = servers.getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
+        QString _saveName = servers.getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
         QString serverName = servers.getValue(QString("server%1").arg(i), "server", "server_details").toString();
         QString portNum = servers.getValue(QString("port%1").arg(i), "server", "server_details").toString();
         QString userName = servers.getValue(QString("username%1").arg(i), "server", "server_details").toString();
         QString pass = servers.getValue(QString("password%1").arg(i), "server", "server_details").toString();
         bool savePass = servers.getValue(QString("savePassword%1").arg(i), "server", "server_details").toBool();
-        QString site = servers.getValue(QString("site%1").arg(i), "server", "server_details").toString();
+        QString _site = servers.getValue(QString("site%1").arg(i), "server", "server_details").toString();
 
-        UserConnection_Information userInfo(saveName, serverName, portNum, userName, pass, savePass, site);
-        serverList.insert(saveName, std::make_pair(serverName, userInfo));
+        UserConnection_Information userInfo(_saveName, serverName, portNum, userName, pass, savePass, _site);
+        serverList.insert(_saveName, std::make_pair(serverName, userInfo));
     }
 
     return serverList;
@@ -45,15 +45,15 @@ QMap<QString, std::pair<QString, UserConnection_Information>> UserConnection_Inf
 
 QStringList UserConnection_Information::getServerInfo(const QString &find)
 {
-    QStringList server;
+    QStringList _server;
 
     ServersSettings &servers = SettingsCache::instance().servers();
 
     int size = servers.getValue("totalServers", "server", "server_details").toInt() + 1;
     for (int i = 0; i < size; i++) {
-        QString saveName = servers.getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
+        QString _saveName = servers.getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
 
-        if (find != saveName)
+        if (find != _saveName)
             continue;
 
         QString serverName = servers.getValue(QString("server%1").arg(i), "server", "server_details").toString();
@@ -61,20 +61,20 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
         QString userName = servers.getValue(QString("username%1").arg(i), "server", "server_details").toString();
         QString pass = servers.getValue(QString("password%1").arg(i), "server", "server_details").toString();
         bool savePass = servers.getValue(QString("savePassword%1").arg(i), "server", "server_details").toBool();
-        QString site = servers.getValue(QString("site%1").arg(i), "server", "server_details").toString();
+        QString _site = servers.getValue(QString("site%1").arg(i), "server", "server_details").toString();
 
-        server.append(saveName);
-        server.append(serverName);
-        server.append(portNum);
-        server.append(userName);
-        server.append(pass);
-        server.append(savePass ? "1" : "0");
-        server.append(site);
+        _server.append(_saveName);
+        _server.append(serverName);
+        _server.append(portNum);
+        _server.append(userName);
+        _server.append(pass);
+        _server.append(savePass ? "1" : "0");
+        _server.append(_site);
         break;
     }
 
-    if (server.empty())
+    if (_server.empty())
         qDebug() << "There was a problem!";
 
-    return server;
+    return _server;
 }

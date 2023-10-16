@@ -126,12 +126,12 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
-    PileZone *deck = new PileZone(this, "deck", true, false, playerArea);
+    auto *_deck = new PileZone(this, "deck", true, false, playerArea);
     QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
                            10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
-    deck->setPos(base);
+    _deck->setPos(base);
 
-    qreal h = deck->boundingRect().width() + 5;
+    qreal h = _deck->boundingRect().width() + 5;
 
     auto *handCounter = new HandCounter(playerArea);
     handCounter->setPos(base + QPointF(0, h + 10));
@@ -321,7 +321,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         bottomLibraryMenu = libraryMenu->addTearOffMenu(QString());
         libraryMenu->addSeparator();
         libraryMenu->addAction(aOpenDeckInDeckEditor);
-        deck->setMenu(libraryMenu, aDrawCard);
+        _deck->setMenu(libraryMenu, aDrawCard);
 
         topLibraryMenu->addAction(aMoveTopToPlay);
         topLibraryMenu->addAction(aMoveTopToPlayFaceDown);
@@ -2282,27 +2282,27 @@ void Player::eventAttachCard(const Event_AttachCard &event)
 
 void Player::eventDrawCards(const Event_DrawCards &event)
 {
-    CardZone *deck = zones.value("deck");
-    CardZone *hand = zones.value("hand");
+    CardZone *_deck = zones.value("deck");
+    CardZone *_hand = zones.value("hand");
 
     const int listSize = event.cards_size();
     if (listSize) {
         for (int i = 0; i < listSize; ++i) {
             const ServerInfo_Card &cardInfo = event.cards(i);
-            CardItem *card = deck->takeCard(0, cardInfo.id());
+            CardItem *card = _deck->takeCard(0, cardInfo.id());
             card->setName(QString::fromStdString(cardInfo.name()));
-            hand->addCard(card, false, -1);
+            _hand->addCard(card, false, -1);
         }
     } else {
         const int number = event.number();
         for (int i = 0; i < number; ++i) {
-            hand->addCard(deck->takeCard(0, -1), false, -1);
+            _hand->addCard(_deck->takeCard(0, -1), false, -1);
         }
     }
 
-    hand->reorganizeCards();
-    deck->reorganizeCards();
-    emit logDrawCards(this, event.number(), deck->getCards().size() == 0);
+    _hand->reorganizeCards();
+    _deck->reorganizeCards();
+    emit logDrawCards(this, event.number(), _deck->getCards().size() == 0);
 }
 
 void Player::eventRevealCards(const Event_RevealCards &event)
@@ -3157,16 +3157,16 @@ void Player::actSetPT()
         if (!empty) {
             const auto oldpt = parsePT(card->getPT());
             int ptIter = 0;
-            for (const auto &item : ptList) {
+            for (const auto &_item : ptList) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-                if (item.typeId() == QMetaType::Type::Int) {
+                if (_item.typeId() == QMetaType::Type::Int) {
 #else
-                if (item.type() == QVariant::Int) {
+                if (_item.type() == QVariant::Int) {
 #endif
                     int oldItem = ptIter < oldpt.size() ? oldpt.at(ptIter).toInt() : 0;
-                    newpt += '/' + QString::number(oldItem + item.toInt());
+                    newpt += '/' + QString::number(oldItem + _item.toInt());
                 } else {
-                    newpt += '/' + item.toString();
+                    newpt += '/' + _item.toString();
                 }
                 ++ptIter;
             }

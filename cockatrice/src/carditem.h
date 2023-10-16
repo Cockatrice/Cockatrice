@@ -138,7 +138,7 @@ public:
         return attachedCards;
     }
     void resetState();
-    void processCardInfo(const ServerInfo_Card &info);
+    void processCardInfo(const ServerInfo_Card &_info);
 
     QMenu *getCardMenu() const
     {

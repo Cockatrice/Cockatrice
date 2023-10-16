@@ -729,8 +729,8 @@ const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) con
 
     for (i = userList.begin(); i != userList.end(); ++i)
         if (i.key().toLower() == userNameToMatchLower) {
-            const ServerInfo_User &userInfo = i.value()->getUserInfo();
-            return &userInfo;
+            const ServerInfo_User &_userInfo = i.value()->getUserInfo();
+            return &_userInfo;
         }
 
     return nullptr;

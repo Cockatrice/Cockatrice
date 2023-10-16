@@ -612,22 +612,22 @@ QStringList CardDatabase::getAllMainCardTypes() const
 
 void CardDatabase::checkUnknownSets()
 {
-    SetList sets = getSetList();
+    auto _sets = getSetList();
 
-    if (sets.getEnabledSetsNum()) {
+    if (_sets.getEnabledSetsNum()) {
         // if some sets are first found on this run, ask the user
-        int numUnknownSets = sets.getUnknownSetsNum();
-        QStringList unknownSetNames = sets.getUnknownSetsNames();
+        int numUnknownSets = _sets.getUnknownSetsNum();
+        QStringList unknownSetNames = _sets.getUnknownSetsNames();
         if (numUnknownSets > 0) {
             emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
         } else {
-            sets.markAllAsKnown();
+            _sets.markAllAsKnown();
         }
     } else {
         // No set enabled. Probably this is the first time running trice
-        sets.guessSortKeys();
-        sets.sortByKey();
-        sets.enableAll();
+        _sets.guessSortKeys();
+        _sets.sortByKey();
+        _sets.enableAll();
         notifyEnabledSetsChanged();
 
         emit cardDatabaseAllNewSetsEnabled();
@@ -636,14 +636,14 @@ void CardDatabase::checkUnknownSets()
 
 void CardDatabase::enableAllUnknownSets()
 {
-    SetList sets = getSetList();
-    sets.enableAllUnknown();
+    auto _sets = getSetList();
+    _sets.enableAllUnknown();
 }
 
 void CardDatabase::markAllSetsAsKnown()
 {
-    SetList sets = getSetList();
-    sets.markAllAsKnown();
+    auto _sets = getSetList();
+    _sets.markAllAsKnown();
 }
 
 void CardDatabase::notifyEnabledSetsChanged()

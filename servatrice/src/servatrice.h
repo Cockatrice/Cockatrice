@@ -143,7 +143,7 @@ private slots:
     void shutdownTimeout();
 
 protected:
-    void doSendIslMessage(const IslMessage &msg, int islServerId) override;
+    void doSendIslMessage(const IslMessage &msg, int _serverId) override;
 
 private:
     enum DatabaseType
@@ -276,9 +276,9 @@ public:
     void incRxBytes(quint64 num);
     void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
 
-    bool islConnectionExists(int islServerId) const;
-    void addIslInterface(int islServerId, IslInterface *interface);
-    void removeIslInterface(int islServerId);
+    bool islConnectionExists(int _serverId) const;
+    void addIslInterface(int _serverId, IslInterface *interface);
+    void removeIslInterface(int _serverId);
     QReadWriteLock islLock;
 
     QList<ServerProperties> getServerList() const;
