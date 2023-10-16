@@ -27,7 +27,7 @@ jobs:
           # used config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
           # https://github.com/transifex/cli#pulling-files-from-transifex
           token: ${{ secrets.TX_TOKEN }}
-          args: pull --all
+          args: pull --force --all
 
       - name: Create pull request
         if: github.event_name != 'pull_request'
@@ -43,17 +43,16 @@ jobs:
           author: github-actions <github-actions@github.com>
           branch: ci-update_translations
           delete-branch: true
-          title: '[Translations] Update translations'
+          title: 'Update translations'
           body: |
-            `pull -all` strings from [Transifex][1]
-            
-            <br>
+            Pulled all translated strings from [Transifex][1].
             
             ---
-            *This PR is automatically generated and updated by the workflow at `.github/workflows/translations-pull.yml`.*<br>
+            *This PR is automatically generated and updated by the workflow at `.github/workflows/translations-pull.yml`. Review [action runs][2].*<br>
             *After merging, all new languages and translations are available in the next build.*
             
             [1]: https://app.transifex.com/cockatrice/cockatrice/
+            [2]: https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml?query=branch%3Amaster
           labels: |
             CI
             Translation
