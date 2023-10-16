@@ -64,9 +64,9 @@ jobs:
           commit-message: Update translation source strings
           # author is the owner of the commit
           author: github-actions <github-actions@github.com>
-          branch: ci-update_translation_source_strings
+          branch: ci-update_translation_source
           delete-branch: true
-          title: '[Translations] Update source strings'
+          title: 'Update source strings'
           body: ${{ steps.template.outputs.result }}
           labels: |
             CI
