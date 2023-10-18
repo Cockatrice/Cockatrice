@@ -302,18 +302,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: Win7+
+          - target: 7
             qt_version: 5.15.*
             qt_arch: msvc2019_64
             qt_tools: "tools_opensslv3_x64"
 
-          - target: Win10+
+          - target: 10
             qt_version: 6.5.*
             qt_arch: msvc2019_64
             qt_tools: "tools_opensslv3_x64"
             qt_modules: "qtmultimedia qtwebsockets"
 
-    name: ${{matrix.target}}
+    name: Windows ${{matrix.target}}
     needs: configure
     runs-on: windows-2019
     env:
@@ -329,7 +329,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
+      - name: Install Qt ${{matrix.qt_version}} for Windows ${{matrix.target}}
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
@@ -352,7 +352,7 @@ jobs:
         id: build
         shell: bash
         env:
-          PACKAGE_SUFFIX: '-${{matrix.target}}'
+          PACKAGE_SUFFIX: '-win${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
@@ -361,7 +361,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{matrix.target}}-installer
+          name: Windows${{matrix.target}}-installer
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
