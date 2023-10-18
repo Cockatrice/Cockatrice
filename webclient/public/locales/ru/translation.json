@@ -1,27 +1,27 @@
 {
   "Common": {
-    "language": "Nederlands (Dutch)",
-    "disconnect": "Verbinding Verbreken",
+    "language": "Русский (Russian)",
+    "disconnect": "Прервать подключение",
     "label": {
-      "confirmPassword": "Wachtwoord Bevestigen",
-      "confirmSure": "Weet je het zeker?",
-      "country": "Land",
-      "delete": "Verwijderen",
-      "email": "Email",
-      "hostName": "Hostnaam",
-      "hostAddress": "Hostaddres",
-      "password": "Wachtwoord",
-      "passwordAgain": "Wachtwoord Nogmaals",
-      "port": "Poort",
-      "realName": "Echte Naam",
-      "saveChanges": "Wijzigingen Opslaan",
-      "token": "Token",
-      "username": "Gebruikersnaam"
+      "confirmPassword": "Подтверждение пароля:",
+      "confirmSure": "Вы уверены?",
+      "country": "Страна:",
+      "delete": "Удалить",
+      "email": "Адрес email:",
+      "hostName": "Наименование сервера",
+      "hostAddress": "Адрес сервера",
+      "password": "Пароль:",
+      "passwordAgain": "Подтверждение пароля:",
+      "port": "&Порт:",
+      "realName": "Настоящее имя:",
+      "saveChanges": "Сохранить изменения",
+      "token": "Фишка",
+      "username": "Имя пользователя:"
     },
     "validation": {
-      "minChars": "Minimum van {count} {count, plural, one {karakter} other {karakters}} verplicht",
-      "passwordsMustMatch": "Wachtwoorden komen niet overeen",
-      "required": "Verplicht"
+      "minChars": "Как минимум {count} {count, plural, one {character} other {characters}} необходимо",
+      "passwordsMustMatch": "Введенные пароли не совпадают.",
+      "required": "Необходимо"
     },
     "countries": {
       "AD": "Andorra",
@@ -284,99 +284,99 @@
     }
   },
   "KnownHosts": {
-    "label": "Host",
-    "add": "Voeg nieuwe host toe",
-    "toast": "Host {mode, select created {toegevoegd} deleted {verwijderd} other {aangepast}}."
+    "label": "&Хост",
+    "add": "Добавить новый сервер",
+    "toast": "Сервер успешно {mode, select, created {created} deleted {deleted} other {edited}}."
   },
   "InitializeContainer": {
-    "title": "WIST JE DAT",
-    "subtitle": "<1>Cockatrice word gerund door vrijwilligers</1><1>die van kaartspellen houden!</1>"
+    "title": "ЗНАЕТЕ ЛИ ВЫ",
+    "subtitle": "<1>Cockatrice поддерживается энтузиастами</1><1>которые любят карточные игры!</1>"
   },
   "LoginContainer": {
     "header": {
-      "title": "Login",
-      "subtitle": "Een cross-platform virtual tabletop voor multiplayer kaartspellen."
+      "title": "Логин",
+      "subtitle": "A cross-platform virtual tabletop for multiplayer card games."
     },
     "footer": {
-      "registerPrompt": "Nog niet geregistreerd?",
-      "registerAction": "Maak een account aan",
-      "credit": "Cockatrice is een open source project",
-      "version": "Versie"
+      "registerPrompt": "Not registered yet?",
+      "registerAction": "Create an account",
+      "credit": "Cockatrice is an open source project",
+      "version": "Version"
     },
     "content": {
-      "subtitle1": "Speel multiplayer kaartspellen online.",
-      "subtitle2": "Cross-platform virtual tabletop voor multiplayer kaartspellen. Gratis en open source."
+      "subtitle1": "Play multiplayer card games online.",
+      "subtitle2": "Cross-platform virtual tabletop for multiplayer card games. Forever free."
     },
     "toasts": {
-      "passwordResetSuccessToast": "Wachtwoord Opnieuw Ingesteld",
-      "accountActivationSuccess": "Account Succesvol Geactiveerd"
+      "passwordResetSuccessToast": "Password Reset Successfully",
+      "accountActivationSuccess": "Account Activated Successfully"
     }
   },
   "UnsupportedContainer": {
-    "title": "Niet-ondersteunde Browser",
-    "subtitle1": "Update je browser en/of check je instellingen.",
-    "subtitle2": "Let op: Private browsing zorgt er voor dat sommige browsers bepaalde toestemmingen of functies uitschakelen."
+    "title": "Unsupported Browser",
+    "subtitle1": "Please update your browser and/or check your permissions.",
+    "subtitle2": "Note: Private browsing causes some browsers to disable certain permissions or features."
   },
   "AccountActivationDialog": {
-    "title": "Account Activatie",
-    "subtitle1": "Je account is nog niet geactiveerd.",
-    "subtitle2": "Vul de activerings-token die je hebt ontvangen via de activerings-email in."
+    "title": "Account Activation",
+    "subtitle1": "Your account has not been activated yet.",
+    "subtitle2": "You need to provide the activation token received in the activation email."
   },
   "KnownHostDialog": {
-    "title": "{mode, select, edit {Aanpassen} other {Toevoegen}} Bekende Host",
-    "subtitle": "Door een nieuwe host toe te voegen kun je verbinden met andere servers. Vul hieronder de gegevens in."
+    "title": "{mode, select, edit {Edit} other {Add}} Known Host",
+    "subtitle": "Adding a new host allows you to connect to different servers. Enter the details below to your host list."
   },
   "RegistrationDialog": {
-    "title": "Maak Een Account Aan"
+    "title": "Создать новый аккаунт"
   },
   "RequestPasswordResetDialog": {
-    "title": "Opniew Wachtwoord Aanvragen"
+    "title": "Запросить сброс пароля"
   },
   "ResetPasswordDialog": {
-    "title": "Vraag Wachtwoord Opnieuw Aan"
+    "title": "Сбросить пароль"
   },
   "AccountActivationForm": {
     "error": {
-      "failed": "Activering account mislukt"
+      "failed": "Не удалось активировать аккаунт"
     },
     "label": {
-      "activate": "Activeer Account"
+      "activate": "Активировать аккаунт"
     }
   },
   "KnownHostForm": {
-    "help": "Hulp nodig met het toevoegen van een nieuwe host?",
+    "help": "Нужна помощь в добавлении нового хоста?",
     "label": {
-      "add": "Voeg Host Toe",
-      "find": "Vind Host"
+      "add": "Добавить хост",
+      "find": "Найти хост"
     }
   },
   "LoginForm": {
     "label": {
-      "autoConnect": "Verbind Automatisch",
-      "forgot": "Wachtwoord Vergeten",
-      "login": "Log in",
-      "savePassword": "Wachtwoord Opslaan",
-      "savedPassword": "Opgeslagen Wachtwoord"
+      "autoConnect": "Автоматическое подключение",
+      "forgot": "Забыли пароль",
+      "login": "Логин",
+      "savePassword": "Сохранить пароль",
+      "savedPassword": "Сохранённый пароль"
     }
   },
   "RegisterForm": {
     "label": {
-      "register": "Registreer"
+      "register": "Зарегистрироваться"
     },
     "toast": {
-      "registerSuccess": "Registratie Geslaagd!"
+      "registerSuccess": "Регистрация прошла успешно!"
     }
   },
   "RequestPasswordResetForm": {
-    "error": "Opniew wachtwoord aanvragen mislukt",
-    "mfaEnabled": "Server heeft multi-factor authenticatie ingeschakeld",
-    "request": "Vraag Reset Token Aan",
-    "skipRequest": "Ik heb al een reset token"
+    "error": "Не удалось запросить сброс пароля",
+    "mfaEnabled": "На сервере включена многофакторная аутентификация",
+    "request": "Запросить токен сброса",
+    "skipRequest": "У меня уже есть токен сброса"
   },
   "ResetPasswordForm": {
-    "error": "Opnieuw wachtwoord aanvragen mislukt",
+    "error": "Не удалось сбросить пароль",
     "label": {
-      "reset": "Vraag Wachtwoord Opnieuw Aan"
+      "reset": "Сбросить пароля"
     }
   }
 }
