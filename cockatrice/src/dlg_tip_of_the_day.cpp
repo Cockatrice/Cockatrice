@@ -154,7 +154,7 @@ void DlgTipOfTheDay::updateTip(int tipId)
         imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
 
-    date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy.MM.dd") + "</i>");
+    date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy-MM-dd") + "</i>");
 
     tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
 
