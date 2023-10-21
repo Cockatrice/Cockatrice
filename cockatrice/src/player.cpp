@@ -771,7 +771,7 @@ void Player::retranslateUi()
         aMoveTopCardToExile->setText(tr("Move top card to e&xile"));
         aMoveTopCardsToGraveyard->setText(tr("Move top cards to &graveyard..."));
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
-        aMoveTopCardsUntil->setText(tr("Take top cards &until..."));
+        aMoveTopCardsUntil->setText(tr("Put top cards on stack &until..."));
 
         aDrawBottomCard->setText(tr("&Draw bottom card"));
         aDrawBottomCards->setText(tr("D&raw bottom cards..."));
@@ -1313,8 +1313,8 @@ void Player::actMoveTopCardsUntil()
     QString expr = previousMovingCardsUntilExpr;
     for (;;) {
         bool ok;
-        expr =
-            QInputDialog::getText(game, "Take top cards until", "Select card (accepts search syntax)", {}, expr, &ok);
+        expr = QInputDialog::getText(game, "Put top cards on stack until", "Card name (or search expressions)", {}, expr,
+                                     &ok);
         if (!ok) {
             return;
         }
