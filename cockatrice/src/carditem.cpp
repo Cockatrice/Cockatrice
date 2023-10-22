@@ -97,10 +97,10 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QMapIterator<int, int> counterIterator(counters);
     while (counterIterator.hasNext()) {
         counterIterator.next();
-        QColor color;
-        color.setHsv(counterIterator.key() * 60, 150, 255);
+        QColor _color;
+        _color.setHsv(counterIterator.key() * 60, 150, 255);
 
-        paintNumberEllipse(counterIterator.value(), 14, color, i, counters.size(), painter);
+        paintNumberEllipse(counterIterator.value(), 14, _color, i, counters.size(), painter);
         ++i;
     }
 
@@ -233,25 +233,25 @@ void CardItem::resetState()
     update();
 }
 
-void CardItem::processCardInfo(const ServerInfo_Card &info)
+void CardItem::processCardInfo(const ServerInfo_Card &_info)
 {
     counters.clear();
-    const int counterListSize = info.counter_list_size();
+    const int counterListSize = _info.counter_list_size();
     for (int i = 0; i < counterListSize; ++i) {
-        const ServerInfo_CardCounter &counterInfo = info.counter_list(i);
+        const ServerInfo_CardCounter &counterInfo = _info.counter_list(i);
         counters.insert(counterInfo.id(), counterInfo.value());
     }
 
-    setId(info.id());
-    setName(QString::fromStdString(info.name()));
-    setAttacking(info.attacking());
-    setFaceDown(info.face_down());
-    setPT(QString::fromStdString(info.pt()));
-    setAnnotation(QString::fromStdString(info.annotation()));
-    setColor(QString::fromStdString(info.color()));
-    setTapped(info.tapped());
-    setDestroyOnZoneChange(info.destroy_on_zone_change());
-    setDoesntUntap(info.doesnt_untap());
+    setId(_info.id());
+    setName(QString::fromStdString(_info.name()));
+    setAttacking(_info.attacking());
+    setFaceDown(_info.face_down());
+    setPT(QString::fromStdString(_info.pt()));
+    setAnnotation(QString::fromStdString(_info.annotation()));
+    setColor(QString::fromStdString(_info.color()));
+    setTapped(_info.tapped());
+    setDestroyOnZoneChange(_info.destroy_on_zone_change());
+    setDoesntUntap(_info.doesnt_untap());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)

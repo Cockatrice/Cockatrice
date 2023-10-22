@@ -14,7 +14,7 @@ public:
     ~CockatriceXml4Parser() override = default;
     bool getCanParseFile(const QString &name, QIODevice &device) override;
     void parseFile(QIODevice &device) override;
-    bool saveToFile(SetNameMap sets,
+    bool saveToFile(SetNameMap _sets,
                     CardNameMap cards,
                     const QString &fileName,
                     const QString &sourceUrl = "unknown",

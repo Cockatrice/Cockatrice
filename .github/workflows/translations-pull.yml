@@ -1,0 +1,72 @@
+name: Update Translations
+
+on:
+  workflow_dispatch:
+  schedule:
+    # runs in the middle of each month starting a quarter (UTC) = two weeks after new strings are built
+    - cron: '0 0 15 1,4,7,10 *'
+  pull_request:
+    paths:
+      - '.github/workflows/translations-pull.yml'
+
+jobs:
+  translations:
+    # Do not run the scheduled workflow on forks
+    if: github.event_name != 'schedule' || github.repository_owner == 'Cockatrice'
+
+    name: Pull languages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull translated strings from Transifex
+        uses: transifex/cli-action@v2
+        with:
+          # used config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
+          # https://github.com/transifex/cli#pulling-files-from-transifex
+          token: ${{ secrets.TX_TOKEN }}
+          args: pull --force --all
+
+      - name: Create pull request
+        if: github.event_name != 'pull_request'
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          add-paths: |
+            cockatrice/translations/*.ts
+            oracle/translations/*.ts
+            webclient/public/locales/*/translation.json
+          commit-message: Update translation files
+          # author is the owner of the commit
+          author: github-actions <github-actions@github.com>
+          branch: ci-update_translations
+          delete-branch: true
+          title: 'Update translations'
+          body: |
+            Pulled all translated strings from [Transifex][1].
+            
+            ---
+            *This PR is automatically generated and updated by the workflow at `.github/workflows/translations-pull.yml`. Review [action runs][2].*<br>
+            *After merging, all new languages and translations are available in the next build.*
+            
+            [1]: https://app.transifex.com/cockatrice/cockatrice/
+            [2]: https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml?query=branch%3Amaster
+          labels: |
+            CI
+            Translation
+          draft: false
+
+      - name: PR Status
+        if: github.event_name != 'pull_request'
+        shell: bash
+        env:
+          STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
+        run: |
+          if [[ "$STATUS" == "" ]]; then
+            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} unchanged!"
+          else
+            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} $STATUS!"
+          fi
+          echo "URL: ${{ steps.create_pr.outputs.pull-request-url }}"

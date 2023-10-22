@@ -89,7 +89,7 @@ void TabLog::getClicked()
     if (maximumResults->value() == 0)
         maximumResults->setValue(1000);
 
-    int dateRange;
+    int dateRange = 0;
     if (lastHour->isChecked())
         dateRange = 1;
 
