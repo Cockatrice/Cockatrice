@@ -268,7 +268,7 @@ jobs:
 
       - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
         if: matrix.qt_version != 'homebrew'
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           cache: true
           setup-python: false
@@ -343,7 +343,7 @@ jobs:
           submodules: recursive
 
       - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           cache: true
           setup-python: false
