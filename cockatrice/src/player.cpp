@@ -1313,8 +1313,8 @@ void Player::actMoveTopCardsUntil()
     QString expr = previousMovingCardsUntilExpr;
     for (;;) {
         bool ok;
-        expr = QInputDialog::getText(game, "Put top cards on stack until", "Card name (or search expressions)", {}, expr,
-                                     &ok);
+        expr = QInputDialog::getText(game, "Put top cards on stack until", "Card name (or search expressions)", {},
+                                     expr, &ok);
         if (!ok) {
             return;
         }
