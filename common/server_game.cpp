@@ -565,13 +565,13 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
             Server_Arrow *a = arrows[i];
             Server_Card *targetCard = qobject_cast<Server_Card *>(a->getTargetItem());
             if (targetCard) {
-                if (targetCard->getZone()->getPlayer() == player)
+                if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player)
                     toDelete.append(a);
             } else if (static_cast<Server_Player *>(a->getTargetItem()) == player)
                 toDelete.append(a);
 
             // Don't use else here! It has to happen regardless of whether targetCard == 0.
-            if (a->getStartCard()->getZone() && a->getStartCard()->getZone()->getPlayer() == player)
+            if (a->getStartCard()->getZone() != nullptr && a->getStartCard()->getZone()->getPlayer() == player)
                 toDelete.append(a);
         }
         for (int i = 0; i < toDelete.size(); ++i) {
