@@ -22,7 +22,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version-file: '.nvmrc'
+        node-version-file: 'webclient/.nvmrc'
         cache: 'npm'
         cache-dependency-path: 'webclient/package-lock.json'
 

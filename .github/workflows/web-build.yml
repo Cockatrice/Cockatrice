@@ -16,24 +16,13 @@ on:
 
 jobs:
   build-web:
-    name: React (Node ${{matrix.node_version}})
+    name: React (Node .nvmrc)
 
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: webclient
-
-    strategy:
-      fail-fast: false
-      matrix:
-        node_version:
-          - .nvmrc
-          - lts
-          - latest
-
-    # Allow failues for most recent Node release
-    continue-on-error: ${{matrix.node_version == 'latest'}}
 
     steps:
       - name: Checkout
@@ -42,8 +31,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{matrix.node_version}}
-          check-latest: true
+          node-version-file: 'webclient/.nvmrc'
           cache: 'npm'
           cache-dependency-path: 'webclient/package-lock.json'
 
@@ -55,3 +43,4 @@ jobs:
 
       - name: Test app
         run: npm run test
+        
