@@ -3,6 +3,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Used <b>Node.js version</b> is defined in [.nvmrc](https://github.com/Cockatrice/Cockatrice/blob/master/webclient/.nvmrc) file.
+
 ## Available Scripts
 
 In the project directory, you can run:
