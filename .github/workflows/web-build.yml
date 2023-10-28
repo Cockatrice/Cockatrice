@@ -55,4 +55,3 @@ jobs:
 
       - name: Test app
         run: npm run test
-        

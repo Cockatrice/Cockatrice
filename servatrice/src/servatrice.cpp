@@ -85,7 +85,7 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
-    connect(ssi, SIGNAL(incTxBytes), this, SLOT(incTxBytes));
+    connect(ssi, SIGNAL(incTxBytes(qint64)), this, SLOT(incTxBytes(qint64)));
     ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
@@ -155,7 +155,7 @@ void Servatrice_WebsocketGameServer::onNewConnection()
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
-    connect(ssi, SIGNAL(incTxBytes), this, SLOT(incTxBytes));
+    connect(ssi, SIGNAL(incTxBytes(quint64)), this, SLOT(incTxBytes(quint64)));
     /*
      * Due to a Qt limitation, websockets can't be moved to another thread.
      * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
@@ -722,16 +722,16 @@ void Servatrice::shutdownTimeout()
     shutdownMinutes--;
 }
 
-bool Servatrice::islConnectionExists(int serverId) const
+bool Servatrice::islConnectionExists(int _serverId) const
 {
     // Only call with islLock locked at least for reading
-    return islInterfaces.contains(serverId);
+    return islInterfaces.contains(_serverId);
 }
 
-void Servatrice::addIslInterface(int serverId, IslInterface *interface)
+void Servatrice::addIslInterface(int _serverId, IslInterface *interface)
 {
     // Only call with islLock locked for writing
-    islInterfaces.insert(serverId, interface);
+    islInterfaces.insert(_serverId, interface);
     connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
     connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
     connect(interface, SIGNAL(externalRoomUserJoined(int, ServerInfo_User)), this,
@@ -753,24 +753,24 @@ void Servatrice::addIslInterface(int serverId, IslInterface *interface)
             SLOT(externalGameEventContainerReceived(GameEventContainer, qint64)));
 }
 
-void Servatrice::removeIslInterface(int serverId)
+void Servatrice::removeIslInterface(int _serverId)
 {
     // Only call with islLock locked for writing
     // XXX we probably need to delete everything that belonged to it...  <-- THIS SHOULD BE FIXED FOR ISL FUNCTIONALITY
     // TO WORK COMPLETLY!
-    islInterfaces.remove(serverId);
+    islInterfaces.remove(_serverId);
 }
 
-void Servatrice::doSendIslMessage(const IslMessage &msg, int serverId)
+void Servatrice::doSendIslMessage(const IslMessage &msg, int _serverId)
 {
     QReadLocker locker(&islLock);
 
-    if (serverId == -1) {
+    if (_serverId == -1) {
         QMapIterator<int, IslInterface *> islIterator(islInterfaces);
         while (islIterator.hasNext())
             islIterator.next().value()->transmitMessage(msg);
     } else {
-        IslInterface *interface = islInterfaces.value(serverId);
+        IslInterface *interface = islInterfaces.value(_serverId);
         if (interface)
             interface->transmitMessage(msg);
     }
@@ -811,7 +811,7 @@ bool Servatrice::getRegOnlyServerEnabled() const
 QString Servatrice::getAuthenticationMethodString() const
 {
     if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
-        return QString("sql");
+        return {"sql"};
     }
     return settingsCache->value("authentication/method").toString();
 }
@@ -854,7 +854,7 @@ QString Servatrice::getRequiredFeatures() const
 QString Servatrice::getDBTypeString() const
 {
     if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
-        return QString("mysql");
+        return {"mysql"};
     }
     return settingsCache->value("database/type").toString();
 }
@@ -862,7 +862,7 @@ QString Servatrice::getDBTypeString() const
 QString Servatrice::getDBPrefixString() const
 {
     if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
-        return QString("cockatrice");
+        return {"cockatrice"};
     }
     return settingsCache->value("database/prefix").toString();
 }
@@ -903,7 +903,7 @@ QString Servatrice::getDBPasswordString() const
 QString Servatrice::getRoomsMethodString() const
 {
     if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
-        return QString("sql");
+        return {"sql"};
     }
     return settingsCache->value("rooms/method").toString();
 }

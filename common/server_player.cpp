@@ -963,7 +963,7 @@ Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/
         }
     }
 
-    if (!userInterface->addSaidMessageSize(cmd.message().size())) {
+    if (!userInterface->addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
         return Response::RespChatFlood;
     }
     Event_GameSay event;
@@ -1029,7 +1029,7 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
     }
 
     Server_CardZone *hand = zones.value("hand");
-    Server_CardZone *deck = zones.value("deck");
+    Server_CardZone *_deck = zones.value("deck");
     int number = cmd.number();
 
     if (!hand->getCards().isEmpty()) {
@@ -1039,11 +1039,11 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
             cardToMove->set_card_id(card->getId());
             cardsToMove.append(cardToMove);
         }
-        moveCard(ges, hand, cardsToMove, deck, -1, 0, false);
+        moveCard(ges, hand, cardsToMove, _deck, -1, 0, false);
         qDeleteAll(cardsToMove);
     }
 
-    deck->shuffle();
+    _deck->shuffle();
     ges.enqueueGameEvent(Event_Shuffle(), playerId);
 
     drawCards(ges, number);
@@ -1280,9 +1280,9 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
     QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
     while (playerIterator.hasNext()) {
         Server_Player *p = playerIterator.next().value();
-        QList<Server_Arrow *> arrows = p->getArrows().values();
+        QList<Server_Arrow *> _arrows = p->getArrows().values();
         QList<Server_Arrow *> toDelete;
-        for (auto a : arrows) {
+        for (auto a : _arrows) {
             auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
             if ((tCard == card) || (a->getStartCard() == card)) {
                 toDelete.append(a);
@@ -1450,12 +1450,12 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
             while (i.hasNext()) {
                 i.next();
 
-                Event_SetCardCounter event;
-                event.set_zone_name(card->getZone()->getName().toStdString());
-                event.set_card_id(card->getId());
+                Event_SetCardCounter _event;
+                _event.set_zone_name(card->getZone()->getName().toStdString());
+                _event.set_card_id(card->getId());
 
-                card->setCounter(i.key(), i.value(), &event);
-                ges.enqueueGameEvent(event, playerId);
+                card->setCounter(i.key(), i.value(), &_event);
+                ges.enqueueGameEvent(_event, playerId);
             }
 
             // Copy parent card
@@ -1473,6 +1473,47 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
 
                 ges.enqueueGameEvent(makeAttachCardEvent(attachedCard, card),
                                      attachedCard->getZone()->getPlayer()->getPlayerId());
+            }
+
+            // Copy Arrows
+            const QList<Server_Player *> &players = game->getPlayers().values();
+            for (auto player : players) {
+                QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
+                while (arrowIterator.hasNext()) {
+                    Server_Arrow *arrow = arrowIterator.next().value();
+                    bool sendGameEvent = false;
+                    const auto *startCard = arrow->getStartCard();
+                    if (startCard == targetCard) {
+                        sendGameEvent = true;
+                        arrow->setStartCard(card);
+                        startCard = card;
+                    }
+                    const auto *targetItem = arrow->getTargetItem();
+                    if (targetItem == targetCard) {
+                        sendGameEvent = true;
+                        arrow->setTargetItem(card);
+                        targetItem = card;
+                    }
+                    if (sendGameEvent) {
+                        Event_CreateArrow _event;
+                        ServerInfo_Arrow *arrowInfo = _event.mutable_arrow_info();
+                        arrowInfo->set_id(arrow->getId());
+                        arrowInfo->set_start_player_id(player->getPlayerId());
+                        arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
+                        arrowInfo->set_start_card_id(startCard->getId());
+                        const Server_Player *arrowTargetPlayer = qobject_cast<const Server_Player *>(targetItem);
+                        if (arrowTargetPlayer != nullptr) {
+                            arrowInfo->set_target_player_id(arrowTargetPlayer->getPlayerId());
+                        } else {
+                            const Server_Card *arrowTargetCard = qobject_cast<const Server_Card *>(targetItem);
+                            arrowInfo->set_target_player_id(arrowTargetCard->getZone()->getPlayer()->getPlayerId());
+                            arrowInfo->set_target_zone(arrowTargetCard->getZone()->getName().toStdString());
+                            arrowInfo->set_target_card_id(arrowTargetCard->getId());
+                        }
+                        arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
+                        ges.enqueueGameEvent(_event, player->getPlayerId());
+                    }
+                }
             }
 
             targetCard->resetState();
@@ -2036,8 +2077,8 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
     } else {
         if (cmd.grant_write_access()) {
             const QList<int> &playerIds = game->getPlayers().keys();
-            for (int playerId : playerIds) {
-                zone->addWritePermission(playerId);
+            for (int _playerId : playerIds) {
+                zone->addWritePermission(_playerId);
             }
         }
 

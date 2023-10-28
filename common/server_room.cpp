@@ -200,20 +200,20 @@ void Server_Room::addExternalUser(const ServerInfo_User &userInfo)
     emit roomInfoChanged(roomInfo);
 }
 
-void Server_Room::removeExternalUser(const QString &name)
+void Server_Room::removeExternalUser(const QString &_name)
 {
     // This function is always called from the Server thread with server->roomsMutex locked.
     ServerInfo_Room roomInfo;
     roomInfo.set_room_id(id);
 
     usersLock.lockForWrite();
-    if (externalUsers.contains(name))
-        externalUsers.remove(name);
+    if (externalUsers.contains(_name))
+        externalUsers.remove(_name);
     roomInfo.set_player_count(users.size() + externalUsers.size());
     usersLock.unlock();
 
     Event_LeaveRoom event;
-    event.set_name(name.toStdString());
+    event.set_name(_name.toStdString());
     sendRoomEvent(prepareRoomEvent(event), false);
 
     emit roomInfoChanged(roomInfo);

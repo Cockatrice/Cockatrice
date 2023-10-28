@@ -1,6 +1,7 @@
-## Syntax Help
+## Search Syntax Help
 -----
-The search bar recognizes a set of special commands similar to some other card databases. Here is a list with examples. Each entry can be clicked to test the query and has a small explanation. Note that all searches are case insensitive.
+The search bar recognizes a set of special commands similar to some other card databases.<br>
+In this list of examples below, each entry has an explanation and can be clicked to test the query. Note that all searches are case insensitive.
 <dl>
 <dt>Name:</dt>
 <dd>[birds of paradise](#birds of paradise) <small>(Any card name containing the words birds, of, and paradise)</small></dd>

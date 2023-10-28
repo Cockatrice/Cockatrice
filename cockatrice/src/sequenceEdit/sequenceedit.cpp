@@ -60,8 +60,8 @@ void SequenceEdit::removeLastShortcut()
     QString sequences = lineEdit->text();
     if (!sequences.isEmpty()) {
         if (sequences.lastIndexOf(";") > 0) {
-            QString valid = sequences.left(sequences.lastIndexOf(";"));
-            lineEdit->setText(valid);
+            QString validText = sequences.left(sequences.lastIndexOf(";"));
+            lineEdit->setText(validText);
         } else {
             lineEdit->clear();
         }

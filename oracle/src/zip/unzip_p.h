@@ -98,7 +98,7 @@ public:
 	UnZip::ErrorCode extractFile(const QString& path, const ZipEntryP& entry, const QDir& dir, UnZip::ExtractionOptions options);
 	UnZip::ErrorCode extractFile(const QString& path, const ZipEntryP& entry, QIODevice* device, UnZip::ExtractionOptions options);
 
-	UnZip::ErrorCode testPassword(quint32* keys, const QString& file, const ZipEntryP& header);
+	UnZip::ErrorCode testPassword(quint32* keys, const QString&_file, const ZipEntryP& header);
 	bool testKeys(const ZipEntryP& header, quint32* keys);
 
 	bool createDirectory(const QString& path);

@@ -57,8 +57,8 @@ protected:
                                     const InnerDecklistNode *zoneNode,
                                     QList<DecklistCardNode *> cards,
                                     bool addComments = true);
-    virtual QString getCardZoneFromName(QString cardName, QString currentZoneName);
-    virtual QString getCompleteCardName(const QString &cardName) const;
+    [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName) override;
+    [[nodiscard]] QString getCompleteCardName(const QString &cardName) const override;
 };
 
 #endif

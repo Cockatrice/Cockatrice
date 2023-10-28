@@ -357,8 +357,8 @@ Data = Resources\")
     COMPONENT Runtime
   )
 
-  if(WIN32SSLRUNTIME_FOUND)
-    install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
+  if(OPENSSL_FOUND)
+    install(FILES ${OPENSSL_INCLUDE_DIRS} DESTINATION ./)
   endif()
 endif()
 

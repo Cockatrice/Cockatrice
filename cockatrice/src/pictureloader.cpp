@@ -212,22 +212,22 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     // Iterates through the list of paths, searching for images with the desired
     // name with any QImageReader-supported
     // extension
-    for (const auto &picsPath : picsPaths) {
-        imgReader.setFileName(picsPath);
+    for (const auto &_picsPath : picsPaths) {
+        imgReader.setFileName(_picsPath);
         if (imgReader.read(&image)) {
             qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
                                << "]: Picture found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
-        imgReader.setFileName(picsPath + ".full");
+        imgReader.setFileName(_picsPath + ".full");
         if (imgReader.read(&image)) {
             qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
                                << "]: Picture.full found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
-        imgReader.setFileName(picsPath + ".xlhq");
+        imgReader.setFileName(_picsPath + ".xlhq");
         if (imgReader.read(&image)) {
             qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
                                << "]: Picture.xlhq found on disk.";

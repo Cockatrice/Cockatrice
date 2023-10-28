@@ -10,7 +10,7 @@ function Layout(props:LayoutProps) {
   }
 
   return (
-    <div className={containerClasses.join(" ")}>
+    <div className={containerClasses.join(' ')}>
       {showNav && <LeftNav />}
       <section className="page">
         <div className={`page__body ${className}`}>

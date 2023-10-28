@@ -1,4 +1,4 @@
-FROM ubuntu:kinetic
+FROM debian:12
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -15,8 +15,8 @@ RUN apt-get update && \
         libprotobuf-dev \
         libqt6multimedia6 \
         libqt6sql6-mysql \
-        libqt6svg6-dev \
-        libqt6websockets6-dev \
+        qt6-svg-dev \
+        qt6-websockets-dev \
         protobuf-compiler \
         qt6-l10n-tools \
         qt6-multimedia-dev \

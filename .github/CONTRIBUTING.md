@@ -290,20 +290,21 @@ be included in the next release 👍
 
 Basic workflow for translations:
  1. Developer adds a `tr("foo")` string in the code;
- 2. Every few days, a maintainer updates the `*_en@source.ts files` with the new strings;
- 3. Transifex picks up the new files from GitHub every 24 hours;
- 4. Translators translate the new untranslated strings on Transifex;
- 5. Before a release, a maintainer fetches the updated translations from Transifex.
+ 2. CI updates the `*_en@source.ts files` regularly and creates a PR automatically;
+ 3. Maintainer verifies and merges the change;
+ 4. Transifex picks up the new files from GitHub automatically;
+ 5. Translators translate the new untranslated strings on Transifex;
+ 6. Before a release, a maintainer fetches the updated translations from Transifex.
 
 ### Using Translations (for developers) ###
 
-All the user-interface strings inside Cockatrice's source code must be written
-in English(US).
+All user interface strings inside Cockatrice's source code must be written
+in English (US).
 Translations to other languages are managed using [Transifex](
 https://www.transifex.com/projects/p/cockatrice/).
 
 Adding a new string to translate is as easy as adding the string in the
-'tr("")' function, the string will be picked up as translatable automatically
+`tr("")` function, the string will be picked up as translatable automatically
 and translated as needed.
 For example, setting the text of a label in the way that the string
 `"My name is:"` can be translated:
@@ -312,7 +313,7 @@ nameLabel.setText(tr("My name is:"));
 ```
 
 To translate a string that would have plural forms you can add the amount to
-the tr call, also you can add an extra string as a hint for translators:
+the tr() call, also you can add an extra string as a hint for translators:
 ```c++
 QString message = tr("Everyone draws %n cards", "pop up message", amount);
 ```
@@ -321,20 +322,46 @@ https://doc.qt.io/qt-5/i18n-source-translation.html#handling-plurals)
 
 If you're about to propose a change that adds or modifies any translatable
 string in the code, you don't need to take care of adding the new strings to
-the translation files.
-Every few days, or when a lot of new strings have been added, someone from the
-development team will take care of extracting all the new strings and adding
-them to the english translation files and making them available to translators
-on Transifex.
+the translation files.<br>
+We have an automated process to update our language source files on a schedule
+and provide the translators on Transifex with the new contents.<br>
+Maintainers can also manually trigger this on demand.
 
 ### Maintaining Translations (for maintainers) ###
 
-When new translatable strings have been added to the code, a maintainer should
-make them available to translators on Transifex. Every few days, or when a lot
-of new strings have been added, a maintainer should take care of extracting all
-the new strings and add them to the english translation files.
+When new translatable strings have been added to the code, a maintainer has to
+make them available to translators on Transifex.
 
-To update the english translation files, re-run cmake enabling the appropriate
+To help with that, we have an automated CI workflow, that regularly looks at the
+code in the master branch, extracts all strings and updates dedicated source string
+files with any changes. These updates are not commited right away, the CI creates a
+PR for reviewing instead.<br>
+After approval, our translation tool automatically picks the changes up and deploys
+them to our translators. Be mindful when merging only a few changes!
+
+Once a release is planned, or when a lot of strings have been added or changed, a
+maintainer can manually trigger a CI run to extract all strings on demand.
+
+<details>
+<summary><b>Manually trigger CI run (Workflow Dispatch)</b></summary>
+
+Maintainers can always request the CI to run on demand if it's required.
+
+Go to the `Actions` tab and select our dedicated translation workflow:
+https://github.com/Cockatrice/Cockatrice/actions/workflows/translations.yml
+
+You see a "This workflow has a workflow_dispatch event trigger." hint at the top of
+the list.<br>
+Select `Run workflow` on the right and trigger a run from master branch.
+
+The CI will now check for changed strings and create a PR if there are any updates.
+
+</details>
+
+<details>
+<summary><b>Manually update source strings locally</b></summary>
+
+To update the english source files for translation, re-run cmake enabling the appropriate
 parameter and then run make:
 ```sh
 cd cockatrice/build
@@ -357,11 +384,13 @@ It is recommended to disable the parameter afterwards using:
 ```sh
 cmake .. -DUPDATE_TRANSLATIONS=OFF
 ```
-Now you are ready to propose your change.
+Now you are ready to commit your changes and open a PR.
 
-Once your change gets merged, Transifex will pick up the modified files
-automatically (checked every 24 hours) and update the interface where
-translators will be able to translate the new strings.
+</details>
+
+Once the changes get merged, Transifex will pick up the modified files
+automatically (checked every few hours) and update their online editor where
+translators will be able to translate the new strings right in the browser.
 
 ### Releasing Translations (for maintainers) ###
 

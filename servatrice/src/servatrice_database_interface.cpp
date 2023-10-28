@@ -106,7 +106,8 @@ bool Servatrice_DatabaseInterface::checkSql()
     if (!sqlDatabase.isValid())
         return false;
 
-    if (!sqlDatabase.exec("select 1").isActive())
+    auto query = QSqlQuery(sqlDatabase);
+    if (query.exec("select 1") && query.isActive())
         return openDatabase();
     return true;
 }
@@ -153,7 +154,16 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     QStringList disallowedWords = disallowedWordsStr.split(",", QString::SkipEmptyParts);
 #endif
     disallowedWords.removeDuplicates();
-    QString disallowedRegExpStr = settingsCache->value("users/disallowedregexp", "").toString();
+    QVariant displayDisallowedWords = settingsCache->value("users/displaydisallowedwords");
+    QString disallowedRegExpStr;
+    if (displayDisallowedWords.isValid()) {
+        disallowedWordsStr = displayDisallowedWords.toString().trimmed();
+        if (!disallowedWordsStr.isEmpty()) {
+            disallowedWordsStr.prepend("\n");
+        }
+    } else {
+        disallowedRegExpStr = settingsCache->value("users/disallowedregexp", "").toString();
+    }
 
     error = QString("%1|%2|%3|%4|%5|%6|%7|%8|%9")
                 .arg(minNameLength)
@@ -824,9 +834,9 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
     for (int i = 0; i < replayList.size(); ++i) {
         QByteArray blob;
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-        const unsigned int size = replayList[i]->ByteSizeLong();
+        const unsigned int size = static_cast<unsigned int>(replayList[i]->ByteSizeLong());
 #else
-        const unsigned int size = replayList[i]->ByteSize();
+        const unsigned int size = static_cast<unsigned int>(replayList[i]->ByteSize());
 #endif
         blob.resize(size);
         replayList[i]->SerializeToArray(blob.data(), size);

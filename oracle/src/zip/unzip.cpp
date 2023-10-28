@@ -1012,9 +1012,9 @@ void UnzipPrivate::initKeys(const QString& pwd, quint32* keys) const
  The \p file parameter can be used in the user interface or for debugging purposes
  as it is the name of the encrypted file for wich the password is being tested.
 */
-UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString& file, const ZipEntryP& header)
+UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString&_file, const ZipEntryP& header)
 {
-    Q_UNUSED(file);
+    Q_UNUSED(_file);
     Q_ASSERT(device);
 
     // read encryption keys

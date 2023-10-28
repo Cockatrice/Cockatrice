@@ -592,7 +592,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
     networkCacheEdit.setSingleStep(1);
     networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
-    networkCacheEdit.setSuffix(tr(" MB"));
+    networkCacheEdit.setSuffix(" MB");
 
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
@@ -937,8 +937,12 @@ MessagesSettingsPage::MessagesSettingsPage()
 
 void MessagesSettingsPage::updateColor(const QString &value)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor colorToSet = QColor::fromString("#" + value);
+#else
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
+#endif
     if (colorToSet.isValid()) {
         SettingsCache::instance().setChatMentionColor(value);
         updateMentionPreview();
@@ -947,8 +951,12 @@ void MessagesSettingsPage::updateColor(const QString &value)
 
 void MessagesSettingsPage::updateHighlightColor(const QString &value)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor colorToSet = QColor::fromString("#" + value);
+#else
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
+#endif
     if (colorToSet.isValid()) {
         SettingsCache::instance().setChatHighlightColor(value);
         updateHighlightPreview();
@@ -1146,28 +1154,28 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
 
     // layout
-    auto *editLayout = new QGridLayout;
-    editLayout->addWidget(currentActionGroupLabel, 0, 0);
-    editLayout->addWidget(currentActionGroupName, 0, 1);
-    editLayout->addWidget(currentActionLabel, 1, 0);
-    editLayout->addWidget(currentActionName, 1, 1);
-    editLayout->addWidget(currentShortcutLabel, 2, 0);
-    editLayout->addWidget(editTextBox, 2, 1);
+    auto *_editLayout = new QGridLayout;
+    _editLayout->addWidget(currentActionGroupLabel, 0, 0);
+    _editLayout->addWidget(currentActionGroupName, 0, 1);
+    _editLayout->addWidget(currentActionLabel, 1, 0);
+    _editLayout->addWidget(currentActionName, 1, 1);
+    _editLayout->addWidget(currentShortcutLabel, 2, 0);
+    _editLayout->addWidget(editTextBox, 2, 1);
 
     editShortcutGroupBox = new QGroupBox;
-    editShortcutGroupBox->setLayout(editLayout);
+    editShortcutGroupBox->setLayout(_editLayout);
 
-    auto *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addWidget(faqLabel);
-    buttonsLayout->addWidget(btnResetAll);
-    buttonsLayout->addWidget(btnClearAll);
+    auto *_buttonsLayout = new QHBoxLayout;
+    _buttonsLayout->addWidget(faqLabel);
+    _buttonsLayout->addWidget(btnResetAll);
+    _buttonsLayout->addWidget(btnClearAll);
 
-    auto *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(shortcutsTable);
-    mainLayout->addWidget(editShortcutGroupBox);
-    mainLayout->addLayout(buttonsLayout);
+    auto *_mainLayout = new QVBoxLayout;
+    _mainLayout->addWidget(shortcutsTable);
+    _mainLayout->addWidget(editShortcutGroupBox);
+    _mainLayout->addLayout(_buttonsLayout);
 
-    setLayout(mainLayout);
+    setLayout(_mainLayout);
 
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetShortcuts()));
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
@@ -1273,8 +1281,8 @@ void ShortcutSettingsPage::retranslateUi()
     currentShortcutLabel->setText(tr("Shortcut:"));
     editTextBox->retranslateUi();
     faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
-    btnResetAll->setText("Restore all default shortcuts");
-    btnClearAll->setText("Clear all shortcuts");
+    btnResetAll->setText(tr("Restore all default shortcuts"));
+    btnClearAll->setText(tr("Clear all shortcuts"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)

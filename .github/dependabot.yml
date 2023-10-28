@@ -1,0 +1,49 @@
+# Configuration options: https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+ # # Enable version updates for git submodules
+ # Not yet possible to bump only on tags or releases, see:
+ # https://github.com/dependabot/dependabot-core/issues/1639
+ # https://github.com/dependabot/dependabot-core/issues/2192
+ # Alternative: Action that updates submodule and can be manually run on demand (workflow_dispatch)
+ # - package-ecosystem: "gitsubmodule"
+ #   # Look for `.gitmodules` in the `root` directory
+ #   directory: "/"
+ #   # Check for updates once a month
+ #   schedule:
+ #     interval: "monthly"
+ #   # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
+ #   open-pull-requests-limit: 1
+
+ # # Enable version updates for Docker
+ # Not yet possible to bump from one LTS version to the next and skip others, see:
+ # https://github.com/dependabot/dependabot-core/issues/2247
+ # - package-ecosystem: "docker"
+ #   # Look for a `Dockerfile` in the `root` directory
+ #   directory: "/"
+ #   # Check for updates once a week
+ #   schedule:
+ #     interval: "weekly"
+ #   # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
+ #   open-pull-requests-limit: 1
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Directory must be set to "/" to check for workflow files in .github/workflows
+    directory: "/"
+    # Check for updates to GitHub Actions once a week
+    schedule:
+      interval: "weekly"
+    # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
+    open-pull-requests-limit: 2
+
+ # # Enable version updates for npm
+ # - package-ecosystem: "npm"
+ #   # Look for `package.json` and `lock` files in the `webclient` subdirectory
+ #   directory: "/webclient"
+ #   # Check the npm registry for updates once a week
+ #   schedule:
+ #     interval: "weekly"
+ #   # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
+ #   open-pull-requests-limit: 5

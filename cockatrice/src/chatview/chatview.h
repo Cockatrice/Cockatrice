@@ -65,8 +65,8 @@ private:
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
-    QColor getCustomMentionColor();
-    QColor getCustomHighlightColor();
+    static QColor getCustomMentionColor();
+    static QColor getCustomHighlightColor();
     void showSystemPopup(const QString &userName);
     bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
     void checkTag(QTextCursor &cursor, QString &message);
