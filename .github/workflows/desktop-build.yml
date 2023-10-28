@@ -209,7 +209,7 @@ jobs:
           - target: 10.15_Catalina
             os: macos-11
             xcode: 11.7 # allows using macOS 10.15 SDK
-            qt_version: 6.2.* # LTS (is compatible with 10.14 and 10.15)
+            qt_version: 6.2.* # 6.2 is last LTS compatible with 10.15, see https://doc.qt.io/qt-6.5/macos.html
             qt_modules: "qtmultimedia qtwebsockets"
             type: Release
             do_tests: 1
@@ -218,7 +218,7 @@ jobs:
 
           - target: 12_Monterey
             os: macos-12
-            xcode: 13.3
+            xcode: 14.0.1
             qt_version: homebrew
             type: Release
             do_tests: 1
@@ -226,7 +226,7 @@ jobs:
 
           - target: 13_Ventura
             os: macos-13
-            xcode: 14.3.1
+            xcode: 14.3
             qt_version: homebrew
             type: Release
             do_tests: 1
@@ -309,24 +309,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: Win7+-64bit
-            bit: 64
-            arch: x64
-            cmake_generator_platform: x64
+          - target: 7
             qt_version: 5.15.*
             qt_arch: msvc2019_64
             qt_tools: "tools_opensslv3_x64"
 
-          - target: Win10+-64bit
-            bit: 64
-            arch: x64
-            cmake_generator_platform: x64
-            qt_version: 6.3.*
+          - target: 10
+            qt_version: 6.5.*
             qt_arch: msvc2019_64
             qt_tools: "tools_opensslv3_x64"
             qt_modules: "qtmultimedia qtwebsockets"
 
-    name: ${{matrix.target}}
+    name: Windows ${{matrix.target}}
     needs: configure
     runs-on: windows-2019
     env:
@@ -342,13 +336,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
+      - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
           setup-python: false
           version: ${{matrix.qt_version}}
-          arch: win${{matrix.bit}}_${{matrix.qt_arch}}
+          arch: win64_${{matrix.qt_arch}}
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
@@ -358,23 +352,23 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
         env:
-          VCPKG_DEFAULT_TRIPLET: '${{matrix.arch}}-windows'
+          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
           VCPKG_DISABLE_METRICS: 1
 
       - name: Build Cockatrice
         id: build
         shell: bash
         env:
-          PACKAGE_SUFFIX: '-${{matrix.target}}'
+          PACKAGE_SUFFIX: '-Win${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          CMAKE_GENERATOR_PLATFORM: '${{matrix.cmake_generator_platform}}'
-          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win${{matrix.bit}}_${{matrix.qt_arch}}'
+          CMAKE_GENERATOR_PLATFORM: 'x64'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{matrix.target}}-installer
+          name: Windows${{matrix.target}}-installer
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
