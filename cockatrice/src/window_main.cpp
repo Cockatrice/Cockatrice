@@ -62,6 +62,7 @@
 #include <QSystemTrayIcon>
 #include <QThread>
 #include <QTimer>
+#include <QWindow>
 #include <QtConcurrent>
 #include <QtNetwork>
 
@@ -476,9 +477,22 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
                "</li>";
 
         if (rules.size() == 9) {
-            if (rules.at(7).size() > 0)
-                out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) +
-                       "</li>";
+            if (rules.at(7).size() > 0) {
+                QString words = rules.at(7).toHtmlEscaped();
+                if (words.startsWith("\n")) {
+                    out += tr("no unacceptable language as specified by these server rules:",
+                              "note that the following lines will not be translated");
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+                    for (QString &line : words.split("\n", Qt::SkipEmptyParts)) {
+#else
+                    for (QString &line : words.split("\n", QString::SkipEmptyParts)) {
+#endif
+                        out += "<li>" + line + "</li>";
+                    }
+                } else {
+                    out += "<li>" + tr("can not contain any of the following words: %1").arg(words) + "</li>";
+                }
+            }
 
             if (rules.at(8).size() > 0)
                 out += "<li>" +
@@ -658,6 +672,9 @@ void MainWindow::retranslateUi()
     aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aViewLog->setText(tr("View &Debug Log"));
+
+    aShow->setText(tr("Show/Hide"));
+
     tabSupervisor->retranslateUi();
 }
 
@@ -707,6 +724,9 @@ void MainWindow::createActions()
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
     aViewLog = new QAction(this);
     connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
+
+    aShow = new QAction(this);
+    connect(aShow, SIGNAL(triggered()), this, SLOT(actShow()));
 
 #if defined(__APPLE__) /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
@@ -833,7 +853,6 @@ MainWindow::MainWindow(QWidget *parent)
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
 
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
-        createTrayActions();
         createTrayIcon();
     }
 
@@ -918,27 +937,32 @@ MainWindow::~MainWindow()
 void MainWindow::createTrayIcon()
 {
     trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(closeAction);
+    trayIconMenu->addAction(aShow);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction(aSettings);
+    trayIconMenu->addAction(aCheckCardUpdates);
+    trayIconMenu->addAction(aAbout);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction(aExit);
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QPixmap("theme:cockatrice"));
     trayIcon->show();
-
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this,
-            SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
-void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+void MainWindow::actShow()
 {
-    if (reason == QSystemTrayIcon::DoubleClick) {
-        if ((windowState() & Qt::WindowMinimized) == 0) {
+    // wait 50 msec before actually checking the active window, this is because the trayicon menu will actually take
+    // focus and we have to wait for the focus to come back to the application
+    QTimer::singleShot(50, this, [this]() {
+        if (isActiveWindow()) {
             showMinimized();
         } else {
             showNormal();
-            QApplication::setActiveWindow(this);
+            activateWindow();
         }
-    }
+    });
 }
 
 void MainWindow::promptForgotPasswordChallenge()
@@ -947,12 +971,6 @@ void MainWindow::promptForgotPasswordChallenge()
     if (dlg.exec())
         client->submitForgotPasswordChallengeToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
                                                       dlg.getPlayerName(), dlg.getEmail());
-}
-
-void MainWindow::createTrayActions()
-{
-    closeAction = new QAction(tr("&Exit"), this);
-    connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

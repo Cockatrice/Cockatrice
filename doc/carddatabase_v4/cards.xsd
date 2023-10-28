@@ -5,6 +5,7 @@
                 <xs:attribute type="xs:string" name="count" use="optional" />
                 <xs:attribute type="xs:string" name="exclude" use="optional" />
                 <xs:attribute type="xs:string" name="attach" use="optional" />
+                <xs:attribute type="xs:string" name="persistent" use="optional" />
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

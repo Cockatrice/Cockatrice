@@ -3,6 +3,7 @@
 #include "../../common/lib/peglib.h"
 
 #include <QByteArray>
+#include <QDebug>
 #include <QString>
 #include <functional>
 
@@ -334,6 +335,12 @@ static void setupParserRules()
     };
 }
 
+FilterString::FilterString()
+{
+    result = [](CardData) -> bool { return false; };
+    _error = "Not initialized";
+}
+
 FilterString::FilterString(const QString &expr)
 {
     QByteArray ba = expr.simplified().toUtf8();
@@ -352,7 +359,7 @@ FilterString::FilterString(const QString &expr)
     };
 
     if (!search.parse(ba.data(), result)) {
-        std::cout << "Error!" << _error.toStdString() << std::endl;
+        qDebug() << "Filter string error" << _error;
         result = [](CardData) -> bool { return false; };
     }
 }

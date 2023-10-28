@@ -9,6 +9,7 @@ import { RoomsService } from 'api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
 import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors, RoomsTypes } from 'store';
 import { RouteEnum } from 'types';
+import Layout from 'containers/Layout/Layout';
 
 import OpenGames from './OpenGames';
 import Messages from './Messages';
@@ -40,7 +41,7 @@ const Room = (props) => {
   }
 
   return (
-    <div className="room-view">
+    <Layout className="room-view">
       <AuthGuard />
 
       <div className="room-view__main">
@@ -84,7 +85,7 @@ const Room = (props) => {
           )}
         />
       </div>
-    </div>
+    </Layout>
   );
 }
 

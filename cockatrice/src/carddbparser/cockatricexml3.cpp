@@ -155,7 +155,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QVariantHash properties = QVariantHash();
             QString colors = QString("");
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            CardInfoPerSetMap sets = CardInfoPerSetMap();
+            auto _sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
             bool isToken = false;
@@ -221,10 +221,10 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     if (attrs.hasAttribute("rarity")) {
                         setInfo.setProperty("rarity", attrs.value("rarity").toString());
                     }
-                    sets.insert(setName, setInfo);
+                    _sets.insert(setName, setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    bool attach = false;
+                    CardRelation::AttachType attach = CardRelation::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     int count = 1;
@@ -246,7 +246,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = true;
+                        attach = CardRelation::AttachTo;
                     }
 
                     if (attrs.hasAttribute("exclude")) {
@@ -268,7 +268,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
 
             properties.insert("colors", colors);
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, sets, cipt, tableRow, upsideDown);
+                                                        reverseRelatedCards, _sets, cipt, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -412,7 +412,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     return xml;
 }
 
-bool CockatriceXml3Parser::saveToFile(SetNameMap sets,
+bool CockatriceXml3Parser::saveToFile(SetNameMap _sets,
                                       CardNameMap cards,
                                       const QString &fileName,
                                       const QString &sourceUrl,
@@ -439,9 +439,9 @@ bool CockatriceXml3Parser::saveToFile(SetNameMap sets,
     xml.writeTextElement("sourceVersion", sourceVersion);
     xml.writeEndElement();
 
-    if (sets.count() > 0) {
+    if (_sets.count() > 0) {
         xml.writeStartElement("sets");
-        for (CardSetPtr set : sets) {
+        for (CardSetPtr set : _sets) {
             xml << set;
         }
         xml.writeEndElement();

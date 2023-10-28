@@ -42,7 +42,7 @@ void ReleaseChannel::checkForUpdates()
 }
 
 // Different release channel checking functions for different operating systems
-#if defined(Q_OS_OSX)
+#if defined(Q_OS_MACOS)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
     static QRegularExpression version_regex("macOS-(\\d+)\\.(\\d+)");

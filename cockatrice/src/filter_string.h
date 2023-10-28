@@ -24,6 +24,7 @@ typedef AstBase<EmptyType> Ast;
 class FilterString
 {
 public:
+    FilterString();
     explicit FilterString(const QString &exp);
     bool check(const CardData &card)
     {

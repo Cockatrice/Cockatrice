@@ -74,11 +74,11 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 2.8.1)
+project("Cockatrice" VERSION 2.9.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Prismatic Bridge")
+  set(GIT_TAG_RELEASENAME "Rings of the Wild")
 endif()
 
 # Use c++17 for all targets
@@ -141,7 +141,7 @@ endif()
 # Define proper compilation flags
 if(MSVC)
   # Visual Studio: Maximum optimization, disable warning C4251, establish C++17 compatibility
-  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive-")
+  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive- /W4")
   # Generate complete debugging information
   #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
@@ -179,7 +179,7 @@ else()
   # other: osx/llvm, bsd/llvm
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
   if(WARNING_AS_ERROR)
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
@@ -216,16 +216,26 @@ include(FindQtRuntime)
 set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
-find_package(Protobuf REQUIRED)
-if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
+find_package(Protobuf CONFIG)
+if(NOT Protobuf_FOUND)
+  find_package(Protobuf REQUIRED)
+endif()
+
+if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
   message(FATAL_ERROR "No protoc command found!")
-else()
-  message(STATUS "Found Protobuf ${Protobuf_VERSION} at: ${Protobuf_LIBRARIES}")
 endif()
 
 #Find OpenSSL
 if(WIN32)
-  find_package(Win32SslRuntime)
+  find_package(OpenSSL REQUIRED)
+  if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIRS})
+  else()
+    message(
+      WARNING
+        "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
+    )
+  endif()
 endif()
 
 #Find VCredist
@@ -252,6 +262,8 @@ if(UNIX)
     set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
     set(CPACK_SYSTEM_NAME "OSX")
     set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/appicon.icns")
+    set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeDMGSetup.script")
+    set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
   else()
     # linux
     if(CPACK_GENERATOR STREQUAL "RPM")

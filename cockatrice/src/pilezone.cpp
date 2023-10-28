@@ -28,12 +28,19 @@ QRectF PileZone::boundingRect() const
     return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
 }
 
+QPainterPath PileZone::shape() const
+{
+    QPainterPath shape;
+    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    return shape;
+}
+
 void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    painter->drawPath(shape());
+
     if (!cards.isEmpty())
         cards.at(0)->paintPicture(painter, cards.at(0)->getTranslatedSize(painter), 90);
-
-    painter->drawRect(QRectF(0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1));
 
     painter->translate((float)CARD_WIDTH / 2, (float)CARD_HEIGHT / 2);
     painter->rotate(-90);

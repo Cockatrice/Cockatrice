@@ -11,6 +11,7 @@ import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from 'component
 import { AuthenticationService, SessionService } from 'api';
 import { ServerSelectors } from 'store';
 import { User } from 'types';
+import Layout from 'containers/Layout/Layout';
 
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';
@@ -33,7 +34,7 @@ const Account = (props: AccountProps) => {
   };
 
   return (
-    <div className="account">
+    <Layout className="account">
       <AuthGuard />
       <div className="account-column">
         <Paper className="account-list">
@@ -96,7 +97,7 @@ const Account = (props: AccountProps) => {
           </div>
         </Paper>
       </div>
-    </div>
+    </Layout>
   )
 }
 

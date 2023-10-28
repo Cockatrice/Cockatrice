@@ -203,7 +203,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, maintype, power, toughness, faceName;
+    QString layout, name, text, colors, colorIdentity, maintype, faceName;
     static const bool isToken = false;
     QVariantHash properties;
     CardInfoPerSet setInfo;
@@ -332,9 +332,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             properties.insert("maintype", mainCardType);
         }
 
-        power = getStringPropertyFromMap(card, "power");
-        toughness = getStringPropertyFromMap(card, "toughness");
-        if (!(power.isEmpty() && toughness.isEmpty())) {
+        // Depending on whether power and/or toughness are present, the format
+        // is either P/T (most common), P (no toughness), or /T (no power).
+        QString power = getStringPropertyFromMap(card, "power");
+        QString toughness = getStringPropertyFromMap(card, "toughness");
+        if (toughness.isEmpty() && !power.isEmpty()) {
+            properties.insert("pt", power);
+        } else if (!toughness.isEmpty()) {
             properties.insert("pt", power + ptSeparator + toughness);
         }
 
@@ -345,8 +349,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // split cards are considered a single card, enqueue for later merging
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
-            auto faceName = getStringPropertyFromMap(card, "faceName");
-            SplitCardPart split(faceName, text, properties, setInfo);
+            auto _faceName = getStringPropertyFromMap(card, "faceName");
+            SplitCardPart split(_faceName, text, properties, setInfo);
             auto found_iter = splitCards.find(name);
             if (found_iter == splitCards.end()) {
                 splitCards.insert(name, {split});
@@ -366,16 +370,29 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
-                        relatedCards.append(new CardRelation(additionalName, true));
+                        relatedCards.append(new CardRelation(additionalName, CardRelation::TransformInto));
                     }
                 } else {
                     for (const QString &additionalName : name.split(" // ")) {
                         if (additionalName != faceName) {
-                            relatedCards.append(new CardRelation(additionalName, true));
+                            relatedCards.append(new CardRelation(additionalName, CardRelation::TransformInto));
                         }
                     }
                 }
                 name = faceName;
+            }
+
+            // mtgjon related cards
+            if (card.contains("relatedCards")) {
+                QVariantMap givenRelated = card.value("relatedCards").toMap();
+                // conjured cards from a spellbook
+                if (givenRelated.contains("spellbook")) {
+                    auto spbk = givenRelated.value("spellbook").toStringList();
+                    for (const QString &spbkName : spbk) {
+                        relatedCards.append(
+                            new CardRelation(spbkName, CardRelation::DoesNotAttach, false, false, 1, true));
+                    }
+                }
             }
 
             CardInfoPtr newCard = addCard(name + numComponent, text, isToken, properties, relatedCards, setInfo);

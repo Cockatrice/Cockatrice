@@ -245,22 +245,22 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     }
 
     UserConnection_Information uci;
-    QStringList data = uci.getServerInfo(saveName);
+    QStringList _data = uci.getServerInfo(saveName);
 
-    bool savePasswordStatus = (data.at(5) == "1");
+    bool savePasswordStatus = (_data.at(5) == "1");
 
-    saveEdit->setText(data.at(0));
-    hostEdit->setText(data.at(1));
-    portEdit->setText(data.at(2));
-    playernameEdit->setText(data.at(3));
+    saveEdit->setText(_data.at(0));
+    hostEdit->setText(_data.at(1));
+    portEdit->setText(_data.at(2));
+    playernameEdit->setText(_data.at(3));
     savePasswordCheckBox->setChecked(savePasswordStatus);
 
     if (savePasswordStatus) {
-        passwordEdit->setText(data.at(4));
+        passwordEdit->setText(_data.at(4));
     }
 
-    if (!data.at(6).isEmpty()) {
-        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(6) + "</a>";
+    if (!_data.at(6).isEmpty()) {
+        QString formattedLink = "<a href=\"" + _data.at(6) + "\">" + _data.at(6) + "</a>";
         serverContactLabel->setText(tr("Webpage") + ":");
         serverContactLink->setText(formattedLink);
     } else {

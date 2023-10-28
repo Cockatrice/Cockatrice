@@ -134,11 +134,11 @@ void TabReplays::actOpenLocalReplay()
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly))
         return;
-    QByteArray data = f.readAll();
+    QByteArray _data = f.readAll();
     f.close();
 
     GameReplay *replay = new GameReplay;
-    replay->ParseFromArray(data.data(), data.size());
+    replay->ParseFromArray(_data.data(), _data.size());
 
     emit openReplay(replay);
 }
@@ -223,10 +223,10 @@ void TabReplays::downloadFinished(const Response &r,
     const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
     QString filePath = extraData.toString();
 
-    const std::string &data = resp.replay_data();
+    const std::string &_data = resp.replay_data();
     QFile f(filePath);
     f.open(QIODevice::WriteOnly);
-    f.write((const char *)data.data(), data.size());
+    f.write((const char *)_data.data(), _data.size());
     f.close();
 }
 

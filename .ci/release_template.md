@@ -8,21 +8,20 @@ git push -d origin --REPLACE-WITH-BETA-LIST--
 include different targets -->
 <pre>
 <b>Pre-compiled binaries we serve:</b>
- - <kbd>Windows 7/8/10/11 (32-bit)</kbd>
- - <kbd>Windows 7/8 (64-bit)</kbd>
- - <kbd>Windows 10/11 (64-bit)</kbd>
- - <kbd>macOS 10.14</kbd> ("Mojave")
- - <kbd>macOS 10.15</kbd> ("Catalina")
- - <kbd>macOS 11.0+</kbd> ("Big Sur")
- - <kbd>Ubuntu 18.04</kbd> ("Bionic Beaver")
- - <kbd>Ubuntu 20.04</kbd> ("Focal Fossa")
- - <kbd>Ubuntu 22.04</kbd> ("Jammy Jellyfish")
- - <kbd>Debian 10</kbd> ("Buster")
+ - <kbd>Windows 7+</kbd>
+ - <kbd>Windows 10+</kbd>
+ - <kbd>macOS 10.15+</kbd> ("Catalina")
+ - <kbd>macOS 12+</kbd> ("Monterey")
+ - <kbd>Ubuntu 18.04 LTS</kbd> ("Bionic Beaver")
+ - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
+ - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
+ - <kbd>Ubuntu 23.04</kbd> ("Lunar Lobster")
  - <kbd>Debian 11</kbd> ("Bullseye")
- - <kbd>Fedora 35</kbd>
- - <kbd>Fedora 36</kbd>
+ - <kbd>Debian 12</kbd> ("Bookworm")
+ - <kbd>Fedora 37</kbd>
+ - <kbd>Fedora 38</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
-<kbd>General linux support is available via a flatpak package (Flathub)</kbd></i>
+<kbd>General Linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
 
 

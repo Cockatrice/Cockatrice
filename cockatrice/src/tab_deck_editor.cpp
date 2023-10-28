@@ -376,7 +376,7 @@ void TabDeckEditor::createCentralFrame()
 {
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
-    searchEdit->setPlaceholderText(tr("Search by card name"));
+    searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
@@ -1076,8 +1076,8 @@ void TabDeckEditor::actDecrementCardFromSideboard()
 
 void TabDeckEditor::copyDatabaseCellContents()
 {
-    QVariant data = databaseView->selectionModel()->currentIndex().data();
-    QApplication::clipboard()->setText(data.toString());
+    auto _data = databaseView->selectionModel()->currentIndex().data();
+    QApplication::clipboard()->setText(_data.toString());
 }
 
 void TabDeckEditor::actIncrement()

@@ -134,7 +134,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            CardInfoPerSetMap sets = CardInfoPerSetMap();
+            auto _sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
             bool isToken = false;
@@ -178,11 +178,11 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                 attrName = "picurl";
                             setInfo.setProperty(attrName, attr.value().toString());
                         }
-                        sets.insert(setName, setInfo);
+                        _sets.insert(setName, setInfo);
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    bool attach = false;
+                    CardRelation::AttachType attachType = CardRelation::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     bool persistent = false;
@@ -205,7 +205,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = true;
+                        attachType = attrs.value("attach").toString() == "transform" ? CardRelation::TransformInto
+                                                                                     : CardRelation::AttachTo;
                     }
 
                     if (attrs.hasAttribute("exclude")) {
@@ -216,7 +217,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         persistent = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count, persistent);
+                    auto *relation = new CardRelation(cardName, attachType, exclude, variable, count, persistent);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -230,7 +231,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             }
 
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, sets, cipt, tableRow, upsideDown);
+                                                        reverseRelatedCards, _sets, cipt, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -294,7 +295,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     for (auto i : related) {
         xml.writeStartElement("related");
         if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
+            xml.writeAttribute("attach", i->getAttachTypeAsString());
         }
         if (i->getIsCreateAllExclusion()) {
             xml.writeAttribute("exclude", "exclude");
@@ -318,7 +319,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     for (auto i : reverseRelated) {
         xml.writeStartElement("reverse-related");
         if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
+            xml.writeAttribute("attach", i->getAttachTypeAsString());
         }
 
         if (i->getIsCreateAllExclusion()) {
@@ -355,7 +356,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     return xml;
 }
 
-bool CockatriceXml4Parser::saveToFile(SetNameMap sets,
+bool CockatriceXml4Parser::saveToFile(SetNameMap _sets,
                                       CardNameMap cards,
                                       const QString &fileName,
                                       const QString &sourceUrl,
@@ -382,9 +383,9 @@ bool CockatriceXml4Parser::saveToFile(SetNameMap sets,
     xml.writeTextElement("sourceVersion", sourceVersion);
     xml.writeEndElement();
 
-    if (sets.count() > 0) {
+    if (_sets.count() > 0) {
         xml.writeStartElement("sets");
-        for (CardSetPtr set : sets) {
+        for (CardSetPtr set : _sets) {
             xml << set;
         }
         xml.writeEndElement();

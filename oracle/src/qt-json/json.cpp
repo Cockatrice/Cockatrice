@@ -80,12 +80,11 @@ QVariant Json::parse(const QString &json, bool &success)
 
     // Return an empty QVariant if the JSON data is either null or empty
     if (!json.isNull() || !json.isEmpty()) {
-        QString data = json;
         // We'll start from index 0
         int index = 0;
 
         // Parse the first value
-        QVariant value = Json::parseValue(data, index, success);
+        QVariant value = Json::parseValue(json, index, success);
 
         // Return the parsed value
         return value;

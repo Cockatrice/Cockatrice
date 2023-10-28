@@ -9,7 +9,8 @@ if(WIN32)
     set(REDIST_ARCH x86)
   endif()
 
-  set(REDIST_FILE vcredist_${REDIST_ARCH}.exe)
+  # VS 2017 uses vcredist_ARCH.exe, VS 2022 uses vc_redist.ARCH.exe
+  set(REDIST_FILE_NAMES vcredist_${REDIST_ARCH}.exe vcredist.${REDIST_ARCH}.exe vc_redist.${REDIST_ARCH}.exe)
 
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
@@ -22,10 +23,13 @@ if(WIN32)
     get_filename_component(_path ${_path} DIRECTORY)
     get_filename_component(_path ${_path}/../../ ABSOLUTE)
 
-    if(EXISTS "${_path}/${REDIST_FILE}") # VS 2017
-      set(VCREDISTRUNTIME_FOUND "YES")
-      set(VCREDISTRUNTIME_FILE ${_path}/${REDIST_FILE})
-    endif()
+    foreach(redist_file ${REDIST_FILE_NAMES})
+      if(EXISTS "${_path}/${REDIST_FILE}")
+        set(VCREDISTRUNTIME_FOUND "YES")
+        set(VCREDISTRUNTIME_FILE ${_path}/${redist_file})
+        break()
+      endif()
+    endforeach()
   endif()
 
   if(VCREDISTRUNTIME_FOUND)

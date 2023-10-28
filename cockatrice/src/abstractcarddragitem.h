@@ -21,17 +21,18 @@ public:
     {
         Type = typeCardDrag
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
     AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
     ~AbstractCardDragItem();
-    QRectF boundingRect() const
+    QRectF boundingRect() const override
     {
         return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
     }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QPainterPath shape() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     AbstractCardItem *getItem() const
     {
         return item;
@@ -44,7 +45,7 @@ public:
     virtual void updatePosition(const QPointF &cursorScenePos) = 0;
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif

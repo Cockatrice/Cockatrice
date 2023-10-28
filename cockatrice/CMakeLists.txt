@@ -320,6 +320,8 @@ if(WIN32)
     PATTERN "imageformats/qtiff.dll"
     PATTERN "imageformats/qwbmp.dll"
     PATTERN "imageformats/qwebp.dll"
+    PATTERN "mediaservice/dsengine.dll"
+    PATTERN "mediaservice/wmfengine.dll"
     PATTERN "platforms/qdirect2d.dll"
     PATTERN "platforms/qminimal.dll"
     PATTERN "platforms/qoffscreen.dll"
@@ -355,8 +357,8 @@ Data = Resources\")
     COMPONENT Runtime
   )
 
-  if(WIN32SSLRUNTIME_FOUND)
-    install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
+  if(OPENSSL_FOUND)
+    install(FILES ${OPENSSL_INCLUDE_DIRS} DESTINATION ./)
   endif()
 endif()
 

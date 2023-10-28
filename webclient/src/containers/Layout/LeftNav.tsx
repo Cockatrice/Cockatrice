@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useNavigate, generatePath } from 'react-router-dom';
-import AppBar from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Toolbar from '@mui/material/Toolbar';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutline';
@@ -18,11 +16,11 @@ import { Images } from 'images';
 import { RoomsSelectors, ServerSelectors } from 'store';
 import { Room, RouteEnum, User } from 'types';
 
-import './Header.css';
+import './LeftNav.css';
 
-const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
+const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
   const navigate = useNavigate();
-  const [state, setState] = useState<HeaderState>({
+  const [state, setState] = useState<LeftNavState>({
     anchorEl: null,
     showCardImportDialog: false,
     options: [],
@@ -73,23 +71,23 @@ const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
   }
 
   return (
-    <AppBar className="Header" position="static">
-      <Toolbar variant="dense">
-        <div className="Header__logo">
+    <div className="LeftNav__container">
+      <div>
+        <div className="LeftNav__logo">
           <NavLink to={RouteEnum.SERVER}>
             <img src={Images.Logo} alt="logo" />
           </NavLink>
           { AuthenticationService.isConnected(serverState) && (
-            <span className="Header-server__indicator"></span>
+            <span className="LeftNav-server__indicator"></span>
           ) }
         </div>
         { AuthenticationService.isConnected(serverState) && (
-          <div className="Header-content">
-            <nav className="Header-nav">
-              <nav className="Header-nav__links">
-                <div className="Header-nav__link">
+          <div className="LeftNav-content">
+            <nav className="LeftNav-nav">
+              <nav className="LeftNav-nav__links">
+                <div className="LeftNav-nav__link">
                   <NavLink
-                    className="Header-nav__link-btn"
+                    className="LeftNav-nav__link-btn"
                     to={
                       joinedRooms.length
                         ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId.toString() })
@@ -97,42 +95,42 @@ const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
                     }
                   >
                     Rooms
-                    <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                    <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
-                  <div className="Header-nav__link-menu">
+                  <div className="LeftNav-nav__link-menu">
                     {joinedRooms.map(({ name, roomId }) => (
-                      <MenuItem className="Header-nav__link-menu__item" key={roomId}>
-                        <NavLink className="Header-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId.toString() }) }>
+                      <div className="LeftNav-nav__link-menu__item" key={roomId}>
+                        <NavLink className="LeftNav-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId.toString() }) }>
                           {name}
 
                           <IconButton size="small" edge="end" onClick={event => leaveRoom(event, roomId)}>
                             <CloseIcon style={{ fontSize: 10, color: 'white' }} />
                           </IconButton>
                         </NavLink>
-                      </MenuItem>
+                      </div>
                     ))}
                   </div>
                 </div>
-                <div className="Header-nav__link">
-                  <NavLink className="Header-nav__link-btn" to={ RouteEnum.GAME }>
+                <div className="LeftNav-nav__link">
+                  <NavLink className="LeftNav-nav__link-btn" to={ RouteEnum.GAME }>
                     Games
-                    <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                    <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                 </div>
-                <div className="Header-nav__link">
-                  <NavLink className="Header-nav__link-btn" to={ RouteEnum.DECKS }>
+                <div className="LeftNav-nav__link">
+                  <NavLink className="LeftNav-nav__link-btn" to={ RouteEnum.DECKS }>
                     Decks
-                    <ArrowDropDownIcon className="Header-nav__link-btn__icon" fontSize="small" />
+                    <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                 </div>
               </nav>
-              <div className="Header-nav__actions">
-                <div className="Header-nav__action">
+              <div className="LeftNav-nav__actions">
+                <div className="LeftNav-nav__action">
                   <IconButton size="large">
                     <MailOutlineRoundedIcon style={{ color: 'inherit' }} />
                   </IconButton>
                 </div>
-                <div className="Header-nav__action">
+                <div className="LeftNav-nav__action">
                   <IconButton onClick={handleMenuOpen} size="large">
                     <MenuRoundedIcon style={{ color: 'inherit' }} />
                   </IconButton>
@@ -163,24 +161,25 @@ const Header = ({ joinedRooms, serverState, user }: HeaderProps) => {
             </nav>
           </div>
         ) }
-      </Toolbar>
+      </div>
 
       <CardImportDialog
         isOpen={state.showCardImportDialog}
         handleClose={closeImportCardWizard}
       ></CardImportDialog>
-    </AppBar>
+    </div>
   );
 }
 
-interface HeaderProps {
+interface LeftNavProps {
   serverState: number;
   server: string;
   user: User;
   joinedRooms: Room[];
+  showNav?: boolean;
 }
 
-interface HeaderState {
+interface LeftNavState {
   anchorEl: Element;
   showCardImportDialog: boolean;
   options: string[];
@@ -193,4 +192,4 @@ const mapStateToProps = state => ({
   joinedRooms: RoomsSelectors.getJoinedRooms(state),
 });
 
-export default connect(mapStateToProps)(Header);
+export default connect(mapStateToProps)(LeftNav);

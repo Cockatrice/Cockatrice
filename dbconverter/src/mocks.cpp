@@ -199,7 +199,13 @@ void SettingsCache::setMainWindowGeometry(const QByteArray & /* _mainWindowGeome
 void SettingsCache::setTokenDialogGeometry(const QByteArray & /* _tokenDialogGeometry */)
 {
 }
+void SettingsCache::setSetsDialogGeometry(const QByteArray & /* _setsDialogGeometry */)
+{
+}
 void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
+{
+}
+void SettingsCache::setNetworkCacheSizeInMB(const int /* _networkCacheSize */)
 {
 }
 void SettingsCache::setClientID(const QString & /* _clientID */)
