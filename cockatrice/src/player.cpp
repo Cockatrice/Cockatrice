@@ -3236,6 +3236,16 @@ void Player::actFlowT()
     actIncPT(-1, 1);
 }
 
+void AnnotationDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
+        event->accept();
+        accept();
+        return;
+    }
+    QInputDialog::keyPressEvent(event);
+}
+
 void Player::actSetAnnotation()
 {
     QString oldAnnotation;
@@ -3247,15 +3257,18 @@ void Player::actSetAnnotation()
         }
     }
 
-    bool ok;
     dialogSemaphore = true;
-    QString annotation = QInputDialog::getMultiLineText(game, tr("Set annotation"),
-                                                        tr("Please enter the new annotation:"), oldAnnotation, &ok)
-                             .left(MAX_NAME_LENGTH);
+    AnnotationDialog *dialog = new AnnotationDialog(game);
+    dialog->setOptions(QInputDialog::UsePlainTextEditForTextInput);
+    dialog->setWindowTitle(tr("Set annotation"));
+    dialog->setLabelText(tr("Please enter the new annotation:"));
+    dialog->setTextValue(oldAnnotation);
+    bool ok = dialog->exec();
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
     }
+    QString annotation = dialog->textValue().left(MAX_NAME_LENGTH);
 
     QList<const ::google::protobuf::Message *> commandList;
     for (const auto &item : sel) {
