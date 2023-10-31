@@ -58,56 +58,83 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     painter->fillRect(boundingRect(), brush);
 }
 
-void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
-                                CardZone *startZone,
-                                const QPoint & /*dropPoint*/)
+void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
-    if (startZone == this)
-        return;
-
     Command_MoveCard cmd;
     cmd.set_start_player_id(startZone->getPlayer()->getId());
     cmd.set_start_zone(startZone->getName().toStdString());
     cmd.set_target_player_id(player->getId());
     cmd.set_target_zone(getName().toStdString());
-    cmd.set_x(0);
+    int new_x = qRound(cardLocationByIndex(dropPoint.y(), true));
+    if (startZone == this) {
+        if (cards.at(new_x)->getId() == dragItems.at(0)->getId()) {
+            return;
+        }
+    }
+    cmd.set_x(new_x);
     cmd.set_y(0);
 
-    for (int i = 0; i < dragItems.size(); ++i)
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
+    for (CardDragItem *item : dragItems) {
+        cmd.mutable_cards_to_move()->add_card()->set_card_id(item->getId());
+    }
 
     player->sendGameCommand(cmd);
 }
 
+qreal StackZone::cardLocationByIndex(qreal index, bool reverse)
+{
+    if (cards.isEmpty()) {
+        return -1;
+    }
+    qreal totalHeight = boundingRect().height();
+    qreal cardHeight = cards.at(0)->boundingRect().height();
+    qreal cardMinOverlap = cardHeight / 3;
+    qreal desiredHeight = cardHeight * cardCount - cardMinOverlap * (cardCount - 1);
+    qreal y;
+    if (desiredHeight > totalHeight) {
+        if (reverse) {
+            y = index / ((totalHeight - cardHeight) / (cardCount - 1));
+        } else {
+            y = index * (totalHeight - cardHeight) / (cardCount - 1);
+        }
+    } else {
+        qreal start = (totalHeight - desiredHeight) / 2;
+        if (reverse) {
+            if (index <= start) {
+                return 0;
+            }
+            y = (index - start) / (cardHeight - cardMinOverlap);
+        } else {
+            y = index * (cardHeight - cardMinOverlap) + start;
+        }
+    }
+    return y;
+}
+
 void StackZone::reorganizeCards()
 {
+    cardCount = cards.size();
     if (!cards.isEmpty()) {
         QSet<ArrowItem *> arrowsToUpdate;
 
         const int cardCount = cards.size();
         qreal totalWidth = boundingRect().width();
-        qreal totalHeight = boundingRect().height();
         qreal cardWidth = cards.at(0)->boundingRect().width();
-        qreal cardHeight = cards.at(0)->boundingRect().height();
         qreal xspace = 5;
         qreal x1 = xspace;
         qreal x2 = totalWidth - xspace - cardWidth;
 
         for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cards.at(i);
+            CardItem *card = cards.at(i);
             qreal x = (i % 2) ? x2 : x1;
-            // If the total height of the cards is smaller than the available height,
-            // the cards do not need to overlap and are displayed in the center of the area.
-            if (cardHeight * cardCount > totalHeight)
-                c->setPos(x, ((qreal)i) * (totalHeight - cardHeight) / (cardCount - 1));
-            else
-                c->setPos(x, ((qreal)i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
-            c->setRealZValue(i);
+            qreal y = cardLocationByIndex(i);
+            card->setPos(x, y);
+            card->setRealZValue(i);
 
-            for (ArrowItem *item : c->getArrowsFrom()) {
+            for (ArrowItem *item : card->getArrowsFrom()) {
                 arrowsToUpdate.insert(item);
             }
-            for (ArrowItem *item : c->getArrowsTo()) {
+            for (ArrowItem *item : card->getArrowsTo()) {
                 arrowsToUpdate.insert(item);
             }
         }
