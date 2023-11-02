@@ -72,6 +72,7 @@ private slots:
     void actClearFilterAll();
     void actClearFilterOne();
 
+    void actSetCustomImage();
     void actSwapCard();
     void actAddCard();
     void actAddCardToSideboard();
