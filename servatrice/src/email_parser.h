@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_EMAILPARSER_H
 #define COCKATRICE_EMAILPARSER_H
 
+#include <QPair>
 #include <QString>
 
 class EmailParser
