@@ -75,7 +75,7 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="cards" minOccurs="0">
+                <xs:element name="cards" minOccurs="0" maxOccurs="2">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element type="cardType" name="card" maxOccurs="unbounded" minOccurs="0" />
