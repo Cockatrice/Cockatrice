@@ -1,5 +1,6 @@
 #include "email_parser.h"
 
+#include <QPair>
 #include <QRegularExpression>
 #include <QString>
 
