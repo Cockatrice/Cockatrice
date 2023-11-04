@@ -20,6 +20,7 @@
 #include "servatrice.h"
 
 #include "decklist.h"
+#include "email_parser.h"
 #include "featureset.h"
 #include "isl_interface.h"
 #include "main.h"
@@ -627,7 +628,7 @@ void Servatrice::statusUpdate()
 
             while (servDbSelQuery->next()) {
                 const QString userName = servDbSelQuery->value(0).toString();
-                const QString emailAddress = servDbSelQuery->value(1).toString();
+                const auto emailAddress = EmailParser::getParsedEmailAddress(servDbSelQuery->value(1).toString());
                 const QString token = servDbSelQuery->value(2).toString();
 
                 if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token)) {
@@ -649,7 +650,7 @@ void Servatrice::statusUpdate()
 
             while (forgotPwQuery->next()) {
                 const QString userName = forgotPwQuery->value(0).toString();
-                const QString emailAddress = forgotPwQuery->value(1).toString();
+                const auto emailAddress = EmailParser::getParsedEmailAddress(forgotPwQuery->value(1).toString());
                 const QString token = forgotPwQuery->value(2).toString();
 
                 if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token)) {

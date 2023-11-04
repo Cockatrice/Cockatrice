@@ -5,6 +5,7 @@
 project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 set(servatrice_SOURCES
+    src/email_parser.cpp
     src/main.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
