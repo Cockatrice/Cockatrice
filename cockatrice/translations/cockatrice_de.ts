@@ -4474,7 +4474,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/player.cpp" line="756"/>
         <source>&amp;Bottom of library...</source>
-        <translation>Unter Karte(n) der Bibliothek...</translation>
+        <translation>Untere Karte(n) der Bibliothek...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="758"/>
