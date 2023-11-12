@@ -1239,7 +1239,7 @@ Um Ihren derzeitigen Avatar zu entfernen, bestätigen Sie, ohne ein neues Bild z
     <message>
         <location filename="src/dlg_edit_tokens.cpp" line="120"/>
         <source>Edit custom tokens</source>
-        <translation>Bearbeite benutzerdefinierte Spielsteine</translation>
+        <translation>Benutzerdefinierte Spielsteine bearbeiten</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_tokens.cpp" line="151"/>
@@ -2870,7 +2870,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="650"/>
         <source>&amp;Register to server...</source>
-        <translation>Beim Server &amp;registrieren...</translation>
+        <translation>Auf Server &amp;registrieren...</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="651"/>
@@ -4780,7 +4780,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/window_main.cpp" line="758"/>
         <source>Discard</source>
-        <translation>Abwerfen</translation>
+        <translation>Verwerfen</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="759"/>
