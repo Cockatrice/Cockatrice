@@ -2,9 +2,35 @@
 
 #include "carditem.h"
 #include "gamescene.h"
+#include "settingscache.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
+
+qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse)
+{
+    qreal cardMinOverlap = cardHeight * SettingsCache::instance().getStackCardOverlapPercent() / 100;
+    qreal desiredHeight = cardHeight * cardCount - cardMinOverlap * (cardCount - 1);
+    qreal y;
+    if (desiredHeight > totalHeight) {
+        if (reverse) {
+            y = index / ((totalHeight - cardHeight) / (cardCount - 1));
+        } else {
+            y = index * (totalHeight - cardHeight) / (cardCount - 1);
+        }
+    } else {
+        qreal start = (totalHeight - desiredHeight) / 2;
+        if (reverse) {
+            if (index <= start) {
+                return 0;
+            }
+            y = (index - start) / (cardHeight - cardMinOverlap);
+        } else {
+            y = index * (cardHeight - cardMinOverlap) + start;
+        }
+    }
+    return y;
+}
 
 SelectZone::SelectZone(Player *_player,
                        const QString &_name,

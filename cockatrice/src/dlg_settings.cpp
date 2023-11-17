@@ -299,6 +299,7 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
+    SettingsCache &settings = SettingsCache::instance();
     QString themeName = SettingsCache::instance().getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
@@ -319,27 +320,31 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
 
-    displayCardNamesCheckBox.setChecked(SettingsCache::instance().getDisplayCardNames());
-    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
-            SLOT(setDisplayCardNames(int)));
+    displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
+    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setDisplayCardNames(int)));
 
-    cardScalingCheckBox.setChecked(SettingsCache::instance().getScaleCards());
-    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setCardScaling(int)));
+    cardScalingCheckBox.setChecked(settings.getScaleCards());
+    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setCardScaling(int)));
+
+    verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
+    verticalCardOverlapPercentBox.setRange(0, 80);
+    connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
+            SLOT(setStackCardOverlapPercent(int)));
 
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
+    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 2, 0, 1, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 2, 1, 1, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
 
-    horizontalHandCheckBox.setChecked(SettingsCache::instance().getHorizontalHand());
-    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
-            SLOT(setHorizontalHand(int)));
+    horizontalHandCheckBox.setChecked(settings.getHorizontalHand());
+    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setHorizontalHand(int)));
 
-    leftJustifiedHandCheckBox.setChecked(SettingsCache::instance().getLeftJustified());
-    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
-            SLOT(setLeftJustified(int)));
+    leftJustifiedHandCheckBox.setChecked(settings.getLeftJustified());
+    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setLeftJustified(int)));
 
     auto *handGrid = new QGridLayout;
     handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
@@ -348,18 +353,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
 
-    invertVerticalCoordinateCheckBox.setChecked(SettingsCache::instance().getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+    invertVerticalCoordinateCheckBox.setChecked(settings.getInvertVerticalCoordinate());
+    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), &settings,
             SLOT(setInvertVerticalCoordinate(int)));
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
-    minPlayersForMultiColumnLayoutEdit.setValue(SettingsCache::instance().getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+    minPlayersForMultiColumnLayoutEdit.setValue(settings.getMinPlayersForMultiColumnLayout());
+    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), &settings,
             SLOT(setMinPlayersForMultiColumnLayout(int)));
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
-    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setMaxFontSize(int)));
-    maxFontSizeForCardsEdit.setValue(SettingsCache::instance().getMaxFontSize());
+    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setMaxFontSize(int)));
+    maxFontSizeForCardsEdit.setValue(settings.getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
@@ -413,6 +418,7 @@ void AppearanceSettingsPage::retranslateUi()
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
+    verticalCardOverlapPercentLabel.setText(tr("Minimum overlap percentage of cards in vertical hand and stack"));
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));

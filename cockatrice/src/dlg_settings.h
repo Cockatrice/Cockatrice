@@ -90,6 +90,8 @@ private:
     QLabel maxFontSizeForCardsLabel;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
+    QLabel verticalCardOverlapPercentLabel;
+    QSpinBox verticalCardOverlapPercentBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;

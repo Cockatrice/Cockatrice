@@ -262,6 +262,7 @@ SettingsCache::SettingsCache()
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
     scaleCards = settings->value("cards/scaleCards", true).toBool();
+    verticalCardOverlapPercent = settings->value("cards/verticalCardOverlapPercent", 33).toInt();
     showMessagePopups = settings->value("chat/showmessagepopups", true).toBool();
     showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
     roomHistory = settings->value("chat/roomhistory", true).toBool();
@@ -330,6 +331,12 @@ void SettingsCache::setCardScaling(const int _scaleCards)
 {
     scaleCards = (bool)_scaleCards;
     settings->setValue("cards/scaleCards", scaleCards);
+}
+
+void SettingsCache::setStackCardOverlapPercent(const int _verticalCardOverlapPercent)
+{
+    verticalCardOverlapPercent = _verticalCardOverlapPercent;
+    settings->setValue("cards/verticalCardOverlapPercent", verticalCardOverlapPercent);
 }
 
 void SettingsCache::setShowMessagePopups(const int _showMessagePopups)

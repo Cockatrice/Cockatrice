@@ -8,8 +8,6 @@ class StackZone : public SelectZone
     Q_OBJECT
 private:
     qreal zoneHeight;
-    int cardCount;
-    qreal cardLocationByIndex(qreal index, bool reverse = false);
 private slots:
     void updateBg();
 

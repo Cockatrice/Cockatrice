@@ -115,6 +115,7 @@ private:
     int pixmapCacheSize;
     int networkCacheSize;
     bool scaleCards;
+    int verticalCardOverlapPercent;
     bool showMessagePopups;
     bool showMentionPopups;
     bool roomHistory;
@@ -352,6 +353,10 @@ public:
     {
         return scaleCards;
     }
+    int getStackCardOverlapPercent() const
+    {
+        return verticalCardOverlapPercent;
+    }
     bool getShowMessagePopup() const
     {
         return showMessagePopups;
@@ -541,6 +546,7 @@ public slots:
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
     void setCardScaling(const int _scaleCards);
+    void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);
     void setRoomHistory(const int _roomHistory);
