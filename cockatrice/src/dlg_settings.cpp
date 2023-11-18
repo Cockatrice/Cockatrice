@@ -418,7 +418,7 @@ void AppearanceSettingsPage::retranslateUi()
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
-    verticalCardOverlapPercentLabel.setText(tr("Minimum overlap percentage of cards in vertical hand and stack"));
+    verticalCardOverlapPercentLabel.setText(tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
