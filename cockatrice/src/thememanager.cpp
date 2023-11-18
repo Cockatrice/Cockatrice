@@ -9,7 +9,7 @@
 #include <QPixmapCache>
 #include <QStandardPaths>
 
-#define NONE_THEME_NAME "None "
+#define NONE_THEME_NAME "Standard"
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
 #define PLAYERZONE_BG_NAME "playerzone"
