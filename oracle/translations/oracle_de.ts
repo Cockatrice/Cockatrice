@@ -9,7 +9,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="201"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
-        <translation>Dieser Assistent wird eine Liste aller Editionen, Karten und Spielsteine, die von Cockatrice genutzt werden, importieren.</translation>
+        <translation>Dieser Assistent wird eine Liste aller Editionen, Karten und Spielsteine importieren, die von Cockatrice genutzt werden.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="203"/>
@@ -32,7 +32,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="260"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation>Bitte geben Sie eine kompatible Quelle für die Liste der Sets und Karten an. Sie können eine herunterzuladende URL-Adresse oder eine existierende Datei von Ihrem Computer verwenden.</translation>
+        <translation>Bitte geben Sie eine kompatible Quelle für die Liste der Editionen und Karten an. Sie können eine URL-Adresse zum Herunterladen angeben oder eine existierende Datei von Ihrem Computer verwenden.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="264"/>
@@ -108,12 +108,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="447"/>
         <source>Parsing file</source>
-        <translation>Datei wird analysiert</translation>
+        <translation>Datei wird verarbeitet</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="469"/>
         <source>Xz extraction failed.</source>
-        <translation>Fehler beim Etrahieren von xz.</translation>
+        <translation>Fehler beim Extrahieren der xz Datei.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="476"/>
@@ -373,12 +373,12 @@
     <message>
         <location filename="src/pagetemplates.cpp" line="77"/>
         <source>Downloading (0MB)</source>
-        <translation>Lade herunter (0MB)</translation>
+        <translation>Herunterladen (0MB)</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="104"/>
         <source>Downloading (%1MB)</source>
-        <translation>Lade herunter (%1MB)</translation>
+        <translation>Herunterladen (%1MB)</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="113"/>
