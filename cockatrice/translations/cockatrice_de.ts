@@ -30,7 +30,7 @@
     <message>
         <location filename="src/dlg_settings.cpp" line="403"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
-        <translation>Das Themenverzeichnis &apos;%1&apos; konnte nicht erstellt werden.</translation>
+        <translation>Das Themeverzeichnis &apos;%1&apos; konnte nicht erstellt werden.</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="409"/>
@@ -40,12 +40,12 @@
     <message>
         <location filename="src/dlg_settings.cpp" line="410"/>
         <source>Current theme:</source>
-        <translation>Derzeitige Darstellung</translation>
+        <translation>Aktuelles Theme:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="411"/>
         <source>Open themes folder</source>
-        <translation>Öffne Themenverzeichnis</translation>
+        <translation>Öffne Themeverzeichnis</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="413"/>
@@ -55,7 +55,7 @@
     <message>
         <location filename="src/dlg_settings.cpp" line="414"/>
         <source>Display card names on cards having a picture</source>
-        <translation>Kartennamen darstellen auch bei Karten, die Bilder haben</translation>
+        <translation>Kartennamen auch bei Karten mit Bildern darstellen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="415"/>
@@ -369,7 +369,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/cardframe.cpp" line="67"/>
         <source>Both</source>
-        <translation>Beide</translation>
+        <translation>Beides</translation>
     </message>
 </context>
 <context>
@@ -1279,7 +1279,7 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
     <message>
         <location filename="src/dlg_edit_user.cpp" line="36"/>
         <source>Real name:</source>
-        <translation>Wahrer Name:</translation>
+        <translation>Echter Name:</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_user.cpp" line="59"/>
@@ -1392,7 +1392,7 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
     <message>
         <location filename="src/dlg_filter_games.cpp" line="120"/>
         <source>Show games only if &amp;spectators can watch</source>
-        <translation>Zeige Spiele nur, wenn &amp;Zuschauer zuschauen können</translation>
+        <translation>Zeige Spiele nur, wenn &amp;Zuschauer erlaubt sind</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="124"/>
@@ -1637,8 +1637,8 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
         <location filename="src/dlg_register.cpp" line="18"/>
         <source>Enter your information and the information of the server you'd like to register to.
 Your email will be used to verify your account.</source>
-        <translation>Geben Sie die eigenen Informationen und die Informationen des Servers, an dem die Registrierung erfolgen soll, an.
-Die E-Mail-Adresse wird zur Kontoverifikation genutzt.</translation>
+        <translation>Geben Sie Ihre Informationen und die Informationen des Servers, bei dem Sie sich registrieren wollen, an.
+Die E-Mail-Adresse wird zur Accountverifikation genutzt.</translation>
     </message>
     <message>
         <location filename="src/dlg_register.cpp" line="22"/>
@@ -1653,7 +1653,7 @@ Die E-Mail-Adresse wird zur Kontoverifikation genutzt.</translation>
     <message>
         <location filename="src/dlg_register.cpp" line="32"/>
         <source>Player &amp;name:</source>
-        <translation>Spieler &amp;Name:</translation>
+        <translation>Spieler&amp;name:</translation>
     </message>
     <message>
         <location filename="src/dlg_register.cpp" line="37"/>
@@ -1688,7 +1688,7 @@ Die E-Mail-Adresse wird zur Kontoverifikation genutzt.</translation>
     <message>
         <location filename="src/dlg_register.cpp" line="319"/>
         <source>Real name:</source>
-        <translation>Wahrer Name:</translation>
+        <translation>Echter Name:</translation>
     </message>
     <message>
         <location filename="src/dlg_register.cpp" line="354"/>
@@ -2345,7 +2345,7 @@ Eventuell müssen Sie die Quellen selbst kompilieren.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="292"/>
         <source>Custom database directory:</source>
-        <translation>Benutzerdefiniertes Datenbankverzeichnis:</translation>
+        <translation>Verzeichnis für benutzerdefinierte Datenbank:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="293"/>
@@ -2920,7 +2920,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="666"/>
         <source>Open custom sets folder</source>
-        <translation>Öffne den Ordner für benutzerdifinierte Sets</translation>
+        <translation>Öffne den Ordner für benutzerdefinierte Sets</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="667"/>
@@ -3775,7 +3775,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1035"/>
         <source>Custom alert words</source>
-        <translation>Benutzerdifinierte Warnungen</translation>
+        <translation>Benutzerdefinierte Benachrichtigungswörter</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1036"/>
@@ -3800,12 +3800,12 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1041"/>
         <source>Ignore chat room messages sent by unregistered users</source>
-        <translation>Ignoriere Nachrichten von unregistrierten Benutzern im Chatroom.</translation>
+        <translation>Nachrichten von unregistrierten Benutzern im Chatroom ignorieren</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1042"/>
         <source>Ignore private messages sent by unregistered users</source>
-        <translation>Ignoriere private Nachrichten von unregistrierten Benutzern.</translation>
+        <translation>Private Nachrichten von unregistrierten Benutzern ignorieren</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1043"/>
@@ -3816,7 +3816,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1045"/>
         <source>Enable desktop notifications for private messages</source>
-        <translation>Desktop Benachrichtigungen für private Nachrichten aktivieren.</translation>
+        <translation>Desktop Benachrichtigungen für private Nachrichten aktivieren</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1046"/>
@@ -3826,7 +3826,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1047"/>
         <source>Enable room message history on join</source>
-        <translation>Aktiviere Nachrichtenverlauf bei Betreten eines Raumes</translation>
+        <translation>Nachrichtenverlauf beim Betreten eines Raumes aktivieren</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1048"/>
@@ -3837,7 +3837,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1050"/>
         <source>Separate words with a space, alphanumeric characters only</source>
-        <translation>Wörter durch Leerzeichen trennen, nur alphanumerische Zeichen verwenden</translation>
+        <translation>Wörter durch Leerzeichen trennen, nur alphanumerische Zeichen</translation>
     </message>
 </context>
 <context>
@@ -5051,12 +5051,12 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1120"/>
         <source>Current sounds theme:</source>
-        <translation>Derzeitiges Geräuschthema:</translation>
+        <translation>Aktuelles Ton-Theme:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1121"/>
         <source>Test system sound engine</source>
-        <translation>Systemsoundeinstellungen testen</translation>
+        <translation>Systemsound testen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1122"/>
@@ -6556,7 +6556,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/userinfobox.cpp" line="77"/>
         <source>Real Name:</source>
-        <translation>Wahrer Name:</translation>
+        <translation>Echter Name:</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="79"/>
@@ -6648,7 +6648,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/dlg_settings.cpp" line="509"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
-        <translation>alle Nichtländer standardmäßig über den Stapel spielen (anstatt direkt auf den Tisch)</translation>
+        <translation>Alle Nichtländer standardmäßig über den Stapel spielen (anstatt direkt auf das Spielfeld)</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="510"/>
@@ -6658,7 +6658,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/dlg_settings.cpp" line="511"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
-        <translation>Benutze Abreißmenüs, erlaube Kontextmenüs, auf dem Bildschirm zu verbleiben</translation>
+        <translation>Benutze Abreißmenüs, erlaubt Kontextmenüs auf dem Bildschirm zu verbleiben</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="512"/>
@@ -6668,17 +6668,17 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/dlg_settings.cpp" line="513"/>
         <source>Enable notifications in taskbar</source>
-        <translation>Taskbarbenachrichtigungen aktivieren</translation>
+        <translation>Benachrichtigungen in der Taskleiste aktivieren</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="514"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
-        <translation>Benachrichtigungen für Spielereignisse auch beim Zusehen anderer Spiele in der Taskbar anzeigen</translation>
+        <translation>Benachrichtigungen für Spielereignisse auch beim Zuschauen anderer Spiele in der Taskbar anzeigen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="515"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
-        <translation>Benachrichtige in der Taskleiste, wenn sich Benutzer aus der Freundesliste anmelden</translation>
+        <translation>Benachrichtige in der Taskleiste wenn sich Benutzer aus der Freundesliste anmelden</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="516"/>
@@ -7523,7 +7523,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/shortcutssettings.h" line="499"/>
         <location filename="src/shortcutssettings.h" line="521"/>
         <source>Exile</source>
-        <translation>ins Exil</translation>
+        <translation>Exil</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="455"/>
@@ -7531,13 +7531,13 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/shortcutssettings.h" line="492"/>
         <location filename="src/shortcutssettings.h" line="514"/>
         <source>Graveyard</source>
-        <translation>in den Friedhof</translation>
+        <translation>Friedhof</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="459"/>
         <location filename="src/shortcutssettings.h" line="470"/>
         <source>Hand</source>
-        <translation>auf die Hand</translation>
+        <translation>Hand</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="460"/>
