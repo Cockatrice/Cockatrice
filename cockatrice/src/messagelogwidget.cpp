@@ -251,7 +251,7 @@ void MessageLogWidget::logCreateArrow(Player *player,
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
-    appendHtmlServerMessage(tr("%1 creates token: %2%3.")
+    appendHtmlServerMessage(tr("%1 creates token: %2 %3.")
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(cardLink(std::move(cardName)))
                                 .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
@@ -325,33 +325,33 @@ void MessageLogWidget::logMoveCard(Player *player,
     if (targetZoneName == tableConstant()) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
-            finalStr = tr("%1 puts %2 into play%3 face down.");
+            finalStr = tr("%1 puts %2 into play %3 face down.");
         } else {
-            finalStr = tr("%1 puts %2 into play%3.");
+            finalStr = tr("%1 puts %2 into play %3.");
         }
     } else if (targetZoneName == graveyardConstant()) {
-        finalStr = tr("%1 puts %2%3 into their graveyard.");
+        finalStr = tr("%1 puts %2 %3 into their graveyard.");
     } else if (targetZoneName == exileConstant()) {
-        finalStr = tr("%1 exiles %2%3.");
+        finalStr = tr("%1 exiles %2 %3.");
     } else if (targetZoneName == handConstant()) {
-        finalStr = tr("%1 moves %2%3 to their hand.");
+        finalStr = tr("%1 moves %2 %3 to their hand.");
     } else if (targetZoneName == deckConstant()) {
         if (newX == -1) {
-            finalStr = tr("%1 puts %2%3 into their library.");
+            finalStr = tr("%1 puts %2 %3 into their library.");
         } else if (newX >= targetZone->getCards().size()) {
-            finalStr = tr("%1 puts %2%3 onto the bottom of their library.");
+            finalStr = tr("%1 puts %2 %3 onto the bottom of their library.");
         } else if (newX == 0) {
-            finalStr = tr("%1 puts %2%3 on top of their library.");
+            finalStr = tr("%1 puts %2 %3 on top of their library.");
         } else {
             ++newX;
             usesNewX = true;
-            finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
+            finalStr = tr("%1 puts %2 %3 into their library %4 cards from the top.");
         }
     } else if (targetZoneName == sideboardConstant()) {
-        finalStr = tr("%1 moves %2%3 to sideboard.");
+        finalStr = tr("%1 moves %2 %3 to sideboard.");
     } else if (targetZoneName == stackConstant()) {
         soundEngine->playSound("play_card");
-        finalStr = tr("%1 plays %2%3.");
+        finalStr = tr("%1 plays %2 %3.");
     }
 
     if (usesNewX) {
