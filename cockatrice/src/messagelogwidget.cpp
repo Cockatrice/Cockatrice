@@ -251,7 +251,7 @@ void MessageLogWidget::logCreateArrow(Player *player,
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
-    appendHtmlServerMessage(tr("%1 creates token: %2 %3.")
+    appendHtmlServerMessage(tr("%1 creates token: %2%3.")
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(cardLink(std::move(cardName)))
                                 .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
