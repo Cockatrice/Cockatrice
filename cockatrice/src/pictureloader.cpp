@@ -6,12 +6,14 @@
 #include "thememanager.h"
 
 #include <QApplication>
+#include <QBuffer>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QImageReader>
+#include <QMovie>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
@@ -499,19 +501,38 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     imgReader.setDecideFormatFromContent(true);
     imgReader.setDevice(reply);
 
-    if (imgReader.read(&testImage)) {
+    bool logSuccessMessage = false;
+
+    static const int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
+    auto replyHeader = reply->peek(riffHeaderSize);
+
+    if (replyHeader.startsWith("RIFF") && replyHeader.endsWith("WEBP")) {
+        auto imgBuf = QBuffer(this);
+        imgBuf.setData(reply->readAll());
+
+        auto movie = QMovie(&imgBuf);
+        movie.start();
+        movie.stop();
+
+        imageLoaded(cardBeingDownloaded.getCard(), movie.currentImage());
+        logSuccessMessage = true;
+    } else if (imgReader.read(&testImage)) {
         imageLoaded(cardBeingDownloaded.getCard(), testImage);
-        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                           << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully "
-                           << (isFromCache ? "loaded from cached" : "downloaded from") << " url "
-                           << reply->url().toDisplayString();
+        logSuccessMessage = true;
     } else {
         qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
                            << " set: " << cardBeingDownloaded.getSetName() << "]: Possible "
                            << (isFromCache ? "cached" : "downloaded") << " picture at "
-                           << reply->url().toDisplayString() << " could not be loaded";
+                           << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
 
         picDownloadFailed();
+    }
+
+    if (logSuccessMessage) {
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully "
+                           << (isFromCache ? "loaded from cached" : "downloaded from") << " url "
+                           << reply->url().toDisplayString();
     }
 
     reply->deleteLater();

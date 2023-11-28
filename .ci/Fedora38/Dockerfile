@@ -7,7 +7,7 @@ RUN dnf install -y \
         git \
         mariadb-devel \
         protobuf-devel \
-        qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
+        qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets,imageformats}-devel \
         rpm-build \
         xz-devel \
         zlib-devel \

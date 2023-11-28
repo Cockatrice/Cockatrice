@@ -18,6 +18,7 @@ RUN apt-get update && \
         libqt6svg6-dev \
         libqt6websockets6-dev \
         protobuf-compiler \
+        qt6-image-formats-plugins \
         qt6-l10n-tools \
         qt6-multimedia-dev \
         qt6-tools-dev \
