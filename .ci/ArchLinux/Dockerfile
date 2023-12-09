@@ -9,6 +9,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         mariadb-libs \
         protobuf \
         qt6-base \
+        qt6-imageformats \
         qt6-multimedia \
         qt6-svg \
         qt6-tools \

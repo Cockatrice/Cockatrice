@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libqt5websockets5-dev \
         protobuf-compiler \
         qt5-default \
+        qt5-image-formats-plugins \
         qtmultimedia5-dev \
         qttools5-dev \
         qttools5-dev-tools \
