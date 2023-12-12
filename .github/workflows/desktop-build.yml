@@ -216,21 +216,13 @@ jobs:
             make_package: 1
             use_old_protobuf: 1
 
-          - target: 12_Monterey
-            os: macos-12
-            xcode: 14.0.1
+          - target: 13_Ventura
+            os: macos-13
+            xcode: 15
             qt_version: homebrew
             type: Release
             do_tests: 1
             make_package: 1
-
-          - target: 13_Ventura
-            os: macos-13
-            xcode: 14.3
-            qt_version: homebrew
-            type: Release
-            do_tests: 1
-            make_package: 0
 
     name: macOS ${{matrix.target}}
     needs: configure
@@ -261,6 +253,7 @@ jobs:
             brew link --force protobuf
           fi
           if [[ $install_qt == homebrew ]]; then
+            rm /usr/local/bin/2to3*
             brew install qt --force-bottle
           else # for some reason the tests fail with the action installed qt?
             brew install googletest
