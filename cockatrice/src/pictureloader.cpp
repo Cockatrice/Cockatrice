@@ -621,7 +621,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
         QScreen *screen = qApp->primaryScreen();
-        int dpr = screen->devicePixelRatio();
+        qreal dpr = screen->devicePixelRatio();
         pixmap = bigPixmap.scaled(size * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         pixmap.setDevicePixelRatio(dpr);
         QPixmapCache::insert(sizeKey, pixmap);
