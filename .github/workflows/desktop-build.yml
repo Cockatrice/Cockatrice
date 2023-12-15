@@ -253,7 +253,7 @@ jobs:
             brew link --force protobuf
           fi
           if [[ $install_qt == homebrew ]]; then
-            rm /usr/local/bin/2to3*
+            brew link --overwrite python3
             brew install qt --force-bottle
           else # for some reason the tests fail with the action installed qt?
             brew install googletest
