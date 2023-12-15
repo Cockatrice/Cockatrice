@@ -477,4 +477,15 @@ public:
     void setLastToken(CardInfoPtr cardInfo);
 };
 
+class AnnotationDialog : public QInputDialog
+{
+    Q_OBJECT
+    void keyPressEvent(QKeyEvent *e) override;
+
+public:
+    AnnotationDialog(QWidget *parent) : QInputDialog(parent)
+    {
+    }
+};
+
 #endif
