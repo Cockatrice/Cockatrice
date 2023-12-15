@@ -251,9 +251,9 @@ jobs:
           else
             brew install protobuf
             brew link --force protobuf
+            brew link --overwrite python@3.12
           fi
           if [[ $install_qt == homebrew ]]; then
-            brew link --overwrite python3
             brew install qt --force-bottle
           else # for some reason the tests fail with the action installed qt?
             brew install googletest
