@@ -855,7 +855,7 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
     }
 
-    aMoveToTopLibrary->setText(tr("&Top of library"));
+    aMoveToTopLibrary->setText(tr("&Top of library in random order"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
     aMoveToHand->setText(tr("&Hand"));
@@ -2953,6 +2953,16 @@ void Player::cardMenuAction()
                 cmd->set_target_zone("deck");
                 cmd->set_x(0);
                 cmd->set_y(0);
+
+                if (idList.card_size() > 1) {
+                    auto *scmd = new Command_Shuffle;
+                    scmd->set_zone_name("deck");
+                    scmd->set_start(0);
+                    scmd->set_end(idList.card_size());
+                    // Server process events backwards, so...
+                    commandList.append(scmd);
+                }
+
                 commandList.append(cmd);
                 break;
             }
