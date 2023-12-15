@@ -348,7 +348,9 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 
-        createDragItem(id, event->pos(), event->scenePos(), facedown || forceFaceDown);
+        // Use the buttonDownPos to align the hot spot with the position when
+        // the user originally clicked
+        createDragItem(id, event->buttonDownPos(Qt::LeftButton), event->scenePos(), facedown || forceFaceDown);
         dragItem->grabMouse();
 
         int childIndex = 0;

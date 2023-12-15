@@ -22,10 +22,12 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
     } else {
         if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
             qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
-            hotSpot = QPointF();
-        } else if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
+            hotSpot = QPointF{qMax(hotSpot.x(), 0.0), qMax(hotSpot.y(), 0.0)};
+        }
+        if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
             qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
-            hotSpot = QPointF(CARD_WIDTH, CARD_HEIGHT);
+            hotSpot = QPointF{qMin(hotSpot.x(), static_cast<qreal>(CARD_WIDTH)),
+                              qMin(hotSpot.y(), static_cast<qreal>(CARD_HEIGHT))};
         }
         setCursor(Qt::ClosedHandCursor);
         setZValue(2000000007);
