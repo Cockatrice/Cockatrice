@@ -218,7 +218,7 @@ jobs:
 
           - target: 13_Ventura
             os: macos-13
-            xcode: 15
+            xcode: 15.0.1
             qt_version: homebrew
             type: Release
             do_tests: 1
@@ -257,8 +257,6 @@ jobs:
           else
             brew install protobuf
             brew link --force protobuf
-            brew install python@3.12
-            brew link --overwrite python@3.12
           fi
           if [[ $install_qt == homebrew ]]; then
             brew install qt --force-bottle
