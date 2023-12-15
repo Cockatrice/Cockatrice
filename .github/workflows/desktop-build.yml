@@ -236,6 +236,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
+
       - name: Install dependencies using homebrew
         shell: bash
         # cmake cannot find the mysql connector
@@ -251,6 +257,7 @@ jobs:
           else
             brew install protobuf
             brew link --force protobuf
+            brew install python@3.12
             brew link --overwrite python@3.12
           fi
           if [[ $install_qt == homebrew ]]; then
