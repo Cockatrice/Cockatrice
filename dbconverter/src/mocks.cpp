@@ -67,6 +67,9 @@ void SettingsCache::setLeftJustified(const int /* _leftJustified */)
 void SettingsCache::setCardScaling(const int /* _scaleCards */)
 {
 }
+void SettingsCache::setStackCardOverlapPercent(const int /* _verticalCardOverlapPercent */)
+{
+}
 void SettingsCache::setShowMessagePopups(const int /* _showMessagePopups */)
 {
 }

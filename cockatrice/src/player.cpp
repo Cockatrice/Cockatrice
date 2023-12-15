@@ -2567,7 +2567,7 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
     } else if (!faceDown &&
                ((!playToStack && tableRow == 3) || ((playToStack && tableRow != 0) && currentZone != "stack"))) {
         cmd.set_target_zone("stack");
-        cmd.set_x(0);
+        cmd.set_x(-1);
         cmd.set_y(0);
     } else {
         tableRow = faceDown ? 2 : info->getTableRow();
