@@ -200,9 +200,8 @@ jobs:
         include:
           - target: Debug # tests only
             os: macos-latest
-            xcode: 14.2
-            qt_version: 6.5
-            qt_modules: "qtmultimedia qtwebsockets"
+            xcode: 15.0.1
+            qt_version: homebrew
             type: Debug
             do_tests: 1
 
@@ -215,10 +214,13 @@ jobs:
             do_tests: 1
             make_package: 1
             use_old_protobuf: 1
+            arch: "clang_64"
+            qt_py7zrversion: '==0.20.*'
+
 
           - target: 13_Ventura
             os: macos-13
-            xcode: 15.0.1
+            xcode: 14.3.1
             qt_version: homebrew
             type: Release
             do_tests: 1
@@ -240,7 +242,6 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         with:
           limit-access-to-actor: true
-
 
       - name: Install dependencies using homebrew
         shell: bash
@@ -272,6 +273,8 @@ jobs:
           setup-python: false
           version: ${{matrix.qt_version}}
           modules: ${{matrix.qt_modules}}
+          arch: ${{matrix.qt_arch}}
+          py7zrversion: ${{matrix.qt_py7zrversion}}
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
