@@ -214,9 +214,7 @@ jobs:
             do_tests: 1
             make_package: 1
             use_old_protobuf: 1
-            arch: "clang_64"
             qt_py7zrversion: '==0.20.*'
-
 
           - target: 13_Ventura
             os: macos-13
@@ -237,11 +235,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
 
       - name: Install dependencies using homebrew
         shell: bash
@@ -273,7 +266,6 @@ jobs:
           setup-python: false
           version: ${{matrix.qt_version}}
           modules: ${{matrix.qt_modules}}
-          arch: ${{matrix.qt_arch}}
           py7zrversion: ${{matrix.qt_py7zrversion}}
 
       - name: Build on Xcode ${{matrix.xcode}}
