@@ -199,8 +199,8 @@ jobs:
       matrix:
         include:
           - target: Debug # tests only
-            os: macos-13
-            xcode: 15.0.1
+            os: macos-latest
+            xcode: 14.2
             qt_version: homebrew
             type: Debug
             do_tests: 1
