@@ -243,6 +243,7 @@ jobs:
         env:
           install_qt: ${{matrix.qt_version}}
           use_old_protobuf: ${{matrix.use_old_protobuf}}
+          HOMEBREW_NO_AUTO_UPDATE: 1
         run: |
           brew update
           if [[ $use_old_protobuf == 1 ]]; then
