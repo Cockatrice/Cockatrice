@@ -201,8 +201,7 @@ jobs:
           - target: Debug # tests only
             os: macos-latest
             xcode: 14.2
-            qt_version: 6.5
-            qt_modules: "qtmultimedia qtwebsockets"
+            qt_version: homebrew
             type: Debug
             do_tests: 1
 
@@ -215,22 +214,15 @@ jobs:
             do_tests: 1
             make_package: 1
             use_old_protobuf: 1
+            qt_py7zrversion: '==0.20.*'
 
-          - target: 12_Monterey
-            os: macos-12
-            xcode: 14.0.1
+          - target: 13_Ventura
+            os: macos-13
+            xcode: 14.3.1
             qt_version: homebrew
             type: Release
             do_tests: 1
             make_package: 1
-
-          - target: 13_Ventura
-            os: macos-13
-            xcode: 14.3
-            qt_version: homebrew
-            type: Release
-            do_tests: 1
-            make_package: 0
 
     name: macOS ${{matrix.target}}
     needs: configure
@@ -251,6 +243,7 @@ jobs:
         env:
           install_qt: ${{matrix.qt_version}}
           use_old_protobuf: ${{matrix.use_old_protobuf}}
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
           brew update
           if [[ $use_old_protobuf == 1 ]]; then
@@ -274,6 +267,7 @@ jobs:
           setup-python: false
           version: ${{matrix.qt_version}}
           modules: ${{matrix.qt_modules}}
+          py7zrversion: ${{matrix.qt_py7zrversion}}
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
