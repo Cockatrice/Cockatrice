@@ -11,7 +11,7 @@ include different targets -->
  - <kbd>Windows 7+</kbd>
  - <kbd>Windows 10+</kbd>
  - <kbd>macOS 10.15+</kbd> ("Catalina")
- - <kbd>macOS 12+</kbd> ("Monterey")
+ - <kbd>macOS 13+</kbd> ("Ventura")
  - <kbd>Ubuntu 18.04 LTS</kbd> ("Bionic Beaver")
  - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
  - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
