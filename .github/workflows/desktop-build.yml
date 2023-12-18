@@ -177,7 +177,7 @@ jobs:
 
       - name: Upload artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{matrix.distro}}-package
           path: ${{steps.build.outputs.path}}
@@ -282,7 +282,7 @@ jobs:
 
       - name: Upload artifact
         if: matrix.make_package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macOS-${{matrix.target}}-dmg
           path: ${{steps.build.outputs.path}}
@@ -360,7 +360,7 @@ jobs:
         run: .ci/compile.sh --server --release --test --package --parallel 2
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Windows${{matrix.target}}-installer
           path: ${{steps.build.outputs.path}}
