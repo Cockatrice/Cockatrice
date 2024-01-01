@@ -20,15 +20,8 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
         parentDrag->addChildDrag(this);
         setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
     } else {
-        if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
-            qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
-            hotSpot = QPointF{qMax(hotSpot.x(), 0.0), qMax(hotSpot.y(), 0.0)};
-        }
-        if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
-            qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
-            hotSpot = QPointF{qMin(hotSpot.x(), static_cast<qreal>(CARD_WIDTH)),
-                              qMin(hotSpot.y(), static_cast<qreal>(CARD_HEIGHT))};
-        }
+        hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CARD_WIDTH - 1)),
+                          qBound(0.0, hotSpot.y(), static_cast<qreal>(CARD_HEIGHT - 1))};
         setCursor(Qt::ClosedHandCursor);
         setZValue(2000000007);
     }

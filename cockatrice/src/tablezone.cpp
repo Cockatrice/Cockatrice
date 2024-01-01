@@ -387,8 +387,10 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
 {
     QPoint gridPoint = mapToGrid(point);
     gridPoint.setX((gridPoint.x() / 3) * 3);
-    while (CardItem *card = getCardFromGrid(gridPoint))
-        gridPoint.setX(gridPoint.x() + (card->getAttachedCards().isEmpty() ? 1 : 3));
+    if (getCardFromGrid(gridPoint))
+        gridPoint.setX(gridPoint.x() + 1);
+    if (getCardFromGrid(gridPoint))
+        gridPoint.setX(gridPoint.x() + 1);
     return mapFromGrid(gridPoint);
 }
 
