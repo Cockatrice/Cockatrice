@@ -13,7 +13,13 @@ class DlgRegister : public QDialog
 {
     Q_OBJECT
 public:
-    DlgRegister(QWidget *parent = nullptr);
+    DlgRegister(QWidget *parent = nullptr,
+                const QString &initialEmail = QString(),
+                const QString &initialUsername = QString(),
+                const QString &initialPassword = QString(),
+                const QString &initialRealName = QString(),
+                const QString &initialCountry = QString()
+        );
     QString getHost() const
     {
         return hostEdit->text();
