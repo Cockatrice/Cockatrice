@@ -1,5 +1,6 @@
 #include "dlg_register.h"
 
+#include "abstractclient.h"
 #include "pb/serverinfo_user.pb.h"
 #include "settingscache.h"
 #include "stringsizes.h"
@@ -12,13 +13,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-DlgRegister::DlgRegister(QWidget *parent,
-                         const QString &initialEmail,
-                         const QString &initialUsername,
-                         const QString &initialPassword,
-                         const QString &initialRealName,
-                         const QString &initialCountry)
-    : QDialog(parent)
+DlgRegister::DlgRegister(QWidget *parent, AbstractClient *abstractClient) : QDialog(parent)
 
 {
     ServersSettings &servers = SettingsCache::instance().servers();
@@ -37,29 +32,30 @@ DlgRegister::DlgRegister(QWidget *parent,
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(servers.getPlayerName().isEmpty() ? initialUsername : servers.getPlayerName());
+    playernameEdit =
+        new QLineEdit(servers.getPlayerName().isEmpty() ? abstractClient->getUserName() : servers.getPlayerName());
     playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(initialPassword);
+    passwordEdit = new QLineEdit(abstractClient->password);
     passwordEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
     passwordConfirmationLabel = new QLabel(tr("Password (again):"));
-    passwordConfirmationEdit = new QLineEdit(initialPassword);
+    passwordConfirmationEdit = new QLineEdit(abstractClient->password);
     passwordConfirmationEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordConfirmationLabel->setBuddy(passwordConfirmationEdit);
     passwordConfirmationEdit->setEchoMode(QLineEdit::Password);
 
     emailLabel = new QLabel(tr("Email:"));
-    emailEdit = new QLineEdit(initialEmail);
+    emailEdit = new QLineEdit(abstractClient->email);
     emailEdit->setMaxLength(MAX_NAME_LENGTH);
     emailLabel->setBuddy(emailEdit);
 
     emailConfirmationLabel = new QLabel(tr("Email (again):"));
-    emailConfirmationEdit = new QLineEdit(initialEmail);
+    emailConfirmationEdit = new QLineEdit(abstractClient->email);
     emailConfirmationEdit->setMaxLength(MAX_NAME_LENGTH);
     emailConfirmationLabel->setBuddy(emailConfirmationEdit);
 
@@ -319,7 +315,7 @@ DlgRegister::DlgRegister(QWidget *parent,
     countryEdit->addItem(QPixmap("theme:countries/zm"), "zm");
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
 
-    int initialCountryIndex = countryEdit->findText(initialCountry);
+    int initialCountryIndex = countryEdit->findText(abstractClient->country);
     if (initialCountryIndex != -1) {
         countryEdit->setCurrentIndex(initialCountryIndex);
     } else {
@@ -331,7 +327,7 @@ DlgRegister::DlgRegister(QWidget *parent,
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
 
     realnameLabel = new QLabel(tr("Real name:"));
-    realnameEdit = new QLineEdit();
+    realnameEdit = new QLineEdit(abstractClient->realName);
     realnameEdit->setMaxLength(MAX_NAME_LENGTH);
     realnameLabel->setBuddy(realnameEdit);
 

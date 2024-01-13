@@ -200,7 +200,7 @@ void MainWindow::actConnect()
 
 void MainWindow::actRegister()
 {
-    DlgRegister dlg(this, dlg.getEmail(), dlg.getPlayerName(), dlg.getPassword(), dlg.getRealName(), dlg.getCountry());
+    DlgRegister dlg(this, client);
     if (dlg.exec()) {
         client->registerToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                  dlg.getPassword(), dlg.getEmail(), dlg.getCountry(), dlg.getRealName());

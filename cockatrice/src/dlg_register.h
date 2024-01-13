@@ -8,17 +8,13 @@
 class QLabel;
 class QPushButton;
 class QCheckBox;
+class AbstractClient;
 
 class DlgRegister : public QDialog
 {
     Q_OBJECT
 public:
-    DlgRegister(QWidget *parent = nullptr,
-                const QString &initialEmail = QString(),
-                const QString &initialUsername = QString(),
-                const QString &initialPassword = QString(),
-                const QString &initialRealName = QString(),
-                const QString &initialCountry = QString());
+    DlgRegister(QWidget *parent = nullptr, AbstractClient *abstractClient = nullptr);
     QString getHost() const
     {
         return hostEdit->text();
