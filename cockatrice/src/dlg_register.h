@@ -18,8 +18,7 @@ public:
                 const QString &initialUsername = QString(),
                 const QString &initialPassword = QString(),
                 const QString &initialRealName = QString(),
-                const QString &initialCountry = QString()
-        );
+                const QString &initialCountry = QString());
     QString getHost() const
     {
         return hostEdit->text();

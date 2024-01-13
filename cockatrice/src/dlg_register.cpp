@@ -12,7 +12,14 @@
 #include <QLabel>
 #include <QMessageBox>
 
-DlgRegister::DlgRegister(QWidget *parent, const QString &initialEmail, const QString &initialUsername, const QString &initialPassword, const QString &initialRealName, const QString &initialCountry) : QDialog(parent)
+DlgRegister::DlgRegister(QWidget *parent,
+                         const QString &initialEmail,
+                         const QString &initialUsername,
+                         const QString &initialPassword,
+                         const QString &initialRealName,
+                         const QString &initialCountry)
+    : QDialog(parent)
+
 {
     ServersSettings &servers = SettingsCache::instance().servers();
     infoLabel = new QLabel(tr("Enter your information and the information of the server you'd like to register to.\n"
