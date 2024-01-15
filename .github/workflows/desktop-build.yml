@@ -236,6 +236,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # RE: https://discord.com/channels/314987288398659595/401594186983407616/1196451948413595778
+      - name: Unlink 2to3
+        if: matrix.target == '10.15_Catalina'
+        run: brew unlink python@2
+
       - name: Install dependencies using homebrew
         shell: bash
         # cmake cannot find the mysql connector
