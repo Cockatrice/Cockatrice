@@ -1725,12 +1725,12 @@ Your email will be used to verify your account.</source>
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1398"/>
+        <location filename="src/dlg_settings.cpp" line="1406"/>
         <source>Unknown Error loading card database</source>
         <translation>Erro desconhecido ao carregar a base de dados das cartas</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1406"/>
+        <location filename="src/dlg_settings.cpp" line="1414"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1747,7 +1747,7 @@ Poderá necessitar de correr o Oracle para actualizar a base de dados.
 Gostaria de alterar a localização da base de dados?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1412"/>
+        <location filename="src/dlg_settings.cpp" line="1420"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1764,7 +1764,7 @@ Pode ser reparado correndo o Oracle de novo para actualizar a base de dados das 
 Gostaria de alterar a localização da base de dados?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1418"/>
+        <location filename="src/dlg_settings.cpp" line="1426"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1773,7 +1773,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1424"/>
+        <location filename="src/dlg_settings.cpp" line="1432"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -1782,7 +1782,7 @@ Would you like to change your database location setting?</source>
 Gostaria de alterar a localização da base de dados?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1428"/>
+        <location filename="src/dlg_settings.cpp" line="1436"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -1791,7 +1791,7 @@ Would you like to change your database location setting?</source>
 Gostaria de alterar a localização da base de dados?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1432"/>
+        <location filename="src/dlg_settings.cpp" line="1440"/>
         <source>Unknown card database load status
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
@@ -1800,59 +1800,59 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1440"/>
-        <location filename="src/dlg_settings.cpp" line="1450"/>
-        <location filename="src/dlg_settings.cpp" line="1460"/>
+        <location filename="src/dlg_settings.cpp" line="1448"/>
+        <location filename="src/dlg_settings.cpp" line="1458"/>
+        <location filename="src/dlg_settings.cpp" line="1468"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1451"/>
+        <location filename="src/dlg_settings.cpp" line="1459"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>O directório do seu deck é inválido. Gostaria de voltar atrás e corrigir o directório?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1461"/>
+        <location filename="src/dlg_settings.cpp" line="1469"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>O directório das imagens das cartas  é inválido. Gostaria de voltar atrás e corrigir o directório?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1473"/>
+        <location filename="src/dlg_settings.cpp" line="1481"/>
         <source>Settings</source>
         <translation>Definições</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1475"/>
+        <location filename="src/dlg_settings.cpp" line="1483"/>
         <source>General</source>
         <translation>Geral</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1476"/>
+        <location filename="src/dlg_settings.cpp" line="1484"/>
         <source>Appearance</source>
         <translation>Aparência</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1477"/>
+        <location filename="src/dlg_settings.cpp" line="1485"/>
         <source>User Interface</source>
         <translation>Interface do utilizador</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1478"/>
+        <location filename="src/dlg_settings.cpp" line="1486"/>
         <source>Card Sources</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1479"/>
+        <location filename="src/dlg_settings.cpp" line="1487"/>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1480"/>
+        <location filename="src/dlg_settings.cpp" line="1488"/>
         <source>Sound</source>
         <translation>Som</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1481"/>
+        <location filename="src/dlg_settings.cpp" line="1489"/>
         <source>Shortcuts</source>
         <translation>Atalhos</translation>
     </message>
@@ -3728,90 +3728,90 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="995"/>
+        <location filename="src/dlg_settings.cpp" line="1003"/>
         <source>Add message</source>
         <translation>Adicionar mensagem</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="995"/>
-        <location filename="src/dlg_settings.cpp" line="1008"/>
+        <location filename="src/dlg_settings.cpp" line="1003"/>
+        <location filename="src/dlg_settings.cpp" line="1016"/>
         <source>Message:</source>
         <translation>Mensagem:</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1008"/>
+        <location filename="src/dlg_settings.cpp" line="1016"/>
         <source>Edit message</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1026"/>
+        <location filename="src/dlg_settings.cpp" line="1034"/>
         <source>Chat settings</source>
         <translation>Definições do Chat</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1027"/>
+        <location filename="src/dlg_settings.cpp" line="1035"/>
         <source>Custom alert words</source>
         <translation>Palavras alerta personalizáveis</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1028"/>
+        <location filename="src/dlg_settings.cpp" line="1036"/>
         <source>Enable chat mentions</source>
         <translation>Permitir menções no chat</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1029"/>
+        <location filename="src/dlg_settings.cpp" line="1037"/>
         <source>Enable mention completer</source>
         <translation>Permitir complementação de menções</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1030"/>
+        <location filename="src/dlg_settings.cpp" line="1038"/>
         <source>In-game message macros</source>
         <translation>Macros de mensagem no decorrer do jogo</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1032"/>
+        <location filename="src/dlg_settings.cpp" line="1040"/>
         <source>How to use in-game message macros</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1033"/>
+        <location filename="src/dlg_settings.cpp" line="1041"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation>Ignorar mensagens de chat enviadas por utilizadores não registados</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1034"/>
+        <location filename="src/dlg_settings.cpp" line="1042"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation>Ignorar mensagens privadas enviadas por utilizadores não registados</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1035"/>
-        <location filename="src/dlg_settings.cpp" line="1036"/>
+        <location filename="src/dlg_settings.cpp" line="1043"/>
+        <location filename="src/dlg_settings.cpp" line="1044"/>
         <source>Invert text color</source>
         <translation>Inverter cor do texto</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1037"/>
+        <location filename="src/dlg_settings.cpp" line="1045"/>
         <source>Enable desktop notifications for private messages</source>
         <translation>Permitir notificações de mensagens privadas no Ambiente de Trabalho</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1038"/>
+        <location filename="src/dlg_settings.cpp" line="1046"/>
         <source>Enable desktop notification for mentions</source>
         <translation>Permitir notificações de menções no ambiente de trabalho</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1039"/>
+        <location filename="src/dlg_settings.cpp" line="1047"/>
         <source>Enable room message history on join</source>
         <translation>Permitir o histórico de mensagens de uma sala ao entrar</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1040"/>
-        <location filename="src/dlg_settings.cpp" line="1041"/>
+        <location filename="src/dlg_settings.cpp" line="1048"/>
+        <location filename="src/dlg_settings.cpp" line="1049"/>
         <source>(Color is hexadecimal)</source>
         <translation>(A cor é hexadecimal)</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1042"/>
+        <location filename="src/dlg_settings.cpp" line="1050"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation>Palavras separadas com espaço, apenas caracteres alfanuméricos</translation>
     </message>
@@ -4932,52 +4932,52 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
 <context>
     <name>ShortcutSettingsPage</name>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1199"/>
+        <location filename="src/dlg_settings.cpp" line="1207"/>
         <source>Restore all default shortcuts</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1200"/>
+        <location filename="src/dlg_settings.cpp" line="1208"/>
         <source>Do you really want to restore all default shortcuts?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1260"/>
+        <location filename="src/dlg_settings.cpp" line="1268"/>
         <source>Clear all default shortcuts</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1261"/>
+        <location filename="src/dlg_settings.cpp" line="1269"/>
         <source>Do you really want to clear all shortcuts?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1268"/>
+        <location filename="src/dlg_settings.cpp" line="1276"/>
         <source>Action</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1268"/>
+        <location filename="src/dlg_settings.cpp" line="1276"/>
         <source>Shortcut</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1271"/>
+        <location filename="src/dlg_settings.cpp" line="1279"/>
         <source>Section:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1272"/>
+        <location filename="src/dlg_settings.cpp" line="1280"/>
         <source>Action:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1273"/>
+        <location filename="src/dlg_settings.cpp" line="1281"/>
         <source>Shortcut:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1275"/>
+        <location filename="src/dlg_settings.cpp" line="1283"/>
         <source>How to set custom shortcuts</source>
         <translation type="unfinished"/>
     </message>
@@ -5018,27 +5018,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1111"/>
+        <location filename="src/dlg_settings.cpp" line="1119"/>
         <source>Enable &amp;sounds</source>
         <translation>Permitir &amp;sons</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1112"/>
+        <location filename="src/dlg_settings.cpp" line="1120"/>
         <source>Current sounds theme:</source>
         <translation>Tema sonoro actual:</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1113"/>
+        <location filename="src/dlg_settings.cpp" line="1121"/>
         <source>Test system sound engine</source>
         <translation>Teste motor de sistema de som</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1114"/>
+        <location filename="src/dlg_settings.cpp" line="1122"/>
         <source>Sound settings</source>
         <translation>Definições de Som</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1115"/>
+        <location filename="src/dlg_settings.cpp" line="1123"/>
         <source>Master volume</source>
         <translation>Volume mestre</translation>
     </message>

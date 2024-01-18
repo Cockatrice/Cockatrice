@@ -1725,12 +1725,12 @@ Your email will be used to verify your account.</source>
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1398"/>
+        <location filename="src/dlg_settings.cpp" line="1406"/>
         <source>Unknown Error loading card database</source>
         <translation>데이터베이스를 불러올 때 미상의 오류가 발생하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1406"/>
+        <location filename="src/dlg_settings.cpp" line="1414"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1747,7 +1747,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1412"/>
+        <location filename="src/dlg_settings.cpp" line="1420"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1764,7 +1764,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1418"/>
+        <location filename="src/dlg_settings.cpp" line="1426"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1773,7 +1773,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1424"/>
+        <location filename="src/dlg_settings.cpp" line="1432"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -1782,7 +1782,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1428"/>
+        <location filename="src/dlg_settings.cpp" line="1436"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -1791,7 +1791,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1432"/>
+        <location filename="src/dlg_settings.cpp" line="1440"/>
         <source>Unknown card database load status
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
@@ -1800,61 +1800,61 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1440"/>
-        <location filename="src/dlg_settings.cpp" line="1450"/>
-        <location filename="src/dlg_settings.cpp" line="1460"/>
+        <location filename="src/dlg_settings.cpp" line="1448"/>
+        <location filename="src/dlg_settings.cpp" line="1458"/>
+        <location filename="src/dlg_settings.cpp" line="1468"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1451"/>
+        <location filename="src/dlg_settings.cpp" line="1459"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>덱 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1461"/>
+        <location filename="src/dlg_settings.cpp" line="1469"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>카드 이미지 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1473"/>
+        <location filename="src/dlg_settings.cpp" line="1481"/>
         <source>Settings</source>
         <translation>환경설정</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1475"/>
+        <location filename="src/dlg_settings.cpp" line="1483"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1476"/>
+        <location filename="src/dlg_settings.cpp" line="1484"/>
         <source>Appearance</source>
         <translation>외형</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1477"/>
+        <location filename="src/dlg_settings.cpp" line="1485"/>
         <source>User Interface</source>
         <translation>인터페이스</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1478"/>
+        <location filename="src/dlg_settings.cpp" line="1486"/>
         <source>Card Sources</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1479"/>
+        <location filename="src/dlg_settings.cpp" line="1487"/>
         <source>Chat</source>
         <translation>대화</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1480"/>
+        <location filename="src/dlg_settings.cpp" line="1488"/>
         <source>Sound</source>
         <translation>소리</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1481"/>
+        <location filename="src/dlg_settings.cpp" line="1489"/>
         <source>Shortcuts</source>
         <translation>단축키</translation>
     </message>
@@ -3728,90 +3728,90 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="995"/>
+        <location filename="src/dlg_settings.cpp" line="1003"/>
         <source>Add message</source>
         <translation>메세지 추가</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="995"/>
-        <location filename="src/dlg_settings.cpp" line="1008"/>
+        <location filename="src/dlg_settings.cpp" line="1003"/>
+        <location filename="src/dlg_settings.cpp" line="1016"/>
         <source>Message:</source>
         <translation>메세지:</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1008"/>
+        <location filename="src/dlg_settings.cpp" line="1016"/>
         <source>Edit message</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1026"/>
+        <location filename="src/dlg_settings.cpp" line="1034"/>
         <source>Chat settings</source>
         <translation>대화 설정</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1027"/>
+        <location filename="src/dlg_settings.cpp" line="1035"/>
         <source>Custom alert words</source>
         <translation>키워드 알림</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1028"/>
+        <location filename="src/dlg_settings.cpp" line="1036"/>
         <source>Enable chat mentions</source>
         <translation>대화 중 본인의 사용자명 멘션 시 해당 문장을 강조</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1029"/>
+        <location filename="src/dlg_settings.cpp" line="1037"/>
         <source>Enable mention completer</source>
         <translation>멘션 자동완성 기능</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1030"/>
+        <location filename="src/dlg_settings.cpp" line="1038"/>
         <source>In-game message macros</source>
         <translation>게임 내 대화 매크로</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1032"/>
+        <location filename="src/dlg_settings.cpp" line="1040"/>
         <source>How to use in-game message macros</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1033"/>
+        <location filename="src/dlg_settings.cpp" line="1041"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation>서버에 가입하지 않은 사용자의 채널 대화 차단</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1034"/>
+        <location filename="src/dlg_settings.cpp" line="1042"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation>서버에 가입하지 않은 사용자가 보낸 1:1 대화 차단</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1035"/>
-        <location filename="src/dlg_settings.cpp" line="1036"/>
+        <location filename="src/dlg_settings.cpp" line="1043"/>
+        <location filename="src/dlg_settings.cpp" line="1044"/>
         <source>Invert text color</source>
         <translation>문장 색 반전</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1037"/>
+        <location filename="src/dlg_settings.cpp" line="1045"/>
         <source>Enable desktop notifications for private messages</source>
         <translation>1:1 대화를 받을 시 데스크탑 알림 설정</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1038"/>
+        <location filename="src/dlg_settings.cpp" line="1046"/>
         <source>Enable desktop notification for mentions</source>
         <translation>자신의 사용자명 멘션 시 데스크탑 알림 설정</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1039"/>
+        <location filename="src/dlg_settings.cpp" line="1047"/>
         <source>Enable room message history on join</source>
         <translation>채널 입장 시 이전 대화 기록 표시</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1040"/>
-        <location filename="src/dlg_settings.cpp" line="1041"/>
+        <location filename="src/dlg_settings.cpp" line="1048"/>
+        <location filename="src/dlg_settings.cpp" line="1049"/>
         <source>(Color is hexadecimal)</source>
         <translation>(16진수 색상 코드)</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1042"/>
+        <location filename="src/dlg_settings.cpp" line="1050"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation>각 단어마다 스페이스바로 띄어써주세요. 문자 및 숫자만 가능합니다.</translation>
     </message>
@@ -4932,52 +4932,52 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>ShortcutSettingsPage</name>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1199"/>
+        <location filename="src/dlg_settings.cpp" line="1207"/>
         <source>Restore all default shortcuts</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1200"/>
+        <location filename="src/dlg_settings.cpp" line="1208"/>
         <source>Do you really want to restore all default shortcuts?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1260"/>
+        <location filename="src/dlg_settings.cpp" line="1268"/>
         <source>Clear all default shortcuts</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1261"/>
+        <location filename="src/dlg_settings.cpp" line="1269"/>
         <source>Do you really want to clear all shortcuts?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1268"/>
+        <location filename="src/dlg_settings.cpp" line="1276"/>
         <source>Action</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1268"/>
+        <location filename="src/dlg_settings.cpp" line="1276"/>
         <source>Shortcut</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1271"/>
+        <location filename="src/dlg_settings.cpp" line="1279"/>
         <source>Section:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1272"/>
+        <location filename="src/dlg_settings.cpp" line="1280"/>
         <source>Action:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1273"/>
+        <location filename="src/dlg_settings.cpp" line="1281"/>
         <source>Shortcut:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1275"/>
+        <location filename="src/dlg_settings.cpp" line="1283"/>
         <source>How to set custom shortcuts</source>
         <translation type="unfinished"/>
     </message>
@@ -5018,27 +5018,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1111"/>
+        <location filename="src/dlg_settings.cpp" line="1119"/>
         <source>Enable &amp;sounds</source>
         <translation>음향 효과 켜기</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1112"/>
+        <location filename="src/dlg_settings.cpp" line="1120"/>
         <source>Current sounds theme:</source>
         <translation>현재 소리 테마:</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1113"/>
+        <location filename="src/dlg_settings.cpp" line="1121"/>
         <source>Test system sound engine</source>
         <translation>시스템 사운드 엔진 테스트</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1114"/>
+        <location filename="src/dlg_settings.cpp" line="1122"/>
         <source>Sound settings</source>
         <translation>음향 설정</translation>
     </message>
     <message>
-        <location filename="src/dlg_settings.cpp" line="1115"/>
+        <location filename="src/dlg_settings.cpp" line="1123"/>
         <source>Master volume</source>
         <translation>주 음량</translation>
     </message>
