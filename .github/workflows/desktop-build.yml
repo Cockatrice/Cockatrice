@@ -158,7 +158,7 @@ jobs:
           distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 2
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 4
 
       - name: Build release package
         id: build
@@ -172,7 +172,7 @@ jobs:
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE" --parallel 2
+                  --ccache "$CCACHE_SIZE" --parallel 4
           .ci/name_build.sh
 
       - name: Upload artifact
@@ -277,7 +277,8 @@ jobs:
           MAKE_TEST: '${{matrix.do_tests}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
-        # Mac machines actually have 3 cores
+        # macOS runner actually have only 3 cores
+        # See https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         run: .ci/compile.sh --server --parallel 3
 
       - name: Upload artifact
@@ -357,7 +358,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
-        run: .ci/compile.sh --server --release --test --package --parallel 2
+        run: .ci/compile.sh --server --release --test --package --parallel 4
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
