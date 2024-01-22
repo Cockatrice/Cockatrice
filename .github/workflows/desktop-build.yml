@@ -16,7 +16,7 @@ on:
       - '**.md'
       - 'webclient/**'
       - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations.yml'
+      - '.github/workflows/translations-*.yml'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
