@@ -26,7 +26,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
-UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
+UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
 {
     aUserName = new QAction(QString(), this);
@@ -306,10 +306,10 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                                       const QString &deckHash,
                                       ChatView *chatView)
 {
-    QAction *aCopyToClipBoard, *aRemoveMessages;
+    QAction *aCopyToClipBoard = nullptr, *aRemoveMessages = nullptr;
     aUserName->setText(userName);
 
-    QMenu *menu = new QMenu(static_cast<QWidget *>(parent()));
+    auto *menu = new QMenu(static_cast<QWidget *>(parent()));
     menu->addAction(aUserName);
     menu->addSeparator();
     if (!deckHash.isEmpty()) {

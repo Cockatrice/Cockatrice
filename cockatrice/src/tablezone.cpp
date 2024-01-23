@@ -346,7 +346,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 
     // Below calculation effectively rounds to the nearest grid point.
     const int gridPointHeight = CARD_HEIGHT + PADDING_Y;
-    int gridPointY = (y + gridPointHeight / 2) / gridPointHeight;
+    int gridPointY = (y + PADDING_Y / 2) / gridPointHeight;
 
     gridPointY = clampValidTableRow(gridPointY);
 
@@ -357,7 +357,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     // widths of each card stack along the row.
 
     // Offset point by the margin amount to reference point within grid area.
-    int x = mapPoint.x() - MARGIN_LEFT;
+    int x = mapPoint.x() - MARGIN_LEFT + PADDING_X / 2;
 
     // Maximum value is a card width from the right margin, referenced to the
     // grid area.
@@ -385,7 +385,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
-    QPoint gridPoint = mapToGrid(point + QPoint(1, 1));
+    QPoint gridPoint = mapToGrid(point);
     gridPoint.setX((gridPoint.x() / 3) * 3);
     if (getCardFromGrid(gridPoint))
         gridPoint.setX(gridPoint.x() + 1);

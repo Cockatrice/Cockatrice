@@ -42,7 +42,7 @@ void ReleaseChannel::checkForUpdates()
 }
 
 // Different release channel checking functions for different operating systems
-#if defined(Q_OS_OSX)
+#if defined(Q_OS_MACOS)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
     static QRegularExpression version_regex("macOS-(\\d+)\\.(\\d+)");
@@ -62,9 +62,14 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
 #if Q_PROCESSOR_WORDSIZE == 4
-    return fileName.contains("win32");
+    return fileName.contains("32bit");
 #elif Q_PROCESSOR_WORDSIZE == 8
-    return fileName.contains("win64");
+    const QString &version = QSysInfo::productVersion();
+    if (version.startsWith("7") || version.startsWith("8")) {
+        return fileName.contains("Win7");
+    } else {
+        return fileName.contains("Win10");
+    }
 #else
     return false;
 #endif

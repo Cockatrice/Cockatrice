@@ -376,7 +376,7 @@ void TabDeckEditor::createCentralFrame()
 {
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
-    searchEdit->setPlaceholderText(tr("Search by card name"));
+    searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
@@ -394,6 +394,7 @@ void TabDeckEditor::createCentralFrame()
     connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));
     connect(help, &QAction::triggered, this, &TabDeckEditor::showSearchSyntaxHelp);
 
     databaseModel = new CardDatabaseModel(db, true, this);
@@ -1071,6 +1072,12 @@ void TabDeckEditor::actDecrementCard()
 void TabDeckEditor::actDecrementCardFromSideboard()
 {
     decrementCardHelper(DECK_ZONE_SIDE);
+}
+
+void TabDeckEditor::copyDatabaseCellContents()
+{
+    auto _data = databaseView->selectionModel()->currentIndex().data();
+    QApplication::clipboard()->setText(_data.toString());
 }
 
 void TabDeckEditor::actIncrement()

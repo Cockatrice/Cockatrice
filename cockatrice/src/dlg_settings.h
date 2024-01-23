@@ -58,7 +58,6 @@ private:
     QLineEdit *tokenDatabasePathEdit;
     QPushButton *resetAllPathsButton;
     QLabel *allPathsResetLabel;
-    QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox;
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
@@ -66,7 +65,6 @@ private:
     QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
-    QLabel pixmapCacheLabel;
     QLabel deckPathLabel;
     QLabel replaysPathLabel;
     QLabel picsPathLabel;
@@ -92,6 +90,8 @@ private:
     QLabel maxFontSizeForCardsLabel;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
+    QLabel verticalCardOverlapPercentLabel;
+    QSpinBox verticalCardOverlapPercentBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
@@ -168,6 +168,10 @@ private:
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+    QLabel networkCacheLabel;
+    QSpinBox networkCacheEdit;
+    QSpinBox pixmapCacheEdit;
+    QLabel pixmapCacheLabel;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage
@@ -202,13 +206,14 @@ private:
     QCheckBox roomHistory;
     QGroupBox *chatGroupBox;
     QGroupBox *highlightGroupBox;
-    QGroupBox *messageShortcuts;
+    QGroupBox *messageGroupBox;
     QLineEdit *mentionColor;
     QLineEdit *highlightColor;
     QLineEdit *customAlertString;
     QLabel hexLabel;
     QLabel hexHighlightLabel;
     QLabel customAlertStringLabel;
+    QLabel explainMessagesLabel;
 
     void storeSettings();
     void updateMentionPreview();

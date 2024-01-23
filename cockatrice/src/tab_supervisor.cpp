@@ -442,7 +442,7 @@ void TabSupervisor::replayLeft(TabGame *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    replayTabs.removeAt(replayTabs.indexOf(tab));
+    replayTabs.removeOne(tab);
 }
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
@@ -508,7 +508,7 @@ void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    deckEditorTabs.removeAt(deckEditorTabs.indexOf(tab));
+    deckEditorTabs.removeOne(tab);
     removeTab(indexOf(tab));
 }
 
@@ -687,12 +687,12 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 
 bool TabSupervisor::isOwnUserRegistered() const
 {
-    return static_cast<bool>(getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
+    return userInfo != nullptr && (userInfo->user_level() & ServerInfo_User::IsRegistered) != 0;
 }
 
 QString TabSupervisor::getOwnUsername() const
 {
-    return userInfo ? QString::fromStdString(userInfo->name()) : QString();
+    return userInfo != nullptr ? QString::fromStdString(userInfo->name()) : QString();
 }
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
@@ -729,9 +729,22 @@ const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) con
 
     for (i = userList.begin(); i != userList.end(); ++i)
         if (i.key().toLower() == userNameToMatchLower) {
-            const ServerInfo_User &userInfo = i.value()->getUserInfo();
-            return &userInfo;
+            const ServerInfo_User &_userInfo = i.value()->getUserInfo();
+            return &_userInfo;
         }
 
     return nullptr;
 };
+
+bool TabSupervisor::switchToGameTabIfAlreadyExists(const int gameId)
+{
+    bool isGameTabExists = false;
+    if (gameTabs.contains(gameId)) {
+        isGameTabExists = true;
+        TabGame *tabGame = gameTabs[gameId];
+        const int gameTabIndex = indexOf(tabGame);
+        setCurrentIndex(gameTabIndex);
+    }
+
+    return isGameTabExists;
+}

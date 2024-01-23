@@ -44,7 +44,7 @@ public:
     {
         Type = typeCard
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
@@ -53,10 +53,11 @@ public:
                      int _id = -1,
                      QGraphicsItem *parent = nullptr);
     ~AbstractCardItem();
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     CardInfoPtr getInfo() const
     {
         return info;
@@ -103,9 +104,9 @@ public:
 
 protected:
     void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
     void cacheBgColor();
 };
 

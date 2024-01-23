@@ -4,8 +4,8 @@ import { OnChange } from 'react-final-form-listeners';
 import setFieldTouched from 'final-form-set-field-touched';
 import { useTranslation } from 'react-i18next';
 
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import { CountryDropdown, InputField, KnownHosts } from 'components';
 import { useReduxEffect } from 'hooks';

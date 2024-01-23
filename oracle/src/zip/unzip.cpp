@@ -465,7 +465,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
     quint16 commentLength = getUShort((const unsigned char*)buffer1, UNZIP_EOCD_OFF_COMMLEN + 4);
     if (commentLength != 0) {
         QByteArray c = device->read(commentLength);
-        if (c.count() != commentLength)
+        if (c.size() != commentLength)
             return UnZip::ReadFailed;
 
         comment = c;
@@ -793,7 +793,6 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
 
     // extract data
     qint64 read;
-    quint64 tot = 0;
 
     /* Allocate inflate state */
     z_stream zstr;
@@ -826,7 +825,6 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
             decryptBytes(*keys, buffer1, read);
 
         cur++;
-        tot += read;
 
         zstr.avail_in = (uInt) read;
         zstr.next_in = (Bytef*) buffer1;
@@ -1014,9 +1012,9 @@ void UnzipPrivate::initKeys(const QString& pwd, quint32* keys) const
  The \p file parameter can be used in the user interface or for debugging purposes
  as it is the name of the encrypted file for wich the password is being tested.
 */
-UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString& file, const ZipEntryP& header)
+UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString&_file, const ZipEntryP& header)
 {
-    Q_UNUSED(file);
+    Q_UNUSED(_file);
     Q_ASSERT(device);
 
     // read encryption keys

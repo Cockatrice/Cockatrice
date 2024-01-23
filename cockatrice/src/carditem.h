@@ -131,14 +131,14 @@ public:
     }
     void removeAttachedCard(CardItem *card)
     {
-        attachedCards.removeAt(attachedCards.indexOf(card));
+        attachedCards.removeOne(card);
     }
     const QList<CardItem *> &getAttachedCards() const
     {
         return attachedCards;
     }
     void resetState();
-    void processCardInfo(const ServerInfo_Card &info);
+    void processCardInfo(const ServerInfo_Card &_info);
 
     QMenu *getCardMenu() const
     {
@@ -157,6 +157,7 @@ public:
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);
+    void drawAttachArrow();
     void playCard(bool faceDown);
 
 protected:

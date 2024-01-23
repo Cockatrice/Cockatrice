@@ -24,4 +24,6 @@ public:
                bool isView = false);
 };
 
+qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse = false);
+
 #endif

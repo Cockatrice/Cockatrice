@@ -3,6 +3,7 @@
 
 #include "abstractgraphicsitem.h"
 #include "carddatabase.h"
+#include "filter_string.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 #include "tearoffmenu.h"
@@ -10,6 +11,7 @@
 #include <QInputDialog>
 #include <QMap>
 #include <QPoint>
+#include <QTimer>
 
 namespace google
 {
@@ -120,7 +122,7 @@ signals:
                         QString targetCard,
                         bool _playerTarget);
     void logCreateToken(Player *player, QString cardName, QString pt);
-    void logDrawCards(Player *player, int number);
+    void logDrawCards(Player *player, int number, bool deckIsEmpty);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
     void logFlipCard(Player *player, QString cardName, bool faceDown);
@@ -162,6 +164,7 @@ public slots:
     void actMoveTopCardToExile();
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
+    void actMoveTopCardsUntil();
     void actMoveTopCardToBottom();
     void actDrawBottomCard();
     void actDrawBottomCards();
@@ -217,6 +220,7 @@ private slots:
     void actPlay();
     void actHide();
     void actPlayFacedown();
+    void actReveal(QAction *action);
     void refreshShortcuts();
 
 private:
@@ -227,22 +231,28 @@ private:
         *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
+    QList<QPair<QString, int>> playersInfo;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
         *aAlwaysRevealTopCard, *aAlwaysLookAtTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard,
-        *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard,
-        *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlay,
-        *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu,
-        *aMoveBottomToPlay, *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard,
-        *aMoveBottomCardToExile, *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard,
-        *aDrawBottomCards;
+        *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardsUntil,
+        *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw,
+        *aMulligan, *aShuffle, *aMoveTopToPlay, *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken,
+        *aCreateAnotherToken, *aCardMenu, *aMoveBottomToPlay, *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop,
+        *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile, *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile,
+        *aDrawBottomCard, *aDrawBottomCards;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
         *aMoveToXfromTopOfLibrary;
+
+    bool movingCardsUntil;
+    QTimer *moveTopCardTimer;
+    QString previousMovingCardsUntilExpr = {};
+    FilterString movingCardsUntilFilter;
 
     bool shortcutsActive;
     int defaultNumberTopCards = 1;
@@ -285,9 +295,12 @@ private:
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
-    void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
-    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
+    void createCard(const CardItem *sourceCard,
+                    const QString &dbCardName,
+                    CardRelation::AttachType attach = CardRelation::DoesNotAttach,
+                    bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
+    void moveOneCardUntil(const CardInfoPtr card);
 
     QRectF bRect;
 
@@ -296,6 +309,7 @@ private:
     void rearrangeCounters();
 
     void initSayMenu();
+    void initContextualPlayersMenu(QMenu *menu);
 
     // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
     void eventGameSay(const Event_GameSay &event);
@@ -461,6 +475,17 @@ public:
     void sendGameCommand(const google::protobuf::Message &command);
 
     void setLastToken(CardInfoPtr cardInfo);
+};
+
+class AnnotationDialog : public QInputDialog
+{
+    Q_OBJECT
+    void keyPressEvent(QKeyEvent *e) override;
+
+public:
+    AnnotationDialog(QWidget *parent) : QInputDialog(parent)
+    {
+    }
 };
 
 #endif

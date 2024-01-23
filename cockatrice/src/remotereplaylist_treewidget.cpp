@@ -218,16 +218,16 @@ ServerInfo_Replay const *RemoteReplayList_TreeModel::getReplay(const QModelIndex
 ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getReplayMatch(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return 0;
+        return nullptr;
 
-    MatchNode *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
+    auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
     if (!node) {
-        ReplayNode *node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
-        if (!node)
-            return 0;
-        return &node->getParent()->getMatchInfo();
-    } else
-        return &node->getMatchInfo();
+        auto *_node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
+        if (!_node)
+            return nullptr;
+        return &_node->getParent()->getMatchInfo();
+    }
+    return &node->getMatchInfo();
 }
 
 void RemoteReplayList_TreeModel::clearTree()

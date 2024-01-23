@@ -1,4 +1,4 @@
-FROM fedora:36
+FROM fedora:37
 
 RUN dnf install -y \
         ccache \
@@ -7,7 +7,8 @@ RUN dnf install -y \
         git \
         mariadb-devel \
         protobuf-devel \
-        qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets,qt5compat}-devel \
+        qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
+        qt6-qtimageformats \
         rpm-build \
         xz-devel \
         zlib-devel \

@@ -97,10 +97,10 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QMapIterator<int, int> counterIterator(counters);
     while (counterIterator.hasNext()) {
         counterIterator.next();
-        QColor color;
-        color.setHsv(counterIterator.key() * 60, 150, 255);
+        QColor _color;
+        _color.setHsv(counterIterator.key() * 60, 150, 255);
 
-        paintNumberEllipse(counterIterator.value(), 14, color, i, counters.size(), painter);
+        paintNumberEllipse(counterIterator.value(), 14, _color, i, counters.size(), painter);
         ++i;
     }
 
@@ -141,21 +141,19 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     if (getBeingPointedAt()) {
-        painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
+        painter->fillPath(shape(), QBrush(QColor(255, 0, 0, 100)));
     }
 
     if (doesntUntap) {
         painter->save();
 
         painter->setRenderHint(QPainter::Antialiasing, false);
-        transformPainter(painter, translatedSize, tapAngle);
 
         QPen pen;
         pen.setColor(Qt::magenta);
-        const int penWidth = 1;
-        pen.setWidth(penWidth);
+        pen.setWidth(0); // Cosmetic pen
         painter->setPen(pen);
-        painter->drawRect(QRectF(0, 0, translatedSize.width() + penWidth, translatedSize.height() - penWidth));
+        painter->drawPath(shape());
 
         painter->restore();
     }
@@ -235,25 +233,25 @@ void CardItem::resetState()
     update();
 }
 
-void CardItem::processCardInfo(const ServerInfo_Card &info)
+void CardItem::processCardInfo(const ServerInfo_Card &_info)
 {
     counters.clear();
-    const int counterListSize = info.counter_list_size();
+    const int counterListSize = _info.counter_list_size();
     for (int i = 0; i < counterListSize; ++i) {
-        const ServerInfo_CardCounter &counterInfo = info.counter_list(i);
+        const ServerInfo_CardCounter &counterInfo = _info.counter_list(i);
         counters.insert(counterInfo.id(), counterInfo.value());
     }
 
-    setId(info.id());
-    setName(QString::fromStdString(info.name()));
-    setAttacking(info.attacking());
-    setFaceDown(info.face_down());
-    setPT(QString::fromStdString(info.pt()));
-    setAnnotation(QString::fromStdString(info.annotation()));
-    setColor(QString::fromStdString(info.color()));
-    setTapped(info.tapped());
-    setDestroyOnZoneChange(info.destroy_on_zone_change());
-    setDoesntUntap(info.doesnt_untap());
+    setId(_info.id());
+    setName(QString::fromStdString(_info.name()));
+    setAttacking(_info.attacking());
+    setFaceDown(_info.face_down());
+    setPT(QString::fromStdString(_info.pt()));
+    setAnnotation(QString::fromStdString(_info.annotation()));
+    setColor(QString::fromStdString(_info.color()));
+    setTapped(_info.tapped());
+    setDestroyOnZoneChange(_info.destroy_on_zone_change());
+    setDoesntUntap(_info.doesnt_untap());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
@@ -286,15 +284,36 @@ void CardItem::drawArrow(const QColor &arrowColor)
     scene()->addItem(arrow);
     arrow->grabMouse();
 
-    QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
-    while (itemIterator.hasNext()) {
-        CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
-        if (!c || (c == this))
+    for (const auto &item : scene()->selectedItems()) {
+        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card == nullptr || card == this)
             continue;
-        if (c->getZone() != zone)
+        if (card->getZone() != zone)
             continue;
 
-        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, c, arrowColor);
+        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor);
+        scene()->addItem(childArrow);
+        arrow->addChildArrow(childArrow);
+    }
+}
+
+void CardItem::drawAttachArrow()
+{
+    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+        return;
+
+    auto *arrow = new ArrowAttachItem(this);
+    scene()->addItem(arrow);
+    arrow->grabMouse();
+
+    for (const auto &item : scene()->selectedItems()) {
+        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card == nullptr)
+            continue;
+        if (card->getZone() != zone)
+            continue;
+
+        ArrowAttachItem *childArrow = new ArrowAttachItem(card);
         scene()->addItem(childArrow);
         arrow->addChildArrow(childArrow);
     }
@@ -329,22 +348,24 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 
-        createDragItem(id, event->pos(), event->scenePos(), facedown || forceFaceDown);
+        // Use the buttonDownPos to align the hot spot with the position when
+        // the user originally clicked
+        createDragItem(id, event->buttonDownPos(Qt::LeftButton), event->scenePos(), facedown || forceFaceDown);
         dragItem->grabMouse();
 
-        QList<QGraphicsItem *> sel = scene()->selectedItems();
-        int j = 0;
-        for (int i = 0; i < sel.size(); i++) {
-            CardItem *c = static_cast<CardItem *>(sel.at(i));
-            if ((c == this) || (c->getZone() != zone))
+        int childIndex = 0;
+        for (const auto &item : scene()->selectedItems()) {
+            CardItem *card = static_cast<CardItem *>(item);
+            if ((card == this) || (card->getZone() != zone))
                 continue;
-            ++j;
+            ++childIndex;
             QPointF childPos;
             if (zone->getHasCardAttr())
-                childPos = c->pos() - pos();
+                childPos = card->pos() - pos();
             else
-                childPos = QPointF(j * CARD_WIDTH / 2, 0);
-            CardDragItem *drag = new CardDragItem(c, c->getId(), childPos, c->getFaceDown() || forceFaceDown, dragItem);
+                childPos = QPointF(childIndex * CARD_WIDTH / 2, 0);
+            CardDragItem *drag =
+                new CardDragItem(card, card->getId(), childPos, card->getFaceDown() || forceFaceDown, dragItem);
             drag->setPos(dragItem->pos() + childPos);
             scene()->addItem(drag);
         }
@@ -369,7 +390,8 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
         if (cardMenu != nullptr && !cardMenu->isEmpty() && owner != nullptr) {
-            cardMenu->exec(event->screenPos());
+            cardMenu->popup(event->screenPos());
+            return;
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
                (!SettingsCache::instance().getDoubleClickToPlay())) {

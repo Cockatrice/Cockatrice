@@ -144,11 +144,11 @@ void Server_Game::storeGameInformation()
     replayMatchInfo->set_game_name(gameInfo.description());
 
     const QStringList &allGameTypes = room->getGameTypes();
-    QStringList gameTypes;
+    QStringList _gameTypes;
     for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
-        gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
+        _gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
 
-    for (auto playerName : allPlayersEver) {
+    for (const auto &playerName : allPlayersEver) {
         replayMatchInfo->add_player_names(playerName.toStdString());
     }
 
@@ -171,7 +171,7 @@ void Server_Game::storeGameInformation()
     delete sessionEvent;
 
     if (server->getStoreReplaysEnabled()) {
-        server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver,
+        server->getDatabaseInterface()->storeGameInformation(room->getName(), _gameTypes, gameInfo, allPlayersEver,
                                                              allSpectatorsEver, replayList);
     }
 }
@@ -565,13 +565,13 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
             Server_Arrow *a = arrows[i];
             Server_Card *targetCard = qobject_cast<Server_Card *>(a->getTargetItem());
             if (targetCard) {
-                if (targetCard->getZone()->getPlayer() == player)
+                if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player)
                     toDelete.append(a);
             } else if (static_cast<Server_Player *>(a->getTargetItem()) == player)
                 toDelete.append(a);
 
             // Don't use else here! It has to happen regardless of whether targetCard == 0.
-            if (a->getStartCard()->getZone()->getPlayer() == player)
+            if (a->getStartCard()->getZone() != nullptr && a->getStartCard()->getZone()->getPlayer() == player)
                 toDelete.append(a);
         }
         for (int i = 0; i < toDelete.size(); ++i) {
@@ -710,8 +710,8 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     event2.set_active_player_id(activePlayer);
     event2.set_active_phase(activePhase);
 
-    for (Server_Player *player : players.values()) {
-        player->getInfo(event2.add_player_list(), player, player->getSpectator() && spectatorsSeeEverything, true);
+    for (auto *_player : players.values()) {
+        _player->getInfo(event2.add_player_list(), _player, _player->getSpectator() && spectatorsSeeEverything, true);
     }
 
     rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));

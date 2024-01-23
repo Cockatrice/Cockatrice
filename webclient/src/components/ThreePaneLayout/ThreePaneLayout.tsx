@@ -1,8 +1,7 @@
-// eslint-disable-next-line
-import React, { Component, CElement } from "react";
+import { Component, CElement } from 'react';
 import { connect } from 'react-redux';
-import Grid from '@material-ui/core/Grid';
-import Hidden from '@material-ui/core/Hidden';
+import Grid from '@mui/material/Grid';
+import Hidden from '@mui/material/Hidden';
 
 import './ThreePaneLayout.css';
 
@@ -12,7 +11,7 @@ class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
   render() {
     return (
       <div className="three-pane-layout">
-        <Grid container spacing={2} className="grid">
+        <Grid container rowSpacing={0} columnSpacing={2} className="grid">
           <Grid item xs={12} md={9} lg={10} className="grid-main">
             <Grid item className={
               'grid-main__top'
@@ -27,7 +26,7 @@ class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
               {this.props.bottom}
             </Grid>
           </Grid>
-          <Hidden smDown>
+          <Hidden mdDown>
             <Grid item md={3} lg={2} className="grid-side">
               {this.props.side}
             </Grid>

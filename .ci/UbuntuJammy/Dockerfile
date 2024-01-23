@@ -13,12 +13,12 @@ RUN apt-get update && \
         liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
-        libqt6core5compat6-dev \
         libqt6multimedia6 \
         libqt6sql6-mysql \
         libqt6svg6-dev \
         libqt6websockets6-dev \
         protobuf-compiler \
+        qt6-image-formats-plugins \
         qt6-l10n-tools \
         qt6-multimedia-dev \
         qt6-tools-dev \

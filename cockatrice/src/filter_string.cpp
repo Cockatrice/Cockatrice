@@ -3,6 +3,7 @@
 #include "../../common/lib/peglib.h"
 
 #include <QByteArray>
+#include <QDebug>
 #include <QString>
 #include <functional>
 
@@ -41,9 +42,10 @@ ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
 
 FieldQuery <- String [:] RegexString / String ws? NumericExpression
 
-NonQuote <- !["].
-UnescapedStringListPart <- ![":<>=! ].
-String <- UnescapedStringListPart+ / ["] <NonQuote*> ["]
+NonDoubleQuoteUnlessEscaped <- !["]. / '\"'.
+NonSingleQuoteUnlessEscaped <- ![']. / "\'".
+UnescapedStringListPart <- !['":<>=! ].
+String <- UnescapedStringListPart+ / ["] <NonDoubleQuoteUnlessEscaped*> ["] / ['] <NonSingleQuoteUnlessEscaped*> [']
 StringValue <- String / [(] StringList [)]
 StringList <- StringListString (ws? [,] ws? StringListString)*
 StringListString <- UnescapedStringListPart+
@@ -55,7 +57,7 @@ CompactStringSet <- StringListString ([,+] StringListString)+
 
 NumericExpression <- NumericOperator ws? NumericValue
 NumericOperator <- [=:] / <[><!][=]?>
-NumericValue <- [0-9]+ 
+NumericValue <- [0-9]+
 
 )");
 
@@ -241,7 +243,12 @@ static void setupParserRules()
 
     search["RegexString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         auto target = sv[0].get<QString>();
-        return [=](const QString &s) { return s.QString::contains(target, Qt::CaseInsensitive); };
+        return [=](const QString &s) {
+            auto sanitizedTarget = QString(target);
+            sanitizedTarget.replace("\\\"", "\"");
+            sanitizedTarget.replace("\\'", "'");
+            return s.QString::contains(sanitizedTarget, Qt::CaseInsensitive);
+        };
     };
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
@@ -334,6 +341,12 @@ static void setupParserRules()
     };
 }
 
+FilterString::FilterString()
+{
+    result = [](CardData) -> bool { return false; };
+    _error = "Not initialized";
+}
+
 FilterString::FilterString(const QString &expr)
 {
     QByteArray ba = expr.simplified().toUtf8();
@@ -352,7 +365,7 @@ FilterString::FilterString(const QString &expr)
     };
 
     if (!search.parse(ba.data(), result)) {
-        std::cout << "Error!" << _error.toStdString() << std::endl;
+        qDebug() << "Filter string error" << _error;
         result = [](CardData) -> bool { return false; };
     }
 }

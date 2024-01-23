@@ -2,13 +2,14 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate, useParams, generatePath } from 'react-router-dom';
 
-import ListItem from '@material-ui/core/ListItem';
-import Paper from '@material-ui/core/Paper';
+import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 
 import { RoomsService } from 'api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
 import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors, RoomsTypes } from 'store';
 import { RouteEnum } from 'types';
+import Layout from 'containers/Layout/Layout';
 
 import OpenGames from './OpenGames';
 import Messages from './Messages';
@@ -40,7 +41,7 @@ const Room = (props) => {
   }
 
   return (
-    <div className="room-view">
+    <Layout className="room-view">
       <AuthGuard />
 
       <div className="room-view__main">
@@ -84,7 +85,7 @@ const Room = (props) => {
           )}
         />
       </div>
-    </div>
+    </Layout>
   );
 }
 

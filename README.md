@@ -18,7 +18,7 @@
 <br><pre>
 <b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
 <b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development, see how to [get involved](#get-involved-)</b>
+<b>To help with development, see how to [get involved](#get-involved--)</b>
 </pre><br>
 
 
@@ -52,8 +52,6 @@ We maintain two tags for contributors to find issues to work on:
 
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.
 
-Read the long-term project **roadmap** to see planned edits and milestones [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
-
 We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
 Cockatrice uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
@@ -67,13 +65,9 @@ Cockatrice uses the [Google Developer Documentation Style Guide](https://develop
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
-# Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://www.transifex.com/projects/p/cockatrice/)
+# Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
 
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
-
-| Cockatrice | Oracle |
-|:-:|:-:|
-| [![Cockatrice Translation Status](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/chart/image_png/)](https://www.transifex.com/projects/p/cockatrice/) | [![Oracle Translation Status](https://www.transifex.com/projects/p/cockatrice/resource/oracle/chart/image_png/)](https://www.transifex.com/projects/p/cockatrice/) |
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice, Oracle and Webatrice to your language or just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
 
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 

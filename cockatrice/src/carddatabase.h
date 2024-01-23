@@ -452,31 +452,60 @@ signals:
 class CardRelation : public QObject
 {
     Q_OBJECT
+public:
+    enum AttachType
+    {
+        DoesNotAttach = 0,
+        AttachTo = 1,
+        TransformInto = 2,
+    };
+
 private:
     QString name;
-    bool doesAttach;
+    AttachType attachType;
     bool isCreateAllExclusion;
     bool isVariableCount;
     int defaultCount;
+    bool isPersistent;
 
 public:
     explicit CardRelation(const QString &_name = QString(),
-                          bool _doesAttach = false,
+                          AttachType _attachType = DoesNotAttach,
                           bool _isCreateAllExclusion = false,
                           bool _isVariableCount = false,
-                          int _defaultCount = 1);
+                          int _defaultCount = 1,
+                          bool _isPersistent = false);
 
     inline const QString &getName() const
     {
         return name;
     }
+    AttachType getAttachType() const
+    {
+        return attachType;
+    }
     bool getDoesAttach() const
     {
-        return doesAttach;
+        return attachType != DoesNotAttach;
+    }
+    bool getDoesTransform() const
+    {
+        return attachType == TransformInto;
+    }
+    QString getAttachTypeAsString() const
+    {
+        switch (attachType) {
+            case AttachTo:
+                return "attach";
+            case TransformInto:
+                return "transform";
+            default:
+                return "";
+        }
     }
     bool getCanCreateAnother() const
     {
-        return !doesAttach;
+        return !getDoesAttach();
     }
     bool getIsCreateAllExclusion() const
     {
@@ -489,6 +518,10 @@ public:
     int getDefaultCount() const
     {
         return defaultCount;
+    }
+    bool getIsPersistent() const
+    {
+        return isPersistent;
     }
 };
 #endif

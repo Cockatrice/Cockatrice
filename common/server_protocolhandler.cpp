@@ -280,8 +280,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc)))
                 ++commandCountOverTime[0];
 
-            for (int i = 0; i < commandCountOverTime.size(); ++i) {
-                totalCount += commandCountOverTime[i];
+            for (int count : commandCountOverTime) {
+                totalCount += count;
             }
 
             if (maxCommandCountPerInterval > 0 && totalCount > maxCommandCountPerInterval) {
@@ -571,7 +571,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     if (databaseInterface->isInIgnoreList(receiver, QString::fromStdString(userInfo->name()))) {
         return Response::RespInIgnoreList;
     }
-    if (!addSaidMessageSize(cmd.message().size())) {
+    if (!addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
         return Response::RespChatFlood;
     }
 
@@ -680,11 +680,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     room->addClient(this);
     rooms.insert(room->getId(), room);
 
-    Event_RoomSay joinMessageEvent;
-    joinMessageEvent.set_message(room->getJoinMessage().toStdString());
-    joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
-    rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
-
     QReadLocker chatHistoryLocker(&room->historyLock);
     QList<ServerInfo_ChatMessage> chatHistory = room->getChatHistory();
     ServerInfo_ChatMessage chatMessage;
@@ -697,6 +692,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
             QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
     }
+
+    Event_RoomSay joinMessageEvent;
+    joinMessageEvent.set_message(room->getJoinMessage().toStdString());
+    joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
+    rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
 
     Response_JoinRoom *re = new Response_JoinRoom;
     room->getInfo(*re->mutable_room_info(), true);
@@ -765,7 +765,7 @@ bool Server_ProtocolHandler::addSaidMessageSize(int size)
 Response::ResponseCode
 Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer & /*rc*/)
 {
-    if (!addSaidMessageSize(cmd.message().size())) {
+    if (!addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
         return Response::RespChatFlood;
     }
     QString msg = QString::fromStdString(cmd.message());

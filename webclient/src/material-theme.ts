@@ -1,6 +1,11 @@
-import { createTheme } from '@material-ui/core/styles';
+import { PaletteMode } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+
+const mode: PaletteMode = 'light';
 
 const palette = {
+  mode,
+
   background: {
     default: 'rgb(35, 35, 35)',
     paper: '#FFFFFF',
@@ -62,112 +67,123 @@ const palette = {
 export const materialTheme = createTheme({
   palette,
 
-  overrides: {
-  //   MuiCssBaseline: {
-  //     '@global': {
-  //       '@font-face': [],
-  //     },
-  //   },
-    MuiButton: {
-      root: {
-        fontWeight: 'bold',
-        textTransform: 'none',
-
-        '&.rounded': {
-          // 'border-radius': '50px',
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '@global': {
+          '@font-face': [],
         },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: 'bold',
+          textTransform: 'none',
 
-        '&.tall': {
-          'height': '40px',
+          '&.rounded': {
+            // 'border-radius': '50px',
+          },
+
+          '&.tall': {
+            'height': '40px',
+          },
         },
       },
     },
 
     MuiCheckbox: {
-      root: {
-        '& .MuiSvgIcon-root': {
-          width: '.75em',
-          height: '.75em',
+      styleOverrides: {
+        root: {
+          '& .MuiSvgIcon-root': {
+            width: '.75em',
+            height: '.75em',
+          },
         },
       },
     },
 
     MuiFormControlLabel: {
-      label: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: palette.primary.main,
-
-      },
-    },
-
-    MuiInputLabel: {
-      outlined: {
-        transform: 'translate(1em, 1em) scale(1)',
+      styleOverrides: {
+        label: {
+          fontSize: 12,
+          fontWeight: 'bold',
+          color: palette.primary.main,
+        },
       },
     },
 
     MuiLink: {
-      root: {
-        fontWeight: 'bold',
+      styleOverrides: {
+        root: {
+          fontWeight: 'bold',
+        },
       },
     },
 
     MuiList: {
-      root: {
-        padding: '8px',
+      styleOverrides: {
+        root: {
+          padding: '8px',
 
-        '&.MuiList-padding': {
-          paddingBottom: '4px',
-        },
+          '&.MuiList-padding': {
+            paddingBottom: '4px',
+          },
 
-        '& .MuiButton-root': {
-          width: '100%',
-        },
+          '& .MuiButton-root': {
+            width: '100%',
+          },
 
-        '& > .MuiButtonBase-root': {
-          padding: '8px 16px',
-          marginBottom: '4px',
-          borderRadius: 0,
-          justifyContent: 'space-between',
-        },
+          '& > .MuiButtonBase-root': {
+            padding: '8px 16px',
+            marginBottom: '4px',
+            borderRadius: 0,
+            justifyContent: 'space-between',
+          },
 
-        '& .MuiButtonBase-root.Mui-selected': {
-          background: 'none',
-          fontWeight: 'bold',
-        },
+          '& .MuiButtonBase-root.Mui-selected, & .MuiButtonBase-root.Mui-selected:focus': {
+            background: 'none',
+            fontWeight: 'bold',
+          },
 
-        ['& .MuiButtonBase-root:hover, & .MuiButtonBase-root.Mui-selected:hover']: {
-          background: palette.primary.light
+          ['& .MuiButtonBase-root:hover, & .MuiButtonBase-root.Mui-selected:hover']: {
+            background: palette.primary.light
+          },
         },
       },
     },
 
     MuiListItem: {
-      root: {
-      },
+      styleOverrides: {
+        root: {
+        },
+      }
     },
 
     MuiInputBase: {
-      formControl: {
-        '& .MuiSelect-root svg': {
-          display: 'none',
+      styleOverrides: {
+        formControl: {
+          '& .MuiSelect-root svg': {
+            display: 'none',
+          },
         },
       },
     },
 
     MuiOutlinedInput: {
-      root: {
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          borderWidth: '1px',
-        },
+      styleOverrides: {
+        root: {
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderWidth: '1px',
+          },
 
-        '.rounded &': {
-          // 'border-radius': '50px',
-        },
+          '.rounded &': {
+            // 'border-radius': '50px',
+          },
 
-        '.tall &': {
-          height: '40px',
+          '.tall &': {
+            height: '40px',
+          },
         },
       },
     },
@@ -199,7 +215,10 @@ export const materialTheme = createTheme({
       lineHeight: 1.4,
       color: palette.grey[500],
     },
-    // body1: {},
+    body1: {
+      fontSize: '.75rem',
+      lineHeight: 1.4,
+    },
     // body2: {},
     // button: {},
     // caption: {},

@@ -43,9 +43,8 @@ public:
     }
     void removeArrowFrom(ArrowItem *arrow)
     {
-        arrowsFrom.removeAt(arrowsFrom.indexOf(arrow));
+        arrowsFrom.removeOne(arrow);
     }
-
     const QList<ArrowItem *> &getArrowsTo() const
     {
         return arrowsTo;
@@ -56,8 +55,7 @@ public:
     }
     void removeArrowTo(ArrowItem *arrow)
     {
-        arrowsTo.removeAt(arrowsTo.indexOf(arrow));
+        arrowsTo.removeOne(arrow);
     }
 };
-
 #endif

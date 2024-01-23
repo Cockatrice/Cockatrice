@@ -71,6 +71,9 @@ void SettingsCache::setLeftJustified(const int /* _leftJustified */)
 void SettingsCache::setCardScaling(const int /* _scaleCards */)
 {
 }
+void SettingsCache::setStackCardOverlapPercent(const int /* _verticalCardOverlapPercent */)
+{
+}
 void SettingsCache::setShowMessagePopups(const int /* _showMessagePopups */)
 {
 }
@@ -203,7 +206,13 @@ void SettingsCache::setMainWindowGeometry(const QByteArray & /* _mainWindowGeome
 void SettingsCache::setTokenDialogGeometry(const QByteArray & /* _tokenDialogGeometry */)
 {
 }
+void SettingsCache::setSetsDialogGeometry(const QByteArray & /* _setsDialogGeometry */)
+{
+}
 void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
+{
+}
+void SettingsCache::setNetworkCacheSizeInMB(const int /* _networkCacheSize */)
 {
 }
 void SettingsCache::setClientID(const QString & /* _clientID */)

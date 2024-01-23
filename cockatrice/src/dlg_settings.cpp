@@ -3,6 +3,7 @@
 #include "carddatabase.h"
 #include "gettextwithmax.h"
 #include "main.h"
+#include "pictureloader.h"
 #include "releasechannel.h"
 #include "sequenceEdit/sequenceedit.h"
 #include "settingscache.h"
@@ -68,18 +69,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
     newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
 
-    // pixmap cache
-    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
-    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
-    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
-    pixmapCacheEdit.setSingleStep(64);
-    pixmapCacheEdit.setValue(settings.getPixmapCacheSize());
-    pixmapCacheEdit.setSuffix(" MB");
-
     showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setPixmapCacheSize(int)));
     connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setNotifyAboutUpdate(int)));
     connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setNotifyAboutNewVersion(int)));
@@ -90,8 +82,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&languageBox, 0, 1);
     personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
-    personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
-    personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0, 1, 2);
     personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0, 1, 2);
     personalGrid->addWidget(&showTipsOnStartup, 5, 0, 1, 2);
@@ -301,7 +291,6 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     customCardDatabasePathLabel.setText(tr("Custom database directory:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
-    pixmapCacheLabel.setText(tr("Picture cache size:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
@@ -310,6 +299,7 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
+    SettingsCache &settings = SettingsCache::instance();
     QString themeName = SettingsCache::instance().getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
@@ -330,27 +320,31 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
 
-    displayCardNamesCheckBox.setChecked(SettingsCache::instance().getDisplayCardNames());
-    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
-            SLOT(setDisplayCardNames(int)));
+    displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
+    connect(&displayCardNamesCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setDisplayCardNames(int)));
 
-    cardScalingCheckBox.setChecked(SettingsCache::instance().getScaleCards());
-    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(), SLOT(setCardScaling(int)));
+    cardScalingCheckBox.setChecked(settings.getScaleCards());
+    connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setCardScaling(int)));
+
+    verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
+    verticalCardOverlapPercentBox.setRange(0, 80);
+    connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
+            SLOT(setStackCardOverlapPercent(int)));
 
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
+    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 2, 0, 1, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 2, 1, 1, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
 
-    horizontalHandCheckBox.setChecked(SettingsCache::instance().getHorizontalHand());
-    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
-            SLOT(setHorizontalHand(int)));
+    horizontalHandCheckBox.setChecked(settings.getHorizontalHand());
+    connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setHorizontalHand(int)));
 
-    leftJustifiedHandCheckBox.setChecked(SettingsCache::instance().getLeftJustified());
-    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
-            SLOT(setLeftJustified(int)));
+    leftJustifiedHandCheckBox.setChecked(settings.getLeftJustified());
+    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), &settings, SLOT(setLeftJustified(int)));
 
     auto *handGrid = new QGridLayout;
     handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
@@ -359,18 +353,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
 
-    invertVerticalCoordinateCheckBox.setChecked(SettingsCache::instance().getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
+    invertVerticalCoordinateCheckBox.setChecked(settings.getInvertVerticalCoordinate());
+    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), &settings,
             SLOT(setInvertVerticalCoordinate(int)));
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
-    minPlayersForMultiColumnLayoutEdit.setValue(SettingsCache::instance().getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+    minPlayersForMultiColumnLayoutEdit.setValue(settings.getMinPlayersForMultiColumnLayout());
+    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), &settings,
             SLOT(setMinPlayersForMultiColumnLayout(int)));
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
-    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setMaxFontSize(int)));
-    maxFontSizeForCardsEdit.setValue(SettingsCache::instance().getMaxFontSize());
+    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setMaxFontSize(int)));
+    maxFontSizeForCardsEdit.setValue(settings.getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
@@ -424,6 +418,8 @@ void AppearanceSettingsPage::retranslateUi()
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
+    verticalCardOverlapPercentLabel.setText(
+        tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
@@ -591,12 +587,38 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     messageListLayout->addWidget(messageToolBar);
     messageListLayout->addWidget(urlList);
 
+    // pixmap cache
+    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
+    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
+    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
+    pixmapCacheEdit.setSingleStep(64);
+    pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
+    pixmapCacheEdit.setSuffix(" MB");
+
+    networkCacheEdit.setMinimum(NETWORK_CACHE_SIZE_MIN);
+    networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
+    networkCacheEdit.setSingleStep(1);
+    networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
+    networkCacheEdit.setSuffix(" MB");
+
+    auto networkCacheLayout = new QHBoxLayout;
+    networkCacheLayout->addStretch();
+    networkCacheLayout->addWidget(&networkCacheLabel);
+    networkCacheLayout->addWidget(&networkCacheEdit);
+
+    auto pixmapCacheLayout = new QHBoxLayout;
+    pixmapCacheLayout->addStretch();
+    pixmapCacheLayout->addWidget(&pixmapCacheLabel);
+    pixmapCacheLayout->addWidget(&pixmapCacheEdit);
+
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
-    lpGeneralGrid->addWidget(&urlLinkLabel, 2, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 2, 1);
+    lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
+    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 0, 1, 2);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 4, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 4, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -611,6 +633,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
             SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
+    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
+    connect(&networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+            SLOT(setNetworkCacheSizeInMB(int)));
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -635,6 +660,11 @@ void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 
 void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
+    PictureLoader::clearNetworkCache();
+
+    // These are not used anymore, but we don't delete them automatically, so
+    // we should do it here lest we leave pictures hanging around on users'
+    // machines.
     QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
@@ -662,6 +692,7 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
     }
     if (outerSuccessRemove) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
+        QDir(SettingsCache::instance().getPicsPath()).rmdir("downloadedPics");
     } else {
         QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
     }
@@ -785,6 +816,10 @@ void DeckEditorSettingsPage::retranslateUi()
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
+    networkCacheLabel.setText(tr("Downloaded images directory size:"));
+    networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
+    pixmapCacheLabel.setText(tr("Picture cache size:"));
+    pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -795,6 +830,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatMentionCompleterCheckbox.setChecked(SettingsCache::instance().getChatMentionCompleter());
     connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), &SettingsCache::instance(),
             SLOT(setChatMentionCompleter(int)));
+
+    explainMessagesLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    explainMessagesLabel.setOpenExternalLinks(true);
 
     ignoreUnregUsersMainChat.setChecked(SettingsCache::instance().getIgnoreUnregisteredUsers());
     ignoreUnregUserMessages.setChecked(SettingsCache::instance().getIgnoreUnregisteredUserMessages());
@@ -887,12 +925,15 @@ MessagesSettingsPage::MessagesSettingsPage()
     messageListLayout->addWidget(messageToolBar);
     messageListLayout->addWidget(messageList);
 
-    messageShortcuts = new QGroupBox;
-    messageShortcuts->setLayout(messageListLayout);
+    auto *messagesLayout = new QVBoxLayout; // combines the explainer label with the actual messages widget pieces
+    messagesLayout->addLayout(messageListLayout);
+    messagesLayout->addWidget(&explainMessagesLabel);
 
-    auto *mainLayout = new QVBoxLayout;
+    messageGroupBox = new QGroupBox; // draws a box around the above layout and allows it to be titled
+    messageGroupBox->setLayout(messagesLayout);
 
-    mainLayout->addWidget(messageShortcuts);
+    auto *mainLayout = new QVBoxLayout; // combines the messages groupbox with the rest of the menu
+    mainLayout->addWidget(messageGroupBox);
     mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(highlightGroupBox);
 
@@ -903,8 +944,12 @@ MessagesSettingsPage::MessagesSettingsPage()
 
 void MessagesSettingsPage::updateColor(const QString &value)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor colorToSet = QColor::fromString("#" + value);
+#else
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
+#endif
     if (colorToSet.isValid()) {
         SettingsCache::instance().setChatMentionColor(value);
         updateMentionPreview();
@@ -913,8 +958,12 @@ void MessagesSettingsPage::updateColor(const QString &value)
 
 void MessagesSettingsPage::updateHighlightColor(const QString &value)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor colorToSet = QColor::fromString("#" + value);
+#else
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
+#endif
     if (colorToSet.isValid()) {
         SettingsCache::instance().setChatHighlightColor(value);
         updateHighlightPreview();
@@ -993,7 +1042,9 @@ void MessagesSettingsPage::retranslateUi()
     highlightGroupBox->setTitle(tr("Custom alert words"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     chatMentionCompleterCheckbox.setText(tr("Enable mention completer"));
-    messageShortcuts->setTitle(tr("In-game message macros"));
+    messageGroupBox->setTitle(tr("In-game message macros"));
+    explainMessagesLabel.setText(
+        QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to use in-game message macros")));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
@@ -1110,28 +1161,28 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
 
     // layout
-    auto *editLayout = new QGridLayout;
-    editLayout->addWidget(currentActionGroupLabel, 0, 0);
-    editLayout->addWidget(currentActionGroupName, 0, 1);
-    editLayout->addWidget(currentActionLabel, 1, 0);
-    editLayout->addWidget(currentActionName, 1, 1);
-    editLayout->addWidget(currentShortcutLabel, 2, 0);
-    editLayout->addWidget(editTextBox, 2, 1);
+    auto *_editLayout = new QGridLayout;
+    _editLayout->addWidget(currentActionGroupLabel, 0, 0);
+    _editLayout->addWidget(currentActionGroupName, 0, 1);
+    _editLayout->addWidget(currentActionLabel, 1, 0);
+    _editLayout->addWidget(currentActionName, 1, 1);
+    _editLayout->addWidget(currentShortcutLabel, 2, 0);
+    _editLayout->addWidget(editTextBox, 2, 1);
 
     editShortcutGroupBox = new QGroupBox;
-    editShortcutGroupBox->setLayout(editLayout);
+    editShortcutGroupBox->setLayout(_editLayout);
 
-    auto *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addWidget(faqLabel);
-    buttonsLayout->addWidget(btnResetAll);
-    buttonsLayout->addWidget(btnClearAll);
+    auto *_buttonsLayout = new QHBoxLayout;
+    _buttonsLayout->addWidget(faqLabel);
+    _buttonsLayout->addWidget(btnResetAll);
+    _buttonsLayout->addWidget(btnClearAll);
 
-    auto *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(shortcutsTable);
-    mainLayout->addWidget(editShortcutGroupBox);
-    mainLayout->addLayout(buttonsLayout);
+    auto *_mainLayout = new QVBoxLayout;
+    _mainLayout->addWidget(shortcutsTable);
+    _mainLayout->addWidget(editShortcutGroupBox);
+    _mainLayout->addLayout(_buttonsLayout);
 
-    setLayout(mainLayout);
+    setLayout(_mainLayout);
 
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetShortcuts()));
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
@@ -1237,8 +1288,8 @@ void ShortcutSettingsPage::retranslateUi()
     currentShortcutLabel->setText(tr("Shortcut:"));
     editTextBox->retranslateUi();
     faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
-    btnResetAll->setText("Restore all default shortcuts");
-    btnClearAll->setText("Clear all shortcuts");
+    btnResetAll->setText(tr("Restore all default shortcuts"));
+    btnClearAll->setText(tr("Clear all shortcuts"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)

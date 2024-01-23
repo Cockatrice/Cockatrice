@@ -10,10 +10,10 @@
   width: 1.5em;
 }
 
-.MuiSelect-root .LanguageDropdown-item__label {
+.MuiSelect-select .LanguageDropdown-item__label {
   display: none;
 }
 
-.MuiListItem-root .LanguageDropdown-item__image {
+.MuiList-root .LanguageDropdown-item__image {
   margin-right: 1em;
 }

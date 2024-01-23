@@ -28,15 +28,15 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - 12
+          - 16
           - lts/*
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{matrix.node_version}}
           cache: 'npm'
@@ -50,4 +50,3 @@ jobs:
 
       - name: Test app
         run: npm run test
-        

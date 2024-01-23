@@ -15,9 +15,9 @@ class SoundEngine : public QObject
 {
     Q_OBJECT
 public:
-    SoundEngine(QObject *parent = nullptr);
-    ~SoundEngine();
-    void playSound(QString fileName);
+    explicit SoundEngine(QObject *parent = nullptr);
+    ~SoundEngine() override;
+    void playSound(const QString &fileName);
     QStringMap &getAvailableThemes();
 
 private:

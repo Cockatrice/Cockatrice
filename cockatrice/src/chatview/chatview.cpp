@@ -21,7 +21,7 @@ UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
     relativePosition = cursor.position() - block.position();
 }
 
-ChatView::ChatView(const TabSupervisor *_tabSupervisor,
+ChatView::ChatView(TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
                    TabGame *_game,
                    bool _showTimestamps,
@@ -470,15 +470,23 @@ void ChatView::showSystemPopup(const QString &userName)
 
 QColor ChatView::getCustomMentionColor()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+#else
     QColor customColor;
     customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
+#endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
 QColor ChatView::getCustomHighlightColor()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+#else
     QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatHighlightColor());
+    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
+#endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 

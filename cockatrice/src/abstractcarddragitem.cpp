@@ -20,13 +20,8 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
         parentDrag->addChildDrag(this);
         setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
     } else {
-        if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
-            qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
-            hotSpot = QPointF();
-        } else if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
-            qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
-            hotSpot = QPointF(CARD_WIDTH, CARD_HEIGHT);
-        }
+        hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CARD_WIDTH - 1)),
+                          qBound(0.0, hotSpot.y(), static_cast<qreal>(CARD_HEIGHT - 1))};
         setCursor(Qt::ClosedHandCursor);
         setZValue(2000000007);
     }
@@ -45,12 +40,19 @@ AbstractCardDragItem::~AbstractCardDragItem()
         delete childDrags[i];
 }
 
+QPainterPath AbstractCardDragItem::shape() const
+{
+    QPainterPath shape;
+    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    return shape;
+}
+
 void AbstractCardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     item->paint(painter, option, widget);
 
     // adds a mask to the card so it looks like the card hasnt been placed yet
-    painter->fillRect(boundingRect(), GHOST_MASK);
+    painter->fillPath(shape(), GHOST_MASK);
 }
 
 void AbstractCardDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

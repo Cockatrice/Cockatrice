@@ -155,7 +155,7 @@ void TabRoom::retranslateUi()
 
 void TabRoom::focusTab()
 {
-    QApplication::setActiveWindow(this);
+    activateWindow();
     tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
     emit maximizeClient();
 }

@@ -20,6 +20,11 @@ class ReleaseChannel;
 #define PIXMAPCACHE_SIZE_MIN 64
 #define PIXMAPCACHE_SIZE_MAX 2047
 
+// In MB
+constexpr int NETWORK_CACHE_SIZE_DEFAULT = 1024 * 4; // 4 GB
+constexpr int NETWORK_CACHE_SIZE_MIN = 1;            // 1 MB
+constexpr int NETWORK_CACHE_SIZE_MAX = 1024 * 1024;  // 1 TB
+
 #define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
 
@@ -46,6 +51,7 @@ signals:
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
+    void networkCacheSizeChanged(int newSizeInMBs);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
@@ -64,6 +70,7 @@ private:
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
+    QByteArray setsDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
@@ -106,7 +113,9 @@ private:
     QString knownMissingFeatures;
     bool useTearOffMenus;
     int pixmapCacheSize;
+    int networkCacheSize;
     bool scaleCards;
+    int verticalCardOverlapPercent;
     bool showMessagePopups;
     bool showMentionPopups;
     bool roomHistory;
@@ -137,6 +146,8 @@ public:
     SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
+    QString getCachePath() const;
+    QString getNetworkCachePath() const;
     const QByteArray &getMainWindowGeometry() const
     {
         return mainWindowGeometry;
@@ -144,6 +155,10 @@ public:
     const QByteArray &getTokenDialogGeometry() const
     {
         return tokenDialogGeometry;
+    }
+    const QByteArray &getSetsDialogGeometry() const
+    {
+        return setsDialogGeometry;
     }
     QString getLang() const
     {
@@ -330,9 +345,17 @@ public:
     {
         return pixmapCacheSize;
     }
+    int getNetworkCacheSizeInMB() const
+    {
+        return networkCacheSize;
+    }
     bool getScaleCards() const
     {
         return scaleCards;
+    }
+    int getStackCardOverlapPercent() const
+    {
+        return verticalCardOverlapPercent;
     }
     bool getShowMessagePopup() const
     {
@@ -480,6 +503,7 @@ public slots:
 
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
+    void setSetsDialogGeometry(const QByteArray &_setsDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
@@ -520,7 +544,9 @@ public slots:
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
+    void setNetworkCacheSizeInMB(const int _networkCacheSize);
     void setCardScaling(const int _scaleCards);
+    void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);
     void setRoomHistory(const int _roomHistory);

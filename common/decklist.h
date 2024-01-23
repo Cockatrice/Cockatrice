@@ -105,7 +105,7 @@ public:
     static QString visibleNameFromName(const QString &_name);
     virtual QString getVisibleName() const;
     void clearTree();
-    AbstractDecklistNode *findChild(const QString &name);
+    AbstractDecklistNode *findChild(const QString &_name);
     int height() const override;
     int recursiveCount(bool countTotalCards = false) const;
     bool compare(AbstractDecklistNode *other) const override;
@@ -178,14 +178,14 @@ private:
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
-    InnerDecklistNode *getZoneObjFromName(QString zoneName);
+    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
 protected:
     virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
     {
         return currentZoneName;
     };
-    virtual QString getCompleteCardName(const QString cardName) const
+    virtual QString getCompleteCardName(const QString &cardName) const
     {
         return cardName;
     };

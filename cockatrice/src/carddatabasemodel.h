@@ -82,7 +82,7 @@ private:
 
 public:
     explicit CardDatabaseDisplayModel(QObject *parent = nullptr);
-    void setFilterTree(FilterTree *filterTree);
+    void setFilterTree(FilterTree *_filterTree);
     void setIsToken(FilterBool _isToken)
     {
         isToken = _isToken;

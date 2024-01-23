@@ -3,9 +3,9 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm } from 'redux-form'
 
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import Paper from '@mui/material/Paper';
 
 import { InputField, CheckboxField } from 'components';
 import { FormKey } from 'types';

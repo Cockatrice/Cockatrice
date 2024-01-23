@@ -127,6 +127,16 @@ allowpunctuationprefix=false
 ; "admin,user,name"
 disallowedwords="admin"
 
+; Overwrite the words shown to the user when they enter a wrong username,
+; use \n to start a new line. Neither the real wordlist nor the disallowed
+; expressions will be sent to the user if this is set.
+; In the old versions of the client this list will be prefaced with
+; "can not contain any of the following words:"
+; example:
+;displaydisallowedwords="no attempts at impersonating staff\nno unparliamentary language\nno references to controversial figures\nstaff reserves the right to remove accounts deemed inappropriate"
+; Setting it to nothing will simply hide the list:
+;displaydisallowedwords=
+
 ; Disallow usernames matching these regular expressions. This list is comma
 ; separated, e.g. "\\w+\\d+,\\d{2}user", hence you cannot use commas in your
 ; expressions. Backslashes must be escaped, so `\w+\d+` becomes `\\w+\\d+`.

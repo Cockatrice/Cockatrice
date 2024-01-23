@@ -6,19 +6,22 @@
 #include "thememanager.h"
 
 #include <QApplication>
-#include <QScreen>
+#include <QBuffer>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QImageReader>
+#include <QMovie>
 #include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPainter>
 #include <QPixmapCache>
 #include <QRegularExpression>
+#include <QScreen>
 #include <QSet>
 #include <QSvgRenderer>
 #include <QThread>
@@ -116,6 +119,21 @@ PictureLoaderWorker::PictureLoaderWorker()
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
     networkManager = new QNetworkAccessManager(this);
+    // We need a timeout to ensure requests don't hang indefinitely in case of
+    // cache corruption, see related Qt bug: https://bugreports.qt.io/browse/QTBUG-111397
+    // Use Qt's default timeout (30s, as of 2023-02-22)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    networkManager->setTransferTimeout();
+#endif
+    auto cache = new QNetworkDiskCache(this);
+    cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
+    // Note: the settings is in MB, but QNetworkDiskCache uses bytes
+    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache,
+            [cache](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
+    networkManager->setCache(cache);
+    // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
+    // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
+    networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
     pictureLoaderThread = new QThread;
@@ -149,37 +167,19 @@ void PictureLoaderWorker::processLoadQueue()
         QString cardName = cardBeingLoaded.getCard()->getName();
         QString correctedCardName = cardBeingLoaded.getCard()->getCorrectedName();
 
-        qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Trying to load picture";
+        qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+                           << "]: Trying to load picture";
 
         if (cardImageExistsOnDisk(setName, correctedCardName)) {
             continue;
         }
 
-        if (picDownload) {
-            qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
-                     << "]: Picture not found on disk, trying to download";
-            cardsToDownload.append(cardBeingLoaded);
-            cardBeingLoaded.clear();
-            if (!downloadRunning) {
-                startNextPicDownload();
-            }
-        } else {
-            if (cardBeingLoaded.nextSet()) {
-                qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
-                         << "]: Picture NOT found and download disabled, moving to next "
-                            "set (new set: "
-                         << setName << " card: " << cardName << ")";
-                mutex.lock();
-                loadQueue.prepend(cardBeingLoaded);
-                cardBeingLoaded.clear();
-                mutex.unlock();
-            } else {
-                qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
-                         << "]: Picture NOT found, download disabled, no more sets to "
-                            "try: BAILING OUT (old set: "
-                         << setName << " card: " << cardName << ")";
-                imageLoaded(cardBeingLoaded.getCard(), QImage());
-            }
+        qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+                           << "]: No custom picture, trying to download";
+        cardsToDownload.append(cardBeingLoaded);
+        cardBeingLoaded.clear();
+        if (!downloadRunning) {
+            startNextPicDownload();
         }
     }
 }
@@ -206,37 +206,112 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
 
     if (!setName.isEmpty()) {
         picsPaths << picsPath + "/" + setName + "/" + correctedCardname
+                  // We no longer store downloaded images there, but don't just ignore
+                  // stuff that old versions have put there.
                   << picsPath + "/downloadedPics/" + setName + "/" + correctedCardname;
     }
 
     // Iterates through the list of paths, searching for images with the desired
     // name with any QImageReader-supported
     // extension
-    for (const auto &picsPath : picsPaths) {
-        imgReader.setFileName(picsPath);
+    for (const auto &_picsPath : picsPaths) {
+        imgReader.setFileName(_picsPath);
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                     << "]: Picture found on disk.";
+            qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                               << "]: Picture found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
-        imgReader.setFileName(picsPath + ".full");
+        imgReader.setFileName(_picsPath + ".full");
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                     << "]: Picture.full found on disk.";
+            qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                               << "]: Picture.full found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
-        imgReader.setFileName(picsPath + ".xlhq");
+        imgReader.setFileName(_picsPath + ".xlhq");
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                     << "]: Picture.xlhq found on disk.";
+            qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                               << "]: Picture.xlhq found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
     }
 
     return false;
+}
+
+static int parse(const QString &urlTemplate,
+                 const QString &propType,
+                 const QString &cardName,
+                 const QString &setName,
+                 std::function<QString(const QString &)> getProperty,
+                 QMap<QString, QString> &transformMap)
+{
+    static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
+    static const QRegularExpression rxSubStr("^(.+)_substr_(\\d+)_(\\d+)$");
+
+    const QRegularExpression rxCardProp("!" + propType + ":([^!]+)!");
+
+    auto matches = rxCardProp.globalMatch(urlTemplate);
+    while (matches.hasNext()) {
+        auto match = matches.next();
+        QString templatePropertyName = match.captured(1);
+        auto fillMatch = rxFillWith.match(templatePropertyName);
+        QString cardPropertyName;
+        QString fillWith;
+        int subStrPos = 0;
+        int subStrLen = -1;
+        if (fillMatch.hasMatch()) {
+            cardPropertyName = fillMatch.captured(1);
+            fillWith = fillMatch.captured(2);
+        } else {
+            fillWith = QString();
+            auto subStrMatch = rxSubStr.match(templatePropertyName);
+            if (subStrMatch.hasMatch()) {
+                cardPropertyName = subStrMatch.captured(1);
+                subStrPos = subStrMatch.captured(2).toInt();
+                subStrLen = subStrMatch.captured(3).toInt();
+            } else {
+                cardPropertyName = templatePropertyName;
+            }
+        }
+        QString propertyValue = getProperty(cardPropertyName);
+        if (propertyValue.isEmpty()) {
+            qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                               << propType << "property (" << cardPropertyName << ") for Url template (" << urlTemplate
+                               << ") is not available";
+            return 1;
+        } else {
+            int propLength = propertyValue.length();
+            if (subStrLen > 0 && subStrPos + subStrLen > propLength) {
+                qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                                   << propType << " property (" << cardPropertyName << ") for Url template ("
+                                   << urlTemplate << ") is smaller than substr specification (" << subStrPos << " + "
+                                   << subStrLen << " > " << propLength << ")";
+                return 1;
+            } else {
+                propertyValue = propertyValue.mid(subStrPos, subStrLen);
+                propLength = subStrLen;
+            }
+
+            if (!fillWith.isEmpty()) {
+                int fillLength = fillWith.length();
+                if (fillLength < propLength) {
+                    qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                                       << propType << " property (" << cardPropertyName << ") for Url template ("
+                                       << urlTemplate << ") is longer than fill specification (" << fillWith << ")";
+                    return 1;
+                } else {
+
+                    propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
+                }
+            }
+
+            transformMap["!" + propType + ":" + templatePropertyName + "!"] = propertyValue;
+        }
+    }
+    return 0;
 }
 
 QString PictureToLoad::transformUrl(const QString &urlTemplate) const
@@ -246,56 +321,23 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
        for downloading images.  If information is requested by the template that is
        not populated for this specific card/set combination, an empty string is returned.*/
 
-    static const QRegularExpression rxCardProp("!prop:([^!]+)!");
-    static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
-    static const QRegularExpression rxSetProp("!set:([^!]+)!");
-
-    QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
 
     QMap<QString, QString> transformMap = QMap<QString, QString>();
+    QString setName = getSetName();
+
     // name
-    transformMap["!name!"] = card->getName();
+    QString cardName = card->getName();
+    transformMap["!name!"] = cardName;
     transformMap["!name_lower!"] = card->getName().toLower();
     transformMap["!corrected_name!"] = card->getCorrectedName();
     transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
 
     // card properties
-    auto matches = rxCardProp.globalMatch(transformedUrl);
-    while (matches.hasNext()) {
-        auto match = matches.next();
-        QString propertyName = match.captured(1);
-        auto fillMatch = rxFillWith.match(propertyName);
-        QString fillPropertyName;
-        QString fillWith;
-        if (fillMatch.hasMatch()) {
-            fillPropertyName = fillMatch.captured(1);
-            fillWith = fillMatch.captured(2);
-        } else {
-            fillPropertyName = propertyName;
-            fillWith = QString();
-        }
-        QString propertyValue = card->getProperty(fillPropertyName);
-        if (propertyValue.isEmpty()) {
-            qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                     << "]: Requested property (" << fillPropertyName << ") for Url template (" << urlTemplate
-                     << ") is not available";
-            return QString();
-        } else {
-            if (!fillWith.isEmpty()) {
-                int fillLength = fillWith.length();
-                int propLength = propertyValue.length();
-                if (fillLength < propLength) {
-                    qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                             << "]: Requested property (" << fillPropertyName << ") for Url template (" << urlTemplate
-                             << ") is longer than fill specification (" << fillWith << ")";
-                    return QString();
-                } else {
-                    propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
-                }
-            }
-            transformMap["!prop:" + propertyName + "!"] = propertyValue;
-        }
+    if (parse(
+            urlTemplate, "prop", cardName, setName, [&](const QString &name) { return card->getProperty(name); },
+            transformMap)) {
+        return QString();
     }
 
     if (set) {
@@ -304,41 +346,10 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
         transformMap["!setname!"] = set->getLongName();
         transformMap["!setname_lower!"] = set->getLongName().toLower();
 
-        auto matches = rxSetProp.globalMatch(transformedUrl);
-        while (matches.hasNext()) {
-            auto match = matches.next();
-            QString propertyName = match.captured(1);
-            auto fillMatch = rxFillWith.match(propertyName);
-            QString fillPropertyName;
-            QString fillWith;
-            if (fillMatch.hasMatch()) {
-                fillPropertyName = fillMatch.captured(1);
-                fillWith = fillMatch.captured(2);
-            } else {
-                fillPropertyName = propertyName;
-                fillWith = QString();
-            }
-            QString propertyValue = card->getSetProperty(set->getShortName(), fillPropertyName);
-            if (propertyValue.isEmpty()) {
-                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                         << "]: Requested set property (" << fillPropertyName << ") for Url template (" << urlTemplate
-                         << ") is not available";
-                return QString();
-            } else {
-                if (!fillWith.isEmpty()) {
-                    int fillLength = fillWith.length();
-                    int propLength = propertyValue.length();
-                    if (fillLength < propLength) {
-                        qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                                 << "]: Requested set property (" << fillPropertyName << ") for Url template ("
-                                 << urlTemplate << ") is longer than fill specification (" << fillWith << ")";
-                        return QString();
-                    } else {
-                        propertyValue = fillWith.left(fillLength - propLength) + propertyValue;
-                    }
-                }
-                transformMap["!set:" + propertyName + "!"] = propertyValue;
-            }
+        if (parse(
+                urlTemplate, "set", cardName, setName,
+                [&](const QString &name) { return card->getSetProperty(set->getShortName(), name); }, transformMap)) {
+            return QString();
         }
     }
 
@@ -346,6 +357,7 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
     transformMap["!sflang!"] = QString(QCoreApplication::translate(
         "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
 
+    QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {
         if (transformedUrl.contains(prop)) {
             if (!transformMap[prop].isEmpty()) {
@@ -355,9 +367,9 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
                  * populated in this card, so it should return an empty string,
                  * indicating an invalid Url.
                  */
-                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                         << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
-                         << ") is not available";
+                qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+                                   << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
+                                   << ") is not available";
                 return QString();
             }
         }
@@ -385,11 +397,10 @@ void PictureLoaderWorker::startNextPicDownload()
         picDownloadFailed();
     } else {
         QUrl url(picUrl);
-        QNetworkRequest req(url);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << "]: Trying to download picture from url:" << url.toDisplayString();
-        networkManager->get(req);
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Trying to fetch picture from url "
+                           << url.toDisplayString();
+        makeRequest(url);
     }
 }
 
@@ -404,10 +415,10 @@ void PictureLoaderWorker::picDownloadFailed()
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << "]:  Picture NOT found, download failed, no more url combinations "
-                    "to try: BAILING OUT";
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Picture NOT found, "
+                           << (picDownload ? "download failed" : "downloads disabled")
+                           << ", no more url combinations to try: BAILING OUT";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
     }
@@ -420,20 +431,53 @@ bool PictureLoaderWorker::imageIsBlackListed(const QByteArray &picData)
     return md5Blacklist.contains(md5sum);
 }
 
+QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
+{
+    QNetworkRequest req(url);
+    if (!picDownload) {
+        req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
+    }
+    return networkManager->get(req);
+}
+
 void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 {
+    bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+
     if (reply->error()) {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]:  Download failed:" << reply->errorString();
+        if (isFromCache) {
+            qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                               << " set: " << cardBeingDownloaded.getSetName()
+                               << "]: Removing corrupted cache file for url " << reply->url().toDisplayString()
+                               << " and retrying (" << reply->errorString() << ")";
+
+            networkManager->cache()->remove(reply->url());
+
+            makeRequest(reply->url());
+        } else {
+            qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                               << " set: " << cardBeingDownloaded.getSetName()
+                               << "]: " << (picDownload ? "Download" : "Cache search") << " failed for url "
+                               << reply->url().toDisplayString() << " (" << reply->errorString() << ")";
+
+            picDownloadFailed();
+            startNextPicDownload();
+        }
+
+        reply->deleteLater();
+        return;
     }
 
+    // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302) {
-        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-        QNetworkRequest req(redirectUrl);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: following redirect:" << req.url().toString();
-        networkManager->get(req);
+    if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
+        statusCode == 308) {
+        QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: following "
+                           << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
+        makeRequest(redirectUrl);
+        reply->deleteLater();
         return;
     }
 
@@ -441,10 +485,10 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     const QByteArray &picData = reply->peek(reply->size());
 
     if (imageIsBlackListed(picData)) {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName()
-                 << "]:Picture downloaded, but blacklisted, will consider it as "
-                    "not found";
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName()
+                           << "]: Picture found, but blacklisted, will consider it as not found";
+
         picDownloadFailed();
         reply->deleteLater();
         startNextPicDownload();
@@ -456,41 +500,39 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setDevice(reply);
-    // the format is determined prior to reading the QImageReader data into a QImage object, as that wipes the
-    // QImageReader buffer
-    QString extension = "." + imgReader.format();
-    if (extension == ".jpeg") {
-        extension = ".jpg";
+
+    bool logSuccessMessage = false;
+
+    static const int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
+    auto replyHeader = reply->peek(riffHeaderSize);
+
+    if (replyHeader.startsWith("RIFF") && replyHeader.endsWith("WEBP")) {
+        auto imgBuf = QBuffer(this);
+        imgBuf.setData(reply->readAll());
+
+        auto movie = QMovie(&imgBuf);
+        movie.start();
+        movie.stop();
+
+        imageLoaded(cardBeingDownloaded.getCard(), movie.currentImage());
+        logSuccessMessage = true;
+    } else if (imgReader.read(&testImage)) {
+        imageLoaded(cardBeingDownloaded.getCard(), testImage);
+        logSuccessMessage = true;
+    } else {
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Possible "
+                           << (isFromCache ? "cached" : "downloaded") << " picture at "
+                           << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
+
+        picDownloadFailed();
     }
 
-    if (imgReader.read(&testImage)) {
-        QString setName = cardBeingDownloaded.getSetName();
-        if (!setName.isEmpty()) {
-            if (!QDir().mkpath(picsPath + "/downloadedPics/" + setName)) {
-                qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                         << " set: " << cardBeingDownloaded.getSetName()
-                         << "]: " << picsPath + "/downloadedPics/" + setName + " could not be created.";
-                return;
-            }
-
-            QFile newPic(picsPath + "/downloadedPics/" + setName + "/" +
-                         cardBeingDownloaded.getCard()->getCorrectedName() + extension);
-            if (!newPic.open(QIODevice::WriteOnly)) {
-                return;
-            }
-            newPic.write(picData);
-            newPic.close();
-        }
-
-        imageLoaded(cardBeingDownloaded.getCard(), testImage);
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully downloaded from "
-                 << reply->request().url().toDisplayString();
-    } else {
-        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
-                 << " set: " << cardBeingDownloaded.getSetName() << "]: Possible picture at "
-                 << reply->request().url().toDisplayString() << " could not be loaded";
-        picDownloadFailed();
+    if (logSuccessMessage) {
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully "
+                           << (isFromCache ? "loaded from cached" : "downloaded from") << " url "
+                           << reply->url().toDisplayString();
     }
 
     reply->deleteLater();
@@ -533,6 +575,11 @@ void PictureLoaderWorker::picsPathChanged()
     customPicsPath = SettingsCache::instance().getCustomPicsPath();
 }
 
+void PictureLoaderWorker::clearNetworkCache()
+{
+    networkManager->cache()->clear();
+}
+
 PictureLoader::PictureLoader() : QObject(nullptr)
 {
     worker = new PictureLoaderWorker;
@@ -573,8 +620,8 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     // load the image and create a copy of the correct size
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
-        QScreen * screen = qApp->primaryScreen();
-        int dpr = screen->devicePixelRatio();
+        QScreen *screen = qApp->primaryScreen();
+        qreal dpr = screen->devicePixelRatio();
         pixmap = bigPixmap.scaled(size * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         pixmap.setDevicePixelRatio(dpr);
         QPixmapCache::insert(sizeKey, pixmap);
@@ -611,6 +658,11 @@ void PictureLoader::clearPixmapCache(CardInfoPtr card)
 void PictureLoader::clearPixmapCache()
 {
     QPixmapCache::clear();
+}
+
+void PictureLoader::clearNetworkCache()
+{
+    getInstance().worker->clearNetworkCache();
 }
 
 void PictureLoader::cacheCardPixmaps(QList<CardInfoPtr> cards)

@@ -21,6 +21,7 @@
 #include "serversocketinterface.h"
 
 #include "decklist.h"
+#include "email_parser.h"
 #include "main.h"
 #include "pb/command_deck_del.pb.h"
 #include "pb/command_deck_del_dir.pb.h"
@@ -1004,43 +1005,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     return Response::RespOk;
 }
 
-QPair<QString, QString> AbstractServerSocketInterface::parseEmailAddress(const QString &emailAddress)
-{
-    // https://www.regular-expressions.info/email.html
-    static const QRegularExpression emailRegex(R"(^([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,})$)",
-                                               QRegularExpression::CaseInsensitiveOption);
-    const auto match = emailRegex.match(emailAddress);
-
-    if (emailAddress.isEmpty() || !match.hasMatch()) {
-        return {};
-    }
-
-    QString capturedEmailUser = match.captured(1);
-    QString capturedEmailAddressDomain = match.captured(2);
-
-    // Replace googlemail.com with gmail.com, as is standard nowadays
-    // https://www.gmass.co/blog/domains-gmail-com-googlemail-com-and-google-com/
-    if (capturedEmailAddressDomain.toLower() == "googlemail.com") {
-        capturedEmailAddressDomain = "gmail.com";
-    }
-
-    // Trim out dots and pluses from Google/Gmail domains
-    if (capturedEmailAddressDomain.toLower() == "gmail.com") {
-        // Remove all content after first plus sign (as unnecessary with gmail)
-        // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
-        const int firstPlusSign = capturedEmailUser.indexOf("+");
-        if (firstPlusSign != -1) {
-            capturedEmailUser = capturedEmailUser.left(firstPlusSign);
-        }
-
-        // Remove all periods (as unnecessary with gmail)
-        // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
-        capturedEmailUser.replace(".", "");
-    }
-
-    return {capturedEmailUser, capturedEmailAddressDomain};
-}
-
 Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd,
                                                                          ResponseContainer &rc)
 {
@@ -1059,9 +1023,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     const QString emailBlackList = servatrice->getEmailBlackList();
     const QString emailWhiteList = servatrice->getEmailWhiteList();
-    auto parsedEmailAddress = parseEmailAddress(nameFromStdString(cmd.email()));
-    const QString emailUser = parsedEmailAddress.first;
-    const QString emailDomain = parsedEmailAddress.second;
+    const auto parsedEmailParts = EmailParser::parseEmailAddress(nameFromStdString(cmd.email()));
+    const auto emailUser = parsedEmailParts.first;
+    const auto emailDomain = parsedEmailParts.second;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     const QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
     const QStringList emailWhiteListFilters = emailWhiteList.split(",", Qt::SkipEmptyParts);
@@ -1126,9 +1090,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespUserAlreadyExists;
     }
 
-    QString emailAddress = emailUser + "@" + emailDomain;
+    const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(parsedEmailParts);
     if (servatrice->getMaxAccountsPerEmail() > 0 &&
-        sqlInterface->checkNumberOfUserAccounts(emailAddress) >= servatrice->getMaxAccountsPerEmail()) {
+        sqlInterface->checkNumberOfUserAccounts(parsedEmailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                          "REGISTER_ACCOUNT", "Too many usernames registered with this email address",
@@ -1184,7 +1148,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, emailAddress,
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, parsedEmailAddress,
                                                    country, !requireEmailActivation);
 
     if (regSucceeded) {
@@ -1262,7 +1226,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
         return Response::RespFunctionNotAllowed;
 
     QString realName = nameFromStdString(cmd.real_name());
-    QString emailAddress = nameFromStdString(cmd.email());
+    const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
     QString country = nameFromStdString(cmd.country());
 
     bool checkedPassword = false;
@@ -1306,16 +1270,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
     QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
     QSqlQuery *query = sqlInterface->prepareQuery(queryText);
     if (cmd.has_real_name()) {
-        QString realName = nameFromStdString(cmd.real_name());
-        query->bindValue(":realName", realName);
+        auto _realName = nameFromStdString(cmd.real_name());
+        query->bindValue(":realName", _realName);
     }
     if (cmd.has_email()) {
-        QString emailAddress = nameFromStdString(cmd.email());
-        query->bindValue(":email", emailAddress);
+        const auto _parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
+        query->bindValue(":email", _parsedEmailAddress);
     }
     if (cmd.has_country()) {
-        QString country = nameFromStdString(cmd.country());
-        query->bindValue(":country", country);
+        auto _country = nameFromStdString(cmd.country());
+        query->bindValue(":country", _country);
     }
     query->bindValue(":userName", userName);
 
@@ -1326,7 +1290,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
         userInfo->set_real_name(realName.toStdString());
     }
     if (cmd.has_email()) {
-        userInfo->set_email(emailAddress.toStdString());
+        userInfo->set_email(parsedEmailAddress.toStdString());
     }
     if (cmd.has_country()) {
         userInfo->set_country(country.toStdString());
@@ -1543,8 +1507,8 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName,
-                                                     nameFromStdString(cmd.email()))) {
+    const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
+    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName, parsedEmailAddress)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                          "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
@@ -1701,9 +1665,14 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
+            SLOT(catchSocketError(QAbstractSocket::SocketError)));
+#else
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+#endif
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -1747,9 +1716,9 @@ void TcpServerSocketInterface::flushOutputQueue()
 
         QByteArray buf;
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-        unsigned int size = item.ByteSizeLong();
+        unsigned int size = static_cast<unsigned int>(item.ByteSizeLong());
 #else
-        unsigned int size = item.ByteSize();
+        unsigned int size = static_cast<unsigned int>(item.ByteSize());
 #endif
         buf.resize(size + 4);
         item.SerializeToArray(buf.data() + 4, size);
@@ -1950,9 +1919,9 @@ void WebsocketServerSocketInterface::flushOutputQueue()
 
         QByteArray buf;
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-        unsigned int size = item.ByteSizeLong();
+        unsigned int size = static_cast<unsigned int>(item.ByteSizeLong());
 #else
-        unsigned int size = item.ByteSize();
+        unsigned int size = static_cast<unsigned int>(item.ByteSize());
 #endif
         buf.resize(size);
         item.SerializeToArray(buf.data(), size);

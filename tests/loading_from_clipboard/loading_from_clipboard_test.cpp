@@ -127,9 +127,10 @@ TEST(LoadingFromClipboardTest, EdgeCaseTesting)
 //(test) Æ ’ | / (3)
 
 
-// Mainboard (10 cards)
+// Mainboard (11 cards)
 Æther Adept
-2x Fire & Ice
+2x Fire // Ice
+1 Minsc & Boo, Timeless Heroes
 3 Pain/Suffering
 4X [B] Forest (3)
 
@@ -145,7 +146,11 @@ TEST(LoadingFromClipboardTest, EdgeCaseTesting)
 )");
 
     Result result("DeckName", "Comment 1\n\nComment [two]\n(test) Æ ’ | / (3)",
-                  {{"Aether Adept", 1}, {"Fire // Ice", 2}, {"Pain // Suffering", 3}, {"Forest", 4}},
+                  {{"Aether Adept", 1},
+                   {"Fire // Ice", 2},
+                   {"Minsc & Boo, Timeless Heroes", 1},
+                   {"Pain // Suffering", 3},
+                   {"Forest", 4}},
                   {{"Nature's Resurgence", 5}, {"Gaea's Skyfolk", 6}, {"B.F.M. (Big Furry Monster)", 7}});
     testDeck(clipboard, result);
 }
