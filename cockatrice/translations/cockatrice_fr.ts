@@ -660,22 +660,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/dlg_settings.cpp" line="812"/>
         <source>Downloaded images directory size:</source>
-        <translation type="unfinished"/>
+        <translation>Taille du fichier d&apos;image téléchargées</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="813"/>
         <source>On-disk cache for downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>Cache pour les images téléchargées</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="814"/>
         <source>Picture cache size:</source>
-        <translation type="unfinished"/>
+        <translation>Taille du cache des images</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="815"/>
         <source>In-memory cache for pictures not currently on screen</source>
-        <translation type="unfinished"/>
+        <translation>Cache en mémoire pour les imges non affichées actuellement</translation>
     </message>
 </context>
 <context>
@@ -2961,7 +2961,7 @@ La version locale est %1, la nouvelle version est %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="676"/>
         <source>Show/Hide</source>
-        <translation type="unfinished"/>
+        <translation>Montrer/Cacher</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="907"/>
@@ -3426,7 +3426,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="372"/>
         <source>%1 tries to draw from an empty library</source>
-        <translation type="unfinished"/>
+        <translation>%1 essaie de piocher dans une bibliothèque vide</translation>
     </message>
     <message numerus="yes">
         <location filename="src/messagelogwidget.cpp" line="374"/>
@@ -3798,7 +3798,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1040"/>
         <source>How to use in-game message macros</source>
-        <translation type="unfinished"/>
+        <translation>Comment utiliser les macro pour les messages en jeu</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1041"/>
@@ -4203,7 +4203,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/player.cpp" line="774"/>
         <source>Take top cards &amp;until...</source>
-        <translation type="unfinished"/>
+        <translation>Prendre les cartes du dessus jusqu&apos;à...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="787"/>
@@ -4618,7 +4618,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/player.cpp" line="3541"/>
         <source>Re&amp;veal to...</source>
-        <translation type="unfinished"/>
+        <translation>Révéler à...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="3588"/>
@@ -4700,17 +4700,17 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../common/decklist.cpp" line="111"/>
         <source>Maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Maindeck</translation>
     </message>
     <message>
         <location filename="../common/decklist.cpp" line="113"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard</translation>
     </message>
     <message>
         <location filename="../common/decklist.cpp" line="115"/>
         <source>Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Jetons</translation>
     </message>
 </context>
 <context>
@@ -4905,22 +4905,22 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="49"/>
         <source>Hit the key/combination of keys you want to set for this action</source>
-        <translation type="unfinished"/>
+        <translation>Choisissez la combinaison de touches que vous voulez utiliser pour cette action</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="172"/>
         <source>Shortcut already in use</source>
-        <translation type="unfinished"/>
+        <translation>Raccourci déjà utilisé</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="175"/>
         <source>Invalid key</source>
-        <translation type="unfinished"/>
+        <translation>Touche invalide</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="192"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Effacer</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="193"/>
