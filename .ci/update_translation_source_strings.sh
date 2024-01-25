@@ -45,12 +45,14 @@ if ! got="$(lupdate $DIRS -ts "$FILE" | tee /dev/stderr)"; then
 fi
 
 # trim output
-output="${got##*(}" # trim everything before last (
+# the line we are interested in is:
+# Found xxx source text(s) (x new and xxx already existing)
+output="${got##* source text(s) (}" # get stuff in between brackets
 output="${output%%)*}" # trim everything after first )
-if [[ $output == $got ]]; then
+if [[ $output == "$got" ]]; then
   echo "could not parse generated output" >&2
   exit 4;
 fi
 
 # write output to ci environment file
-echo "output=$output" >> $GITHUB_OUTPUT
+echo "output=$output" >> "$GITHUB_OUTPUT"
