@@ -200,7 +200,15 @@ void MainWindow::actConnect()
 
 void MainWindow::actRegister()
 {
-    DlgRegister dlg(this, client);
+    // Note the pre-existing form data so that if the user is bounced back to the dialogue, they
+    // won't have to re-enter all the information again.
+    QString username = client->getUserName();
+    QString password = client->password;
+    QString email = client->email;
+    QString country = client->country;
+    QString realname = client->realName;
+
+    DlgRegister dlg(this, username, password, email, country, realname);
     if (dlg.exec()) {
         client->registerToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                  dlg.getPassword(), dlg.getEmail(), dlg.getCountry(), dlg.getRealName());

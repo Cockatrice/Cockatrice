@@ -27,7 +27,7 @@ class Event_ConnectionClosed;
 class Event_ServerShutdown;
 class Event_ReplayAdded;
 class FeatureSet;
-class DlgRegister;
+class MainWindow;
 
 enum ClientStatus
 {
@@ -46,7 +46,7 @@ enum ClientStatus
 
 class AbstractClient : public QObject
 {
-    friend class DlgRegister;
+    friend class MainWindow;
     Q_OBJECT
 signals:
     void statusChanged(ClientStatus _status);

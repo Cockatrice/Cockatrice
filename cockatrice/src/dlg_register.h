@@ -14,7 +14,12 @@ class DlgRegister : public QDialog
 {
     Q_OBJECT
 public:
-    DlgRegister(QWidget *parent = nullptr, AbstractClient *abstractClient = nullptr);
+    DlgRegister(QWidget *parent = nullptr,
+                QString username = "",
+                QString password = "",
+                QString email = "",
+                QString country = "",
+                QString realname = "");
     QString getHost() const
     {
         return hostEdit->text();
