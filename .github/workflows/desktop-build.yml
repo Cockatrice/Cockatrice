@@ -239,7 +239,7 @@ jobs:
       # RE: https://discord.com/channels/314987288398659595/401594186983407616/1196451948413595778
       - name: Unlink 2to3
         if: matrix.target == '10.15_Catalina'
-        run: brew unlink /usr/local/bin/2to3
+        run: rm '/usr/local/bin/2to3'
 
       - name: Install dependencies using homebrew
         shell: bash
