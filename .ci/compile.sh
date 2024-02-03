@@ -132,9 +132,6 @@ if [[ $PARALLEL_COUNT ]]; then
     echo "this version of cmake does not support --parallel, using native build tool -j instead"
     buildflags+=(-- -j "$PARALLEL_COUNT")
     # note, no normal build flags should be added after this
-  elif [[ $RUNNER_OS == Windows ]]; then
-    # comment
-    :
   else
     buildflags+=(--parallel "$PARALLEL_COUNT")
   fi
