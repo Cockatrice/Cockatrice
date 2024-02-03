@@ -359,7 +359,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
         # no need for --parallel flag, MTT is added in the compile script to let cmake/msbuild manage core count and parallelism
-        run: .ci/compile.sh --server --release --test --package
+        run: .ci/compile.sh --server --release --test --package --parallel 4
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
