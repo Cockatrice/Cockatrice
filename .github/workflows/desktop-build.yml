@@ -158,7 +158,7 @@ jobs:
           distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 4
 
       - name: Build release package
         id: build
@@ -172,7 +172,7 @@ jobs:
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE"
+                  --ccache "$CCACHE_SIZE" --parallel 4
           .ci/name_build.sh
 
       - name: Upload artifact
