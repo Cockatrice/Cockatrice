@@ -360,7 +360,7 @@ jobs:
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
         # no need for --parallel flag, MTT is added in the compile script to let cmake/msbuild manage core count and
         # process parallelism (not project): https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-        run: .ci/compile.sh --server --release --test --package --parallel 4
+        run: .ci/compile.sh --server --release --test --package
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
