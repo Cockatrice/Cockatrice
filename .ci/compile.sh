@@ -163,7 +163,7 @@ echo "::group::Build project"
 if [[ $RUNNER_OS == Windows ]]; then
   # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  cmake --build . "${buildflags[@]}" -- -p:UseMSBuildResourceManager=true
+  cmake --build . "${buildflags[@]}" -- -p:UseMSBuildResourceManager=true;CL_MP=true
 else
   cmake --build . "${buildflags[@]}"
 fi
