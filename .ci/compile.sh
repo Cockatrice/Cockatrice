@@ -137,11 +137,6 @@ if [[ $PARALLEL_COUNT ]]; then
   fi
 fi
 
-if [[ $RUNNER_OS == Windows ]]; then
-  # --parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
-  buildflags+=(/MP)
-fi
-
 function ccachestatsverbose() {
   # note, verbose only works on newer ccache, discard the error
   local got
@@ -167,7 +162,7 @@ echo "::endgroup::"
 echo "::group::Build project"
 if [[ $RUNNER_OS == Windows ]]; then
   # --parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
-  cmake --build . "${buildflags[@]}"
+  cmake --build . "${buildflags[@]}" -- -p:CL_MPcount=4
 else
   cmake --build . "${buildflags[@]}"
 fi
