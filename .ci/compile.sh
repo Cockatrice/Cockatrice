@@ -161,8 +161,9 @@ echo "::endgroup::"
 
 echo "::group::Build project"
 if [[ $RUNNER_OS == Windows ]]; then
-  # --parallel option doesn't set /MP, see https://gitlab.kitware.com/cmake/cmake/-/issues/20564
-  cmake --build . "${buildflags[@]}" -- -p:CL_MP=true
+  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true
 else
   cmake --build . "${buildflags[@]}"
 fi
