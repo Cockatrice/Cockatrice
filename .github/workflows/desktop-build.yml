@@ -324,7 +324,7 @@ jobs:
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Checkout
         uses: actions/checkout@v4
