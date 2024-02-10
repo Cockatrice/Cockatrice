@@ -160,7 +160,13 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-cmake --build . "${buildflags[@]}"
+if [[ $RUNNER_OS == Windows ]]; then
+  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true
+else
+  cmake --build . "${buildflags[@]}"
+fi
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
