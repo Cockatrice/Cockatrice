@@ -1,28 +1,46 @@
-import protobuf from 'protobufjs';
-
-import { RoomEvents, SessionEvents } from '../events';
+import {
+  CommandContainer,
+  Command_Ping,
+  IResponse,
+  IRoomEvent,
+  ISessionEvent,
+  ModeratorCommand,
+  RoomCommand,
+  ServerMessage,
+  SessionCommand,
+} from 'protoFiles';
+import * as pf from 'protoFiles';
 import { SessionPersistence } from '../persistence';
 import { WebClient } from '../WebClient';
 
-import ProtoFiles from '../../proto-files.json';
-
-export interface ProtobufEvents {
-  [event: string]: Function;
-}
+type Checked<T> = Exclude<T, null | undefined>
+export type Handlers = Partial<{
+  [event in keyof IResponse]: (arg0: Checked<IResponse[event]>) => void;
+} & {
+  [event in keyof ISessionEvent]: (arg0: Checked<ISessionEvent[event]>) => void;
+} & {
+  [event in keyof IRoomEvent]: (arg0: Checked<IRoomEvent[event]>) => void;
+}>;
 
 export class ProtobufService {
   static PB_FILE_DIR = `${process.env.PUBLIC_URL}/pb`;
+  private handlers: Handlers;
 
-  public controller;
   private cmdId = 0;
-  private pendingCommands: { [cmdId: string]: Function } = {};
+  private pendingCommands: { [cmdId: number]: Function } = {};
 
   private webClient: WebClient;
 
   constructor(webClient: WebClient) {
     this.webClient = webClient;
+    this.handlers = {};
+    SessionPersistence.initialized();
+  }
 
-    this.loadProtobufFiles();
+  public AddHandlers(
+    handlers: Handlers
+  ) {
+    this.handlers = { ...this.handlers, ...handlers };
   }
 
   public resetCommands() {
@@ -30,45 +48,51 @@ export class ProtobufService {
     this.pendingCommands = {};
   }
 
-  public sendRoomCommand(roomId: number, roomCmd: number, callback?: Function) {
-    const cmd = this.controller.CommandContainer.create({
-      'roomId': roomId,
-      'roomCommand': [roomCmd]
+  public sendRoomCommand(
+    roomId: number,
+    roomCmd: RoomCommand,
+    callback?: Function
+  ) {
+    const cmd = CommandContainer.create({
+      roomId: roomId,
+      roomCommand: [roomCmd],
     });
 
-    this.sendCommand(cmd, raw => callback && callback(raw));
+    this.sendCommand(cmd, callback);
   }
 
-  public sendSessionCommand(sesCmd: number, callback?: Function) {
-    const cmd = this.controller.CommandContainer.create({
-      'sessionCommand': [sesCmd]
+  public sendSessionCommand(sesCmd: SessionCommand, callback?: Function) {
+    const cmd = CommandContainer.create({
+      sessionCommand: [sesCmd],
     });
 
-    this.sendCommand(cmd, (raw) => callback && callback(raw));
+    this.sendCommand(cmd, callback);
   }
 
-  public sendModeratorCommand(modCmd: number, callback?: Function) {
-    const cmd = this.controller.CommandContainer.create({
-      'moderatorCommand': [modCmd]
+  public sendModeratorCommand(modCmd: ModeratorCommand, callback?: Function) {
+    const cmd = CommandContainer.create({
+      moderatorCommand: [modCmd],
     });
 
-    this.sendCommand(cmd, (raw) => callback && callback(raw));
+    this.sendCommand(cmd, callback);
   }
 
-  public sendCommand(cmd: number, callback: Function) {
+  public sendCommand(cmd: CommandContainer, callback?: Function) {
     this.cmdId++;
 
     cmd['cmdId'] = this.cmdId;
-    this.pendingCommands[this.cmdId] = callback;
+    if (callback) {
+      this.pendingCommands[this.cmdId] = callback;
+    }
 
     if (this.webClient.socket.checkReadyState(WebSocket.OPEN)) {
-      this.webClient.socket.send(this.controller.CommandContainer.encode(cmd).finish());
+      this.webClient.socket.send(CommandContainer.encode(cmd).finish());
     }
   }
 
   public sendKeepAliveCommand(pingReceived: Function) {
-    const command = this.controller.SessionCommand.create({
-      '.Command_Ping.ext': this.controller.Command_Ping.create()
+    const command = SessionCommand.create({
+      '.Command_Ping.ext': Command_Ping.create(),
     });
 
     this.sendSessionCommand(command, pingReceived);
@@ -77,31 +101,30 @@ export class ProtobufService {
   public handleMessageEvent({ data }: MessageEvent): void {
     try {
       const uint8msg = new Uint8Array(data);
-      const msg = this.controller.ServerMessage.decode(uint8msg);
+      const msg = ServerMessage.decode(uint8msg);
 
-      if (msg) {
-        switch (msg.messageType) {
-          case this.controller.ServerMessage.MessageType.RESPONSE:
-            this.processServerResponse(msg.response);
-            break;
-          case this.controller.ServerMessage.MessageType.ROOM_EVENT:
-            this.processRoomEvent(msg.roomEvent, msg);
-            break;
-          case this.controller.ServerMessage.MessageType.SESSION_EVENT:
-            this.processSessionEvent(msg.sessionEvent, msg);
-            break;
-          case this.controller.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
+      switch (msg.messageType) {
+        case ServerMessage.MessageType.RESPONSE:
+          this.processServerResponse(msg.response!);
+          break;
+        case ServerMessage.MessageType.ROOM_EVENT:
+          this.processEvent(msg.roomEvent!, msg);
+          break;
+        case ServerMessage.MessageType.SESSION_EVENT:
+          this.processEvent(msg.sessionEvent!, msg);
+          break;
+        case ServerMessage.MessageType.GAME_EVENT_CONTAINER:
           // @TODO
-            break;
-        }
+          break;
       }
     } catch (err) {
       console.error('Processing failed:', err);
     }
   }
 
-  private processServerResponse(response: any) {
-    const { cmdId } = response;
+  private processServerResponse(response: IResponse) {
+    const rawCmdId = response.cmdId;
+    const cmdId = Number(rawCmdId);
 
     if (this.pendingCommands[cmdId]) {
       this.pendingCommands[cmdId](response);
@@ -109,35 +132,10 @@ export class ProtobufService {
     }
   }
 
-  private processRoomEvent(response: any, raw: any) {
-    this.processEvent(response, RoomEvents, raw);
-  }
-
-  private processSessionEvent(response: any, raw: any) {
-    this.processEvent(response, SessionEvents, raw);
-  }
-
-  private processEvent(response: any, events: ProtobufEvents, raw: any) {
-    for (const event in events) {
-      const payload = response[event];
-
-      if (payload) {
-        events[event](payload, raw);
-        return;
-      }
+  private processEvent(event: IRoomEvent | ISessionEvent, raw: ServerMessage) {
+    for (const name in event) {
+      // @ts-ignore
+      this.handlers[name]?.(event[name]);
     }
-  }
-
-  private loadProtobufFiles() {
-    const files = ProtoFiles.map(file => `${ProtobufService.PB_FILE_DIR}/${file}`);
-
-    this.controller = new protobuf.Root();
-    this.controller.load(files, { keepCase: false }, (err, root) => {
-      if (err) {
-        throw err;
-      }
-
-      SessionPersistence.initialized();
-    });
   }
 }

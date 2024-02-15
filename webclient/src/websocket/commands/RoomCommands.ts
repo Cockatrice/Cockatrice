@@ -1,3 +1,4 @@
+import { Command_LeaveRoom, Command_RoomSay, RoomCommand, Response } from 'protoFiles';
 import { RoomPersistence } from '../persistence';
 import webClient from '../WebClient';
 
@@ -9,11 +10,11 @@ export class RoomCommands {
       return;
     }
 
-    const CmdRoomSay = webClient.protobuf.controller.Command_RoomSay.create({
+    const CmdRoomSay = Command_RoomSay.create({
       'message': trimmed
     });
 
-    const rc = webClient.protobuf.controller.RoomCommand.create({
+    const rc = RoomCommand.create({
       '.Command_RoomSay.ext': CmdRoomSay
     });
 
@@ -21,9 +22,9 @@ export class RoomCommands {
   }
 
   static leaveRoom(roomId: number): void {
-    const CmdLeaveRoom = webClient.protobuf.controller.Command_LeaveRoom.create();
+    const CmdLeaveRoom = Command_LeaveRoom.create();
 
-    const rc = webClient.protobuf.controller.RoomCommand.create({
+    const rc = RoomCommand.create({
       '.Command_LeaveRoom.ext': CmdLeaveRoom
     });
 
@@ -31,7 +32,7 @@ export class RoomCommands {
       const { responseCode } = raw;
 
       switch (responseCode) {
-        case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+        case Response.ResponseCode.RespOk:
           RoomPersistence.leaveRoom(roomId);
           break;
         default:

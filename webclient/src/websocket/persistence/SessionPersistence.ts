@@ -1,3 +1,4 @@
+import { IServerInfo_User } from 'protoFiles';
 import { ServerDispatch } from 'store';
 import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
@@ -41,7 +42,7 @@ export class SessionPersistence {
     ServerDispatch.updateBuddyList(buddyList);
   }
 
-  static addToBuddyList(user: User) {
+  static addToBuddyList(user: IServerInfo_User) {
     ServerDispatch.addToBuddyList(user);
   }
 
@@ -53,7 +54,7 @@ export class SessionPersistence {
     ServerDispatch.updateIgnoreList(ignoreList);
   }
 
-  static addToIgnoreList(user: User) {
+  static addToIgnoreList(user: IServerInfo_User) {
     ServerDispatch.addToIgnoreList(user);
   }
 
@@ -81,7 +82,7 @@ export class SessionPersistence {
     ServerDispatch.updateUsers(users);
   }
 
-  static userJoined(user: User) {
+  static userJoined(user: IServerInfo_User) {
     ServerDispatch.userJoined(user);
   }
 

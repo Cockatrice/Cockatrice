@@ -1,3 +1,4 @@
+import { IServerInfo_Room } from 'protoFiles';
 import { store, RoomsDispatch, RoomsSelectors } from 'store';
 import { Game, Message, Room, User } from 'types';
 import NormalizeService from '../utils/NormalizeService';
@@ -16,7 +17,7 @@ export class RoomPersistence {
     RoomsDispatch.leaveRoom(roomId);
   }
 
-  static updateRooms(rooms: Room[]) {
+  static updateRooms(rooms: IServerInfo_Room[]) {
     RoomsDispatch.updateRooms(rooms);
   }
 
