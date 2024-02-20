@@ -8,7 +8,6 @@
 #include <QWebSocket>
 
 class QTimer;
-class DlgRegister;
 
 class RemoteClient : public AbstractClient
 {

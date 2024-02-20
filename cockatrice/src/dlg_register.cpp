@@ -1,6 +1,5 @@
 #include "dlg_register.h"
 
-#include "abstractclient.h"
 #include "pb/serverinfo_user.pb.h"
 #include "settingscache.h"
 #include "stringsizes.h"
@@ -14,7 +13,9 @@
 #include <QMessageBox>
 
 DlgRegister::DlgRegister(QWidget *parent,
-                         QString username,
+                         QString hostname,
+                         QString port,
+                         QString playerName,
                          QString password,
                          QString email,
                          QString country,
@@ -22,23 +23,22 @@ DlgRegister::DlgRegister(QWidget *parent,
     : QDialog(parent)
 
 {
-    ServersSettings &servers = SettingsCache::instance().servers();
     infoLabel = new QLabel(tr("Enter your information and the information of the server you'd like to register to.\n"
                               "Your email will be used to verify your account."));
     infoLabel->setWordWrap(true);
 
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(servers.getHostname());
+    hostEdit = new QLineEdit(hostname);
     hostEdit->setMaxLength(MAX_NAME_LENGTH);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(servers.getPort());
+    portEdit = new QLineEdit(port);
     portEdit->setValidator(new QIntValidator(0, 0xffff, portEdit));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(servers.getPlayerName().isEmpty() ? username : servers.getPlayerName());
+    playernameEdit = new QLineEdit(playerName);
     playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
@@ -320,12 +320,14 @@ DlgRegister::DlgRegister(QWidget *parent,
     countryEdit->addItem(QPixmap("theme:countries/zm"), "zm");
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
 
-    int initialCountryIndex = countryEdit->findText(country);
-    if (initialCountryIndex != -1) {
-        countryEdit->setCurrentIndex(initialCountryIndex);
-    } else {
-        countryEdit->setCurrentIndex(0);
+    int countryIndex = 0;
+    if (!country.isEmpty()) {
+        countryIndex = countryEdit->findText(country);
+        if (countryIndex == -1) {
+            countryIndex = 0;
+        }
     }
+    countryEdit->setCurrentIndex(countryIndex);
 
     QStringList countries = SettingsCache::instance().getCountries();
     foreach (QString c, countries)
