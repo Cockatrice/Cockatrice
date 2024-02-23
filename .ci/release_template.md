@@ -15,7 +15,6 @@ include different targets -->
  - <kbd>Ubuntu 18.04 LTS</kbd> ("Bionic Beaver")
  - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
  - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
- - <kbd>Ubuntu 23.04</kbd> ("Lunar Lobster")
  - <kbd>Debian 11</kbd> ("Bullseye")
  - <kbd>Debian 12</kbd> ("Bookworm")
  - <kbd>Fedora 37</kbd>
