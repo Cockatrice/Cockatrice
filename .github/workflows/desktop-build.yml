@@ -236,13 +236,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Workaround to fix homebrew on macOS 10.15
       # RE: https://discord.com/channels/314987288398659595/401594186983407616/1196451948413595778
+      # See also PR #4986 and issue #5007, as well as pypa/pipenv#3831
       - name: Unlink 2to3
         if: matrix.target == '10.15_Catalina'
         run: |
           rm '/usr/local/bin/2to3'
           rm '/usr/local/bin/2to3-3.11'
           rm '/usr/local/bin/2to3-3.12'
+          rm '/usr/local/bin/idle3'
+          rm '/usr/local/bin/idle3.11'
+          rm '/usr/local/bin/idle3.12'
+          rm '/usr/local/bin/pydoc3'
+          rm '/usr/local/bin/pydoc3.11'
+          rm '/usr/local/bin/pydoc3.12'
+          rm '/usr/local/bin/python3'
+          rm '/usr/local/bin/python3-config'
+          rm '/usr/local/bin/python3.11'
+          rm '/usr/local/bin/python3.11-config'
+          rm '/usr/local/bin/python3.12'
+          rm '/usr/local/bin/python3.12-config'
+          rm '/usr/local/share/man/man1/python3.1'
+          rm '/usr/local/lib/pkgconfig/python3-embed.pc'
+          rm '/usr/local/lib/pkgconfig/python3.pc'
+          rm '/usr/local/Frameworks/Python.framework/Headers'
+          rm '/usr/local/Frameworks/Python.framework/Python'
+          rm '/usr/local/Frameworks/Python.framework/Resources'
+          rm '/usr/local/Frameworks/Python.framework/Versions/Current'
 
       - name: Install dependencies using homebrew
         shell: bash
