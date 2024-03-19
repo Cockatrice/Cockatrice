@@ -21,6 +21,10 @@ public:
     {
         return id;
     }
+    void setId(int _id)
+    {
+        id = _id;
+    }
     Server_Card *getStartCard() const
     {
         return startCard;
