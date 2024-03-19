@@ -89,7 +89,7 @@ private slots:
     void submitForgotPasswordChallengeResponse(const Response &response);
 
 private:
-    static const int maxTimeout = 5;
+    int maxTimeout;
     int timeRunning, lastDataReceived;
     QByteArray inputBuffer;
     bool messageInProgress;

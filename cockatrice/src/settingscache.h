@@ -134,6 +134,7 @@ private:
     bool spectatorsCanSeeEverything;
     bool createGameAsSpectator;
     int keepalive;
+    int timeout;
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
@@ -433,6 +434,10 @@ public:
     int getKeepAlive() const
     {
         return keepalive;
+    }
+    int getTimeOut() const
+    {
+        return timeout;
     }
     int getMaxFontSize() const
     {

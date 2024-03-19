@@ -32,6 +32,7 @@ RemoteClient::RemoteClient(QObject *parent)
 {
 
     clearNewClientFeatures();
+    maxTimeout = SettingsCache::instance().getTimeOut();
     int keepalive = SettingsCache::instance().getKeepAlive();
     timer = new QTimer(this);
     timer->setInterval(keepalive * 1000);

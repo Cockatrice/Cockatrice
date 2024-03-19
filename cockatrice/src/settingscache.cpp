@@ -195,6 +195,7 @@ SettingsCache::SettingsCache()
 
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 3).toInt();
+    timeout = settings->value("personal/timeout", 5).toInt();
 
     // tip of the day settings
     showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
