@@ -74,6 +74,7 @@ public:
 
     void enqueueImageLoad(CardInfoPtr card);
     void clearNetworkCache();
+    void setCustomImage(CardInfoPtr card, const QString &location);
 
 private:
     static QStringList md5Blacklist;
@@ -127,6 +128,7 @@ private:
 public:
     static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
     static void getCardBackPixmap(QPixmap &pixmap, QSize size);
+    static void setCustomImage(CardInfoPtr card, const QString &location);
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfoPtr> cards);
