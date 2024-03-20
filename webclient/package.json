@@ -46,7 +46,7 @@
     "redux-form": "^8.3.8",
     "redux-thunk": "^2.4.1",
     "rxjs": "^7.5.4",
-    "sanitize-html": "^2.7.3"
+    "sanitize-html": "^2.12.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
