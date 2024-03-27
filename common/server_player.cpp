@@ -296,6 +296,12 @@ void Server_Player::addArrow(Server_Arrow *arrow)
     arrows.insert(arrow->getId(), arrow);
 }
 
+void Server_Player::updateArrowId(int id)
+{
+    auto *arrow = arrows.take(id);
+    arrows.insert(arrow->getId(), arrow);
+}
+
 bool Server_Player::deleteArrow(int arrowId)
 {
     Server_Arrow *arrow = arrows.value(arrowId, 0);
@@ -497,9 +503,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             const QList<Server_Player *> &players = game->getPlayers().values();
             for (auto player : players) {
                 QList<int> arrowsToDelete;
-                QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
-                while (arrowIterator.hasNext()) {
-                    Server_Arrow *arrow = arrowIterator.next().value();
+                for (Server_Arrow *arrow : player->getArrows()) {
                     if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
                         arrowsToDelete.append(arrow->getId());
                 }
@@ -1478,9 +1482,8 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
             // Copy Arrows
             const QList<Server_Player *> &players = game->getPlayers().values();
             for (auto player : players) {
-                QMapIterator<int, Server_Arrow *> arrowIterator(player->getArrows());
-                while (arrowIterator.hasNext()) {
-                    Server_Arrow *arrow = arrowIterator.next().value();
+                QList<int> changedArrowIds;
+                for (Server_Arrow *arrow : player->getArrows()) {
                     bool sendGameEvent = false;
                     const auto *startCard = arrow->getStartCard();
                     if (startCard == targetCard) {
@@ -1497,7 +1500,10 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                     if (sendGameEvent) {
                         Event_CreateArrow _event;
                         ServerInfo_Arrow *arrowInfo = _event.mutable_arrow_info();
-                        arrowInfo->set_id(arrow->getId());
+                        changedArrowIds.append(arrow->getId());
+                        int id = player->newArrowId();
+                        arrow->setId(id);
+                        arrowInfo->set_id(id);
                         arrowInfo->set_start_player_id(player->getPlayerId());
                         arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
                         arrowInfo->set_start_card_id(startCard->getId());
@@ -1513,6 +1519,9 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
                         arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
                         ges.enqueueGameEvent(_event, player->getPlayerId());
                     }
+                }
+                for (int id : changedArrowIds) {
+                    player->updateArrowId(id);
                 }
             }
 
@@ -1579,9 +1588,7 @@ Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer 
         return Response::RespNameNotFound;
     }
 
-    QMapIterator<int, Server_Arrow *> arrowIterator(arrows);
-    while (arrowIterator.hasNext()) {
-        Server_Arrow *temp = arrowIterator.next().value();
+    for (Server_Arrow *temp : arrows) {
         if ((temp->getStartCard() == startCard) && (temp->getTargetItem() == targetItem)) {
             return Response::RespContextError;
         }

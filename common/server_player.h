@@ -164,6 +164,7 @@ public:
 
     void addZone(Server_CardZone *zone);
     void addArrow(Server_Arrow *arrow);
+    void updateArrowId(int id);
     bool deleteArrow(int arrowId);
     void addCounter(Server_Counter *counter);
 
