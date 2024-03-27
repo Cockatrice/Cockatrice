@@ -20,7 +20,7 @@ import './Account.css';
 
 const Account = (props: AccountProps) => {
   const { buddyList, ignoreList, serverName, serverVersion, user } = props;
-  const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user;
+  const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user || {};
   let url = URL.createObjectURL(new Blob([avatarBmp], { 'type': 'image/png' }));
 
   const { t } = useTranslation();

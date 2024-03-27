@@ -1,2 +1,2 @@
-export * from './RoomEvents';
-export * from './SessionEvents';
+export * from './room';
+export * from './session';

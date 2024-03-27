@@ -1,7 +1,7 @@
-import { RoomCommands } from './RoomCommands';
+import { RoomPersistence } from '../../persistence';
+import webClient from '../../WebClient';
 
-import { RoomPersistence } from '../persistence';
-import webClient from '../WebClient';
+import { leaveRoom, roomSay } from './';
 
 describe('RoomCommands', () => {
   const roomId = 1;
@@ -25,7 +25,7 @@ describe('RoomCommands', () => {
     it('should call protobuf controller methods and sendCommand', () => {
       const message = ' message ';
 
-      RoomCommands.roomSay(roomId, message);
+      roomSay(roomId, message);
 
       expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(roomId, {
@@ -36,7 +36,7 @@ describe('RoomCommands', () => {
     it('should not call sendRoomCommand if trimmed message is empty', () => {
       const message = ' ';
 
-      RoomCommands.roomSay(roomId, message);
+      roomSay(roomId, message);
 
       expect(webClient.protobuf.sendRoomCommand).not.toHaveBeenCalled();
     });
@@ -48,7 +48,7 @@ describe('RoomCommands', () => {
     });
 
     it('should call protobuf controller methods and sendCommand', () => {
-      RoomCommands.leaveRoom(roomId);
+      leaveRoom(roomId);
 
       expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalled();
       expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
@@ -67,7 +67,7 @@ describe('RoomCommands', () => {
 
       jest.spyOn(RoomPersistence, 'leaveRoom').mockImplementation(() => {});
 
-      RoomCommands.leaveRoom(roomId);
+      leaveRoom(roomId);
 
       expect(RoomPersistence.leaveRoom).toHaveBeenCalledWith(roomId);
     });
