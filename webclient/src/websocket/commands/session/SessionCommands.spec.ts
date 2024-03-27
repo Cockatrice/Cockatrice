@@ -1,10 +1,10 @@
+import { AccountActivationParams, ServerRegisterParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
-import { SessionCommands } from './SessionCommands';
+import webClient from '../../WebClient';
+import { RoomPersistence, SessionPersistence } from '../../persistence';
 
-import { RoomPersistence, SessionPersistence } from '../persistence';
-import webClient from '../WebClient';
-import { AccountActivationParams, ServerRegisterParams } from '../../store';
+import * as SessionCommands from './';
 
 describe('SessionCommands', () => {
   const roomId = 1;

@@ -1,13 +1,15 @@
 import { Message } from 'types';
 
+import { RoomPersistence } from '../../persistence';
+
 import {
-  RoomEvents,
   RoomEvent,
   JoinRoomData,
   LeaveRoomData,
   ListGamesData,
-} from './RoomEvents';
-import { RoomPersistence } from '../persistence/RoomPersistence';
+} from './interfaces';
+
+import { RoomEvents } from '.';
 
 describe('RoomEvents', () => {
   it('.Event_JoinRoom.ext should call RoomPersistence.userJoined', () => {

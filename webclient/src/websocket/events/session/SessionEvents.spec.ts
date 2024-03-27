@@ -1,5 +1,9 @@
 import { StatusEnum, WebSocketConnectReason } from 'types';
 
+import { SessionCommands } from '../../commands';
+import { RoomPersistence, SessionPersistence } from '../../persistence';
+import webClient from '../../WebClient';
+
 import {
   AddToListData,
   ConnectionClosedData,
@@ -7,14 +11,11 @@ import {
   RemoveFromListData,
   ServerIdentificationData,
   ServerMessageData,
-  SessionEvents,
   UserJoinedData,
   UserLeftData,
-} from './SessionEvents';
+} from './interfaces';
 
-import { SessionCommands } from '../commands';
-import { RoomPersistence, SessionPersistence } from '../persistence';
-import webClient from '../WebClient';
+import { SessionEvents } from '.';
 
 describe('SessionEvents', () => {
   const roomId = 1;
