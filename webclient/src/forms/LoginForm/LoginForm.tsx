@@ -35,13 +35,14 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
     return errors;
   }
 
-  const useStoredPassword = (remember, password) => remember && host.hashedPassword && !password;
+  const useStoredPassword = (remember, password) => remember && host?.hashedPassword && !password;
   const togglePasswordLabel = (useStoredLabel) => {
     setUseStoredPasswordLabel(useStoredLabel);
   };
 
   const handleOnSubmit = ({ userName, ...values }) => {
     userName = userName?.trim();
+    console.log(userName, values);
 
     onSubmit({ userName, ...values });
   }
@@ -84,7 +85,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
         }, [host]);
 
         const onUserNameChange = (userName) => {
-          const fieldChanged = host.userName?.toLowerCase() !== values.userName?.toLowerCase();
+          const fieldChanged = host?.userName?.toLowerCase() !== values.userName?.toLowerCase();
           if (useStoredPassword(values.remember, values.password) && fieldChanged) {
             setHost(({ hashedPassword, ...s }) => ({ ...s, userName }));
           }

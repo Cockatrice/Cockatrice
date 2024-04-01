@@ -1,2 +1,2 @@
-export { RoomCommands } from './RoomCommands';
-export { SessionCommands } from './SessionCommands';
+export * as RoomCommands from './room';
+export * as SessionCommands from './session';
