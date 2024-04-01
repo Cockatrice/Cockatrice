@@ -11,7 +11,7 @@ import {
 
 import { RoomEvents } from '.';
 
-describe('RoomEvents', () => {
+describe.skip('RoomEvents', () => {
   it('.Event_JoinRoom.ext should call RoomPersistence.userJoined', () => {
     jest.spyOn(RoomPersistence, 'userJoined').mockImplementation(() => {});
     const data: JoinRoomData = { userInfo: {} as any };

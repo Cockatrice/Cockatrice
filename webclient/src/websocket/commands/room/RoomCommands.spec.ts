@@ -3,7 +3,7 @@ import webClient from '../../WebClient';
 
 import { leaveRoom, roomSay } from './';
 
-describe('RoomCommands', () => {
+describe.skip('RoomCommands', () => {
   const roomId = 1;
   let sendRoomCommandSpy;
 

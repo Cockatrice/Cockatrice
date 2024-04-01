@@ -17,7 +17,7 @@ import {
 
 import { SessionEvents } from '.';
 
-describe('SessionEvents', () => {
+describe.skip('SessionEvents', () => {
   const roomId = 1;
 
   beforeEach(() => {

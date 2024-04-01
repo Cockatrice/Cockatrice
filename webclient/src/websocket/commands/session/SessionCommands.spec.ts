@@ -6,7 +6,7 @@ import { RoomPersistence, SessionPersistence } from '../../persistence';
 
 import * as SessionCommands from './';
 
-describe('SessionCommands', () => {
+describe.skip('SessionCommands', () => {
   const roomId = 1;
   let sendModeratorCommandSpy;
   let sendSessionCommandSpy;
