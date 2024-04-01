@@ -1,9 +1,9 @@
-import { ForgotPasswordChallengeParams } from "store";
-import { StatusEnum, WebSocketConnectOptions } from "types";
+import { ForgotPasswordChallengeParams } from 'store';
+import { StatusEnum, WebSocketConnectOptions } from 'types';
 
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
-import { disconnect, updateStatus } from "./";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
+import { disconnect, updateStatus } from './';
 
 export function resetPasswordChallenge(options: WebSocketConnectOptions): void {
   const { userName, email } = options as unknown as ForgotPasswordChallengeParams;

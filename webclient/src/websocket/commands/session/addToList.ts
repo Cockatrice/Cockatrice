@@ -1,4 +1,4 @@
-import webClient from "../../WebClient";
+import webClient from '../../WebClient';
 
 export function addToBuddyList(userName: string): void {
   addToList('buddy', userName);

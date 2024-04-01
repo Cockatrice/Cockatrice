@@ -1,5 +1,5 @@
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
 
 export function viewLogHistory(filters): void {
   const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);

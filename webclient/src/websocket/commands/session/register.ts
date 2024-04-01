@@ -1,12 +1,12 @@
-import { ServerRegisterParams } from "store";
-import { WebSocketConnectOptions } from "types";
+import { ServerRegisterParams } from 'store';
+import { WebSocketConnectOptions } from 'types';
 
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
-import { hashPassword } from "../../utils";
-import NormalizeService from "../../utils/NormalizeService";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
+import { hashPassword } from '../../utils';
+import NormalizeService from '../../utils/NormalizeService';
 
-import { login, disconnect } from "./";
+import { login, disconnect } from './';
 
 export function register(options: WebSocketConnectOptions, passwordSalt?: string): void {
   const { userName, password, email, country, realName } = options as ServerRegisterParams;

@@ -1,5 +1,5 @@
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
 
 export function listUsers(): void {
   const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();

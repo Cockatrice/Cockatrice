@@ -1,10 +1,10 @@
-import { AccountActivationParams } from "store";
-import { StatusEnum, WebSocketConnectOptions } from "types";
+import { AccountActivationParams } from 'store';
+import { StatusEnum, WebSocketConnectOptions } from 'types';
 
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
 
-import { disconnect, login, updateStatus } from "./";
+import { disconnect, login, updateStatus } from './';
 
 export function activateAccount(options: WebSocketConnectOptions, passwordSalt?: string): void {
   const { userName, token } = options as unknown as AccountActivationParams;

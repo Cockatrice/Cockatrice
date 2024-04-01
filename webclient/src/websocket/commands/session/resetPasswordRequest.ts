@@ -1,10 +1,10 @@
-import { ForgotPasswordParams } from "store";
-import { StatusEnum, WebSocketConnectOptions } from "types";
+import { ForgotPasswordParams } from 'store';
+import { StatusEnum, WebSocketConnectOptions } from 'types';
 
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
 
-import { disconnect, updateStatus } from "./";
+import { disconnect, updateStatus } from './';
 
 export function resetPasswordRequest(options: WebSocketConnectOptions): void {
   const { userName } = options as unknown as ForgotPasswordParams;

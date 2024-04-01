@@ -1,5 +1,5 @@
-import webClient from "../../WebClient";
-import { RoomPersistence } from "../../persistence";
+import webClient from '../../WebClient';
+import { RoomPersistence } from '../../persistence';
 
 export function joinRoom(roomId: number): void {
   const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({ roomId });

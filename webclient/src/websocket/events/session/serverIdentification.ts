@@ -1,6 +1,6 @@
-import { StatusEnum, WebSocketConnectReason } from "types";
+import { StatusEnum, WebSocketConnectReason } from 'types';
 
-import webClient from "../../WebClient";
+import webClient from '../../WebClient';
 import {
   activateAccount,
   disconnect,
@@ -11,10 +11,10 @@ import {
   resetPasswordChallenge,
   resetPasswordRequest,
   updateStatus,
-} from "../../commands/session";
-import { generateSalt, passwordSaltSupported } from "../../utils";
-import { ServerIdentificationData } from "./interfaces";
-import { SessionPersistence } from "../../persistence";
+} from '../../commands/session';
+import { generateSalt, passwordSaltSupported } from '../../utils';
+import { ServerIdentificationData } from './interfaces';
+import { SessionPersistence } from '../../persistence';
 
 export function serverIdentification(info: ServerIdentificationData) {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;

@@ -1,7 +1,7 @@
-import { StatusEnum } from "types";
-import webClient from "../../WebClient";
-import { updateStatus } from "../../commands/session";
-import { ConnectionClosedData } from "./interfaces";
+import { StatusEnum } from 'types';
+import webClient from '../../WebClient';
+import { updateStatus } from '../../commands/session';
+import { ConnectionClosedData } from './interfaces';
 
 export function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
   let message;

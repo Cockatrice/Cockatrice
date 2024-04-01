@@ -1,6 +1,6 @@
-import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from "types";
+import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 import webClient from '../../WebClient';
-import { updateStatus } from "./";
+import { updateStatus } from './';
 
 export function connect(options: WebSocketConnectOptions, reason: WebSocketConnectReason): void {
   switch (reason) {

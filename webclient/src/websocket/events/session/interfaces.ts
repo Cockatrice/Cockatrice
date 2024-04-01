@@ -1,4 +1,4 @@
-import { Room, User } from "types";
+import { Room, User } from 'types';
 
 export interface SessionEvent {
   sessionEvent: {}

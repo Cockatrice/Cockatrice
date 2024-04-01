@@ -1,16 +1,16 @@
-import { ProtobufEvents } from "../../services/ProtobufService";
-import { addToList } from "./addToList";
-import { connectionClosed } from "./connectionClosed";
-import { listRooms } from "./listRooms";
-import { notifyUser } from "./notifyUser";
-import { playerPropertiesChanges } from "./playerPropertiesChanges";
-import { removeFromList } from "./removeFromList";
-import { serverIdentification } from "./serverIdentification";
-import { serverMessage } from "./serverMessage";
-import { serverShutdown } from "./serverShutdown";
-import { userJoined } from "./userJoined";
-import { userLeft } from "./userLeft";
-import { userMessage } from "./userMessage";
+import { ProtobufEvents } from '../../services/ProtobufService';
+import { addToList } from './addToList';
+import { connectionClosed } from './connectionClosed';
+import { listRooms } from './listRooms';
+import { notifyUser } from './notifyUser';
+import { playerPropertiesChanges } from './playerPropertiesChanges';
+import { removeFromList } from './removeFromList';
+import { serverIdentification } from './serverIdentification';
+import { serverMessage } from './serverMessage';
+import { serverShutdown } from './serverShutdown';
+import { userJoined } from './userJoined';
+import { userLeft } from './userLeft';
+import { userMessage } from './userMessage';
 
 export const SessionEvents: ProtobufEvents = {
   '.Event_AddToList.ext': addToList,

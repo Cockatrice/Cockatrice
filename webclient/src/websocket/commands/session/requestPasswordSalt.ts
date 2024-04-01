@@ -1,8 +1,8 @@
-import { RequestPasswordSaltParams } from "store";
-import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from "types";
+import { RequestPasswordSaltParams } from 'store';
+import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
-import webClient from "../../WebClient";
-import { SessionPersistence } from "../../persistence";
+import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
 
 import {
   activateAccount,
@@ -10,7 +10,7 @@ import {
   login,
   resetPassword,
   updateStatus
-} from "./";
+} from './';
 
 export function requestPasswordSalt(options: WebSocketConnectOptions): void {
   const { userName } = options as RequestPasswordSaltParams;

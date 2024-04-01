@@ -1,7 +1,7 @@
-import webClient from "../../WebClient";
-import { joinRoom } from "../../commands/session";
-import { RoomPersistence } from "../../persistence";
-import { ListRoomsData } from "./interfaces";
+import webClient from '../../WebClient';
+import { joinRoom } from '../../commands/session';
+import { RoomPersistence } from '../../persistence';
+import { ListRoomsData } from './interfaces';
 
 export function listRooms({ roomList }: ListRoomsData) {
   RoomPersistence.updateRooms(roomList);

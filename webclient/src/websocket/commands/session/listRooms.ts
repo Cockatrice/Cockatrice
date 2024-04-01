@@ -1,4 +1,4 @@
-import webClient from "../../WebClient";
+import webClient from '../../WebClient';
 
 export function listRooms(): void {
   const CmdListRooms = webClient.protobuf.controller.Command_ListRooms.create();

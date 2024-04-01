@@ -1,14 +1,14 @@
-import { StatusEnum, WebSocketConnectOptions } from "types";
-import webClient from "../../WebClient";
-import { hashPassword } from "../../utils";
-import { SessionPersistence } from "../../persistence";
+import { StatusEnum, WebSocketConnectOptions } from 'types';
+import webClient from '../../WebClient';
+import { hashPassword } from '../../utils';
+import { SessionPersistence } from '../../persistence';
 
 import {
   disconnect,
   listUsers,
   listRooms,
   updateStatus,
-} from "./";
+} from './';
 
 export function login(options: WebSocketConnectOptions, passwordSalt?: string): void {
   const { userName, password, hashedPassword } = options;

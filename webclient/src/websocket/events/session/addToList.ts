@@ -1,5 +1,5 @@
-import { SessionPersistence } from "../../persistence";
-import { AddToListData } from "./interfaces";
+import { SessionPersistence } from '../../persistence';
+import { AddToListData } from './interfaces';
 
 export function addToList({ listName, userInfo }: AddToListData) {
   switch (listName) {

@@ -1,4 +1,4 @@
-import webClient from "../../WebClient";
+import webClient from '../../WebClient';
 
 export function removeFromBuddyList(userName: string): void {
   removeFromList('buddy', userName);

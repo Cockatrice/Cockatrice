@@ -1,5 +1,5 @@
-import { SessionPersistence } from "../../persistence";
-import { RemoveFromListData } from "./interfaces";
+import { SessionPersistence } from '../../persistence';
+import { RemoveFromListData } from './interfaces';
 
 export function removeFromList({ listName, userName }: RemoveFromListData) {
   switch (listName) {
