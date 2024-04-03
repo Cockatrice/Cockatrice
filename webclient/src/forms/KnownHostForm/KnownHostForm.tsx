@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import AnchorLink from '@mui/material/Link';
 
-import { InputField } from 'components';
+import { InputField, CheckboxField } from 'components';
 
 import './KnownHostForm.css';
 
@@ -49,6 +49,7 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
         name: host?.name,
         host: host?.host,
         port: host?.port,
+        https: host?.https,
       }}
       onSubmit={handleOnSubmit}
       validate={validate}
@@ -64,25 +65,28 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
           <div className="KnownHostForm-item">
             <Field label={t('Common.label.port')} name="port" type="number" component={InputField} />
           </div>
+          <div className="KnownHostForm-item">
+            <Field label={t('Common.label.https')} name="https" component={CheckboxField} />
+          </div>
 
           <Button className="KnownHostForm-submit" color="primary" variant="contained" type="submit">
-            {host ? t('Common.label.saveChanges') : t('KnownHostForm.label.add') }
+            {host ? t('Common.label.saveChanges') : t('KnownHostForm.label.add')}
           </Button>
 
           <div className="KnownHostForm-actions">
             <div className="KnownHostForm-actions__delete">
-              { host && (
+              {host && (
                 <Button color="inherit" onClick={() => !confirmDelete ? setConfirmDelete(true) : onRemove(host)}>
-                  { !confirmDelete ? t('Common.label.delete') : t('Common.label.confirmSure') }
+                  {!confirmDelete ? t('Common.label.delete') : t('Common.label.confirmSure')}
                 </Button>
-              ) }
+              )}
             </div>
             <AnchorLink href='https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers' target='_blank'>
-              { t('KnownHostForm.label.find') }
+              {t('KnownHostForm.label.find')}
             </AnchorLink>
           </div>
         </form>
-      ) }
+      )}
     </Form>
   );
 };

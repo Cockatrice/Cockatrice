@@ -57,11 +57,22 @@ export class WebClient {
   public connect(options: WebSocketConnectOptions) {
     this.connectionAttemptMade = true;
     this.options = options;
-    this.socket.connect(options);
+    if (!options.https) {
+      this.socket.connect(options);
+    }
+    else {
+      this.socket.connect(options, 'https');
+    }
   }
 
   public testConnect(options: WebSocketConnectOptions) {
-    this.socket.testConnect(options);
+    console.log(options.https)
+    if (!options.https) {
+      this.socket.testConnect(options);
+    }
+    else {
+      this.socket.testConnect(options, 'https');
+    }
   }
 
   public disconnect() {

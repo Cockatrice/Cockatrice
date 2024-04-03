@@ -15,6 +15,7 @@ export enum StatusEnum {
 export interface WebSocketConnectOptions {
   host?: string;
   port?: string;
+  https?: boolean;
   userName?: string;
   password?: string;
   hashedPassword?: string;
@@ -44,6 +45,7 @@ export class Host {
   name: string;
   host: string;
   port: string;
+  https?: boolean;
   localHost?: string;
   localPort?: string;
   editable: boolean;
@@ -83,19 +85,21 @@ export const DefaultHosts: Host[] = [
   },
 ];
 
-export const getHostPort = (host: Host): { host: string, port: string } => {
+export const getHostPort = (host: Host): { host: string, port: string, https: boolean } => {
   const isLocal = window.location.hostname === 'localhost';
 
   if (!host) {
     return {
       host: '',
-      port: ''
+      port: '',
+      https: host.https,
     };
   }
 
   return {
     host: !isLocal ? host.host : host.localHost || host.host,
     port: !isLocal ? host.port : host.localPort || host.port,
+    https: host.https,
   }
 };
 

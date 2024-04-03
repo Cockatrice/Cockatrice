@@ -30,24 +30,30 @@ export class WebSocketService {
   }
 
   public connect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
-    if (window.location.hostname === 'localhost') {
+    const { host, port } = options;
+    if (window.location.hostname === 'localhost' && protocol !== 'https') {
       protocol = 'ws';
     }
-
-    const { host, port } = options;
     this.keepalive = this.webClient.clientOptions.keepalive;
-
-    this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
+    if (protocol !== 'https') {
+      this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
+    }
+    else {
+      this.socket = this.createWebSocket(`${protocol}://${host}:${port}/servatrice`);
+    }
   }
 
   public testConnect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
-    if (window.location.hostname === 'localhost') {
+    const { host, port } = options;
+    if (window.location.hostname === 'localhost' && protocol !== 'https') {
       protocol = 'ws';
     }
-
-    const { host, port } = options;
-
-    this.testWebSocket(`${protocol}://${host}:${port}`);
+    if (protocol !== 'https') {
+      this.testWebSocket(`${protocol}://${host}:${port}`);
+    }
+    else {
+      this.testWebSocket(`${protocol}://${host}:${port}/servatrice`);
+    }
   }
 
   public disconnect(): void {
