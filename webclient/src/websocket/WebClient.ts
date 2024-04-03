@@ -59,8 +59,7 @@ export class WebClient {
     this.options = options;
     if (!options.https) {
       this.socket.connect(options);
-    }
-    else {
+    } else {
       this.socket.connect(options, 'https');
     }
   }
@@ -69,8 +68,7 @@ export class WebClient {
     console.log(options.https)
     if (!options.https) {
       this.socket.testConnect(options);
-    }
-    else {
+    } else {
       this.socket.testConnect(options, 'https');
     }
   }

@@ -37,8 +37,7 @@ export class WebSocketService {
     this.keepalive = this.webClient.clientOptions.keepalive;
     if (protocol !== 'https') {
       this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
-    }
-    else {
+    } else {
       this.socket = this.createWebSocket(`${protocol}://${host}:${port}/servatrice`);
     }
   }
@@ -50,8 +49,7 @@ export class WebSocketService {
     }
     if (protocol !== 'https') {
       this.testWebSocket(`${protocol}://${host}:${port}`);
-    }
-    else {
+    } else {
       this.testWebSocket(`${protocol}://${host}:${port}/servatrice`);
     }
   }
