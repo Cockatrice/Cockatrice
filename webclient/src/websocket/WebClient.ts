@@ -1,4 +1,4 @@
-import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
+import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
@@ -37,16 +37,13 @@ export class WebClient {
   };
 
   public options: WebSocketConnectOptions;
+  public status: StatusEnum;
 
   public connectionAttemptMade = false;
 
   constructor() {
     this.socket.message$.subscribe((message: MessageEvent) => {
       this.protobuf.handleMessageEvent(message);
-    });
-
-    this.socket.statusChange$.subscribe((status: ServerStatus) => {
-      this.handleStatusChange(status);
     });
 
     if (process.env.NODE_ENV !== 'test') {
@@ -68,12 +65,8 @@ export class WebClient {
     this.socket.disconnect();
   }
 
-  public updateStatus(status: StatusEnum, description: string) {
-    this.socket.updateStatus(status, description);
-  }
-
-  public handleStatusChange({ status, description }: ServerStatus) {
-    SessionPersistence.updateStatus(status, description);
+  public updateStatus(status: StatusEnum) {
+    this.status = status;
 
     if (status === StatusEnum.DISCONNECTED) {
       this.protobuf.resetCommands();

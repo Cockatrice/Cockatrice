@@ -1,10 +1,11 @@
 import { Subject } from 'rxjs';
 
-import { ServerStatus, StatusEnum, WebSocketConnectOptions } from 'types';
+import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { WebClient } from '../WebClient';
 import { SessionPersistence } from '../persistence';
+import { updateStatus } from '../commands/session';
 
 export class WebSocketService {
   private socket: WebSocket;
@@ -14,9 +15,7 @@ export class WebSocketService {
   private keepAliveService: KeepAliveService;
 
   public message$: Subject<MessageEvent> = new Subject();
-  public statusChange$: Subject<ServerStatus> = new Subject();
 
-  private status: StatusEnum = StatusEnum.DISCONNECTED;
   private keepalive: number;
 
   constructor(webClient: WebClient) {
@@ -25,7 +24,7 @@ export class WebSocketService {
     this.keepAliveService = new KeepAliveService(this);
     this.keepAliveService.disconnected$.subscribe(() => {
       this.disconnect();
-      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
+      updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
     });
   }
 
@@ -64,11 +63,6 @@ export class WebSocketService {
     this.socket.send(message);
   }
 
-  public updateStatus(status: StatusEnum, description: string): void {
-    this.status = status;
-    this.statusChange$.next({ status, description });
-  }
-
   private createWebSocket(url: string): WebSocket {
     const socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
@@ -77,7 +71,7 @@ export class WebSocketService {
 
     socket.onopen = () => {
       clearTimeout(connectionTimer);
-      this.updateStatus(StatusEnum.CONNECTED, 'Connected');
+      updateStatus(StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: Function) => {
         this.webClient.keepAlive(pingReceived);
@@ -86,15 +80,15 @@ export class WebSocketService {
 
     socket.onclose = () => {
       // dont overwrite failure messages
-      if (this.status !== StatusEnum.DISCONNECTED) {
-        this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
+      if (this.webClient.status !== StatusEnum.DISCONNECTED) {
+        updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
       }
 
       this.keepAliveService.endPingLoop();
     };
 
     socket.onerror = () => {
-      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
+      updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
       SessionPersistence.connectionFailed();
     };
 
