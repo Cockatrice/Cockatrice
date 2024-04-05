@@ -1,17 +1,14 @@
 import { KeepAliveService } from './KeepAliveService';
-import { WebSocketService } from './WebSocketService';
 
 import webClient from '../WebClient';
 
 describe('KeepAliveService', () => {
   let service: KeepAliveService;
-  let socket: WebSocketService;
 
   beforeEach(() => {
     jest.useFakeTimers();
 
-    socket = new WebSocketService(webClient);
-    service = new KeepAliveService(socket);
+    service = new KeepAliveService(webClient.socket);
   });
 
   it('should create', () => {
@@ -30,7 +27,7 @@ describe('KeepAliveService', () => {
       promise = new Promise(resolve => resolvePing = resolve);
       ping = (done) => promise.then(done);
 
-      checkReadyStateSpy = jest.spyOn(socket, 'checkReadyState');
+      checkReadyStateSpy = jest.spyOn(webClient.socket, 'checkReadyState');
       checkReadyStateSpy.mockImplementation(() => true);
 
       service.startPingLoop(interval, ping);
