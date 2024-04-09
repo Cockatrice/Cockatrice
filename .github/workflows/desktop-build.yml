@@ -114,6 +114,9 @@ jobs:
             package: DEB
             test: skip # running tests on all distros is superfluous
 
+          - distro: UbuntuNoble
+            package: DEB
+
     name: ${{matrix.distro}}
     needs: configure
     runs-on: ubuntu-latest
