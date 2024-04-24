@@ -18,8 +18,8 @@ include different targets -->
  - <kbd>Ubuntu 24.04 LTS</kbd> ("Noble Numbat")
  - <kbd>Debian 11</kbd> ("Bullseye")
  - <kbd>Debian 12</kbd> ("Bookworm")
- - <kbd>Fedora 38</kbd>
  - <kbd>Fedora 39</kbd>
+ - <kbd>Fedora 40</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General Linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
