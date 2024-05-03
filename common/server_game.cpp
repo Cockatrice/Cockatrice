@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "server_game.h"
 
-#include "decklist.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
 #include "pb/event_delete_arrow.pb.h"

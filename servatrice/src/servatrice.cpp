@@ -312,7 +312,7 @@ bool Servatrice::initServer()
 
     if (getRoomsMethodString() == "sql") {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-            "select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size from "
+            "select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size, card_limit from "
             "{prefix}_rooms where id_server = :id_server order by id asc");
         query->bindValue(":id_server", serverId);
         servatriceDatabaseInterface->execSqlQuery(query);
@@ -328,7 +328,7 @@ bool Servatrice::initServer()
             addRoom(new Server_Room(query->value(0).toInt(), query->value(7).toInt(), query->value(1).toString(),
                                     query->value(2).toString(), query->value(3).toString().toLower(),
                                     query->value(4).toString().toLower(), static_cast<bool>(query->value(5).toInt()),
-                                    query->value(6).toString(), gameTypes, this));
+                                    query->value(6).toString(), gameTypes, query->value(8).toUInt(), this));
         }
     } else {
         int size = settingsCache->beginReadArray("rooms/roomlist");
@@ -346,14 +346,14 @@ bool Servatrice::initServer()
                 settingsCache->value("description").toString(),
                 settingsCache->value("permissionlevel").toString().toLower(),
                 settingsCache->value("privilegelevel").toString().toLower(), settingsCache->value("autojoin").toBool(),
-                settingsCache->value("joinmessage").toString(), gameTypes, this);
+                settingsCache->value("joinmessage").toString(), gameTypes, settingsCache->value("cardlimit").toUInt(), this);
             addRoom(newRoom);
         }
 
         if (size == 0) {
             // no room defined in config, add a dummy one
             Server_Room *newRoom = new Server_Room(0, 100, "General room", "Play anything here.", "none", "none", true,
-                                                   "", QStringList("Standard"), this);
+                                                   "", QStringList("Standard"), 0, this);
             addRoom(newRoom);
         }
 
