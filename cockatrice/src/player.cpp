@@ -110,7 +110,7 @@ void PlayerArea::setPlayerZoneId(int _playerZoneId)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), movingCardsUntil(false), shortcutsActive(false), lastTokenDestroy(true),
+    : QObject(_parent), game(_parent), movingCardsUntil(false), isCreatingArrow(false), shortcutsActive(false), lastTokenDestroy(true),
       lastTokenTableRow(0), id(_id), active(false), local(_local), judge(_judge), mirrored(false), handVisible(false),
       conceded(false), zoneId(0), dialogSemaphore(false), deck(nullptr)
 {
@@ -1967,6 +1967,7 @@ void Player::eventRollDie(const Event_RollDie &event)
 
 void Player::eventCreateArrow(const Event_CreateArrow &event)
 {
+    isCreatingArrow = false;
     ArrowItem *arrow = addArrow(event.arrow_info());
     if (!arrow) {
         return;
@@ -3199,7 +3200,13 @@ void Player::actSetPT()
 
 void Player::actDrawArrow()
 {
+    if (isCreatingArrow) {
+        return;
+    }
+
+    isCreatingArrow = true;
     if (!game->getActiveCard()) {
+        isCreatingArrow = false;
         return;
     }
 
