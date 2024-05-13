@@ -110,9 +110,9 @@ void PlayerArea::setPlayerZoneId(int _playerZoneId)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), movingCardsUntil(false), isCreatingArrow(false), shortcutsActive(false), lastTokenDestroy(true),
-      lastTokenTableRow(0), id(_id), active(false), local(_local), judge(_judge), mirrored(false), handVisible(false),
-      conceded(false), zoneId(0), dialogSemaphore(false), deck(nullptr)
+    : QObject(_parent), game(_parent), movingCardsUntil(false), isCreatingArrow(false), shortcutsActive(false),
+      lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false), local(_local), judge(_judge),
+      mirrored(false), handVisible(false), conceded(false), zoneId(0), dialogSemaphore(false), deck(nullptr)
 {
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
