@@ -317,14 +317,16 @@ jobs:
 
     name: Windows ${{matrix.target}}
     needs: configure
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
-      CMAKE_GENERATOR: 'Visual Studio 16 2019'
+      CMAKE_GENERATOR: 'Visual Studio 17 2022'
 
     steps:
       - name: Add msbuild to PATH
         id: add-msbuild
         uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
 
       - name: Checkout
         uses: actions/checkout@v4

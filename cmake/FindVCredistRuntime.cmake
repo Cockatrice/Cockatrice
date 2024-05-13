@@ -24,7 +24,7 @@ if(WIN32)
     get_filename_component(_path ${_path}/../../ ABSOLUTE)
 
     foreach(redist_file ${REDIST_FILE_NAMES})
-      if(EXISTS "${_path}/${REDIST_FILE}")
+      if(EXISTS "${_path}/${redist_file}")
         set(VCREDISTRUNTIME_FOUND "YES")
         set(VCREDISTRUNTIME_FILE ${_path}/${redist_file})
         break()
