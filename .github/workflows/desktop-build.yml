@@ -200,14 +200,14 @@ jobs:
         include:
           - target: Debug # tests only
             os: macos-latest
-            xcode: 14.2
+            xcode: 14.3.1 # Lowest supported version on GHA
             qt_version: homebrew
             type: Debug
             do_tests: 1
 
           - target: 10.15_Catalina
             os: macos-11
-            xcode: 11.7 # allows using macOS 10.15 SDK
+            xcode: 11.7 # allows using macOS 10.15 SDK, Lowest supported version on GHA
             qt_version: 6.2.* # 6.2 is last LTS compatible with 10.15, see https://doc.qt.io/qt-6.5/macos.html
             qt_modules: "qtmultimedia qtwebsockets"
             type: Release
@@ -218,7 +218,7 @@ jobs:
 
           - target: 13_Ventura
             os: macos-13
-            xcode: 14.3.1
+            xcode: 14.1 # Lowest supported version on GHA
             qt_version: homebrew
             type: Release
             do_tests: 1
