@@ -214,6 +214,7 @@ jobs:
             do_tests: 1
             make_package: 1
             use_old_protobuf: 1
+            force_overwrite_python: 1
             qt_py7zrversion: '==0.20.*'
 
           - target: 13_Ventura
@@ -246,6 +247,10 @@ jobs:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
           brew update
+          if [[ $force_overwrite_python == 1 ]]; then
+            brew install python@3.12
+            brew link --overwrite python@3.12
+          fi
           if [[ $use_old_protobuf == 1 ]]; then
             brew install protobuf@21
             brew link --force protobuf@21
