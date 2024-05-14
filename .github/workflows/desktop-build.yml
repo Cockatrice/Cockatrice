@@ -243,6 +243,7 @@ jobs:
         # neither of these works: mariadb-connector-c mysql-connector-c++
         env:
           install_qt: ${{matrix.qt_version}}
+          force_overwrite_python: ${{matrix.force_overwrite_python}}
           use_old_protobuf: ${{matrix.use_old_protobuf}}
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
