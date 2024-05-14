@@ -248,8 +248,8 @@ jobs:
         run: |
           brew update
           if [[ $force_overwrite_python == 1 ]]; then
-            brew install python@3.12
-            brew link --overwrite python@3.12
+            brew install --overwrite python@3.11 
+            brew install --overwrite python@3.12
           fi
           if [[ $use_old_protobuf == 1 ]]; then
             brew install protobuf@21
