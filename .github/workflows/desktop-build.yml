@@ -231,11 +231,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: true
-
       - name: Install dependencies using homebrew
         shell: bash
         # cmake cannot find the mysql connector
@@ -247,14 +242,6 @@ jobs:
           brew install protobuf
           brew link --force protobuf
           brew install qt --force-bottle
-
-      - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
-        if: matrix.qt_version != 'homebrew'
-        uses: jurplel/install-qt-action@v3
-        with:
-          cache: true
-          version: ${{matrix.qt_version}}
-          modules: ${{matrix.qt_modules}}
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
