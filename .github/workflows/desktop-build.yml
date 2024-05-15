@@ -219,7 +219,7 @@ jobs:
             do_tests: 1
             make_package: 1
 
-    name: macOS ${{matrix.target}}
+    name: macOS_${{matrix.target}}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
@@ -302,7 +302,7 @@ jobs:
             qt_tools: "tools_opensslv3_x64"
             qt_modules: "qtmultimedia qtwebsockets"
 
-    name: Windows ${{matrix.target}}
+    name: Windows_${{matrix.target}}
     needs: configure
     runs-on: windows-2022
     env:
