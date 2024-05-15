@@ -255,7 +255,6 @@ jobs:
           brew update
           if [[ $force_overwrite_python == 1 ]]; then
             brew link --force python@3.12
-            rm /opt/homebrew/Cellar/python\@3*/**/EXTERNALLY-MANAGED
           fi
           if [[ $use_old_protobuf == 1 ]]; then
             brew install protobuf@21
@@ -275,7 +274,6 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
-          setup-python: false
           version: ${{matrix.qt_version}}
           modules: ${{matrix.qt_modules}}
           py7zrversion: ${{matrix.qt_py7zrversion}}
