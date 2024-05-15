@@ -198,7 +198,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 12_Monteray
+          - target: 12_Monterey
             os: macos-12
             xcode: "13.1"
             type: Release
