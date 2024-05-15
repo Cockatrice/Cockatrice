@@ -198,29 +198,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: Debug # tests only
-            os: macos-latest
-            xcode: 14.3.1 # Lowest supported version on GHA
-            qt_version: homebrew
-            type: Debug
-            do_tests: 1
-
-          - target: 10.15_Catalina
-            os: macos-11
-            xcode: 11.7 # allows using macOS 10.15 SDK, Lowest supported version on GHA
-            qt_version: 6.2.* # 6.2 is last LTS compatible with 10.15, see https://doc.qt.io/qt-6.5/macos.html
-            qt_modules: "qtmultimedia qtwebsockets"
+          - target: 12_Monteray
+            os: macos-12
+            xcode: "13.1"
             type: Release
             do_tests: 1
             make_package: 1
-            use_old_protobuf: 1
-            force_overwrite_python: 1
-            qt_py7zrversion: '==0.20.*'
 
           - target: 13_Ventura
             os: macos-13
-            xcode: 14.1 # Lowest supported version on GHA
-            qt_version: homebrew
+            xcode: "14.1"
+            type: Release
+            do_tests: 1
+            make_package: 1
+
+          - target: 14_Sonoma
+            os: macos-14
+            xcode: "14.3.1"
             type: Release
             do_tests: 1
             make_package: 1
@@ -247,27 +241,12 @@ jobs:
         # cmake cannot find the mysql connector
         # neither of these works: mariadb-connector-c mysql-connector-c++
         env:
-          install_qt: ${{matrix.qt_version}}
-          force_overwrite_python: ${{matrix.force_overwrite_python}}
-          use_old_protobuf: ${{matrix.use_old_protobuf}}
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
           brew update
-          if [[ $force_overwrite_python == 1 ]]; then
-            brew link --force python@3.12
-          fi
-          if [[ $use_old_protobuf == 1 ]]; then
-            brew install protobuf@21
-            brew link --force protobuf@21
-          else
-            brew install protobuf
-            brew link --force protobuf
-          fi
-          if [[ $install_qt == homebrew ]]; then
-            brew install qt --force-bottle
-          else # for some reason the tests fail with the action installed qt?
-            brew install googletest
-          fi
+          brew install protobuf
+          brew link --force protobuf
+          brew install qt --force-bottle
 
       - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
         if: matrix.qt_version != 'homebrew'
@@ -276,7 +255,6 @@ jobs:
           cache: true
           version: ${{matrix.qt_version}}
           modules: ${{matrix.qt_modules}}
-          py7zrversion: ${{matrix.qt_py7zrversion}}
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
