@@ -85,46 +85,54 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # these names correspond to the files in .ci/$distro
+        # These names correspond to the files in ".ci/$distro $version"
         include:
           - distro: ArchLinux
-            package: skip # we are packaged in arch already
+            package: skip    # We are packaged in Arch already
             allow-failure: yes
 
-          - distro: Debian11
+          - distro: Debian
+            version: 11
             package: DEB
 
-          - distro: Debian12
+          - distro: Debian
+            version: 12
             package: DEB
 
-          - distro: Fedora39
+          - distro: Fedora
+            version: 39
             package: RPM
 
-          - distro: Fedora40
+          - distro: Fedora
+            version: 40
             package: RPM
 
-          - distro: UbuntuBionic
+          - distro: Ubuntu
+            version: 18.04 LTS
             package: DEB
 
-          - distro: UbuntuFocal
+          - distro: Ubuntu
+            version: 20.04 LTS
             package: DEB
-            test: skip # UbuntuFocal has a broken qt for debug builds
+            test: skip    # Ubuntu 20.04 has a broken Qt for debug builds
 
-          - distro: UbuntuJammy
+          - distro: Ubuntu
+            version: 22.04 LTS
             package: DEB
-            test: skip # running tests on all distros is superfluous
+            test: skip    # Running tests on all distros is superfluous
 
-          - distro: UbuntuNoble
+          - distro: Ubuntu
+            version: 24.04 LTS
             package: DEB
 
-    name: ${{matrix.distro}}
+    name: ${{matrix.distro}} ${{matrix.version}}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
-      NAME: ${{matrix.distro}}
-      CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
-      # cache size over the entire repo is 10Gi link:
+      NAME: ${{matrix.distro}}${{matrix.version}}
+      CACHE: /tmp/${{matrix.distro}}-cache    # ${{runner.temp}} does not work?
+      # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 200M
 
@@ -143,19 +151,17 @@ jobs:
           timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
         with:
           path: ${{env.CACHE}}
-          key: docker-${{matrix.distro}}-cache-${{env.timestamp}}
+          key: docker-${{matrix.distro}}${{matrix.version}}-cache-${{env.timestamp}}
           restore-keys: |
-            docker-${{matrix.distro}}-cache-
+            docker-${{matrix.distro}}${{matrix.version}}-cache-
 
-      - name: Build ${{matrix.distro}} Docker image
+      - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
         run: source .ci/docker.sh --build
 
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
-        env:
-          distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
           RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 4
@@ -166,9 +172,8 @@ jobs:
         shell: bash
         env:
           BUILD_DIR: build
-          SUFFIX: '-${{matrix.distro}}'
-          distro: '${{matrix.distro}}'
-          type: '${{matrix.package}}'
+          SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
+          type: '${{matrix.package}}${{matrix.version}}'
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --dir "$BUILD_DIR" \
@@ -179,7 +184,7 @@ jobs:
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{matrix.distro}}-package
+          name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
@@ -198,17 +203,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: Debug # tests only
+          - target: Debug    # Tests only
             os: macos-latest
-            xcode: 14.3.1 # Lowest supported version on GHA
+            xcode: 14.3.1    # Lowest supported version on GHA
             qt_version: homebrew
             type: Debug
             do_tests: 1
 
-          - target: 10.15_Catalina
+          - target: 10.15
             os: macos-11
-            xcode: 11.7 # allows using macOS 10.15 SDK, Lowest supported version on GHA
-            qt_version: 6.2.* # 6.2 is last LTS compatible with 10.15, see https://doc.qt.io/qt-6.5/macos.html
+            xcode: 11.7    # Allows using macOS 10.15 SDK, Lowest supported version on GHA
+            qt_version: 6.2.*    # 6.2 is last LTS compatible with 10.15: https://doc.qt.io/qt-6.5/macos.html
             qt_modules: "qtmultimedia qtwebsockets"
             type: Release
             do_tests: 1
@@ -216,9 +221,9 @@ jobs:
             use_old_protobuf: 1
             qt_py7zrversion: '==0.20.*'
 
-          - target: 13_Ventura
+          - target: 13
             os: macos-13
-            xcode: 14.1 # Lowest supported version on GHA
+            xcode: 14.1    # Lowest supported version on GHA
             qt_version: homebrew
             type: Release
             do_tests: 1
@@ -238,8 +243,8 @@ jobs:
 
       - name: Install dependencies using homebrew
         shell: bash
-        # cmake cannot find the mysql connector
-        # neither of these works: mariadb-connector-c mysql-connector-c++
+        # CMake cannot find the MySQL connector
+        # Neither of these works: mariadb-connector-c mysql-connector-c++
         env:
           install_qt: ${{matrix.qt_version}}
           use_old_protobuf: ${{matrix.use_old_protobuf}}
@@ -277,8 +282,8 @@ jobs:
           MAKE_TEST: '${{matrix.do_tests}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
-        # macOS runner actually have only 3 cores
-        # See https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+        # macOS runner actually have only 3 cores:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         run: .ci/compile.sh --server --parallel 3
 
       - name: Upload artifact
