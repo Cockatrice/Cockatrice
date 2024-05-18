@@ -131,7 +131,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: /tmp/${{matrix.distro}}-cache    # ${{runner.temp}} does not work?
+      CACHE: /tmp/${{matrix.distro}}${{matrix.version}}-cache    # ${{runner.temp}} does not work?
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 200M
@@ -173,7 +173,7 @@ jobs:
         env:
           BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
-          type: '${{matrix.package}}${{matrix.version}}'
+          type: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --dir "$BUILD_DIR" \
@@ -264,7 +264,7 @@ jobs:
             brew install googletest
           fi
 
-      - name: Install Qt ${{matrix.qt_version}} for ${{matrix.target}}
+      - name: Install Qt ${{matrix.qt_version}} for macOS ${{matrix.target}}
         if: matrix.qt_version != 'homebrew'
         uses: jurplel/install-qt-action@v3
         with:
@@ -281,8 +281,8 @@ jobs:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_TEST: '${{matrix.do_tests}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
-        # macOS runner actually have only 3 cores:
+          PACKAGE_SUFFIX: '-macOS${{matrix.target}}'
+        # macOS runner have only 3 cores:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         run: .ci/compile.sh --server --parallel 3
 
@@ -290,7 +290,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
-          name: macOS-${{matrix.target}}-dmg
+          name: macOS${{matrix.target}}-dmg
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
