@@ -198,27 +198,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 12_Monterey
+          - target: 12_Monterey_and_13_Ventura
             os: macos-12
-            xcode: "13.1"
-            type: Release
-            make_package: 1
-
-          - target: 13_Ventura
-            os: macos-13
-            xcode: "14.1"
+            xcode: "14.0.1"
             type: Release
             make_package: 1
 
           - target: 14_Sonoma
             os: macos-14
-            xcode: "14.3.1"
+            xcode: "15.4"
             type: Release
             make_package: 1
 
           - target: 14_Sonoma_Debug
             os: macos-14
-            xcode: "14.3.1"
+            xcode: "15.4"
             type: Debug
 
     name: macOS${{matrix.target}}
