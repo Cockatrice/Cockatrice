@@ -203,24 +203,28 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 12_Monterey_and_13_Ventura
+          - target: 12
+            soc: Intel
             os: macos-12
             xcode: "14.0.1"
             type: Release
             make_package: 1
 
-          - target: 14_Sonoma
+          - target: 14
+            soc: Apple
             os: macos-14
             xcode: "15.4"
             type: Release
             make_package: 1
 
-          - target: 14_Sonoma_Debug
+          - target: 14
+            soc: Apple
             os: macos-14
             xcode: "15.4"
             type: Debug
+            make_package: 0
 
-    name: macOS ${{matrix.target}}
+    name: macOS ${{matrix.target}} (${{matrix.soc}}) ${{ matrix.type == 'Debug' && 'Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
@@ -249,7 +253,7 @@ jobs:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_TEST: 1
           MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '-macOS${{matrix.target}}'
+          PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
         # macOS runner have only 3 cores:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         run: .ci/compile.sh --server --parallel 3
