@@ -7,4 +7,5 @@ message Event_RollDie {
     }
     optional uint32 sides = 1;
     optional uint32 value = 2;
+    repeated uint32 values = 3;
 }

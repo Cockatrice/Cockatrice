@@ -1060,7 +1060,7 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
 }
 
 Response::ResponseCode
-Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges) const
 {
     if (spectator) {
         return Response::RespFunctionNotAllowed;
@@ -1071,7 +1071,9 @@ Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/
 
     Event_RollDie event;
     event.set_sides(cmd.sides());
-    event.set_value(rng->rand(1, cmd.sides()));
+    for (google::protobuf::uint32 i = 0; i < cmd.dice_to_roll(); ++i) {
+        event.add_values(rng->rand(1, static_cast<int>(cmd.sides())));
+    }
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;

@@ -558,18 +558,21 @@ void MessageLogWidget::logReverseTurn(Player *player, bool reversed)
                                 .arg(reversed ? tr("reversed") : tr("normal")));
 }
 
-void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
+void MessageLogWidget::logRollDie(Player *player, int sides, const QString &rolls)
 {
-    if (sides == 2) {
-        QString coinOptions[2] = {tr("Heads") + " (1)", tr("Tails") + " (2)"};
-        appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font class=\"blue\">" + coinOptions[roll - 1] + "</font>"));
-    } else {
-        appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font class=\"blue\">" + QString::number(roll) + "</font>")
-                                    .arg("<font class=\"blue\">" + QString::number(sides) + "</font>"));
+    for (const auto &rollString : rolls.split(",")) {
+        const auto roll = rollString.toInt();
+        if (sides == 2) {
+            QString coinOptions[2] = {tr("Heads") + " (1)", tr("Tails") + " (2)"};
+            appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.")
+                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg("<font class=\"blue\">" + coinOptions[roll - 1] + "</font>"));
+        } else {
+            appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.")
+                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg("<font class=\"blue\">" + QString::number(roll) + "</font>")
+                                        .arg("<font class=\"blue\">" + QString::number(sides) + "</font>"));
+        }
     }
     soundEngine->playSound("roll_dice");
 }
@@ -796,7 +799,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
 
     connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
     connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
-    connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
+    connect(player, SIGNAL(logRollDie(Player *, int, const QString &)), this,
+            SLOT(logRollDie(Player *, int, const QString &)));
     connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this,
             SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
     connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this,
