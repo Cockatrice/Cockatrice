@@ -86,6 +86,11 @@ private:
     void revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorage &ges);
 
 public:
+    static constexpr uint MINIMUM_DIE_SIDES = 2;
+    static constexpr uint MAXIMUM_DIE_SIDES = 1000000;
+    static constexpr uint MINIMUM_DICE_TO_ROLL = 1;
+    static constexpr uint MAXIMUM_DICE_TO_ROLL = 100;
+
     mutable QMutex playerMutex;
     Server_Player(Server_Game *_game,
                   int _playerId,

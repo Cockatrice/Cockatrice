@@ -10,12 +10,8 @@ class DlgRollDice : public QDialog
 {
     Q_OBJECT
 
-    const int DEFAULT_NUMBER_SIDES_DIE = 20;
-    const int MINIMUM_DIE_SIDES = 2;
-    const int MAXIMUM_DIE_SIDES = 1000000;
-    const int DEFAULT_NUMBER_DICE_TO_ROLL = 1;
-    const int MINIMUM_DICE_TO_ROLL = 1;
-    const int MAXIMUM_DICE_TO_ROLL = 100;
+    static constexpr uint DEFAULT_NUMBER_SIDES_DIE = 20;
+    static constexpr uint DEFAULT_NUMBER_DICE_TO_ROLL = 1;
 
     QLabel *numberOfSidesLabel, *numberOfDiceLabel;
     QLineEdit *numberOfSidesEdit, *numberOfDiceEdit;

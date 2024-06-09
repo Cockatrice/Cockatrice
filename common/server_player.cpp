@@ -1069,10 +1069,13 @@ Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/
         return Response::RespContextError;
     }
 
+    const auto validatedSides = static_cast<int>(std::min(std::max(cmd.sides(), MINIMUM_DIE_SIDES), MAXIMUM_DIE_SIDES));
+    const auto validatedDiceToRoll = static_cast<int>(std::min(std::max(cmd.dice_to_roll(), MINIMUM_DICE_TO_ROLL), MAXIMUM_DICE_TO_ROLL));
+
     Event_RollDie event;
-    event.set_sides(cmd.sides());
-    for (google::protobuf::uint32 i = 0; i < cmd.dice_to_roll(); ++i) {
-        event.add_values(rng->rand(1, static_cast<int>(cmd.sides())));
+    event.set_sides(validatedSides);
+    for (auto i = 0; i < validatedDiceToRoll; ++i) {
+        event.add_values(rng->rand(1, validatedSides));
     }
     ges.enqueueGameEvent(event, playerId);
 
