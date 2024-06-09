@@ -8,9 +8,9 @@
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
 #include "pixmapgenerator.h"
-#include "stringsizes.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"
+#include "trice_limits.h"
 #include "user_context_menu.h"
 
 #include <QApplication>

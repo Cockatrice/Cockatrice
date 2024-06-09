@@ -11,7 +11,7 @@
 #include "pb/serverinfo_room.pb.h"
 #include "server_game.h"
 #include "server_protocolhandler.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDateTime>
 #include <QDebug>

@@ -58,10 +58,10 @@
 #include "playertarget.h"
 #include "settingscache.h"
 #include "stackzone.h"
-#include "stringsizes.h"
 #include "tab_game.h"
 #include "tablezone.h"
 #include "thememanager.h"
+#include "trice_limits.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 
@@ -1963,16 +1963,18 @@ void Player::eventShuffle(const Event_Shuffle &event)
 
 void Player::eventRollDie(const Event_RollDie &event)
 {
-    QStringList stringResults;
-    for (const auto &i : event.values()) {
-        stringResults.append(QString::number(i));
-    }
     if (event.value()) {
         // Backwards compatibility for old clients
-        stringResults.append(QString::number(event.value()));
-    }
+        emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
+    } else {
+        QList<uint> rolls(event.values().size());
 
-    emit logRollDie(this, static_cast<int>(event.sides()), stringResults.join(","));
+        QList<uint> hold(event.values().begin(), event.values().end());
+        qDebug() << "Rolls Unsorted = " << hold;
+        std::partial_sort_copy(event.values().begin(), event.values().end(), rolls.begin(), rolls.end());
+        qDebug() << "Rolls Sorted = " << rolls;
+        emit logRollDie(this, static_cast<int>(event.sides()), rolls);
+    }
 }
 
 void Player::eventCreateArrow(const Event_CreateArrow &event)

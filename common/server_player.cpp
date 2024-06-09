@@ -79,7 +79,7 @@
 #include "server_database_interface.h"
 #include "server_game.h"
 #include "server_room.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDebug>
 #include <algorithm>

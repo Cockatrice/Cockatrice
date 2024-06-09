@@ -3,8 +3,8 @@
 #include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
 #include "settingscache.h"
-#include "stringsizes.h"
 #include "tab_room.h"
+#include "trice_limits.h"
 
 #include <QApplication>
 #include <QCheckBox>

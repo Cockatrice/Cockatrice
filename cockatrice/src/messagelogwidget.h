@@ -79,7 +79,7 @@ public slots:
                         bool faceDown,
                         int amount);
     void logReverseTurn(Player *player, bool reversed);
-    void logRollDie(Player *player, int sides, const QString &rolls);
+    void logRollDie(Player *player, int sides, const QList<uint> &rolls);
     void logSay(Player *player, QString message);
     void logSetActivePhase(int phase);
     void logSetActivePlayer(Player *player);

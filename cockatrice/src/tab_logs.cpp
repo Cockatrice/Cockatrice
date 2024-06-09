@@ -6,7 +6,7 @@
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
 #include "pending_command.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>

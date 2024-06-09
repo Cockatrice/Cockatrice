@@ -1,7 +1,7 @@
 #include "dlg_edit_user.h"
 
 #include "settingscache.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDebug>
 #include <QDialogButtonBox>

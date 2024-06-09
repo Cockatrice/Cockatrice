@@ -114,7 +114,7 @@ signals:
     // Log events
     void logSay(Player *player, QString message);
     void logShuffle(Player *player, CardZone *zone, int start, int end);
-    void logRollDie(Player *player, int sides, const QString &rolls);
+    void logRollDie(Player *player, int sides, const QList<uint> &rolls);
     void logCreateArrow(Player *player,
                         Player *startPlayer,
                         QString startCard,

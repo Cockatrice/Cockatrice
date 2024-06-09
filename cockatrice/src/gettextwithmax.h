@@ -2,7 +2,7 @@
 #ifndef GETTEXTWITHMAX_H
 #define GETTEXTWITHMAX_H
 
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QInputDialog>
 

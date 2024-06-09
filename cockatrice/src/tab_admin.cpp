@@ -2,7 +2,7 @@
 
 #include "abstractclient.h"
 #include "pb/admin_commands.pb.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

@@ -558,10 +558,10 @@ void MessageLogWidget::logReverseTurn(Player *player, bool reversed)
                                 .arg(reversed ? tr("reversed") : tr("normal")));
 }
 
-void MessageLogWidget::logRollDie(Player *player, int sides, const QString &rolls)
+void MessageLogWidget::logRollDie(Player *player, int sides, const QList<uint> &rolls)
 {
-    for (const auto &rollString : rolls.split(",")) {
-        const auto roll = rollString.toInt();
+    if (rolls.length() == 1) {
+        const auto roll = rolls.at(0);
         if (sides == 2) {
             QString coinOptions[2] = {tr("Heads") + " (1)", tr("Tails") + " (2)"};
             appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.")
@@ -572,6 +572,24 @@ void MessageLogWidget::logRollDie(Player *player, int sides, const QString &roll
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg("<font class=\"blue\">" + QString::number(roll) + "</font>")
                                         .arg("<font class=\"blue\">" + QString::number(sides) + "</font>"));
+        }
+    } else {
+        if (sides == 2) {
+            appendHtmlServerMessage(tr("%1 flips %2 coins. There are %3 heads and %4 tails.")
+                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg("<font class=\"blue\">" + QString::number(rolls.length()) + "</font>")
+                                        .arg("<font class=\"blue\">" + QString::number(rolls.count(1)) + "</font>")
+                                        .arg("<font class=\"blue\">" + QString::number(rolls.count(2)) + "</font>"));
+        } else {
+            QStringList rollsStrings;
+            for (const auto &roll : rolls) {
+                rollsStrings.append(QString::number(roll));
+            }
+            appendHtmlServerMessage(tr("%1 rolls a %2-sided dice %3 times: %4.")
+                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg("<font class=\"blue\">" + QString::number(sides) + "</font>")
+                                        .arg("<font class=\"blue\">" + QString::number(rolls.length()) + "</font>")
+                                        .arg("<font class=\"blue\">" + rollsStrings.join(", ") + "</font>"));
         }
     }
     soundEngine->playSound("roll_dice");
@@ -799,8 +817,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
 
     connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
     connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
-    connect(player, SIGNAL(logRollDie(Player *, int, const QString &)), this,
-            SLOT(logRollDie(Player *, int, const QString &)));
+    connect(player, SIGNAL(logRollDie(Player *, int, const QList<uint> &)), this,
+            SLOT(logRollDie(Player *, int, const QList<uint> &)));
     connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this,
             SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
     connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this,

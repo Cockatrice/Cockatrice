@@ -1,7 +1,7 @@
 #include "dlg_edit_password.h"
 
 #include "settingscache.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

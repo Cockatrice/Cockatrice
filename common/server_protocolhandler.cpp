@@ -21,7 +21,7 @@
 #include "server_game.h"
 #include "server_player.h"
 #include "server_room.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDateTime>
 #include <QDebug>
