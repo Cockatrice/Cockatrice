@@ -1967,12 +1967,8 @@ void Player::eventRollDie(const Event_RollDie &event)
         // Backwards compatibility for old clients
         emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
     } else {
-        QList<uint> rolls(event.values().size());
-
-        QList<uint> hold(event.values().begin(), event.values().end());
-        qDebug() << "Rolls Unsorted = " << hold;
-        std::partial_sort_copy(event.values().begin(), event.values().end(), rolls.begin(), rolls.end());
-        qDebug() << "Rolls Sorted = " << rolls;
+        QList<uint> rolls(event.values().begin(), event.values().end());
+        std::sort(rolls.begin(), rolls.end());
         emit logRollDie(this, static_cast<int>(event.sides()), rolls);
     }
 }
