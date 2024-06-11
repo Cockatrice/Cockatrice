@@ -1609,7 +1609,7 @@ void Player::actRollDie()
 
     Command_RollDie cmd;
     cmd.set_sides(dlg.getDieSideCount());
-    cmd.set_dice_to_roll(dlg.getDiceToRollCount());
+    cmd.set_count(dlg.getDiceToRollCount());
     sendGameCommand(cmd);
 }
 

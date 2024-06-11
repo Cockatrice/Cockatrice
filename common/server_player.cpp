@@ -1071,7 +1071,7 @@ Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/
 
     const auto validatedSides = static_cast<int>(std::min(std::max(cmd.sides(), MINIMUM_DIE_SIDES), MAXIMUM_DIE_SIDES));
     const auto validatedDiceToRoll =
-        static_cast<int>(std::min(std::max(cmd.dice_to_roll(), MINIMUM_DICE_TO_ROLL), MAXIMUM_DICE_TO_ROLL));
+        static_cast<int>(std::min(std::max(cmd.count(), MINIMUM_DICE_TO_ROLL), MAXIMUM_DICE_TO_ROLL));
 
     Event_RollDie event;
     event.set_sides(validatedSides);
