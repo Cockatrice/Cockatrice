@@ -8,4 +8,8 @@ export default class ModeratorService {
   static banFromServer(minutes: number, userName?: string, address?: string, reason?: string, visibleReason?: string, clientid?: string, removeMessages?: number): void {
     ModeratorCommands.banFromServer(minutes, userName, address, reason, visibleReason, clientid, removeMessages);
   }
+
+  static getBanHistory(userName: string): void {
+    ModeratorCommands.getBanHistory(userName);
+  }
 }
