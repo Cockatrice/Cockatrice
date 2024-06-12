@@ -1967,7 +1967,14 @@ void Player::eventRollDie(const Event_RollDie &event)
         // Backwards compatibility for old clients
         emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
     } else {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         QList<uint> rolls(event.values().begin(), event.values().end());
+#else
+        QList<uint> rolls;
+        for (const auto &value : event.values()) {
+            rolls.append(value);
+        }
+#endif
         std::sort(rolls.begin(), rolls.end());
         emit logRollDie(this, static_cast<int>(event.sides()), rolls);
     }
