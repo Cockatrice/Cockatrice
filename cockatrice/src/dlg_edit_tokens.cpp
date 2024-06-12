@@ -4,7 +4,7 @@
 #include "carddatabasemodel.h"
 #include "gettextwithmax.h"
 #include "main.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QAction>
 #include <QComboBox>

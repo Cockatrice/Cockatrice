@@ -203,7 +203,7 @@ public:
     Response::ResponseCode cmdGameSay(const Command_GameSay &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdShuffle(const Command_Shuffle &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdMulligan(const Command_Mulligan &cmd, ResponseContainer &rc, GameEventStorage &ges);
-    Response::ResponseCode cmdRollDie(const Command_RollDie &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode cmdRollDie(const Command_RollDie &cmd, ResponseContainer &rc, GameEventStorage &ges) const;
     Response::ResponseCode cmdDrawCards(const Command_DrawCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdUndoDraw(const Command_UndoDraw &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer &rc, GameEventStorage &ges);

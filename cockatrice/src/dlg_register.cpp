@@ -2,7 +2,7 @@
 
 #include "pb/serverinfo_user.pb.h"
 #include "settingscache.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QDebug>

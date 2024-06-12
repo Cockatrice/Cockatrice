@@ -10,7 +10,7 @@
 #include "pending_command.h"
 #include "settingscache.h"
 #include "soundengine.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QApplication>
 #include <QDebug>

@@ -5,7 +5,7 @@
 #include "decklist.h"
 #include "main.h"
 #include "settingscache.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QCloseEvent>

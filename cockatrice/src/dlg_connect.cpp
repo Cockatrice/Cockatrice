@@ -1,7 +1,7 @@
 #include "dlg_connect.h"
 
 #include "settingscache.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 #include "userconnection_information.h"
 
 #include <QCheckBox>

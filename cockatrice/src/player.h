@@ -114,7 +114,7 @@ signals:
     // Log events
     void logSay(Player *player, QString message);
     void logShuffle(Player *player, CardZone *zone, int start, int end);
-    void logRollDie(Player *player, int sides, int roll);
+    void logRollDie(Player *player, int sides, const QList<uint> &rolls);
     void logCreateArrow(Player *player,
                         Player *startPlayer,
                         QString startCard,
@@ -259,8 +259,6 @@ private:
     int defaultNumberTopCardsToPlaceBelow = 1;
     int defaultNumberBottomCards = 1;
     int defaultNumberDieRoll = 20;
-    static constexpr int minDieRoll = 2;
-    static constexpr int maxDieRoll = 1000000;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
     int lastTokenTableRow;

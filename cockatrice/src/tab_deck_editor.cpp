@@ -15,9 +15,9 @@
 #include "pictureloader.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
-#include "stringsizes.h"
 #include "tab_supervisor.h"
 #include "tappedout_interface.h"
+#include "trice_limits.h"
 
 #include <QAction>
 #include <QApplication>

@@ -1,6 +1,6 @@
 #include "dlg_edit_avatar.h"
 
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QBuffer>
 #include <QDebug>

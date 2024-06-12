@@ -10,7 +10,7 @@
 #include "pb/session_commands.pb.h"
 #include "pending_command.h"
 #include "soundengine.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 #include "userinfobox.h"
 #include "userlist.h"
 

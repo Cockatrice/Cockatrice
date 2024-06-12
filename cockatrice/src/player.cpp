@@ -9,6 +9,7 @@
 #include "counter_general.h"
 #include "deck_loader.h"
 #include "dlg_create_token.h"
+#include "dlg_roll_dice.h"
 #include "gamescene.h"
 #include "gettextwithmax.h"
 #include "handcounter.h"
@@ -57,10 +58,10 @@
 #include "playertarget.h"
 #include "settingscache.h"
 #include "stackzone.h"
-#include "stringsizes.h"
 #include "tab_game.h"
 #include "tablezone.h"
 #include "thememanager.h"
+#include "trice_limits.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
 
@@ -1601,15 +1602,15 @@ void Player::actUntapAll()
 
 void Player::actRollDie()
 {
-    bool ok;
-    int sides = QInputDialog::getInt(game, tr("Roll die"), tr("Number of sides:"), defaultNumberDieRoll, minDieRoll,
-                                     maxDieRoll, 1, &ok);
-    if (ok) {
-        defaultNumberDieRoll = sides;
-        Command_RollDie cmd;
-        cmd.set_sides(static_cast<google::protobuf::uint32>(sides));
-        sendGameCommand(cmd);
+    DlgRollDice dlg(game);
+    if (!dlg.exec()) {
+        return;
     }
+
+    Command_RollDie cmd;
+    cmd.set_sides(dlg.getDieSideCount());
+    cmd.set_count(dlg.getDiceToRollCount());
+    sendGameCommand(cmd);
 }
 
 void Player::actCreateToken()
@@ -1962,7 +1963,21 @@ void Player::eventShuffle(const Event_Shuffle &event)
 
 void Player::eventRollDie(const Event_RollDie &event)
 {
-    emit logRollDie(this, event.sides(), event.value());
+    if (event.value()) {
+        // Backwards compatibility for old clients
+        emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
+    } else {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        QList<uint> rolls(event.values().begin(), event.values().end());
+#else
+        QList<uint> rolls;
+        for (const auto &value : event.values()) {
+            rolls.append(value);
+        }
+#endif
+        std::sort(rolls.begin(), rolls.end());
+        emit logRollDie(this, static_cast<int>(event.sides()), rolls);
+    }
 }
 
 void Player::eventCreateArrow(const Event_CreateArrow &event)

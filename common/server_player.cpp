@@ -79,7 +79,7 @@
 #include "server_database_interface.h"
 #include "server_game.h"
 #include "server_room.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QDebug>
 #include <algorithm>
@@ -1060,7 +1060,7 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
 }
 
 Response::ResponseCode
-Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges) const
 {
     if (spectator) {
         return Response::RespFunctionNotAllowed;
@@ -1069,9 +1069,15 @@ Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/
         return Response::RespContextError;
     }
 
+    const auto validatedSides = static_cast<int>(std::min(std::max(cmd.sides(), MINIMUM_DIE_SIDES), MAXIMUM_DIE_SIDES));
+    const auto validatedDiceToRoll =
+        static_cast<int>(std::min(std::max(cmd.count(), MINIMUM_DICE_TO_ROLL), MAXIMUM_DICE_TO_ROLL));
+
     Event_RollDie event;
-    event.set_sides(cmd.sides());
-    event.set_value(rng->rand(1, cmd.sides()));
+    event.set_sides(validatedSides);
+    for (auto i = 0; i < validatedDiceToRoll; ++i) {
+        event.add_values(rng->rand(1, validatedSides));
+    }
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;

@@ -48,6 +48,7 @@ set(cockatrice_SOURCES
     src/dlg_load_remote_deck.cpp
     src/dlg_manage_sets.cpp
     src/dlg_register.cpp
+    src/dlg_roll_dice.cpp
     src/dlg_settings.cpp
     src/dlg_tip_of_the_day.cpp
     src/dlg_update.cpp

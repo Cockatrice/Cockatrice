@@ -65,7 +65,7 @@
 #include "server_response_containers.h"
 #include "server_room.h"
 #include "settingscache.h"
-#include "stringsizes.h"
+#include "trice_limits.h"
 #include "version_string.h"
 
 #include <QDateTime>
