@@ -5,7 +5,8 @@ export default class ModeratorService {
     ModeratorCommands.viewLogHistory(filters);
   }
 
-  static banFromServer(minutes: number, userName?: string, address?: string, reason?: string, visibleReason?: string, clientid?: string, removeMessages?: number): void {
+  static banFromServer(minutes: number, userName?: string, address?: string, reason?: string,
+    visibleReason?: string, clientid?: string, removeMessages?: number): void {
     ModeratorCommands.banFromServer(minutes, userName, address, reason, visibleReason, clientid, removeMessages);
   }
 
