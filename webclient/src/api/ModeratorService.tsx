@@ -12,4 +12,8 @@ export default class ModeratorService {
   static getBanHistory(userName: string): void {
     ModeratorCommands.getBanHistory(userName);
   }
+
+  static getWarnHistory(userName: string): void {
+    ModeratorCommands.getWarnHistory(userName);
+  }
 }

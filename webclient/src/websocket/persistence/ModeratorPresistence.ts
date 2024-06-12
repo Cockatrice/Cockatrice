@@ -12,6 +12,10 @@ export class ModeratorPersistence {
         console.log(banHistory);
     }
 
+    static warnHistory(warnList: any) {
+        console.log(warnList);
+    }
+
     static viewLogs(logs: Log[]) {
         ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
     }
