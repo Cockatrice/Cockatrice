@@ -89,10 +89,6 @@ export class SessionPersistence {
     ServerDispatch.userLeft(userName);
   }
 
-  static viewLogs(logs: Log[]) {
-    ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
-  }
-
   static serverMessage(message: string) {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }

@@ -1,5 +1,5 @@
 import webClient from '../../WebClient';
-import { SessionPersistence } from '../../persistence';
+import {ModeratorPersistence} from '../../persistence';
 
 export function viewLogHistory(filters): void {
   const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
@@ -16,7 +16,7 @@ export function viewLogHistory(filters): void {
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
         const { logMessage } = raw['.Response_ViewLogHistory.ext'];
-        SessionPersistence.viewLogs(logMessage)
+        ModeratorPersistence.viewLogs(logMessage)
         return;
       default:
         error = 'Failed to retrieve log history.';
