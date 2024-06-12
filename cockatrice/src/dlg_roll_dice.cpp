@@ -1,23 +1,25 @@
 #include "dlg_roll_dice.h"
+#include "trice_limits.h"
 
 #include <QDialogButtonBox>
-#include <QIntValidator>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <server_player.h>
-#include <trice_limits.h>
+#include <QSpinBox>
 
 DlgRollDice::DlgRollDice(QWidget *parent) : QDialog(parent)
 {
     numberOfSidesLabel = new QLabel(tr("Number of sides:"));
-    numberOfSidesEdit = new QLineEdit(QString::number(DEFAULT_NUMBER_SIDES_DIE));
-    numberOfSidesEdit->setValidator(new QIntValidator(MINIMUM_DIE_SIDES, MAXIMUM_DIE_SIDES, numberOfSidesEdit));
+    numberOfSidesEdit = new QSpinBox(this);
+    numberOfSidesEdit->setValue(DEFAULT_NUMBER_SIDES_DIE);
+    numberOfSidesEdit->setRange(MINIMUM_DIE_SIDES, MAXIMUM_DIE_SIDES);
+    numberOfSidesEdit->setFocus();
     numberOfSidesLabel->setBuddy(numberOfSidesEdit);
 
     numberOfDiceLabel = new QLabel(tr("Number of dice:"));
-    numberOfDiceEdit = new QLineEdit(QString::number(DEFAULT_NUMBER_DICE_TO_ROLL));
-    numberOfDiceEdit->setValidator(new QIntValidator(MINIMUM_DICE_TO_ROLL, MAXIMUM_DICE_TO_ROLL, numberOfDiceEdit));
+    numberOfDiceEdit = new QSpinBox(this);
+    numberOfDiceEdit->setValue(DEFAULT_NUMBER_DICE_TO_ROLL);
+    numberOfDiceEdit->setRange(MINIMUM_DICE_TO_ROLL, MAXIMUM_DICE_TO_ROLL);
     numberOfDiceLabel->setBuddy(numberOfDiceEdit);
 
     auto *grid = new QGridLayout;

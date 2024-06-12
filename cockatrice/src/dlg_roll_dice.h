@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QLabel>
-#include <QLineEdit>
+#include <QSpinBox>
 
 class DlgRollDice : public QDialog
 {
@@ -14,7 +14,7 @@ class DlgRollDice : public QDialog
     static constexpr uint DEFAULT_NUMBER_DICE_TO_ROLL = 1;
 
     QLabel *numberOfSidesLabel, *numberOfDiceLabel;
-    QLineEdit *numberOfSidesEdit, *numberOfDiceEdit;
+    QSpinBox *numberOfSidesEdit, *numberOfDiceEdit;
     QDialogButtonBox *buttonBox;
 
 public:
