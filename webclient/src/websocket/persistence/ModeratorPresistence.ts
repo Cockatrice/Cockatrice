@@ -12,6 +12,10 @@ export class ModeratorPersistence {
         console.log(banHistory);
     }
 
+    static warnUser(userName: any) {
+        console.log(userName);
+    }
+
     static warnHistory(warnList: any) {
         console.log(warnList);
     }

@@ -16,4 +16,8 @@ export default class ModeratorService {
   static getWarnHistory(userName: string): void {
     ModeratorCommands.getWarnHistory(userName);
   }
+
+  static warnUser(userName: string, reason: string, clientid?: string, removeMessage?: boolean): void {
+    ModeratorCommands.warnUser(userName, reason, clientid, removeMessage);
+  }
 }
