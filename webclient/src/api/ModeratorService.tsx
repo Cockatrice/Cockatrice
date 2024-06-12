@@ -1,7 +1,7 @@
-import { SessionCommands } from 'websocket';
+import { ModeratorCommands } from 'websocket';
 
 export default class ModeratorService {
   static viewLogHistory(filters): void {
-    SessionCommands.viewLogHistory(filters);
+    ModeratorCommands.viewLogHistory(filters);
   }
 }
