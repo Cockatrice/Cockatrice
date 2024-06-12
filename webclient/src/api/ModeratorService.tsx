@@ -20,4 +20,8 @@ export default class ModeratorService {
   static warnUser(userName: string, reason: string, clientid?: string, removeMessage?: boolean): void {
     ModeratorCommands.warnUser(userName, reason, clientid, removeMessage);
   }
+
+  static getWarnList(modName: string, userName: string, userClientid: string): void {
+    ModeratorCommands.getWarnList(modName, userName, userClientid);
+  }
 }

@@ -20,6 +20,10 @@ export class ModeratorPersistence {
         console.log(warnList);
     }
 
+    static warnList(warning: any) {
+        console.log(warning);
+    }
+
     static viewLogs(logs: Log[]) {
         ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
     }
