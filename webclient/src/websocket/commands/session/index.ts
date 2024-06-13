@@ -13,4 +13,3 @@ export * from './resetPassword';
 export * from './resetPasswordChallenge'
 export * from './resetPasswordRequest';
 export * from './updateStatus';
-export * from './viewLogHistory';

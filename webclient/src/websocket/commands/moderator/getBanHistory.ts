@@ -1,25 +1,25 @@
 import webClient from '../../WebClient';
-import { SessionPersistence } from '../../persistence';
+import { ModeratorPersistence } from '../../persistence';
 
-export function viewLogHistory(filters): void {
-  const CmdViewLogHistory = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
+export function getBanHistory(userName: string): void {
+  const command = webClient.protobuf.controller.Command_GetBanHistory.create({ userName });
 
   const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_ViewLogHistory.ext': CmdViewLogHistory
+    '.Command_GetBanHistory.ext': command
   });
 
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;
 
-    let error;
+    let error: string;
 
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
-        const { logMessage } = raw['.Response_ViewLogHistory.ext'];
-        SessionPersistence.viewLogs(logMessage)
+        const { banList } = raw['.Response_BanHistory.ext'];
+        ModeratorPersistence.banHistory(banList);
         return;
       default:
-        error = 'Failed to retrieve log history.';
+        error = 'Failed to get ban history.';
         break;
     }
 
