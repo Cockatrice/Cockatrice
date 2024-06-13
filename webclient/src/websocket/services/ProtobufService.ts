@@ -55,6 +55,14 @@ export class ProtobufService {
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
+  public sendAdminCommand(adminCmd: number, callback?: Function) {
+    const cmd = this.controller.CommandContainer.create({
+      'adminCommand': [adminCmd]
+    });
+
+    this.sendCommand(cmd, (raw) => callback && callback(raw));
+  }
+
   public sendCommand(cmd: number, callback: Function) {
     this.cmdId++;
 

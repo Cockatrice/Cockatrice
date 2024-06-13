@@ -1,3 +1,4 @@
+export { default as AdminService } from './AdminService';
 export { default as AuthenticationService } from './AuthenticationService';
 export { default as ModeratorService } from './ModeratorService';
 export { default as RoomsService } from './RoomsService';
