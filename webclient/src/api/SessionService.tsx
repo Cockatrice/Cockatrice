@@ -16,4 +16,12 @@ export default class SessionService {
   static removeFromIgnoreList(userName: string) {
     SessionCommands.removeFromIgnoreList(userName);
   }
+
+  static changeAccountPassword(oldPassword: string, newPassword: string, hashedNewPassword?: string): void {
+    SessionCommands.accountPassword(oldPassword, newPassword, hashedNewPassword);
+  }
+
+  static changeAccountDetails(passwordCheck: string, realName?: string, email?: string, country?: string): void {
+    SessionCommands.accountEdit(passwordCheck, realName, email, country);
+  }
 }
