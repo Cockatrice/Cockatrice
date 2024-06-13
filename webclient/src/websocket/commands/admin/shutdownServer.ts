@@ -1,11 +1,11 @@
 import webClient from '../../WebClient';
 import { AdminPersistence } from '../../persistence';
 
-export function updateServerMessage(): void {
-  const command = webClient.protobuf.controller.Command_UpdateServerMessage.create();
+export function shutdownServer(reason: string, minutes: number): void {
+  const command = webClient.protobuf.controller.Command_ShutdownServer.create({ reason, minutes });
 
   const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_UpdateServerMessage.ext': command
+    '.Command_ShutdownServer.ext': command
   });
 
   webClient.protobuf.sendAdminCommand(sc, (raw) => {
@@ -15,7 +15,7 @@ export function updateServerMessage(): void {
 
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
-        AdminPersistence.updateServerMessage();
+        AdminPersistence.shutdownServer();
         return;
       default:
         error = 'Failed to update server message.';
