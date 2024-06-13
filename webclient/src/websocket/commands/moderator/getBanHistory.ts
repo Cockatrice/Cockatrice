@@ -11,7 +11,7 @@ export function getBanHistory(userName: string): void {
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;
 
-    let error;
+    let error: string;
 
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:

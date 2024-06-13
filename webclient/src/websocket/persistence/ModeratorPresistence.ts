@@ -12,8 +12,8 @@ export class ModeratorPersistence {
     console.log(banHistory);
   }
 
-  static warnUser(userName: any) {
-    console.log(userName);
+  static viewLogs(logs: Log[]) {
+    ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
   }
 
   static warnHistory(warnList: any) {
@@ -24,7 +24,7 @@ export class ModeratorPersistence {
     console.log(warning);
   }
 
-  static viewLogs(logs: Log[]) {
-    ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
+  static warnUser(userName: any) {
+    console.log(userName);
   }
 }

@@ -14,9 +14,7 @@ export function banFromServer(minutes: number, userName?: string, address?: stri
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;
 
-    console.log(raw);
-
-    let error;
+    let error: string;
 
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
