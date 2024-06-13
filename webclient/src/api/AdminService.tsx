@@ -1,6 +1,10 @@
 import { AdminCommands } from 'websocket';
 
 export default class AdminService {
+    static adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {
+        AdminCommands.adjustMod(userName, shouldBeMod, shouldBeJudge);
+    }
+
     static reloadConfig(): void {
         AdminCommands.reloadConfig();
     }
