@@ -16,13 +16,13 @@ export function accountEdit(passwordCheck: string, realName?: string, email?: st
         SessionPersistence.accountEditChanged(realName, email, country);
         break;
       case webClient.protobuf.controller.Response.ResponseCode.RespFunctionNotAllowed:
-        console.log("Not allowed");
+        console.log('Not allowed');
         break;
       case webClient.protobuf.controller.Response.ResponseCode.RespWrongPassword:
-        console.log("Wrong password");
+        console.log('Wrong password');
         break;
       default:
-        console.log("Failed to update information");
+        console.log('Failed to update information');
     }
   });
 }

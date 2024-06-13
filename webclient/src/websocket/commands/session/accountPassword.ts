@@ -16,7 +16,7 @@ export function accountPassword(oldPassword: string, newPassword: string, hashed
         SessionPersistence.accountPasswordChange();
         break;
       default:
-        console.log("Failed to change password");
+        console.log('Failed to change password');
     }
   });
 }

@@ -146,10 +146,10 @@ export class SessionPersistence {
   }
 
   static accountPasswordChange(): void {
-    console.log("accountPassword");
+    console.log('accountPassword');
   }
 
   static accountEditChanged(realName?: string, email?: string, country?: string): void {
-    console.log("accountEditChange");
+    console.log('accountEditChange');
   }
 }
