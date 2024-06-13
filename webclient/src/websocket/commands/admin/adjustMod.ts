@@ -2,7 +2,7 @@ import webClient from '../../WebClient';
 import { AdminPersistence } from '../../persistence';
 
 export function adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {
-  const command = webClient.protobuf.controller.Command_ReloadConfig.create({ userName, shouldBeMod, shouldBeJudge });
+  const command = webClient.protobuf.controller.Command_AdjustMod.create({ userName, shouldBeMod, shouldBeJudge });
 
   const sc = webClient.protobuf.controller.AdminCommand.create({
     '.Command_AdjustMod.ext': command
