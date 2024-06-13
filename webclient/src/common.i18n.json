@@ -13,6 +13,7 @@
       "password": "Password",
       "passwordAgain": "Password Again",
       "port": "Port",
+      "https": "Use HTTPS",
       "realName": "Real Name",
       "saveChanges": "Save Changes",
       "token": "Token",
@@ -282,5 +283,5 @@
       "nl": "Dutch",
       "pt_BR": "Portuguese - Brazil"
     }
-  } 
+  }
 }

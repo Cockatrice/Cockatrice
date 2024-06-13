@@ -144,12 +144,13 @@ const KnownHosts = (props) => {
     setShowDeleteToast(true)
   };
 
-  const handleDialogSubmit = async ({ id, name, host, port }) => {
+  const handleDialogSubmit = async ({ id, name, host, port, https }) => {
     if (id) {
       const hostDTO = await HostDTO.get(id);
       hostDTO.name = name;
       hostDTO.host = host;
       hostDTO.port = port;
+      hostDTO.https = https;
       await hostDTO.save();
 
       setHostsState(s => ({
@@ -159,7 +160,7 @@ const KnownHosts = (props) => {
       }));
       setShowEditToast(true)
     } else {
-      const newHost: Host = { name, host, port, editable: true };
+      const newHost: Host = { name, host, port, https, editable: true };
       newHost.id = await HostDTO.add(newHost) as number;
 
       setHostsState(s => ({
@@ -203,7 +204,7 @@ const KnownHosts = (props) => {
   return (
     <Root className={'KnownHosts ' + classes.root}>
       <FormControl className='KnownHosts-form' size='small' variant='outlined'>
-        { touched && (
+        {touched && (
           <div className='KnownHosts-validation'>
             {
               (error &&
@@ -216,9 +217,9 @@ const KnownHosts = (props) => {
               (warning && <div className='KnownHosts-warning'>{warning}</div>)
             }
           </div>
-        ) }
+        )}
 
-        <InputLabel id='KnownHosts-select'>{ t('KnownHosts.label') }</InputLabel>
+        <InputLabel id='KnownHosts-select'>{t('KnownHosts.label')}</InputLabel>
         <Select
           id='KnownHosts-select'
           labelId='KnownHosts-label'
@@ -231,7 +232,7 @@ const KnownHosts = (props) => {
           disabled={disabled}
         >
           <Button value={hostsState.selectedHost} onClick={openAddKnownHostDialog}>
-            <span>{ t('KnownHosts.add') }</span>
+            <span>{t('KnownHosts.add')}</span>
             <AddIcon fontSize='small' color='primary' />
           </Button>
 
@@ -250,17 +251,17 @@ const KnownHosts = (props) => {
 
                     <div className='KnownHosts-item__label'>
                       <Check />
-                      <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>
+                      <span>{host.name} ({getHostPort(hostsState.hosts[index]).host}:{getHostPort(hostsState.hosts[index]).port})</span>
                     </div>
                   </div>
 
-                  { host.editable && (
+                  {host.editable && (
                     <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={(e) => {
                       openEditKnownHostDialog(hostsState.hosts[index]);
                     }}>
                       <EditRoundedIcon fontSize='small' />
                     </IconButton>
-                  ) }
+                  )}
                 </div>
               </MenuItem>
             ))
@@ -275,9 +276,9 @@ const KnownHosts = (props) => {
         onSubmit={handleDialogSubmit}
         handleClose={closeKnownHostDialog}
       />
-      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>{ t('KnownHosts.toast', { mode: 'created' }) }</Toast>
-      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>{ t('KnownHosts.toast', { mode: 'deleted' }) }</Toast>
-      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>{ t('KnownHosts.toast', { mode: 'edited' }) }</Toast>
+      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>{t('KnownHosts.toast', { mode: 'created' })}</Toast>
+      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>{t('KnownHosts.toast', { mode: 'deleted' })}</Toast>
+      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>{t('KnownHosts.toast', { mode: 'edited' })}</Toast>
     </Root>
   );
 };
