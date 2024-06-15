@@ -30,4 +30,8 @@ export default class SessionService {
   static changeAccountImage(image: IBytesValue): void {
     SessionCommands.accountImage(image);
   }
+
+  static sendDirectMessage(userName: string, message: string): void {
+    SessionCommands.message(userName, message);
+  }
 }

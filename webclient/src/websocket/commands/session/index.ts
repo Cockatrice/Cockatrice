@@ -16,3 +16,4 @@ export * from './updateStatus';
 export * from './accountPassword';
 export * from './accountEdit';
 export * from './accountImage';
+export * from "./message";

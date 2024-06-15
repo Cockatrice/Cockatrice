@@ -156,4 +156,8 @@ export class SessionPersistence {
   static accountImageChanged(): void {
     console.log("accountImageChanged");
   }
+
+  static directMessageSent(userName: string, message: string): void {
+    console.log("directMessageSent");
+  }
 }
