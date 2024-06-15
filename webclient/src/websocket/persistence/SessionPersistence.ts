@@ -154,14 +154,14 @@ export class SessionPersistence {
   }
 
   static accountImageChanged(): void {
-    console.log("accountImageChanged");
+    console.log('accountImageChanged');
   }
 
   static directMessageSent(userName: string, message: string): void {
-    console.log("directMessageSent");
+    console.log('directMessageSent');
   }
 
   static getUserInfo(userInfo: string) {
-    console.log("getUserInfo");
+    console.log('getUserInfo');
   }
 }

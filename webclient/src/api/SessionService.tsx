@@ -1,5 +1,5 @@
 import { SessionCommands } from 'websocket';
-import {common} from "protobufjs";
+import { common } from 'protobufjs';
 import IBytesValue = common.IBytesValue;
 
 export default class SessionService {

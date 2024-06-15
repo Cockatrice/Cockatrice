@@ -1,6 +1,6 @@
 import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
-import {common} from "protobufjs";
+import { common } from 'protobufjs';
 import IBytesValue = common.IBytesValue;
 
 export function accountImage(image: IBytesValue): void {
