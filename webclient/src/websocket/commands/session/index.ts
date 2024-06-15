@@ -13,3 +13,8 @@ export * from './resetPassword';
 export * from './resetPasswordChallenge'
 export * from './resetPasswordRequest';
 export * from './updateStatus';
+export * from './accountPassword';
+export * from './accountEdit';
+export * from './accountImage';
+export * from './message';
+export * from './getUserInfo';

@@ -144,4 +144,24 @@ export class SessionPersistence {
   static resetPasswordFailed() {
     ServerDispatch.resetPasswordFailed();
   }
+
+  static accountPasswordChange(): void {
+    console.log('accountPassword');
+  }
+
+  static accountEditChanged(realName?: string, email?: string, country?: string): void {
+    console.log('accountEditChange');
+  }
+
+  static accountImageChanged(): void {
+    console.log('accountImageChanged');
+  }
+
+  static directMessageSent(userName: string, message: string): void {
+    console.log('directMessageSent');
+  }
+
+  static getUserInfo(userInfo: string) {
+    console.log('getUserInfo');
+  }
 }
