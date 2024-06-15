@@ -1,4 +1,6 @@
 import { SessionCommands } from 'websocket';
+import {common} from "protobufjs";
+import IBytesValue = common.IBytesValue;
 
 export default class SessionService {
   static addToBuddyList(userName: string) {
@@ -23,5 +25,9 @@ export default class SessionService {
 
   static changeAccountDetails(passwordCheck: string, realName?: string, email?: string, country?: string): void {
     SessionCommands.accountEdit(passwordCheck, realName, email, country);
+  }
+
+  static changeAccountImage(image: IBytesValue): void {
+    SessionCommands.accountImage(image);
   }
 }

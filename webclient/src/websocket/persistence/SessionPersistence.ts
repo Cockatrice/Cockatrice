@@ -152,4 +152,8 @@ export class SessionPersistence {
   static accountEditChanged(realName?: string, email?: string, country?: string): void {
     console.log('accountEditChange');
   }
+
+  static accountImageChanged(): void {
+    console.log("accountImageChanged");
+  }
 }
