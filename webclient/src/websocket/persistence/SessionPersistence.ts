@@ -160,4 +160,8 @@ export class SessionPersistence {
   static directMessageSent(userName: string, message: string): void {
     console.log("directMessageSent");
   }
+
+  static getUserInfo(userInfo: string) {
+    console.log("getUserInfo");
+  }
 }

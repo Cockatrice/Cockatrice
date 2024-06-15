@@ -34,4 +34,8 @@ export default class SessionService {
   static sendDirectMessage(userName: string, message: string): void {
     SessionCommands.message(userName, message);
   }
+
+  static getUserInfo(userName: string): void {
+    SessionCommands.getUserInfo(userName);
+  }
 }
