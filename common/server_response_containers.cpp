@@ -41,8 +41,10 @@ void GameEventStorage::setGameEventContext(const ::google::protobuf::Message &_g
 void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event,
                                         int playerId,
                                         GameEventStorageItem::EventRecipients recipients,
-                                        int _privatePlayerId)
+                                        int _privatePlayerId,
+                                        bool _overwriteOwnership)
 {
+    overwriteOwnership = _overwriteOwnership;
     gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
     if (_privatePlayerId != -1)
         privatePlayerId = _privatePlayerId;
@@ -53,18 +55,21 @@ void GameEventStorage::sendToGame(Server_Game *game)
     if (gameEventList.isEmpty())
         return;
 
-    GameEventContainer *contPrivate = new GameEventContainer;
-    GameEventContainer *contOthers = new GameEventContainer;
+    auto *contPrivate = new GameEventContainer;
+    auto *contOthers = new GameEventContainer;
     int id = privatePlayerId;
-    bool overwriteOwnership = false;
     if (forcedByJudge != -1) {
         contPrivate->set_forced_by_judge(forcedByJudge);
         contOthers->set_forced_by_judge(forcedByJudge);
-        overwriteOwnership = true;
+        if (overwriteOwnership) {
+            id = forcedByJudge;
+            overwriteOwnership = false;
+        }
     }
-    for (int i = 0; i < gameEventList.size(); ++i) {
-        const GameEvent &event = gameEventList[i]->getGameEvent();
-        const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
+
+    for (const auto &i : gameEventList) {
+        const GameEvent &event = i->getGameEvent();
+        const GameEventStorageItem::EventRecipients recipients = i->getRecipients();
         if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
             contPrivate->add_event_list()->CopyFrom(event);
         if (recipients.testFlag(GameEventStorageItem::SendToOthers))
@@ -75,9 +80,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
         contOthers->mutable_context()->CopyFrom(*gameEventContext);
     }
 
-    // GameCommand::REVEAL_CARDS
-
-    game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, id, overwriteOwnership);
+    game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, id);
     game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, id);
 }
 

@@ -2085,7 +2085,7 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
             zone->addWritePermission(cmd.player_id());
         }
 
-        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, cmd.player_id());
+        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, cmd.player_id(), judge);
         ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
     } else {
         if (cmd.grant_write_access()) {

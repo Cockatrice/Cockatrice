@@ -50,6 +50,7 @@ private:
     QList<GameEventStorageItem *> gameEventList;
     int privatePlayerId;
     int forcedByJudge = -1;
+    bool overwriteOwnership = false;
 
 public:
     GameEventStorage();
@@ -72,12 +73,17 @@ public:
     {
         forcedByJudge = playerId;
     }
+    void setOverwriteOwnership(bool shouldOverwriteOwnership)
+    {
+        overwriteOwnership = shouldOverwriteOwnership;
+    }
 
     void enqueueGameEvent(const ::google::protobuf::Message &event,
                           int playerId,
                           GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
                                                                              GameEventStorageItem::SendToOthers,
-                          int _privatePlayerId = -1);
+                          int _privatePlayerId = -1,
+                          bool _overwriteOwnership = false);
     void sendToGame(Server_Game *game);
 };
 
