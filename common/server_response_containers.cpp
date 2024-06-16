@@ -44,7 +44,7 @@ void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event
                                         int _privatePlayerId,
                                         bool _overwriteOwnership)
 {
-    overwriteOwnership = _overwriteOwnership;
+    setOverwriteOwnership(_overwriteOwnership);
     gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
     if (_privatePlayerId != -1)
         privatePlayerId = _privatePlayerId;
@@ -63,7 +63,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
         contOthers->set_forced_by_judge(forcedByJudge);
         if (overwriteOwnership) {
             id = forcedByJudge;
-            overwriteOwnership = false;
+            setOverwriteOwnership(false);
         }
     }
 
@@ -79,7 +79,6 @@ void GameEventStorage::sendToGame(Server_Game *game)
         contPrivate->mutable_context()->CopyFrom(*gameEventContext);
         contOthers->mutable_context()->CopyFrom(*gameEventContext);
     }
-
     game->sendGameEventContainer(contPrivate, GameEventStorageItem::SendToPrivate, id);
     game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, id);
 }
