@@ -294,7 +294,7 @@ void Server_Game::sendGameStateToPlayers()
     for (Server_Player *player : players.values()) {
         GameEventContainer *gec;
         if (player->getSpectator()) {
-            qDebug() << "Player" << player->getUserInfo()->name()
+            qDebug() << "Player" << QString::fromUtf8(player->getUserInfo()->name().c_str())
                      << "spectatorsSeeEverything=" << spectatorsSeeEverything
                      << "player->getJudge()=" << player->getJudge();
             if (spectatorsSeeEverything || player->getJudge()) {
