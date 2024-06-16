@@ -294,14 +294,9 @@ void Server_Game::sendGameStateToPlayers()
     for (Server_Player *player : players.values()) {
         GameEventContainer *gec;
         if (player->getSpectator()) {
-            qDebug() << "Player" << QString::fromUtf8(player->getUserInfo()->name().c_str())
-                     << "spectatorsSeeEverything=" << spectatorsSeeEverything
-                     << "player->getJudge()=" << player->getJudge();
             if (spectatorsSeeEverything || player->getJudge()) {
-                qDebug() << "Spectator can see all omniscient events";
                 gec = prepareGameEvent(omniscientEvent, -1);
             } else {
-                qDebug() << "Spectator can only see normal events";
                 gec = prepareGameEvent(spectatorNormalEvent, -1);
             }
         } else {
@@ -347,7 +342,7 @@ void Server_Game::doStartGameIfReady()
         gameInfo->set_started(false);
 
         Event_GameStateChanged omniscientEvent;
-        createGameStateChangedEvent(&omniscientEvent, 0, true, true);
+        createGameStateChangedEvent(&omniscientEvent, nullptr, true, true);
 
         GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
         replayCont->set_seconds_elapsed(0);
@@ -732,8 +727,8 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
 
     cont->set_game_id(gameId);
     for (Server_Player *player : players.values()) {
-        const bool playerPrivate =
-            (player->getPlayerId() == privatePlayerId) || (player->getSpectator() && spectatorsSeeEverything);
+        const bool playerPrivate = (player->getPlayerId() == privatePlayerId) ||
+                                   (player->getSpectator() && (spectatorsSeeEverything || player->getJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
             player->sendGameEvent(*cont);
