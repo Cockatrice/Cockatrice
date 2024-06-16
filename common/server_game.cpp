@@ -276,7 +276,7 @@ void Server_Game::sendGameStateToPlayers()
 {
     // game state information for replay and omniscient spectators
     Event_GameStateChanged omniscientEvent;
-    createGameStateChangedEvent(&omniscientEvent, 0, true, false);
+    createGameStateChangedEvent(&omniscientEvent, nullptr, true, false);
 
     GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
     replayCont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
@@ -287,18 +287,19 @@ void Server_Game::sendGameStateToPlayers()
     // If spectators are not omniscient, we need an additional createGameStateChangedEvent call, otherwise we can use
     // the data we used for the replay. All spectators are equal, so we don't need to make a createGameStateChangedEvent
     // call for each one.
-    Event_GameStateChanged spectatorEvent;
-    if (spectatorsSeeEverything)
-        spectatorEvent = omniscientEvent;
-    else
-        createGameStateChangedEvent(&spectatorEvent, 0, false, false);
+    Event_GameStateChanged spectatorEmptyEvent;
+    createGameStateChangedEvent(&spectatorEmptyEvent, nullptr, false, false);
 
     // send game state info to clients according to their role in the game
     for (Server_Player *player : players.values()) {
         GameEventContainer *gec;
-        if (player->getSpectator())
-            gec = prepareGameEvent(spectatorEvent, -1);
-        else {
+        if (player->getSpectator()) {
+            if (spectatorsSeeEverything || player->getJudge()) {
+                gec = prepareGameEvent(omniscientEvent, -1);
+            } else {
+                gec = prepareGameEvent(spectatorEmptyEvent, -1);
+            }
+        } else {
             Event_GameStateChanged event;
             createGameStateChangedEvent(&event, player, false, false);
 
