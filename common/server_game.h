@@ -206,7 +206,8 @@ public:
     void sendGameEventContainer(GameEventContainer *cont,
                                 GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
                                                                                    GameEventStorageItem::SendToOthers,
-                                int privatePlayerId = -1);
+                                int privatePlayerId = -1,
+                                bool overwriteOwnership = false);
 };
 
 #endif

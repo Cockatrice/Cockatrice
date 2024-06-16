@@ -721,13 +721,14 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
 
 void Server_Game::sendGameEventContainer(GameEventContainer *cont,
                                          GameEventStorageItem::EventRecipients recipients,
-                                         int privatePlayerId)
+                                         int privatePlayerId,
+                                         bool overwriteOwnership)
 {
     QMutexLocker locker(&gameMutex);
 
     cont->set_game_id(gameId);
     for (Server_Player *player : players.values()) {
-        const bool playerPrivate = (player->getPlayerId() == privatePlayerId) ||
+        const bool playerPrivate = (player->getPlayerId() == privatePlayerId) || overwriteOwnership ||
                                    (player->getSpectator() && (spectatorsSeeEverything || player->getJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
