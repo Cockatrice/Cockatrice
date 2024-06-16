@@ -53,17 +53,21 @@ void GameEventStorage::sendToGame(Server_Game *game)
     if (gameEventList.isEmpty())
         return;
 
-    GameEventContainer *contPrivate = new GameEventContainer;
-    GameEventContainer *contOthers = new GameEventContainer;
+    auto *contPrivate = new GameEventContainer;
+    auto *contOthers = new GameEventContainer;
     int id = privatePlayerId;
     if (forcedByJudge != -1) {
         contPrivate->set_forced_by_judge(forcedByJudge);
         contOthers->set_forced_by_judge(forcedByJudge);
-        id = forcedByJudge;
+        if (overwriteOwnership) {
+            id = forcedByJudge;
+            setOverwriteOwnership(false);
+        }
     }
-    for (int i = 0; i < gameEventList.size(); ++i) {
-        const GameEvent &event = gameEventList[i]->getGameEvent();
-        const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
+
+    for (const auto &i : gameEventList) {
+        const GameEvent &event = i->getGameEvent();
+        const GameEventStorageItem::EventRecipients recipients = i->getRecipients();
         if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
             contPrivate->add_event_list()->CopyFrom(event);
         if (recipients.testFlag(GameEventStorageItem::SendToOthers))

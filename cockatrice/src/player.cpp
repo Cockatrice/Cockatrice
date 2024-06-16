@@ -152,7 +152,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     stack = new StackZone(this, (int)table->boundingRect().height(), this);
 
-    hand = new HandZone(this, _local || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
+    hand = new HandZone(this, _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
                         (int)table->boundingRect().height(), this);
     connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
     connect(handCounter, SIGNAL(showContextMenu(const QPoint &)), hand, SLOT(showContextMenu(const QPoint &)));
