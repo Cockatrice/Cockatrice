@@ -41,10 +41,8 @@ void GameEventStorage::setGameEventContext(const ::google::protobuf::Message &_g
 void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event,
                                         int playerId,
                                         GameEventStorageItem::EventRecipients recipients,
-                                        int _privatePlayerId,
-                                        bool _overwriteOwnership)
+                                        int _privatePlayerId)
 {
-    setOverwriteOwnership(_overwriteOwnership);
     gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
     if (_privatePlayerId != -1)
         privatePlayerId = _privatePlayerId;

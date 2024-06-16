@@ -82,8 +82,7 @@ public:
                           int playerId,
                           GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
                                                                              GameEventStorageItem::SendToOthers,
-                          int _privatePlayerId = -1,
-                          bool _overwriteOwnership = false);
+                          int _privatePlayerId = -1);
     void sendToGame(Server_Game *game);
 };
 
