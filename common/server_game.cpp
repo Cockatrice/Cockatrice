@@ -287,17 +287,22 @@ void Server_Game::sendGameStateToPlayers()
     // If spectators are not omniscient, we need an additional createGameStateChangedEvent call, otherwise we can use
     // the data we used for the replay. All spectators are equal, so we don't need to make a createGameStateChangedEvent
     // call for each one.
-    Event_GameStateChanged spectatorEmptyEvent;
-    createGameStateChangedEvent(&spectatorEmptyEvent, nullptr, false, false);
+    Event_GameStateChanged spectatorNormalEvent;
+    createGameStateChangedEvent(&spectatorNormalEvent, nullptr, false, false);
 
     // send game state info to clients according to their role in the game
     for (Server_Player *player : players.values()) {
         GameEventContainer *gec;
         if (player->getSpectator()) {
+            qDebug() << "Player" << player->getUserInfo()->name()
+                     << "spectatorsSeeEverything=" << spectatorsSeeEverything
+                     << "player->getJudge()=" << player->getJudge();
             if (spectatorsSeeEverything || player->getJudge()) {
+                qDebug() << "Spectator can see all omniscient events";
                 gec = prepareGameEvent(omniscientEvent, -1);
             } else {
-                gec = prepareGameEvent(spectatorEmptyEvent, -1);
+                qDebug() << "Spectator can only see normal events";
+                gec = prepareGameEvent(spectatorNormalEvent, -1);
             }
         } else {
             Event_GameStateChanged event;
@@ -712,7 +717,7 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     event2.set_active_phase(activePhase);
 
     for (auto *_player : players.values()) {
-        _player->getInfo(event2.add_player_list(), _player, _player->getSpectator() && spectatorsSeeEverything, true);
+        _player->getInfo(event2.add_player_list(), _player, (_player->getSpectator() && spectatorsSeeEverything) || _player->getJudge(), true);
     }
 
     rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
