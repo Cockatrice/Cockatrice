@@ -1,11 +1,5 @@
 import { Game, User } from 'types';
 
-export interface RoomEvent {
-  roomEvent: {
-    roomId: number;
-  }
-}
-
 export interface JoinRoomData {
   userInfo: User;
 }
@@ -21,4 +15,10 @@ export interface ListGamesData {
 export interface RemoveMessagesData {
   name: string;
   amount: number;
+}
+
+export interface RoomEvent {
+  roomEvent: {
+    roomId: number;
+  }
 }

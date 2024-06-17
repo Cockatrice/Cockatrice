@@ -3,7 +3,12 @@ import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
-import { GameJoinedData } from '../events/session/interfaces';
+import {
+  GameJoinedData,
+  NotifyUserData,
+  PlayerGamePropertiesData,
+  ServerShutdownData, UserMessageData
+} from '../events/session/interfaces';
 
 export class SessionPersistence {
   static initialized() {
@@ -172,5 +177,21 @@ export class SessionPersistence {
 
   static gameJoined(gameJoinedData: GameJoinedData): void {
     console.log('gameJoined', gameJoinedData);
+  }
+
+  static notifyUser(payload: NotifyUserData): void {
+    console.log('notifyUser', payload);
+  }
+
+  static playerPropertiesChanged(payload: PlayerGamePropertiesData): void {
+    console.log('playerPropertiesChanged', payload);
+  }
+
+  static serverShutdown(payload: ServerShutdownData): void {
+    console.log('serverShutdown', payload);
+  }
+
+  static userMessage(payload: UserMessageData): void {
+    console.log('userMessage', payload);
   }
 }
