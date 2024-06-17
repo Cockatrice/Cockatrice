@@ -14,6 +14,7 @@ import { userMessage } from './userMessage';
 import { gameJoined } from './gameJoined';
 
 export const SessionEvents: ProtobufEvents = {
+  '.Event_AddToList.ext': addToList,
   '.Event_ConnectionClosed.ext': connectionClosed,
   '.Event_GameJoined.ext': gameJoined,
   '.Event_ListRooms.ext': listRooms,
@@ -27,5 +28,4 @@ export const SessionEvents: ProtobufEvents = {
   '.Event_UserJoined.ext': userJoined,
   '.Event_UserLeft.ext': userLeft,
   '.Event_UserMessage.ext': userMessage,
-  '.Event_AddToList.ext': addToList,
 }
