@@ -85,13 +85,17 @@ class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDeck
 private:
     QString name;
     class compareFunctor;
+    qsizetype limit;
 
 public:
-    explicit InnerDecklistNode(QString _name = QString(), InnerDecklistNode *_parent = nullptr)
+    explicit InnerDecklistNode(QString _name, InnerDecklistNode *_parent)
         : AbstractDecklistNode(_parent), name(std::move(_name))
     {
     }
-    explicit InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = nullptr);
+    explicit InnerDecklistNode(qsizetype limit_ = 0) : limit(limit_)
+    {
+    }
+    explicit InnerDecklistNode(InnerDecklistNode *other);
     ~InnerDecklistNode() override;
     void setSortMethod(DeckSortMethod method) override;
     QString getName() const override
@@ -115,6 +119,8 @@ public:
 
     bool readElement(QXmlStreamReader *xml) override;
     void writeElement(QXmlStreamWriter *xml) override;
+
+    bool addCardCount(qsizetype amount);
 };
 
 class AbstractDecklistCardNode : public AbstractDecklistNode
@@ -204,9 +210,9 @@ public slots:
     }
 
 public:
-    explicit DeckList();
+    explicit DeckList(qsizetype limit = 0);
     DeckList(const DeckList &other);
-    explicit DeckList(const QString &nativeString);
+    explicit DeckList(const QString &nativeString, qsizetype limit = 0);
     ~DeckList() override;
     QString getName() const
     {

@@ -47,6 +47,7 @@ private:
     QMap<QString, Server_ProtocolHandler *> users;
     QMap<QString, ServerInfo_User_Container> externalUsers;
     QList<ServerInfo_ChatMessage> chatHistory;
+    qsizetype cardLimit;
 private slots:
     void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
 
@@ -63,6 +64,7 @@ public:
                 bool _autoJoin,
                 const QString &_joinMessage,
                 const QStringList &_gameTypes,
+                qsizetype limit,
                 Server *parent);
     ~Server_Room();
     int getId() const
@@ -139,6 +141,10 @@ public:
 
     void sendRoomEvent(RoomEvent *event, bool sendToIsl = true);
     RoomEvent *prepareRoomEvent(const ::google::protobuf::Message &roomEvent);
+
+    qsizetype getCardLimit(){
+      return cardLimit;
+    }
 };
 
 #endif

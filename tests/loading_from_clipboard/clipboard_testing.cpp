@@ -13,22 +13,36 @@ void Result::operator()(const InnerDecklistNode *innerDecklistNode, const Deckli
     }
 }
 
-void testEmpty(const QString &clipboard)
+DeckList getDeckList(const QString &clipboard)
 {
-    QString cp(clipboard);
     DeckList deckList;
+    QString cp(clipboard);
     QTextStream stream(&cp); // text stream requires local copy
     deckList.loadFromStream_Plain(stream);
+    return deckList;
+}
+
+void testEmpty(const QString &clipboard)
+{
+    DeckList deckList = getDeckList(clipboard);
 
     ASSERT_TRUE(deckList.getCardList().isEmpty());
 }
 
+void testHash(const QString &clipboard, const std::string &hash)
+{
+    DeckList deckList = getDeckList(clipboard);
+    std::cout << deckList.writeToString_Native().toStdString() << std::endl;
+
+    if (deckList.getCardList().isEmpty()) {
+        deckList.updateDeckHash();
+    }
+    ASSERT_EQ(deckList.getDeckHash().toStdString(), hash);
+}
+
 void testDeck(const QString &clipboard, const Result &result)
 {
-    QString cp(clipboard);
-    DeckList deckList;
-    QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream);
+    DeckList deckList = getDeckList(clipboard);
 
     ASSERT_EQ(result.name, deckList.getName().toStdString());
     ASSERT_EQ(result.comments, deckList.getComments().toStdString());
