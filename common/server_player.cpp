@@ -1076,7 +1076,12 @@ Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/
     Event_RollDie event;
     event.set_sides(validatedSides);
     for (auto i = 0; i < validatedDiceToRoll; ++i) {
-        event.add_values(rng->rand(1, validatedSides));
+        const auto roll = rng->rand(1, validatedSides);
+        if (i == 0) {
+            // Backwards compatibility
+            event.set_value(roll);
+        }
+        event.add_values(roll);
     }
     ges.enqueueGameEvent(event, playerId);
 

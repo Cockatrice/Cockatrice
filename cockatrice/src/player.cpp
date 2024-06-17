@@ -1963,10 +1963,7 @@ void Player::eventShuffle(const Event_Shuffle &event)
 
 void Player::eventRollDie(const Event_RollDie &event)
 {
-    if (event.value()) {
-        // Backwards compatibility for old clients
-        emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
-    } else {
+    if (!event.values().empty()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         QList<uint> rolls(event.values().begin(), event.values().end());
 #else
@@ -1977,6 +1974,10 @@ void Player::eventRollDie(const Event_RollDie &event)
 #endif
         std::sort(rolls.begin(), rolls.end());
         emit logRollDie(this, static_cast<int>(event.sides()), rolls);
+    }
+    else if (event.value()) {
+        // Backwards compatibility for old clients
+        emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
     }
 }
 
