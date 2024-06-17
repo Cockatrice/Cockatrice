@@ -142,7 +142,8 @@ signals:
                         QString cardName,
                         Player *otherPlayer,
                         bool faceDown,
-                        int amount);
+                        int amount,
+                        bool isLentToAnotherPlayer = false);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
     void logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal);
 
@@ -225,11 +226,12 @@ private slots:
 
 private:
     TabGame *game;
-    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
-        *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
+    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
+        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
     TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
         *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
+    QList<QMenu *> singlePlayerLists;
     QList<QAction *> allPlayersActions;
     QList<QPair<QString, int>> playersInfo;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -299,6 +301,8 @@ private:
                     bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
     void moveOneCardUntil(const CardInfoPtr card);
+    void addPlayerToList(QMenu *playerList, Player *player);
+    static void removePlayerFromList(QMenu *playerList, Player *player);
 
     QRectF bRect;
 

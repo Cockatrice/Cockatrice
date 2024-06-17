@@ -314,6 +314,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addAction(aViewTopCards);
         libraryMenu->addSeparator();
         playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
+        singlePlayerLists.append(mLendLibrary = libraryMenu->addMenu(QString()));
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
         libraryMenu->addAction(aAlwaysRevealTopCard);
         libraryMenu->addAction(aAlwaysLookAtTopCard);
@@ -582,12 +583,20 @@ void Player::addPlayer(Player *player)
     }
 
     for (auto &playerList : playerLists) {
-        QAction *newAction = playerList->addAction(player->getName());
-        newAction->setData(player->getId());
-        connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
+        addPlayerToList(playerList, player);
+    }
+    for (auto &playerList : singlePlayerLists) {
+        addPlayerToList(playerList, player);
     }
 
     playersInfo.append(qMakePair(player->getName(), player->getId()));
+}
+
+void Player::addPlayerToList(QMenu *playerList, Player *player)
+{
+    QAction *newAction = playerList->addAction(player->getName());
+    newAction->setData(player->getId());
+    connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
 }
 
 void Player::removePlayer(Player *player)
@@ -597,12 +606,10 @@ void Player::removePlayer(Player *player)
     }
 
     for (auto &playerList : playerLists) {
-        QList<QAction *> actionList = playerList->actions();
-        for (auto &j : actionList)
-            if (j->data().toInt() == player->getId()) {
-                playerList->removeAction(j);
-                j->deleteLater();
-            }
+        removePlayerFromList(playerList, player);
+    }
+    for (auto &playerList : singlePlayerLists) {
+        removePlayerFromList(playerList, player);
     }
 
     for (auto it = playersInfo.begin(); it != playersInfo.end();) {
@@ -612,6 +619,16 @@ void Player::removePlayer(Player *player)
             ++it;
         }
     }
+}
+
+void Player::removePlayerFromList(QMenu *playerList, Player *player)
+{
+    QList<QAction *> actionList = playerList->actions();
+    for (auto &j : actionList)
+        if (j->data().toInt() == player->getId()) {
+            playerList->removeAction(j);
+            j->deleteLater();
+        }
 }
 
 void Player::playerListActionTriggered()
@@ -625,8 +642,9 @@ void Player::playerListActionTriggered()
         cmd.set_player_id(otherPlayerId);
     }
 
-    if (menu == mRevealLibrary) {
+    if (menu == mRevealLibrary || menu == mLendLibrary) {
         cmd.set_zone_name("deck");
+        cmd.set_grant_write_access(menu == mLendLibrary);
     } else if (menu == mRevealTopCard) {
         int deckSize = zones.value("deck")->getCards().size();
         bool ok;
@@ -752,6 +770,7 @@ void Player::retranslateUi()
         aViewHand->setText(tr("&View hand"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
+        mLendLibrary->setTitle(tr("Lend library to..."));
         mRevealTopCard->setTitle(tr("Reveal &top cards to..."));
         topLibraryMenu->setTitle(tr("&Top of library..."));
         bottomLibraryMenu->setTitle(tr("&Bottom of library..."));
@@ -1974,8 +1993,7 @@ void Player::eventRollDie(const Event_RollDie &event)
 #endif
         std::sort(rolls.begin(), rolls.end());
         emit logRollDie(this, static_cast<int>(event.sides()), rolls);
-    }
-    else if (event.value()) {
+    } else if (event.value()) {
         // Backwards compatibility for old clients
         emit logRollDie(this, static_cast<int>(event.sides()), {event.value()});
     }
@@ -2373,7 +2391,8 @@ void Player::eventRevealCards(const Event_RevealCards &event)
         }
 
         emit logRevealCards(this, zone, cardId, cardName, otherPlayer, false,
-                            event.has_number_of_cards() ? event.number_of_cards() : cardList.size());
+                            event.has_number_of_cards() ? event.number_of_cards() : cardList.size(),
+                            event.grant_write_access());
     }
 }
 

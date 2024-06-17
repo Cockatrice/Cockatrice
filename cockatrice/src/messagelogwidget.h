@@ -77,7 +77,8 @@ public slots:
                         QString cardName,
                         Player *otherPlayer,
                         bool faceDown,
-                        int amount);
+                        int amount,
+                        bool isLentToAnotherPlayer);
     void logReverseTurn(Player *player, bool reversed);
     void logRollDie(Player *player, int sides, const QList<uint> &rolls);
     void logSay(Player *player, QString message);
