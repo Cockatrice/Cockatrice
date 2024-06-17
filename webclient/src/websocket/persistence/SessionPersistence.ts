@@ -3,6 +3,7 @@ import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
+import { GameJoinedData } from '../events/session/interfaces';
 
 export class SessionPersistence {
   static initialized() {
@@ -167,5 +168,9 @@ export class SessionPersistence {
 
   static getGamesOfUser(userName: string, response: any): void {
     console.log('getGamesOfUser');
+  }
+
+  static gameJoined(gameJoinedData: GameJoinedData): void {
+    console.log('gameJoined', gameJoinedData);
   }
 }

@@ -48,4 +48,8 @@ export class RoomPersistence {
   static userLeft(roomId: number, name: string) {
     RoomsDispatch.userLeft(roomId, name);
   }
+
+  static removeMessages(roomId: number, name: string, amount: number): void {
+    console.log('removeMessages', roomId, name, amount);
+  };
 }

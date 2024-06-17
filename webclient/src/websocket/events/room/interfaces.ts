@@ -17,3 +17,8 @@ export interface LeaveRoomData {
 export interface ListGamesData {
   gameList: Game[];
 }
+
+export interface RemoveMessagesData {
+  name: string;
+  amount: number;
+}

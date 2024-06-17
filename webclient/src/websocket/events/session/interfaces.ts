@@ -1,4 +1,4 @@
-import { Room, User } from 'types';
+import { Game, Room, User } from 'types';
 
 export interface SessionEvent {
   sessionEvent: {}
@@ -41,4 +41,12 @@ export interface UserJoinedData {
 
 export interface UserLeftData {
   name: string;
+}
+
+export interface GameJoinedData {
+  gameInfo: Game;
+  playerId: number;
+  spectator: boolean;
+  resuming: boolean;
+  judge: boolean;
 }
