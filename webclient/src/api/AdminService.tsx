@@ -1,6 +1,6 @@
 import { AdminCommands } from 'websocket';
 
-export default class AdminService {
+export class AdminService {
   static adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {
     AdminCommands.adjustMod(userName, shouldBeMod, shouldBeJudge);
   }

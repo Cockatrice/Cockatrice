@@ -1,7 +1,7 @@
 import { ModeratorCommands } from 'websocket';
 import { LogFilters } from 'types';
 
-export default class ModeratorService {
+export class ModeratorService {
   static banFromServer(minutes: number, userName?: string, address?: string, reason?: string,
     visibleReason?: string, clientid?: string, removeMessages?: number): void {
     ModeratorCommands.banFromServer(minutes, userName, address, reason, visibleReason, clientid, removeMessages);
