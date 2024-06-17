@@ -6,10 +6,7 @@ export function banFromServer(minutes: number, userName?: string, address?: stri
   const command = webClient.protobuf.controller.Command_BanFromServer.create({
     minutes, userName, address, reason, visibleReason, clientid, removeMessages
   });
-
-  const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_BanFromServer.ext': command
-  });
+  const sc = webClient.protobuf.controller.ModeratorCommand.create({ '.Command_BanFromServer.ext': command });
 
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;

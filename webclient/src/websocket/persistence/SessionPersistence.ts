@@ -1,14 +1,15 @@
 import { ServerDispatch } from 'store';
-import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
+import { StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
-import NormalizeService from '../utils/NormalizeService';
 import {
   GameJoinedData,
   NotifyUserData,
   PlayerGamePropertiesData,
-  ServerShutdownData, UserMessageData
+  ServerShutdownData,
+  UserMessageData
 } from '../events/session/interfaces';
+import NormalizeService from '../utils/NormalizeService';
 
 export class SessionPersistence {
   static initialized() {
@@ -119,8 +120,10 @@ export class SessionPersistence {
     ServerDispatch.registrationSuccess();
   }
 
-  static registrationFailed(error: string) {
-    ServerDispatch.registrationFailed(error);
+  static registrationFailed(reason: string, endTime?: number) {
+    const reasonMsg = endTime ? NormalizeService.normalizeBannedUserError(reason, endTime) : reason;
+
+    ServerDispatch.registrationFailed(reasonMsg);
   }
 
   static registrationEmailError(error: string) {
@@ -193,5 +196,13 @@ export class SessionPersistence {
 
   static userMessage(payload: UserMessageData): void {
     console.log('userMessage', payload);
+  }
+
+  static addToList(list: string, userName: string): void {
+    console.log('addToList', list, userName);
+  }
+
+  static removeFromList(list: string, userName: string): void {
+    console.log('removeFromList', list, userName);
   }
 }

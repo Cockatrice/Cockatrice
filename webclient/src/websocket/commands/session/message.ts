@@ -3,10 +3,7 @@ import { SessionPersistence } from '../../persistence';
 
 export function message(userName: string, message: string): void {
   const command = webClient.protobuf.controller.Command_Message.create({ userName, message });
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_Message.ext': command
-  });
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_Message.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     const { responseCode } = raw;

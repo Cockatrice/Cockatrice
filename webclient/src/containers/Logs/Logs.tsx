@@ -7,6 +7,7 @@ import { ModeratorService } from 'api';
 import { AuthGuard, ModGuard } from 'components';
 import { SearchForm } from 'forms';
 import { ServerDispatch, ServerSelectors, ServerStateLogs } from 'store';
+import { LogFilters } from 'types';
 
 import LogResults from './LogResults';
 import './Logs.css';
@@ -24,7 +25,7 @@ class Logs extends Component<LogsTypes> {
     ServerDispatch.clearLogs();
   }
 
-  onSubmit(fields) {
+  onSubmit(fields: LogFilters) {
     const trimmedFields: any = this.trimFields(fields);
 
     const { userName, ipAddress, gameName, gameId, message, logLocation } = trimmedFields;

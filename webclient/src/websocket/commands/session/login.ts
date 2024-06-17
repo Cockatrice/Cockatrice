@@ -25,13 +25,10 @@ export function login(options: WebSocketConnectOptions, passwordSalt?: string): 
     loginConfig.password = password;
   }
 
-  const CmdLogin = webClient.protobuf.controller.Command_Login.create(loginConfig);
+  const command = webClient.protobuf.controller.Command_Login.create(loginConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_Login.ext': command });
 
-  const command = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_Login.ext': CmdLogin
-  });
-
-  webClient.protobuf.sendSessionCommand(command, raw => {
+  webClient.protobuf.sendSessionCommand(sc, raw => {
     const resp = raw['.Response_Login.ext'];
 
     if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {

@@ -3,10 +3,7 @@ import { ModeratorPersistence } from '../../persistence';
 
 export function warnUser(userName: string, reason: string, clientid?: string, removeMessage?: boolean): void {
   const command = webClient.protobuf.controller.Command_BanFromServer.create({ userName, reason, clientid, removeMessage });
-
-  const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_WarnUser.ext': command
-  });
+  const sc = webClient.protobuf.controller.ModeratorCommand.create({ '.Command_WarnUser.ext': command });
 
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;

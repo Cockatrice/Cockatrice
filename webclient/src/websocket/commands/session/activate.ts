@@ -15,11 +15,8 @@ export function activate(options: WebSocketConnectOptions, passwordSalt?: string
     token,
   };
 
-  const CmdActivate = webClient.protobuf.controller.Command_Activate.create(accountActivationConfig);
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_Activate.ext': CmdActivate
-  });
+  const command = webClient.protobuf.controller.Command_Activate.create(accountActivationConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_Activate.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespActivationAccepted) {

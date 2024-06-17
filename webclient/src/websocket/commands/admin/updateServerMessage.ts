@@ -3,10 +3,7 @@ import { AdminPersistence } from '../../persistence';
 
 export function updateServerMessage(): void {
   const command = webClient.protobuf.controller.Command_UpdateServerMessage.create();
-
-  const sc = webClient.protobuf.controller.AdminCommand.create({
-    '.Command_UpdateServerMessage.ext': command
-  });
+  const sc = webClient.protobuf.controller.AdminCommand.create({ '.Command_UpdateServerMessage.ext': command });
 
   webClient.protobuf.sendAdminCommand(sc, (raw) => {
     const { responseCode } = raw;

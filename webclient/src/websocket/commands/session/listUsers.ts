@@ -2,11 +2,8 @@ import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
 
 export function listUsers(): void {
-  const CmdListUsers = webClient.protobuf.controller.Command_ListUsers.create();
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_ListUsers.ext': CmdListUsers
-  });
+  const command = webClient.protobuf.controller.Command_ListUsers.create();
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ListUsers.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     const { responseCode } = raw;

@@ -14,11 +14,8 @@ export function forgotPasswordChallenge(options: WebSocketConnectOptions): void 
     email,
   };
 
-  const CmdForgotPasswordChallenge = webClient.protobuf.controller.Command_ForgotPasswordChallenge.create(forgotPasswordChallengeConfig);
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_ForgotPasswordChallenge.ext': CmdForgotPasswordChallenge
-  });
+  const command = webClient.protobuf.controller.Command_ForgotPasswordChallenge.create(forgotPasswordChallengeConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ForgotPasswordChallenge.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {

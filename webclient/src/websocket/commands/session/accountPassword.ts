@@ -3,10 +3,7 @@ import { SessionPersistence } from '../../persistence';
 
 export function accountPassword(oldPassword: string, newPassword: string, hashedNewPassword: string): void {
   const command = webClient.protobuf.controller.Command_AccountPassword.create({ oldPassword, newPassword, hashedNewPassword });
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_AccountPassword.ext': command
-  });
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_AccountPassword.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     const { responseCode } = raw;

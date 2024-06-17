@@ -1,5 +1,4 @@
-import { Game, Room, User } from 'types';
-import { NotificationType } from '../../../types/session';
+import { Game, NotificationType, Room, User } from 'types';
 
 export interface AddToListData {
   listName: string;
