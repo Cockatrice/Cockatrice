@@ -5,7 +5,7 @@ import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
 import { disconnect, updateStatus } from './';
 
-export function resetPasswordChallenge(options: WebSocketConnectOptions): void {
+export function forgotPasswordChallenge(options: WebSocketConnectOptions): void {
   const { userName, email } = options as unknown as ForgotPasswordChallengeParams;
 
   const forgotPasswordChallengeConfig = {

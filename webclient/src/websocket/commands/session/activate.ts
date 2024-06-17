@@ -6,7 +6,7 @@ import { SessionPersistence } from '../../persistence';
 
 import { disconnect, login, updateStatus } from './';
 
-export function activateAccount(options: WebSocketConnectOptions, passwordSalt?: string): void {
+export function activate(options: WebSocketConnectOptions, passwordSalt?: string): void {
   const { userName, token } = options as unknown as AccountActivationParams;
 
   const accountActivationConfig = {

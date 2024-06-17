@@ -164,4 +164,8 @@ export class SessionPersistence {
   static getUserInfo(userInfo: string) {
     console.log('getUserInfo');
   }
+
+  static getGamesOfUser(userName: string, response: any): void {
+    console.log('getGamesOfUser');
+  }
 }

@@ -319,14 +319,14 @@ describe.skip('SessionEvents', () => {
     });
 
     it('should update stat/info and activate account', () => {
-      jest.spyOn(SessionCommands, 'activateAccount').mockImplementation(() => {});
+      jest.spyOn(SessionCommands, 'activate').mockImplementation(() => {});
 
       webClient.options.reason = WebSocketConnectReason.ACTIVATE_ACCOUNT;
 
       event(data);
 
       expect(SessionPersistence.updateInfo).toHaveBeenCalledWith(data.serverName, data.serverVersion);
-      expect(SessionCommands.activateAccount).toHaveBeenCalled();
+      expect(SessionCommands.activate).toHaveBeenCalled();
     });
 
     it('should disconnect if protocolVersion mismatched', () => {
