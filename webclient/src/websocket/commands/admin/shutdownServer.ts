@@ -3,10 +3,7 @@ import { AdminPersistence } from '../../persistence';
 
 export function shutdownServer(reason: string, minutes: number): void {
   const command = webClient.protobuf.controller.Command_ShutdownServer.create({ reason, minutes });
-
-  const sc = webClient.protobuf.controller.AdminCommand.create({
-    '.Command_ShutdownServer.ext': command
-  });
+  const sc = webClient.protobuf.controller.AdminCommand.create({ '.Command_ShutdownServer.ext': command });
 
   webClient.protobuf.sendAdminCommand(sc, (raw) => {
     const { responseCode } = raw;

@@ -3,10 +3,7 @@ import { ModeratorPersistence } from '../../persistence';
 
 export function getBanHistory(userName: string): void {
   const command = webClient.protobuf.controller.Command_GetBanHistory.create({ userName });
-
-  const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_GetBanHistory.ext': command
-  });
+  const sc = webClient.protobuf.controller.ModeratorCommand.create({ '.Command_GetBanHistory.ext': command });
 
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;

@@ -3,10 +3,7 @@ import { ModeratorPersistence } from '../../persistence';
 
 export function getWarnList(modName: string, userName: string, userClientid: string): void {
   const command = webClient.protobuf.controller.Command_GetWarnList.create({ modName, userName, userClientid });
-
-  const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_GetWarnList.ext': command
-  });
+  const sc = webClient.protobuf.controller.ModeratorCommand.create({ '.Command_GetWarnList.ext': command });
 
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;

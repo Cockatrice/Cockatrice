@@ -3,8 +3,8 @@ import webClient from '../../WebClient';
 import { updateStatus } from '../../commands/session';
 import { ConnectionClosedData } from './interfaces';
 
-export function connectionClosed({ reason, reasonStr }: ConnectionClosedData) {
-  let message;
+export function connectionClosed({ reason, reasonStr }: ConnectionClosedData): void {
+  let message: string;
 
   // @TODO (5)
   if (reasonStr) {

@@ -16,7 +16,7 @@ import { generateSalt, passwordSaltSupported } from '../../utils';
 import { ServerIdentificationData } from './interfaces';
 import { SessionPersistence } from '../../persistence';
 
-export function serverIdentification(info: ServerIdentificationData) {
+export function serverIdentification(info: ServerIdentificationData): void {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;
   if (protocolVersion !== webClient.protocolVersion) {
     updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);

@@ -25,11 +25,8 @@ export function register(options: WebSocketConnectOptions, passwordSalt?: string
     registerConfig.password = password;
   }
 
-  const CmdRegister = webClient.protobuf.controller.Command_Register.create(registerConfig);
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_Register.ext': CmdRegister
-  });
+  const command = webClient.protobuf.controller.Command_Register.create(registerConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_Register.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespRegistrationAccepted) {
@@ -46,7 +43,6 @@ export function register(options: WebSocketConnectOptions, passwordSalt?: string
         SessionPersistence.registrationUserNameError('Username is taken');
         break;
       case webClient.protobuf.controller.Response.ResponseCode.RespUsernameInvalid:
-        console.error('ResponseCode.RespUsernameInvalid', raw.reasonStr);
         SessionPersistence.registrationUserNameError('Invalid username');
         break;
       case webClient.protobuf.controller.Response.ResponseCode.RespPasswordTooShort:
@@ -65,7 +61,7 @@ export function register(options: WebSocketConnectOptions, passwordSalt?: string
         SessionPersistence.registrationFailed('Registration is currently disabled');
         break;
       case webClient.protobuf.controller.Response.ResponseCode.RespUserIsBanned:
-        SessionPersistence.registrationFailed(NormalizeService.normalizeBannedUserError(raw.reasonStr, raw.endTime));
+        SessionPersistence.registrationFailed(raw.reasonStr, raw.endTime);
         break;
       case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationFailed:
       default:

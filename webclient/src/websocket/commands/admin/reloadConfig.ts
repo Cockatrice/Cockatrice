@@ -3,10 +3,7 @@ import { AdminPersistence } from '../../persistence';
 
 export function reloadConfig(): void {
   const command = webClient.protobuf.controller.Command_ReloadConfig.create();
-
-  const sc = webClient.protobuf.controller.AdminCommand.create({
-    '.Command_ReloadConfig.ext': command
-  });
+  const sc = webClient.protobuf.controller.AdminCommand.create({ '.Command_ReloadConfig.ext': command });
 
   webClient.protobuf.sendAdminCommand(sc, (raw) => {
     const { responseCode } = raw;

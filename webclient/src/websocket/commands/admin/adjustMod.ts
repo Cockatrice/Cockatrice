@@ -3,10 +3,7 @@ import { AdminPersistence } from '../../persistence';
 
 export function adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {
   const command = webClient.protobuf.controller.Command_AdjustMod.create({ userName, shouldBeMod, shouldBeJudge });
-
-  const sc = webClient.protobuf.controller.AdminCommand.create({
-    '.Command_AdjustMod.ext': command
-  });
+  const sc = webClient.protobuf.controller.AdminCommand.create({ '.Command_AdjustMod.ext': command });
 
   webClient.protobuf.sendAdminCommand(sc, (raw) => {
     const { responseCode } = raw;

@@ -1,14 +1,9 @@
 import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
-import { common } from 'protobufjs';
-import IBytesValue = common.IBytesValue;
 
-export function accountImage(image: IBytesValue): void {
+export function accountImage(image: unknown): void {
   const command = webClient.protobuf.controller.Command_AccountImage.create({ image });
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_AccountImage.ext': command
-  });
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_AccountImage.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     const { responseCode } = raw;

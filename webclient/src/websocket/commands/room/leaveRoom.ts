@@ -2,11 +2,8 @@ import { RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
 
 export function leaveRoom(roomId: number): void {
-  const CmdLeaveRoom = webClient.protobuf.controller.Command_LeaveRoom.create();
-
-  const rc = webClient.protobuf.controller.RoomCommand.create({
-    '.Command_LeaveRoom.ext': CmdLeaveRoom
-  });
+  const command = webClient.protobuf.controller.Command_LeaveRoom.create();
+  const rc = webClient.protobuf.controller.RoomCommand.create({ '.Command_LeaveRoom.ext': command });
 
   webClient.protobuf.sendRoomCommand(roomId, rc, (raw) => {
     const { responseCode } = raw;

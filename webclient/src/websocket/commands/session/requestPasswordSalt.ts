@@ -20,11 +20,8 @@ export function requestPasswordSalt(options: WebSocketConnectOptions): void {
     userName,
   };
 
-  const CmdRequestPasswordSalt = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_RequestPasswordSalt.ext': CmdRequestPasswordSalt
-  });
+  const command = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_RequestPasswordSalt.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     switch (raw.responseCode) {

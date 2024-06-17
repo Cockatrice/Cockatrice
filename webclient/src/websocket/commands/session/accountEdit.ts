@@ -3,10 +3,7 @@ import { SessionPersistence } from '../../persistence';
 
 export function accountEdit(passwordCheck: string, realName?: string, email?: string, country?: string): void {
   const command = webClient.protobuf.controller.Command_AccountEdit.create({ passwordCheck, realName, email, country });
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_AccountEdit.ext': command
-  });
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_AccountEdit.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     const { responseCode } = raw;

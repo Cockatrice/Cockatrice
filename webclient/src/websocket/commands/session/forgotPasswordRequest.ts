@@ -22,11 +22,8 @@ export function forgotPasswordRequest(options: WebSocketConnectOptions, password
     forgotPasswordResetConfig.newPassword = newPassword;
   }
 
-  const CmdForgotPasswordReset = webClient.protobuf.controller.Command_ForgotPasswordReset.create(forgotPasswordResetConfig);
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_ForgotPasswordReset.ext': CmdForgotPasswordReset
-  });
+  const command = webClient.protobuf.controller.Command_ForgotPasswordReset.create(forgotPasswordResetConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ForgotPasswordReset.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {

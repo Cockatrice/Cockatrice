@@ -1,12 +1,10 @@
 import webClient from '../../WebClient';
 import { ModeratorPersistence } from '../../persistence';
+import { LogFilters } from 'types';
 
-export function viewLogHistory(filters): void {
+export function viewLogHistory(filters: LogFilters): void {
   const command = webClient.protobuf.controller.Command_ViewLogHistory.create(filters);
-
-  const sc = webClient.protobuf.controller.ModeratorCommand.create({
-    '.Command_ViewLogHistory.ext': command
-  });
+  const sc = webClient.protobuf.controller.ModeratorCommand.create({ '.Command_ViewLogHistory.ext': command });
 
   webClient.protobuf.sendModeratorCommand(sc, (raw) => {
     const { responseCode } = raw;

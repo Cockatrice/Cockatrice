@@ -1,8 +1,4 @@
-import { Game, Room, User } from 'types';
-
-export interface SessionEvent {
-  sessionEvent: {}
-}
+import { Game, NotificationType, Room, User } from 'types';
 
 export interface AddToListData {
   listName: string;
@@ -15,8 +11,35 @@ export interface ConnectionClosedData {
   reasonStr: string;
 }
 
+export interface GameJoinedData {
+  gameInfo: Game;
+  playerId: number;
+  spectator: boolean;
+  resuming: boolean;
+  judge: boolean;
+}
+
 export interface ListRoomsData {
   roomList: Room[];
+}
+
+export interface NotifyUserData {
+  type: NotificationType;
+  warningReason: string;
+  customTitle: string;
+  customContent: string;
+}
+
+export interface PlayerGamePropertiesData {
+  playerId: number;
+  userInfo: User;
+  spectator: boolean;
+  conceded: boolean;
+  readyStart: boolean;
+  deckHash: string;
+  pingSeconds: number;
+  sideboardLocked: boolean;
+  judge: boolean;
 }
 
 export interface RemoveFromListData {
@@ -35,6 +58,11 @@ export interface ServerMessageData {
   message: string;
 }
 
+export interface ServerShutdownData {
+  reason: string;
+  minutes: number;
+}
+
 export interface UserJoinedData {
   userInfo: User;
 }
@@ -43,10 +71,8 @@ export interface UserLeftData {
   name: string;
 }
 
-export interface GameJoinedData {
-  gameInfo: Game;
-  playerId: number;
-  spectator: boolean;
-  resuming: boolean;
-  judge: boolean;
+export interface UserMessageData {
+  senderName: string;
+  receiverName: string;
+  message: string;
 }
