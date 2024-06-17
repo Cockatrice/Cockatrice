@@ -18,3 +18,4 @@ export * from './accountEdit';
 export * from './accountImage';
 export * from './message';
 export * from './getUserInfo';
+export * from './getGamesOfUser';

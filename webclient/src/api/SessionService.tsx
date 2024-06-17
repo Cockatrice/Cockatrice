@@ -38,4 +38,8 @@ export default class SessionService {
   static getUserInfo(userName: string): void {
     SessionCommands.getUserInfo(userName);
   }
+
+  static getUserGames(userName: string): void {
+    SessionCommands.getGamesOfUser(userName);
+  }
 }
