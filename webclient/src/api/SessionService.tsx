@@ -2,7 +2,7 @@ import { SessionCommands } from 'websocket';
 import { common } from 'protobufjs';
 import IBytesValue = common.IBytesValue;
 
-export default class SessionService {
+export class SessionService {
   static addToBuddyList(userName: string) {
     SessionCommands.addToBuddyList(userName);
   }

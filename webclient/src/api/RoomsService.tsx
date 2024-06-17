@@ -1,6 +1,6 @@
 import { RoomCommands, SessionCommands } from 'websocket';
 
-export default class RoomsService {
+export class RoomsService {
   static joinRoom(roomId: number): void {
     SessionCommands.joinRoom(roomId);
   }

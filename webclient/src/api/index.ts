@@ -1,5 +1,5 @@
-export { default as AdminService } from './AdminService';
-export { default as AuthenticationService } from './AuthenticationService';
-export { default as ModeratorService } from './ModeratorService';
-export { default as RoomsService } from './RoomsService';
-export { default as SessionService } from './SessionService';
+export { AdminService } from './AdminService';
+export { AuthenticationService } from './AuthenticationService';
+export { ModeratorService } from './ModeratorService';
+export { RoomsService } from './RoomsService';
+export { SessionService } from './SessionService';
