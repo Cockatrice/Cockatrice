@@ -166,6 +166,6 @@ export class SessionPersistence {
   }
 
   static getGamesOfUser(userName: string, response: any): void {
-    console.log("getGamesOfUser");
+    console.log('getGamesOfUser');
   }
 }
