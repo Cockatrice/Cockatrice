@@ -3,7 +3,7 @@ import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
-import {GameJoinedData} from "../events/session/interfaces";
+import { GameJoinedData } from '../events/session/interfaces';
 
 export class SessionPersistence {
   static initialized() {
