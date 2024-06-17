@@ -2,13 +2,13 @@ import { StatusEnum, WebSocketConnectReason } from 'types';
 
 import webClient from '../../WebClient';
 import {
-  activateAccount,
+  activate,
   disconnect,
   login,
   register,
   requestPasswordSalt,
-  resetPassword,
-  resetPasswordChallenge,
+  forgotPasswordChallenge,
+  forgotPasswordRequest,
   resetPasswordRequest,
   updateStatus,
 } from '../../commands/session';
@@ -44,20 +44,20 @@ export function serverIdentification(info: ServerIdentificationData) {
       if (getPasswordSalt) {
         requestPasswordSalt(options);
       } else {
-        activateAccount(options);
+        activate(options);
       }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
       resetPasswordRequest(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
-      resetPasswordChallenge(options);
+      forgotPasswordChallenge(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
       if (getPasswordSalt) {
         requestPasswordSalt(options);
       } else {
-        resetPassword(options);
+        forgotPasswordRequest(options);
       }
       break;
     default:

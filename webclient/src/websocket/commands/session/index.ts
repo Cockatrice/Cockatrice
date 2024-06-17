@@ -1,4 +1,4 @@
-export * from './activateAccount';
+export * from './activate';
 export * from './addToList';
 export * from './connect';
 export * from './disconnect';
@@ -9,8 +9,8 @@ export * from './login';
 export * from './register';
 export * from './removeFromList';
 export * from './requestPasswordSalt';
-export * from './resetPassword';
-export * from './resetPasswordChallenge'
+export * from './forgotPasswordRequest';
+export * from './forgotPasswordChallenge'
 export * from './resetPasswordRequest';
 export * from './updateStatus';
 export * from './accountPassword';

@@ -5,10 +5,10 @@ import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
 
 import {
-  activateAccount,
+  activate,
   disconnect,
   login,
-  resetPassword,
+  forgotPasswordRequest,
   updateStatus
 } from './';
 
@@ -33,12 +33,12 @@ export function requestPasswordSalt(options: WebSocketConnectOptions): void {
 
         switch (options.reason) {
           case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
-            activateAccount(options, passwordSalt);
+            activate(options, passwordSalt);
             break;
           }
 
           case WebSocketConnectReason.PASSWORD_RESET: {
-            resetPassword(options, passwordSalt);
+            forgotPasswordRequest(options, passwordSalt);
             break;
           }
 

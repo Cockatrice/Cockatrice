@@ -1,4 +1,4 @@
-#!/bin/bash
+# #!/bin/bash
 
 # This script will run clang-format on all modified, non-3rd-party C++/Header files.
 # Optionally runs cmake-format on all modified cmake files.
