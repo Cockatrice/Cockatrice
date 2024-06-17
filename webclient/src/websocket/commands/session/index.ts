@@ -19,3 +19,4 @@ export * from './accountImage';
 export * from './message';
 export * from './getUserInfo';
 export * from './getGamesOfUser';
+export * from './ping';

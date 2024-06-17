@@ -3,7 +3,7 @@ import protobuf from 'protobufjs';
 import { RoomEvents, SessionEvents } from '../events';
 import { SessionPersistence } from '../persistence';
 import { WebClient } from '../WebClient';
-
+import { SessionCommands } from 'websocket';
 import ProtoFiles from '../../proto-files.json';
 
 export interface ProtobufEvents {
@@ -75,11 +75,7 @@ export class ProtobufService {
   }
 
   public sendKeepAliveCommand(pingReceived: Function) {
-    const command = this.controller.SessionCommand.create({
-      '.Command_Ping.ext': this.controller.Command_Ping.create()
-    });
-
-    this.sendSessionCommand(command, pingReceived);
+    SessionCommands.ping(pingReceived);
   }
 
   public handleMessageEvent({ data }: MessageEvent): void {
