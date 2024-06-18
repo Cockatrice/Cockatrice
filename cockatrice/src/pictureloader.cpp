@@ -1,7 +1,6 @@
 #include "pictureloader.h"
 
 #include "carddatabase.h"
-#include "main.h"
 #include "settingscache.h"
 #include "thememanager.h"
 
@@ -22,7 +21,6 @@
 #include <QPixmapCache>
 #include <QRegularExpression>
 #include <QScreen>
-#include <QSet>
 #include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
@@ -36,9 +34,14 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
     : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
-        for (const auto &set : card->getSets()) {
-            sortedSets << set.getPtr();
+        if (card->getSets().contains(card->getPrintingSetName().toUpper())) {
+            sortedSets << card->getSets().find(card->getPrintingSetName().toUpper())->getPtr();
+        } else {
+            for (const auto &set : card->getSets()) {
+                sortedSets << set.getPtr();
+            }
         }
+
         if (sortedSets.empty()) {
             sortedSets << CardSet::newInstance("", "", "", QDate());
         }
@@ -101,9 +104,9 @@ QString PictureToLoad::getSetName() const
 {
     if (currentSet) {
         return currentSet->getCorrectedShortName();
-    } else {
-        return QString();
     }
+
+    return {};
 }
 
 // Card back returned by gatherer when card is not found
@@ -539,7 +542,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     startNextPicDownload();
 }
 
-void PictureLoaderWorker::enqueueImageLoad(CardInfoPtr card)
+void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
 {
     QMutexLocker locker(&mutex);
 
@@ -605,7 +608,7 @@ void PictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
     }
 }
 
-void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
+void PictureLoader::getPixmap(QPixmap &pixmap, const CardInfoPtr &card, QSize size)
 {
     if (card == nullptr) {
         return;
@@ -632,7 +635,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     getInstance().worker->enqueueImageLoad(card);
 }
 
-void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
+void PictureLoader::imageLoaded(const CardInfoPtr &card, const QImage &image)
 {
     if (image.isNull()) {
         QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap());

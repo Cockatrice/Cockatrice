@@ -384,6 +384,8 @@ void CardDatabase::addCard(CardInfoPtr card)
         return;
     }
 
+    cardsAllPrintings[card->getName()].append(card);
+
     // if card already exists just add the new set property
     if (cards.contains(card->getName())) {
         CardInfoPtr sameCard = cards[card->getName()];
@@ -438,6 +440,15 @@ QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
     }
 
     return cardInfos;
+}
+
+QList<CardInfoPtr> CardDatabase::getAllPrintingsOfCard(const QString &cardName) const
+{
+    if (cardsAllPrintings.contains(cardName)) {
+        return cardsAllPrintings[cardName];
+    }
+
+    return {};
 }
 
 CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const

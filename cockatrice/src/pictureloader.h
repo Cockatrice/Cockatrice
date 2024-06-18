@@ -4,7 +4,6 @@
 #include "carddatabase.h"
 
 #include <QList>
-#include <QMap>
 #include <QMutex>
 #include <QNetworkRequest>
 class QNetworkAccessManager;
@@ -72,7 +71,7 @@ public:
     explicit PictureLoaderWorker();
     ~PictureLoaderWorker() override;
 
-    void enqueueImageLoad(CardInfoPtr card);
+    void enqueueImageLoad(const CardInfoPtr &card);
     void clearNetworkCache();
 
 private:
@@ -125,7 +124,7 @@ private:
     PictureLoaderWorker *worker;
 
 public:
-    static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
+    static void getPixmap(QPixmap &pixmap, const CardInfoPtr &card, QSize size);
     static void getCardBackPixmap(QPixmap &pixmap, QSize size);
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
@@ -139,6 +138,6 @@ private slots:
     void picsPathChanged();
 
 public slots:
-    void imageLoaded(CardInfoPtr card, const QImage &image);
+    static void imageLoaded(const CardInfoPtr &card, const QImage &image);
 };
 #endif

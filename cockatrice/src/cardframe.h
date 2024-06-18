@@ -3,6 +3,7 @@
 
 #include "carddatabase.h"
 
+#include <QComboBox>
 #include <QTabWidget>
 
 class AbstractCardItem;
@@ -22,6 +23,16 @@ private:
     QWidget *tab1, *tab2, *tab3;
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
     QSplitter *splitter;
+    QComboBox *cardVersionSelector;
+
+    void refreshCardVersionSelector(const QString &cardName) const;
+
+    struct CardImageData
+    {
+        CardInfoPtr cardInfoPtr;
+        QString cardSetName;
+        QString cardNumber;
+    };
 
 public:
     enum ViewMode
@@ -37,8 +48,10 @@ public slots:
     void setCard(CardInfoPtr card);
     void setCard(const QString &cardName);
     void setCard(AbstractCardItem *card);
+    void setCard(const CardImageData &cardImageData);
     void clearCard();
     void setViewMode(int mode);
+    void updateCardImage(int newIndex);
 };
 
 #endif
