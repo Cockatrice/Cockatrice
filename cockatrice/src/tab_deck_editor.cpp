@@ -609,6 +609,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
 
     this->installEventFilter(this);
 
+    connect(cardInfo->getCardVersionSelector(), SIGNAL(currentIndexChanged(int)), this, SLOT(refreshCardVersion(int)));
+
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
@@ -1047,7 +1049,10 @@ void TabDeckEditor::actRemoveCard()
     setModified(true);
 }
 
-void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
+void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx,
+                                       int offset,
+                                       const QString &cardSetCode,
+                                       const QString &cardCollectorNumber)
 {
     if (!idx.isValid() || offset == 0)
         return;
@@ -1056,10 +1061,17 @@ void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
     const int new_count = count + offset;
     deckView->setCurrentIndex(numberIndex);
-    if (new_count <= 0)
+    if (new_count <= 0) {
         deckModel->removeRow(idx.row(), idx.parent());
-    else
+    } else {
         deckModel->setData(numberIndex, new_count, Qt::EditRole);
+        const auto newCardSetCode = (cardSetCode == "") ? cardInfo->getCardMetadata().cardSetCode : cardSetCode;
+        const auto newCardCollectorNumber =
+            (cardCollectorNumber == "") ? cardInfo->getCardMetadata().cardCollectorNumber : cardCollectorNumber;
+        qDebug() << "Updating with" << newCardSetCode << newCardCollectorNumber;
+        deckModel->setData(idx.sibling(idx.row(), 2), newCardSetCode, Qt::EditRole);
+        deckModel->setData(idx.sibling(idx.row(), 3), newCardCollectorNumber, Qt::EditRole);
+    }
     setModified(true);
 }
 
@@ -1103,6 +1115,16 @@ void TabDeckEditor::actDecrement()
 {
     const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
     offsetCountAtIndex(currentIndex, -1);
+}
+
+void TabDeckEditor::refreshCardVersion(int)
+{
+    const auto &cardImageData = cardInfo->getCardVersionSelector()->currentData().value<CardFrame::CardImageData>();
+
+    qDebug() << "refreshCardVersion called" << cardInfo->getCardMetadata().cardSetCode;
+    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
+    offsetCountAtIndex(currentIndex, 0, cardInfo->getCardMetadata().cardSetCode,
+                       cardInfo->getCardMetadata().cardCollectorNumber);
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)

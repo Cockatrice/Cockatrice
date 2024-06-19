@@ -50,6 +50,13 @@ public:
         }
         return {};
     }
+    [[nodiscard]] QComboBox *getCardVersionSelector() const
+    {
+        return cardVersionSelector;
+    }
+
+signals:
+    void refreshCardVersion() const;
 
 public slots:
     void setCard(CardInfoPtr card);
