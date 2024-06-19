@@ -437,21 +437,18 @@ CardDatabase::getCard(const QString &cardName, const QString &cardSetCode, const
         return getCard(cardName);
     }
 
-    if (cardsAllPrintings.contains(cardName)) {
-        for (const auto &card : cardsAllPrintings[cardName]) {
-            if (card->getCardSetCode() == cardSetCode) {
-                if (cardCollectorNumber == "") {
-                    return card;
-                }
-                if (card->getCollectorNumber() == cardCollectorNumber) {
-                    return card;
-                }
+    if (!cardsAllPrintings.contains(cardName))
+        return {};
+
+    for (const auto &card : cardsAllPrintings[cardName]) {
+        if (card->getCardSetCode() == cardSetCode) {
+            if (cardCollectorNumber == "" || card->getCollectorNumber() == cardCollectorNumber) {
+                return card;
             }
         }
-        return cardsAllPrintings[cardName].at(0);
     }
 
-    return {};
+    return cardsAllPrintings[cardName].at(0);
 }
 
 QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
