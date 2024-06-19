@@ -109,7 +109,7 @@ public:
     }
     static QString visibleNameFromName(const QString &_name);
     virtual QString getVisibleName() const;
-    [[nodiscard]] QString getCardSetName() const
+    [[nodiscard]] QString getCardSetName() const override
     {
          return cardSetName;
     }
@@ -117,7 +117,7 @@ public:
     {
         cardSetName = _cardSetCode;
     }
-    [[nodiscard]] QString getCardSetNumber() const
+    [[nodiscard]] QString getCardSetNumber() const override
     {
         return cardSetNumber;
     }
@@ -149,9 +149,9 @@ public:
     virtual void setNumber(int _number) = 0;
     QString getName() const override = 0;
     virtual void setName(const QString &_name) = 0;
-    virtual QString getCardSetName() const = 0;
+    virtual QString getCardSetName() const override = 0;
     virtual void setCardSetName(const QString &_cardSetName) = 0;
-    virtual QString getCardSetNumber() const = 0;
+    virtual QString getCardSetNumber() const override = 0;
     virtual void setCardSetNumber(const QString &_cardSetNumber) = 0;
     int height() const override
     {

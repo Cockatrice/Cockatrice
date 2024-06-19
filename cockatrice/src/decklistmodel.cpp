@@ -139,6 +139,10 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                         return card->getNumber();
                     case 1:
                         return card->getName();
+                    case 2:
+                        return card->getCardSetName();
+                    case 3:
+                        return card->getCardSetNumber();
                     default:
                         return QVariant();
                 }
@@ -168,13 +172,13 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
 
     switch (section) {
         case 0:
-            return tr("Number");
+            return tr("Count");
         case 1:
             return tr("Card");
         case 2:
             return tr("Set");
         case 3:
-            return tr("Collector Number");
+            return tr("Number");
         default:
             return {};
     }

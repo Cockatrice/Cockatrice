@@ -717,9 +717,11 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
     }
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        // Get the card from somewhere...
-        cardInfo->setCard(current.sibling(current.row(), 1).data().toString(), {});
-        qDebug() << "UpdateCardInfoRight" << cardInfo->getCardMetadata().cardSetName << cardInfo->getCardMetadata().cardNumber;
+        auto cardName = current.sibling(current.row(), 1).data().toString();
+        CardFrame::CardImageData metadata;
+        metadata.cardSetName = current.sibling(current.row(), 2).data().toString();
+        metadata.cardNumber = current.sibling(current.row(), 3).data().toString();
+        cardInfo->setCard(cardName, metadata);
     }
 }
 
