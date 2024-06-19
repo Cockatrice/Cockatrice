@@ -437,16 +437,8 @@ CardDatabase::getCard(const QString &cardName, const QString &cardSetCode, const
         return getCard(cardName);
     }
 
-    const auto &x = getAllPrintingsOfCard(cardName);
-    for (const auto &y : x) {
-        qDebug() << "getAllPrintingsOfCard" << y->getName() << y->getCardSetCode() << y->getCollectorNumber();
-    }
-
     if (cardsAllPrintings.contains(cardName)) {
-        qDebug() << "SIZE OF" << cardName << "is" << cardsAllPrintings[cardName].length();
         for (const auto &card : cardsAllPrintings[cardName]) {
-            qDebug() << "Trying to find" << card->getCardSetCode() << card->getCollectorNumber() << "in" << cardSetCode
-                     << cardCollectorNumber;
             if (card->getCardSetCode() == cardSetCode) {
                 if (cardCollectorNumber == "") {
                     return card;
@@ -456,7 +448,6 @@ CardDatabase::getCard(const QString &cardName, const QString &cardSetCode, const
                 }
             }
         }
-        qDebug() << "Returning Default Item";
         return cardsAllPrintings[cardName].at(0);
     }
 
