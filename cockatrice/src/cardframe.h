@@ -37,8 +37,8 @@ public:
     struct CardImageData
     {
         CardInfoPtr cardInfoPtr;
-        QString cardSetName;
-        QString cardNumber;
+        QString cardSetCode;
+        QString cardCollectorNumber;
     };
 
     explicit CardFrame(const QString &cardName = QString(), QWidget *parent = nullptr);

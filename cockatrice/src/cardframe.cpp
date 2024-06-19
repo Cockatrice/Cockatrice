@@ -127,11 +127,11 @@ void CardFrame::setCard(const CardImageData &cardImageData)
 
     if (info) {
         connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
-        qDebug() << "Loading in Card" << info->getName() << cardImageData.cardSetName << cardImageData.cardNumber;
-        info->setPixmapCacheKey(QLatin1String("card_") + info->getName() + "_" + cardImageData.cardSetName + "_" +
-                                cardImageData.cardNumber);
-        info->setCardSetCode(cardImageData.cardSetName);
-        info->setCollectorNumber(cardImageData.cardNumber);
+        qDebug() << "Loading in Card" << info->getName() << cardImageData.cardSetCode << cardImageData.cardCollectorNumber;
+        info->setPixmapCacheKey(QLatin1String("card_") + info->getName() + "_" + cardImageData.cardSetCode + "_" +
+                                cardImageData.cardCollectorNumber);
+        info->setCardSetCode(cardImageData.cardSetCode);
+        info->setCollectorNumber(cardImageData.cardCollectorNumber);
     }
 
     text->setCard(info);
@@ -159,7 +159,7 @@ void CardFrame::setCard(const QString &cardName, CardImageData cardMetaData)
     refreshCardVersionSelector(cardName);
     // setCard(db->guessCard(cardName));
 
-    cardMetaData.cardInfoPtr = db->getCard(cardName, cardMetaData.cardSetName, cardMetaData.cardNumber);
+    cardMetaData.cardInfoPtr = db->getCard(cardName, cardMetaData.cardSetCode, cardMetaData.cardCollectorNumber);
     setCard(cardMetaData);
 }
 

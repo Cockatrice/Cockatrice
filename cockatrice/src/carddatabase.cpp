@@ -430,9 +430,9 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName) const
     return getCardFromMap(cards, cardName);
 }
 
-CardInfoPtr CardDatabase::getCard(const QString &cardName, const QString &cardSet, const QString &cardNumber) const
+CardInfoPtr CardDatabase::getCard(const QString &cardName, const QString &cardSetCode, const QString &cardCollectorNumber) const
 {
-    if (cardSet == "") {
+    if (cardSetCode == "") {
         return getCard(cardName);
     }
 
@@ -444,12 +444,13 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName, const QString &cardSe
     if (cardsAllPrintings.contains(cardName)) {
         qDebug() << "SIZE OF" << cardName << "is" << cardsAllPrintings[cardName].length();
         for (const auto &card : cardsAllPrintings[cardName]) {
-            qDebug() << "Trying to find" << card->getCardSetCode() << card->getCollectorNumber() << "in" << cardSet << cardNumber;
-            if (card->getCardSetCode() == cardSet) {
-                if (cardNumber == "") {
+            qDebug() << "Trying to find" << card->getCardSetCode() << card->getCollectorNumber() << "in" << cardSetCode
+                     << cardCollectorNumber;
+            if (card->getCardSetCode() == cardSetCode) {
+                if (cardCollectorNumber == "") {
                     return card;
                 }
-                if (card->getCollectorNumber() == cardNumber) {
+                if (card->getCollectorNumber() == cardCollectorNumber) {
                     return card;
                 }
             }

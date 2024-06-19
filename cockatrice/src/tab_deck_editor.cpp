@@ -719,8 +719,8 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         auto cardName = current.sibling(current.row(), 1).data().toString();
         CardFrame::CardImageData metadata;
-        metadata.cardSetName = current.sibling(current.row(), 2).data().toString();
-        metadata.cardNumber = current.sibling(current.row(), 3).data().toString();
+        metadata.cardSetCode = current.sibling(current.row(), 2).data().toString();
+        metadata.cardCollectorNumber = current.sibling(current.row(), 3).data().toString();
         cardInfo->setCard(cardName, metadata);
     }
 }
@@ -973,11 +973,11 @@ CardInfoPtr TabDeckEditor::currentCardInfo() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
     const auto cardMetadata = cardInfo->getCardMetadata();
-    if (cardMetadata.cardSetName != "") {
-        if (cardMetadata.cardNumber != "") {
-            return db->getCard(cardName, cardMetadata.cardSetName, cardMetadata.cardNumber);
+    if (cardMetadata.cardSetCode != "") {
+        if (cardMetadata.cardCollectorNumber != "") {
+            return db->getCard(cardName, cardMetadata.cardSetCode, cardMetadata.cardCollectorNumber);
         }
-        return db->getCard(cardName, cardMetadata.cardSetName);
+        return db->getCard(cardName, cardMetadata.cardSetCode);
     }
     return db->getCard(cardName);
 }

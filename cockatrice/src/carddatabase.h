@@ -441,7 +441,7 @@ public:
     void removeCard(CardInfoPtr card);
     [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
     [[nodiscard]] CardInfoPtr
-    getCard(const QString &cardName, const QString &cardSet, const QString &cardNumber = QString()) const;
+    getCard(const QString &cardName, const QString &cardSetCode, const QString &cardCollectorNumber = QString()) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
     QList<CardInfoPtr> getAllPrintingsOfCard(const QString &cardName) const;
     CardInfoPtr guessCard(const QString &cardName) const;

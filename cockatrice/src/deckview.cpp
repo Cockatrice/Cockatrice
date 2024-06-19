@@ -215,7 +215,7 @@ void DeckViewCardContainer::addCard(DeckViewCard *card)
     cardsByType.insert(card->getInfo() ? card->getInfo()->getMainCardType() : "", card);
 }
 
-void DeckViewCardContainer::removeCard(DeckViewCard *card)
+void DeckViewCardContainer::removeCard(DeckViewCard *card)Ï
 {
     cards.removeOne(card);
     cardsByType.remove(card->getInfo() ? card->getInfo()->getMainCardType() : "", card);
