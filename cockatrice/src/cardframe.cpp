@@ -127,7 +127,8 @@ void CardFrame::setCard(const CardImageData &cardImageData)
 
     if (info) {
         connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
-        qDebug() << "Loading in Card" << info->getName() << cardImageData.cardSetCode << cardImageData.cardCollectorNumber;
+        qDebug() << "Loading in Card" << info->getName() << cardImageData.cardSetCode
+                 << cardImageData.cardCollectorNumber;
         info->setPixmapCacheKey(QLatin1String("card_") + info->getName() + "_" + cardImageData.cardSetCode + "_" +
                                 cardImageData.cardCollectorNumber);
         info->setCardSetCode(cardImageData.cardSetCode);

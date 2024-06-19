@@ -430,7 +430,8 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName) const
     return getCardFromMap(cards, cardName);
 }
 
-CardInfoPtr CardDatabase::getCard(const QString &cardName, const QString &cardSetCode, const QString &cardCollectorNumber) const
+CardInfoPtr
+CardDatabase::getCard(const QString &cardName, const QString &cardSetCode, const QString &cardCollectorNumber) const
 {
     if (cardSetCode == "") {
         return getCard(cardName);

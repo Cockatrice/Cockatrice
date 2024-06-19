@@ -140,7 +140,8 @@ void InnerDecklistNode::clearTree()
 }
 
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()), cardSetName(other->getCardSetCode()), cardSetNumber(other->getCardCollectorNumber())
+    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()),
+      cardSetName(other->getCardSetCode()), cardSetNumber(other->getCardCollectorNumber())
 {
 }
 
@@ -269,12 +270,10 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                 InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 newZone->readElement(xml);
             } else if (childName == "card") {
-                DecklistCardNode *newCard =
-                    new DecklistCardNode(xml->attributes().value("name").toString(),
-                                         xml->attributes().value("number").toString().toInt(),
-                                         this,
-                                         xml->attributes().value("setCode").toString(),
-                                         xml->attributes().value("collectorNumber").toString());
+                DecklistCardNode *newCard = new DecklistCardNode(xml->attributes().value("name").toString(),
+                                                                 xml->attributes().value("number").toString().toInt(),
+                                                                 this, xml->attributes().value("setCode").toString(),
+                                                                 xml->attributes().value("collectorNumber").toString());
                 newCard->readElement(xml);
             }
         } else if (xml->isEndElement() && (childName == "zone"))

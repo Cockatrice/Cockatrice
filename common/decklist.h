@@ -111,7 +111,7 @@ public:
     [[nodiscard]] virtual QString getVisibleName() const;
     [[nodiscard]] QString getCardSetCode() const override
     {
-         return cardSetCode;
+        return cardSetCode;
     }
     void setCardSetCode(const QString &_cardSetCode)
     {
