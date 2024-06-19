@@ -154,10 +154,11 @@ void CardFrame::setCard(CardInfoPtr card)
     pic->setCard(info);
 }
 
-void CardFrame::setCard(const QString &cardName)
+void CardFrame::setCard(const QString &cardName, CardImageData cardMetaData)
 {
     refreshCardVersionSelector(cardName);
-    setCard(db->guessCard(cardName));
+    // setCard(db->guessCard(cardName));
+    setCard(db->getCard(cardName, cardMetaData.cardSetName, cardMetaData.cardNumber));
 }
 
 void CardFrame::setCard(AbstractCardItem *card)

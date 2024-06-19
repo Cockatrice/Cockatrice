@@ -712,10 +712,15 @@ void TabDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelI
 
 void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
-    if (!current.isValid())
+    if (!current.isValid()) {
         return;
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0)))
-        cardInfo->setCard(current.sibling(current.row(), 1).data().toString());
+    }
+
+    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+        // Get the card from somewhere...
+        cardInfo->setCard(current.sibling(current.row(), 1).data().toString(), {});
+        qDebug() << "UpdateCardInfoRight" << cardInfo->getCardMetadata().cardSetName << cardInfo->getCardMetadata().cardNumber;
+    }
 }
 
 void TabDeckEditor::updateSearch(const QString &search)
@@ -983,7 +988,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
+    const QModelIndex newCardIndex = deckModel->addCard(info, zoneName);
     recursiveExpand(newCardIndex);
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);

@@ -53,7 +53,7 @@ public:
 
 public slots:
     void setCard(CardInfoPtr card);
-    void setCard(const QString &cardName);
+    void setCard(const QString &cardName, CardImageData cardMetaData = {});
     void setCard(AbstractCardItem *card);
     void setCard(const CardImageData &cardImageData);
     void clearCard();

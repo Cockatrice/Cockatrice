@@ -70,6 +70,8 @@ public:
         sortMethod = method;
     }
     virtual QString getName() const = 0;
+    virtual QString getCardSetName() const = 0;
+    virtual QString getCardSetNumber() const = 0;
     InnerDecklistNode *getParent() const
     {
         return parent;
@@ -84,8 +86,9 @@ public:
 
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *>
 {
-private:
     QString name;
+    QString cardSetName;
+    QString cardSetNumber;
     class compareFunctor;
 
 public:
@@ -106,6 +109,23 @@ public:
     }
     static QString visibleNameFromName(const QString &_name);
     virtual QString getVisibleName() const;
+    [[nodiscard]] QString getCardSetName() const
+    {
+         return cardSetName;
+    }
+    void setCardSetName(const QString &_cardSetCode)
+    {
+        cardSetName = _cardSetCode;
+    }
+    [[nodiscard]] QString getCardSetNumber() const
+    {
+        return cardSetNumber;
+    }
+    void setCardSetNumber(const QString &_cardSetCollectorNumber)
+    {
+        cardSetNumber = _cardSetCollectorNumber;
+    }
+
     void clearTree();
     AbstractDecklistNode *findChild(const QString &_name);
     int height() const override;
@@ -147,7 +167,6 @@ public:
 
 class DecklistCardNode : public AbstractDecklistCardNode
 {
-private:
     QString name;
     int number;
     QString cardSetName;

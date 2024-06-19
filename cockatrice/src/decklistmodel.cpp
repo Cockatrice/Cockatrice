@@ -78,7 +78,7 @@ int DeckListModel::rowCount(const QModelIndex &parent) const
 
 int DeckListModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 4;
 }
 
 QVariant DeckListModel::data(const QModelIndex &index, int role) const
@@ -95,7 +95,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
     auto *temp = static_cast<AbstractDecklistNode *>(index.internalPointer());
     auto *card = dynamic_cast<DecklistModelCardNode *>(temp);
     if (card == nullptr) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(temp);
+        const auto *node = dynamic_cast<InnerDecklistNode *>(temp);
         switch (role) {
             case Qt::FontRole: {
                 QFont f;
@@ -112,6 +112,10 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                             return node->getVisibleName();
                         else
                             return node->getName();
+                    case 2:
+                        return node->getCardSetName();
+                    case 3:
+                        return node->getCardSetNumber();
                     default:
                         return QVariant();
                 }
@@ -152,14 +156,14 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant DeckListModel::headerData(const int section, const Qt::Orientation orientation, const int role) const
 {
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal)) {
-        return QVariant();
+        return {};
     }
 
     if (section >= columnCount()) {
-        return QVariant();
+        return {};
     }
 
     switch (section) {
@@ -167,8 +171,12 @@ QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int
             return tr("Number");
         case 1:
             return tr("Card");
+        case 2:
+            return tr("Set");
+        case 3:
+            return tr("Collector Number");
         default:
-            return QVariant();
+            return {};
     }
 }
 
@@ -214,7 +222,7 @@ void DeckListModel::emitRecursiveUpdates(const QModelIndex &index)
     emitRecursiveUpdates(index.parent());
 }
 
-bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, const int role)
 {
     auto *node = getNode<DecklistModelCardNode *>(index);
     if (!node || (role != Qt::EditRole)) {
@@ -227,6 +235,12 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
             break;
         case 1:
             node->setName(value.toString());
+            break;
+        case 2:
+            node->setCardSetName(value.toString());
+            break;
+        case 3:
+            node->setCardSetNumber(value.toString());
             break;
         default:
             return false;
