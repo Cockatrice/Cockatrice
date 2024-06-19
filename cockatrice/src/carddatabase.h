@@ -178,8 +178,8 @@ private:
     bool upsideDownArt;
 
     // Specific printings params
-    QString printingSetName;
-    QString printingCardNumber;
+    QString cardSetCode;
+    QString collectorNumber;
 
 public:
     explicit CardInfo(const QString &_name = QString(),
@@ -353,24 +353,24 @@ public:
         pixmapCacheKey = cacheKey;
     }
 
-    void setPrintingSetName(const QString &setName)
+    void setCardSetCode(const QString &_cardSetCode)
     {
-        printingSetName = setName;
+        cardSetCode = _cardSetCode;
     }
 
-    QString getPrintingSetName()
+    QString getCardSetCode()
     {
-        return printingSetName;
+        return cardSetCode;
     }
 
-    void setPrintingNumber(const QString &cardNumber)
+    void setCollectorNumber(const QString &_collectorNumber)
     {
-        printingCardNumber = cardNumber;
+        collectorNumber = _collectorNumber;
     }
 
-    QString getPrintingNumber()
+    QString getCollectorNumber()
     {
-        return printingCardNumber;
+        return collectorNumber;
     }
 
     /**

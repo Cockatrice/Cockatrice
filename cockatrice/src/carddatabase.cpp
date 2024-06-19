@@ -438,18 +438,18 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName, const QString &cardSe
 
     const auto &x = getAllPrintingsOfCard(cardName);
     for (const auto &y : x) {
-        qDebug() << "getAllPrintingsOfCard" << y->getName() << y->getPrintingSetName() << y->getPrintingNumber();
+        qDebug() << "getAllPrintingsOfCard" << y->getName() << y->getCardSetCode() << y->getCollectorNumber();
     }
 
     if (cardsAllPrintings.contains(cardName)) {
         qDebug() << "SIZE OF" << cardName << "is" << cardsAllPrintings[cardName].length();
         for (const auto &card : cardsAllPrintings[cardName]) {
-            qDebug() << "Trying to find" << card->getPrintingSetName() << card->getPrintingNumber() << "in" << cardSet << cardNumber;
-            if (card->getPrintingSetName() == cardSet) {
+            qDebug() << "Trying to find" << card->getCardSetCode() << card->getCollectorNumber() << "in" << cardSet << cardNumber;
+            if (card->getCardSetCode() == cardSet) {
                 if (cardNumber == "") {
                     return card;
                 }
-                if (card->getPrintingNumber() == cardNumber) {
+                if (card->getCollectorNumber() == cardNumber) {
                     return card;
                 }
             }

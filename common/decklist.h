@@ -70,8 +70,8 @@ public:
         sortMethod = method;
     }
     virtual QString getName() const = 0;
-    virtual QString getCardSetName() const = 0;
-    virtual QString getCardSetNumber() const = 0;
+    virtual QString getCardSetCode() const = 0;
+    virtual QString getCardCollectorNumber() const = 0;
     InnerDecklistNode *getParent() const
     {
         return parent;
@@ -87,8 +87,8 @@ public:
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *>
 {
     QString name;
-    QString cardSetName;
-    QString cardSetNumber;
+    QString cardSetCode;
+    QString cardCollectorNumber;
     class compareFunctor;
 
 public:
@@ -99,7 +99,7 @@ public:
     explicit InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = nullptr);
     ~InnerDecklistNode() override;
     void setSortMethod(DeckSortMethod method) override;
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return name;
     }
@@ -108,22 +108,22 @@ public:
         name = _name;
     }
     static QString visibleNameFromName(const QString &_name);
-    virtual QString getVisibleName() const;
-    [[nodiscard]] QString getCardSetName() const override
+    [[nodiscard]] virtual QString getVisibleName() const;
+    [[nodiscard]] QString getCardSetCode() const override
     {
-         return cardSetName;
+         return cardSetCode;
     }
-    void setCardSetName(const QString &_cardSetCode)
+    void setCardSetCode(const QString &_cardSetCode)
     {
-        cardSetName = _cardSetCode;
+        cardSetCode = _cardSetCode;
     }
-    [[nodiscard]] QString getCardSetNumber() const override
+    [[nodiscard]] QString getCardCollectorNumber() const override
     {
-        return cardSetNumber;
+        return cardCollectorNumber;
     }
-    void setCardSetNumber(const QString &_cardSetCollectorNumber)
+    void setCardCollectorNumber(const QString &_cardCollectorNumber)
     {
-        cardSetNumber = _cardSetCollectorNumber;
+        cardCollectorNumber = _cardCollectorNumber;
     }
 
     void clearTree();
@@ -149,10 +149,10 @@ public:
     virtual void setNumber(int _number) = 0;
     QString getName() const override = 0;
     virtual void setName(const QString &_name) = 0;
-    virtual QString getCardSetName() const override = 0;
-    virtual void setCardSetName(const QString &_cardSetName) = 0;
-    virtual QString getCardSetNumber() const override = 0;
-    virtual void setCardSetNumber(const QString &_cardSetNumber) = 0;
+    virtual QString getCardSetCode() const override = 0;
+    virtual void setCardSetCode(const QString &_cardSetName) = 0;
+    virtual QString getCardCollectorNumber() const override = 0;
+    virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;
     int height() const override
     {
         return 0;
@@ -200,19 +200,19 @@ public:
     {
         name = _name;
     }
-    QString getCardSetName() const override
+    QString getCardSetCode() const override
     {
         return cardSetName;
     }
-    void setCardSetName(const QString &_cardSetName) override
+    void setCardSetCode(const QString &_cardSetName) override
     {
         cardSetName = _cardSetName;
     }
-    QString getCardSetNumber() const override
+    QString getCardCollectorNumber() const override
     {
         return cardSetNumber;
     }
-    void setCardSetNumber(const QString &_cardSetNumber) override
+    void setCardCollectorNumber(const QString &_cardSetNumber) override
     {
         cardSetNumber = _cardSetNumber;
     }

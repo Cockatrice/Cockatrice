@@ -113,9 +113,9 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                         else
                             return node->getName();
                     case 2:
-                        return node->getCardSetName();
+                        return node->getCardSetCode();
                     case 3:
-                        return node->getCardSetNumber();
+                        return node->getCardCollectorNumber();
                     default:
                         return QVariant();
                 }
@@ -140,9 +140,9 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                     case 1:
                         return card->getName();
                     case 2:
-                        return card->getCardSetName();
+                        return card->getCardSetCode();
                     case 3:
-                        return card->getCardSetNumber();
+                        return card->getCardCollectorNumber();
                     default:
                         return QVariant();
                 }
@@ -241,10 +241,10 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
             node->setName(value.toString());
             break;
         case 2:
-            node->setCardSetName(value.toString());
+            node->setCardSetCode(value.toString());
             break;
         case 3:
-            node->setCardSetNumber(value.toString());
+            node->setCardCollectorNumber(value.toString());
             break;
         default:
             return false;
@@ -362,14 +362,14 @@ QModelIndex DeckListModel::addCard(const CardInfoPtr &info, const QString &zoneN
     auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(info->getName()));
     if (!cardNode) {
         auto *decklistCard =
-            deckList->addCard(info->getName(), zoneName, info->getPrintingSetName(), info->getPrintingNumber());
+            deckList->addCard(info->getName(), zoneName, info->getCardSetCode(), info->getCollectorNumber());
         beginInsertRows(parentIndex, static_cast<int>(cardTypeNode->size()), static_cast<int>(cardTypeNode->size()));
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
-        cardNode->setCardSetName(info->getPrintingSetName());
-        cardNode->setCardSetNumber(info->getPrintingNumber());
+        cardNode->setCardSetCode(info->getCardSetCode());
+        cardNode->setCardCollectorNumber(info->getCollectorNumber());
         deckList->updateDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);

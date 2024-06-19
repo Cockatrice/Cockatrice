@@ -130,8 +130,8 @@ void CardFrame::setCard(const CardImageData &cardImageData)
         qDebug() << "Loading in Card" << info->getName() << cardImageData.cardSetName << cardImageData.cardNumber;
         info->setPixmapCacheKey(QLatin1String("card_") + info->getName() + "_" + cardImageData.cardSetName + "_" +
                                 cardImageData.cardNumber);
-        info->setPrintingSetName(cardImageData.cardSetName);
-        info->setPrintingNumber(cardImageData.cardNumber);
+        info->setCardSetCode(cardImageData.cardSetName);
+        info->setCollectorNumber(cardImageData.cardNumber);
     }
 
     text->setCard(info);

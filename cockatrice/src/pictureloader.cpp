@@ -34,8 +34,8 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
     : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
-        if (card->getSets().contains(card->getPrintingSetName().toUpper())) {
-            sortedSets << card->getSets().find(card->getPrintingSetName().toUpper())->getPtr();
+        if (card->getSets().contains(card->getCardSetCode().toUpper())) {
+            sortedSets << card->getSets().find(card->getCardSetCode().toUpper())->getPtr();
         } else {
             for (const auto &set : card->getSets()) {
                 sortedSets << set.getPtr();
