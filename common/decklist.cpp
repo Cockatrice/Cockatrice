@@ -302,6 +302,14 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
 {
     xml->writeEmptyElement("card");
     xml->writeAttribute("number", QString::number(getNumber()));
+
+    if (getCardSetName() != "") {
+        xml->writeAttribute("setCode", getCardSetName());
+        if (getCardSetNumber() != "") {
+            xml->writeAttribute("collectorNumber", getCardSetNumber());
+        }
+    }
+
     xml->writeAttribute("name", getName());
 }
 
@@ -740,14 +748,17 @@ int DeckList::getSideboardSize() const
     return size;
 }
 
-DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
+DecklistCardNode *DeckList::addCard(const QString &cardName,
+                                    const QString &zoneName,
+                                    const QString &cardSetName,
+                                    const QString &cardSetCollectorNumber)
 {
     auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (zoneNode == nullptr) {
         zoneNode = new InnerDecklistNode(zoneName, root);
     }
 
-    auto *node = new DecklistCardNode(cardName, 1, zoneNode);
+    auto *node = new DecklistCardNode(cardName, 1, zoneNode, cardSetName, cardSetCollectorNumber);
     updateDeckHash();
 
     return node;

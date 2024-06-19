@@ -430,6 +430,28 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName) const
     return getCardFromMap(cards, cardName);
 }
 
+CardInfoPtr CardDatabase::getCard(const QString &cardName, const QString &cardSet, const QString &cardNumber) const
+{
+    if (cardSet == "") {
+        return getCard(cardName);
+    }
+
+    if (cardsAllPrintings.contains(cardName)) {
+        for (const auto &card : cardsAllPrintings[cardName]) {
+            if (card->getPrintingSetName() == cardSet) {
+                if (cardNumber == "") {
+                    return card;
+                }
+                if (card->getPrintingNumber() == cardNumber) {
+                    return card;
+                }
+            }
+        }
+    }
+
+    return {};
+}
+
 QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;

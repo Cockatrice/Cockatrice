@@ -330,20 +330,28 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
         }
     }
 
+    return addCard(info, zoneName);
+}
+
+QModelIndex DeckListModel::addCard(const CardInfoPtr &info, const QString &zoneName)
+{
     InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
 
-    QString cardType = info->getMainCardType();
+    const auto cardType = info->getMainCardType();
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
 
-    QModelIndex parentIndex = nodeToIndex(cardTypeNode);
-    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(cardName));
+    const auto parentIndex = nodeToIndex(cardTypeNode);
+    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(info->getName()));
     if (!cardNode) {
-        DecklistCardNode *decklistCard = deckList->addCard(cardName, zoneName);
-        beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
+        auto *decklistCard =
+            deckList->addCard(info->getName(), zoneName, info->getPrintingSetName(), info->getPrintingNumber());
+        beginInsertRows(parentIndex, static_cast<int>(cardTypeNode->size()), static_cast<int>(cardTypeNode->size()));
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
+        cardNode->setCardSetName(info->getPrintingSetName());
+        cardNode->setCardSetNumber(info->getPrintingNumber());
         deckList->updateDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);

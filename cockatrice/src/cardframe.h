@@ -27,13 +27,6 @@ private:
 
     void refreshCardVersionSelector(const QString &cardName) const;
 
-    struct CardImageData
-    {
-        CardInfoPtr cardInfoPtr;
-        QString cardSetName;
-        QString cardNumber;
-    };
-
 public:
     enum ViewMode
     {
@@ -41,8 +34,22 @@ public:
         TextOnlyView,
         ImageAndTextView
     };
+    struct CardImageData
+    {
+        CardInfoPtr cardInfoPtr;
+        QString cardSetName;
+        QString cardNumber;
+    };
+
     explicit CardFrame(const QString &cardName = QString(), QWidget *parent = nullptr);
     void retranslateUi();
+    [[nodiscard]] CardImageData getCardMetadata() const
+    {
+        if (cardVersionSelector) {
+            return cardVersionSelector->currentData().value<CardImageData>();
+        }
+        return {};
+    }
 
 public slots:
     void setCard(CardInfoPtr card);

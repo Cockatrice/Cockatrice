@@ -965,7 +965,13 @@ CardInfoPtr TabDeckEditor::currentCardInfo() const
     }
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
-
+    const auto cardMetadata = cardInfo->getCardMetadata();
+    if (cardMetadata.cardSetName != "") {
+        if (cardMetadata.cardNumber != "") {
+            return db->getCard(cardName, cardMetadata.cardSetName, cardMetadata.cardNumber);
+        }
+        return db->getCard(cardName, cardMetadata.cardSetName);
+    }
     return db->getCard(cardName);
 }
 

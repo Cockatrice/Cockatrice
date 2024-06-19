@@ -1,6 +1,7 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
+#include "carddatabase.h"
 #include "decklist.h"
 
 #include <QAbstractItemModel>
@@ -37,6 +38,22 @@ public:
     {
         dataNode->setName(_name);
     }
+    QString getCardSetName() const override
+    {
+        return dataNode->getCardSetName();
+    }
+    void setCardSetName(const QString &_cardSetName) override
+    {
+        dataNode->setCardSetName(_cardSetName);
+    }
+    QString getCardSetNumber() const override
+    {
+        return dataNode->getCardSetNumber();
+    }
+    void setCardSetNumber(const QString &_cardSetNumber) override
+    {
+        dataNode->setCardSetNumber(_cardSetNumber);
+    }
     DecklistCardNode *getDataNode() const
     {
         return dataNode;
@@ -67,6 +84,8 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent) override;
     QModelIndex findCard(const QString &cardName, const QString &zoneName) const;
     QModelIndex addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway = false);
+    QModelIndex addCard(const CardInfoPtr &info, const QString &zoneName);
+
     void sort(int column, Qt::SortOrder order) override;
     void cleanList();
     DeckLoader *getDeckList() const
