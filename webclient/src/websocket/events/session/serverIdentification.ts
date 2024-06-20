@@ -8,8 +8,8 @@ import {
   register,
   requestPasswordSalt,
   forgotPasswordChallenge,
-  forgotPasswordRequest,
-  resetPasswordRequest,
+  forgotPasswordReset,
+  forgotPasswordReset,
   updateStatus,
 } from '../../commands/session';
 import { generateSalt, passwordSaltSupported } from '../../utils';
@@ -48,7 +48,7 @@ export function serverIdentification(info: ServerIdentificationData): void {
       }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
-      resetPasswordRequest(options);
+      forgotPasswordReset(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
       forgotPasswordChallenge(options);
@@ -57,7 +57,7 @@ export function serverIdentification(info: ServerIdentificationData): void {
       if (getPasswordSalt) {
         requestPasswordSalt(options);
       } else {
-        forgotPasswordRequest(options);
+        forgotPasswordReset(options);
       }
       break;
     default:

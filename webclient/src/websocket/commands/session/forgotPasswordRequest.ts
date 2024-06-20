@@ -1,34 +1,33 @@
-import { ForgotPasswordResetParams } from 'store';
+import { ForgotPasswordParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
-import { hashPassword } from '../../utils';
 
-import { disconnect, updateStatus } from '.';
+import { disconnect, updateStatus } from './';
 
-export function forgotPasswordRequest(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, token, newPassword } = options as unknown as ForgotPasswordResetParams;
+export function forgotPasswordRequest(options: WebSocketConnectOptions): void {
+  const { userName } = options as unknown as ForgotPasswordParams;
 
-  const forgotPasswordResetConfig: any = {
+  const forgotPasswordConfig = {
     ...webClient.clientConfig,
     userName,
-    token,
   };
 
-  if (passwordSalt) {
-    forgotPasswordResetConfig.hashedNewPassword = hashPassword(passwordSalt, newPassword);
-  } else {
-    forgotPasswordResetConfig.newPassword = newPassword;
-  }
-
-  const command = webClient.protobuf.controller.Command_ForgotPasswordReset.create(forgotPasswordResetConfig);
-  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ForgotPasswordReset.ext': command });
+  const command = webClient.protobuf.controller.Command_ForgotPasswordRequest.create(forgotPasswordConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ForgotPasswordRequest.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
-      updateStatus(StatusEnum.DISCONNECTED, null);
-      SessionPersistence.resetPasswordSuccess();
+      const resp = raw['.Response_ForgotPasswordRequest.ext'];
+
+      if (resp.challengeEmail) {
+        updateStatus(StatusEnum.DISCONNECTED, null);
+        SessionPersistence.resetPasswordChallenge();
+      } else {
+        updateStatus(StatusEnum.DISCONNECTED, null);
+        SessionPersistence.resetPassword();
+      }
     } else {
       updateStatus(StatusEnum.DISCONNECTED, null);
       SessionPersistence.resetPasswordFailed();
