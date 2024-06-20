@@ -84,6 +84,7 @@ void CardFrame::refreshCardVersionSelector(const QString &cardName) const
         }
     }
     cardVersionSelector->setDisabled(cardVersionSelector->count() < 2);
+    cardVersionSelector->setVisible(cardVersionSelector->count() >= 1);
 }
 
 void CardFrame::retranslateUi()
