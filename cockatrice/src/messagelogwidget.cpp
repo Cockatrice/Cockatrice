@@ -481,7 +481,8 @@ void MessageLogWidget::logRevealCards(Player *player,
                                       QString cardName,
                                       Player *otherPlayer,
                                       bool faceDown,
-                                      int amount)
+                                      int amount,
+                                      bool isLentToAnotherPlayer)
 {
     // getFromStr uses cardname.empty() to check if it should contain the start zone, it's not actually used
     QPair<QString, QString> temp = getFromStr(zone, amount == 1 ? cardName : QString::number(amount), cardId, false);
@@ -507,10 +508,17 @@ void MessageLogWidget::logRevealCards(Player *player,
     }
     if (cardId == -1) {
         if (otherPlayer) {
-            appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
-                                        .arg(sanitizeHtml(player->getName()))
-                                        .arg(zone->getTranslatedName(true, CaseRevealZone))
-                                        .arg(sanitizeHtml(otherPlayer->getName())));
+            if (isLentToAnotherPlayer) {
+                appendHtmlServerMessage(tr("%1 lends %2 to %3.")
+                                            .arg(sanitizeHtml(player->getName()))
+                                            .arg(zone->getTranslatedName(true, CaseRevealZone))
+                                            .arg(sanitizeHtml(otherPlayer->getName())));
+            } else {
+                appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
+                                            .arg(sanitizeHtml(player->getName()))
+                                            .arg(zone->getTranslatedName(true, CaseRevealZone))
+                                            .arg(sanitizeHtml(otherPlayer->getName())));
+            }
         } else {
             appendHtmlServerMessage(tr("%1 reveals %2.")
                                         .arg(sanitizeHtml(player->getName()))
@@ -845,8 +853,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
     connect(player, SIGNAL(logDrawCards(Player *, int, bool)), this, SLOT(logDrawCards(Player *, int, bool)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
-    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)), this,
-            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)));
+    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int, bool)), this,
+            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int, bool)));
     connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this,
             SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
     connect(player, SIGNAL(logAlwaysLookAtTopCard(Player *, CardZone *, bool)), this,
