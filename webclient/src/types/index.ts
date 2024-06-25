@@ -14,3 +14,4 @@ export * from './settings';
 export * from './languages';
 export * from './logs';
 export * from './session';
+export * from './deckList';

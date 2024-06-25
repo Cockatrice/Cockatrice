@@ -1,5 +1,5 @@
 import { ServerDispatch } from 'store';
-import { StatusEnum, User, WebSocketConnectOptions } from 'types';
+import { DeckStorageTreeItem, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import {
@@ -10,6 +10,7 @@ import {
   UserMessageData
 } from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
+import { DeckList } from '../../types/deckList';
 
 export class SessionPersistence {
   static initialized() {
@@ -205,4 +206,30 @@ export class SessionPersistence {
   static removeFromList(list: string, userName: string): void {
     console.log('removeFromList', list, userName);
   }
+
+  static deckDelete(deckId: number): void {
+    console.log('deckDelete', deckId);
+  }
+
+  static deckDeleteDir(path: string): void {
+    console.log('deckDeleteDir', path);
+  }
+
+  static deckDownload(deckId: number): void {
+    console.log('deckDownload', deckId);
+  }
+
+  static deckList(deckList: DeckList): void {
+    console.log('deckList', deckList);
+  }
+
+  static deckNewDir(path: string, dirName: string): void {
+    console.log('deckNewDir', path, dirName);
+  }
+
+  static deckUpload(treeItem: DeckStorageTreeItem): void {
+    console.log('deckUpload', treeItem);
+  }
 }
+
+

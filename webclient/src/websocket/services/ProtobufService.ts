@@ -1,6 +1,6 @@
 import protobuf from 'protobufjs';
 
-import { RoomEvents, SessionEvents } from '../events';
+import { CommonEvents, RoomEvents, SessionEvents } from '../events';
 import { SessionPersistence } from '../persistence';
 import { WebClient } from '../WebClient';
 import { SessionCommands } from 'websocket';
@@ -95,7 +95,10 @@ export class ProtobufService {
             this.processSessionEvent(msg.sessionEvent, msg);
             break;
           case this.controller.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
-          // @TODO
+            console.log(msg);
+            break;
+          default:
+            console.log(msg);
             break;
         }
       }
@@ -111,6 +114,10 @@ export class ProtobufService {
       this.pendingCommands[cmdId](response);
       delete this.pendingCommands[cmdId];
     }
+  }
+
+  private processCommonEvent(response: any, raw: any) {
+    this.processEvent(response, CommonEvents, raw);
   }
 
   private processRoomEvent(response: any, raw: any) {

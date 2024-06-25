@@ -52,4 +52,12 @@ export class RoomPersistence {
   static removeMessages(roomId: number, name: string, amount: number): void {
     console.log('removeMessages', roomId, name, amount);
   };
+
+  static gameCreated(roomId: number) {
+    console.log('gameCreated', roomId);
+  }
+
+  static joinedGame(roomId: number, gameId: number) {
+    console.log('joinedGame', roomId, gameId);
+  }
 }

@@ -8,7 +8,7 @@ import {
   activate,
   disconnect,
   login,
-  forgotPasswordRequest,
+  forgotPasswordReset,
   updateStatus
 } from './';
 
@@ -35,7 +35,7 @@ export function requestPasswordSalt(options: WebSocketConnectOptions): void {
           }
 
           case WebSocketConnectReason.PASSWORD_RESET: {
-            forgotPasswordRequest(options, passwordSalt);
+            forgotPasswordReset(options, passwordSalt);
             break;
           }
 
