@@ -8,8 +8,9 @@ import {
   register,
   requestPasswordSalt,
   forgotPasswordChallenge,
+  forgotPasswordRequest,
   forgotPasswordReset,
-  updateStatus, forgotPasswordRequest,
+  updateStatus,
 } from '../../commands/session';
 import { generateSalt, passwordSaltSupported } from '../../utils';
 import { ServerIdentificationData } from './interfaces';
