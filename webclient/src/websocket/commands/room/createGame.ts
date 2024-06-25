@@ -1,6 +1,6 @@
 import { RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
-import {GameConfig} from "types";
+import { GameConfig } from 'types';
 
 export function createGame(roomId: number, gameConfig: GameConfig): void {
   const command = webClient.protobuf.controller.Command_CreateGame.create(gameConfig);

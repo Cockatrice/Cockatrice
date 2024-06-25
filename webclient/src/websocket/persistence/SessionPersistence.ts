@@ -1,5 +1,5 @@
 import { ServerDispatch } from 'store';
-import {DeckStorageTreeItem, StatusEnum, User, WebSocketConnectOptions} from 'types';
+import { DeckStorageTreeItem, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import {
@@ -10,7 +10,7 @@ import {
   UserMessageData
 } from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
-import {DeckList} from "../../types/deckList";
+import { DeckList } from '../../types/deckList';
 
 export class SessionPersistence {
   static initialized() {

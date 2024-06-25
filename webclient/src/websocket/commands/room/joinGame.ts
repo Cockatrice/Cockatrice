@@ -1,6 +1,6 @@
 import { RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
-import {GameConfig, JoinGameParams} from "types";
+import { GameConfig, JoinGameParams } from 'types';
 
 export function joinGame(roomId: number, joinGameParams: JoinGameParams): void {
   const command = webClient.protobuf.controller.Command_JoinGame.create(joinGameParams);
