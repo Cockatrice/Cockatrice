@@ -62,4 +62,10 @@ export const Actions = {
     type: Types.GAME_CREATED,
     roomId
   }),
+
+  joinedGame: (roomId, gameId) => ({
+    type: Types.JOINED_GAME,
+    roomId,
+    gameId
+  }),
 }

@@ -51,4 +51,8 @@ export const Dispatch = {
   gameCreated: (roomId) => {
     store.dispatch(Actions.gameCreated(roomId));
   },
+
+  joinedGame: (roomId, gameId) => {
+    store.dispatch(Actions.joinedGame(roomId, gameId));
+  }
 }

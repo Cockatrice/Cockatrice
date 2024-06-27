@@ -58,6 +58,6 @@ export class RoomPersistence {
   }
 
   static joinedGame(roomId: number, gameId: number) {
-    console.log('joinedGame', roomId, gameId);
+    RoomsDispatch.joinedGame(roomId, gameId);
   }
 }
