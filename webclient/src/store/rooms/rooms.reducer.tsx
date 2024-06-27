@@ -9,7 +9,9 @@ import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
 
 const initialState: RoomsState = {
   rooms: {},
-  joined: {},
+  games: {},
+  joinedRoomIds: {},
+  joinedGameIds: {},
   messages: {},
   sortGamesBy: {
     field: GameSortField.START_TIME,
@@ -56,7 +58,7 @@ export const roomsReducer = (state = initialState, action: any) => {
 
     case Types.JOIN_ROOM: {
       const { roomInfo } = action;
-      const { joined, rooms, sortGamesBy, sortUsersBy } = state;
+      const { joinedRoomIds, rooms, sortGamesBy, sortUsersBy } = state;
 
       const { roomId } = roomInfo;
 
@@ -83,8 +85,8 @@ export const roomsReducer = (state = initialState, action: any) => {
           }
         },
 
-        joined: {
-          ...joined,
+        joinedRoomIds: {
+          ...joinedRoomIds,
           [roomId]: true
         },
       }
@@ -92,10 +94,10 @@ export const roomsReducer = (state = initialState, action: any) => {
 
     case Types.LEAVE_ROOM: {
       const { roomId } = action;
-      const { joined, messages } = state;
+      const { joinedRoomIds, messages } = state;
 
       const _joined = {
-        ...joined
+        ...joinedRoomIds
       };
 
       const _messages = {
@@ -108,7 +110,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       return {
         ...state,
 
-        joined: _joined,
+        joinedRoomIds: _joined,
         messages: _messages,
       }
     }
@@ -298,6 +300,22 @@ export const roomsReducer = (state = initialState, action: any) => {
               return keep;
             })
             .reverse()
+        }
+      }
+    }
+
+    case Types.JOINED_GAME: {
+      const { gameId, roomId } = action;
+      const { joinedGameIds } = state;
+
+      return {
+        ...state,
+        joinedGameIds: {
+          ...joinedGameIds,
+          [roomId]: {
+            ...joinedGameIds[roomId],
+            [gameId]: true,
+          }
         }
       }
     }
