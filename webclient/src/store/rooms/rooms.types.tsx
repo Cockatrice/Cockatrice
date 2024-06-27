@@ -9,10 +9,7 @@ export const Types = {
   USER_LEFT: '[Rooms] User Left',
   SORT_GAMES: '[Rooms] Sort Games',
   REMOVE_MESSAGES: '[Rooms] Remove Messages',
-<<<<<<< Updated upstream
-=======
   GAME_CREATED: '[Rooms] Game Created',
->>>>>>> Stashed changes
 };
 
 export const MAX_ROOM_MESSAGES = 1000;
