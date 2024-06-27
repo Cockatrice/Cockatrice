@@ -49,5 +49,12 @@ export const Actions = {
     roomId,
     field,
     order
-  })
+  }),
+
+  removeMessages: (roomId, name, amount) => ({
+    type: Types.REMOVE_MESSAGES,
+    roomId,
+    name,
+    amount
+  }),
 }
