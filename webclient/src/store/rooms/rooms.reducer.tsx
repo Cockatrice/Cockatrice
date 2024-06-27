@@ -313,7 +313,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         joinedGameIds: {
           ...joinedGameIds,
           [roomId]: {
-            ...joinedGameIds[roomId], 
+            ...joinedGameIds[roomId],
             [gameId]: true,
           }
         }
