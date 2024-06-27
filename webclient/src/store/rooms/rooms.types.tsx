@@ -9,6 +9,7 @@ export const Types = {
   USER_LEFT: '[Rooms] User Left',
   SORT_GAMES: '[Rooms] Sort Games',
   REMOVE_MESSAGES: '[Rooms] Remove Messages',
+  GAME_CREATED: '[Rooms] Game Created',
 };
 
 export const MAX_ROOM_MESSAGES = 1000;

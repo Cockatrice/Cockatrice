@@ -57,4 +57,9 @@ export const Actions = {
     name,
     amount
   }),
+
+  gameCreated: (roomId) => ({
+    type: Types.GAME_CREATED,
+    roomId
+  }),
 }
