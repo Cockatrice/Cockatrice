@@ -54,7 +54,7 @@ export class RoomPersistence {
   };
 
   static gameCreated(roomId: number) {
-    console.log('gameCreated', roomId);
+    RoomsDispatch.gameCreated(roomId);
   }
 
   static joinedGame(roomId: number, gameId: number) {

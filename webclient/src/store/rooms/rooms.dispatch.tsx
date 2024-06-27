@@ -47,4 +47,11 @@ export const Dispatch = {
   removeMessages: (roomId, name, amount) => {
     store.dispatch(Actions.removeMessages(roomId, name, amount));
   },
+<<<<<<< Updated upstream
+=======
+
+  gameCreated: (roomId) => {
+    store.dispatch(Actions.gameCreated(roomId));
+  },
+>>>>>>> Stashed changes
 }

@@ -57,4 +57,12 @@ export const Actions = {
     name,
     amount
   }),
+<<<<<<< Updated upstream
+=======
+
+  gameCreated: (roomId) => ({
+    type: Types.GAME_CREATED,
+    roomId
+  }),
+>>>>>>> Stashed changes
 }
