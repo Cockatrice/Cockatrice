@@ -42,5 +42,9 @@ export const Dispatch = {
 
   sortGames: (roomId, field, order) => {
     store.dispatch(Actions.sortGames(roomId, field, order));
-  }
+  },
+
+  removeMessages: (roomId, name, amount) => {
+    store.dispatch(Actions.removeMessages(roomId, name, amount));
+  },
 }
