@@ -804,13 +804,18 @@ void DeckList::updateDeckHash()
     hashZones << DECK_ZONE_MAIN << DECK_ZONE_SIDE; // Zones in deck to be included in hashing process
     optionalZones << DECK_ZONE_TOKENS;             // Optional zones in deck not included in hashing process
 
-    for (int i = 0; i < root->size(); i++) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+    unsigned int cardsHashedAlready = 0;
+    for (auto innerDecklistNode : *root) {
+        auto *node = dynamic_cast<InnerDecklistNode *>(innerDecklistNode);
         for (int j = 0; j < node->size(); j++) {
             if (hashZones.contains(node->getName())) // Mainboard or Sideboard
             {
                 auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
                 for (int k = 0; k < card->getNumber(); ++k) {
+                    if (++cardsHashedAlready >= MAX_CARDS_TO_HASH) {
+                        cardList.clear();
+                        break; // We can't efficiently calculate a hash with a larger number
+                    }
                     cardList.append((node->getName() == DECK_ZONE_SIDE ? "SB:" : "") + card->getName().toLower());
                 }
             }
