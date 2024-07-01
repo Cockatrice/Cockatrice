@@ -6,6 +6,7 @@
 #include "main.h"
 #include "settingscache.h"
 
+#include <QDebug>
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <utility>
@@ -31,6 +32,10 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
     insertTab(TextOnlyView, tab2, QString());
     insertTab(ImageAndTextView, tab3, QString());
     connect(this, SIGNAL(currentChanged(int)), this, SLOT(setViewMode(int)));
+
+    cardVersionSelector = new QComboBox(this);
+    refreshCardVersionSelector(cardName);
+    connect(cardVersionSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(updateCardImage(int)));
 
     tab1Layout = new QVBoxLayout();
     tab1Layout->setObjectName("tab1Layout");
@@ -60,6 +65,28 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
     setCard(db->getCard(cardName));
 }
 
+void CardFrame::updateCardImage(int)
+{
+    const auto &cardImageData = cardVersionSelector->currentData().value<CardImageData>();
+    setCard(cardImageData);
+}
+
+void CardFrame::refreshCardVersionSelector(const QString &cardName) const
+{
+    cardVersionSelector->clear();
+    const auto &results = db->getAllPrintingsOfCard(cardName);
+    for (const auto &x : results) {
+        for (const auto &y : x->getSets()) {
+            CardImageData data{x, y.getPtr()->getShortName(), y.getProperty("num")};
+            QVariant qVariant;
+            qVariant.setValue(data);
+            cardVersionSelector->addItem(y.getPtr()->getShortName() + " " + y.getProperty("num"), qVariant);
+        }
+    }
+    cardVersionSelector->setDisabled(cardVersionSelector->count() < 2);
+    cardVersionSelector->setVisible(cardVersionSelector->count() >= 1);
+}
+
 void CardFrame::retranslateUi()
 {
     setTabText(ImageOnlyView, tr("Image"));
@@ -76,10 +103,12 @@ void CardFrame::setViewMode(int mode)
         case ImageOnlyView:
         case TextOnlyView:
             tab1Layout->addWidget(pic);
+            tab1Layout->addWidget(cardVersionSelector);
             tab2Layout->addWidget(text);
             break;
         case ImageAndTextView:
             splitter->addWidget(pic);
+            splitter->addWidget(cardVersionSelector);
             splitter->addWidget(text);
             break;
         default:
@@ -87,6 +116,28 @@ void CardFrame::setViewMode(int mode)
     }
 
     SettingsCache::instance().setCardInfoViewMode(mode);
+}
+
+void CardFrame::setCard(const CardImageData &cardImageData)
+{
+    if (info) {
+        disconnect(info.data(), nullptr, this, nullptr);
+    }
+
+    info = cardImageData.cardInfoPtr;
+
+    if (info) {
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
+        qDebug() << "Loading in Card" << info->getName() << cardImageData.cardSetCode
+                 << cardImageData.cardCollectorNumber;
+        info->setPixmapCacheKey(QLatin1String("card_") + info->getName() + "_" + cardImageData.cardSetCode + "_" +
+                                cardImageData.cardCollectorNumber);
+        info->setCardSetCode(cardImageData.cardSetCode);
+        info->setCollectorNumber(cardImageData.cardCollectorNumber);
+    }
+
+    text->setCard(info);
+    pic->setCard(info);
 }
 
 void CardFrame::setCard(CardInfoPtr card)
@@ -105,9 +156,19 @@ void CardFrame::setCard(CardInfoPtr card)
     pic->setCard(info);
 }
 
-void CardFrame::setCard(const QString &cardName)
+void CardFrame::setCard(const QString &cardName, CardImageData cardMetaData)
 {
-    setCard(db->guessCard(cardName));
+    refreshCardVersionSelector(cardName);
+
+    if (cardMetaData.cardSetCode != "") {
+        cardMetaData.cardInfoPtr = db->getCard(cardName, cardMetaData.cardSetCode, cardMetaData.cardCollectorNumber);
+    } else {
+        cardMetaData.cardInfoPtr = db->getCard(cardName);
+        cardMetaData.cardSetCode = cardMetaData.cardInfoPtr->getCardSetCode();
+        cardMetaData.cardCollectorNumber = cardMetaData.cardInfoPtr->getCollectorNumber();
+    }
+
+    setCard(cardMetaData);
 }
 
 void CardFrame::setCard(AbstractCardItem *card)
