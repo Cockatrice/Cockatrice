@@ -1728,6 +1728,24 @@ Your email will be used to verify your account.</source>
     </message>
 </context>
 <context>
+    <name>DlgRollDice</name>
+    <message>
+        <location filename="src/dlg_roll_dice.cpp" line="13"/>
+        <source>Number of sides:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dlg_roll_dice.cpp" line="20"/>
+        <source>Number of dice:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dlg_roll_dice.cpp" line="41"/>
+        <source>Roll Dice</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DlgSettings</name>
     <message>
         <location filename="src/dlg_settings.cpp" line="1413"/>
@@ -3482,13 +3500,13 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="500"/>
+        <location filename="src/messagelogwidget.cpp" line="501"/>
         <source>cards</source>
         <comment>an unknown amount of cards</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="502"/>
+        <location filename="src/messagelogwidget.cpp" line="503"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
         <translation type="unfinished">
@@ -3497,102 +3515,117 @@ Cockatrice will now reload the card database.</source>
         </translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="510"/>
+        <location filename="src/messagelogwidget.cpp" line="512"/>
+        <source>%1 lends %2 to %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/messagelogwidget.cpp" line="517"/>
         <source>%1 reveals %2 to %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="515"/>
+        <location filename="src/messagelogwidget.cpp" line="523"/>
         <source>%1 reveals %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="521"/>
+        <location filename="src/messagelogwidget.cpp" line="529"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="528"/>
+        <location filename="src/messagelogwidget.cpp" line="536"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="534"/>
+        <location filename="src/messagelogwidget.cpp" line="542"/>
         <source>%1 peeks at face down card #%2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="536"/>
+        <location filename="src/messagelogwidget.cpp" line="544"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="542"/>
+        <location filename="src/messagelogwidget.cpp" line="550"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="549"/>
+        <location filename="src/messagelogwidget.cpp" line="557"/>
         <source>%1 reveals %2%3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="556"/>
+        <location filename="src/messagelogwidget.cpp" line="564"/>
         <source>%1 reversed turn order, now it&apos;s %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="558"/>
+        <location filename="src/messagelogwidget.cpp" line="566"/>
         <source>reversed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="558"/>
+        <location filename="src/messagelogwidget.cpp" line="566"/>
         <source>normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="564"/>
+        <location filename="src/messagelogwidget.cpp" line="574"/>
         <source>Heads</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="564"/>
+        <location filename="src/messagelogwidget.cpp" line="574"/>
         <source>Tails</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="565"/>
+        <location filename="src/messagelogwidget.cpp" line="575"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="569"/>
+        <location filename="src/messagelogwidget.cpp" line="579"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="src/messagelogwidget.cpp" line="586"/>
+        <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="src/messagelogwidget.cpp" line="596"/>
+        <source>%1 rolls a %2-sided dice %3 times: %4.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/messagelogwidget.cpp" line="625"/>
         <source>%1&apos;s turn.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="602"/>
+        <location filename="src/messagelogwidget.cpp" line="631"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="613"/>
+        <location filename="src/messagelogwidget.cpp" line="642"/>
         <source>%1 places %2 %3 on %4 (now %5).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="615"/>
+        <location filename="src/messagelogwidget.cpp" line="644"/>
         <source>%1 removes %2 %3 from %4 (now %5).</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="621"/>
+        <location filename="src/messagelogwidget.cpp" line="650"/>
         <source>red counter(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3600,7 +3633,7 @@ Cockatrice will now reload the card database.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="624"/>
+        <location filename="src/messagelogwidget.cpp" line="653"/>
         <source>yellow counter(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3608,7 +3641,7 @@ Cockatrice will now reload the card database.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="627"/>
+        <location filename="src/messagelogwidget.cpp" line="656"/>
         <source>green counter(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -3616,97 +3649,97 @@ Cockatrice will now reload the card database.</source>
         </translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="646"/>
+        <location filename="src/messagelogwidget.cpp" line="675"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="658"/>
+        <location filename="src/messagelogwidget.cpp" line="687"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="660"/>
+        <location filename="src/messagelogwidget.cpp" line="689"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="679"/>
+        <location filename="src/messagelogwidget.cpp" line="708"/>
         <source>%1 removes the PT of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="684"/>
+        <location filename="src/messagelogwidget.cpp" line="713"/>
         <source>%1 changes the PT of %2 from nothing to %4.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="687"/>
+        <location filename="src/messagelogwidget.cpp" line="716"/>
         <source>%1 changes the PT of %2 from %3 to %4.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="695"/>
+        <location filename="src/messagelogwidget.cpp" line="724"/>
         <source>%1 has locked their sideboard.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="697"/>
+        <location filename="src/messagelogwidget.cpp" line="726"/>
         <source>%1 has unlocked their sideboard.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="715"/>
+        <location filename="src/messagelogwidget.cpp" line="744"/>
         <source>%1 taps their permanents.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="715"/>
+        <location filename="src/messagelogwidget.cpp" line="744"/>
         <source>%1 untaps their permanents.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="718"/>
+        <location filename="src/messagelogwidget.cpp" line="747"/>
         <source>%1 taps %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="718"/>
+        <location filename="src/messagelogwidget.cpp" line="747"/>
         <source>%1 untaps %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="734"/>
+        <location filename="src/messagelogwidget.cpp" line="763"/>
         <source>%1 shuffles %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="738"/>
+        <location filename="src/messagelogwidget.cpp" line="767"/>
         <source>%1 shuffles the bottom %3 cards of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="743"/>
+        <location filename="src/messagelogwidget.cpp" line="772"/>
         <source>%1 shuffles the top %3 cards of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="748"/>
+        <location filename="src/messagelogwidget.cpp" line="777"/>
         <source>%1 shuffles cards %3 - %4 of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="767"/>
+        <location filename="src/messagelogwidget.cpp" line="796"/>
         <source>%1 unattaches %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="773"/>
+        <location filename="src/messagelogwidget.cpp" line="802"/>
         <source>%1 undoes their last draw.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="776"/>
+        <location filename="src/messagelogwidget.cpp" line="805"/>
         <source>%1 undoes their last draw (%2).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4008,614 +4041,609 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>Player</name>
     <message>
-        <location filename="src/player.cpp" line="632"/>
+        <location filename="src/player.cpp" line="651"/>
         <source>Reveal top cards of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="633"/>
-        <location filename="src/player.cpp" line="1079"/>
-        <location filename="src/player.cpp" line="1157"/>
-        <location filename="src/player.cpp" line="1182"/>
-        <location filename="src/player.cpp" line="1254"/>
-        <location filename="src/player.cpp" line="1286"/>
-        <location filename="src/player.cpp" line="1438"/>
-        <location filename="src/player.cpp" line="1470"/>
-        <location filename="src/player.cpp" line="1531"/>
+        <location filename="src/player.cpp" line="652"/>
+        <location filename="src/player.cpp" line="1099"/>
+        <location filename="src/player.cpp" line="1177"/>
+        <location filename="src/player.cpp" line="1202"/>
+        <location filename="src/player.cpp" line="1274"/>
+        <location filename="src/player.cpp" line="1306"/>
+        <location filename="src/player.cpp" line="1458"/>
+        <location filename="src/player.cpp" line="1490"/>
+        <location filename="src/player.cpp" line="1551"/>
         <source>Number of cards: (max. %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="724"/>
+        <location filename="src/player.cpp" line="743"/>
         <source>&amp;View graveyard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="725"/>
+        <location filename="src/player.cpp" line="744"/>
         <source>&amp;View exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="727"/>
+        <location filename="src/player.cpp" line="746"/>
         <source>Player &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="728"/>
-        <location filename="src/player.cpp" line="735"/>
-        <location filename="src/player.cpp" line="748"/>
-        <location filename="src/player.cpp" line="862"/>
+        <location filename="src/player.cpp" line="747"/>
+        <location filename="src/player.cpp" line="754"/>
+        <location filename="src/player.cpp" line="767"/>
+        <location filename="src/player.cpp" line="882"/>
         <source>&amp;Graveyard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="729"/>
-        <location filename="src/player.cpp" line="736"/>
-        <location filename="src/player.cpp" line="742"/>
-        <location filename="src/player.cpp" line="863"/>
+        <location filename="src/player.cpp" line="748"/>
+        <location filename="src/player.cpp" line="755"/>
+        <location filename="src/player.cpp" line="761"/>
+        <location filename="src/player.cpp" line="883"/>
         <source>&amp;Exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="732"/>
+        <location filename="src/player.cpp" line="751"/>
         <source>&amp;Move hand to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="733"/>
-        <location filename="src/player.cpp" line="739"/>
-        <location filename="src/player.cpp" line="745"/>
+        <location filename="src/player.cpp" line="752"/>
+        <location filename="src/player.cpp" line="758"/>
+        <location filename="src/player.cpp" line="764"/>
         <source>&amp;Top of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="734"/>
-        <location filename="src/player.cpp" line="740"/>
-        <location filename="src/player.cpp" line="746"/>
+        <location filename="src/player.cpp" line="753"/>
+        <location filename="src/player.cpp" line="759"/>
+        <location filename="src/player.cpp" line="765"/>
         <source>&amp;Bottom of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="738"/>
+        <location filename="src/player.cpp" line="757"/>
         <source>&amp;Move graveyard to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="741"/>
-        <location filename="src/player.cpp" line="747"/>
-        <location filename="src/player.cpp" line="786"/>
-        <location filename="src/player.cpp" line="861"/>
+        <location filename="src/player.cpp" line="760"/>
+        <location filename="src/player.cpp" line="766"/>
+        <location filename="src/player.cpp" line="806"/>
+        <location filename="src/player.cpp" line="881"/>
         <source>&amp;Hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="744"/>
+        <location filename="src/player.cpp" line="763"/>
         <source>&amp;Move exile to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="750"/>
+        <location filename="src/player.cpp" line="769"/>
         <source>&amp;View library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="751"/>
+        <location filename="src/player.cpp" line="770"/>
         <source>&amp;View hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="752"/>
+        <location filename="src/player.cpp" line="771"/>
         <source>View &amp;top cards of library...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="753"/>
+        <location filename="src/player.cpp" line="772"/>
         <source>Reveal &amp;library to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="757"/>
+        <location filename="src/player.cpp" line="777"/>
         <source>&amp;Always reveal top card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="760"/>
+        <location filename="src/player.cpp" line="780"/>
         <source>&amp;View sideboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="761"/>
+        <location filename="src/player.cpp" line="781"/>
         <source>&amp;Draw card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="762"/>
+        <location filename="src/player.cpp" line="782"/>
         <source>D&amp;raw cards...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="763"/>
+        <location filename="src/player.cpp" line="783"/>
         <source>&amp;Undo last draw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="764"/>
+        <location filename="src/player.cpp" line="784"/>
         <source>Take &amp;mulligan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="765"/>
+        <location filename="src/player.cpp" line="785"/>
         <source>&amp;Shuffle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="768"/>
+        <location filename="src/player.cpp" line="788"/>
         <source>Play top card &amp;face down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="770"/>
+        <location filename="src/player.cpp" line="790"/>
         <source>Move top card to grave&amp;yard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="771"/>
+        <location filename="src/player.cpp" line="791"/>
         <source>Move top card to e&amp;xile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="772"/>
+        <location filename="src/player.cpp" line="792"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="773"/>
+        <location filename="src/player.cpp" line="793"/>
         <source>Move top cards to &amp;exile...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="769"/>
+        <location filename="src/player.cpp" line="789"/>
         <source>Put top card on &amp;bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="774"/>
+        <location filename="src/player.cpp" line="773"/>
+        <source>Lend library to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/player.cpp" line="794"/>
         <source>Put top cards on stack &amp;until...</source>
         <oldsource>Take top cards &amp;until...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="787"/>
+        <location filename="src/player.cpp" line="807"/>
         <source>&amp;Reveal hand to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="788"/>
+        <location filename="src/player.cpp" line="808"/>
         <source>Reveal r&amp;andom card to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="789"/>
+        <location filename="src/player.cpp" line="809"/>
         <source>Reveal random card to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="790"/>
+        <location filename="src/player.cpp" line="810"/>
         <source>&amp;Sideboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="791"/>
+        <location filename="src/player.cpp" line="811"/>
         <source>&amp;Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="792"/>
+        <location filename="src/player.cpp" line="812"/>
         <source>&amp;Counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="794"/>
+        <location filename="src/player.cpp" line="814"/>
         <source>&amp;Untap all permanents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="795"/>
+        <location filename="src/player.cpp" line="815"/>
         <source>R&amp;oll die...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="796"/>
+        <location filename="src/player.cpp" line="816"/>
         <source>&amp;Create token...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="797"/>
+        <location filename="src/player.cpp" line="817"/>
         <source>C&amp;reate another token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="798"/>
+        <location filename="src/player.cpp" line="818"/>
         <source>Cr&amp;eate predefined token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="808"/>
-        <location filename="src/player.cpp" line="1030"/>
+        <location filename="src/player.cpp" line="828"/>
+        <location filename="src/player.cpp" line="1050"/>
         <source>&amp;All players</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="813"/>
+        <location filename="src/player.cpp" line="833"/>
         <source>S&amp;ay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="816"/>
+        <location filename="src/player.cpp" line="836"/>
         <source>&amp;Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="817"/>
+        <location filename="src/player.cpp" line="837"/>
         <source>&amp;Hide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="818"/>
+        <location filename="src/player.cpp" line="838"/>
         <source>Play &amp;Face Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="820"/>
+        <location filename="src/player.cpp" line="840"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="821"/>
+        <location filename="src/player.cpp" line="841"/>
         <source>Toggle &amp;normal untapping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="823"/>
+        <location filename="src/player.cpp" line="843"/>
         <source>T&amp;urn Over</source>
         <extracomment>Turn face up/face down</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="826"/>
+        <location filename="src/player.cpp" line="846"/>
         <source>&amp;Peek at card face</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="827"/>
+        <location filename="src/player.cpp" line="847"/>
         <source>&amp;Clone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="828"/>
+        <location filename="src/player.cpp" line="848"/>
         <source>Attac&amp;h to card...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="829"/>
+        <location filename="src/player.cpp" line="849"/>
         <source>Unattac&amp;h</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="830"/>
+        <location filename="src/player.cpp" line="850"/>
         <source>&amp;Draw arrow...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="831"/>
+        <location filename="src/player.cpp" line="851"/>
         <source>&amp;Increase power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="832"/>
+        <location filename="src/player.cpp" line="852"/>
         <source>&amp;Decrease power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="833"/>
+        <location filename="src/player.cpp" line="853"/>
         <source>I&amp;ncrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="834"/>
+        <location filename="src/player.cpp" line="854"/>
         <source>D&amp;ecrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="835"/>
+        <location filename="src/player.cpp" line="855"/>
         <source>In&amp;crease power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="836"/>
+        <location filename="src/player.cpp" line="856"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="837"/>
+        <location filename="src/player.cpp" line="857"/>
         <source>Increase power and decrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="838"/>
+        <location filename="src/player.cpp" line="858"/>
         <source>Decrease power and increase toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="839"/>
+        <location filename="src/player.cpp" line="859"/>
         <source>Set &amp;power and toughness...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="840"/>
+        <location filename="src/player.cpp" line="860"/>
         <source>Reset p&amp;ower and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="841"/>
+        <location filename="src/player.cpp" line="861"/>
         <source>&amp;Set annotation...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="844"/>
+        <location filename="src/player.cpp" line="864"/>
         <source>Red</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="845"/>
+        <location filename="src/player.cpp" line="865"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="846"/>
+        <location filename="src/player.cpp" line="866"/>
         <source>Green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="849"/>
+        <location filename="src/player.cpp" line="869"/>
         <source>&amp;Add counter (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="852"/>
+        <location filename="src/player.cpp" line="872"/>
         <source>&amp;Remove counter (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="855"/>
+        <location filename="src/player.cpp" line="875"/>
         <source>&amp;Set counters (%1)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="858"/>
+        <location filename="src/player.cpp" line="878"/>
         <source>&amp;Top of library in random order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="859"/>
+        <location filename="src/player.cpp" line="879"/>
         <source>X cards from the top of library...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="860"/>
+        <location filename="src/player.cpp" line="880"/>
         <source>&amp;Bottom of library in random order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1079"/>
+        <location filename="src/player.cpp" line="1099"/>
         <source>View top cards of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="2819"/>
+        <location filename="src/player.cpp" line="2854"/>
         <source>Which position should this card be placed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="2819"/>
+        <location filename="src/player.cpp" line="2854"/>
         <source>(max. %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1156"/>
+        <location filename="src/player.cpp" line="1176"/>
         <source>Draw hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1158"/>
+        <location filename="src/player.cpp" line="1178"/>
         <source>0 and lower are in comparison to current hand size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1182"/>
+        <location filename="src/player.cpp" line="1202"/>
         <source>Draw cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1783"/>
-        <location filename="src/player.cpp" line="3366"/>
+        <location filename="src/player.cpp" line="1803"/>
+        <location filename="src/player.cpp" line="3401"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1254"/>
+        <location filename="src/player.cpp" line="1274"/>
         <source>Move top cards to grave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="754"/>
+        <location filename="src/player.cpp" line="774"/>
         <source>Reveal &amp;top cards to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="755"/>
+        <location filename="src/player.cpp" line="775"/>
         <source>&amp;Top of library...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="756"/>
+        <location filename="src/player.cpp" line="776"/>
         <source>&amp;Bottom of library...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="758"/>
+        <location filename="src/player.cpp" line="778"/>
         <source>&amp;Always look at top card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="759"/>
+        <location filename="src/player.cpp" line="779"/>
         <source>&amp;Open deck in deck editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="767"/>
+        <location filename="src/player.cpp" line="787"/>
         <source>&amp;Play top card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="776"/>
+        <location filename="src/player.cpp" line="796"/>
         <source>&amp;Draw bottom card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="777"/>
+        <location filename="src/player.cpp" line="797"/>
         <source>D&amp;raw bottom cards...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="778"/>
+        <location filename="src/player.cpp" line="798"/>
         <source>&amp;Play bottom card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="779"/>
+        <location filename="src/player.cpp" line="799"/>
         <source>Play bottom card &amp;face down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="780"/>
+        <location filename="src/player.cpp" line="800"/>
         <source>Move bottom card to grave&amp;yard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="781"/>
+        <location filename="src/player.cpp" line="801"/>
         <source>Move bottom card to e&amp;xile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="782"/>
+        <location filename="src/player.cpp" line="802"/>
         <source>Move bottom cards to &amp;graveyard...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="783"/>
+        <location filename="src/player.cpp" line="803"/>
         <source>Move bottom cards to &amp;exile...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="784"/>
+        <location filename="src/player.cpp" line="804"/>
         <source>Put bottom card on &amp;top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="805"/>
+        <location filename="src/player.cpp" line="825"/>
         <source>Selec&amp;ted cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1286"/>
+        <location filename="src/player.cpp" line="1306"/>
         <source>Move top cards to exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1438"/>
+        <location filename="src/player.cpp" line="1458"/>
         <source>Move bottom cards to grave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1470"/>
+        <location filename="src/player.cpp" line="1490"/>
         <source>Move bottom cards to exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1531"/>
+        <location filename="src/player.cpp" line="1551"/>
         <source>Draw bottom cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1605"/>
-        <source>Roll die</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/player.cpp" line="1605"/>
-        <source>Number of sides:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/player.cpp" line="1636"/>
-        <location filename="src/player.cpp" line="3775"/>
+        <location filename="src/player.cpp" line="1656"/>
+        <location filename="src/player.cpp" line="3810"/>
         <source>C&amp;reate another %1 token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="1783"/>
+        <location filename="src/player.cpp" line="1803"/>
         <source>Create tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="2818"/>
+        <location filename="src/player.cpp" line="2853"/>
         <source>Place card X cards from top of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3153"/>
+        <location filename="src/player.cpp" line="3188"/>
         <source>Change power/toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3153"/>
+        <location filename="src/player.cpp" line="3188"/>
         <source>Change stats to:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3273"/>
+        <location filename="src/player.cpp" line="3308"/>
         <source>Set annotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3274"/>
+        <location filename="src/player.cpp" line="3309"/>
         <source>Please enter the new annotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3366"/>
+        <location filename="src/player.cpp" line="3401"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3564"/>
+        <location filename="src/player.cpp" line="3599"/>
         <source>Re&amp;veal to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3611"/>
+        <location filename="src/player.cpp" line="3646"/>
         <source>View related cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3650"/>
+        <location filename="src/player.cpp" line="3685"/>
         <source>Token: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/player.cpp" line="3667"/>
+        <location filename="src/player.cpp" line="3702"/>
         <source>All tokens</source>
         <translation type="unfinished"></translation>
     </message>
