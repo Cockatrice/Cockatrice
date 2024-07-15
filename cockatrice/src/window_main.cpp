@@ -200,10 +200,27 @@ void MainWindow::actConnect()
 
 void MainWindow::actRegister()
 {
-    DlgRegister dlg(this);
+    if (registerHostname.isEmpty()) {
+        registerHostname = SettingsCache::instance().servers().getHostname();
+    }
+    if (registerPort.isEmpty()) {
+        registerPort = SettingsCache::instance().servers().getPort();
+    }
+    if (registerUserName.isEmpty()) {
+        registerUserName = SettingsCache::instance().servers().getPlayerName();
+    }
+    DlgRegister dlg(this, registerHostname, registerPort, registerUserName, registerPassword, registerEmail,
+                    registerCountry, registerRealName);
     if (dlg.exec()) {
-        client->registerToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
-                                 dlg.getPassword(), dlg.getEmail(), dlg.getCountry(), dlg.getRealName());
+        registerHostname = dlg.getHost();
+        registerPort = dlg.getPort();
+        registerUserName = dlg.getPlayerName();
+        registerPassword = dlg.getPassword();
+        registerEmail = dlg.getEmail();
+        registerCountry = dlg.getCountry();
+        registerRealName = dlg.getRealName();
+        client->registerToServer(registerHostname, static_cast<unsigned int>(registerPort.toInt()), registerUserName,
+                                 registerPassword, registerEmail, registerCountry, registerRealName);
     }
 }
 
