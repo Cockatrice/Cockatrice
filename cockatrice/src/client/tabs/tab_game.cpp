@@ -256,7 +256,7 @@ void TabGame::refreshShortcuts()
         aResetLayout->setShortcuts(shortcuts.getShortcut("Player/aResetLayout"));
     }
     if (aFocusChat) {
-        aFocusChat->setShortcuts(shortcuts.getShortcut("Player/aFocusChat"));
+        aFocusChat->setShortcuts(shortcuts.getShortcut("tab_game/aFocusChat"));
     }
     if (aReplaySkipForward) {
         aReplaySkipForward->setShortcuts(shortcuts.getShortcut("Replays/aSkipForward"));
