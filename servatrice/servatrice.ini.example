@@ -305,6 +305,9 @@ roomlist\1\joinmessage="This message is only here to show that rooms can have a 
 ; The number of chat history messages to save that gets presented to a user joining the room
 roomlist\1\chathistorysize=100
 
+; The maximum amount of cards allowed in a decklist when playing in this room
+roomlist\1\cardlimit=1000000
+
 ; Number of game types allowed (defined) in the room number 1
 roomlist\1\game_types\size=3
 

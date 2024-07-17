@@ -763,7 +763,7 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
             return r;
         }
     } else {
-        newDeck = new DeckList(fileFromStdString(cmd.deck()));
+        newDeck = new DeckList(fileFromStdString(cmd.deck()), game->getRoom()->getCardLimit());
     }
 
     if (!newDeck) {
