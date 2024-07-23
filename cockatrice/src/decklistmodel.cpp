@@ -78,7 +78,7 @@ int DeckListModel::rowCount(const QModelIndex &parent) const
 
 int DeckListModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 4;
 }
 
 QVariant DeckListModel::data(const QModelIndex &index, int role) const
@@ -95,7 +95,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
     auto *temp = static_cast<AbstractDecklistNode *>(index.internalPointer());
     auto *card = dynamic_cast<DecklistModelCardNode *>(temp);
     if (card == nullptr) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(temp);
+        const auto *node = dynamic_cast<InnerDecklistNode *>(temp);
         switch (role) {
             case Qt::FontRole: {
                 QFont f;
@@ -112,6 +112,10 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                             return node->getVisibleName();
                         else
                             return node->getName();
+                    case 2:
+                        return node->getCardSetCode();
+                    case 3:
+                        return node->getCardCollectorNumber();
                     default:
                         return QVariant();
                 }
@@ -135,6 +139,10 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                         return card->getNumber();
                     case 1:
                         return card->getName();
+                    case 2:
+                        return card->getCardSetCode();
+                    case 3:
+                        return card->getCardCollectorNumber();
                     default:
                         return QVariant();
                 }
@@ -152,23 +160,27 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant DeckListModel::headerData(const int section, const Qt::Orientation orientation, const int role) const
 {
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal)) {
-        return QVariant();
+        return {};
     }
 
     if (section >= columnCount()) {
-        return QVariant();
+        return {};
     }
 
     switch (section) {
         case 0:
-            return tr("Number");
+            return tr("Count");
         case 1:
             return tr("Card");
+        case 2:
+            return tr("Set");
+        case 3:
+            return tr("Number");
         default:
-            return QVariant();
+            return {};
     }
 }
 
@@ -214,7 +226,7 @@ void DeckListModel::emitRecursiveUpdates(const QModelIndex &index)
     emitRecursiveUpdates(index.parent());
 }
 
-bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, const int role)
 {
     auto *node = getNode<DecklistModelCardNode *>(index);
     if (!node || (role != Qt::EditRole)) {
@@ -227,6 +239,12 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
             break;
         case 1:
             node->setName(value.toString());
+            break;
+        case 2:
+            node->setCardSetCode(value.toString());
+            break;
+        case 3:
+            node->setCardCollectorNumber(value.toString());
             break;
         default:
             return false;
@@ -330,20 +348,28 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
         }
     }
 
+    return addCard(info, zoneName);
+}
+
+QModelIndex DeckListModel::addCard(const CardInfoPtr &info, const QString &zoneName)
+{
     InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
 
-    QString cardType = info->getMainCardType();
+    const auto cardType = info->getMainCardType();
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
 
-    QModelIndex parentIndex = nodeToIndex(cardTypeNode);
-    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(cardName));
+    const auto parentIndex = nodeToIndex(cardTypeNode);
+    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(info->getName()));
     if (!cardNode) {
-        DecklistCardNode *decklistCard = deckList->addCard(cardName, zoneName);
-        beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
+        auto *decklistCard =
+            deckList->addCard(info->getName(), zoneName, info->getCardSetCode(), info->getCollectorNumber());
+        beginInsertRows(parentIndex, static_cast<int>(cardTypeNode->size()), static_cast<int>(cardTypeNode->size()));
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
+        cardNode->setCardSetCode(info->getCardSetCode());
+        cardNode->setCardCollectorNumber(info->getCollectorNumber());
         deckList->updateDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);
