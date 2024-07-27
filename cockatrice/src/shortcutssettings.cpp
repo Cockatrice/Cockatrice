@@ -168,11 +168,7 @@ bool ShortcutsSettings::isValid(const QString &name, const QString &Sequences) c
 
     QList<QString> allKeys = shortCuts.keys();
     for (const auto &key : allKeys) {
-        if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow") ||
-            (key.startsWith("Textbox") && checkKey.startsWith("Player")) ||  // Textbox/unfocusTextBox and
-            (key.startsWith("Player") && checkKey.startsWith("Textbox")) ||  // tab_game/aFocusChat should
-            (key.startsWith("tab_game") && checkKey.startsWith("Player")) || // not have conflicting shortcuts
-            (key.startsWith("Player") && checkKey.startsWith("tab_game"))) { // with Player family (PR # 5079)
+        if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow")) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
             QStringList stringSequences = storedSequence.split(sep);
             if (stringSequences.contains(checkSequence)) {
