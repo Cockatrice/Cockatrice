@@ -13,7 +13,7 @@ export function getBanHistory(userName: string): void {
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
         const { banList } = raw['.Response_BanHistory.ext'];
-        ModeratorPersistence.banHistory(banList);
+        ModeratorPersistence.banHistory(userName, banList);
         return;
       default:
         error = 'Failed to get ban history.';
