@@ -119,5 +119,44 @@ export const Dispatch = {
   },
   resetPasswordSuccess: () => {
     store.dispatch(Actions.resetPasswordSuccess());
-  }
+  },
+  reloadConfig: () => {
+    store.dispatch(Actions.reloadConfig());
+  },
+  shutdownServer: () => {
+    store.dispatch(Actions.shutdownServer());
+  },
+  updateServerMessage: () => {
+    store.dispatch(Actions.updateServerMessage());
+  },
+  accountPasswordChange: () => {
+    store.dispatch(Actions.accountPasswordChange());
+  },
+  accountEditChanged: (user) => {
+    store.dispatch(Actions.accountEditChanged(user));
+  },
+  accountImageChanged: (user) => {
+    store.dispatch(Actions.accountImageChanged(user));
+  },
+  directMessageSent: (userName, message) => {
+    store.dispatch(Actions.directMessageSent(userName,message)); 
+  },
+  getUserInfo: (userInfo) => {
+    store.dispatch(Actions.getUserInfo(userInfo));
+  },
+  notifyUser: (notification) => {
+    store.dispatch(Actions.notifyUser(notification))
+  },
+  serverShutdown: (data) => {
+    store.dispatch(Actions.serverShutdown(data))
+  },
+  userMessage: (messageData) => {
+    store.dispatch(Actions.userMessage(messageData))
+  },
+  addToList: (list, userName) => {
+    store.dispatch(Actions.addToList(list, userName))
+  },
+  removeFromList: (list, userName)=> {
+    store.dispatch(Actions.removeFromList(list, userName))
+  },
 }

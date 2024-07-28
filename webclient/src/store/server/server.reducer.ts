@@ -31,6 +31,10 @@ const initialState: ServerState = {
     order: SortDirection.ASC
   },
   connectOptions: {},
+  messages: {},
+  userInfo: {},
+  notifications: [],
+  serverShutdown: null,
 };
 
 export const serverReducer = (state = initialState, action: any) => {
@@ -162,7 +166,9 @@ export const serverReducer = (state = initialState, action: any) => {
         status: { ...status }
       }
     }
-    case Types.UPDATE_USER: {
+    case Types.UPDATE_USER:
+    case Types.ACCOUNT_EDIT_CHANGED:
+    case Types.ACCOUNT_IMAGE_CHANGED: {
       const { user } = action;
 
       return {
@@ -226,6 +232,51 @@ export const serverReducer = (state = initialState, action: any) => {
           ...initialState.logs
         }
       }
+    }
+    case Types.USER_MESSAGE: {
+      const {senderName, receiverName} = action.messageData;
+      const userName = state.user.name === senderName ? receiverName : senderName; 
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [userName]: [
+            ...state.messages[userName],
+            action.messageData,
+          ],
+        }
+      };
+    }
+    case Types.GET_USER_INFO: {
+      const {userInfo} = action;
+      
+      return {
+        ...state,
+        userInfo: {
+          ...state.userInfo,
+          [userInfo.name]: userInfo,
+        }
+      };
+    }
+    case Types.NOTIFY_USER: {
+      const {notification} = action;
+
+      return {
+        ...state,
+        notifications: [
+          ...state.notifications, 
+          notification
+        ]
+      };
+    }
+    case Types.SERVER_SHUTDOWN: {
+      const {data} = action;
+
+      return {
+        ...state,
+        serverShutdown: data,
+      };
     }
     default:
       return state;

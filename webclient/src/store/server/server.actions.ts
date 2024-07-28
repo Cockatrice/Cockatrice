@@ -1,6 +1,4 @@
-import { Type } from 'protobufjs';
 import { WebSocketConnectOptions } from 'types';
-
 import { Types } from './server.types';
 
 export const Actions = {
@@ -132,5 +130,56 @@ export const Actions = {
   }),
   resetPasswordSuccess: () => ({
     type: Types.RESET_PASSWORD_SUCCESS,
-  })
+  }),
+  reloadConfig: () => ({
+    type: Types.RELOAD_CONFIG,
+  }),
+  shutdownServer: () => ({
+    type: Types.SHUTDOWN_SERVER,
+  }),
+  updateServerMessage: () => ({
+    type: Types.UPDATE_SERVER_MESSAGE,
+  }),
+  accountPasswordChange: () => ({
+    type: Types.ACCOUNT_PASSWORD_CHANGE,
+  }),
+  accountEditChanged: (user) => ({
+    type: Types.ACCOUNT_EDIT_CHANGED,
+    user,
+  }),
+  accountImageChanged: (user) => ({
+    type: Types.ACCOUNT_IMAGE_CHANGED,
+    user,
+  }),
+  directMessageSent: (userName, message) => ({
+    type: Types.DIRECT_MESSAGE_SENT,
+    userName,
+    message,
+  }),
+  getUserInfo: (userInfo) => ({
+    type: Types.GET_USER_INFO,
+    userInfo,
+  }),
+  notifyUser: (notification) => ({
+    type: Types.NOTIFY_USER,
+    notification,
+  }),
+  serverShutdown: (data) => ({
+    type: Types.SERVER_SHUTDOWN,
+    data,
+  }),
+  userMessage: (messageData) => ({
+    type: Types.USER_MESSAGE,
+    messageData,
+  }),
+  addToList: (list,userName) => ({
+    type: Types.ADD_TO_LIST,
+    list,
+    userName,
+  }),
+  removeFromList: (list,userName) => ({
+    type: Types.REMOVE_FROM_LIST,
+    list,
+    userName,
+  }),
 }
