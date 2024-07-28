@@ -234,9 +234,9 @@ export const serverReducer = (state = initialState, action: any) => {
       }
     }
     case Types.USER_MESSAGE: {
-      const {senderName, receiverName} = action.messageData;
-      const userName = state.user.name === senderName ? receiverName : senderName; 
-      
+      const { senderName, receiverName } = action.messageData;
+      const userName = state.user.name === senderName ? receiverName : senderName;
+
       return {
         ...state,
         messages: {
@@ -249,8 +249,8 @@ export const serverReducer = (state = initialState, action: any) => {
       };
     }
     case Types.GET_USER_INFO: {
-      const {userInfo} = action;
-      
+      const { userInfo } = action;
+
       return {
         ...state,
         userInfo: {
@@ -260,18 +260,18 @@ export const serverReducer = (state = initialState, action: any) => {
       };
     }
     case Types.NOTIFY_USER: {
-      const {notification} = action;
+      const { notification } = action;
 
       return {
         ...state,
         notifications: [
-          ...state.notifications, 
+          ...state.notifications,
           notification
         ]
       };
     }
     case Types.SERVER_SHUTDOWN: {
-      const {data} = action;
+      const { data } = action;
 
       return {
         ...state,

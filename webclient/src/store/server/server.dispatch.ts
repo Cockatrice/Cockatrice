@@ -139,7 +139,7 @@ export const Dispatch = {
     store.dispatch(Actions.accountImageChanged(user));
   },
   directMessageSent: (userName, message) => {
-    store.dispatch(Actions.directMessageSent(userName,message)); 
+    store.dispatch(Actions.directMessageSent(userName, message));
   },
   getUserInfo: (userInfo) => {
     store.dispatch(Actions.getUserInfo(userInfo));
@@ -156,7 +156,7 @@ export const Dispatch = {
   addToList: (list, userName) => {
     store.dispatch(Actions.addToList(list, userName))
   },
-  removeFromList: (list, userName)=> {
+  removeFromList: (list, userName) => {
     store.dispatch(Actions.removeFromList(list, userName))
   },
 }

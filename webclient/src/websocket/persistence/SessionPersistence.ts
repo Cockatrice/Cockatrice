@@ -166,7 +166,7 @@ export class SessionPersistence {
   }
 
   static accountImageChanged(avatarBmp: IBytesValue): void {
-    ServerDispatch.accountImageChanged({avatarBmp});
+    ServerDispatch.accountImageChanged({ avatarBmp });
   }
 
   static directMessageSent(userName: string, message: string): void {
@@ -176,7 +176,7 @@ export class SessionPersistence {
   static getUserInfo(userInfo: User) {
     ServerDispatch.getUserInfo(userInfo);
   }
-  
+
   static getGamesOfUser(userName: string, response: any): void {
     console.log('getGamesOfUser');
   }

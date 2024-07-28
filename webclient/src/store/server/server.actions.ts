@@ -172,12 +172,12 @@ export const Actions = {
     type: Types.USER_MESSAGE,
     messageData,
   }),
-  addToList: (list,userName) => ({
+  addToList: (list, userName) => ({
     type: Types.ADD_TO_LIST,
     list,
     userName,
   }),
-  removeFromList: (list,userName) => ({
+  removeFromList: (list, userName) => ({
     type: Types.REMOVE_FROM_LIST,
     list,
     userName,
