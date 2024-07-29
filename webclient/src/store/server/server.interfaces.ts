@@ -1,4 +1,4 @@
-import { Log, SortBy, User, UserSortField, WebSocketConnectOptions } from 'types';
+import { LogItem, SortBy, User, UserSortField, WebSocketConnectOptions } from 'types';
 import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
 export interface ServerConnectParams {
@@ -72,9 +72,9 @@ export interface ServerStateInfo {
 }
 
 export interface ServerStateLogs {
-  room: Log[];
-  game: Log[];
-  chat: Log[];
+  room: LogItem[];
+  game: LogItem[];
+  chat: LogItem[];
 }
 
 export interface ServerStateSortUsersBy extends SortBy {

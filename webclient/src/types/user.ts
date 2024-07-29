@@ -1,22 +1,17 @@
 export interface User {
   accountageSecs: number;
   name: string;
-  privlevel: UserAccessLevel;
-  userLevel: UserPrivLevel;
+  privlevel: UserPrivLevel;
+  userLevel: number;
   realName?: string;
   country?: string;
   avatarBmp?: Uint8Array;
 }
 
-export enum UserAccessLevel {
-  'NONE'
-}
-
 export enum UserPrivLevel {
-  'unknown 1',
-  'unknown 2',
-  'unknown 3',
-  'unknown 4'
+  NONE = 0,
+  VIP = 1,
+  DONOR = 2
 }
 
 export enum UserSortField {

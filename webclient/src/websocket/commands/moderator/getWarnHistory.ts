@@ -13,7 +13,7 @@ export function getWarnHistory(userName: string): void {
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
         const { warnList } = raw['.Response_WarnHistory.ext'];
-        ModeratorPersistence.warnHistory(warnList);
+        ModeratorPersistence.warnHistory(userName, warnList);
         return;
       default:
         error = 'Failed to get warn history.';
