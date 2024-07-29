@@ -1,4 +1,5 @@
 import { LogItem, SortBy, User, UserSortField, WebSocketConnectOptions } from 'types';
+import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
 export interface ServerConnectParams {
   host: string;
@@ -49,6 +50,14 @@ export interface ServerState {
   users: User[];
   sortUsersBy: ServerStateSortUsersBy;
   connectOptions: WebSocketConnectOptions;
+  messages: {
+    [userName: string]: UserMessageData[];
+  }
+  userInfo: {
+    [userName: string]: User;
+  }
+  notifications: NotifyUserData[];
+  serverShutdown: ServerShutdownData;
 }
 
 export interface ServerStateStatus {

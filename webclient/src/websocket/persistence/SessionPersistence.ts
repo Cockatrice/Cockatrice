@@ -11,6 +11,8 @@ import {
 } from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
 import { DeckList } from '../../types/deckList';
+import { common } from 'protobufjs';
+import IBytesValue = common.IBytesValue;
 
 export class SessionPersistence {
   static initialized() {
@@ -156,23 +158,23 @@ export class SessionPersistence {
   }
 
   static accountPasswordChange(): void {
-    console.log('accountPassword');
+    ServerDispatch.accountPasswordChange();
   }
 
   static accountEditChanged(realName?: string, email?: string, country?: string): void {
-    console.log('accountEditChange');
+    ServerDispatch.accountEditChanged({ realName, email, country });
   }
 
-  static accountImageChanged(): void {
-    console.log('accountImageChanged');
+  static accountImageChanged(avatarBmp: IBytesValue): void {
+    ServerDispatch.accountImageChanged({ avatarBmp });
   }
 
   static directMessageSent(userName: string, message: string): void {
-    console.log('directMessageSent');
+    ServerDispatch.directMessageSent(userName, message);
   }
 
-  static getUserInfo(userInfo: string) {
-    console.log('getUserInfo');
+  static getUserInfo(userInfo: User) {
+    ServerDispatch.getUserInfo(userInfo);
   }
 
   static getGamesOfUser(userName: string, response: any): void {
@@ -183,28 +185,28 @@ export class SessionPersistence {
     console.log('gameJoined', gameJoinedData);
   }
 
-  static notifyUser(payload: NotifyUserData): void {
-    console.log('notifyUser', payload);
+  static notifyUser(notification: NotifyUserData): void {
+    ServerDispatch.notifyUser(notification);
   }
 
   static playerPropertiesChanged(payload: PlayerGamePropertiesData): void {
     console.log('playerPropertiesChanged', payload);
   }
 
-  static serverShutdown(payload: ServerShutdownData): void {
-    console.log('serverShutdown', payload);
+  static serverShutdown(data: ServerShutdownData): void {
+    ServerDispatch.serverShutdown(data);
   }
 
-  static userMessage(payload: UserMessageData): void {
-    console.log('userMessage', payload);
+  static userMessage(messageData: UserMessageData): void {
+    ServerDispatch.userMessage(messageData);
   }
 
   static addToList(list: string, userName: string): void {
-    console.log('addToList', list, userName);
+    ServerDispatch.addToList(list, userName)
   }
 
   static removeFromList(list: string, userName: string): void {
-    console.log('removeFromList', list, userName);
+    ServerDispatch.removeFromList(list, userName);
   }
 
   static deckDelete(deckId: number): void {
