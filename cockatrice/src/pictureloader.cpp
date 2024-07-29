@@ -284,15 +284,17 @@ static int parse(const QString &urlTemplate,
             return 1;
         } else {
             int propLength = propertyValue.length();
-            if (subStrLen > 0 && subStrPos + subStrLen > propLength) {
-                qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
-                                   << propType << " property (" << cardPropertyName << ") for Url template ("
-                                   << urlTemplate << ") is smaller than substr specification (" << subStrPos << " + "
-                                   << subStrLen << " > " << propLength << ")";
-                return 1;
-            } else {
-                propertyValue = propertyValue.mid(subStrPos, subStrLen);
-                propLength = subStrLen;
+            if (subStrLen > 0) {
+                if (subStrPos + subStrLen > propLength) {
+                    qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested "
+                                       << propType << " property (" << cardPropertyName << ") for Url template ("
+                                       << urlTemplate << ") is smaller than substr specification (" << subStrPos
+                                       << " + " << subStrLen << " > " << propLength << ")";
+                    return 1;
+                } else {
+                    propertyValue = propertyValue.mid(subStrPos, subStrLen);
+                    propLength = subStrLen;
+                }
             }
 
             if (!fillWith.isEmpty()) {
