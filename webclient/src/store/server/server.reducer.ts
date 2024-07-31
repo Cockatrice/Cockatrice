@@ -1,4 +1,4 @@
-import { SortDirection, StatusEnum, UserSortField } from 'types';
+import { SortDirection, StatusEnum, UserLevelFlag, UserSortField } from 'types';
 
 import { SortUtil } from '../common';
 
@@ -35,6 +35,11 @@ const initialState: ServerState = {
   userInfo: {},
   notifications: [],
   serverShutdown: null,
+  banUser: '',
+  banHistory: {},
+  warnHistory: {},
+  warnListOptions: [],
+  warnUser: '',
 };
 
 export const serverReducer = (state = initialState, action: any) => {
@@ -276,6 +281,69 @@ export const serverReducer = (state = initialState, action: any) => {
       return {
         ...state,
         serverShutdown: data,
+      };
+    }
+    case Types.BAN_FROM_SERVER: {
+      const { userName } = action;
+
+      return { 
+        ...state,
+        banUser: userName,
+      };
+    }
+    case Types.BAN_HISTORY: {
+      const { userName, banHistory } = action;
+
+      return {
+        ...state,
+        banHistory: {
+          ...state.banHistory,
+          [userName]: banHistory,
+        }
+      };
+    }
+    case Types.WARN_HISTORY: {
+      const { userName, warnHistory } = action;
+
+      return {
+        ...state,
+        warnHistory: {
+          ...state.warnHistory,
+          [userName]: warnHistory,
+        }
+      };
+    }
+    case Types.WARN_LIST_OPTIONS: {
+      const {warnList} = action;
+
+      return {
+        ...state,
+        warnListOptions: warnList,
+      };
+    }
+    case Types.WARN_USER: {
+      const { userName } = action;
+      return {
+        ...state,
+        warnUser: userName,
+      };
+    }
+    case Types.ADJUST_MOD: {
+      const { userName,shouldBeMod,shouldBeJudge } = action;
+
+      return {
+        ...state,
+        users: state.users.map((user)=>{
+          if (user.name !== userName){
+            return user;
+          }
+          const judgeFlag = shouldBeJudge ? UserLevelFlag.IsJudge : UserLevelFlag.IsNothing;
+          const modFlag = shouldBeMod ? UserLevelFlag.IsModerator : UserLevelFlag.IsNothing;
+          return {
+            ...user, 
+            userLevel: user.userLevel & (judgeFlag | modFlag)
+          }
+        })
       };
     }
     default:

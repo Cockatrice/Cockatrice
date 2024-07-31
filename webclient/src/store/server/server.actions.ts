@@ -131,6 +131,12 @@ export const Actions = {
   resetPasswordSuccess: () => ({
     type: Types.RESET_PASSWORD_SUCCESS,
   }),
+  adjustMod: (userName, shouldBeMod, shouldBeJudge) => ({
+    type: Types.ADJUST_MOD,
+    userName,
+    shouldBeMod,
+    shouldBeJudge,
+  }),
   reloadConfig: () => ({
     type: Types.RELOAD_CONFIG,
   }),
@@ -180,6 +186,28 @@ export const Actions = {
   removeFromList: (list, userName) => ({
     type: Types.REMOVE_FROM_LIST,
     list,
+    userName,
+  }),
+  banFromServer: (userName) => ({
+    type: Types.BAN_FROM_SERVER,
+    userName,
+  }),
+  banHistory: (userName, banHistory) => ({
+    type: Types.BAN_HISTORY,
+    userName,
+    banHistory,
+  }),
+  warnHistory: (userName, warnHistory) => ({
+    type: Types.WARN_HISTORY,
+    userName,
+    warnHistory,
+  }),
+  warnListOptions: (warnList) => ({
+    type: Types.WARN_LIST_OPTIONS,
+    warnList,
+  }),
+  warnUser: (userName) => ({
+    type: Types.WARN_USER,
     userName,
   }),
 }

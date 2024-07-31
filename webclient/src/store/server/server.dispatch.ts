@@ -120,6 +120,9 @@ export const Dispatch = {
   resetPasswordSuccess: () => {
     store.dispatch(Actions.resetPasswordSuccess());
   },
+  adjustMod: (userName, shouldBeMod, shouldBeJudge) => {
+    store.dispatch(Actions.adjustMod(userName, shouldBeMod, shouldBeJudge));
+  },
   reloadConfig: () => {
     store.dispatch(Actions.reloadConfig());
   },
@@ -158,5 +161,20 @@ export const Dispatch = {
   },
   removeFromList: (list, userName) => {
     store.dispatch(Actions.removeFromList(list, userName))
+  },
+  banFromServer: (userName) => {
+    store.dispatch(Actions.banFromServer(userName));
+  },
+  banHistory: (userName, banHistory) => {
+    store.dispatch(Actions.banHistory(userName, banHistory))
+  },
+  warnHistory: (userName, warnHistory) => {
+    store.dispatch(Actions.warnHistory(userName, warnHistory))
+  },
+  warnListOptions: (warnList) => {
+    store.dispatch(Actions.warnListOptions(warnList))
+  },
+  warnUser: (userName) => {
+    store.dispatch(Actions.warnUser(userName))
   },
 }

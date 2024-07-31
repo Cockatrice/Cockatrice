@@ -2,7 +2,7 @@ import { ServerDispatch } from 'store';
 
 export class AdminPersistence {
   static adjustMod(userName: string, shouldBeMod: boolean, shouldBeJudge: boolean) {
-    console.log('adjustMod');
+    ServerDispatch.adjustMod(userName, shouldBeMod, shouldBeJudge)
   }
 
   static reloadConfig() {

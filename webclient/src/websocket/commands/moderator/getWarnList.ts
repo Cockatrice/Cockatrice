@@ -13,7 +13,7 @@ export function getWarnList(modName: string, userName: string, userClientid: str
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:
         const { warning } = raw['.Response_WarnList.ext'];
-        ModeratorPersistence.warnList(warning);
+        ModeratorPersistence.warnListOptions(warning);
         return;
       default:
         error = 'Failed to get warn list.';
