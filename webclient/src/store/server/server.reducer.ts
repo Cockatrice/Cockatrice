@@ -286,7 +286,7 @@ export const serverReducer = (state = initialState, action: any) => {
     case Types.BAN_FROM_SERVER: {
       const { userName } = action;
 
-      return { 
+      return {
         ...state,
         banUser: userName,
       };
@@ -314,7 +314,7 @@ export const serverReducer = (state = initialState, action: any) => {
       };
     }
     case Types.WARN_LIST_OPTIONS: {
-      const {warnList} = action;
+      const { warnList } = action;
 
       return {
         ...state,
@@ -329,18 +329,18 @@ export const serverReducer = (state = initialState, action: any) => {
       };
     }
     case Types.ADJUST_MOD: {
-      const { userName,shouldBeMod,shouldBeJudge } = action;
+      const { userName, shouldBeMod, shouldBeJudge } = action;
 
       return {
         ...state,
-        users: state.users.map((user)=>{
-          if (user.name !== userName){
+        users: state.users.map((user) => {
+          if (user.name !== userName) {
             return user;
           }
           const judgeFlag = shouldBeJudge ? UserLevelFlag.IsJudge : UserLevelFlag.IsNothing;
           const modFlag = shouldBeMod ? UserLevelFlag.IsModerator : UserLevelFlag.IsNothing;
           return {
-            ...user, 
+            ...user,
             userLevel: user.userLevel & (judgeFlag | modFlag)
           }
         })
