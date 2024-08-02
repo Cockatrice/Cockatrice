@@ -65,7 +65,7 @@
     <message>
         <location filename="src/dlg_settings.cpp" line="422"/>
         <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
-        <translation type="unfinished"/>
+        <translation>Minimum overlap percentage of cards on the stack and in vertical hand</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="424"/>
@@ -665,22 +665,22 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
     <message>
         <location filename="src/dlg_settings.cpp" line="819"/>
         <source>Downloaded images directory size:</source>
-        <translation type="unfinished"/>
+        <translation>Downloaded images directory size:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="820"/>
         <source>On-disk cache for downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>On-disk cache for downloaded pictures</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="821"/>
         <source>Picture cache size:</source>
-        <translation type="unfinished"/>
+        <translation>Picture cache size:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="822"/>
         <source>In-memory cache for pictures not currently on screen</source>
-        <translation type="unfinished"/>
+        <translation>In-memory cache for pictures not currently on screen</translation>
     </message>
 </context>
 <context>
@@ -1734,17 +1734,17 @@ Your email will be used to verify your account.</translation>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="13"/>
         <source>Number of sides:</source>
-        <translation type="unfinished"/>
+        <translation>Number of sides:</translation>
     </message>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="20"/>
         <source>Number of dice:</source>
-        <translation type="unfinished"/>
+        <translation>Number of dice:</translation>
     </message>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="41"/>
         <source>Roll Dice</source>
-        <translation type="unfinished"/>
+        <translation>Roll Dice</translation>
     </message>
 </context>
 <context>
@@ -2747,7 +2747,7 @@ This usually means that your client version is out of date, and the server sent 
         <location filename="src/window_main.cpp" line="483"/>
         <source>no unacceptable language as specified by these server rules:</source>
         <comment>note that the following lines will not be translated</comment>
-        <translation type="unfinished"/>
+        <translation>no unacceptable language as specified by these server rules:</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="493"/>
@@ -2983,7 +2983,7 @@ Local version is %1, remote version is %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="676"/>
         <source>Show/Hide</source>
-        <translation type="unfinished"/>
+        <translation>Show/Hide</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="907"/>
@@ -3446,7 +3446,7 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="372"/>
         <source>%1 tries to draw from an empty library</source>
-        <translation type="unfinished"/>
+        <translation>%1 tries to draw from an empty library</translation>
     </message>
     <message numerus="yes">
         <location filename="src/messagelogwidget.cpp" line="374"/>
@@ -3549,7 +3549,7 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="512"/>
         <source>%1 lends %2 to %3.</source>
-        <translation type="unfinished"/>
+        <translation>%1 lends %2 to %3.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="517"/>
@@ -3629,12 +3629,12 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="586"/>
         <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
-        <translation type="unfinished"/>
+        <translation>%1 flips %2 coins. There are %3 heads and %4 tails.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="596"/>
         <source>%1 rolls a %2-sided dice %3 times: %4.</source>
-        <translation type="unfinished"/>
+        <translation>%1 rolls a %2-sided dice %3 times: %4.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="625"/>
@@ -3833,7 +3833,7 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1047"/>
         <source>How to use in-game message macros</source>
-        <translation type="unfinished"/>
+        <translation>How to use in-game message macros</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1048"/>
@@ -4237,13 +4237,13 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/player.cpp" line="773"/>
         <source>Lend library to...</source>
-        <translation type="unfinished"/>
+        <translation>Lend library to...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="794"/>
         <source>Put top cards on stack &amp;until...</source>
         <oldsource>Take top cards &amp;until...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Put top cards on stack &amp;until...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="807"/>
@@ -4456,7 +4456,7 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/player.cpp" line="878"/>
         <source>&amp;Top of library in random order</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Top of library in random order</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="879"/>
@@ -4653,7 +4653,7 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/player.cpp" line="3599"/>
         <source>Re&amp;veal to...</source>
-        <translation type="unfinished"/>
+        <translation>Re&amp;veal to...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="3646"/>
@@ -4735,17 +4735,17 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="../common/decklist.cpp" line="111"/>
         <source>Maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Maindeck</translation>
     </message>
     <message>
         <location filename="../common/decklist.cpp" line="113"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard</translation>
     </message>
     <message>
         <location filename="../common/decklist.cpp" line="115"/>
         <source>Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Tokens</translation>
     </message>
 </context>
 <context>
@@ -4935,32 +4935,32 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="43"/>
         <source>Choose an action from the table</source>
-        <translation type="unfinished"/>
+        <translation>Choose an action from the table</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="49"/>
         <source>Hit the key/combination of keys you want to set for this action</source>
-        <translation type="unfinished"/>
+        <translation>Hit the key/combination of keys you want to set for this action</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="172"/>
         <source>Shortcut already in use</source>
-        <translation type="unfinished"/>
+        <translation>Shortcut already in use</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="175"/>
         <source>Invalid key</source>
-        <translation type="unfinished"/>
+        <translation>Invalid key</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="192"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Clear</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="193"/>
         <source>Restore default</source>
-        <translation type="unfinished"/>
+        <translation>Restore default</translation>
     </message>
 </context>
 <context>
@@ -5047,7 +5047,7 @@ Cockatrice will now reload the card database.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1292"/>
         <source>Clear all shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Clear all shortcuts</translation>
     </message>
 </context>
 <context>
@@ -5234,7 +5234,7 @@ Please check your shortcut settings!</translation>
         <location filename="src/tab_deck_editor.cpp" line="379"/>
         <source>Search by card name (or search expressions)</source>
         <oldsource>Search by card name</oldsource>
-        <translation type="unfinished"/>
+        <translation>Search by card name (or search expressions)</translation>
     </message>
     <message>
         <location filename="src/tab_deck_editor.cpp" line="469"/>
@@ -7643,7 +7643,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/shortcutssettings.h" line="503"/>
         <source>Stack Until Found</source>
-        <translation type="unfinished"/>
+        <translation>Stack Until Found</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="528"/>
