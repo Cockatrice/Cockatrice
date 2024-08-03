@@ -275,13 +275,11 @@ jobs:
           - target: 7
             qt_version: 5.15.*
             qt_arch: msvc2019_64
-            qt_tools: "tools_opensslv3_x64"
 
           - target: 10
             qt_version: 6.5.*
             qt_arch: msvc2019_64
-            qt_tools: "tools_opensslv3_x64"
-            qt_modules: "qtmultimedia qtwebsockets"
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: Windows ${{matrix.target}}
     needs: configure
