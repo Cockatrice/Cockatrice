@@ -25,12 +25,12 @@
     <message>
         <location filename="src/dlg_settings.cpp" line="408"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Foutmelding</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="408"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Kon de themes map niet aanmaken op &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="414"/>
@@ -65,7 +65,7 @@
     <message>
         <location filename="src/dlg_settings.cpp" line="422"/>
         <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
-        <translation type="unfinished"/>
+        <translation>Minimum overlap percentage van kaarten op de stack en in verticale handweergave</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="424"/>
@@ -170,7 +170,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="src/userlist.cpp" line="104"/>
         <source>Redact all messages from this user in all rooms</source>
-        <translation type="unfinished"/>
+        <translation>Verwijder alle berichten van deze gebruiker in alle kamers</translation>
     </message>
     <message>
         <location filename="src/userlist.cpp" line="106"/>
@@ -364,7 +364,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="src/cardframe.cpp" line="65"/>
         <source>Image</source>
-        <translation>Plaatje</translation>
+        <translation>Afbeelding</translation>
     </message>
     <message>
         <location filename="src/cardframe.cpp" line="66"/>
@@ -665,22 +665,22 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="src/dlg_settings.cpp" line="819"/>
         <source>Downloaded images directory size:</source>
-        <translation type="unfinished"/>
+        <translation>Grootte van map voor gedownloade afbeeldingen:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="820"/>
         <source>On-disk cache for downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>Cache op schijf voor gedownloade afbeeldingen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="821"/>
         <source>Picture cache size:</source>
-        <translation type="unfinished"/>
+        <translation>Afbeeldingen cache grootte:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="822"/>
         <source>In-memory cache for pictures not currently on screen</source>
-        <translation type="unfinished"/>
+        <translation>Cache in geheugen voor afbeeldingen die momenteel niet op het scherm staan</translation>
     </message>
 </context>
 <context>
@@ -962,7 +962,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="src/dlg_creategame.cpp" line="88"/>
         <source>Create game as spectator</source>
-        <translation type="unfinished"/>
+        <translation>Maak spel aan als toeschouwer</translation>
     </message>
     <message>
         <location filename="src/dlg_creategame.cpp" line="95"/>
@@ -982,7 +982,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
     <message>
         <location filename="src/dlg_creategame.cpp" line="193"/>
         <source>Game information</source>
-        <translation>Spel informatie</translation>
+        <translation>Spelgegevens</translation>
     </message>
     <message>
         <location filename="src/dlg_creategame.cpp" line="275"/>
@@ -1094,14 +1094,14 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de v
         <location filename="src/dlg_edit_avatar.cpp" line="17"/>
         <location filename="src/dlg_edit_avatar.cpp" line="56"/>
         <source>No image chosen.</source>
-        <translation>Geen plaatje gekozen.</translation>
+        <translation>Geen afbeelding gekozen.</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_avatar.cpp" line="22"/>
         <source>To change your avatar, choose a new image.
 To remove your current avatar, confirm without choosing a new image.</source>
-        <translation>Om uw icoon te veranderen, kies een nieuw plaatje.
-Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</translation>
+        <translation>Om je avatar te veranderen, kies een nieuwe afbeelding.
+Om je avatar te verwijderen, accepteer zonder een nieuwe afbeelding te kiezen.</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_avatar.cpp" line="24"/>
@@ -1116,17 +1116,17 @@ Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</trans
     <message>
         <location filename="src/dlg_edit_avatar.cpp" line="54"/>
         <source>Open Image</source>
-        <translation>Plaatje openen</translation>
+        <translation>Afbeelding openen</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_avatar.cpp" line="54"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation>Plaatjes (*.png *.jpg *.bmp)</translation>
+        <translation>Afbeeldingen (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_avatar.cpp" line="65"/>
         <source>Invalid image chosen.</source>
-        <translation>Geen geldig plaatje gekozen</translation>
+        <translation>Geen geldige afbeelding gekozen</translation>
     </message>
 </context>
 <context>
@@ -1160,7 +1160,7 @@ Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</trans
     <message>
         <location filename="src/dlg_edit_password.cpp" line="64"/>
         <source>Your password is too short.</source>
-        <translation>Uw wachtwoord is te kort.</translation>
+        <translation>Je wachtwoord is te kort.</translation>
     </message>
     <message>
         <location filename="src/dlg_edit_password.cpp" line="67"/>
@@ -1332,12 +1332,12 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_filter_games.cpp" line="30"/>
         <source>Show &amp;full games</source>
-        <translation type="unfinished"/>
+        <translation>Laat &amp;volle spelle zien</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="33"/>
         <source>Show games &amp;that have started</source>
-        <translation type="unfinished"/>
+        <translation>Laat spellen zien die al &amp;begonnen zijn</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="36"/>
@@ -1352,7 +1352,7 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_filter_games.cpp" line="47"/>
         <source>&amp;Newer than:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nieuwer dan:</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="52"/>
@@ -1397,27 +1397,27 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_filter_games.cpp" line="120"/>
         <source>Show games only if &amp;spectators can watch</source>
-        <translation type="unfinished"/>
+        <translation>Laat alleen spellen zien als &amp;toeschouwers kunnen kijken</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="124"/>
         <source>Show spectator password p&amp;rotected games</source>
-        <translation type="unfinished"/>
+        <translation>Laat spellen zien met &amp;wachtwoord voor toeschouwers</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="126"/>
         <source>Show only if spectators can ch&amp;at</source>
-        <translation type="unfinished"/>
+        <translation>Laat alleen spellen zien als toeschouwers kunnen &amp;chatten</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="128"/>
         <source>Show only if spectators can see &amp;hands</source>
-        <translation type="unfinished"/>
+        <translation>Laat alleen spellen zien als toeschouwers &amp;handen kunnen zien</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="138"/>
         <source>Spectators</source>
-        <translation type="unfinished"/>
+        <translation>Toeschouwers</translation>
     </message>
     <message>
         <location filename="src/dlg_filter_games.cpp" line="171"/>
@@ -1430,17 +1430,17 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="31"/>
         <source>Reset Password Challenge Warning</source>
-        <translation type="unfinished"/>
+        <translation>Wachtwoord Vergeten Challenge Waarschuwing</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation type="unfinished"/>
+        <translation>Een probleem heeft zich opgetreden. Gelieve opnieuw een wachtwoord aan te vragen.</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>Enter the information of the server and the account you&apos;d like to request a new password for.</source>
-        <translation type="unfinished"/>
+        <translation>Vul de gegevens in van de server en het account waar je een nieuw wachtwoord aan voor wil vragen.</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="40"/>
@@ -1465,12 +1465,12 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="89"/>
         <source>Reset Password Challenge</source>
-        <translation type="unfinished"/>
+        <translation>Wachtwoord Vergeten Challenge</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="97"/>
         <source>Reset Password Challenge Error</source>
-        <translation type="unfinished"/>
+        <translation>Foutmelding Wachtwoord Vergeten Challenge</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordchallenge.cpp" line="97"/>
@@ -1483,7 +1483,7 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_forgotpasswordrequest.cpp" line="30"/>
         <source>Enter the information of the server you&apos;d like to request a new password for.</source>
-        <translation type="unfinished"/>
+        <translation>Vul de gegevens in van de server waar je een nieuw wachtwoord aan voor wil vragen.</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordrequest.cpp" line="33"/>
@@ -1503,12 +1503,12 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_forgotpasswordrequest.cpp" line="66"/>
         <source>Reset Password Request</source>
-        <translation type="unfinished"/>
+        <translation>Wachtwoord Vergeten Aanvraag</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordrequest.cpp" line="74"/>
         <source>Reset Password Error</source>
-        <translation type="unfinished"/>
+        <translation>Foutmelding Wachtwoord Resetten</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordrequest.cpp" line="74"/>
@@ -1521,17 +1521,17 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="31"/>
         <source>Reset Password Warning</source>
-        <translation type="unfinished"/>
+        <translation>Waarschuwing Wachtwoord Resetten</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="32"/>
         <source>A problem has occurred. Please try to request a new password again.</source>
-        <translation type="unfinished"/>
+        <translation>Een probleem heeft zich opgetreden. Gelieve opnieuw een wachtwoord aan te vragen.</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="36"/>
         <source>Enter the received token and the new password in order to set your new password.</source>
-        <translation type="unfinished"/>
+        <translation>Vul het ontvangen token en het nieuwe wachtwoord in om je wachtwoord in te stellen.</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="39"/>
@@ -1562,7 +1562,7 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="104"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Reset Wachtwoord</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="112"/>
@@ -1575,7 +1575,7 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
         <location filename="src/dlg_forgotpasswordreset.cpp" line="122"/>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="131"/>
         <source>Reset Password Error</source>
-        <translation type="unfinished"/>
+        <translation>Foutmelding Resetten Wachtwoord</translation>
     </message>
     <message>
         <location filename="src/dlg_forgotpasswordreset.cpp" line="117"/>
@@ -1642,7 +1642,8 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
         <location filename="src/dlg_register.cpp" line="18"/>
         <source>Enter your information and the information of the server you'd like to register to.
 Your email will be used to verify your account.</source>
-        <translation type="unfinished"/>
+        <translation>Vul je gegevens en de gegevens van de server waar je wil registreren.
+Je email zal gebruikt worden om je account te controleren.</translation>
     </message>
     <message>
         <location filename="src/dlg_register.cpp" line="22"/>
@@ -1710,7 +1711,7 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="src/dlg_register.cpp" line="363"/>
         <source>Your password is too short.</source>
-        <translation type="unfinished"/>
+        <translation>Je wachtwoord is te kort.</translation>
     </message>
     <message>
         <location filename="src/dlg_register.cpp" line="366"/>
@@ -1733,17 +1734,17 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="13"/>
         <source>Number of sides:</source>
-        <translation type="unfinished"/>
+        <translation>Aantal zijden:</translation>
     </message>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="20"/>
         <source>Number of dice:</source>
-        <translation type="unfinished"/>
+        <translation>Aantal dobbelstenen:</translation>
     </message>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="41"/>
         <source>Roll Dice</source>
-        <translation type="unfinished"/>
+        <translation>Werp Dobbelstenen</translation>
     </message>
 </context>
 <context>
@@ -1779,13 +1780,13 @@ This can cause problems loading card information or images
 Usually this can be fixed by rerunning oracle to to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation>Uw kaart database versie is te oud.
+        <translation>Je kaart database versie is te oud.
 
-Dit kan problemen veroorzaken tijdens het laden van kaart informatie of plaatjes.
+Dit kan problemen veroorzaken tijdens het laden van kaart gegevens of afbeeldingen.
 
-Dit zou opgelost kunnen worden door oracle opnieuw te starten en uw kaart database te updaten.
+Dit zou mogelijk opgelost worden door oracle opnieuw te starten en je kaart database te updaten.
 
-Zou u de locatie van uw database willen veranderen?</translation>
+Wil je de locatie van je database veranderen?</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1433"/>
@@ -1794,7 +1795,11 @@ Zou u de locatie van uw database willen veranderen?</translation>
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Uw kaart database was niet klaar met laden
+
+Plaats een klacht op https://github.com/Cockatrice/Cockatrice/issues met uw cards.xml als bijlage alstublieft.
+
+Wilt u uw database lokatie aanpassen?</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1439"/>
@@ -1821,7 +1826,11 @@ Wilt u uw database lokatie aanpassen?</translation>
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Onbekende kaart database laad status
+
+Plaats een klacht op https://github.com/Cockatrice/Cockatrice/issues asltublieft.
+
+Wilt u uw database lokatie aanpassen?</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1455"/>
@@ -1838,7 +1847,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="src/dlg_settings.cpp" line="1476"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Het pad naar uw kaart plaatjes map is niet geldig. Wilt u terug gaan en de correcte pad invullen?</translation>
+        <translation>Het pad naar uw kaart afbeelding map is niet geldig. Wil je terug gaan en het juiste pad invullen?</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1488"/>
@@ -1924,7 +1933,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="src/dlg_update.cpp" line="55"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>Controleren op Client-updates</translation>
     </message>
     <message>
         <location filename="src/dlg_update.cpp" line="63"/>
@@ -2198,24 +2207,24 @@ Mogelijk moet je zelf van source bouwen.</translation>
     <message>
         <location filename="src/gamesmodel.cpp" line="48"/>
         <source>&gt;1 day</source>
-        <translation type="unfinished"/>
+        <translation>&gt;1 dag</translation>
     </message>
     <message numerus="yes">
         <location filename="src/gamesmodel.cpp" line="57"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1%2 uur</numerusform><numerusform>%1%2 uur</numerusform></translation>
     </message>
     <message>
         <location filename="src/gamesmodel.cpp" line="59"/>
         <source>new</source>
-        <translation type="unfinished"/>
+        <translation>nieuw</translation>
     </message>
     <message numerus="yes">
         <location filename="src/gamesmodel.cpp" line="62"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform></translation>
     </message>
     <message>
         <location filename="src/gamesmodel.cpp" line="154"/>
@@ -2299,12 +2308,12 @@ Mogelijk moet je zelf van source bouwen.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="138"/>
         <source>Reset all paths</source>
-        <translation type="unfinished"/>
+        <translation>Reset alle bestandspaden</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="140"/>
         <source>All paths have been reset</source>
-        <translation type="unfinished"/>
+        <translation>Alle bestandspaden zijn gereset</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="201"/>
@@ -2359,7 +2368,7 @@ Mogelijk moet je zelf van source bouwen.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="292"/>
         <source>Custom database directory:</source>
-        <translation type="unfinished"/>
+        <translation>Custom database map:</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="293"/>
@@ -2738,7 +2747,7 @@ Dit betekent meestal dat uw clientversie verouderd is en dat de server een antwo
         <location filename="src/window_main.cpp" line="483"/>
         <source>no unacceptable language as specified by these server rules:</source>
         <comment>note that the following lines will not be translated</comment>
-        <translation type="unfinished"/>
+        <translation>geen onacceptabel taalgebruik als aangegeven door deze server regels:</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="493"/>
@@ -2889,7 +2898,7 @@ Lokale versie is %1, externe versie is %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="651"/>
         <source>&amp;Restore password...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Reset wachtwoord...</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="652"/>
@@ -2964,17 +2973,17 @@ Lokale versie is %1, externe versie is %2.</translation>
     <message>
         <location filename="src/window_main.cpp" line="673"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Kijk of er kaartupdates zijn...</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="674"/>
         <source>View &amp;Debug Log</source>
-        <translation type="unfinished"/>
+        <translation>Bekijk &amp;debug log</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="676"/>
         <source>Show/Hide</source>
-        <translation type="unfinished"/>
+        <translation>Tonen/Verbergen</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="907"/>
@@ -3162,7 +3171,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
         <location filename="src/window_main.cpp" line="1355"/>
         <location filename="src/window_main.cpp" line="1364"/>
         <source>Reset Password</source>
-        <translation type="unfinished"/>
+        <translation>Reset Wachtwoord</translation>
     </message>
     <message>
         <location filename="src/window_main.cpp" line="1346"/>
@@ -3275,12 +3284,12 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="157"/>
         <source>%1 can now look at top card %2 at any time.</source>
-        <translation type="unfinished"/>
+        <translation>%1 kan nu altijd de bovenste kaart %2 bekijken.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="158"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
-        <translation type="unfinished"/>
+        <translation>%1 kan nu niet meer de bovenste kaart %2 bekijken.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="165"/>
@@ -3380,7 +3389,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="328"/>
         <source>%1 puts %2 into play%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 zet %2 gesloten in het spel%3.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="330"/>
@@ -3410,7 +3419,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="342"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
-        <translation type="unfinished"/>
+        <translation>%1 legt %2%3 aan de onderkant van hun library.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="344"/>
@@ -3435,7 +3444,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="372"/>
         <source>%1 tries to draw from an empty library</source>
-        <translation type="unfinished"/>
+        <translation>%1 probeert een kaart te nemen van een lege library</translation>
     </message>
     <message numerus="yes">
         <location filename="src/messagelogwidget.cpp" line="374"/>
@@ -3538,7 +3547,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="512"/>
         <source>%1 lends %2 to %3.</source>
-        <translation type="unfinished"/>
+        <translation>%1 leent %2 aan %3.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="517"/>
@@ -3618,12 +3627,12 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/messagelogwidget.cpp" line="586"/>
         <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
-        <translation type="unfinished"/>
+        <translation>%1 werpt %2 munten. Er zijn %3 koppen en %4 munten.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="596"/>
         <source>%1 rolls a %2-sided dice %3 times: %4.</source>
-        <translation type="unfinished"/>
+        <translation>%1 werpt een %2-zijdige dobbelsteen %3 keer: %4.</translation>
     </message>
     <message>
         <location filename="src/messagelogwidget.cpp" line="625"/>
@@ -3766,17 +3775,17 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="906"/>
         <source>Add New Message</source>
-        <translation type="unfinished"/>
+        <translation>Bericht toevoegen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="910"/>
         <source>Edit Message</source>
-        <translation type="unfinished"/>
+        <translation>Bericht bewerken</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="914"/>
         <source>Remove Message</source>
-        <translation type="unfinished"/>
+        <translation>Bericht Verwijderen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1010"/>
@@ -3822,7 +3831,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1047"/>
         <source>How to use in-game message macros</source>
-        <translation type="unfinished"/>
+        <translation>Uitleg gebruik van in-game bericht macro&apos;s</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="1048"/>
@@ -3877,7 +3886,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/game_specific_terms.h" line="31"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Mana Waarde</translation>
     </message>
     <message>
         <location filename="src/game_specific_terms.h" line="33"/>
@@ -4226,13 +4235,13 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/player.cpp" line="773"/>
         <source>Lend library to...</source>
-        <translation type="unfinished"/>
+        <translation>Leen library aan...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="794"/>
         <source>Put top cards on stack &amp;until...</source>
         <oldsource>Take top cards &amp;until...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Plaats bovenste kaart op stack &amp;totdat...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="807"/>
@@ -4445,7 +4454,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/player.cpp" line="878"/>
         <source>&amp;Top of library in random order</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Bovenste kaart van library in willekeurige volgorde</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="879"/>
@@ -4465,12 +4474,12 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/player.cpp" line="2854"/>
         <source>Which position should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>Hoeveelste van boven moet de kaart geplaatst worden:</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="2854"/>
         <source>(max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>(max. %1)</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="1176"/>
@@ -4501,82 +4510,82 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/player.cpp" line="774"/>
         <source>Reveal &amp;top cards to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Onthul bovenste kaarten aan....</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="775"/>
         <source>&amp;Top of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Bovenkant van library</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="776"/>
         <source>&amp;Bottom of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Onderkant van library</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="778"/>
         <source>&amp;Always look at top card</source>
-        <translation type="unfinished"/>
+        <translation>Toon &amp;altijd de bovenste kaart</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="779"/>
         <source>&amp;Open deck in deck editor</source>
-        <translation type="unfinished"/>
+        <translation>O&amp;pen deck in deck editor</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="787"/>
         <source>&amp;Play top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Speel bovenste kaart</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="796"/>
         <source>&amp;Draw bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Trek onderste kaart</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="797"/>
         <source>D&amp;raw bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>T&amp;rek onderste kaarten...</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="798"/>
         <source>&amp;Play bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Speel onderste kaart</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="799"/>
         <source>Play bottom card &amp;face down</source>
-        <translation type="unfinished"/>
+        <translation>Speel onderste kaart &amp;gesloten</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="800"/>
         <source>Move bottom card to grave&amp;yard</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats onderste kaart naar grave&amp;yard</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="801"/>
         <source>Move bottom card to e&amp;xile</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats onderste kaart naar exile</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="802"/>
         <source>Move bottom cards to &amp;graveyard...</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats onderste kaarten naar &amp;graveyard....</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="803"/>
         <source>Move bottom cards to &amp;exile...</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats onderste kaarten naar &amp;exile....</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="804"/>
         <source>Put bottom card on &amp;top</source>
-        <translation type="unfinished"/>
+        <translation>Leg onderste kaart &amp;bovenop</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="825"/>
         <source>Selec&amp;ted cards</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Geselecteerde kaarten</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="1306"/>
@@ -4586,17 +4595,17 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/player.cpp" line="1458"/>
         <source>Move bottom cards to grave</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats onderste kaarten naar graveyard</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="1490"/>
         <source>Move bottom cards to exile</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats onderste kaart naar exile</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="1551"/>
         <source>Draw bottom cards</source>
-        <translation type="unfinished"/>
+        <translation>Trek onderste kaarten</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="1656"/>
@@ -4642,7 +4651,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/player.cpp" line="3599"/>
         <source>Re&amp;veal to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Onthul aan....</translation>
     </message>
     <message>
         <location filename="src/player.cpp" line="3646"/>
@@ -4724,17 +4733,17 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="../common/decklist.cpp" line="111"/>
         <source>Maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Maindeck</translation>
     </message>
     <message>
         <location filename="../common/decklist.cpp" line="113"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard</translation>
     </message>
     <message>
         <location filename="../common/decklist.cpp" line="115"/>
         <source>Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Tokens</translation>
     </message>
 </context>
 <context>
@@ -4924,32 +4933,32 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="43"/>
         <source>Choose an action from the table</source>
-        <translation type="unfinished"/>
+        <translation>Kies een actie uit de tabel</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="49"/>
         <source>Hit the key/combination of keys you want to set for this action</source>
-        <translation type="unfinished"/>
+        <translation>Druk op de toets/combinatie van toetsen die je voor deze functie wilt gebruiken.</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="172"/>
         <source>Shortcut already in use</source>
-        <translation type="unfinished"/>
+        <translation>Sneltoets reeds in gebruik</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="175"/>
         <source>Invalid key</source>
-        <translation type="unfinished"/>
+        <translation>Ongeldige toets</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="192"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Wis</translation>
     </message>
     <message>
         <location filename="src/sequenceEdit/sequenceedit.cpp" line="193"/>
         <source>Restore default</source>
-        <translation type="unfinished"/>
+        <translation>Herstel standaard</translation>
     </message>
 </context>
 <context>
@@ -5036,7 +5045,7 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
     <message>
         <location filename="src/dlg_settings.cpp" line="1292"/>
         <source>Clear all shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Alle sneltoetsen wissen</translation>
     </message>
 </context>
 <context>
@@ -5222,7 +5231,7 @@ Controleer uw snelkoppelingsinstellingen!</translation>
         <location filename="src/tab_deck_editor.cpp" line="379"/>
         <source>Search by card name (or search expressions)</source>
         <oldsource>Search by card name</oldsource>
-        <translation type="unfinished"/>
+        <translation>Zoek op kaartnaam (of zoekexpressies)</translation>
     </message>
     <message>
         <location filename="src/tab_deck_editor.cpp" line="469"/>
@@ -5446,7 +5455,7 @@ Wil je de wijzigingen opslaan?</translation>
     <message>
         <location filename="src/tab_deck_editor.cpp" line="806"/>
         <source>Could not save remote deck</source>
-        <translation type="unfinished"/>
+        <translation>Kon remote deck niet opslaan</translation>
     </message>
     <message>
         <location filename="src/tab_deck_editor.cpp" line="828"/>
@@ -5521,12 +5530,12 @@ Kijk a.u.b. na of je schrijfrechten op de folder hebt, en probeer opnieuw.</tran
         <location filename="src/tab_deck_storage.cpp" line="187"/>
         <location filename="src/tab_deck_storage.cpp" line="219"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Foutmelding</translation>
     </message>
     <message>
         <location filename="src/tab_deck_storage.cpp" line="187"/>
         <source>Invalid deck file</source>
-        <translation type="unfinished"/>
+        <translation>Ongeldig deck bestand</translation>
     </message>
     <message>
         <location filename="src/tab_deck_storage.cpp" line="194"/>
@@ -5547,7 +5556,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_deck_storage.cpp" line="219"/>
         <source>Failed to upload deck to server</source>
-        <translation type="unfinished"/>
+        <translation>Uploaded van deck naar server mislukt</translation>
     </message>
     <message>
         <location filename="src/tab_deck_storage.cpp" line="235"/>
@@ -5664,7 +5673,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_game.cpp" line="540"/>
         <source>Game &amp;information</source>
-        <translation>Spelinformatie</translation>
+        <translation>Spelgegevens</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="542"/>
@@ -5755,12 +5764,12 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_game.cpp" line="1209"/>
         <source>A player has joined game #%1</source>
-        <translation type="unfinished"/>
+        <translation>Een speler sluitte aan bij spel #%1</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="1210"/>
         <source>%1 has joined the game</source>
-        <translation type="unfinished"/>
+        <translation>%1 sluitte bij het spel aan</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="1221"/>
@@ -5898,7 +5907,7 @@ Please enter a name:</source>
         <source>At least one filter is required.
 The more information you put in, the more specific your results will be.</source>
         <translation>Er is minstens één filter nodig.
-Hoe meer informatie u inbrengt, hoe specifieker uw resultaten zullen zijn.</translation>
+Hoe meer informatie je inbrengt, hoe specifieker je resultaten zullen zijn.</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="188"/>
@@ -5939,7 +5948,7 @@ Hoe meer informatie u inbrengt, hoe specifieker uw resultaten zullen zijn.</tran
     <message>
         <location filename="src/tab_logs.cpp" line="272"/>
         <source>Failed to collect message history information.</source>
-        <translation>Is er niet in geslaagd om informatie over de berichtgeschiedenis te verzamelen.</translation>
+        <translation>Het is mislukt om informatie over de berichtgeschiedenis te verzamelen.</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="278"/>
@@ -6042,7 +6051,7 @@ Hoe meer informatie u inbrengt, hoe specifieker uw resultaten zullen zijn.</tran
     <message>
         <location filename="src/tab_replays.cpp" line="200"/>
         <source>Folder download is not yet supported. Please download replays individually.</source>
-        <translation type="unfinished"/>
+        <translation>Het downloaden van folders is niet ondersteund. Download de individuele replays alstublieft.</translation>
     </message>
     <message>
         <location filename="src/tab_replays.cpp" line="268"/>
@@ -6121,22 +6130,22 @@ Hoe meer informatie u inbrengt, hoe specifieker uw resultaten zullen zijn.</tran
     <message>
         <location filename="src/tab_server.cpp" line="210"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
-        <translation type="unfinished"/>
+        <translation>Aansluiten bij kamer mislukt: deze bestaat niet op de server.</translation>
     </message>
     <message>
         <location filename="src/tab_server.cpp" line="215"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
-        <translation type="unfinished"/>
+        <translation>De server denkt dat je in de kamer bent, maar de client is niet in staat om deze te tonen. Probeer de client opnieuw te starten.</translation>
     </message>
     <message>
         <location filename="src/tab_server.cpp" line="220"/>
         <source>You do not have the required permission to join this server room.</source>
-        <translation type="unfinished"/>
+        <translation>U heeft niet de vereiste toestemming om bij deze kamer aan te sluiten.</translation>
     </message>
     <message>
         <location filename="src/tab_server.cpp" line="225"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Mislukt om bij de kamer aan te sluiten door een onbekende fout: %1.</translation>
     </message>
 </context>
 <context>
@@ -6392,7 +6401,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/user_context_menu.cpp" line="70"/>
         <source>Promote user to &amp;judge</source>
-        <translation type="unfinished"/>
+        <translation>Bevorder gebruiker tot &amp;judge</translation>
     </message>
     <message>
         <location filename="src/user_context_menu.cpp" line="71"/>
@@ -6424,7 +6433,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/user_context_menu.cpp" line="185"/>
         <source>Failed to collect ban information.</source>
-        <translation>Mislukt in het verzamelen van informatie over ban.</translation>
+        <translation>Mislukt in het verzamelen van gegevens over ban.</translation>
     </message>
     <message>
         <location filename="src/user_context_menu.cpp" line="195"/>
@@ -6446,7 +6455,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/user_context_menu.cpp" line="221"/>
         <source>Failed to collect warning information.</source>
-        <translation>Mislukt in het verzamelen van informatie over waarschuwing.</translation>
+        <translation>Mislukt in het verzamelen van gegevens over waarschuwing.</translation>
     </message>
     <message>
         <location filename="src/user_context_menu.cpp" line="231"/>
@@ -6488,7 +6497,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/user_context_menu.cpp" line="336"/>
         <source>Remove this user&apos;s messages</source>
-        <translation type="unfinished"/>
+        <translation>Verwijder de berichten van deze gebruiker</translation>
     </message>
 </context>
 <context>
@@ -6552,19 +6561,19 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/userinfobox.cpp" line="313"/>
         <source>The entered password does not match your account.</source>
-        <translation type="unfinished"/>
+        <translation>Het opgegeven wachtwoord komt niet overeen met jouw account.</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="306"/>
         <location filename="src/userinfobox.cpp" line="327"/>
         <location filename="src/userinfobox.cpp" line="351"/>
         <source>Information</source>
-        <translation>Informatie</translation>
+        <translation>Gegevens</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="306"/>
         <source>User information updated.</source>
-        <translation>Gebruikersinformatie bijgewerkt.</translation>
+        <translation>Gebruikersgegevens bijgewerkt.</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="256"/>
@@ -6583,51 +6592,51 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/userinfobox.cpp" line="70"/>
         <source>User Information</source>
-        <translation type="unfinished"/>
+        <translation>Gebruikersgegevens</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="77"/>
         <source>Real Name:</source>
-        <translation type="unfinished"/>
+        <translation>Echte Naam:</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="79"/>
         <source>User Level:</source>
-        <translation type="unfinished"/>
+        <translation>Gebruikersniveau:</translation>
     </message>
     <message numerus="yes">
         <location filename="src/userinfobox.cpp" line="154"/>
         <source>%n Year(s), </source>
         <comment>amount of years (only shown if more than 0)</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%n jaar, </numerusform><numerusform>%n jaar, </numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="src/userinfobox.cpp" line="157"/>
         <source>%10%n Day(s) %20</source>
         <comment>amount of years (if more than 0), amount of days, date in local short format</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%10%n dag %20</numerusform><numerusform>%10%n Dagen %20</numerusform></translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="215"/>
         <source>Enter Password</source>
-        <translation type="unfinished"/>
+        <translation>Wachtwoord Invoeren</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="216"/>
         <source>Password verification is required in order to change your email address</source>
-        <translation type="unfinished"/>
+        <translation>Wachtwoord controle is vereist om je e-mailadres te veranderen</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="257"/>
         <location filename="src/userinfobox.cpp" line="318"/>
         <location filename="src/userinfobox.cpp" line="341"/>
         <source>An error occurred while trying to update your user information.</source>
-        <translation type="unfinished"/>
+        <translation>Er is een fout opgetreden bij het bijwerken van uw gebruikersgegevens.</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="310"/>
         <source>This server does not permit you to update your user informations.</source>
-        <translation>Deze server staat u niet toe om uw gebruikersinformatie bij te werken.</translation>
+        <translation>Deze server staat jou niet toe om je gebruikersgegevens bij te werken.</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="327"/>
@@ -6690,12 +6699,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/dlg_settings.cpp" line="518"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
-        <translation type="unfinished"/>
+        <translation>Gebruik tear-off menus, laat rechtermuisknopmenu&apos;s op het scherm staan</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="519"/>
         <source>Notifications settings</source>
-        <translation type="unfinished"/>
+        <translation>Notificatie instellingen</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="520"/>
@@ -6710,7 +6719,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/dlg_settings.cpp" line="522"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
-        <translation type="unfinished"/>
+        <translation>Notificatie in de taakbalk wanneer gebruikers in je buddy lijst verbinding maken</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="523"/>
@@ -6756,7 +6765,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/userlist.cpp" line="142"/>
         <source>Redact all messages from this user in all rooms</source>
-        <translation type="unfinished"/>
+        <translation>Verwijder alle berichten van deze gebruiker in alle kamers</translation>
     </message>
     <message>
         <location filename="src/userlist.cpp" line="144"/>
@@ -6855,23 +6864,23 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/dlg_manage_sets.cpp" line="133"/>
         <source>Use CTRL+A to select all sets in the view.</source>
-        <translation type="unfinished"/>
+        <translation>Gebruik CTRL+A om alle sets in de lijst te selecteren.</translation>
     </message>
     <message>
         <location filename="src/dlg_manage_sets.cpp" line="134"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor.</source>
-        <translation type="unfinished"/>
+        <translation>Alleen kaarten in de ingeschakelde sets zullen verschijnen in de kaartlijst van de deck editor.</translation>
     </message>
     <message>
         <location filename="src/dlg_manage_sets.cpp" line="135"/>
         <source>Image priority is decided in the following order:</source>
-        <translation type="unfinished"/>
+        <translation>De prioriteit voor afbeeldingen wordt in de volgende volgorde vastgesteld:</translation>
     </message>
     <message>
         <location filename="src/dlg_manage_sets.cpp" line="136"/>
         <source>first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)</source>
         <comment>%1 is a link to the wiki</comment>
-        <translation type="unfinished"/>
+        <translation>eerst de CUSTOM Map (%1), daarna de Ingeschakelde Sets in deze dialoog (Boven naar Beneden)</translation>
     </message>
     <message>
         <location filename="src/dlg_manage_sets.cpp" line="135"/>
@@ -6984,12 +6993,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="44"/>
         <source>Card Counters</source>
-        <translation type="unfinished"/>
+        <translation>Kaart-counters</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="46"/>
         <source>Player Counters</source>
-        <translation type="unfinished"/>
+        <translation>Tellers</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="48"/>
@@ -7009,7 +7018,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="54"/>
         <source>Move Selected Card</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats Geselecteerde Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="56"/>
@@ -7019,12 +7028,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="58"/>
         <source>Move Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats Bovenste Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="60"/>
         <source>Move Bottom Card</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats Onderste Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="62"/>
@@ -7039,27 +7048,27 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="66"/>
         <source>Chat Room</source>
-        <translation type="unfinished"/>
+        <translation>Chatkamer</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="68"/>
         <source>Game Window</source>
-        <translation type="unfinished"/>
+        <translation>Spel Venster</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="70"/>
         <source>Load Deck from Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Laad Deck van Klembord</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="140"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>Controleren op Kaart Updates...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="143"/>
         <source>Connect...</source>
-        <translation type="unfinished"/>
+        <translation>Verbinden...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="149"/>
@@ -7079,37 +7088,37 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="157"/>
         <source>Register...</source>
-        <translation type="unfinished"/>
+        <translation>Registreer...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="160"/>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Instellingen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="163"/>
         <source>Start a Local Game...</source>
-        <translation type="unfinished"/>
+        <translation>Start een Lokaal Spel...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="166"/>
         <source>Watch Replay...</source>
-        <translation type="unfinished"/>
+        <translation>Bekijk Replay...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="169"/>
         <source>Analyze Deck</source>
-        <translation type="unfinished"/>
+        <translation>Analyseer Deck</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="172"/>
         <source>Clear All Filters</source>
-        <translation type="unfinished"/>
+        <translation>Wis Alle Filters</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="175"/>
         <source>Clear Selected Filter</source>
-        <translation type="unfinished"/>
+        <translation>Wis Geselecteerde Filter</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="179"/>
@@ -7119,294 +7128,294 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="180"/>
         <source>Remove Card</source>
-        <translation type="unfinished"/>
+        <translation>Verwijder Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="183"/>
         <source>Manage Sets...</source>
-        <translation type="unfinished"/>
+        <translation>Beheer Sets...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="186"/>
         <source>Edit Custom Tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Aangepaste Tokens Bewerken...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="189"/>
         <source>Export Deck</source>
-        <translation type="unfinished"/>
+        <translation>Exporteer Deck</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="192"/>
         <source>Add Card</source>
-        <translation type="unfinished"/>
+        <translation>Voeg Kaart Toe</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="195"/>
         <source>Load Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Deck Inladen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="199"/>
         <source>Load Deck from Clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Deck Inladen van Klembord...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="202"/>
         <source>New Deck</source>
-        <translation type="unfinished"/>
+        <translation>Nieuw Deck</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="206"/>
         <source>Open Custom Pictures Folder</source>
-        <translation type="unfinished"/>
+        <translation>Open Custom Afbeeldingen Map</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="209"/>
         <source>Print Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Print Deck...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="212"/>
         <source>Delete Card</source>
-        <translation type="unfinished"/>
+        <translation>Verwijder Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="215"/>
         <location filename="src/shortcutssettings.h" line="584"/>
         <source>Reset Layout</source>
-        <translation type="unfinished"/>
+        <translation>Reset Lay-out</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="218"/>
         <source>Save Deck</source>
-        <translation type="unfinished"/>
+        <translation>Bewaar Deck</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="221"/>
         <source>Save Deck as...</source>
-        <translation type="unfinished"/>
+        <translation>Bewaar Deck Als...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="225"/>
         <source>Save Deck to Clipboard, Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Bewaar Deck op Klembord, Geannoteerd</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="229"/>
         <source>Save Deck to Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Bewaar Deck op Klembord</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="232"/>
         <source>Load Local Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Lokaal Deck Inladen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="235"/>
         <source>Load Remote Deck...</source>
-        <translation type="unfinished"/>
+        <translation>Remote Deck Inladen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="238"/>
         <source>Set Ready to Start</source>
-        <translation type="unfinished"/>
+        <translation>Klaar om te Beginnen</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="242"/>
         <source>Toggle Sideboard Lock</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard Vergrendeling Omschakelen</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="245"/>
         <location filename="src/shortcutssettings.h" line="317"/>
         <source>Add Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Groene Counters Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="248"/>
         <location filename="src/shortcutssettings.h" line="320"/>
         <source>Remove Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>Groene Counters Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="251"/>
         <location filename="src/shortcutssettings.h" line="323"/>
         <source>Set Green Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Groene Tellers Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="254"/>
         <source>Add Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Gele Counters Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="257"/>
         <source>Remove Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>Gele Counters Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="260"/>
         <source>Set Yellow Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Gele Counters Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="263"/>
         <location filename="src/shortcutssettings.h" line="308"/>
         <source>Add Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rode Counters Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="266"/>
         <location filename="src/shortcutssettings.h" line="311"/>
         <source>Remove Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>Rode Counters Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="269"/>
         <location filename="src/shortcutssettings.h" line="314"/>
         <source>Set Red Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Rode Counters Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="272"/>
         <source>Add Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Levensteller Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="275"/>
         <source>Remove Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>Levensteller Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="278"/>
         <source>Set Life Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Levensteller Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="281"/>
         <source>Add White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Witte Teller Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="284"/>
         <source>Remove White Counter</source>
-        <translation type="unfinished"/>
+        <translation>Witte Teller Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="287"/>
         <source>Set White Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Witte Teller Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="290"/>
         <source>Add Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Blauwe Teller Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="293"/>
         <source>Remove Blue Counter</source>
-        <translation type="unfinished"/>
+        <translation>Blauwe Teller Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="296"/>
         <source>Set Blue Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Blauwe Teller Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="299"/>
         <source>Add Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Zwarte Teller Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="302"/>
         <source>Remove Black Counter</source>
-        <translation type="unfinished"/>
+        <translation>Zwarte Teller Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="305"/>
         <source>Set Black Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Zwarte Teller Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="326"/>
         <source>Add Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Kleurloze Teller Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="329"/>
         <source>Remove Colorless Counter</source>
-        <translation type="unfinished"/>
+        <translation>Kleurloze Teller Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="332"/>
         <source>Set Colorless Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Kleurloze Teller Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="335"/>
         <source>Add Other Counter</source>
-        <translation type="unfinished"/>
+        <translation>Overige Teller Omhoog</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="338"/>
         <source>Remove Other Counter</source>
-        <translation type="unfinished"/>
+        <translation>Overige Teller Omlaag</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="341"/>
         <source>Set Other Counters...</source>
-        <translation type="unfinished"/>
+        <translation>Overige Teller Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="344"/>
         <source>Add Power (+1/+0)</source>
-        <translation type="unfinished"/>
+        <translation>Kracht Verhogen (+1/+0)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="347"/>
         <source>Remove Power (-1/-0)</source>
-        <translation type="unfinished"/>
+        <translation>Kracht Verlagen (-1/-0)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="350"/>
         <source>Move Toughness to Power (+1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats Hardheid Naar Kracht (+1/-1)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="353"/>
         <source>Add Toughness (+0/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Hardheid Verhogen (+0/+1)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="356"/>
         <source>Remove Toughness (-0/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Hardheid Verlagen (-0/-1)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="359"/>
         <source>Move Power to Toughness (-1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Verplaats Kracht Naar Hardheid (-1/+1)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="362"/>
         <source>Add Power and Toughness (+1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Kracht en Hardheid Verhogen (+1/+1)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="365"/>
         <source>Remove Power and Toughness (-1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Kracht en Hardheid Verlagen (-1/-1)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="368"/>
         <source>Set Power and Toughness...</source>
-        <translation type="unfinished"/>
+        <translation>Kracht en Hardheid Instellen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="371"/>
         <source>Reset Power and Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Kracht en Hardheid Resetten</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="374"/>
@@ -7426,12 +7435,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="381"/>
         <source>First Main Phase</source>
-        <translation type="unfinished"/>
+        <translation>Eerste Hoofdfase</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="384"/>
         <source>Start Combat</source>
-        <translation type="unfinished"/>
+        <translation>Start Gevechtfase</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="388"/>
@@ -7451,12 +7460,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="393"/>
         <source>End Combat</source>
-        <translation type="unfinished"/>
+        <translation>Einde Gevechtfase</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="396"/>
         <source>Second Main Phase</source>
-        <translation type="unfinished"/>
+        <translation>Tweede Hoofdfase</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="400"/>
@@ -7466,17 +7475,17 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="401"/>
         <source>Next Phase</source>
-        <translation type="unfinished"/>
+        <translation>Volgende Fase</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="404"/>
         <source>Next Phase Action</source>
-        <translation type="unfinished"/>
+        <translation>Volgende Fase Handeling</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="407"/>
         <source>Next Turn</source>
-        <translation type="unfinished"/>
+        <translation>Volgende Beurt</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="410"/>
@@ -7486,68 +7495,68 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="413"/>
         <source>Untap All</source>
-        <translation type="unfinished"/>
+        <translation>Untap Alles</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="416"/>
         <source>Toggle Untap</source>
-        <translation type="unfinished"/>
+        <translation>Untap Omschakelen</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="419"/>
         <source>Turn Card Over</source>
-        <translation type="unfinished"/>
+        <translation>Draai Kaart Om</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="422"/>
         <source>Peek Card</source>
-        <translation type="unfinished"/>
+        <translation>Bekijk Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="425"/>
         <source>Play Card</source>
-        <translation type="unfinished"/>
+        <translation>Speel Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="428"/>
         <source>Attach Card...</source>
-        <translation type="unfinished"/>
+        <translation>Kaart Bevestigen Aan...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="431"/>
         <source>Unattach Card</source>
-        <translation type="unfinished"/>
+        <translation>Kaart Losmaken</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="434"/>
         <source>Clone Card</source>
-        <translation type="unfinished"/>
+        <translation>Copieer Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="437"/>
         <source>Create Token...</source>
-        <translation type="unfinished"/>
+        <translation>Maak Token...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="440"/>
         <source>Create All Related Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Maak Alle Gerelateerde Tokens</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="443"/>
         <source>Create Another Token</source>
-        <translation type="unfinished"/>
+        <translation>Maak Nog een Token</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="446"/>
         <source>Set Annotation...</source>
-        <translation type="unfinished"/>
+        <translation>Zet Annotatie...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="449"/>
         <location filename="src/shortcutssettings.h" line="506"/>
         <source>Bottom of Library</source>
-        <translation type="unfinished"/>
+        <translation>Onderkant van Library</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="452"/>
@@ -7575,19 +7584,19 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
         <location filename="src/shortcutssettings.h" line="460"/>
         <location filename="src/shortcutssettings.h" line="525"/>
         <source>Top of Library</source>
-        <translation type="unfinished"/>
+        <translation>Bovenkant van Library</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="463"/>
         <location filename="src/shortcutssettings.h" line="489"/>
         <location filename="src/shortcutssettings.h" line="511"/>
         <source>Battlefield, Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Speelveld, Gesloten</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="466"/>
         <source>Battlefield</source>
-        <translation type="unfinished"/>
+        <translation>Speelveld</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="474"/>
@@ -7602,60 +7611,60 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="480"/>
         <source>Top Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Bovenste Kaarten van Library</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="483"/>
         <source>Close Recent View</source>
-        <translation type="unfinished"/>
+        <translation>Recent Overzicht Sluiten</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="486"/>
         <location filename="src/shortcutssettings.h" line="510"/>
         <source>Stack</source>
-        <translation type="unfinished"/>
+        <translation>Stack</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="495"/>
         <location filename="src/shortcutssettings.h" line="517"/>
         <source>Graveyard (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Graveyard (Meerdere)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="500"/>
         <location filename="src/shortcutssettings.h" line="522"/>
         <source>Exile (Multiple)</source>
-        <translation type="unfinished"/>
+        <translation>Exile (Meerdere)</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="503"/>
         <source>Stack Until Found</source>
-        <translation type="unfinished"/>
+        <translation>Stack Totdat Gevonden</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="528"/>
         <source>Draw Bottom Card</source>
-        <translation type="unfinished"/>
+        <translation>Trek Onderste Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="531"/>
         <source>Draw Multiple Cards from Bottom...</source>
-        <translation type="unfinished"/>
+        <translation>Trek Meerdere Kaarten van Onderkant...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="534"/>
         <source>Draw Arrow...</source>
-        <translation type="unfinished"/>
+        <translation>Trek Pijl...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="537"/>
         <source>Remove Local Arrows</source>
-        <translation type="unfinished"/>
+        <translation>Verwijder Lokale Pijlen</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="540"/>
         <source>Leave Game</source>
-        <translation type="unfinished"/>
+        <translation>Verlaat Spel</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="544"/>
@@ -7665,12 +7674,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="545"/>
         <source>Roll Dice...</source>
-        <translation type="unfinished"/>
+        <translation>Werp Dobbelstenen...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="548"/>
         <source>Shuffle Library</source>
-        <translation type="unfinished"/>
+        <translation>Library Schudden</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="551"/>
@@ -7680,52 +7689,52 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/shortcutssettings.h" line="554"/>
         <source>Draw a Card</source>
-        <translation type="unfinished"/>
+        <translation>Trek een Kaart</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="557"/>
         <source>Draw Multiple Cards...</source>
-        <translation type="unfinished"/>
+        <translation>Trek Meerdere Kaarten...</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="560"/>
         <source>Undo Draw</source>
-        <translation type="unfinished"/>
+        <translation>Kaart Trekken Ongedaan Maken</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="563"/>
         <source>Always Reveal Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Altijd Bovenste Kaart Onthullen</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="566"/>
         <source>Always Look At Top Card</source>
-        <translation type="unfinished"/>
+        <translation>Altijd Bovenste Kaart Bekijken</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="569"/>
         <source>Rotate View Clockwise</source>
-        <translation type="unfinished"/>
+        <translation>Draai Weergave Met de Klok Mee</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="572"/>
         <source>Rotate View Counterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Draai Weergave Tegen de Klok In</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="575"/>
         <source>Unfocus Text Box</source>
-        <translation type="unfinished"/>
+        <translation>Textvak Verlaten</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="578"/>
         <source>Focus Chat</source>
-        <translation type="unfinished"/>
+        <translation>Focus Naar Chat</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="581"/>
         <source>Clear Chat</source>
-        <translation type="unfinished"/>
+        <translation>Wis Chat</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="587"/>
