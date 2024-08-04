@@ -8,6 +8,15 @@ export interface User {
   avatarBmp?: Uint8Array;
 }
 
+export enum UserLevelFlag {
+  IsNothing = 0,
+  IsUser = 1,
+  IsRegistered = 2,
+  IsModerator = 4,
+  IsAdmin = 8,
+  IsJudge = 16,
+}
+
 export enum UserPrivLevel {
   NONE = 0,
   VIP = 1,

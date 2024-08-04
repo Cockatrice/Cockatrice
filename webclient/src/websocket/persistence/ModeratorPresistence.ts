@@ -5,11 +5,11 @@ import NormalizeService from '../utils/NormalizeService';
 
 export class ModeratorPersistence {
   static banFromServer(userName: string): void {
-    console.log(userName);
+    ServerDispatch.banFromServer(userName);
   }
 
   static banHistory(userName: string, banHistory: BanHistoryItem[]): void {
-    console.log(userName, banHistory);
+    ServerDispatch.banHistory(userName, banHistory);
   }
 
   static viewLogs(logs: LogItem[]): void {
@@ -17,14 +17,14 @@ export class ModeratorPersistence {
   }
 
   static warnHistory(userName: string, warnHistory: WarnHistoryItem[]): void {
-    console.log(userName, warnHistory);
+    ServerDispatch.warnHistory(userName, warnHistory);
   }
 
-  static warnList(warnList: WarnListItem[]): void {
-    console.log(warnList);
+  static warnListOptions(warnList: WarnListItem[]): void {
+    ServerDispatch.warnListOptions(warnList);
   }
 
   static warnUser(userName: string): void {
-    console.log(userName);
+    ServerDispatch.warnUser(userName);
   }
 }
