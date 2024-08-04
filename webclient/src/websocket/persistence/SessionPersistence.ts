@@ -10,7 +10,7 @@ import {
   UserMessageData
 } from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
-import { DeckList } from '../../types/deckList';
+import { DeckList } from 'types';
 import { common } from 'protobufjs';
 import IBytesValue = common.IBytesValue;
 

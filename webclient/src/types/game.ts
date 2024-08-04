@@ -33,3 +33,10 @@ export interface JoinGameParams {
   overrideRestrictions: boolean;
   joinAsJudge: boolean;
 }
+
+export enum LeaveGameReason {
+  OTHER = 1,
+  USER_KICKED = 2,
+  USER_LEFT = 3,
+  USER_DISCONNECTED = 4
+}
