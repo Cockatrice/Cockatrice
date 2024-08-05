@@ -888,6 +888,10 @@ void MainWindow::startupConfigCheck()
         } else {
             const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
+
+        qDebug() << "[MainWindow] Migrating shortcuts after update detected.";
+        SettingsCache::instance().shortcuts().migrateShortcuts();
+
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found

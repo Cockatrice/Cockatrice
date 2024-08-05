@@ -126,6 +126,7 @@ public:
 
     void resetAllShortcuts();
     void clearAllShortcuts();
+    void migrateShortcuts();
 
 signals:
     void shortCutChanged();

@@ -56,6 +56,33 @@ ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *paren
     }
 }
 
+/// PR 5079 changes Textbox/unfocusTextBox to Player/unfocusTextBox and tab_game/aFocusChat to Player/aFocusChat.
+/// A migration is necessary to let players keep their already configured shortcuts.
+void ShortcutsSettings::migrateShortcuts()
+{
+    if (QFile(settingsFilePath).exists()) {
+        QSettings shortCutsFile(settingsFilePath, QSettings::IniFormat);
+
+        shortCutsFile.beginGroup(custom);
+
+        if (shortCutsFile.contains("Textbox/unfocusTextBox")) {
+            qDebug() << "[ShortcutsSettings] Textbox/unfocusTextBox shortcut found. Migrating to Player/unfocusTextBox.";
+            QString unfocusTextBox = shortCutsFile.value("Textbox/unfocusTextBox", "").toString();
+            this->setShortcuts("Player/unfocusTextBox", unfocusTextBox);
+            shortCutsFile.remove("Textbox/unfocusTextBox");
+        }
+
+        if (shortCutsFile.contains("tab_game/aFocusChat")) {
+            qDebug() << "[ShortcutsSettings] tab_game/aFocusChat shortcut found. Migrating to Player/aFocusChat.";
+            QString aFocusChat = shortCutsFile.value("tab_game/aFocusChat", "").toString();
+            this->setShortcuts("Player/aFocusChat", aFocusChat);
+            shortCutsFile.remove("tab_game/aFocusChat");
+        }
+
+        shortCutsFile.endGroup();
+    }
+}
+
 ShortcutKey ShortcutsSettings::getDefaultShortcut(const QString &name) const
 {
     return defaultShortCuts.value(name, ShortcutKey());
