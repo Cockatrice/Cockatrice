@@ -66,7 +66,8 @@ void ShortcutsSettings::migrateShortcuts()
         shortCutsFile.beginGroup(custom);
 
         if (shortCutsFile.contains("Textbox/unfocusTextBox")) {
-            qDebug() << "[ShortcutsSettings] Textbox/unfocusTextBox shortcut found. Migrating to Player/unfocusTextBox.";
+            qDebug()
+                << "[ShortcutsSettings] Textbox/unfocusTextBox shortcut found. Migrating to Player/unfocusTextBox.";
             QString unfocusTextBox = shortCutsFile.value("Textbox/unfocusTextBox", "").toString();
             this->setShortcuts("Player/unfocusTextBox", unfocusTextBox);
             shortCutsFile.remove("Textbox/unfocusTextBox");
