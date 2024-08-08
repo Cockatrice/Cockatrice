@@ -1,5 +1,6 @@
 #include "shortcutssettings.h"
 
+#include <QDebug>
 #include <QFile>
 #include <QMessageBox>
 #include <QStringList>
