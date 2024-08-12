@@ -207,9 +207,11 @@ void SetList::guessSortKeys()
 
         QDate date = set->getReleaseDate();
         if (date.isNull()) {
-            set->setSortKey(static_cast<unsigned int>(aHundredYears));
-        } else {
+            set->setSortKey(static_cast<unsigned int>(aHundredYears * 2));
+        } else if (set->getSetType() == "Core" || set->getSetType() == "Expansion") {
             set->setSortKey(static_cast<unsigned int>(date.daysTo(distantFuture)));
+        } else {
+            set->setSortKey(static_cast<unsigned int>(aHundredYears + date.daysTo(distantFuture)));
         }
     }
 }
