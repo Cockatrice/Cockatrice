@@ -30,7 +30,8 @@ Q_DECLARE_METATYPE(CardInfoPtr)
 class CardSet : public QList<CardInfoPtr>
 {
 public:
-    enum Priority {
+    enum Priority
+    {
         PriorityUndefined = 0,
         PriorityPrimary = 10,
         PrioritySecondary = 20,

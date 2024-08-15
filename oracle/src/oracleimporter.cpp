@@ -503,9 +503,9 @@ int OracleImporter::startImport()
     sets.insert(TOKENS_SETNAME, tokenSet);
 
     for (const SetToDownload &curSetToParse : allSets) {
-        CardSetPtr newSet = CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(),
-                                                 curSetToParse.getSetType(), curSetToParse.getReleaseDate(),
-                                                 curSetToParse.getPriority());
+        CardSetPtr newSet =
+            CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(), curSetToParse.getSetType(),
+                                 curSetToParse.getReleaseDate(), curSetToParse.getPriority());
         if (!sets.contains(newSet->getShortName()))
             sets.insert(newSet->getShortName(), newSet);
 
