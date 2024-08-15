@@ -7,11 +7,35 @@
 #include <utility>
 
 // many users prefer not to see these sets with non english arts
-// as a solution we remove the date property on these sets
-// that way they will be sorted last by default
-// this will cause their art to not get priority over english cards
-// users will still be able to find these sets and prioritize them manually
 const QStringList nonEnglishSets = {"4BB", "FBB", "PS11", "PSAL", "REN", "RIN"};
+const QMap<QString, CardSet::Priority> setTypePriorities{
+    {"core",             CardSet::Priority::PRIMARY},
+    {"expansion",        CardSet::Priority::PRIMARY},
+
+    {"commander",        CardSet::Priority::SECONDARY},
+    {"starter",          CardSet::Priority::SECONDARY},
+
+    {"archenemy",        CardSet::Priority::REPRINT},
+    {"arsenal",          CardSet::Priority::REPRINT},
+    {"box",              CardSet::Priority::REPRINT},
+    {"draft_innovation", CardSet::Priority::REPRINT},
+    {"duel_deck",        CardSet::Priority::REPRINT},
+    {"from_the_vault",   CardSet::Priority::REPRINT},
+    {"masterpiece",      CardSet::Priority::REPRINT},
+    {"masters",          CardSet::Priority::REPRINT},
+    {"memorabilia",      CardSet::Priority::REPRINT},
+    {"planechase",       CardSet::Priority::REPRINT},
+    {"premium_deck",     CardSet::Priority::REPRINT},
+    {"promo",            CardSet::Priority::REPRINT},
+    {"spellbook",        CardSet::Priority::REPRINT},
+    {"token",            CardSet::Priority::REPRINT},
+    {"treasure_chest",   CardSet::Priority::REPRINT},
+
+    {"alchemy",          CardSet::Priority::OTHER},
+    {"funny",            CardSet::Priority::OTHER},
+    {"minigame",         CardSet::Priority::OTHER},
+    {"vanguard",         CardSet::Priority::OTHER},
+};
 
 class SetToDownload
 {
@@ -20,6 +44,7 @@ private:
     QList<QVariant> cards;
     QDate releaseDate;
     QString setType;
+    CardSet::Priority priority;
 
 public:
     const QString &getShortName() const
@@ -42,13 +67,18 @@ public:
     {
         return releaseDate;
     }
+    CardSet::Priority getPriority() const
+    {
+        return priority;
+    }
     SetToDownload(QString _shortName,
                   QString _longName,
                   QList<QVariant> _cards,
+                  CardSet::Priority _priority,
                   QString _setType = QString(),
                   const QDate &_releaseDate = QDate())
         : shortName(std::move(_shortName)), longName(std::move(_longName)), cards(std::move(_cards)),
-          releaseDate(_releaseDate), setType(std::move(_setType))
+          releaseDate(_releaseDate), setType(std::move(_setType)), priority(_priority)
     {
     }
     bool operator<(const SetToDownload &set) const
@@ -108,6 +138,7 @@ signals:
 
 public:
     explicit OracleImporter(const QString &_dataDir, QObject *parent = nullptr);
+    CardSet::Priority getSetPriority(QString &setType, QString &shortName);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);

@@ -77,6 +77,7 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
         if (name == "set") {
             QString shortName, longName, setType;
             QDate releaseDate;
+            short priority;
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement) {
                     break;
@@ -92,13 +93,15 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 } else if (name == "releasedate") {
                     releaseDate =
                         QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
+                } else if (name == "priority") {
+                    priority = xml.readElementText(QXmlStreamReader::IncludeChildElements).toShort();
                 } else if (!name.isEmpty()) {
                     qDebug() << "[CockatriceXml3Parser] Unknown set property" << name << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
 
-            internalAddSet(shortName, longName, setType, releaseDate);
+            internalAddSet(shortName, longName, setType, releaseDate, static_cast<CardSet::Priority>(priority));
         }
     }
 }
@@ -286,6 +289,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set
     xml.writeTextElement("longname", set->getLongName());
     xml.writeTextElement("settype", set->getSetType());
     xml.writeTextElement("releasedate", set->getReleaseDate().toString(Qt::ISODate));
+    xml.writeTextElement("priority", QString::number(set->getPriority()));
     xml.writeEndElement();
 
     return xml;
