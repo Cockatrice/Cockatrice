@@ -33,7 +33,7 @@ protected:
                               const QString &longName = "",
                               const QString &setType = "",
                               const QDate &releaseDate = QDate(),
-                              const CardSet::Priority priority = CardSet::Priority::UNDEFINED);
+                              const CardSet::Priority priority = CardSet::PriorityUndefined);
 signals:
     virtual void addCard(CardInfoPtr card) = 0;
     virtual void addSet(CardSetPtr set) = 0;
