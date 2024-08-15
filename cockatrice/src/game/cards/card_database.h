@@ -31,13 +31,13 @@ class CardSet : public QList<CardInfoPtr>
 {
 public:
     enum Priority {
-        UNDEFINED = 0,
-        PRIMARY = 10,
-        SECONDARY = 20,
-        REPRINT = 30,
-        OTHER = 40,
-        FALLBACK = 50,
-        LOWEST = 100,
+        PriorityUndefined = 0,
+        PriorityPrimary = 10,
+        PrioritySecondary = 20,
+        PriorityReprint = 30,
+        PriorityOther = 40,
+        PriorityFallback = 50,
+        PriorityLowest = 100,
     };
 
 private:
@@ -53,12 +53,12 @@ public:
                      const QString &_longName = QString(),
                      const QString &_setType = QString(),
                      const QDate &_releaseDate = QDate(),
-                     const Priority _priority = Priority::UNDEFINED);
+                     const Priority _priority = PriorityUndefined);
     static CardSetPtr newInstance(const QString &_shortName = QString(),
                                   const QString &_longName = QString(),
                                   const QString &_setType = QString(),
                                   const QDate &_releaseDate = QDate(),
-                                  const Priority _priority = Priority::UNDEFINED);
+                                  const Priority _priority = PriorityUndefined);
     QString getCorrectedShortName() const;
     QString getShortName() const
     {
@@ -78,7 +78,7 @@ public:
     }
     Priority getPriority() const
     {
-        return priority ? priority : Priority::FALLBACK;
+        return priority ? priority : PriorityFallback;
     }
     void setLongName(const QString &_longName)
     {
