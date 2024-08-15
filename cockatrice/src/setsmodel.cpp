@@ -56,6 +56,8 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
             return set->getLongName();
         case ReleaseDateCol:
             return set->getReleaseDate().toString(Qt::ISODate);
+        case PriorityCol:
+            return set->getPriority();
         default:
             return QVariant();
     }
@@ -80,6 +82,9 @@ QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int rol
         case IsKnownCol:
             return QString(
                 "Is known"); /* no tr() for translations needed, column is just used for sorting --> hidden */
+        case PriorityCol:
+            return QString(
+                "Priority"); /* no tr() for translations needed, column is just used for sorting --> hidden */
         case EnabledCol:
             return tr("Enabled");
         case SetTypeCol:
@@ -193,6 +198,13 @@ void SetsModel::swapRows(int oldRow, int newRow)
     endInsertRows();
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+}
+
+void SetsModel::restoreOriginalOrder()
+{
+    int numRows = rowCount();
+    sets.defaultSort();
+    emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
 }
 
 void SetsModel::sort(int column, Qt::SortOrder order)

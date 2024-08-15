@@ -15,6 +15,7 @@
             <xs:element type="xs:string" name="longname" minOccurs="0" maxOccurs="1" />
             <xs:element type="xs:string" name="settype" minOccurs="0" maxOccurs="1" />
             <xs:element type="xs:string" name="releasedate" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:integer" name="priority" minOccurs="1" maxOccurs="1"/>
         </xs:all>
     </xs:complexType>
     <xs:complexType name="cardInSetType">

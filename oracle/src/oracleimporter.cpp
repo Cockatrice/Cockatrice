@@ -19,6 +19,18 @@ OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : CardD
 {
 }
 
+CardSet::Priority OracleImporter::getSetPriority(QString &setType, QString &shortName)
+{
+    if (!setTypePriorities.contains(setType.toLower())) {
+        qDebug() << "warning: Set type" << setType << "unrecognized for prioritization";
+    }
+    CardSet::Priority priority = setTypePriorities.value(setType.toLower(), CardSet::Priority::UNDEFINED);
+    if (nonEnglishSets.contains(shortName)) {
+        priority = CardSet::Priority::LOWEST;
+    }
+    return priority;
+}
+
 bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 {
     QList<SetToDownload> newSetList;
@@ -38,6 +50,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     QList<QVariant> setCards;
     QString setType;
     QDate releaseDate;
+    CardSet::Priority priority;
 
     while (it.hasNext()) {
         map = it.next().toMap();
@@ -45,6 +58,8 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         longName = map.value("name").toString();
         setCards = map.value("cards").toList();
         setType = map.value("type").toString();
+        releaseDate = map.value("releaseDate").toDate();
+        priority = getSetPriority(setType, shortName);
         // capitalize set type
         if (setType.length() > 0) {
             // basic grammar for words that aren't capitalized, like in "From the Vault"
@@ -62,12 +77,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
             }
             setType = setType.trimmed();
         }
-        if (!nonEnglishSets.contains(shortName)) {
-            releaseDate = map.value("releaseDate").toDate();
-        } else {
-            releaseDate = QDate();
-        }
-        newSetList.append(SetToDownload(shortName, longName, setCards, setType, releaseDate));
+        newSetList.append(SetToDownload(shortName, longName, setCards, priority, setType, releaseDate));
     }
 
     std::sort(newSetList.begin(), newSetList.end());
@@ -494,7 +504,8 @@ int OracleImporter::startImport()
 
     for (const SetToDownload &curSetToParse : allSets) {
         CardSetPtr newSet = CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(),
-                                                 curSetToParse.getSetType(), curSetToParse.getReleaseDate());
+                                                 curSetToParse.getSetType(), curSetToParse.getReleaseDate(),
+                                                 curSetToParse.getPriority());
         if (!sets.contains(newSet->getShortName()))
             sets.insert(newSet->getShortName(), newSet);
 
