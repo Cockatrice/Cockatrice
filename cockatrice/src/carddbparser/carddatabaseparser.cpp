@@ -1,7 +1,5 @@
 #include "carddatabaseparser.h"
 
-#include <QDebug>
-
 SetNameMap ICardDatabaseParser::sets;
 
 void ICardDatabaseParser::clearSetlist()
