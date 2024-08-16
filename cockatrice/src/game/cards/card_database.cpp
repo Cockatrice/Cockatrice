@@ -218,13 +218,13 @@ void SetList::defaultSort()
         CardSet::Priority bPriority = b->getPriority() ? b->getPriority() : CardSet::PriorityFallback;
 
         // Sort by priority, then by release date, then by short name
-        if (aPriority == bPriority) {
-            if (aDate.daysTo(bDate) == 0) {
-                return a->getShortName().compare(b->getShortName()) < 0;
-            }
+        if (aPriority != bPriority) {
+            return aPriority < bPriority;
+        }
+        if (aDate.daysTo(bDate) != 0) {
             return aDate.daysTo(bDate) < 0;
         }
-        return aPriority < bPriority;
+        return a->getShortName().compare(b->getShortName()) < 0;
     });
 }
 
