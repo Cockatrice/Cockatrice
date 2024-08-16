@@ -79,7 +79,7 @@ public:
     }
     Priority getPriority() const
     {
-        return priority ? priority : PriorityFallback;
+        return priority;
     }
     void setLongName(const QString &_longName)
     {

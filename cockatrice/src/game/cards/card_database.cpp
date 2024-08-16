@@ -214,15 +214,17 @@ void SetList::defaultSort()
         QDate distantPast = QDate(1970, 1, 1);
         QDate aDate = a->getReleaseDate().isValid() ? a->getReleaseDate() : distantPast;
         QDate bDate = b->getReleaseDate().isValid() ? b->getReleaseDate() : distantPast;
+        CardSet::Priority aPriority = a->getPriority() ? a->getPriority() : CardSet::PriorityFallback;
+        CardSet::Priority bPriority = b->getPriority() ? b->getPriority() : CardSet::PriorityFallback;
 
         // Sort by priority, then by release date, then by short name
-        if (a->getPriority() == b->getPriority()) {
+        if (aPriority == bPriority) {
             if (aDate.daysTo(bDate) == 0) {
                 return a->getShortName().compare(b->getShortName()) < 0;
             }
             return aDate.daysTo(bDate) < 0;
         }
-        return a->getPriority() < b->getPriority();
+        return aPriority < bPriority;
     });
 }
 
