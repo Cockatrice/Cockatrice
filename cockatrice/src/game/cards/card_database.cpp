@@ -200,6 +200,10 @@ void SetList::guessSortKeys()
     defaultSort();
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
+        if (set.isNull()) {
+            qDebug() << "guessSortKeys set is null";
+            continue;
+        }
         set->setSortKey(i);
     }
 }
