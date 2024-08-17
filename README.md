@@ -5,7 +5,7 @@
 <p align='center'>
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
-   <a href="#get-involved--">Get Involved</a> <b>|</b>
+   <a href="#get-involved-">Get Involved</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#translations-">Translations</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
@@ -18,7 +18,7 @@
 <br><pre>
 <b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
 <b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development, see how to [get involved](#get-involved--)</b>
+<b>To help with development, see how to [get involved](#get-involved-)</b>
 </pre><br>
 
 
