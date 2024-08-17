@@ -35,6 +35,7 @@ export const Types = {
   RESET_PASSWORD_FAILED: '[Server] Reset Password Failed',
   RESET_PASSWORD_CHALLENGE: '[Server] Reset Password Challenge',
   RESET_PASSWORD_SUCCESS: '[Server] Reset Password Success',
+  ADJUST_MOD: '[Server] Adjust Mod',
   RELOAD_CONFIG: '[Server] Reload Config',
   SHUTDOWN_SERVER: '[Server] Shutdown Server',
   UPDATE_SERVER_MESSAGE: '[Server] Update Server Message',
@@ -48,4 +49,9 @@ export const Types = {
   USER_MESSAGE: '[Server] User Message',
   ADD_TO_LIST: '[Server] Add To List',
   REMOVE_FROM_LIST: '[Server] Remove From List',
+  BAN_FROM_SERVER: '[Server] Ban From Server',
+  BAN_HISTORY: '[Server] Ban History',
+  WARN_HISTORY: '[Server] Warn History',
+  WARN_LIST_OPTIONS: '[Server] Warn List Options',
+  WARN_USER: '[Server] Warn User',
 };

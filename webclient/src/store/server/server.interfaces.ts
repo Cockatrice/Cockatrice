@@ -1,4 +1,4 @@
-import { LogItem, SortBy, User, UserSortField, WebSocketConnectOptions } from 'types';
+import { WarnHistoryItem, BanHistoryItem, LogItem, SortBy, User, UserSortField, WebSocketConnectOptions, WarnListItem } from 'types';
 import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
 export interface ServerConnectParams {
@@ -58,6 +58,15 @@ export interface ServerState {
   }
   notifications: NotifyUserData[];
   serverShutdown: ServerShutdownData;
+  banUser: string;
+  banHistory: {
+    [userName: string]: BanHistoryItem[];
+  };
+  warnHistory: {
+    [userName: string]: WarnHistoryItem[];
+  };
+  warnListOptions: WarnListItem[];
+  warnUser: string;
 }
 
 export interface ServerStateStatus {
