@@ -300,7 +300,7 @@ jobs:
           submodules: recursive
 
       - name: Install Qt ${{matrix.qt_version}}
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           cache: true
           setup-python: false
