@@ -14,12 +14,12 @@ const QMap<QString, CardSet::Priority> setTypePriorities{
 
     {"commander", CardSet::PrioritySecondary},
     {"starter", CardSet::PrioritySecondary},
+    {"draft_innovation", CardSet::PrioritySecondary},
+    {"duel_deck", CardSet::PrioritySecondary},
 
     {"archenemy", CardSet::PriorityReprint},
     {"arsenal", CardSet::PriorityReprint},
     {"box", CardSet::PriorityReprint},
-    {"draft_innovation", CardSet::PriorityReprint},
-    {"duel_deck", CardSet::PriorityReprint},
     {"from_the_vault", CardSet::PriorityReprint},
     {"masterpiece", CardSet::PriorityReprint},
     {"masters", CardSet::PriorityReprint},
