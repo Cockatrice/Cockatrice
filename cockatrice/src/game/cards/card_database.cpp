@@ -210,8 +210,8 @@ void SetList::guessSortKeys()
 
 void SetList::defaultSort()
 {
+    static const QDate distantPast = QDate(1970, 1, 1);
     std::sort(begin(), end(), [](const CardSetPtr &a, const CardSetPtr &b) {
-        QDate distantPast = QDate(1970, 1, 1);
         QDate aDate = a->getReleaseDate().isValid() ? a->getReleaseDate() : distantPast;
         QDate bDate = b->getReleaseDate().isValid() ? b->getReleaseDate() : distantPast;
         CardSet::Priority aPriority = a->getPriority() ? a->getPriority() : CardSet::PriorityFallback;
