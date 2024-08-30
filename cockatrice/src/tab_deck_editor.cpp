@@ -50,7 +50,10 @@
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
-    if (treeView && ((event->key() == Qt::Key_Up) || (event->key() == Qt::Key_Down)))
+    // List of key events that must be handled by the card list instead of the search box
+    static const QVector<Qt::Key> forwardToTreeView = {Qt::Key_Up,     Qt::Key_Down, Qt::Key_PageDown,
+                                                       Qt::Key_PageUp, Qt::Key_End,  Qt::Key_Home};
+    if (treeView && forwardToTreeView.contains(event->key()))
         QCoreApplication::sendEvent(treeView, event);
     LineEditUnfocusable::keyPressEvent(event);
 }
