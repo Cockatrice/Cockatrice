@@ -1,5 +1,6 @@
-FROM ubuntu:bionic
-MAINTAINER Zach Halpern <zahalpern+github@gmail.com>
+FROM ubuntu:jammy
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y\
   build-essential\
@@ -10,7 +11,7 @@ RUN apt-get update && apt-get install -y\
   libmysqlclient-dev\
   libqt5websockets5-dev\
   protobuf-compiler\
-  qt5-default\
+  qt5-qmake\
   qtbase5-dev\
   qttools5-dev-tools\
   qttools5-dev
@@ -28,4 +29,3 @@ WORKDIR /home/servatrice
 EXPOSE 4747
 
 ENTRYPOINT [ "servatrice", "--log-to-console" ]
-
