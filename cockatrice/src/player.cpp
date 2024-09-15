@@ -1037,7 +1037,7 @@ void Player::initSayMenu()
 
     for (int i = 0; i < count; ++i) {
         auto *newAction = new QAction(SettingsCache::instance().messages().getMessageAt(i), this);
-        if (i <= 10) {
+        if (i < 10) {
             newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }
         connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
