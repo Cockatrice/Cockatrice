@@ -223,7 +223,7 @@ private slots:
     void actPlayFacedown();
     void actReveal(QAction *action);
     void refreshShortcuts();
-    
+
     void initSayMenu();
 
 private:
