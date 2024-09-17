@@ -223,6 +223,8 @@ private slots:
     void actPlayFacedown();
     void actReveal(QAction *action);
     void refreshShortcuts();
+    
+    void initSayMenu();
 
 private:
     TabGame *game;
@@ -310,7 +312,6 @@ private:
     QMap<int, ArrowItem *> arrows;
     void rearrangeCounters();
 
-    void initSayMenu();
     void initContextualPlayersMenu(QMenu *menu);
 
     // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);

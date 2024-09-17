@@ -419,6 +419,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     if (local) {
         sayMenu = playerMenu->addMenu(QString());
+        connect(&SettingsCache::instance().messages(), SIGNAL(messageMacrosChanged()), this, SLOT(initSayMenu()));
         initSayMenu();
     }
 

@@ -15,6 +15,7 @@ public:
     void setCount(int count);
     void setMessageAt(int index, QString message);
 signals:
+    void messageMacrosChanged();
 
 public slots:
 
