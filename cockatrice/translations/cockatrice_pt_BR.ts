@@ -756,7 +756,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="src/dlg_connect.h" line="79"/>
+        <location filename="src/connect.h" line="79"/>
         <source>Downloading...</source>
         <translation>Baixando...</translation>
     </message>

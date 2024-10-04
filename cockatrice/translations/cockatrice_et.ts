@@ -756,7 +756,7 @@ See on mõeldud ainult moderaatoritele ja blokeeritav isik seda ei näe.</transl
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="src/dlg_connect.h" line="79"/>
+        <location filename="src/connect.h" line="79"/>
         <source>Downloading...</source>
         <translation type="unfinished"/>
     </message>

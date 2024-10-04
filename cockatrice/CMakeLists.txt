@@ -33,26 +33,26 @@ set(cockatrice_SOURCES
     src/deck/decklistmodel.cpp
     src/deck/deckstats_interface.cpp
     src/deck/deckview.cpp
-    src/dlg/dlg_connect.cpp
-    src/dlg/dlg_create_token.cpp
-    src/dlg/dlg_creategame.cpp
-    src/dlg/dlg_edit_avatar.cpp
-    src/dlg/dlg_edit_password.cpp
-    src/dlg/dlg_edit_tokens.cpp
-    src/dlg/dlg_edit_user.cpp
-    src/dlg/dlg_filter_games.cpp
-    src/dlg/dlg_forgotpasswordchallenge.cpp
-    src/dlg/dlg_forgotpasswordrequest.cpp
-    src/dlg/dlg_forgotpasswordreset.cpp
-    src/dlg/dlg_load_deck_from_clipboard.cpp
-    src/dlg/dlg_load_remote_deck.cpp
-    src/dlg/dlg_manage_sets.cpp
-    src/dlg/dlg_register.cpp
-    src/dlg/dlg_roll_dice.cpp
-    src/dlg/dlg_settings.cpp
-    src/dlg/dlg_tip_of_the_day.cpp
-    src/dlg/dlg_update.cpp
-    src/dlg/dlg_viewlog.cpp
+        src/dialogs/connect.cpp
+        src/dialogs/create_token.cpp
+        src/dialogs/create_game.cpp
+        src/dialogs/edit_avatar.cpp
+        src/dialogs/edit_password.cpp
+        src/dialogs/edit_tokens.cpp
+        src/dialogs/edit_user.cpp
+        src/dialogs/filter_games.cpp
+        src/dialogs/forgot_password_challenge.cpp
+        src/dialogs/forgot_password_request.cpp
+        src/dialogs/forgot_password_reset.cpp
+        src/dialogs/load_deck_from_clipboard.cpp
+        src/dialogs/load_remote_deck.cpp
+        src/dialogs/manage_sets.cpp
+        src/dialogs/register.cpp
+        src/dialogs/roll_dice.cpp
+        src/dialogs/settings.cpp
+        src/dialogs/dlg_tip_of_the_day.cpp
+        src/dialogs/update.cpp
+        src/dialogs/view_log.cpp
         src/game/filter/filter_string.cpp
         src/game/filter/filterbuilder.cpp
         src/game/filter/filtertree.cpp

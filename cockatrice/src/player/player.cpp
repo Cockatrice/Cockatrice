@@ -1,20 +1,28 @@
 #include "player.h"
 
+#include "../client/tabs/tab_game.h"
+#include "../client/thememanager.h"
+#include "../deck/deck_loader.h"
+#include "../dialogs/dlg_create_token.h"
+#include "../dialogs/dlg_roll_dice.h"
 #include "../game/board/arrowitem.h"
+#include "../game/board/counter_general.h"
 #include "../game/cards/carddatabase.h"
 #include "../game/cards/carditem.h"
 #include "../game/cards/cardlist.h"
-#include "../game/zones/cardzone.h"
-#include "color.h"
-#include "../game/board/counter_general.h"
-#include "../deck/deck_loader.h"
-#include "../dlg/dlg_create_token.h"
-#include "../dlg/dlg_roll_dice.h"
 #include "../game/gamescene.h"
-#include "../gettextwithmax.h"
 #include "../game/handcounter.h"
+#include "../game/zones/cardzone.h"
 #include "../game/zones/handzone.h"
+#include "../game/zones/pilezone.h"
+#include "../game/zones/stackzone.h"
+#include "../game/zones/tablezone.h"
+#include "../game/zones/zoneviewwidget.h"
+#include "../game/zones/zoneviewzone.h"
+#include "../gettextwithmax.h"
 #include "../main.h"
+#include "../settings/settingscache.h"
+#include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_concede.pb.h"
@@ -54,16 +62,8 @@
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_zone.pb.h"
-#include "../game/zones/pilezone.h"
 #include "playertarget.h"
-#include "../settings/settingscache.h"
-#include "../game/zones/stackzone.h"
-#include "../client/tabs/tab_game.h"
-#include "../game/zones/tablezone.h"
-#include "../client/thememanager.h"
 #include "trice_limits.h"
-#include "../game/zones/zoneviewwidget.h"
-#include "../game/zones/zoneviewzone.h"
 
 #include <QDebug>
 #include <QMenu>
@@ -1634,7 +1634,7 @@ void Player::actRollDie()
 
 void Player::actCreateToken()
 {
-    DlgCreateToken dlg(predefinedTokens, game);
+    CreateToken dlg(predefinedTokens, game);
     if (!dlg.exec()) {
         return;
     }
