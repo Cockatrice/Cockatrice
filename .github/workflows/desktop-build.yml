@@ -85,46 +85,57 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # these names correspond to the files in .ci/$distro
+        # These names correspond to the files in ".ci/$distro$version"
         include:
-          - distro: ArchLinux
-            package: skip # we are packaged in arch already
+          - distro: Arch
+            package: skip    # We are packaged in Arch already
             allow-failure: yes
 
-          - distro: Debian11
+          - distro: Debian
+            version: 11
+            package: DEB
+            test: skip    # Running tests on all distros is superfluous
+
+          - distro: Debian
+            version: 12
             package: DEB
 
-          - distro: Debian12
-            package: DEB
+          - distro: Fedora
+            version: 39
+            package: RPM
+            test: skip    # Running tests on all distros is superfluous
 
-          - distro: Fedora39
+          - distro: Fedora
+            version: 40
             package: RPM
 
-          - distro: Fedora40
-            package: RPM
+          - distro: Ubuntu
+            version: 18.04
+            package: DEB
+            test: skip    # Running tests on all distros is superfluous
 
-          - distro: UbuntuBionic
+          - distro: Ubuntu
+            version: 20.04
+            package: DEB
+            test: skip    # Ubuntu 20.04 has a broken Qt for debug builds
+
+          - distro: Ubuntu
+            version: 22.04
+            package: DEB
+            test: skip    # Running tests on all distros is superfluous
+
+          - distro: Ubuntu
+            version: 24.04
             package: DEB
 
-          - distro: UbuntuFocal
-            package: DEB
-            test: skip # UbuntuFocal has a broken qt for debug builds
-
-          - distro: UbuntuJammy
-            package: DEB
-            test: skip # running tests on all distros is superfluous
-
-          - distro: UbuntuNoble
-            package: DEB
-
-    name: ${{matrix.distro}}
+    name: ${{matrix.distro}} ${{matrix.version}}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
-      NAME: ${{matrix.distro}}
-      CACHE: /tmp/${{matrix.distro}}-cache # ${{runner.temp}} does not work?
-      # cache size over the entire repo is 10Gi link:
+      NAME: ${{matrix.distro}}${{matrix.version}}
+      CACHE: /tmp/${{matrix.distro}}${{matrix.version}}-cache    # ${{runner.temp}} does not work?
+      # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 200M
 
@@ -132,7 +143,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get cache timestamp
+      - name: Generate cache timestamp
         id: cache_timestamp
         shell: bash
         run: echo "timestamp=$(date -u '+%Y%m%d%H%M%S')" >>"$GITHUB_OUTPUT"
@@ -143,19 +154,17 @@ jobs:
           timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
         with:
           path: ${{env.CACHE}}
-          key: docker-${{matrix.distro}}-cache-${{env.timestamp}}
+          key: docker-${{matrix.distro}}${{matrix.version}}-cache-${{env.timestamp}}
           restore-keys: |
-            docker-${{matrix.distro}}-cache-
+            docker-${{matrix.distro}}${{matrix.version}}-cache-
 
-      - name: Build ${{matrix.distro}} Docker image
+      - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
         run: source .ci/docker.sh --build
 
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
-        env:
-          distro: '${{matrix.distro}}'
         run: |
           source .ci/docker.sh
           RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 4
@@ -166,8 +175,7 @@ jobs:
         shell: bash
         env:
           BUILD_DIR: build
-          SUFFIX: '-${{matrix.distro}}'
-          distro: '${{matrix.distro}}'
+          SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           type: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
@@ -179,7 +187,7 @@ jobs:
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{matrix.distro}}-package
+          name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
@@ -198,24 +206,28 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 12_Monterey_and_13_Ventura
+          - target: 12
+            soc: Intel
             os: macos-12
             xcode: "14.0.1"
             type: Release
             make_package: 1
 
-          - target: 14_Sonoma
+          - target: 14
+            soc: Apple
             os: macos-14
             xcode: "15.4"
             type: Release
             make_package: 1
 
-          - target: 14_Sonoma_Debug
+          - target: 14
+            soc: Apple
             os: macos-14
             xcode: "15.4"
             type: Debug
+            make_package: 0
 
-    name: macOS${{matrix.target}}
+    name: macOS ${{matrix.target}} ${{ matrix.type == 'Debug' && 'Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
@@ -229,8 +241,8 @@ jobs:
 
       - name: Install dependencies using Homebrew
         shell: bash
-        # cmake cannot find the mysql connector
-        # neither of these works: mariadb-connector-c mysql-connector-c++
+        # CMake cannot find the MySQL connector
+        # Neither of these works: mariadb-connector-c mysql-connector-c++
         env:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
@@ -244,16 +256,16 @@ jobs:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_TEST: 1
           MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '-macOS-${{matrix.target}}'
-        # macOS runner actually have only 3 cores
-        # See https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+          PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
+        # macOS runner have only 3 cores:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         run: .ci/compile.sh --server --parallel 3
 
       - name: Upload artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
-          name: macOS-${{matrix.target}}-dmg
+          name: macOS${{matrix.target}}_${{matrix.soc}}-dmg
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
