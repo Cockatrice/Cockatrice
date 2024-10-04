@@ -47,8 +47,8 @@ private slots:
 
 public:
     FilterGames(const QMap<int, QString> &_allGameTypes,
-                   const GamesProxyModel *_gamesProxyModel,
-                   QWidget *parent = nullptr);
+                const GamesProxyModel *_gamesProxyModel,
+                QWidget *parent = nullptr);
 
     bool getShowFullGames() const;
     bool getShowGamesThatStarted() const;
