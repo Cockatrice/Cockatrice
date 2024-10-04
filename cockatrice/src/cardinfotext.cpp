@@ -27,7 +27,7 @@ CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
     retranslateUi();
 }
 
-void CardInfoText::setCard(CardInfoPtr card)
+void CardInfoText::setCard(const CardInfoPtr &card)
 {
     if (card == nullptr) {
         nameLabel->setText("");

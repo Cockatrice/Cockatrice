@@ -98,11 +98,15 @@ private slots:
     void saveDbHeaderState();
     void setSaveStatus(bool newStatus);
     void showSearchSyntaxHelp();
+    void refreshCardVersion(int);
 
 private:
     CardInfoPtr currentCardInfo() const;
     void addCardHelper(QString zoneName);
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
+    void offsetCountAtIndex(const QModelIndex &idx,
+                            int offset,
+                            const QString &cardSetCode = QString(),
+                            const QString &cardCollectorNumber = QString());
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
 

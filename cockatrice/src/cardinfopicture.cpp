@@ -1,11 +1,11 @@
 #include "cardinfopicture.h"
 
 #include "carditem.h"
-#include "main.h"
 #include "pictureloader.h"
 
 #include <QStylePainter>
 #include <QWidget>
+#include <utility>
 
 CardInfoPicture::CardInfoPicture(QWidget *parent) : QWidget(parent), info(nullptr), pixmapDirty(true)
 {
@@ -18,7 +18,7 @@ void CardInfoPicture::setCard(CardInfoPtr card)
         disconnect(info.data(), nullptr, this, nullptr);
     }
 
-    info = card;
+    info = std::move(card);
 
     if (info) {
         connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));

@@ -24,7 +24,7 @@ public:
 signals:
     void linkActivated(const QString &link);
 public slots:
-    void setCard(CardInfoPtr card);
+    void setCard(const CardInfoPtr &card);
 };
 
 #endif
