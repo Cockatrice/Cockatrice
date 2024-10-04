@@ -72,13 +72,13 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
     QString zoneName = zone->getName();
 
     if (zoneName == tableConstant()) {
-        fromStr = tr(" from play");
+        fromStr = tr("from play");
     } else if (zoneName == graveyardConstant()) {
-        fromStr = tr(" from their graveyard");
+        fromStr = tr("from their graveyard");
     } else if (zoneName == exileConstant()) {
-        fromStr = tr(" from exile");
+        fromStr = tr("from exile");
     } else if (zoneName == handConstant()) {
-        fromStr = tr(" from their hand");
+        fromStr = tr("from their hand");
     } else if (zoneName == deckConstant()) {
         if (position == 0) {
             if (cardName.isEmpty()) {
@@ -90,9 +90,9 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getName());
+                    fromStr = tr("from the top of %1's library").arg(zone->getPlayer()->getName());
                 } else {
-                    fromStr = tr(" from the top of their library");
+                    fromStr = tr("from the top of their library");
                 }
             }
         } else if (position >= zone->getCards().size() - 1) {
@@ -105,22 +105,22 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getName());
+                    fromStr = tr("from the bottom of %1's library").arg(zone->getPlayer()->getName());
                 } else {
-                    fromStr = tr(" from the bottom of their library");
+                    fromStr = tr("from the bottom of their library");
                 }
             }
         } else {
             if (ownerChange) {
-                fromStr = tr(" from %1's library").arg(zone->getPlayer()->getName());
+                fromStr = tr("from %1's library").arg(zone->getPlayer()->getName());
             } else {
-                fromStr = tr(" from their library");
+                fromStr = tr("from their library");
             }
         }
     } else if (zoneName == sideboardConstant()) {
-        fromStr = tr(" from sideboard");
+        fromStr = tr("from sideboard");
     } else if (zoneName == stackConstant()) {
-        fromStr = tr(" from the stack");
+        fromStr = tr("from the stack");
     }
 
     if (!cardNameContainsStartZone) {
@@ -325,33 +325,33 @@ void MessageLogWidget::logMoveCard(Player *player,
     if (targetZoneName == tableConstant()) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
-            finalStr = tr("%1 puts %2 into play%3 face down.");
+            finalStr = tr("%1 puts %2 into play %3 face down.");
         } else {
-            finalStr = tr("%1 puts %2 into play%3.");
+            finalStr = tr("%1 puts %2 into play %3.");
         }
     } else if (targetZoneName == graveyardConstant()) {
-        finalStr = tr("%1 puts %2%3 into their graveyard.");
+        finalStr = tr("%1 puts %2 %3 into their graveyard.");
     } else if (targetZoneName == exileConstant()) {
-        finalStr = tr("%1 exiles %2%3.");
+        finalStr = tr("%1 exiles %2 %3.");
     } else if (targetZoneName == handConstant()) {
-        finalStr = tr("%1 moves %2%3 to their hand.");
+        finalStr = tr("%1 moves %2 %3 to their hand.");
     } else if (targetZoneName == deckConstant()) {
         if (newX == -1) {
-            finalStr = tr("%1 puts %2%3 into their library.");
+            finalStr = tr("%1 puts %2 %3 into their library.");
         } else if (newX >= targetZone->getCards().size()) {
-            finalStr = tr("%1 puts %2%3 onto the bottom of their library.");
+            finalStr = tr("%1 puts %2 %3 onto the bottom of their library.");
         } else if (newX == 0) {
-            finalStr = tr("%1 puts %2%3 on top of their library.");
+            finalStr = tr("%1 puts %2 %3 on top of their library.");
         } else {
             ++newX;
             usesNewX = true;
-            finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
+            finalStr = tr("%1 puts %2 %3 into their library %4 cards from the top.");
         }
     } else if (targetZoneName == sideboardConstant()) {
-        finalStr = tr("%1 moves %2%3 to sideboard.");
+        finalStr = tr("%1 moves %2 %3 to sideboard.");
     } else if (targetZoneName == stackConstant()) {
         soundEngine->playSound("play_card");
-        finalStr = tr("%1 plays %2%3.");
+        finalStr = tr("%1 plays %2 %3.");
     }
 
     if (usesNewX) {
@@ -526,14 +526,14 @@ void MessageLogWidget::logRevealCards(Player *player,
         }
     } else if (cardId == -2) {
         if (otherPlayer) {
-            appendHtmlServerMessage(tr("%1 randomly reveals %2%3 to %4.")
+            appendHtmlServerMessage(tr("%1 randomly reveals %2 %3 to %4.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
                                         .arg(sanitizeHtml(otherPlayer->getName())));
         } else {
             appendHtmlServerMessage(
-                tr("%1 randomly reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                tr("%1 randomly reveals %2 %3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
         }
     } else {
         if (faceDown && player == otherPlayer) {
@@ -547,14 +547,14 @@ void MessageLogWidget::logRevealCards(Player *player,
                                             .arg(cardStr));
             }
         } else if (otherPlayer) {
-            appendHtmlServerMessage(tr("%1 reveals %2%3 to %4.")
+            appendHtmlServerMessage(tr("%1 reveals %2 %3 to %4.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
                                         .arg(sanitizeHtml(otherPlayer->getName())));
         } else {
             appendHtmlServerMessage(
-                tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                tr("%1 reveals %2 %3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
         }
     }
 }
