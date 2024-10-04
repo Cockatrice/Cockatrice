@@ -1,9 +1,9 @@
 #include "cardzone.h"
 
+#include "../../player/player.h"
 #include "../cards/carditem.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
-#include "../../player/player.h"
 #include "zoneviewzone.h"
 
 #include <QAction>
@@ -44,7 +44,7 @@ CardZone::~CardZone()
  */
 void CardZone::retranslateUi()
 {
-    for (auto & card : cards)
+    for (auto &card : cards)
         card->retranslateUi();
 }
 
@@ -60,7 +60,7 @@ void CardZone::retranslateUi()
  */
 void CardZone::clearContents()
 {
-    for (auto & card : cards) {
+    for (auto &card : cards) {
         const QList<CardItem *> &attachedCards = card->getAttachedCards();
         for (const auto attachedCard : attachedCards)
             attachedCard->setParentItem(attachedCard->getZone());
@@ -84,7 +84,7 @@ void CardZone::clearContents()
 QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
 {
     const QString ownerName = player->getName();
-    switch ( name ) {
+    switch (name) {
         case "hand":
             return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
         case "deck":
@@ -101,7 +101,8 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
                 case CaseShuffleZone:
                     return (theirOwn ? tr("their library", "shuffle") : tr("%1's library", "shuffle").arg(ownerName));
                 default:
-                    return (theirOwn ? tr("their library", "nominative") : tr("%1's library", "nominative").arg(ownerName));
+                    return (theirOwn ? tr("their library", "nominative")
+                                     : tr("%1's library", "nominative").arg(ownerName));
             }
         case "grave":
             return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
@@ -333,7 +334,7 @@ void CardZone::moveAllToZone()
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(targetX);
 
-    for (auto & card : cards)
+    for (auto &card : cards)
         cmd.mutable_cards_to_move()->add_card()->set_card_id(card->getId());
 
     player->sendGameCommand(cmd);

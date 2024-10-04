@@ -1,5 +1,4 @@
 #include "dlg_update.h"
-
 #include "releasechannel.h"
 #include "settingscache.h"
 #include "window_main.h"
