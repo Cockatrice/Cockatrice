@@ -3885,52 +3885,52 @@ Il database delle carte verrà ricaricato.</translation>
 <context>
     <name>Mtg</name>
     <message>
-        <location filename="src/game_specific_terms.h" line="29"/>
+        <location filename="src/gamespecificterms.h" line="29"/>
         <source>Card Type</source>
         <translation>Tipo di carta</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="31"/>
+        <location filename="src/gamespecificterms.h" line="31"/>
         <source>Mana Value</source>
         <translation>Valore di Mana</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="33"/>
+        <location filename="src/gamespecificterms.h" line="33"/>
         <source>Color(s)</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="35"/>
+        <location filename="src/gamespecificterms.h" line="35"/>
         <source>Loyalty</source>
         <translation>Fedeltà</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="37"/>
+        <location filename="src/gamespecificterms.h" line="37"/>
         <source>Main Card Type</source>
         <translation>Tipo principale</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="39"/>
+        <location filename="src/gamespecificterms.h" line="39"/>
         <source>Mana Cost</source>
         <translation>Costo di mana</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="41"/>
+        <location filename="src/gamespecificterms.h" line="41"/>
         <source>P/T</source>
         <translation>F/C</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="43"/>
+        <location filename="src/gamespecificterms.h" line="43"/>
         <source>Side</source>
         <translation>Lato</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="45"/>
+        <location filename="src/gamespecificterms.h" line="45"/>
         <source>Layout</source>
         <translation>Layout</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="47"/>
+        <location filename="src/gamespecificterms.h" line="47"/>
         <source>Color Identity</source>
         <translation>Identità di colore</translation>
     </message>
