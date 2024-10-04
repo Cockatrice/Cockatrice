@@ -1,8 +1,8 @@
 #ifndef WINDOW_DECKEDITOR_H
 #define WINDOW_DECKEDITOR_H
 
-#include "carddatabase.h"
-#include "customlineedit.h"
+#include "../../game/cards/database.h"
+#include "../../deck/custom_line_edit.h"
 #include "keysignals.h"
 #include "tab.h"
 

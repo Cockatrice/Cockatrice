@@ -1,6 +1,6 @@
-#include "tab_replays.h"
+#include "replays.h"
 
-#include "abstractclient.h"
+#include "../abstract_client.h"
 #include "pb/command_replay_delete_match.pb.h"
 #include "pb/command_replay_download.pb.h"
 #include "pb/command_replay_modify_match.pb.h"
@@ -8,10 +8,10 @@
 #include "pb/game_replay.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_replay_download.pb.h"
-#include "pending_command.h"
-#include "remotereplaylist_treewidget.h"
-#include "settingscache.h"
-#include "tab_game.h"
+#include "../../server/pending_command.h"
+#include "../../server/remote/replay_list_tree_widget.h"
+#include "../../settings/cache.h"
+#include "game.h"
 
 #include <QAction>
 #include <QApplication>

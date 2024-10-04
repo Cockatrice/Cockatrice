@@ -16,12 +16,12 @@ set(oracle_SOURCES
     src/oracleimporter.cpp
     src/pagetemplates.cpp
     src/qt-json/json.cpp
-    ../cockatrice/src/game/cards/carddatabase.cpp
-    ../cockatrice/src/client/pictureloader.cpp
-    ../cockatrice/src/carddbparser/carddatabaseparser.cpp
-    ../cockatrice/src/carddbparser/cockatricexml3.cpp
-    ../cockatrice/src/carddbparser/cockatricexml4.cpp
-    ../cockatrice/src/settings/settingscache.cpp
+        ../cockatrice/src/game/cards/database.cpp
+        ../cockatrice/src/client/picture_loader.cpp
+        ../cockatrice/src/carddbparser/card_database_parser.cpp
+        ../cockatrice/src/carddbparser/cockatrice_xml3.cpp
+        ../cockatrice/src/carddbparser/cockatrice_xml4.cpp
+        ../cockatrice/src/settings/cache.cpp
     ../cockatrice/src/settings/shortcutssettings.cpp
     ../cockatrice/src/settings/carddatabasesettings.cpp
     ../cockatrice/src/settings/serverssettings.cpp
@@ -30,7 +30,7 @@ set(oracle_SOURCES
     ../cockatrice/src/settings/gamefilterssettings.cpp
     ../cockatrice/src/settings/layoutssettings.cpp
     ../cockatrice/src/settings/downloadsettings.cpp
-        ../cockatrice/src/client/thememanager.cpp
+        ../cockatrice/src/client/theme_manager.cpp
     ../cockatrice/src/releasechannel.cpp
     ${VERSION_STRING_CPP}
 )

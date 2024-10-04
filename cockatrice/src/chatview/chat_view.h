@@ -1,11 +1,11 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../tab_supervisor.h"
-#include "../userlist.h"
+#include "../client/tabs/tab_supervisor.h"
+#include "../server/user/user_list.h"
 #include "room_message_type.h"
 #include "user_level.h"
-#include "userlistProxy.h"
+#include "user_list_proxy.h"
 
 #include <QAction>
 #include <QColor>

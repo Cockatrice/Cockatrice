@@ -242,32 +242,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="70"/>
+        <location filename="src/database_model.cpp" line="70"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="72"/>
+        <location filename="src/database_model.cpp" line="72"/>
         <source>Sets</source>
         <translation>系列</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="74"/>
+        <location filename="src/database_model.cpp" line="74"/>
         <source>Mana cost</source>
         <translation>法术力费用</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="76"/>
+        <location filename="src/database_model.cpp" line="76"/>
         <source>Card type</source>
         <translation>卡牌类别</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="78"/>
+        <location filename="src/database_model.cpp" line="78"/>
         <source>P/T</source>
         <translation>力量/防御力</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="80"/>
+        <location filename="src/database_model.cpp" line="80"/>
         <source>Color(s)</source>
         <translation>颜色</translation>
     </message>
@@ -275,86 +275,86 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFilter</name>
     <message>
-        <location filename="src/cardfilter.cpp" line="7"/>
+        <location filename="src/card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
         <translation>和</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="9"/>
+        <location filename="src/card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
         <translation>或</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="11"/>
+        <location filename="src/card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
         <translation>和不是</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="13"/>
+        <location filename="src/card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
         <translation>或不是</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="23"/>
+        <location filename="src/card.cpp" line="23"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="25"/>
+        <location filename="src/card.cpp" line="25"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="27"/>
+        <location filename="src/card.cpp" line="27"/>
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="29"/>
+        <location filename="src/card.cpp" line="29"/>
         <source>Text</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="31"/>
+        <location filename="src/card.cpp" line="31"/>
         <source>Set</source>
         <translation>系列</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="33"/>
+        <location filename="src/card.cpp" line="33"/>
         <source>Mana Cost</source>
         <translation>法术力费用</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="35"/>
+        <location filename="src/card.cpp" line="35"/>
         <source>Mana Value</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="37"/>
+        <location filename="src/card.cpp" line="37"/>
         <source>Rarity</source>
         <translation>稀有度</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="39"/>
+        <location filename="src/card.cpp" line="39"/>
         <source>Power</source>
         <translation>力量</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="41"/>
+        <location filename="src/card.cpp" line="41"/>
         <source>Toughness</source>
         <translation>防御力</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="43"/>
+        <location filename="src/card.cpp" line="43"/>
         <source>Loyalty</source>
         <translation>忠诚值</translation>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="45"/>
+        <location filename="src/card.cpp" line="45"/>
         <source>Format</source>
         <translation>赛制</translation>
     </message>
@@ -362,17 +362,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFrame</name>
     <message>
-        <location filename="src/cardframe.cpp" line="65"/>
+        <location filename="src/frame.cpp" line="65"/>
         <source>Image</source>
         <translation>卡图</translation>
     </message>
     <message>
-        <location filename="src/cardframe.cpp" line="66"/>
+        <location filename="src/frame.cpp" line="66"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="src/cardframe.cpp" line="67"/>
+        <location filename="src/frame.cpp" line="67"/>
         <source>Both</source>
         <translation>完整信息</translation>
     </message>
@@ -398,12 +398,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="src/carditem.cpp" line="87"/>
+        <location filename="src/item.cpp" line="87"/>
         <source>&amp;Move to</source>
         <translation>移动到</translation>
     </message>
     <message>
-        <location filename="src/carditem.cpp" line="88"/>
+        <location filename="src/item.cpp" line="88"/>
         <source>&amp;Power / toughness</source>
         <translation>力量/防御力</translation>
     </message>
@@ -686,12 +686,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckListModel</name>
     <message>
-        <location filename="src/decklistmodel.cpp" line="167"/>
+        <location filename="src/list_model.cpp" line="167"/>
         <source>Number</source>
         <translation>数量</translation>
     </message>
     <message>
-        <location filename="src/decklistmodel.cpp" line="169"/>
+        <location filename="src/list_model.cpp" line="169"/>
         <source>Card</source>
         <translation>卡牌</translation>
     </message>
@@ -699,13 +699,13 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckStatsInterface</name>
     <message>
-        <location filename="src/deckstats_interface.cpp" line="23"/>
-        <location filename="src/deckstats_interface.cpp" line="35"/>
+        <location filename="src/stats_interface.cpp" line="23"/>
+        <location filename="src/stats_interface.cpp" line="35"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="src/deckstats_interface.cpp" line="35"/>
+        <location filename="src/stats_interface.cpp" line="35"/>
         <source>The reply from the server could not be parsed.</source>
         <translation>服务器的回复无法分析</translation>
     </message>
@@ -2082,7 +2082,7 @@ You may have to build from source yourself.</source>
 <context>
     <name>FilterBuilder</name>
     <message>
-        <location filename="src/filterbuilder.cpp" line="28"/>
+        <location filename="src/builder.cpp" line="28"/>
         <source>Type your filter here</source>
         <translation>输入你打算筛选的类型</translation>
     </message>
@@ -2090,105 +2090,105 @@ You may have to build from source yourself.</source>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="src/gameselector.cpp" line="217"/>
-        <location filename="src/gameselector.cpp" line="220"/>
-        <location filename="src/gameselector.cpp" line="223"/>
-        <location filename="src/gameselector.cpp" line="226"/>
-        <location filename="src/gameselector.cpp" line="229"/>
-        <location filename="src/gameselector.cpp" line="232"/>
-        <location filename="src/gameselector.cpp" line="235"/>
-        <location filename="src/gameselector.cpp" line="238"/>
-        <location filename="src/gameselector.cpp" line="272"/>
+        <location filename="src/selector.cpp" line="217"/>
+        <location filename="src/selector.cpp" line="220"/>
+        <location filename="src/selector.cpp" line="223"/>
+        <location filename="src/selector.cpp" line="226"/>
+        <location filename="src/selector.cpp" line="229"/>
+        <location filename="src/selector.cpp" line="232"/>
+        <location filename="src/selector.cpp" line="235"/>
+        <location filename="src/selector.cpp" line="238"/>
+        <location filename="src/selector.cpp" line="272"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="217"/>
+        <location filename="src/selector.cpp" line="217"/>
         <source>Please join the appropriate room first.</source>
         <translation>首先请加入一个房间.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="220"/>
+        <location filename="src/selector.cpp" line="220"/>
         <source>Wrong password.</source>
         <translation>密码错误.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="223"/>
+        <location filename="src/selector.cpp" line="223"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>这个游戏不允许观众加入.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="226"/>
+        <location filename="src/selector.cpp" line="226"/>
         <source>The game is already full.</source>
         <translation>这个游戏已经满了.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="229"/>
+        <location filename="src/selector.cpp" line="229"/>
         <source>The game does not exist any more.</source>
         <translation>这个游戏不能装下啊更多了.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="232"/>
+        <location filename="src/selector.cpp" line="232"/>
         <source>This game is only open to registered users.</source>
         <translation>这个游戏只开放给注册用户.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="235"/>
+        <location filename="src/selector.cpp" line="235"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>这个游戏只开放给好友.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="238"/>
+        <location filename="src/selector.cpp" line="238"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>你屏蔽了这个与游戏的创造者.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="258"/>
+        <location filename="src/selector.cpp" line="258"/>
         <source>Join game</source>
         <translation>加入游戏</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="258"/>
+        <location filename="src/selector.cpp" line="258"/>
         <source>Password:</source>
         <translation>密码:</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="272"/>
+        <location filename="src/selector.cpp" line="272"/>
         <source>Please join the respective room first.</source>
         <translation>请各自加入一个房间.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="315"/>
+        <location filename="src/selector.cpp" line="315"/>
         <source>&amp;Filter games</source>
         <translation>过滤房间</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="316"/>
+        <location filename="src/selector.cpp" line="316"/>
         <source>C&amp;lear filter</source>
         <translation>清除筛选项目</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="318"/>
+        <location filename="src/selector.cpp" line="318"/>
         <source>C&amp;reate</source>
         <translation>创建</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="319"/>
+        <location filename="src/selector.cpp" line="319"/>
         <source>&amp;Join</source>
         <translation>加入</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="320"/>
+        <location filename="src/selector.cpp" line="320"/>
         <source>J&amp;oin as spectator</source>
         <translation>观看</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="341"/>
+        <location filename="src/selector.cpp" line="341"/>
         <source>Games shown: %1 / %2</source>
         <translation>显示游戏:%1/%2</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="343"/>
+        <location filename="src/selector.cpp" line="343"/>
         <source>Games</source>
         <translation>游戏</translation>
     </message>
@@ -2196,100 +2196,100 @@ You may have to build from source yourself.</source>
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="src/gamesmodel.cpp" line="48"/>
+        <location filename="src/model.cpp" line="48"/>
         <source>&gt;1 day</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/gamesmodel.cpp" line="57"/>
+        <location filename="src/model.cpp" line="57"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="59"/>
+        <location filename="src/model.cpp" line="59"/>
         <source>new</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/gamesmodel.cpp" line="62"/>
+        <location filename="src/model.cpp" line="62"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="154"/>
+        <location filename="src/model.cpp" line="154"/>
         <source>password</source>
         <translation>密码</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="156"/>
+        <location filename="src/model.cpp" line="156"/>
         <source>buddies only</source>
         <translation>仅限好友</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="158"/>
+        <location filename="src/model.cpp" line="158"/>
         <source>reg. users only</source>
         <translation>仅注册用户</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="190"/>
-        <location filename="src/gamesmodel.cpp" line="195"/>
+        <location filename="src/model.cpp" line="190"/>
+        <location filename="src/model.cpp" line="195"/>
         <source>can chat</source>
         <translation>允许聊天</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="192"/>
+        <location filename="src/model.cpp" line="192"/>
         <source>see hands</source>
         <translation>查看手牌</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="197"/>
+        <location filename="src/model.cpp" line="197"/>
         <source>can see hands</source>
         <translation>允许查看手牌</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="202"/>
+        <location filename="src/model.cpp" line="202"/>
         <source>not allowed</source>
         <translation>不允许</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="220"/>
+        <location filename="src/model.cpp" line="220"/>
         <source>Room</source>
         <translation>房间</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="224"/>
+        <location filename="src/model.cpp" line="224"/>
         <source>Age</source>
         <translation>时长</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="232"/>
+        <location filename="src/model.cpp" line="232"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="234"/>
+        <location filename="src/model.cpp" line="234"/>
         <source>Creator</source>
         <translation>创建者</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="236"/>
+        <location filename="src/model.cpp" line="236"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="238"/>
+        <location filename="src/model.cpp" line="238"/>
         <source>Restrictions</source>
         <translation>限制</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="242"/>
+        <location filename="src/model.cpp" line="242"/>
         <source>Players</source>
         <translation>玩家</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="250"/>
+        <location filename="src/model.cpp" line="250"/>
         <source>Spectators</source>
         <translation>观看者</translation>
     </message>
@@ -3179,575 +3179,575 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="75"/>
+        <location filename="src/message_log_widget.cpp" line="75"/>
         <source> from play</source>
         <translation>从战场上</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="77"/>
+        <location filename="src/message_log_widget.cpp" line="77"/>
         <source> from their graveyard</source>
         <translation>从他的坟墓场</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="79"/>
+        <location filename="src/message_log_widget.cpp" line="79"/>
         <source> from exile</source>
         <translation>从放逐区</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="81"/>
+        <location filename="src/message_log_widget.cpp" line="81"/>
         <source> from their hand</source>
         <translation>从他的手牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="86"/>
+        <location filename="src/message_log_widget.cpp" line="86"/>
         <source>the top card of %1&apos;s library</source>
         <translation>%1牌库顶的牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="88"/>
+        <location filename="src/message_log_widget.cpp" line="88"/>
         <source>the top card of their library</source>
         <translation>他牌库顶的卡牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="93"/>
+        <location filename="src/message_log_widget.cpp" line="93"/>
         <source> from the top of %1&apos;s library</source>
         <translation>从%1的牌库顶</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="95"/>
+        <location filename="src/message_log_widget.cpp" line="95"/>
         <source> from the top of their library</source>
         <translation>从他的牌库顶</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="101"/>
+        <location filename="src/message_log_widget.cpp" line="101"/>
         <source>the bottom card of %1&apos;s library</source>
         <translation>%1的牌库底牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="103"/>
+        <location filename="src/message_log_widget.cpp" line="103"/>
         <source>the bottom card of their library</source>
         <translation>他牌库底部的牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="108"/>
+        <location filename="src/message_log_widget.cpp" line="108"/>
         <source> from the bottom of %1&apos;s library</source>
         <translation>从%1的牌库底</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="110"/>
+        <location filename="src/message_log_widget.cpp" line="110"/>
         <source> from the bottom of their library</source>
         <translation>从他的牌库底</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="115"/>
+        <location filename="src/message_log_widget.cpp" line="115"/>
         <source> from %1&apos;s library</source>
         <translation>从%1的牌库中</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="117"/>
+        <location filename="src/message_log_widget.cpp" line="117"/>
         <source> from their library</source>
         <translation>从他的牌库</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="121"/>
+        <location filename="src/message_log_widget.cpp" line="121"/>
         <source> from sideboard</source>
         <translation>从备牌中</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="123"/>
+        <location filename="src/message_log_widget.cpp" line="123"/>
         <source> from the stack</source>
         <translation>从堆叠中</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="149"/>
+        <location filename="src/message_log_widget.cpp" line="149"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
         <translation>%1已持续展示牌库顶牌%2</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="150"/>
+        <location filename="src/message_log_widget.cpp" line="150"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
         <translation>%1不再%2展示牌库顶牌。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="157"/>
+        <location filename="src/message_log_widget.cpp" line="157"/>
         <source>%1 can now look at top card %2 at any time.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="158"/>
+        <location filename="src/message_log_widget.cpp" line="158"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="165"/>
+        <location filename="src/message_log_widget.cpp" line="165"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <translation>%1 结附 %2 指向 %3的 %4.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="175"/>
+        <location filename="src/message_log_widget.cpp" line="175"/>
         <source>%1 has conceded the game.</source>
         <translation>%1 已放弃游戏。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="181"/>
+        <location filename="src/message_log_widget.cpp" line="181"/>
         <source>%1 has unconceded the game.</source>
         <translation>%1 已放弃游戏。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="188"/>
+        <location filename="src/message_log_widget.cpp" line="188"/>
         <source>%1 has restored connection to the game.</source>
         <translation>%1已恢复连接。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="192"/>
+        <location filename="src/message_log_widget.cpp" line="192"/>
         <source>%1 has lost connection to the game.</source>
         <translation>%1 已失去连接。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="208"/>
+        <location filename="src/message_log_widget.cpp" line="208"/>
         <source>%1 points from their %2 to themselves.</source>
         <translation>%1 将%2 指向自己。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="211"/>
+        <location filename="src/message_log_widget.cpp" line="211"/>
         <source>%1 points from their %2 to %3.</source>
         <translation>%1 将%2指向%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="215"/>
+        <location filename="src/message_log_widget.cpp" line="215"/>
         <source>%1 points from %2&apos;s %3 to themselves.</source>
         <translation>%1将%2的%3</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="219"/>
+        <location filename="src/message_log_widget.cpp" line="219"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <translation>%1 将%2的%3指向%4。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="227"/>
+        <location filename="src/message_log_widget.cpp" line="227"/>
         <source>%1 points from their %2 to their %3.</source>
         <translation>%1将他的%2指向他的%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="230"/>
+        <location filename="src/message_log_widget.cpp" line="230"/>
         <source>%1 points from their %2 to %3&apos;s %4.</source>
         <translation>%1将他的%2指向%3的%4。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="236"/>
+        <location filename="src/message_log_widget.cpp" line="236"/>
         <source>%1 points from %2&apos;s %3 to their own %4.</source>
         <translation>%1将%2的%3指向他自己的%4。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="242"/>
+        <location filename="src/message_log_widget.cpp" line="242"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <translation>%1 将%2的%3指向%4的%5。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="254"/>
+        <location filename="src/message_log_widget.cpp" line="254"/>
         <source>%1 creates token: %2%3.</source>
         <translation>%1创建衍生物：%2%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="263"/>
+        <location filename="src/message_log_widget.cpp" line="263"/>
         <source>%1 has loaded a deck (%2).</source>
         <translation>%1 已载入套牌(%2)</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="265"/>
+        <location filename="src/message_log_widget.cpp" line="265"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
         <translation>%1已载入含有 %2张备牌的套牌(%3)</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="275"/>
+        <location filename="src/message_log_widget.cpp" line="275"/>
         <source>%1 destroys %2.</source>
         <translation>%1销毁了%2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="310"/>
+        <location filename="src/message_log_widget.cpp" line="310"/>
         <source>a card</source>
         <translation>一张牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="316"/>
+        <location filename="src/message_log_widget.cpp" line="316"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1让%2控制%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="328"/>
+        <location filename="src/message_log_widget.cpp" line="328"/>
         <source>%1 puts %2 into play%3 face down.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="330"/>
+        <location filename="src/message_log_widget.cpp" line="330"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1将%2%3放进战场。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="333"/>
+        <location filename="src/message_log_widget.cpp" line="333"/>
         <source>%1 puts %2%3 into their graveyard.</source>
         <translation>%1将%2%3置入他的坟墓场。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="335"/>
+        <location filename="src/message_log_widget.cpp" line="335"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 %3放逐了 %2</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="337"/>
+        <location filename="src/message_log_widget.cpp" line="337"/>
         <source>%1 moves %2%3 to their hand.</source>
         <translation>%1将%2%3放回他的手牌中。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="340"/>
+        <location filename="src/message_log_widget.cpp" line="340"/>
         <source>%1 puts %2%3 into their library.</source>
         <translation>%1将%2%3放入他的牌库。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="342"/>
+        <location filename="src/message_log_widget.cpp" line="342"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="344"/>
+        <location filename="src/message_log_widget.cpp" line="344"/>
         <source>%1 puts %2%3 on top of their library.</source>
         <translation>%1将%2%3置于其牌库顶。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="348"/>
+        <location filename="src/message_log_widget.cpp" line="348"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
         <translation>%1将%2%3放入牌库%4张牌放在牌库顶</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="351"/>
+        <location filename="src/message_log_widget.cpp" line="351"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1 将%2%3移动到备牌</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="354"/>
+        <location filename="src/message_log_widget.cpp" line="354"/>
         <source>%1 plays %2%3.</source>
         <translation>%1使用 %2%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="372"/>
+        <location filename="src/message_log_widget.cpp" line="372"/>
         <source>%1 tries to draw from an empty library</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="374"/>
+        <location filename="src/message_log_widget.cpp" line="374"/>
         <source>%1 draws %2 card(s).</source>
         <translation><numerusform>%1 抓了 %2 张牌。</numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="384"/>
+        <location filename="src/message_log_widget.cpp" line="384"/>
         <source>%1 is looking at %2.</source>
         <translation>%1 正在查看%2。</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="389"/>
+        <location filename="src/message_log_widget.cpp" line="389"/>
         <source>%1 is looking at the top %3 card(s) %2.</source>
         <comment>top card for singular, top %3 cards for plural</comment>
         <translation><numerusform>%1正在%3检视牌库顶的%2张牌。</numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="400"/>
+        <location filename="src/message_log_widget.cpp" line="400"/>
         <source>%1 turns %2 face-down.</source>
         <translation>%1回合%2翻为面朝下。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="403"/>
+        <location filename="src/message_log_widget.cpp" line="403"/>
         <source>%1 turns %2 face-up.</source>
         <translation>%1回合%2翻为面朝上。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="409"/>
+        <location filename="src/message_log_widget.cpp" line="409"/>
         <source>The game has been closed.</source>
         <translation>游戏已经关闭。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="414"/>
+        <location filename="src/message_log_widget.cpp" line="414"/>
         <source>The game has started.</source>
         <translation>游戏已开始。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="420"/>
+        <location filename="src/message_log_widget.cpp" line="420"/>
         <source>%1 has joined the game.</source>
         <translation>%1 已经加入游戏。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="426"/>
+        <location filename="src/message_log_widget.cpp" line="426"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 正在旁观游戏。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="431"/>
+        <location filename="src/message_log_widget.cpp" line="431"/>
         <source>You have been kicked out of the game.</source>
         <translation>你已被踢出游戏。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="438"/>
+        <location filename="src/message_log_widget.cpp" line="438"/>
         <source>%1 has left the game (%2).</source>
         <translation>%1 已经离开了游戏(%2)。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="444"/>
+        <location filename="src/message_log_widget.cpp" line="444"/>
         <source>%1 is not watching the game any more (%2).</source>
         <translation>%1 不再旁观游戏(%2)。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="450"/>
+        <location filename="src/message_log_widget.cpp" line="450"/>
         <source>%1 is not ready to start the game any more.</source>
         <translation>%1 还未准备好开始游戏。</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="459"/>
+        <location filename="src/message_log_widget.cpp" line="459"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
         <translation><numerusform>%1洗牌并抓了新的%2张起手</numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="464"/>
+        <location filename="src/message_log_widget.cpp" line="464"/>
         <source>%1 shuffles their deck and draws a new hand.</source>
         <translation>%1洗牌并抓了新的起手</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="470"/>
+        <location filename="src/message_log_widget.cpp" line="470"/>
         <source>You are watching a replay of game #%1.</source>
         <translation>你正在观看游戏#%1的录像。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="475"/>
+        <location filename="src/message_log_widget.cpp" line="475"/>
         <source>%1 is ready to start the game.</source>
         <translation>%1已准备好开始游戏。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="501"/>
+        <location filename="src/message_log_widget.cpp" line="501"/>
         <source>cards</source>
         <comment>an unknown amount of cards</comment>
         <translation>牌</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="503"/>
+        <location filename="src/message_log_widget.cpp" line="503"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
         <translation><numerusform>%1 卡牌</numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="512"/>
+        <location filename="src/message_log_widget.cpp" line="512"/>
         <source>%1 lends %2 to %3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="517"/>
+        <location filename="src/message_log_widget.cpp" line="517"/>
         <source>%1 reveals %2 to %3.</source>
         <translation>%1将%2展示给%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="523"/>
+        <location filename="src/message_log_widget.cpp" line="523"/>
         <source>%1 reveals %2.</source>
         <translation>%1 展示 %2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="529"/>
+        <location filename="src/message_log_widget.cpp" line="529"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation>%1随机展示%2%3给%4。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="536"/>
+        <location filename="src/message_log_widget.cpp" line="536"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation>%1随机展示%2%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="542"/>
+        <location filename="src/message_log_widget.cpp" line="542"/>
         <source>%1 peeks at face down card #%2.</source>
         <translation>%1查看面朝下的卡牌#%2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="544"/>
+        <location filename="src/message_log_widget.cpp" line="544"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <translation>%1查看面朝下的卡牌#%2:%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="550"/>
+        <location filename="src/message_log_widget.cpp" line="550"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation>%1展示%2%3给%4。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="557"/>
+        <location filename="src/message_log_widget.cpp" line="557"/>
         <source>%1 reveals %2%3.</source>
         <translation>%1展示%2%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="564"/>
+        <location filename="src/message_log_widget.cpp" line="564"/>
         <source>%1 reversed turn order, now it&apos;s %2.</source>
         <translation>%1 反转回合顺序，现在是%2的回合。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="566"/>
+        <location filename="src/message_log_widget.cpp" line="566"/>
         <source>reversed</source>
         <translation>反转</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="566"/>
+        <location filename="src/message_log_widget.cpp" line="566"/>
         <source>normal</source>
         <translation>正常</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="574"/>
+        <location filename="src/message_log_widget.cpp" line="574"/>
         <source>Heads</source>
         <translation>正面</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="574"/>
+        <location filename="src/message_log_widget.cpp" line="574"/>
         <source>Tails</source>
         <translation>反面</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="575"/>
+        <location filename="src/message_log_widget.cpp" line="575"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <translation>%1掷硬币。结果为%2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="579"/>
+        <location filename="src/message_log_widget.cpp" line="579"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation>%1掷%3面骰子，结果为%2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="586"/>
+        <location filename="src/message_log_widget.cpp" line="586"/>
         <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="596"/>
+        <location filename="src/message_log_widget.cpp" line="596"/>
         <source>%1 rolls a %2-sided dice %3 times: %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="625"/>
+        <location filename="src/message_log_widget.cpp" line="625"/>
         <source>%1&apos;s turn.</source>
         <translation>现在是%1的回合。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="631"/>
+        <location filename="src/message_log_widget.cpp" line="631"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation>%1给%2添加了注释%3。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="642"/>
+        <location filename="src/message_log_widget.cpp" line="642"/>
         <source>%1 places %2 %3 on %4 (now %5).</source>
         <translation>%1在%4上放置了%2个%3指示物(现在是%5)。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="644"/>
+        <location filename="src/message_log_widget.cpp" line="644"/>
         <source>%1 removes %2 %3 from %4 (now %5).</source>
         <translation>%1 从%4上移去了%2个%3指示物 (现在是%5)。</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="650"/>
+        <location filename="src/message_log_widget.cpp" line="650"/>
         <source>red counter(s)</source>
         <translation><numerusform>红色指示物</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="653"/>
+        <location filename="src/message_log_widget.cpp" line="653"/>
         <source>yellow counter(s)</source>
         <translation><numerusform>黄色指示物</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="656"/>
+        <location filename="src/message_log_widget.cpp" line="656"/>
         <source>green counter(s)</source>
         <translation><numerusform>绿色指示物</numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="675"/>
+        <location filename="src/message_log_widget.cpp" line="675"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation>%1 将%2指示物设置为 %3 (%4%5)。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="687"/>
+        <location filename="src/message_log_widget.cpp" line="687"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation>%1 将 %2 设置为不会被通常重置。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="689"/>
+        <location filename="src/message_log_widget.cpp" line="689"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation>%1 将 %2 设置为可通常重置。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="708"/>
+        <location filename="src/message_log_widget.cpp" line="708"/>
         <source>%1 removes the PT of %2.</source>
         <translation>%1 移除%2力量/防御</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="713"/>
+        <location filename="src/message_log_widget.cpp" line="713"/>
         <source>%1 changes the PT of %2 from nothing to %4.</source>
         <translation>%1改变%2的力量/防御至%4</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="716"/>
+        <location filename="src/message_log_widget.cpp" line="716"/>
         <source>%1 changes the PT of %2 from %3 to %4.</source>
         <translation>%1将%2的力量/防御从%3改变至%4</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="724"/>
+        <location filename="src/message_log_widget.cpp" line="724"/>
         <source>%1 has locked their sideboard.</source>
         <translation>%1已锁定他的备牌。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="726"/>
+        <location filename="src/message_log_widget.cpp" line="726"/>
         <source>%1 has unlocked their sideboard.</source>
         <translation>%1 解除锁定他的备牌。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="744"/>
+        <location filename="src/message_log_widget.cpp" line="744"/>
         <source>%1 taps their permanents.</source>
         <translation>%1 横置了永久物。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="744"/>
+        <location filename="src/message_log_widget.cpp" line="744"/>
         <source>%1 untaps their permanents.</source>
         <translation>%1 重置了永久物。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="747"/>
+        <location filename="src/message_log_widget.cpp" line="747"/>
         <source>%1 taps %2.</source>
         <translation>%1 横置了 %2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="747"/>
+        <location filename="src/message_log_widget.cpp" line="747"/>
         <source>%1 untaps %2.</source>
         <translation>%1 重置了 %2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="763"/>
+        <location filename="src/message_log_widget.cpp" line="763"/>
         <source>%1 shuffles %2.</source>
         <translation>%1 切洗了%2。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="767"/>
+        <location filename="src/message_log_widget.cpp" line="767"/>
         <source>%1 shuffles the bottom %3 cards of %2.</source>
         <translation>%1 洗 %2 底的 %3 张卡</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="772"/>
+        <location filename="src/message_log_widget.cpp" line="772"/>
         <source>%1 shuffles the top %3 cards of %2.</source>
         <translation>%1 洗 %2 顶的 %3 张卡</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="777"/>
+        <location filename="src/message_log_widget.cpp" line="777"/>
         <source>%1 shuffles cards %3 - %4 of %2.</source>
         <translation>%1洗%3 - %4 到%2.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="796"/>
+        <location filename="src/message_log_widget.cpp" line="796"/>
         <source>%1 unattaches %2.</source>
         <translation>%1 取消了%2的结附。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="802"/>
+        <location filename="src/message_log_widget.cpp" line="802"/>
         <source>%1 undoes their last draw.</source>
         <translation>%1撤销了最后的抓牌。</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="805"/>
+        <location filename="src/message_log_widget.cpp" line="805"/>
         <source>%1 undoes their last draw (%2).</source>
         <translation>%1撤销了最后的抓牌(%2)。</translation>
     </message>
@@ -3982,57 +3982,57 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>PhasesToolbar</name>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="152"/>
+        <location filename="src/phases_toolbar.cpp" line="152"/>
         <source>Untap step</source>
         <translation>重置阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="154"/>
+        <location filename="src/phases_toolbar.cpp" line="154"/>
         <source>Upkeep step</source>
         <translation>维持阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="156"/>
+        <location filename="src/phases_toolbar.cpp" line="156"/>
         <source>Draw step</source>
         <translation>抓牌阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="158"/>
+        <location filename="src/phases_toolbar.cpp" line="158"/>
         <source>First main phase</source>
         <translation>主要阶段1</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="160"/>
+        <location filename="src/phases_toolbar.cpp" line="160"/>
         <source>Beginning of combat step</source>
         <translation>战斗开始阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="162"/>
+        <location filename="src/phases_toolbar.cpp" line="162"/>
         <source>Declare attackers step</source>
         <translation>宣告进攻阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="164"/>
+        <location filename="src/phases_toolbar.cpp" line="164"/>
         <source>Declare blockers step</source>
         <translation>宣告阻挡阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="166"/>
+        <location filename="src/phases_toolbar.cpp" line="166"/>
         <source>Combat damage step</source>
         <translation>战斗伤害阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="168"/>
+        <location filename="src/phases_toolbar.cpp" line="168"/>
         <source>End of combat step</source>
         <translation>战斗结束阶段</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="170"/>
+        <location filename="src/phases_toolbar.cpp" line="170"/>
         <source>Second main phase</source>
         <translation>主要阶段2</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="172"/>
+        <location filename="src/phases_toolbar.cpp" line="172"/>
         <source>End of turn step</source>
         <translation>结束阶段</translation>
     </message>
@@ -4040,7 +4040,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>PictureLoader</name>
     <message>
-        <location filename="src/pictureloader.cpp" line="357"/>
+        <location filename="src/picture_loader.cpp" line="357"/>
         <source>en</source>
         <comment>code for scryfall's language property, not available for all languages</comment>
         <translation>zhs</translation>
@@ -4702,7 +4702,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>Cockatrice鸡蛇卡牌数据库 (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/deck_loader.cpp" line="14"/>
+        <location filename="src/loader.cpp" line="14"/>
         <location filename="src/window_main.cpp" line="80"/>
         <source>All files (*.*)</source>
         <translation>全部文件 (*.*)</translation>
@@ -4713,7 +4713,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>鸡蛇录像文件 (*.cor)</translation>
     </message>
     <message>
-        <location filename="src/deck_loader.cpp" line="13"/>
+        <location filename="src/loader.cpp" line="13"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
         <translation>通用套牌格式(*.cod *.dec *.dek *.txt *.mwDeck)</translation>
     </message>
@@ -4829,17 +4829,17 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>RemoteDeckList_TreeModel</name>
     <message>
-        <location filename="src/remotedecklist_treewidget.cpp" line="170"/>
+        <location filename="src/decklist_tree_widget.cpp" line="170"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="src/remotedecklist_treewidget.cpp" line="172"/>
+        <location filename="src/decklist_tree_widget.cpp" line="172"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/remotedecklist_treewidget.cpp" line="174"/>
+        <location filename="src/decklist_tree_widget.cpp" line="174"/>
         <source>Upload time</source>
         <translation>上传时间</translation>
     </message>
@@ -4847,32 +4847,32 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>RemoteReplayList_TreeModel</name>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="151"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="151"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="153"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="153"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="155"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="155"/>
         <source>Players</source>
         <translation>玩家</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="157"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="157"/>
         <source>Keep</source>
         <translation>维持</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="159"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="159"/>
         <source>Time started</source>
         <translation>游戏时间</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="161"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="161"/>
         <source>Duration (sec)</source>
         <translation>持续(离开)</translation>
     </message>
@@ -4880,37 +4880,37 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>RoomSelector</name>
     <message>
-        <location filename="src/tab_server.cpp" line="55"/>
+        <location filename="src/server.cpp" line="55"/>
         <source>Rooms</source>
         <translation>房间</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="56"/>
+        <location filename="src/server.cpp" line="56"/>
         <source>Joi&amp;n</source>
         <translation>加入</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="59"/>
+        <location filename="src/server.cpp" line="59"/>
         <source>Room</source>
         <translation>房间</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="60"/>
+        <location filename="src/server.cpp" line="60"/>
         <source>Description</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="61"/>
+        <location filename="src/server.cpp" line="61"/>
         <source>Permissions</source>
         <translation>许可证</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="62"/>
+        <location filename="src/server.cpp" line="62"/>
         <source>Players</source>
         <translation>玩家</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="63"/>
+        <location filename="src/server.cpp" line="63"/>
         <source>Games</source>
         <translation>游戏</translation>
     </message>
@@ -5178,7 +5178,7 @@ Please check your shortcut settings!</source>
 <context>
     <name>TabAdmin</name>
     <message>
-        <location filename="src/tab_admin.h" line="53"/>
+        <location filename="src/admin.h" line="53"/>
         <source>Administration</source>
         <translation>管理员</translation>
     </message>
@@ -5472,7 +5472,7 @@ Please check that the directory is writable and try again.</source>
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="src/tab_deck_storage.h" line="57"/>
+        <location filename="src/deck_storage.h" line="57"/>
         <source>Deck storage</source>
         <translation>套牌仓库</translation>
     </message>
@@ -5948,37 +5948,37 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabMessage</name>
     <message>
-        <location filename="src/tab_message.cpp" line="69"/>
+        <location filename="src/message.cpp" line="69"/>
         <source>Private &amp;chat</source>
         <translation>私人聊天</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="70"/>
+        <location filename="src/message.cpp" line="70"/>
         <source>&amp;Leave</source>
         <translation>离开</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="86"/>
+        <location filename="src/message.cpp" line="86"/>
         <source>%1 - Private chat</source>
         <translation>%1 - 私人聊天</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="113"/>
+        <location filename="src/message.cpp" line="113"/>
         <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
         <translation>该用户已屏蔽你，他无法在主聊天中看见你的消息，你也不能加入他的游戏。</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="151"/>
+        <location filename="src/message.cpp" line="151"/>
         <source>Private message from</source>
         <translation>私人信息来自</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="168"/>
+        <location filename="src/message.cpp" line="168"/>
         <source>%1 has left the server.</source>
         <translation>%1 已经离开了服务器.</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="174"/>
+        <location filename="src/message.cpp" line="174"/>
         <source>%1 has joined the server.</source>
         <translation>%1 已经加入了服务器.</translation>
     </message>
@@ -5986,69 +5986,69 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="src/tab_replays.h" line="55"/>
+        <location filename="src/replays.h" line="55"/>
         <source>Game replays</source>
         <translation>游戏录像</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="116"/>
+        <location filename="src/replays.cpp" line="116"/>
         <source>Local file system</source>
         <translation>本地文件系统</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="117"/>
+        <location filename="src/replays.cpp" line="117"/>
         <source>Server replay storage</source>
         <translation>服务器录像仓库</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="119"/>
-        <location filename="src/tab_replays.cpp" line="121"/>
+        <location filename="src/replays.cpp" line="119"/>
+        <location filename="src/replays.cpp" line="121"/>
         <source>Watch replay</source>
         <translation>观看录像</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="120"/>
-        <location filename="src/tab_replays.cpp" line="124"/>
+        <location filename="src/replays.cpp" line="120"/>
+        <location filename="src/replays.cpp" line="124"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="122"/>
+        <location filename="src/replays.cpp" line="122"/>
         <source>Download replay</source>
         <translation>下载游戏录像</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="123"/>
+        <location filename="src/replays.cpp" line="123"/>
         <source>Toggle expiration lock</source>
         <translation>过期锁定</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="149"/>
+        <location filename="src/replays.cpp" line="149"/>
         <source>Delete local file</source>
         <translation>删除本地文件</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="150"/>
+        <location filename="src/replays.cpp" line="150"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>你确定想要删除&quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="199"/>
+        <location filename="src/replays.cpp" line="199"/>
         <source>Downloading Replays</source>
         <translation>正在下载游戏录像</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="200"/>
+        <location filename="src/replays.cpp" line="200"/>
         <source>Folder download is not yet supported. Please download replays individually.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="268"/>
+        <location filename="src/replays.cpp" line="268"/>
         <source>Delete remote replay</source>
         <translation>删除服务器上的录像</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="269"/>
+        <location filename="src/replays.cpp" line="269"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation>你确定要删除这这个游戏的录像吗 %1?</translation>
     </message>
@@ -6056,47 +6056,47 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="src/tab_room.cpp" line="148"/>
+        <location filename="src/room.cpp" line="148"/>
         <source>&amp;Say:</source>
         <translation>说:</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="149"/>
+        <location filename="src/room.cpp" line="149"/>
         <source>Chat</source>
         <translation>聊天</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="150"/>
+        <location filename="src/room.cpp" line="150"/>
         <source>&amp;Room</source>
         <translation>房间</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="151"/>
+        <location filename="src/room.cpp" line="151"/>
         <source>&amp;Leave room</source>
         <translation>离开房间</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="152"/>
+        <location filename="src/room.cpp" line="152"/>
         <source>&amp;Clear chat</source>
         <translation>清除聊天记录</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="153"/>
+        <location filename="src/room.cpp" line="153"/>
         <source>Chat Settings...</source>
         <translation>聊天设置</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="165"/>
+        <location filename="src/room.cpp" line="165"/>
         <source> mentioned you.</source>
         <translation>提到了你。</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="173"/>
+        <location filename="src/room.cpp" line="173"/>
         <source>Click to view</source>
         <translation>点击查看</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="216"/>
+        <location filename="src/room.cpp" line="216"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>你正在灌水，请等待几秒再发言.</translation>
     </message>
@@ -6109,30 +6109,30 @@ The more information you put in, the more specific your results will be.</source
         <translation>服务器</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="209"/>
-        <location filename="src/tab_server.cpp" line="214"/>
-        <location filename="src/tab_server.cpp" line="219"/>
-        <location filename="src/tab_server.cpp" line="224"/>
+        <location filename="src/server.cpp" line="209"/>
+        <location filename="src/server.cpp" line="214"/>
+        <location filename="src/server.cpp" line="219"/>
+        <location filename="src/server.cpp" line="224"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="210"/>
+        <location filename="src/server.cpp" line="210"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="215"/>
+        <location filename="src/server.cpp" line="215"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="220"/>
+        <location filename="src/server.cpp" line="220"/>
         <source>You do not have the required permission to join this server room.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="225"/>
+        <location filename="src/server.cpp" line="225"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
         <translation type="unfinished"/>
     </message>
@@ -6140,32 +6140,32 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabSupervisor</name>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="174"/>
+        <location filename="src/supervisor.cpp" line="174"/>
         <source>Are you sure?</source>
         <translation>你确定吗?</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="175"/>
+        <location filename="src/supervisor.cpp" line="175"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>游戏还在继续, 你确定要退出吗?</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="577"/>
+        <location filename="src/supervisor.cpp" line="577"/>
         <source>Click to view</source>
         <translation>点击查看</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="605"/>
+        <location filename="src/supervisor.cpp" line="605"/>
         <source>Your buddy %1 has signed on!</source>
         <translation>你的好友%1已登录!</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="646"/>
+        <location filename="src/supervisor.cpp" line="646"/>
         <source>Unknown Event</source>
         <translation>未知事件</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="647"/>
+        <location filename="src/supervisor.cpp" line="647"/>
         <source>The server has sent you a message that your client does not understand.
 This message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
@@ -6176,39 +6176,39 @@ To update your client, go to Help -&gt; Check for Updates.</source>
 要升级你的客户端，请点击“帮助”-&gt;“检查更新”</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="652"/>
+        <location filename="src/supervisor.cpp" line="652"/>
         <source>Idle Timeout</source>
         <translation>闲置超时</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="652"/>
+        <location filename="src/supervisor.cpp" line="652"/>
         <source>You are about to be logged out due to inactivity.</source>
         <translation>你即将因为长时间未操作而被退出。</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="656"/>
+        <location filename="src/supervisor.cpp" line="656"/>
         <source>Promotion</source>
         <translation>晋升</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="657"/>
+        <location filename="src/supervisor.cpp" line="657"/>
         <source>You have been promoted. Please log out and back in for changes to take effect.</source>
         <translation>您已被提升为版主。请退出再登陆以使修改生效。</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="661"/>
+        <location filename="src/supervisor.cpp" line="661"/>
         <source>Warned</source>
         <translation>被警告</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="662"/>
+        <location filename="src/supervisor.cpp" line="662"/>
         <source>You have received a warning due to %1.
 Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</source>
         <translation>你因为%1被警告。
 请杜绝此类行为否则会被采取进一步行动。如果有任何疑问，请私信版主。</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="676"/>
+        <location filename="src/supervisor.cpp" line="676"/>
         <source>You have received the following message from the server.
 (custom messages like these could be untranslated)</source>
         <translation>你收到来自服务器的如下消息。
@@ -6218,7 +6218,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>TabUserLists</name>
     <message>
-        <location filename="src/tab_account.h" line="56"/>
+        <location filename="src/account.h" line="56"/>
         <source>Account</source>
         <translation>账户</translation>
     </message>
@@ -6236,13 +6236,13 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>TappedOutInterface</name>
     <message>
-        <location filename="src/tappedout_interface.cpp" line="23"/>
-        <location filename="src/tappedout_interface.cpp" line="63"/>
+        <location filename="src/tapped_out_interface.cpp" line="23"/>
+        <location filename="src/tapped_out_interface.cpp" line="63"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="src/tappedout_interface.cpp" line="44"/>
+        <location filename="src/tapped_out_interface.cpp" line="44"/>
         <source>Unable to analyze the deck.</source>
         <translation>无法分析套牌。</translation>
     </message>
@@ -6318,173 +6318,173 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserContextMenu</name>
     <message>
-        <location filename="src/user_context_menu.cpp" line="56"/>
+        <location filename="src/context_menu.cpp" line="56"/>
         <source>User &amp;details</source>
         <translation>用户详细信息</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="57"/>
+        <location filename="src/context_menu.cpp" line="57"/>
         <source>Private &amp;chat</source>
         <translation>私人聊天</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="58"/>
+        <location filename="src/context_menu.cpp" line="58"/>
         <source>Show this user&apos;s &amp;games</source>
         <translation>显示这个用户的游戏</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="59"/>
+        <location filename="src/context_menu.cpp" line="59"/>
         <source>Add to &amp;buddy list</source>
         <translation>加入到好友列表</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="60"/>
+        <location filename="src/context_menu.cpp" line="60"/>
         <source>Remove from &amp;buddy list</source>
         <translation>从好友列表移除</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="61"/>
+        <location filename="src/context_menu.cpp" line="61"/>
         <source>Add to &amp;ignore list</source>
         <translation>加入到屏蔽列表</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="62"/>
+        <location filename="src/context_menu.cpp" line="62"/>
         <source>Remove from &amp;ignore list</source>
         <translation>从屏蔽列表移除</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="63"/>
+        <location filename="src/context_menu.cpp" line="63"/>
         <source>Kick from &amp;game</source>
         <translation>从游戏中踢出</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="64"/>
+        <location filename="src/context_menu.cpp" line="64"/>
         <source>Warn user</source>
         <translation>警告用户</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="65"/>
+        <location filename="src/context_menu.cpp" line="65"/>
         <source>View user&apos;s war&amp;n history</source>
         <translation>查看用户警告记录</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="66"/>
+        <location filename="src/context_menu.cpp" line="66"/>
         <source>Ban from &amp;server</source>
         <translation>在服务器中禁止</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="67"/>
+        <location filename="src/context_menu.cpp" line="67"/>
         <source>View user&apos;s &amp;ban history</source>
         <translation>查看用户禁止记录</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="68"/>
+        <location filename="src/context_menu.cpp" line="68"/>
         <source>&amp;Promote user to moderator</source>
         <translation>将用户提升为版主</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="69"/>
+        <location filename="src/context_menu.cpp" line="69"/>
         <source>Dem&amp;ote user from moderator</source>
         <translation>撤销用户版主职位</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="70"/>
+        <location filename="src/context_menu.cpp" line="70"/>
         <source>Promote user to &amp;judge</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="71"/>
+        <location filename="src/context_menu.cpp" line="71"/>
         <source>Demote user from judge</source>
         <translation>撤销用户的裁判身份</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="101"/>
+        <location filename="src/context_menu.cpp" line="101"/>
         <source>%1&apos;s games</source>
         <translation>%1的游戏</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="157"/>
-        <location filename="src/user_context_menu.cpp" line="180"/>
-        <location filename="src/user_context_menu.cpp" line="184"/>
+        <location filename="src/context_menu.cpp" line="157"/>
+        <location filename="src/context_menu.cpp" line="180"/>
+        <location filename="src/context_menu.cpp" line="184"/>
         <source>Ban History</source>
         <translation>禁止历史</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="163"/>
+        <location filename="src/context_menu.cpp" line="163"/>
         <source>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</source>
         <translation>禁止时间；版主；禁止时长；禁止理由；可见理由</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="181"/>
+        <location filename="src/context_menu.cpp" line="181"/>
         <source>User has never been banned.</source>
         <translation>用户从未被禁止</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="185"/>
+        <location filename="src/context_menu.cpp" line="185"/>
         <source>Failed to collect ban information.</source>
         <translation>获取禁止信息失败。</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="195"/>
-        <location filename="src/user_context_menu.cpp" line="216"/>
-        <location filename="src/user_context_menu.cpp" line="220"/>
+        <location filename="src/context_menu.cpp" line="195"/>
+        <location filename="src/context_menu.cpp" line="216"/>
+        <location filename="src/context_menu.cpp" line="220"/>
         <source>Warning History</source>
         <translation>警告历史</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="200"/>
+        <location filename="src/context_menu.cpp" line="200"/>
         <source>Warning Time;Moderator;User Name;Reason</source>
         <translation>警告时间；版主；用户名；理由</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="217"/>
+        <location filename="src/context_menu.cpp" line="217"/>
         <source>User has never been warned.</source>
         <translation>用户从未被警告</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="221"/>
+        <location filename="src/context_menu.cpp" line="221"/>
         <source>Failed to collect warning information.</source>
         <translation>获取警告信息失败。</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="231"/>
-        <location filename="src/user_context_menu.cpp" line="234"/>
+        <location filename="src/context_menu.cpp" line="231"/>
+        <location filename="src/context_menu.cpp" line="234"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="232"/>
+        <location filename="src/context_menu.cpp" line="232"/>
         <source>Successfully promoted user.</source>
         <translation>提升用户成功。</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="234"/>
+        <location filename="src/context_menu.cpp" line="234"/>
         <source>Successfully demoted user.</source>
         <translation>撤销用户成功。</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="239"/>
-        <location filename="src/user_context_menu.cpp" line="241"/>
+        <location filename="src/context_menu.cpp" line="239"/>
+        <location filename="src/context_menu.cpp" line="241"/>
         <source>Failed</source>
         <translation>失败</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="239"/>
+        <location filename="src/context_menu.cpp" line="239"/>
         <source>Failed to promote user.</source>
         <translation>提升用户失败。</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="241"/>
+        <location filename="src/context_menu.cpp" line="241"/>
         <source>Failed to demote user.</source>
         <translation>撤销用户失败。</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="316"/>
+        <location filename="src/context_menu.cpp" line="316"/>
         <source>Copy hash to clipboard</source>
         <translation>复制哈希到剪切板</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="336"/>
+        <location filename="src/context_menu.cpp" line="336"/>
         <source>Remove this user&apos;s messages</source>
         <translation>除这个用户打的信</translation>
     </message>
@@ -6920,22 +6920,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="140"/>
+        <location filename="src/view_widget.cpp" line="140"/>
         <source>sort by name</source>
         <translation>按名称排序</translation>
     </message>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="141"/>
+        <location filename="src/view_widget.cpp" line="141"/>
         <source>sort by type</source>
         <translation>按类型排序</translation>
     </message>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="142"/>
+        <location filename="src/view_widget.cpp" line="142"/>
         <source>shuffle when closing</source>
         <translation>当关闭界面时洗牌</translation>
     </message>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="143"/>
+        <location filename="src/view_widget.cpp" line="143"/>
         <source>pile view</source>
         <translation>柱形图</translation>
     </message>
@@ -6943,7 +6943,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>i18n</name>
     <message>
-        <location filename="src/settingscache.cpp" line="170"/>
+        <location filename="src/cache.cpp" line="170"/>
         <source>English</source>
         <translation>简体中文 (Chinese Simplified)</translation>
     </message>

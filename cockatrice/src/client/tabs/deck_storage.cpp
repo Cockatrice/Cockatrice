@@ -1,7 +1,7 @@
-#include "tab_deck_storage.h"
+#include "deck_storage.h"
 
-#include "abstractclient.h"
-#include "deck_loader.h"
+#include "../abstract_client.h"
+#include "../../deck/loader.h"
 #include "decklist.h"
 #include "gettextwithmax.h"
 #include "pb/command_deck_del.pb.h"
@@ -12,9 +12,9 @@
 #include "pb/response.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
-#include "pending_command.h"
-#include "remotedecklist_treewidget.h"
-#include "settingscache.h"
+#include "../../server/pending_command.h"
+#include "../../server/remote/decklist_tree_widget.h"
+#include "../../settings/cache.h"
 
 #include <QAction>
 #include <QApplication>

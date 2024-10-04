@@ -1,11 +1,11 @@
-#include "tab_logs.h"
+#include "logs.h"
 
-#include "abstractclient.h"
-#include "customlineedit.h"
-#include "dlg_manage_sets.h"
+#include "../abstract_client.h"
+#include "../../deck/custom_line_edit.h"
+#include "../../dialogs/manage_sets.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
-#include "pending_command.h"
+#include "../../server/pending_command.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

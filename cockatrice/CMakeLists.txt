@@ -5,34 +5,34 @@
 project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 set(cockatrice_SOURCES
-    src/abstract/abstractcarddragitem.cpp
-    src/abstract/abstractcarditem.cpp
-    src/abstract/abstractclient.cpp
+    src/game/cards/abstractcarddragitem.cpp
+    src/game/cards/abstractcarditem.cpp
+    src/client/abstract_client.cpp
     src/abstract/abstractcounter.cpp
     src/abstract/abstractgraphicsitem.cpp
-    src/game/board/arrowitem.cpp
-    src/game/board/arrowtarget.cpp
-    src/game/cards/carddatabase.cpp
-    src/game/cards/carddatabasemodel.cpp
-    src/carddbparser/carddatabaseparser.cpp
-    src/carddbparser/cockatricexml3.cpp
-    src/carddbparser/cockatricexml4.cpp
+        src/game/board/arrow_item.cpp
+        src/game/board/arrow_target.cpp
+        src/game/cards/database.cpp
+        src/game/cards/database_model.cpp
+        src/carddbparser/card_database_parser.cpp
+        src/carddbparser/cockatrice_xml3.cpp
+        src/carddbparser/cockatrice_xml4.cpp
     src/game/cards/carddragitem.cpp
-    src/game/filter/cardfilter.cpp
-    src/game/cards/cardframe.cpp
+        src/game/filter/card.cpp
+        src/game/cards/frame.cpp
     src/game/cards/cardinfopicture.cpp
     src/game/cards/cardinfotext.cpp
-    src/game/cards/cardinfowidget.cpp
-    src/game/cards/carditem.cpp
+        src/game/cards/info_widget.cpp
+        src/game/cards/item.cpp
     src/game/cards/cardlist.cpp
     src/game/zones/cardzone.cpp
-    src/chatview/chatview.cpp
+        src/chatview/chat_view.cpp
     src/game/board/counter_general.cpp
-    src/customlineedit.cpp
-    src/deck/deck_loader.cpp
-    src/deck/decklistmodel.cpp
-    src/deck/deckstats_interface.cpp
-    src/deck/deckview.cpp
+        src/deck/custom_line_edit.cpp
+        src/deck/loader.cpp
+        src/deck/list_model.cpp
+        src/deck/stats_interface.cpp
+        src/deck/view.cpp
         src/dialogs/connect.cpp
         src/dialogs/create_token.cpp
         src/dialogs/create_game.cpp
@@ -53,16 +53,16 @@ set(cockatrice_SOURCES
         src/dialogs/dlg_tip_of_the_day.cpp
         src/dialogs/update.cpp
         src/dialogs/view_log.cpp
-        src/game/filter/filter_string.cpp
-        src/game/filter/filterbuilder.cpp
-        src/game/filter/filtertree.cpp
-        src/game/filter/filtertreemodel.cpp
-    src/game/gamescene.cpp
-    src/game/gameselector.cpp
-    src/game/gamesmodel.cpp
-    src/game/gameview.cpp
+        src/game/filter/string.cpp
+        src/game/filter/builder.cpp
+        src/game/filter/tree.cpp
+        src/game/filter/tree_model.cpp
+        src/game/scene.cpp
+        src/game/selector.cpp
+        src/game/model.cpp
+    src/game/view.cpp
     src/gettextwithmax.cpp
-    src/game/handcounter.cpp
+        src/game/hand_counter.cpp
     src/server/handle_public_servers.cpp
     src/game/zones/handzone.cpp
     src/keysignals.cpp
@@ -72,20 +72,20 @@ set(cockatrice_SOURCES
     src/server/localserverinterface.cpp
     src/logger.cpp
     src/main.cpp
-    src/server/messagelogwidget.cpp
+        src/server/message_log_widget.cpp
     src/server/pending_command.cpp
     src/game/phase.cpp
-    src/phasestoolbar.cpp
-    src/client/pictureloader.cpp
+        src/phases_toolbar.cpp
+        src/client/picture_loader.cpp
     src/game/zones/pilezone.cpp
     src/pixmapgenerator.cpp
     src/player/player.cpp
-    src/player/playerlistwidget.cpp
-    src/player/playertarget.cpp
+        src/player/list_widget.cpp
+        src/player/target.cpp
     src/releasechannel.cpp
-    src/server/remote/remoteclient.cpp
-    src/server/remote/remotedecklist_treewidget.cpp
-    src/server/remote/remotereplaylist_treewidget.cpp
+        src/server/remote/client.cpp
+        src/server/remote/decklist_tree_widget.cpp
+        src/server/remote/replay_list_tree_widget.cpp
         src/replaytimelinewidget.cpp
     src/game/zones/selectzone.cpp
     src/sequenceEdit/sequenceedit.cpp
@@ -97,36 +97,36 @@ set(cockatrice_SOURCES
     src/settings/messagesettings.cpp
     src/settings/serverssettings.cpp
     src/settings/settingsmanager.cpp
-    src/settings/settingscache.cpp
+        src/settings/cache.cpp
     src/settings/shortcutssettings.cpp
     src/client/soundengine.cpp
     src/client/spoilerbackgroundupdater.cpp
     src/game/zones/stackzone.cpp
     src/client/tabs/tab.cpp
-    src/client/tabs/tab_account.cpp
-    src/client/tabs/tab_admin.cpp
-    src/client/tabs/tab_deck_editor.cpp
-    src/client/tabs/tab_deck_storage.cpp
-    src/client/tabs/tab_game.cpp
-    src/client/tabs/tab_logs.cpp
-    src/client/tabs/tab_message.cpp
-    src/client/tabs/tab_replays.cpp
-    src/client/tabs/tab_room.cpp
-    src/client/tabs/tab_server.cpp
-    src/client/tabs/tab_supervisor.cpp
+        src/client/tabs/account.cpp
+        src/client/tabs/admin.cpp
+        src/client/tabs/deck_editor.cpp
+        src/client/tabs/deck_storage.cpp
+        src/client/tabs/game.cpp
+        src/client/tabs/logs.cpp
+    src/client/tabs/message.cpp
+        src/client/tabs/replays.cpp
+        src/client/tabs/room.cpp
+        src/client/tabs/server.cpp
+        src/client/tabs/supervisor.cpp
     src/game/zones/tablezone.cpp
-    src/client/tappedout_interface.cpp
-    src/client/thememanager.cpp
+        src/client/tapped_out_interface.cpp
+    src/client/theme_manager.cpp
     src/client/tip_of_the_day.cpp
     src/translatecountername.cpp
     src/update_downloader.cpp
-    src/server/user/user_context_menu.cpp
-    src/server/user/userconnection_information.cpp
-    src/server/user/userinfobox.cpp
-    src/server/user/userlist.cpp
+        src/server/user/context_menu.cpp
+        src/server/user/connection_information.cpp
+        src/server/user/info_box.cpp
+        src/server/user/list.cpp
     src/client/window_main.cpp
-    src/game/zones/zoneviewwidget.cpp
-    src/game/zones/zoneviewzone.cpp
+        src/game/zones/view_widget.cpp
+        src/game/zones/view.cpp
     ${VERSION_STRING_CPP}
 )
 

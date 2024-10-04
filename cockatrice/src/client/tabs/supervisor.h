@@ -1,8 +1,8 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "chatview/userlistProxy.h"
-#include "deck_loader.h"
+#include "../../chatview/user_list_proxy.h"
+#include "../../deck/loader.h"
 
 #include <QAbstractButton>
 #include <QCommonStyle>
