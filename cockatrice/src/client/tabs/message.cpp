@@ -1,15 +1,15 @@
-#include "tab_message.h"
+#include "message.h"
 
-#include "abstractclient.h"
-#include "chatview/chatview.h"
-#include "customlineedit.h"
-#include "main.h"
+#include "../abstract_client.h"
+#include "../../chatview/chat_view.h"
+#include "../../deck/custom_line_edit.h"
+#include "../../main.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/session_commands.pb.h"
-#include "pending_command.h"
-#include "settingscache.h"
-#include "soundengine.h"
+#include "../../server/pending_command.h"
+#include "../../settings/cache.h"
+#include "../soundengine.h"
 #include "trice_limits.h"
 
 #include <QApplication>

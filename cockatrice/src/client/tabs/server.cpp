@@ -1,13 +1,13 @@
-#include "tab_server.h"
+#include "server.h"
 
-#include "abstractclient.h"
+#include "../../client/abstract_client.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/response_join_room.pb.h"
 #include "pb/session_commands.pb.h"
-#include "pending_command.h"
-#include "tab_supervisor.h"
-#include "userlist.h"
+#include "../../server/pending_command.h"
+#include "supervisor.h"
+#include "../../server/user/list.h"
 
 #include <QCheckBox>
 #include <QDebug>

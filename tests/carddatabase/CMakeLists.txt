@@ -5,19 +5,19 @@ set(TEST_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Concurrent ${COCKATRICE_QT_VE
 )
 
 if(Qt6_FOUND)
-  qt6_wrap_cpp(MOCKS_SOURCES ../../cockatrice/src/settings/settingscache.h ../../cockatrice/src/settings/carddatabasesettings.h)
+  qt6_wrap_cpp(MOCKS_SOURCES ../../cockatrice/src/settings/cache.h ../../cockatrice/src/settings/carddatabasesettings.h)
 elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOCKS_SOURCES ../../cockatrice/src/settings/settingscache.h ../../cockatrice/src/settings/carddatabasesettings.h)
+  qt5_wrap_cpp(MOCKS_SOURCES ../../cockatrice/src/settings/cache.h ../../cockatrice/src/settings/carddatabasesettings.h)
 endif()
 
 add_executable(
   carddatabase_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-        ../../cockatrice/src/game/cards/carddatabase.cpp
-  ../../cockatrice/src/carddbparser/carddatabaseparser.cpp
-  ../../cockatrice/src/carddbparser/cockatricexml3.cpp
-  ../../cockatrice/src/carddbparser/cockatricexml4.cpp
+        ../../cockatrice/src/game/cards/database.cpp
+        ../../cockatrice/src/carddbparser/card_database_parser.cpp
+        ../../cockatrice/src/carddbparser/cockatrice_xml3.cpp
+        ../../cockatrice/src/carddbparser/cockatrice_xml4.cpp
   ../../cockatrice/src/settings/settingsmanager.cpp
   carddatabase_test.cpp
   mocks.cpp
@@ -26,13 +26,13 @@ add_executable(
   filter_string_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-        ../../cockatrice/src/game/cards/carddatabase.cpp
-  ../../cockatrice/src/carddbparser/carddatabaseparser.cpp
-  ../../cockatrice/src/carddbparser/cockatricexml3.cpp
-  ../../cockatrice/src/carddbparser/cockatricexml4.cpp
-        ../../cockatrice/src/game/filter/cardfilter.cpp
-        ../../cockatrice/src/game/filter/filter_string.cpp
-        ../../cockatrice/src/game/filter/filtertree.cpp
+        ../../cockatrice/src/game/cards/database.cpp
+        ../../cockatrice/src/carddbparser/card_database_parser.cpp
+        ../../cockatrice/src/carddbparser/cockatrice_xml3.cpp
+        ../../cockatrice/src/carddbparser/cockatrice_xml4.cpp
+        ../../cockatrice/src/game/filter/card.cpp
+        ../../cockatrice/src/game/filter/string.cpp
+        ../../cockatrice/src/game/filter/tree.cpp
   ../../cockatrice/src/settings/settingsmanager.cpp
   filter_string_test.cpp
   mocks.cpp

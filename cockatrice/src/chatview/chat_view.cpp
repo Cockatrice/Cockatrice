@@ -1,10 +1,10 @@
-#include "chatview.h"
+#include "chat_view.h"
 
 #include "../pixmapgenerator.h"
-#include "../settingscache.h"
-#include "../soundengine.h"
-#include "../tab_account.h"
-#include "../user_context_menu.h"
+#include "../settings/settingscache.h"
+#include "../client/soundengine.h"
+#include "../client/tabs/tab_account.h"
+#include "../server/user/user_context_menu.h"
 #include "user_level.h"
 
 #include <QApplication>

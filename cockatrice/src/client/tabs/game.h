@@ -4,7 +4,7 @@
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
-#include "tearoffmenu.h"
+#include "../../client/tearoff_menu.h"
 
 #include <QCompleter>
 #include <QMap>
