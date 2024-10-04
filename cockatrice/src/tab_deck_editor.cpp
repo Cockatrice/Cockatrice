@@ -465,11 +465,12 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     const CardInfoPtr info = currentCardInfo();
 
     // add to deck and sideboard options
-    QAction *addToDeck, *addToSideboard;
-    addToDeck = menu.addAction(tr("Add to Deck"));
-    addToSideboard = menu.addAction(tr("Add to Sideboard"));
+    QAction *addToDeck = menu.addAction(tr("Add to Deck"));
+    QAction *addToSideboard = menu.addAction(tr("Add to Sideboard"));
+    QAction *setCustomImage = menu.addAction(tr("Set custom image"));
     connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
     connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
+    connect(setCustomImage, SIGNAL(triggered()), this, SLOT(actSetCustomImage()));
 
     // filling out the related cards submenu
     auto *relatedMenu = new QMenu(tr("Show Related cards"));
@@ -1005,6 +1006,20 @@ void TabDeckEditor::actSwapCard()
 
     setModified(true);
     setSaveStatus(true);
+}
+
+void TabDeckEditor::actSetCustomImage()
+{
+    const CardInfoPtr info = currentCardInfo();
+    if (info == nullptr) {
+        return;
+    }
+
+    QString location = QFileDialog::getOpenFileName(this, tr("Select image"), "", "Images (*.png *.jpg)");
+    if (location.isNull()) {
+        return;
+    }
+    PictureLoader::setCustomImage(info, location);
 }
 
 void TabDeckEditor::actAddCard()

@@ -184,12 +184,9 @@ void PictureLoaderWorker::processLoadQueue()
     }
 }
 
-bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &correctedCardname)
+QList<QString> findCustomPics(QString &customPicsPath, QString &correctedCardname)
 {
-    QImage image;
-    QImageReader imgReader;
-    imgReader.setDecideFormatFromContent(true);
-    QList<QString> picsPaths = QList<QString>();
+    QList<QString> picsPaths{};
     QDirIterator it(customPicsPath, QDirIterator::Subdirectories);
 
     // Recursively check all subdirectories of the CUSTOM folder
@@ -203,6 +200,15 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
             picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
         }
     }
+    return picsPaths;
+}
+
+bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &correctedCardname)
+{
+    QImage image;
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+    QList<QString> picsPaths = findCustomPics(customPicsPath, correctedCardname);
 
     if (!setName.isEmpty()) {
         picsPaths << picsPath + "/" + setName + "/" + correctedCardname
@@ -648,6 +654,50 @@ void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
     }
 
     card->emitPixmapUpdated();
+}
+
+void PictureLoader::setCustomImage(CardInfoPtr card, const QString &location)
+{
+    if (card == nullptr) {
+        return;
+    }
+    QString correctedCardname = card->getCorrectedName();
+    QImage image;
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+
+    imgReader.setFileName(location);
+    auto format = imgReader.format();
+    if (!imgReader.read(&image)) {
+        qDebug().nospace() << "PictureLoader: [card: " << correctedCardname
+                           << "]: Setting custom image failed because the image at " << location << " can't be read.";
+        return;
+    }
+
+    QString customPicsPath = SettingsCache::instance().getCustomPicsPath();
+    auto paths = findCustomPics(customPicsPath, correctedCardname);
+    QString newPath;
+    if (!paths.isEmpty()) {
+        newPath = paths[0];
+        for (auto &path : paths) {
+            QFile file(path);
+            file.remove();
+        }
+    } else {
+        QString newPathDir = customPicsPath + "/" + correctedCardname[0].toLower();
+        newPath = newPathDir + "/" + correctedCardname + "." + format;
+        QDir().mkdir(newPathDir);
+    }
+
+    if (QFile::copy(location, newPath)) {
+        qDebug().nospace() << "PictureLoader: [card: " << correctedCardname << "]: Installed custom image to "
+                           << newPath << ".";
+        getInstance().imageLoaded(card, image);
+    } else {
+        qDebug().nospace() << "PictureLoader: [card: " << correctedCardname
+                           << "]: Setting custom image failed because the file at " << location
+                           << " couldn't be copied to " << newPath << ".";
+    }
 }
 
 void PictureLoader::clearPixmapCache(CardInfoPtr card)
