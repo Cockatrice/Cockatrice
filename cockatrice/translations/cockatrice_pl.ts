@@ -3871,52 +3871,52 @@ Cockatrice ponownie załaduje teraz bazę danych.</translation>
 <context>
     <name>Mtg</name>
     <message>
-        <location filename="src/game_specific_terms.h" line="29"/>
+        <location filename="src/gamespecificterms.h" line="29"/>
         <source>Card Type</source>
         <translation>Typ Karty</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="31"/>
+        <location filename="src/gamespecificterms.h" line="31"/>
         <source>Mana Value</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="33"/>
+        <location filename="src/gamespecificterms.h" line="33"/>
         <source>Color(s)</source>
         <translation>Kolor(y)</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="35"/>
+        <location filename="src/gamespecificterms.h" line="35"/>
         <source>Loyalty</source>
         <translation>Lojalność</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="37"/>
+        <location filename="src/gamespecificterms.h" line="37"/>
         <source>Main Card Type</source>
         <translation>Główny Typ Karty</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="39"/>
+        <location filename="src/gamespecificterms.h" line="39"/>
         <source>Mana Cost</source>
         <translation>Koszt Many</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="41"/>
+        <location filename="src/gamespecificterms.h" line="41"/>
         <source>P/T</source>
         <translation>S/W</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="43"/>
+        <location filename="src/gamespecificterms.h" line="43"/>
         <source>Side</source>
         <translation>Strona</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="45"/>
+        <location filename="src/gamespecificterms.h" line="45"/>
         <source>Layout</source>
         <translation>Ułożenie</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="47"/>
+        <location filename="src/gamespecificterms.h" line="47"/>
         <source>Color Identity</source>
         <translation>Tożsamość Koloru</translation>
     </message>

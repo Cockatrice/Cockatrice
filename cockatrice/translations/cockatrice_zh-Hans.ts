@@ -3866,52 +3866,52 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>Mtg</name>
     <message>
-        <location filename="src/game_specific_terms.h" line="29"/>
+        <location filename="src/gamespecificterms.h" line="29"/>
         <source>Card Type</source>
         <translation>牌类型</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="31"/>
+        <location filename="src/gamespecificterms.h" line="31"/>
         <source>Mana Value</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="33"/>
+        <location filename="src/gamespecificterms.h" line="33"/>
         <source>Color(s)</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="35"/>
+        <location filename="src/gamespecificterms.h" line="35"/>
         <source>Loyalty</source>
         <translation>忠诚</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="37"/>
+        <location filename="src/gamespecificterms.h" line="37"/>
         <source>Main Card Type</source>
         <translation>牌的主类型</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="39"/>
+        <location filename="src/gamespecificterms.h" line="39"/>
         <source>Mana Cost</source>
         <translation>法术力费用</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="41"/>
+        <location filename="src/gamespecificterms.h" line="41"/>
         <source>P/T</source>
         <translation>力量/防御力</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="43"/>
+        <location filename="src/gamespecificterms.h" line="43"/>
         <source>Side</source>
         <translation>旁边</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="45"/>
+        <location filename="src/gamespecificterms.h" line="45"/>
         <source>Layout</source>
         <translation>布局</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="47"/>
+        <location filename="src/gamespecificterms.h" line="47"/>
         <source>Color Identity</source>
         <translation>标识色</translation>
     </message>

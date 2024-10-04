@@ -86,7 +86,7 @@ set(cockatrice_SOURCES
     src/server/remote/remoteclient.cpp
     src/server/remote/remotedecklist_treewidget.cpp
     src/server/remote/remotereplaylist_treewidget.cpp
-    src/replay_timeline_widget.cpp
+        src/replaytimelinewidget.cpp
     src/game/zones/selectzone.cpp
     src/sequenceEdit/sequenceedit.cpp
     src/setsmodel.cpp

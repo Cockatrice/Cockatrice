@@ -3879,52 +3879,52 @@ Cockatrice zal nu de kaartendatabase herladen.</translation>
 <context>
     <name>Mtg</name>
     <message>
-        <location filename="src/game_specific_terms.h" line="29"/>
+        <location filename="src/gamespecificterms.h" line="29"/>
         <source>Card Type</source>
         <translation>Kaart type</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="31"/>
+        <location filename="src/gamespecificterms.h" line="31"/>
         <source>Mana Value</source>
         <translation>Mana Waarde</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="33"/>
+        <location filename="src/gamespecificterms.h" line="33"/>
         <source>Color(s)</source>
         <translation>Kleur(en)</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="35"/>
+        <location filename="src/gamespecificterms.h" line="35"/>
         <source>Loyalty</source>
         <translation>Loyaliteit</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="37"/>
+        <location filename="src/gamespecificterms.h" line="37"/>
         <source>Main Card Type</source>
         <translation>Hoofd Kaarttype</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="39"/>
+        <location filename="src/gamespecificterms.h" line="39"/>
         <source>Mana Cost</source>
         <translation>Mana Kosten</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="41"/>
+        <location filename="src/gamespecificterms.h" line="41"/>
         <source>P/T</source>
         <translation>P/T</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="43"/>
+        <location filename="src/gamespecificterms.h" line="43"/>
         <source>Side</source>
         <translation>Kant</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="45"/>
+        <location filename="src/gamespecificterms.h" line="45"/>
         <source>Layout</source>
         <translation>Lay-out</translation>
     </message>
     <message>
-        <location filename="src/game_specific_terms.h" line="47"/>
+        <location filename="src/gamespecificterms.h" line="47"/>
         <source>Color Identity</source>
         <translation>Color Identity</translation>
     </message>
