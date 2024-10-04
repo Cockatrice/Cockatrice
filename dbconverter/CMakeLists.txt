@@ -5,7 +5,7 @@ project(Dbconverter VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.$
 set(dbconverter_SOURCES
     src/main.cpp
     src/mocks.cpp
-    ../cockatrice/src/carddatabase.cpp
+        ../cockatrice/src/game/cards/carddatabase.cpp
     ../cockatrice/src/carddbparser/carddatabaseparser.cpp
     ../cockatrice/src/carddbparser/cockatricexml3.cpp
     ../cockatrice/src/carddbparser/cockatricexml4.cpp
@@ -16,9 +16,9 @@ set(dbconverter_SOURCES
 set(QT_DONT_USE_QTGUI TRUE)
 
 if(Qt6_FOUND)
-  qt6_wrap_cpp(dbconverter_SOURCES ../cockatrice/src/settingscache.h ../cockatrice/src/settings/carddatabasesettings.h)
+  qt6_wrap_cpp(dbconverter_SOURCES ../cockatrice/src/settings/settingscache.h ../cockatrice/src/settings/carddatabasesettings.h)
 elseif(Qt5_FOUND)
-  qt5_wrap_cpp(dbconverter_SOURCES ../cockatrice/src/settingscache.h ../cockatrice/src/settings/carddatabasesettings.h)
+  qt5_wrap_cpp(dbconverter_SOURCES ../cockatrice/src/settings/settingscache.h ../cockatrice/src/settings/carddatabasesettings.h)
 endif()
 
 # Build servatrice binary and link it
