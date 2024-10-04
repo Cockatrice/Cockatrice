@@ -3,7 +3,7 @@ name: Code Style (TypeScript)
 on:
   pull_request:
     paths:
-      - '.github/workflows/web-*.yml'
+      - '.github/workflows/web-lint.yml'
       - 'webclient/**'
       - '!**.md'
 
@@ -22,6 +22,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
+        node-version-file: 'webclient/.nvmrc'
         cache: 'npm'
         cache-dependency-path: 'webclient/package-lock.json'
 
