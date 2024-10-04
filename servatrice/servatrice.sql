@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,
   `chat_history_size` int(4) NOT NULL,
+  `card_limit` int(10) unsigned NOT NULL,
   `id_server` tinyint(3) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
