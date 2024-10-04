@@ -756,7 +756,7 @@ Dette vises kun til moderatorer, og er ikke synlig for brukeren.</translation>
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="src/dlg_connect.h" line="79"/>
+        <location filename="src/connect.h" line="79"/>
         <source>Downloading...</source>
         <translation>Laster ned...</translation>
     </message>

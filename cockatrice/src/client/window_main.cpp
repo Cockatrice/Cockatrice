@@ -189,7 +189,7 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    dlgConnect = new DlgConnect(this);
+    dlgConnect = new Connect(this);
     connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
 
     if (dlgConnect->exec()) {
@@ -330,7 +330,7 @@ void MainWindow::actTips()
         delete tip;
         tip = nullptr;
     }
-    tip = new DlgTipOfTheDay(this);
+    tip = new TipOfTheDay(this);
     if (tip->successfulInit) {
         tip->show();
     }
@@ -864,7 +864,7 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
 
-    tip = new DlgTipOfTheDay();
+    tip = new TipOfTheDay();
 
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
@@ -1005,7 +1005,7 @@ void MainWindow::changeEvent(QEvent *event)
                 client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
             } else if (SettingsCache::instance().servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
-                DlgConnect dlg(this);
+                Connect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                         dlg.getPassword());
             }
