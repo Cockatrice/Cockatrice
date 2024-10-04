@@ -1,18 +1,18 @@
-#include "tab_account.h"
+#include "account.h"
 
-#include "abstractclient.h"
-#include "customlineedit.h"
+#include "../abstract_client.h"
+#include "../../deck/custom_line_edit.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/response_list_users.pb.h"
 #include "pb/session_commands.pb.h"
-#include "pending_command.h"
-#include "soundengine.h"
+#include "../../server/pending_command.h"
+#include "../soundengine.h"
 #include "trice_limits.h"
-#include "userinfobox.h"
-#include "userlist.h"
+#include "../../server/user/info_box.h"
+#include "../../server/user/list.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>

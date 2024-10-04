@@ -242,32 +242,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="70"/>
+        <location filename="src/database_model.cpp" line="70"/>
         <source>Name</source>
         <translation>카드 이름</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="72"/>
+        <location filename="src/database_model.cpp" line="72"/>
         <source>Sets</source>
         <translation>확장판</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="74"/>
+        <location filename="src/database_model.cpp" line="74"/>
         <source>Mana cost</source>
         <translation>마나 비용</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="76"/>
+        <location filename="src/database_model.cpp" line="76"/>
         <source>Card type</source>
         <translation>카드 유형</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="78"/>
+        <location filename="src/database_model.cpp" line="78"/>
         <source>P/T</source>
         <translation>공/방</translation>
     </message>
     <message>
-        <location filename="src/carddatabasemodel.cpp" line="80"/>
+        <location filename="src/database_model.cpp" line="80"/>
         <source>Color(s)</source>
         <translation>색(들)</translation>
     </message>
@@ -275,86 +275,86 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFilter</name>
     <message>
-        <location filename="src/cardfilter.cpp" line="7"/>
+        <location filename="src/card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="9"/>
+        <location filename="src/card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="11"/>
+        <location filename="src/card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="13"/>
+        <location filename="src/card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="23"/>
+        <location filename="src/card.cpp" line="23"/>
         <source>Name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="25"/>
+        <location filename="src/card.cpp" line="25"/>
         <source>Type</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="27"/>
+        <location filename="src/card.cpp" line="27"/>
         <source>Color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="29"/>
+        <location filename="src/card.cpp" line="29"/>
         <source>Text</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="31"/>
+        <location filename="src/card.cpp" line="31"/>
         <source>Set</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="33"/>
+        <location filename="src/card.cpp" line="33"/>
         <source>Mana Cost</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="35"/>
+        <location filename="src/card.cpp" line="35"/>
         <source>Mana Value</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="37"/>
+        <location filename="src/card.cpp" line="37"/>
         <source>Rarity</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="39"/>
+        <location filename="src/card.cpp" line="39"/>
         <source>Power</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="41"/>
+        <location filename="src/card.cpp" line="41"/>
         <source>Toughness</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="43"/>
+        <location filename="src/card.cpp" line="43"/>
         <source>Loyalty</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardfilter.cpp" line="45"/>
+        <location filename="src/card.cpp" line="45"/>
         <source>Format</source>
         <translation type="unfinished"/>
     </message>
@@ -362,17 +362,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFrame</name>
     <message>
-        <location filename="src/cardframe.cpp" line="65"/>
+        <location filename="src/frame.cpp" line="65"/>
         <source>Image</source>
         <translation>이미지</translation>
     </message>
     <message>
-        <location filename="src/cardframe.cpp" line="66"/>
+        <location filename="src/frame.cpp" line="66"/>
         <source>Description</source>
         <translation> 텍스트</translation>
     </message>
     <message>
-        <location filename="src/cardframe.cpp" line="67"/>
+        <location filename="src/frame.cpp" line="67"/>
         <source>Both</source>
         <translation>모두 보기</translation>
     </message>
@@ -398,12 +398,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="src/carditem.cpp" line="87"/>
+        <location filename="src/item.cpp" line="87"/>
         <source>&amp;Move to</source>
         <translation>다른 영역으로 이동:</translation>
     </message>
     <message>
-        <location filename="src/carditem.cpp" line="88"/>
+        <location filename="src/item.cpp" line="88"/>
         <source>&amp;Power / toughness</source>
         <translation>공격력 / 방어력 설정</translation>
     </message>
@@ -686,12 +686,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckListModel</name>
     <message>
-        <location filename="src/decklistmodel.cpp" line="167"/>
+        <location filename="src/list_model.cpp" line="167"/>
         <source>Number</source>
         <translation>카드 장수</translation>
     </message>
     <message>
-        <location filename="src/decklistmodel.cpp" line="169"/>
+        <location filename="src/list_model.cpp" line="169"/>
         <source>Card</source>
         <translation>카드 이름</translation>
     </message>
@@ -699,13 +699,13 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckStatsInterface</name>
     <message>
-        <location filename="src/deckstats_interface.cpp" line="23"/>
-        <location filename="src/deckstats_interface.cpp" line="35"/>
+        <location filename="src/stats_interface.cpp" line="23"/>
+        <location filename="src/stats_interface.cpp" line="35"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="src/deckstats_interface.cpp" line="35"/>
+        <location filename="src/stats_interface.cpp" line="35"/>
         <source>The reply from the server could not be parsed.</source>
         <translation>서버로부터 받은 응답을 해석할 수 없었습니다.</translation>
     </message>
@@ -2081,7 +2081,7 @@ You may have to build from source yourself.</source>
 <context>
     <name>FilterBuilder</name>
     <message>
-        <location filename="src/filterbuilder.cpp" line="28"/>
+        <location filename="src/builder.cpp" line="28"/>
         <source>Type your filter here</source>
         <translation type="unfinished"/>
     </message>
@@ -2089,105 +2089,105 @@ You may have to build from source yourself.</source>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="src/gameselector.cpp" line="217"/>
-        <location filename="src/gameselector.cpp" line="220"/>
-        <location filename="src/gameselector.cpp" line="223"/>
-        <location filename="src/gameselector.cpp" line="226"/>
-        <location filename="src/gameselector.cpp" line="229"/>
-        <location filename="src/gameselector.cpp" line="232"/>
-        <location filename="src/gameselector.cpp" line="235"/>
-        <location filename="src/gameselector.cpp" line="238"/>
-        <location filename="src/gameselector.cpp" line="272"/>
+        <location filename="src/selector.cpp" line="217"/>
+        <location filename="src/selector.cpp" line="220"/>
+        <location filename="src/selector.cpp" line="223"/>
+        <location filename="src/selector.cpp" line="226"/>
+        <location filename="src/selector.cpp" line="229"/>
+        <location filename="src/selector.cpp" line="232"/>
+        <location filename="src/selector.cpp" line="235"/>
+        <location filename="src/selector.cpp" line="238"/>
+        <location filename="src/selector.cpp" line="272"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="217"/>
+        <location filename="src/selector.cpp" line="217"/>
         <source>Please join the appropriate room first.</source>
         <translation>해당 게임이 열려있는 채널에 먼저 들어가시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="220"/>
+        <location filename="src/selector.cpp" line="220"/>
         <source>Wrong password.</source>
         <translation>잘못된 비밀번호를 입력하셨습니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="223"/>
+        <location filename="src/selector.cpp" line="223"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>관전이 허용되지 않은 게임입니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="226"/>
+        <location filename="src/selector.cpp" line="226"/>
         <source>The game is already full.</source>
         <translation>게임 인원이 전부 찼습니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="229"/>
+        <location filename="src/selector.cpp" line="229"/>
         <source>The game does not exist any more.</source>
         <translation>게임이 더 이상 존재하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="232"/>
+        <location filename="src/selector.cpp" line="232"/>
         <source>This game is only open to registered users.</source>
         <translation>서버에 가입한 사용자만 참가 할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="235"/>
+        <location filename="src/selector.cpp" line="235"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>방장의 친구 목록에 등록된 사용자만 참가 할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="238"/>
+        <location filename="src/selector.cpp" line="238"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>방장이 당신을 차단하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="258"/>
+        <location filename="src/selector.cpp" line="258"/>
         <source>Join game</source>
         <translation>게임 참가</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="258"/>
+        <location filename="src/selector.cpp" line="258"/>
         <source>Password:</source>
         <translation>비밀번호:</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="272"/>
+        <location filename="src/selector.cpp" line="272"/>
         <source>Please join the respective room first.</source>
         <translation>해당 게임이 열려있는 채널에 먼저 들어가시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="315"/>
+        <location filename="src/selector.cpp" line="315"/>
         <source>&amp;Filter games</source>
         <translation>게임 필터</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="316"/>
+        <location filename="src/selector.cpp" line="316"/>
         <source>C&amp;lear filter</source>
         <translation>필터 해제</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="318"/>
+        <location filename="src/selector.cpp" line="318"/>
         <source>C&amp;reate</source>
         <translation>게임 생성</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="319"/>
+        <location filename="src/selector.cpp" line="319"/>
         <source>&amp;Join</source>
         <translation>게임 참가</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="320"/>
+        <location filename="src/selector.cpp" line="320"/>
         <source>J&amp;oin as spectator</source>
         <translation>관전자로 참가하기</translation>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="341"/>
+        <location filename="src/selector.cpp" line="341"/>
         <source>Games shown: %1 / %2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gameselector.cpp" line="343"/>
+        <location filename="src/selector.cpp" line="343"/>
         <source>Games</source>
         <translation>게임 목록</translation>
     </message>
@@ -2195,100 +2195,100 @@ You may have to build from source yourself.</source>
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="src/gamesmodel.cpp" line="48"/>
+        <location filename="src/model.cpp" line="48"/>
         <source>&gt;1 day</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/gamesmodel.cpp" line="57"/>
+        <location filename="src/model.cpp" line="57"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="59"/>
+        <location filename="src/model.cpp" line="59"/>
         <source>new</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/gamesmodel.cpp" line="62"/>
+        <location filename="src/model.cpp" line="62"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="154"/>
+        <location filename="src/model.cpp" line="154"/>
         <source>password</source>
         <translation>비밀번호 필요</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="156"/>
+        <location filename="src/model.cpp" line="156"/>
         <source>buddies only</source>
         <translation>친구만</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="158"/>
+        <location filename="src/model.cpp" line="158"/>
         <source>reg. users only</source>
         <translation>가입한 사용자 전용</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="190"/>
-        <location filename="src/gamesmodel.cpp" line="195"/>
+        <location filename="src/model.cpp" line="190"/>
+        <location filename="src/model.cpp" line="195"/>
         <source>can chat</source>
         <translation>관전자 대화 가능</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="192"/>
+        <location filename="src/model.cpp" line="192"/>
         <source>see hands</source>
         <translation>손 공개</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="197"/>
+        <location filename="src/model.cpp" line="197"/>
         <source>can see hands</source>
         <translation>관전자에게 손 공개</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="202"/>
+        <location filename="src/model.cpp" line="202"/>
         <source>not allowed</source>
         <translation>허용 안됨</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="220"/>
+        <location filename="src/model.cpp" line="220"/>
         <source>Room</source>
         <translation>게임</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="224"/>
+        <location filename="src/model.cpp" line="224"/>
         <source>Age</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="232"/>
+        <location filename="src/model.cpp" line="232"/>
         <source>Description</source>
         <translation>게임 이름</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="234"/>
+        <location filename="src/model.cpp" line="234"/>
         <source>Creator</source>
         <translation>방장</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="236"/>
+        <location filename="src/model.cpp" line="236"/>
         <source>Type</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="238"/>
+        <location filename="src/model.cpp" line="238"/>
         <source>Restrictions</source>
         <translation>입장 제한</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="242"/>
+        <location filename="src/model.cpp" line="242"/>
         <source>Players</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="src/gamesmodel.cpp" line="250"/>
+        <location filename="src/model.cpp" line="250"/>
         <source>Spectators</source>
         <translation>관전자</translation>
     </message>
@@ -3170,575 +3170,575 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="75"/>
+        <location filename="src/message_log_widget.cpp" line="75"/>
         <source> from play</source>
         <translation>전장에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="77"/>
+        <location filename="src/message_log_widget.cpp" line="77"/>
         <source> from their graveyard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="79"/>
+        <location filename="src/message_log_widget.cpp" line="79"/>
         <source> from exile</source>
         <translation>추방 영역에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="81"/>
+        <location filename="src/message_log_widget.cpp" line="81"/>
         <source> from their hand</source>
         <translation>자신의 손에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="86"/>
+        <location filename="src/message_log_widget.cpp" line="86"/>
         <source>the top card of %1&apos;s library</source>
         <translation>%1의 서고 맨 위의 카드</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="88"/>
+        <location filename="src/message_log_widget.cpp" line="88"/>
         <source>the top card of their library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="93"/>
+        <location filename="src/message_log_widget.cpp" line="93"/>
         <source> from the top of %1&apos;s library</source>
         <translation>%1의 서고 맨 위에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="95"/>
+        <location filename="src/message_log_widget.cpp" line="95"/>
         <source> from the top of their library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="101"/>
+        <location filename="src/message_log_widget.cpp" line="101"/>
         <source>the bottom card of %1&apos;s library</source>
         <translation>%1의 서고 맨 밑의 카드</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="103"/>
+        <location filename="src/message_log_widget.cpp" line="103"/>
         <source>the bottom card of their library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="108"/>
+        <location filename="src/message_log_widget.cpp" line="108"/>
         <source> from the bottom of %1&apos;s library</source>
         <translation>%1의 서고 맨 밑에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="110"/>
+        <location filename="src/message_log_widget.cpp" line="110"/>
         <source> from the bottom of their library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="115"/>
+        <location filename="src/message_log_widget.cpp" line="115"/>
         <source> from %1&apos;s library</source>
         <translation>%1의 서고에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="117"/>
+        <location filename="src/message_log_widget.cpp" line="117"/>
         <source> from their library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="121"/>
+        <location filename="src/message_log_widget.cpp" line="121"/>
         <source> from sideboard</source>
         <translation>사이드보드에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="123"/>
+        <location filename="src/message_log_widget.cpp" line="123"/>
         <source> from the stack</source>
         <translation>스택에</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="149"/>
+        <location filename="src/message_log_widget.cpp" line="149"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
         <translation>%1이(가) %2 맨 위 카드를 공개합니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="150"/>
+        <location filename="src/message_log_widget.cpp" line="150"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
         <translation>%1이(가) %2 맨 위 카드를 더 이상 공개하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="157"/>
+        <location filename="src/message_log_widget.cpp" line="157"/>
         <source>%1 can now look at top card %2 at any time.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="158"/>
+        <location filename="src/message_log_widget.cpp" line="158"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="165"/>
+        <location filename="src/message_log_widget.cpp" line="165"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="175"/>
+        <location filename="src/message_log_widget.cpp" line="175"/>
         <source>%1 has conceded the game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="181"/>
+        <location filename="src/message_log_widget.cpp" line="181"/>
         <source>%1 has unconceded the game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="188"/>
+        <location filename="src/message_log_widget.cpp" line="188"/>
         <source>%1 has restored connection to the game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="192"/>
+        <location filename="src/message_log_widget.cpp" line="192"/>
         <source>%1 has lost connection to the game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="208"/>
+        <location filename="src/message_log_widget.cpp" line="208"/>
         <source>%1 points from their %2 to themselves.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="211"/>
+        <location filename="src/message_log_widget.cpp" line="211"/>
         <source>%1 points from their %2 to %3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="215"/>
+        <location filename="src/message_log_widget.cpp" line="215"/>
         <source>%1 points from %2&apos;s %3 to themselves.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="219"/>
+        <location filename="src/message_log_widget.cpp" line="219"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="227"/>
+        <location filename="src/message_log_widget.cpp" line="227"/>
         <source>%1 points from their %2 to their %3.</source>
         <translation>%1님이 자신의 %2에서 자신의 %3을(를) 가리켰습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="230"/>
+        <location filename="src/message_log_widget.cpp" line="230"/>
         <source>%1 points from their %2 to %3&apos;s %4.</source>
         <translation>%1님이 자신의 %2에서 %3님의 %4을(를) 가리켰습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="236"/>
+        <location filename="src/message_log_widget.cpp" line="236"/>
         <source>%1 points from %2&apos;s %3 to their own %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="242"/>
+        <location filename="src/message_log_widget.cpp" line="242"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="254"/>
+        <location filename="src/message_log_widget.cpp" line="254"/>
         <source>%1 creates token: %2%3.</source>
         <translation>%1님이 토큰 생성: %2%3.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="263"/>
+        <location filename="src/message_log_widget.cpp" line="263"/>
         <source>%1 has loaded a deck (%2).</source>
         <translation>%1이(가) 덱을 불러왔습니다. (해시값: %2)</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="265"/>
+        <location filename="src/message_log_widget.cpp" line="265"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
         <translation>%1이(가) %2장의 사이드보드가 있는 덱을 불러왔습니다. (해시값: %3)</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="275"/>
+        <location filename="src/message_log_widget.cpp" line="275"/>
         <source>%1 destroys %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="310"/>
+        <location filename="src/message_log_widget.cpp" line="310"/>
         <source>a card</source>
         <translation>카드 한 장</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="316"/>
+        <location filename="src/message_log_widget.cpp" line="316"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1이(가) %3의 조종권을 %2에게 넘깁니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="328"/>
+        <location filename="src/message_log_widget.cpp" line="328"/>
         <source>%1 puts %2 into play%3 face down.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="330"/>
+        <location filename="src/message_log_widget.cpp" line="330"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1이(가) %3서 %2을(를) 전장에 놓았습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="333"/>
+        <location filename="src/message_log_widget.cpp" line="333"/>
         <source>%1 puts %2%3 into their graveyard.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="335"/>
+        <location filename="src/message_log_widget.cpp" line="335"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1이(가) %3 있던 %2을(를) 추방합니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="337"/>
+        <location filename="src/message_log_widget.cpp" line="337"/>
         <source>%1 moves %2%3 to their hand.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="340"/>
+        <location filename="src/message_log_widget.cpp" line="340"/>
         <source>%1 puts %2%3 into their library.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="342"/>
+        <location filename="src/message_log_widget.cpp" line="342"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="344"/>
+        <location filename="src/message_log_widget.cpp" line="344"/>
         <source>%1 puts %2%3 on top of their library.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="348"/>
+        <location filename="src/message_log_widget.cpp" line="348"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="351"/>
+        <location filename="src/message_log_widget.cpp" line="351"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 맨 밑에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="354"/>
+        <location filename="src/message_log_widget.cpp" line="354"/>
         <source>%1 plays %2%3.</source>
         <translation>%1이(가) %3서 %2을(를) 플레이 하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="372"/>
+        <location filename="src/message_log_widget.cpp" line="372"/>
         <source>%1 tries to draw from an empty library</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="374"/>
+        <location filename="src/message_log_widget.cpp" line="374"/>
         <source>%1 draws %2 card(s).</source>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="384"/>
+        <location filename="src/message_log_widget.cpp" line="384"/>
         <source>%1 is looking at %2.</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="389"/>
+        <location filename="src/message_log_widget.cpp" line="389"/>
         <source>%1 is looking at the top %3 card(s) %2.</source>
         <comment>top card for singular, top %3 cards for plural</comment>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="400"/>
+        <location filename="src/message_log_widget.cpp" line="400"/>
         <source>%1 turns %2 face-down.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="403"/>
+        <location filename="src/message_log_widget.cpp" line="403"/>
         <source>%1 turns %2 face-up.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="409"/>
+        <location filename="src/message_log_widget.cpp" line="409"/>
         <source>The game has been closed.</source>
         <translation>게임이 종료되었습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="414"/>
+        <location filename="src/message_log_widget.cpp" line="414"/>
         <source>The game has started.</source>
         <translation>게임이 시작되었습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="420"/>
+        <location filename="src/message_log_widget.cpp" line="420"/>
         <source>%1 has joined the game.</source>
         <translation>%1님이 게임에 입장했습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="426"/>
+        <location filename="src/message_log_widget.cpp" line="426"/>
         <source>%1 is now watching the game.</source>
         <translation>%1이(가) 관전을 시작하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="431"/>
+        <location filename="src/message_log_widget.cpp" line="431"/>
         <source>You have been kicked out of the game.</source>
         <translation>게임에서 강제 퇴장 당하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="438"/>
+        <location filename="src/message_log_widget.cpp" line="438"/>
         <source>%1 has left the game (%2).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="444"/>
+        <location filename="src/message_log_widget.cpp" line="444"/>
         <source>%1 is not watching the game any more (%2).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="450"/>
+        <location filename="src/message_log_widget.cpp" line="450"/>
         <source>%1 is not ready to start the game any more.</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="459"/>
+        <location filename="src/message_log_widget.cpp" line="459"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="464"/>
+        <location filename="src/message_log_widget.cpp" line="464"/>
         <source>%1 shuffles their deck and draws a new hand.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="470"/>
+        <location filename="src/message_log_widget.cpp" line="470"/>
         <source>You are watching a replay of game #%1.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="475"/>
+        <location filename="src/message_log_widget.cpp" line="475"/>
         <source>%1 is ready to start the game.</source>
         <translation>%1님이 게임 시작 준비를 끝냈습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="501"/>
+        <location filename="src/message_log_widget.cpp" line="501"/>
         <source>cards</source>
         <comment>an unknown amount of cards</comment>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="503"/>
+        <location filename="src/message_log_widget.cpp" line="503"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="512"/>
+        <location filename="src/message_log_widget.cpp" line="512"/>
         <source>%1 lends %2 to %3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="517"/>
+        <location filename="src/message_log_widget.cpp" line="517"/>
         <source>%1 reveals %2 to %3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="523"/>
+        <location filename="src/message_log_widget.cpp" line="523"/>
         <source>%1 reveals %2.</source>
         <translation>%1님이 %2을(를) 공개.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="529"/>
+        <location filename="src/message_log_widget.cpp" line="529"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="536"/>
+        <location filename="src/message_log_widget.cpp" line="536"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="542"/>
+        <location filename="src/message_log_widget.cpp" line="542"/>
         <source>%1 peeks at face down card #%2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="544"/>
+        <location filename="src/message_log_widget.cpp" line="544"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="550"/>
+        <location filename="src/message_log_widget.cpp" line="550"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="557"/>
+        <location filename="src/message_log_widget.cpp" line="557"/>
         <source>%1 reveals %2%3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="564"/>
+        <location filename="src/message_log_widget.cpp" line="564"/>
         <source>%1 reversed turn order, now it&apos;s %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="566"/>
+        <location filename="src/message_log_widget.cpp" line="566"/>
         <source>reversed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="566"/>
+        <location filename="src/message_log_widget.cpp" line="566"/>
         <source>normal</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="574"/>
+        <location filename="src/message_log_widget.cpp" line="574"/>
         <source>Heads</source>
         <translation>앞면</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="574"/>
+        <location filename="src/message_log_widget.cpp" line="574"/>
         <source>Tails</source>
         <translation>뒷면</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="575"/>
+        <location filename="src/message_log_widget.cpp" line="575"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="579"/>
+        <location filename="src/message_log_widget.cpp" line="579"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="586"/>
+        <location filename="src/message_log_widget.cpp" line="586"/>
         <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="596"/>
+        <location filename="src/message_log_widget.cpp" line="596"/>
         <source>%1 rolls a %2-sided dice %3 times: %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="625"/>
+        <location filename="src/message_log_widget.cpp" line="625"/>
         <source>%1&apos;s turn.</source>
         <translation>%1의 차례입니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="631"/>
+        <location filename="src/message_log_widget.cpp" line="631"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="642"/>
+        <location filename="src/message_log_widget.cpp" line="642"/>
         <source>%1 places %2 %3 on %4 (now %5).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="644"/>
+        <location filename="src/message_log_widget.cpp" line="644"/>
         <source>%1 removes %2 %3 from %4 (now %5).</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="650"/>
+        <location filename="src/message_log_widget.cpp" line="650"/>
         <source>red counter(s)</source>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="653"/>
+        <location filename="src/message_log_widget.cpp" line="653"/>
         <source>yellow counter(s)</source>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/messagelogwidget.cpp" line="656"/>
+        <location filename="src/message_log_widget.cpp" line="656"/>
         <source>green counter(s)</source>
         <translation type="unfinished"><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="675"/>
+        <location filename="src/message_log_widget.cpp" line="675"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="687"/>
+        <location filename="src/message_log_widget.cpp" line="687"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="689"/>
+        <location filename="src/message_log_widget.cpp" line="689"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="708"/>
+        <location filename="src/message_log_widget.cpp" line="708"/>
         <source>%1 removes the PT of %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="713"/>
+        <location filename="src/message_log_widget.cpp" line="713"/>
         <source>%1 changes the PT of %2 from nothing to %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="716"/>
+        <location filename="src/message_log_widget.cpp" line="716"/>
         <source>%1 changes the PT of %2 from %3 to %4.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="724"/>
+        <location filename="src/message_log_widget.cpp" line="724"/>
         <source>%1 has locked their sideboard.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="726"/>
+        <location filename="src/message_log_widget.cpp" line="726"/>
         <source>%1 has unlocked their sideboard.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="744"/>
+        <location filename="src/message_log_widget.cpp" line="744"/>
         <source>%1 taps their permanents.</source>
         <translation>%1님이 자신의 지속물을 탭.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="744"/>
+        <location filename="src/message_log_widget.cpp" line="744"/>
         <source>%1 untaps their permanents.</source>
         <translation>%1님이 자신의 지속물을 언탭.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="747"/>
+        <location filename="src/message_log_widget.cpp" line="747"/>
         <source>%1 taps %2.</source>
         <translation>%1님이 %2을(를) 탭.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="747"/>
+        <location filename="src/message_log_widget.cpp" line="747"/>
         <source>%1 untaps %2.</source>
         <translation>%1님이 %2을(를) 언탭.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="763"/>
+        <location filename="src/message_log_widget.cpp" line="763"/>
         <source>%1 shuffles %2.</source>
         <translation>%1님이 %2를 셔플했습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="767"/>
+        <location filename="src/message_log_widget.cpp" line="767"/>
         <source>%1 shuffles the bottom %3 cards of %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="772"/>
+        <location filename="src/message_log_widget.cpp" line="772"/>
         <source>%1 shuffles the top %3 cards of %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="777"/>
+        <location filename="src/message_log_widget.cpp" line="777"/>
         <source>%1 shuffles cards %3 - %4 of %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="796"/>
+        <location filename="src/message_log_widget.cpp" line="796"/>
         <source>%1 unattaches %2.</source>
         <translation>%1님이 %2을(를) 뗴어냈습니다.</translation>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="802"/>
+        <location filename="src/message_log_widget.cpp" line="802"/>
         <source>%1 undoes their last draw.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/messagelogwidget.cpp" line="805"/>
+        <location filename="src/message_log_widget.cpp" line="805"/>
         <source>%1 undoes their last draw (%2).</source>
         <translation type="unfinished"/>
     </message>
@@ -3973,57 +3973,57 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>PhasesToolbar</name>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="152"/>
+        <location filename="src/phases_toolbar.cpp" line="152"/>
         <source>Untap step</source>
         <translation>언탭단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="154"/>
+        <location filename="src/phases_toolbar.cpp" line="154"/>
         <source>Upkeep step</source>
         <translation>유지단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="156"/>
+        <location filename="src/phases_toolbar.cpp" line="156"/>
         <source>Draw step</source>
         <translation>뽑기단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="158"/>
+        <location filename="src/phases_toolbar.cpp" line="158"/>
         <source>First main phase</source>
         <translation>첫번째 본단계</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="160"/>
+        <location filename="src/phases_toolbar.cpp" line="160"/>
         <source>Beginning of combat step</source>
         <translation>전투 시작단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="162"/>
+        <location filename="src/phases_toolbar.cpp" line="162"/>
         <source>Declare attackers step</source>
         <translation>공격자 선언단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="164"/>
+        <location filename="src/phases_toolbar.cpp" line="164"/>
         <source>Declare blockers step</source>
         <translation>방어자 선언단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="166"/>
+        <location filename="src/phases_toolbar.cpp" line="166"/>
         <source>Combat damage step</source>
         <translation>전투 피해단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="168"/>
+        <location filename="src/phases_toolbar.cpp" line="168"/>
         <source>End of combat step</source>
         <translation>전투 종료단</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="170"/>
+        <location filename="src/phases_toolbar.cpp" line="170"/>
         <source>Second main phase</source>
         <translation>두번째 본단계</translation>
     </message>
     <message>
-        <location filename="src/phasestoolbar.cpp" line="172"/>
+        <location filename="src/phases_toolbar.cpp" line="172"/>
         <source>End of turn step</source>
         <translation>종료단</translation>
     </message>
@@ -4031,7 +4031,7 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>PictureLoader</name>
     <message>
-        <location filename="src/pictureloader.cpp" line="357"/>
+        <location filename="src/picture_loader.cpp" line="357"/>
         <source>en</source>
         <comment>code for scryfall's language property, not available for all languages</comment>
         <translation>ko</translation>
@@ -4693,7 +4693,7 @@ Cockatrice will now reload the card database.</source>
         <translation>코카트리스 카드 데이터베이스 파일 (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/deck_loader.cpp" line="14"/>
+        <location filename="src/loader.cpp" line="14"/>
         <location filename="src/window_main.cpp" line="80"/>
         <source>All files (*.*)</source>
         <translation>모든 파일 (*.*)</translation>
@@ -4704,7 +4704,7 @@ Cockatrice will now reload the card database.</source>
         <translation>코카트리스 리플레이 파일 (*.cor)</translation>
     </message>
     <message>
-        <location filename="src/deck_loader.cpp" line="13"/>
+        <location filename="src/loader.cpp" line="13"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
         <translation type="unfinished"/>
     </message>
@@ -4820,17 +4820,17 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>RemoteDeckList_TreeModel</name>
     <message>
-        <location filename="src/remotedecklist_treewidget.cpp" line="170"/>
+        <location filename="src/decklist_tree_widget.cpp" line="170"/>
         <source>Name</source>
         <translation>덱 이름</translation>
     </message>
     <message>
-        <location filename="src/remotedecklist_treewidget.cpp" line="172"/>
+        <location filename="src/decklist_tree_widget.cpp" line="172"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/remotedecklist_treewidget.cpp" line="174"/>
+        <location filename="src/decklist_tree_widget.cpp" line="174"/>
         <source>Upload time</source>
         <translation>업로드 시간</translation>
     </message>
@@ -4838,32 +4838,32 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>RemoteReplayList_TreeModel</name>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="151"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="151"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="153"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="153"/>
         <source>Name</source>
         <translation>게임 이름</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="155"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="155"/>
         <source>Players</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="157"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="157"/>
         <source>Keep</source>
         <translation>보존</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="159"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="159"/>
         <source>Time started</source>
         <translation>게임 시작 시간</translation>
     </message>
     <message>
-        <location filename="src/remotereplaylist_treewidget.cpp" line="161"/>
+        <location filename="src/replay_list_tree_widget.cpp" line="161"/>
         <source>Duration (sec)</source>
         <translation>게임 길이</translation>
     </message>
@@ -4871,37 +4871,37 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>RoomSelector</name>
     <message>
-        <location filename="src/tab_server.cpp" line="55"/>
+        <location filename="src/server.cpp" line="55"/>
         <source>Rooms</source>
         <translation>채널 목록</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="56"/>
+        <location filename="src/server.cpp" line="56"/>
         <source>Joi&amp;n</source>
         <translation>채널에 참가</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="59"/>
+        <location filename="src/server.cpp" line="59"/>
         <source>Room</source>
         <translation>게임</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="60"/>
+        <location filename="src/server.cpp" line="60"/>
         <source>Description</source>
         <translation>설명</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="61"/>
+        <location filename="src/server.cpp" line="61"/>
         <source>Permissions</source>
         <translation>권한</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="62"/>
+        <location filename="src/server.cpp" line="62"/>
         <source>Players</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="63"/>
+        <location filename="src/server.cpp" line="63"/>
         <source>Games</source>
         <translation>게임</translation>
     </message>
@@ -5167,7 +5167,7 @@ Please check your shortcut settings!</source>
 <context>
     <name>TabAdmin</name>
     <message>
-        <location filename="src/tab_admin.h" line="53"/>
+        <location filename="src/admin.h" line="53"/>
         <source>Administration</source>
         <translation>관리자 메뉴</translation>
     </message>
@@ -5461,7 +5461,7 @@ Please check that the directory is writable and try again.</source>
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="src/tab_deck_storage.h" line="57"/>
+        <location filename="src/deck_storage.h" line="57"/>
         <source>Deck storage</source>
         <translation>덱 보관함</translation>
     </message>
@@ -5937,37 +5937,37 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabMessage</name>
     <message>
-        <location filename="src/tab_message.cpp" line="69"/>
+        <location filename="src/message.cpp" line="69"/>
         <source>Private &amp;chat</source>
         <translation>1:1 대화</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="70"/>
+        <location filename="src/message.cpp" line="70"/>
         <source>&amp;Leave</source>
         <translation>나가기</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="86"/>
+        <location filename="src/message.cpp" line="86"/>
         <source>%1 - Private chat</source>
         <translation>%1 - 1:1 대화</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="113"/>
+        <location filename="src/message.cpp" line="113"/>
         <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="151"/>
+        <location filename="src/message.cpp" line="151"/>
         <source>Private message from</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="168"/>
+        <location filename="src/message.cpp" line="168"/>
         <source>%1 has left the server.</source>
         <translation>%1이(가) 서버와의 연결을 끊었습니다.</translation>
     </message>
     <message>
-        <location filename="src/tab_message.cpp" line="174"/>
+        <location filename="src/message.cpp" line="174"/>
         <source>%1 has joined the server.</source>
         <translation>%1이(가) 서버에 연결하였습니다.</translation>
     </message>
@@ -5975,69 +5975,69 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="src/tab_replays.h" line="55"/>
+        <location filename="src/replays.h" line="55"/>
         <source>Game replays</source>
         <translation>게임 리플레이</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="116"/>
+        <location filename="src/replays.cpp" line="116"/>
         <source>Local file system</source>
         <translation>로컬 파일 시스템</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="117"/>
+        <location filename="src/replays.cpp" line="117"/>
         <source>Server replay storage</source>
         <translation>서버 리플레이 보관함</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="119"/>
-        <location filename="src/tab_replays.cpp" line="121"/>
+        <location filename="src/replays.cpp" line="119"/>
+        <location filename="src/replays.cpp" line="121"/>
         <source>Watch replay</source>
         <translation>리플레이 보기</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="120"/>
-        <location filename="src/tab_replays.cpp" line="124"/>
+        <location filename="src/replays.cpp" line="120"/>
+        <location filename="src/replays.cpp" line="124"/>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="122"/>
+        <location filename="src/replays.cpp" line="122"/>
         <source>Download replay</source>
         <translation>리플레이 다운로드</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="123"/>
+        <location filename="src/replays.cpp" line="123"/>
         <source>Toggle expiration lock</source>
         <translation>자동 삭제 여부 토글</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="149"/>
+        <location filename="src/replays.cpp" line="149"/>
         <source>Delete local file</source>
         <translation>로컬 파일 삭제</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="150"/>
+        <location filename="src/replays.cpp" line="150"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>정말로 &quot;%1&quot;을(를) 삭제하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="199"/>
+        <location filename="src/replays.cpp" line="199"/>
         <source>Downloading Replays</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="200"/>
+        <location filename="src/replays.cpp" line="200"/>
         <source>Folder download is not yet supported. Please download replays individually.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="268"/>
+        <location filename="src/replays.cpp" line="268"/>
         <source>Delete remote replay</source>
         <translation>서버에 저장된 리플레이 삭제</translation>
     </message>
     <message>
-        <location filename="src/tab_replays.cpp" line="269"/>
+        <location filename="src/replays.cpp" line="269"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation>정말 게임 %1의 리플레이를 삭제하시겠습니까?</translation>
     </message>
@@ -6045,47 +6045,47 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="src/tab_room.cpp" line="148"/>
+        <location filename="src/room.cpp" line="148"/>
         <source>&amp;Say:</source>
         <translation>말하기:</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="149"/>
+        <location filename="src/room.cpp" line="149"/>
         <source>Chat</source>
         <translation>대화</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="150"/>
+        <location filename="src/room.cpp" line="150"/>
         <source>&amp;Room</source>
         <translation>채널</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="151"/>
+        <location filename="src/room.cpp" line="151"/>
         <source>&amp;Leave room</source>
         <translation>채널에서 나가기</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="152"/>
+        <location filename="src/room.cpp" line="152"/>
         <source>&amp;Clear chat</source>
         <translation>대화 내용 삭제</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="153"/>
+        <location filename="src/room.cpp" line="153"/>
         <source>Chat Settings...</source>
         <translation>대화 설정...</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="165"/>
+        <location filename="src/room.cpp" line="165"/>
         <source> mentioned you.</source>
         <translation>이(가) 당신에게 멘션을 보냈습니다.</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="173"/>
+        <location filename="src/room.cpp" line="173"/>
         <source>Click to view</source>
         <translation>여기를 눌러 확인</translation>
     </message>
     <message>
-        <location filename="src/tab_room.cpp" line="216"/>
+        <location filename="src/room.cpp" line="216"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>너무 빨리 말하고 있습니다. 조금만 기다려 주세요.</translation>
     </message>
@@ -6098,30 +6098,30 @@ The more information you put in, the more specific your results will be.</source
         <translation>서버</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="209"/>
-        <location filename="src/tab_server.cpp" line="214"/>
-        <location filename="src/tab_server.cpp" line="219"/>
-        <location filename="src/tab_server.cpp" line="224"/>
+        <location filename="src/server.cpp" line="209"/>
+        <location filename="src/server.cpp" line="214"/>
+        <location filename="src/server.cpp" line="219"/>
+        <location filename="src/server.cpp" line="224"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="210"/>
+        <location filename="src/server.cpp" line="210"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="215"/>
+        <location filename="src/server.cpp" line="215"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="220"/>
+        <location filename="src/server.cpp" line="220"/>
         <source>You do not have the required permission to join this server room.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_server.cpp" line="225"/>
+        <location filename="src/server.cpp" line="225"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
         <translation type="unfinished"/>
     </message>
@@ -6129,33 +6129,33 @@ The more information you put in, the more specific your results will be.</source
 <context>
     <name>TabSupervisor</name>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="174"/>
+        <location filename="src/supervisor.cpp" line="174"/>
         <source>Are you sure?</source>
         <translation>확실하십니까?</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="175"/>
+        <location filename="src/supervisor.cpp" line="175"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>참가 중인 게임이 있습니다. 
 정말로 코카트리스를 종료하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="577"/>
+        <location filename="src/supervisor.cpp" line="577"/>
         <source>Click to view</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="605"/>
+        <location filename="src/supervisor.cpp" line="605"/>
         <source>Your buddy %1 has signed on!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="646"/>
+        <location filename="src/supervisor.cpp" line="646"/>
         <source>Unknown Event</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="647"/>
+        <location filename="src/supervisor.cpp" line="647"/>
         <source>The server has sent you a message that your client does not understand.
 This message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
@@ -6163,32 +6163,32 @@ To update your client, go to Help -&gt; Check for Updates.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="652"/>
+        <location filename="src/supervisor.cpp" line="652"/>
         <source>Idle Timeout</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="652"/>
+        <location filename="src/supervisor.cpp" line="652"/>
         <source>You are about to be logged out due to inactivity.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="656"/>
+        <location filename="src/supervisor.cpp" line="656"/>
         <source>Promotion</source>
         <translation>승급</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="657"/>
+        <location filename="src/supervisor.cpp" line="657"/>
         <source>You have been promoted. Please log out and back in for changes to take effect.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="661"/>
+        <location filename="src/supervisor.cpp" line="661"/>
         <source>Warned</source>
         <translation>경고</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="662"/>
+        <location filename="src/supervisor.cpp" line="662"/>
         <source>You have received a warning due to %1.
 Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</source>
         <translation>운영진으로부터 %1의 사유로 경고를 받았습니다.
@@ -6196,7 +6196,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 문의사항은 관리자에게 1:1대화로 물어보시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="src/tab_supervisor.cpp" line="676"/>
+        <location filename="src/supervisor.cpp" line="676"/>
         <source>You have received the following message from the server.
 (custom messages like these could be untranslated)</source>
         <translation type="unfinished"/>
@@ -6205,7 +6205,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>TabUserLists</name>
     <message>
-        <location filename="src/tab_account.h" line="56"/>
+        <location filename="src/account.h" line="56"/>
         <source>Account</source>
         <translation>사용자 정보</translation>
     </message>
@@ -6223,13 +6223,13 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>TappedOutInterface</name>
     <message>
-        <location filename="src/tappedout_interface.cpp" line="23"/>
-        <location filename="src/tappedout_interface.cpp" line="63"/>
+        <location filename="src/tapped_out_interface.cpp" line="23"/>
+        <location filename="src/tapped_out_interface.cpp" line="63"/>
         <source>Error</source>
         <translation>에러</translation>
     </message>
     <message>
-        <location filename="src/tappedout_interface.cpp" line="44"/>
+        <location filename="src/tapped_out_interface.cpp" line="44"/>
         <source>Unable to analyze the deck.</source>
         <translation type="unfinished"/>
     </message>
@@ -6303,173 +6303,173 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserContextMenu</name>
     <message>
-        <location filename="src/user_context_menu.cpp" line="56"/>
+        <location filename="src/context_menu.cpp" line="56"/>
         <source>User &amp;details</source>
         <translation>사용자 정보</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="57"/>
+        <location filename="src/context_menu.cpp" line="57"/>
         <source>Private &amp;chat</source>
         <translation>1:1 대화</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="58"/>
+        <location filename="src/context_menu.cpp" line="58"/>
         <source>Show this user&apos;s &amp;games</source>
         <translation>이 사용자의 게임 보기</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="59"/>
+        <location filename="src/context_menu.cpp" line="59"/>
         <source>Add to &amp;buddy list</source>
         <translation>친구 목록에 추가</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="60"/>
+        <location filename="src/context_menu.cpp" line="60"/>
         <source>Remove from &amp;buddy list</source>
         <translation>친구 목록에서 삭제</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="61"/>
+        <location filename="src/context_menu.cpp" line="61"/>
         <source>Add to &amp;ignore list</source>
         <translation>차단 목록에 추가</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="62"/>
+        <location filename="src/context_menu.cpp" line="62"/>
         <source>Remove from &amp;ignore list</source>
         <translation>차단 목록에서 제거</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="63"/>
+        <location filename="src/context_menu.cpp" line="63"/>
         <source>Kick from &amp;game</source>
         <translation>게임에서 강제 퇴장</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="64"/>
+        <location filename="src/context_menu.cpp" line="64"/>
         <source>Warn user</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="65"/>
+        <location filename="src/context_menu.cpp" line="65"/>
         <source>View user&apos;s war&amp;n history</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="66"/>
+        <location filename="src/context_menu.cpp" line="66"/>
         <source>Ban from &amp;server</source>
         <translation>서버에서 추방</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="67"/>
+        <location filename="src/context_menu.cpp" line="67"/>
         <source>View user&apos;s &amp;ban history</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="68"/>
+        <location filename="src/context_menu.cpp" line="68"/>
         <source>&amp;Promote user to moderator</source>
         <translation>사용자를 관리자로 승급</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="69"/>
+        <location filename="src/context_menu.cpp" line="69"/>
         <source>Dem&amp;ote user from moderator</source>
         <translation>사용자를 관리자로부터 강등</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="70"/>
+        <location filename="src/context_menu.cpp" line="70"/>
         <source>Promote user to &amp;judge</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="71"/>
+        <location filename="src/context_menu.cpp" line="71"/>
         <source>Demote user from judge</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="101"/>
+        <location filename="src/context_menu.cpp" line="101"/>
         <source>%1&apos;s games</source>
         <translation>%1의 게임</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="157"/>
-        <location filename="src/user_context_menu.cpp" line="180"/>
-        <location filename="src/user_context_menu.cpp" line="184"/>
+        <location filename="src/context_menu.cpp" line="157"/>
+        <location filename="src/context_menu.cpp" line="180"/>
+        <location filename="src/context_menu.cpp" line="184"/>
         <source>Ban History</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="163"/>
+        <location filename="src/context_menu.cpp" line="163"/>
         <source>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="181"/>
+        <location filename="src/context_menu.cpp" line="181"/>
         <source>User has never been banned.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="185"/>
+        <location filename="src/context_menu.cpp" line="185"/>
         <source>Failed to collect ban information.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="195"/>
-        <location filename="src/user_context_menu.cpp" line="216"/>
-        <location filename="src/user_context_menu.cpp" line="220"/>
+        <location filename="src/context_menu.cpp" line="195"/>
+        <location filename="src/context_menu.cpp" line="216"/>
+        <location filename="src/context_menu.cpp" line="220"/>
         <source>Warning History</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="200"/>
+        <location filename="src/context_menu.cpp" line="200"/>
         <source>Warning Time;Moderator;User Name;Reason</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="217"/>
+        <location filename="src/context_menu.cpp" line="217"/>
         <source>User has never been warned.</source>
         <translation>경고를 받은 적이 없는 사용자입니다.</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="221"/>
+        <location filename="src/context_menu.cpp" line="221"/>
         <source>Failed to collect warning information.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="231"/>
-        <location filename="src/user_context_menu.cpp" line="234"/>
+        <location filename="src/context_menu.cpp" line="231"/>
+        <location filename="src/context_menu.cpp" line="234"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="232"/>
+        <location filename="src/context_menu.cpp" line="232"/>
         <source>Successfully promoted user.</source>
         <translation>해당 사용자 승급에 성공하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="234"/>
+        <location filename="src/context_menu.cpp" line="234"/>
         <source>Successfully demoted user.</source>
         <translation>해당 사용자 강등에 성공하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="239"/>
-        <location filename="src/user_context_menu.cpp" line="241"/>
+        <location filename="src/context_menu.cpp" line="239"/>
+        <location filename="src/context_menu.cpp" line="241"/>
         <source>Failed</source>
         <translation>실패</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="239"/>
+        <location filename="src/context_menu.cpp" line="239"/>
         <source>Failed to promote user.</source>
         <translation>해당 사용자 승급에 실패하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="241"/>
+        <location filename="src/context_menu.cpp" line="241"/>
         <source>Failed to demote user.</source>
         <translation>해당 사용자 강등에 실패하였습니다.</translation>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="316"/>
+        <location filename="src/context_menu.cpp" line="316"/>
         <source>Copy hash to clipboard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/user_context_menu.cpp" line="336"/>
+        <location filename="src/context_menu.cpp" line="336"/>
         <source>Remove this user&apos;s messages</source>
         <translation type="unfinished"/>
     </message>
@@ -6905,22 +6905,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="140"/>
+        <location filename="src/view_widget.cpp" line="140"/>
         <source>sort by name</source>
         <translation>카드 이름순 정렬</translation>
     </message>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="141"/>
+        <location filename="src/view_widget.cpp" line="141"/>
         <source>sort by type</source>
         <translation>카드 유형별 정렬</translation>
     </message>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="142"/>
+        <location filename="src/view_widget.cpp" line="142"/>
         <source>shuffle when closing</source>
         <translation>닫은 후 덱 섞기</translation>
     </message>
     <message>
-        <location filename="src/zoneviewwidget.cpp" line="143"/>
+        <location filename="src/view_widget.cpp" line="143"/>
         <source>pile view</source>
         <translation>카드 유형별 행 정렬</translation>
     </message>
@@ -6928,7 +6928,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>i18n</name>
     <message>
-        <location filename="src/settingscache.cpp" line="170"/>
+        <location filename="src/cache.cpp" line="170"/>
         <source>English</source>
         <translation>한국어 (Korean)</translation>
     </message>

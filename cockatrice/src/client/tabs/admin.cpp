@@ -1,6 +1,6 @@
-#include "tab_admin.h"
+#include "admin.h"
 
-#include "abstractclient.h"
+#include "../abstract_client.h"
 #include "pb/admin_commands.pb.h"
 #include "trice_limits.h"
 
