@@ -1,6 +1,6 @@
 #include "handcounter.h"
 
-#include "cardzone.h"
+#include "zones/cardzone.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
