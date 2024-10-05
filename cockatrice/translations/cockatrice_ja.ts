@@ -2,7 +2,7 @@
 <context>
     <name>AbstractCounter</name>
     <message>
-        <location filename="src/abstractcounter.cpp" line="81"/>
+        <location filename="src/abstract_counter.cpp" line="81"/>
         <source>&amp;Set counter...</source>
         <translation>カウンターの数を決める...</translation>
     </message>
@@ -10,12 +10,12 @@
 <context>
     <name>AbstractCounterDialog</name>
     <message>
-        <location filename="src/abstractcounter.cpp" line="199"/>
+        <location filename="src/abstract_counter.cpp" line="199"/>
         <source>Set counter</source>
         <translation>カウンターの設定</translation>
     </message>
     <message>
-        <location filename="src/abstractcounter.cpp" line="200"/>
+        <location filename="src/abstract_counter.cpp" line="200"/>
         <source>New value for counter &apos;%1&apos;:</source>
         <translation>&apos;%1&apos;カウンターの新しい値:</translation>
     </message>
@@ -219,22 +219,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>BetaReleaseChannel</name>
     <message>
-        <location filename="src/releasechannel.cpp" line="206"/>
+        <location filename="src/release_channel.cpp" line="206"/>
         <source>Beta Releases</source>
         <translation>ベータリリース</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="232"/>
+        <location filename="src/release_channel.cpp" line="232"/>
         <source>No reply received from the release update server.</source>
         <translation>リリース更新サーバーから応答がありませんでした。</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="241"/>
+        <location filename="src/release_channel.cpp" line="241"/>
         <source>Invalid reply received from the release update server.</source>
         <translation>リリース更新サーバーから無効な応答が受信されました。</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="274"/>
+        <location filename="src/release_channel.cpp" line="274"/>
         <source>No reply received from the file update server.</source>
         <translation>ファイル更新サーバーからの応答がありませんでした。</translation>
     </message>
@@ -242,32 +242,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="src/database_model.cpp" line="70"/>
+        <location filename="src/card_database_model.cpp" line="70"/>
         <source>Name</source>
         <translation>カード名</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="72"/>
+        <location filename="src/card_database_model.cpp" line="72"/>
         <source>Sets</source>
         <translation>カードセット</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="74"/>
+        <location filename="src/card_database_model.cpp" line="74"/>
         <source>Mana cost</source>
         <translation>マナ・コスト</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="76"/>
+        <location filename="src/card_database_model.cpp" line="76"/>
         <source>Card type</source>
         <translation>カード・タイプ</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="78"/>
+        <location filename="src/card_database_model.cpp" line="78"/>
         <source>P/T</source>
         <translation>P/T</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="80"/>
+        <location filename="src/card_database_model.cpp" line="80"/>
         <source>Color(s)</source>
         <translation>色</translation>
     </message>
@@ -275,86 +275,86 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFilter</name>
     <message>
-        <location filename="src/card.cpp" line="7"/>
+        <location filename="src/filter_card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
         <translation>AND</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="9"/>
+        <location filename="src/filter_card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
         <translation>OR</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="11"/>
+        <location filename="src/filter_card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
         <translation>AND NOT</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="13"/>
+        <location filename="src/filter_card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
         <translation>OR NOT</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="23"/>
+        <location filename="src/filter_card.cpp" line="23"/>
         <source>Name</source>
         <translation>カード名</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="25"/>
+        <location filename="src/filter_card.cpp" line="25"/>
         <source>Type</source>
         <translation>タイプ</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="27"/>
+        <location filename="src/filter_card.cpp" line="27"/>
         <source>Color</source>
         <translation>色</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="29"/>
+        <location filename="src/filter_card.cpp" line="29"/>
         <source>Text</source>
         <translation>ルール文章</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="31"/>
+        <location filename="src/filter_card.cpp" line="31"/>
         <source>Set</source>
         <translation>カードセット</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="33"/>
+        <location filename="src/filter_card.cpp" line="33"/>
         <source>Mana Cost</source>
         <translation>マナ・コスト</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="35"/>
+        <location filename="src/filter_card.cpp" line="35"/>
         <source>Mana Value</source>
         <translation>マナ総量</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="37"/>
+        <location filename="src/filter_card.cpp" line="37"/>
         <source>Rarity</source>
         <translation>稀少度</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="39"/>
+        <location filename="src/filter_card.cpp" line="39"/>
         <source>Power</source>
         <translation>パワー</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="41"/>
+        <location filename="src/filter_card.cpp" line="41"/>
         <source>Toughness</source>
         <translation>タフネス</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="43"/>
+        <location filename="src/filter_card.cpp" line="43"/>
         <source>Loyalty</source>
         <translation>忠誠度</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="45"/>
+        <location filename="src/filter_card.cpp" line="45"/>
         <source>Format</source>
         <translation>フォーマット</translation>
     </message>
@@ -362,17 +362,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFrame</name>
     <message>
-        <location filename="src/frame.cpp" line="65"/>
+        <location filename="src/card_frame.cpp" line="65"/>
         <source>Image</source>
         <translation>カード画像</translation>
     </message>
     <message>
-        <location filename="src/frame.cpp" line="66"/>
+        <location filename="src/card_frame.cpp" line="66"/>
         <source>Description</source>
         <translation>カード文章</translation>
     </message>
     <message>
-        <location filename="src/frame.cpp" line="67"/>
+        <location filename="src/card_frame.cpp" line="67"/>
         <source>Both</source>
         <translation>画像+文章</translation>
     </message>
@@ -380,17 +380,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardInfoText</name>
     <message>
-        <location filename="src/info_text.cpp" line="40"/>
+        <location filename="src/card_info_text.cpp" line="40"/>
         <source>Name:</source>
         <translation>カード名:</translation>
     </message>
     <message>
-        <location filename="src/info_text.cpp" line="53"/>
+        <location filename="src/card_info_text.cpp" line="53"/>
         <source>Related cards:</source>
         <translation>関連カード:</translation>
     </message>
     <message>
-        <location filename="src/info_text.cpp" line="70"/>
+        <location filename="src/card_info_text.cpp" line="70"/>
         <source>Unknown card:</source>
         <translation>謎のカード:</translation>
     </message>
@@ -398,12 +398,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="src/item.cpp" line="87"/>
+        <location filename="src/card_item.cpp" line="87"/>
         <source>&amp;Move to</source>
         <translation>領域の移動</translation>
     </message>
     <message>
-        <location filename="src/item.cpp" line="88"/>
+        <location filename="src/card_item.cpp" line="88"/>
         <source>&amp;Power / toughness</source>
         <translation>パワー / タフネス</translation>
     </message>
@@ -411,121 +411,121 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardZone</name>
     <message>
-        <location filename="src/cardzone.cpp" line="64"/>
+        <location filename="src/card_zone.cpp" line="64"/>
         <source>their hand</source>
         <comment>nominative</comment>
         <translation>手札</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="64"/>
+        <location filename="src/card_zone.cpp" line="64"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
         <translation>%1の手札</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="68"/>
+        <location filename="src/card_zone.cpp" line="68"/>
         <source>their library</source>
         <comment>look at zone</comment>
         <translation>ライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="69"/>
+        <location filename="src/card_zone.cpp" line="69"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
         <translation>%1のライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="71"/>
+        <location filename="src/card_zone.cpp" line="71"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
         <translation>ライブラリーの</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="72"/>
+        <location filename="src/card_zone.cpp" line="72"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
         <translation>%1のライブラリーの</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="74"/>
+        <location filename="src/card_zone.cpp" line="74"/>
         <source>their library</source>
         <comment>reveal zone</comment>
         <translation>ライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="75"/>
+        <location filename="src/card_zone.cpp" line="75"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
         <translation>%1のライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="77"/>
+        <location filename="src/card_zone.cpp" line="77"/>
         <source>their library</source>
         <comment>shuffle</comment>
         <translation>ライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="77"/>
+        <location filename="src/card_zone.cpp" line="77"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
         <translation>%1のライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="79"/>
+        <location filename="src/card_zone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
         <translation>ライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="79"/>
+        <location filename="src/card_zone.cpp" line="79"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
         <translation>%1のライブラリー</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="82"/>
+        <location filename="src/card_zone.cpp" line="82"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
         <translation>墓地</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="82"/>
+        <location filename="src/card_zone.cpp" line="82"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
         <translation>%1の墓地</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="84"/>
+        <location filename="src/card_zone.cpp" line="84"/>
         <source>their exile</source>
         <comment>nominative</comment>
         <translation>追放領域</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="84"/>
+        <location filename="src/card_zone.cpp" line="84"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
         <translation>%1の追放領域</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="88"/>
+        <location filename="src/card_zone.cpp" line="88"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
         <translation>サイドボード</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="89"/>
+        <location filename="src/card_zone.cpp" line="89"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
         <translation>%1のサイドボード</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="91"/>
+        <location filename="src/card_zone.cpp" line="91"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
         <translation>サイドボード</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="92"/>
+        <location filename="src/card_zone.cpp" line="92"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
         <translation>%1のサイドボード</translation>
@@ -686,12 +686,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckListModel</name>
     <message>
-        <location filename="src/list_model.cpp" line="167"/>
+        <location filename="src/deck_list_model.cpp" line="167"/>
         <source>Number</source>
         <translation>枚数</translation>
     </message>
     <message>
-        <location filename="src/list_model.cpp" line="169"/>
+        <location filename="src/deck_list_model.cpp" line="169"/>
         <source>Card</source>
         <translation>カード名</translation>
     </message>
@@ -699,13 +699,13 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckStatsInterface</name>
     <message>
-        <location filename="src/stats_interface.cpp" line="23"/>
-        <location filename="src/stats_interface.cpp" line="35"/>
+        <location filename="src/deck_stats_interface.cpp" line="23"/>
+        <location filename="src/deck_stats_interface.cpp" line="35"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/stats_interface.cpp" line="35"/>
+        <location filename="src/deck_stats_interface.cpp" line="35"/>
         <source>The reply from the server could not be parsed.</source>
         <translation>サーバーからの応答が解析できませんでした。</translation>
     </message>

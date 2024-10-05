@@ -1,7 +1,7 @@
 #ifndef COUNTER_GENERAL_H
 #define COUNTER_GENERAL_H
 
-#include "abstractcounter.h"
+#include "abstract_counter.h"
 
 class GeneralCounter : public AbstractCounter
 {

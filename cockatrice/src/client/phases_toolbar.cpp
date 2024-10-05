@@ -1,10 +1,10 @@
-#include "phasestoolbar.h"
+#include "phases_toolbar.h"
 
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_next_turn.pb.h"
 #include "pb/command_set_active_phase.pb.h"
 #include "pb/command_set_card_attr.pb.h"
-#include "pixmapgenerator.h"
+#include "pixel_map_generator.h"
 
 #include <QAction>
 #include <QDebug>

@@ -1,14 +1,14 @@
-#include "messagelogwidget.h"
+#include "message_log_widget.h"
 
-#include "carditem.h"
-#include "cardzone.h"
+#include "../client/sound_engine.h"
+#include "../client/translate_counter_name.h"
+#include "../game/cards/card_item.h"
+#include "../game/phase.h"
+#include "../game/zones/card_zone.h"
+#include "../player/player.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/serverinfo_user.pb.h"
-#include "phase.h"
-#include "player.h"
-#include "soundengine.h"
-#include "translatecountername.h"
 
 #include <utility>
 

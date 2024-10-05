@@ -21,18 +21,18 @@
 #include "main.h"
 
 #include "QtNetwork/QNetworkInterface"
-#include "carddatabase.h"
-#include "dlg_settings.h"
+#include "client/pixel_map_generator.h"
+#include "client/sound_engine.h"
+#include "client/spoiler_background_updater.h"
+#include "client/theme_manager.h"
+#include "client/window_main.h"
+#include "dialogs/dlg_settings.h"
 #include "featureset.h"
-#include "logger.h"
-#include "pixmapgenerator.h"
+#include "game/cards/card_database.h"
 #include "rng_sfmt.h"
-#include "settingscache.h"
-#include "soundengine.h"
-#include "spoilerbackgroundupdater.h"
-#include "thememanager.h"
+#include "settings/cache_settings.h"
+#include "utility/logger.h"
 #include "version_string.h"
-#include "window_main.h"
 
 #include <QApplication>
 #include <QCryptographicHash>

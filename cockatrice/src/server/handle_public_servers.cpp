@@ -1,6 +1,6 @@
 #include "handle_public_servers.h"
 
-#include "settingscache.h"
+#include "../settings/cache_settings.h"
 
 #include <QJsonDocument>
 #include <QMessageBox>

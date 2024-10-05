@@ -1,6 +1,6 @@
-#include "sequenceedit.h"
+#include "sequence_edit.h"
 
-#include "../settingscache.h"
+#include "../settings/cache_settings.h"
 
 #include <QHBoxLayout>
 #include <QKeyEvent>

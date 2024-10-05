@@ -1,7 +1,7 @@
 #ifndef ARROWTARGET_H
 #define ARROWTARGET_H
 
-#include "abstractgraphicsitem.h"
+#include "abstract_graphics_item.h"
 
 #include <QList>
 

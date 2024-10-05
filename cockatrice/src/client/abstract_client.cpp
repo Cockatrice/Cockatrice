@@ -1,5 +1,6 @@
 #include "abstract_client.h"
 
+#include "../server/pending_command.h"
 #include "featureset.h"
 #include "get_pb_extension.h"
 #include "pb/commands.pb.h"
@@ -17,7 +18,6 @@
 #include "pb/event_user_left.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/server_message.pb.h"
-#include "../server/pending_command.h"
 
 #include <google/protobuf/descriptor.h>
 

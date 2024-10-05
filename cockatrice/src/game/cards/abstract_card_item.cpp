@@ -1,9 +1,10 @@
 #include "abstract_card_item.h"
-#include "carddatabase.h"
-#include "gamescene.h"
-#include "main.h"
-#include "pictureloader.h"
-#include "settingscache.h"
+
+#include "../../client/picture_loader.h"
+#include "../../main.h"
+#include "../../settings/cache_settings.h"
+#include "../game_scene.h"
+#include "card_database.h"
 
 #include <QCursor>
 #include <QGraphicsScene>

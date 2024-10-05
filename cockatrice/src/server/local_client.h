@@ -1,7 +1,7 @@
 #ifndef LOCALCLIENT_H
 #define LOCALCLIENT_H
 
-#include "abstractclient.h"
+#include "../client/abstract_client.h"
 
 class LocalServerInterface;
 

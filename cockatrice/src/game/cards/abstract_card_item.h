@@ -1,8 +1,8 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
-#include "arrowtarget.h"
-#include "carddatabase.h"
+#include "../board/arrow_target.h"
+#include "card_database.h"
 
 class Player;
 

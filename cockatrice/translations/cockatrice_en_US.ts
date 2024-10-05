@@ -2,7 +2,7 @@
 <context>
     <name>AbstractCounter</name>
     <message>
-        <location filename="src/abstractcounter.cpp" line="81"/>
+        <location filename="src/abstract_counter.cpp" line="81"/>
         <source>&amp;Set counter...</source>
         <translation>&amp;Set counter...</translation>
     </message>
@@ -10,12 +10,12 @@
 <context>
     <name>AbstractCounterDialog</name>
     <message>
-        <location filename="src/abstractcounter.cpp" line="199"/>
+        <location filename="src/abstract_counter.cpp" line="199"/>
         <source>Set counter</source>
         <translation>Set counter</translation>
     </message>
     <message>
-        <location filename="src/abstractcounter.cpp" line="200"/>
+        <location filename="src/abstract_counter.cpp" line="200"/>
         <source>New value for counter &apos;%1&apos;:</source>
         <translation>New value for counter &apos;%1&apos;:</translation>
     </message>
@@ -219,22 +219,22 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>BetaReleaseChannel</name>
     <message>
-        <location filename="src/releasechannel.cpp" line="206"/>
+        <location filename="src/release_channel.cpp" line="206"/>
         <source>Beta Releases</source>
         <translation>Beta Releases</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="232"/>
+        <location filename="src/release_channel.cpp" line="232"/>
         <source>No reply received from the release update server.</source>
         <translation>No reply received from the release update server.</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="241"/>
+        <location filename="src/release_channel.cpp" line="241"/>
         <source>Invalid reply received from the release update server.</source>
         <translation>Invalid reply received from the release update server.</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="274"/>
+        <location filename="src/release_channel.cpp" line="274"/>
         <source>No reply received from the file update server.</source>
         <translation>No reply received from the file update server.</translation>
     </message>
@@ -242,32 +242,32 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="src/database_model.cpp" line="70"/>
+        <location filename="src/card_database_model.cpp" line="70"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="72"/>
+        <location filename="src/card_database_model.cpp" line="72"/>
         <source>Sets</source>
         <translation>Sets</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="74"/>
+        <location filename="src/card_database_model.cpp" line="74"/>
         <source>Mana cost</source>
         <translation>Mana cost</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="76"/>
+        <location filename="src/card_database_model.cpp" line="76"/>
         <source>Card type</source>
         <translation>Card type</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="78"/>
+        <location filename="src/card_database_model.cpp" line="78"/>
         <source>P/T</source>
         <translation>P/T</translation>
     </message>
     <message>
-        <location filename="src/database_model.cpp" line="80"/>
+        <location filename="src/card_database_model.cpp" line="80"/>
         <source>Color(s)</source>
         <translation>Color(s)</translation>
     </message>
@@ -275,86 +275,86 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardFilter</name>
     <message>
-        <location filename="src/card.cpp" line="7"/>
+        <location filename="src/filter_card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
         <translation>AND</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="9"/>
+        <location filename="src/filter_card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
         <translation>OR</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="11"/>
+        <location filename="src/filter_card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
         <translation>AND NOT</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="13"/>
+        <location filename="src/filter_card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
         <translation>OR NOT</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="23"/>
+        <location filename="src/filter_card.cpp" line="23"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="25"/>
+        <location filename="src/filter_card.cpp" line="25"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="27"/>
+        <location filename="src/filter_card.cpp" line="27"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="29"/>
+        <location filename="src/filter_card.cpp" line="29"/>
         <source>Text</source>
         <translation>Text</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="31"/>
+        <location filename="src/filter_card.cpp" line="31"/>
         <source>Set</source>
         <translation>Set</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="33"/>
+        <location filename="src/filter_card.cpp" line="33"/>
         <source>Mana Cost</source>
         <translation>Mana Cost</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="35"/>
+        <location filename="src/filter_card.cpp" line="35"/>
         <source>Mana Value</source>
         <translation>Mana Value</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="37"/>
+        <location filename="src/filter_card.cpp" line="37"/>
         <source>Rarity</source>
         <translation>Rarity</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="39"/>
+        <location filename="src/filter_card.cpp" line="39"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="41"/>
+        <location filename="src/filter_card.cpp" line="41"/>
         <source>Toughness</source>
         <translation>Toughness</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="43"/>
+        <location filename="src/filter_card.cpp" line="43"/>
         <source>Loyalty</source>
         <translation>Loyalty</translation>
     </message>
     <message>
-        <location filename="src/card.cpp" line="45"/>
+        <location filename="src/filter_card.cpp" line="45"/>
         <source>Format</source>
         <translation>Format</translation>
     </message>
@@ -362,17 +362,17 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardFrame</name>
     <message>
-        <location filename="src/frame.cpp" line="65"/>
+        <location filename="src/card_frame.cpp" line="65"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="src/frame.cpp" line="66"/>
+        <location filename="src/card_frame.cpp" line="66"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="src/frame.cpp" line="67"/>
+        <location filename="src/card_frame.cpp" line="67"/>
         <source>Both</source>
         <translation>Both</translation>
     </message>
@@ -380,17 +380,17 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardInfoText</name>
     <message>
-        <location filename="src/info_text.cpp" line="40"/>
+        <location filename="src/card_info_text.cpp" line="40"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="src/info_text.cpp" line="53"/>
+        <location filename="src/card_info_text.cpp" line="53"/>
         <source>Related cards:</source>
         <translation>Related cards:</translation>
     </message>
     <message>
-        <location filename="src/info_text.cpp" line="70"/>
+        <location filename="src/card_info_text.cpp" line="70"/>
         <source>Unknown card:</source>
         <translation>Unknown card:</translation>
     </message>
@@ -398,12 +398,12 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="src/item.cpp" line="87"/>
+        <location filename="src/card_item.cpp" line="87"/>
         <source>&amp;Move to</source>
         <translation>&amp;Move to</translation>
     </message>
     <message>
-        <location filename="src/item.cpp" line="88"/>
+        <location filename="src/card_item.cpp" line="88"/>
         <source>&amp;Power / toughness</source>
         <translation>&amp;Power / toughness</translation>
     </message>
@@ -411,121 +411,121 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardZone</name>
     <message>
-        <location filename="src/cardzone.cpp" line="64"/>
+        <location filename="src/card_zone.cpp" line="64"/>
         <source>their hand</source>
         <comment>nominative</comment>
         <translation>their hand</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="64"/>
+        <location filename="src/card_zone.cpp" line="64"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
         <translation>%1&apos;s hand</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="68"/>
+        <location filename="src/card_zone.cpp" line="68"/>
         <source>their library</source>
         <comment>look at zone</comment>
         <translation>their library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="69"/>
+        <location filename="src/card_zone.cpp" line="69"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
         <translation>%1&apos;s library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="71"/>
+        <location filename="src/card_zone.cpp" line="71"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
         <translation>of their library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="72"/>
+        <location filename="src/card_zone.cpp" line="72"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
         <translation>of %1&apos;s library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="74"/>
+        <location filename="src/card_zone.cpp" line="74"/>
         <source>their library</source>
         <comment>reveal zone</comment>
         <translation>their library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="75"/>
+        <location filename="src/card_zone.cpp" line="75"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
         <translation>%1&apos;s library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="77"/>
+        <location filename="src/card_zone.cpp" line="77"/>
         <source>their library</source>
         <comment>shuffle</comment>
         <translation>their library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="77"/>
+        <location filename="src/card_zone.cpp" line="77"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
         <translation>%1&apos;s library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="79"/>
+        <location filename="src/card_zone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
         <translation>their library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="79"/>
+        <location filename="src/card_zone.cpp" line="79"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
         <translation>%1&apos;s library</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="82"/>
+        <location filename="src/card_zone.cpp" line="82"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
         <translation>their graveyard</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="82"/>
+        <location filename="src/card_zone.cpp" line="82"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
         <translation>%1&apos;s graveyard</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="84"/>
+        <location filename="src/card_zone.cpp" line="84"/>
         <source>their exile</source>
         <comment>nominative</comment>
         <translation>their exile</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="84"/>
+        <location filename="src/card_zone.cpp" line="84"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
         <translation>%1&apos;s exile</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="88"/>
+        <location filename="src/card_zone.cpp" line="88"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
         <translation>their sideboard</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="89"/>
+        <location filename="src/card_zone.cpp" line="89"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
         <translation>%1&apos;s sideboard</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="91"/>
+        <location filename="src/card_zone.cpp" line="91"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
         <translation>their sideboard</translation>
     </message>
     <message>
-        <location filename="src/cardzone.cpp" line="92"/>
+        <location filename="src/card_zone.cpp" line="92"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
         <translation>%1&apos;s sideboard</translation>
@@ -686,12 +686,12 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>DeckListModel</name>
     <message>
-        <location filename="src/list_model.cpp" line="167"/>
+        <location filename="src/deck_list_model.cpp" line="167"/>
         <source>Number</source>
         <translation>Number</translation>
     </message>
     <message>
-        <location filename="src/list_model.cpp" line="169"/>
+        <location filename="src/deck_list_model.cpp" line="169"/>
         <source>Card</source>
         <translation>Card</translation>
     </message>
@@ -699,13 +699,13 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>DeckStatsInterface</name>
     <message>
-        <location filename="src/stats_interface.cpp" line="23"/>
-        <location filename="src/stats_interface.cpp" line="35"/>
+        <location filename="src/deck_stats_interface.cpp" line="23"/>
+        <location filename="src/deck_stats_interface.cpp" line="35"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/stats_interface.cpp" line="35"/>
+        <location filename="src/deck_stats_interface.cpp" line="35"/>
         <source>The reply from the server could not be parsed.</source>
         <translation>The reply from the server could not be parsed.</translation>
     </message>
@@ -2091,7 +2091,7 @@ You may have to build from source yourself.</translation>
 <context>
     <name>FilterBuilder</name>
     <message>
-        <location filename="src/builder.cpp" line="28"/>
+        <location filename="src/filter_builder.cpp" line="28"/>
         <source>Type your filter here</source>
         <translation>Type your filter here</translation>
     </message>
@@ -2099,105 +2099,105 @@ You may have to build from source yourself.</translation>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="src/selector.cpp" line="217"/>
-        <location filename="src/selector.cpp" line="220"/>
-        <location filename="src/selector.cpp" line="223"/>
-        <location filename="src/selector.cpp" line="226"/>
-        <location filename="src/selector.cpp" line="229"/>
-        <location filename="src/selector.cpp" line="232"/>
-        <location filename="src/selector.cpp" line="235"/>
-        <location filename="src/selector.cpp" line="238"/>
-        <location filename="src/selector.cpp" line="272"/>
+        <location filename="src/game_selector.cpp" line="217"/>
+        <location filename="src/game_selector.cpp" line="220"/>
+        <location filename="src/game_selector.cpp" line="223"/>
+        <location filename="src/game_selector.cpp" line="226"/>
+        <location filename="src/game_selector.cpp" line="229"/>
+        <location filename="src/game_selector.cpp" line="232"/>
+        <location filename="src/game_selector.cpp" line="235"/>
+        <location filename="src/game_selector.cpp" line="238"/>
+        <location filename="src/game_selector.cpp" line="272"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="217"/>
+        <location filename="src/game_selector.cpp" line="217"/>
         <source>Please join the appropriate room first.</source>
         <translation>Please join the appropriate room first.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="220"/>
+        <location filename="src/game_selector.cpp" line="220"/>
         <source>Wrong password.</source>
         <translation>Wrong password.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="223"/>
+        <location filename="src/game_selector.cpp" line="223"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>Spectators are not allowed in this game.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="226"/>
+        <location filename="src/game_selector.cpp" line="226"/>
         <source>The game is already full.</source>
         <translation>The game is already full.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="229"/>
+        <location filename="src/game_selector.cpp" line="229"/>
         <source>The game does not exist any more.</source>
         <translation>The game does not exist any more.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="232"/>
+        <location filename="src/game_selector.cpp" line="232"/>
         <source>This game is only open to registered users.</source>
         <translation>This game is only open to registered users.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="235"/>
+        <location filename="src/game_selector.cpp" line="235"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>This game is only open to its creator&apos;s buddies.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="238"/>
+        <location filename="src/game_selector.cpp" line="238"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>You are being ignored by the creator of this game.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="258"/>
+        <location filename="src/game_selector.cpp" line="258"/>
         <source>Join game</source>
         <translation>Join game</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="258"/>
+        <location filename="src/game_selector.cpp" line="258"/>
         <source>Password:</source>
         <translation>Password:</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="272"/>
+        <location filename="src/game_selector.cpp" line="272"/>
         <source>Please join the respective room first.</source>
         <translation>Please join the respective room first.</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="315"/>
+        <location filename="src/game_selector.cpp" line="315"/>
         <source>&amp;Filter games</source>
         <translation>&amp;Filter games</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="316"/>
+        <location filename="src/game_selector.cpp" line="316"/>
         <source>C&amp;lear filter</source>
         <translation>C&amp;lear filter</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="318"/>
+        <location filename="src/game_selector.cpp" line="318"/>
         <source>C&amp;reate</source>
         <translation>C&amp;reate</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="319"/>
+        <location filename="src/game_selector.cpp" line="319"/>
         <source>&amp;Join</source>
         <translation>&amp;Join</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="320"/>
+        <location filename="src/game_selector.cpp" line="320"/>
         <source>J&amp;oin as spectator</source>
         <translation>J&amp;oin as spectator</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="341"/>
+        <location filename="src/game_selector.cpp" line="341"/>
         <source>Games shown: %1 / %2</source>
         <translation>Games shown: %1 / %2</translation>
     </message>
     <message>
-        <location filename="src/selector.cpp" line="343"/>
+        <location filename="src/game_selector.cpp" line="343"/>
         <source>Games</source>
         <translation>Games</translation>
     </message>
@@ -2205,100 +2205,100 @@ You may have to build from source yourself.</translation>
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="src/model.cpp" line="48"/>
+        <location filename="src/games_model.cpp" line="48"/>
         <source>&gt;1 day</source>
         <translation>&gt;1 day</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/model.cpp" line="57"/>
+        <location filename="src/games_model.cpp" line="57"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
         <translation><numerusform>%1%2 hr</numerusform><numerusform>%1%2 hr</numerusform></translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="59"/>
+        <location filename="src/games_model.cpp" line="59"/>
         <source>new</source>
         <translation>new</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/model.cpp" line="62"/>
+        <location filename="src/games_model.cpp" line="62"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
         <translation><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform></translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="154"/>
+        <location filename="src/games_model.cpp" line="154"/>
         <source>password</source>
         <translation>password</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="156"/>
+        <location filename="src/games_model.cpp" line="156"/>
         <source>buddies only</source>
         <translation>buddies only</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="158"/>
+        <location filename="src/games_model.cpp" line="158"/>
         <source>reg. users only</source>
         <translation>reg. users only</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="190"/>
-        <location filename="src/model.cpp" line="195"/>
+        <location filename="src/games_model.cpp" line="190"/>
+        <location filename="src/games_model.cpp" line="195"/>
         <source>can chat</source>
         <translation>can chat</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="192"/>
+        <location filename="src/games_model.cpp" line="192"/>
         <source>see hands</source>
         <translation>see hands</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="197"/>
+        <location filename="src/games_model.cpp" line="197"/>
         <source>can see hands</source>
         <translation>can see hands</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="202"/>
+        <location filename="src/games_model.cpp" line="202"/>
         <source>not allowed</source>
         <translation>not allowed</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="220"/>
+        <location filename="src/games_model.cpp" line="220"/>
         <source>Room</source>
         <translation>Room</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="224"/>
+        <location filename="src/games_model.cpp" line="224"/>
         <source>Age</source>
         <translation>Age</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="232"/>
+        <location filename="src/games_model.cpp" line="232"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="234"/>
+        <location filename="src/games_model.cpp" line="234"/>
         <source>Creator</source>
         <translation>Creator</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="236"/>
+        <location filename="src/games_model.cpp" line="236"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="238"/>
+        <location filename="src/games_model.cpp" line="238"/>
         <source>Restrictions</source>
         <translation>Restrictions</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="242"/>
+        <location filename="src/games_model.cpp" line="242"/>
         <source>Players</source>
         <translation>Players</translation>
     </message>
     <message>
-        <location filename="src/model.cpp" line="250"/>
+        <location filename="src/games_model.cpp" line="250"/>
         <source>Spectators</source>
         <translation>Spectators</translation>
     </message>
@@ -3881,52 +3881,52 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>Mtg</name>
     <message>
-        <location filename="src/gamespecificterms.h" line="29"/>
+        <location filename="src/game_specific_terms.h" line="29"/>
         <source>Card Type</source>
         <translation>Card Type</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="31"/>
+        <location filename="src/game_specific_terms.h" line="31"/>
         <source>Mana Value</source>
         <translation>Mana Value</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="33"/>
+        <location filename="src/game_specific_terms.h" line="33"/>
         <source>Color(s)</source>
         <translation>Color(s)</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="35"/>
+        <location filename="src/game_specific_terms.h" line="35"/>
         <source>Loyalty</source>
         <translation>Loyalty</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="37"/>
+        <location filename="src/game_specific_terms.h" line="37"/>
         <source>Main Card Type</source>
         <translation>Main Card Type</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="39"/>
+        <location filename="src/game_specific_terms.h" line="39"/>
         <source>Mana Cost</source>
         <translation>Mana Cost</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="41"/>
+        <location filename="src/game_specific_terms.h" line="41"/>
         <source>P/T</source>
         <translation>P/T</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="43"/>
+        <location filename="src/game_specific_terms.h" line="43"/>
         <source>Side</source>
         <translation>Side</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="45"/>
+        <location filename="src/game_specific_terms.h" line="45"/>
         <source>Layout</source>
         <translation>Layout</translation>
     </message>
     <message>
-        <location filename="src/gamespecificterms.h" line="47"/>
+        <location filename="src/game_specific_terms.h" line="47"/>
         <source>Color Identity</source>
         <translation>Color Identity</translation>
     </message>
@@ -4717,7 +4717,7 @@ Cockatrice will now reload the card database.</translation>
         <translation>Cockatrice card database (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/loader.cpp" line="14"/>
+        <location filename="src/deck_loader.cpp" line="14"/>
         <location filename="src/window_main.cpp" line="80"/>
         <source>All files (*.*)</source>
         <translation>All files (*.*)</translation>
@@ -4728,7 +4728,7 @@ Cockatrice will now reload the card database.</translation>
         <translation>Cockatrice replays (*.cor)</translation>
     </message>
     <message>
-        <location filename="src/loader.cpp" line="13"/>
+        <location filename="src/deck_loader.cpp" line="13"/>
         <source>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</source>
         <translation>Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)</translation>
     </message>
@@ -4844,17 +4844,17 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>RemoteDeckList_TreeModel</name>
     <message>
-        <location filename="src/decklist_tree_widget.cpp" line="170"/>
+        <location filename="src/remote_decklist_tree_widget.cpp" line="170"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="src/decklist_tree_widget.cpp" line="172"/>
+        <location filename="src/remote_decklist_tree_widget.cpp" line="172"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/decklist_tree_widget.cpp" line="174"/>
+        <location filename="src/remote_decklist_tree_widget.cpp" line="174"/>
         <source>Upload time</source>
         <translation>Upload time</translation>
     </message>
@@ -4862,32 +4862,32 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>RemoteReplayList_TreeModel</name>
     <message>
-        <location filename="src/replay_list_tree_widget.cpp" line="151"/>
+        <location filename="src/remote_replay_list_tree_widget.cpp" line="151"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/replay_list_tree_widget.cpp" line="153"/>
+        <location filename="src/remote_replay_list_tree_widget.cpp" line="153"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="src/replay_list_tree_widget.cpp" line="155"/>
+        <location filename="src/remote_replay_list_tree_widget.cpp" line="155"/>
         <source>Players</source>
         <translation>Players</translation>
     </message>
     <message>
-        <location filename="src/replay_list_tree_widget.cpp" line="157"/>
+        <location filename="src/remote_replay_list_tree_widget.cpp" line="157"/>
         <source>Keep</source>
         <translation>Keep</translation>
     </message>
     <message>
-        <location filename="src/replay_list_tree_widget.cpp" line="159"/>
+        <location filename="src/remote_replay_list_tree_widget.cpp" line="159"/>
         <source>Time started</source>
         <translation>Time started</translation>
     </message>
     <message>
-        <location filename="src/replay_list_tree_widget.cpp" line="161"/>
+        <location filename="src/remote_replay_list_tree_widget.cpp" line="161"/>
         <source>Duration (sec)</source>
         <translation>Duration (sec)</translation>
     </message>
@@ -4895,37 +4895,37 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>RoomSelector</name>
     <message>
-        <location filename="src/server.cpp" line="55"/>
+        <location filename="src/tab_server.cpp" line="55"/>
         <source>Rooms</source>
         <translation>Rooms</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="56"/>
+        <location filename="src/tab_server.cpp" line="56"/>
         <source>Joi&amp;n</source>
         <translation>Joi&amp;n</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="59"/>
+        <location filename="src/tab_server.cpp" line="59"/>
         <source>Room</source>
         <translation>Room</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="60"/>
+        <location filename="src/tab_server.cpp" line="60"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="61"/>
+        <location filename="src/tab_server.cpp" line="61"/>
         <source>Permissions</source>
         <translation>Permissions</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="62"/>
+        <location filename="src/tab_server.cpp" line="62"/>
         <source>Players</source>
         <translation>Players</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="63"/>
+        <location filename="src/tab_server.cpp" line="63"/>
         <source>Games</source>
         <translation>Games</translation>
     </message>
@@ -4966,27 +4966,27 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>SetsModel</name>
     <message>
-        <location filename="src/setsmodel.cpp" line="84"/>
+        <location filename="src/sets_model.cpp" line="84"/>
         <source>Enabled</source>
         <translation>Enabled</translation>
     </message>
     <message>
-        <location filename="src/setsmodel.cpp" line="86"/>
+        <location filename="src/sets_model.cpp" line="86"/>
         <source>Set type</source>
         <translation>Set type</translation>
     </message>
     <message>
-        <location filename="src/setsmodel.cpp" line="88"/>
+        <location filename="src/sets_model.cpp" line="88"/>
         <source>Set code</source>
         <translation>Set code</translation>
     </message>
     <message>
-        <location filename="src/setsmodel.cpp" line="90"/>
+        <location filename="src/sets_model.cpp" line="90"/>
         <source>Long name</source>
         <translation>Long name</translation>
     </message>
     <message>
-        <location filename="src/setsmodel.cpp" line="92"/>
+        <location filename="src/sets_model.cpp" line="92"/>
         <source>Release date</source>
         <translation>Release date</translation>
     </message>
@@ -5053,14 +5053,14 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>ShortcutsSettings</name>
     <message>
-        <location filename="src/shortcutssettings.cpp" line="46"/>
+        <location filename="src/shortcuts_settings.cpp" line="46"/>
         <source>Your configuration file contained invalid shortcuts.
 Please check your shortcut settings!</source>
         <translation>Your configuration file contained invalid shortcuts.
 Please check your shortcut settings!</translation>
     </message>
     <message>
-        <location filename="src/shortcutssettings.cpp" line="48"/>
+        <location filename="src/shortcuts_settings.cpp" line="48"/>
         <source>The following shortcuts have been set to default:
 </source>
         <translation>The following shortcuts have been set to default:
@@ -5165,27 +5165,27 @@ Please check your shortcut settings!</translation>
 <context>
     <name>StableReleaseChannel</name>
     <message>
-        <location filename="src/releasechannel.cpp" line="92"/>
+        <location filename="src/release_channel.cpp" line="92"/>
         <source>Stable Releases</source>
         <translation>Stable Releases</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="108"/>
+        <location filename="src/release_channel.cpp" line="108"/>
         <source>No reply received from the release update server.</source>
         <translation>No reply received from the release update server.</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="116"/>
+        <location filename="src/release_channel.cpp" line="116"/>
         <source>Invalid reply received from the release update server.</source>
         <translation>Invalid reply received from the release update server.</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="172"/>
+        <location filename="src/release_channel.cpp" line="172"/>
         <source>No reply received from the tag update server.</source>
         <translation>No reply received from the tag update server.</translation>
     </message>
     <message>
-        <location filename="src/releasechannel.cpp" line="179"/>
+        <location filename="src/release_channel.cpp" line="179"/>
         <source>Invalid reply received from the tag update server.</source>
         <translation>Invalid reply received from the tag update server.</translation>
     </message>
@@ -5963,37 +5963,37 @@ The more information you put in, the more specific your results will be.</transl
 <context>
     <name>TabMessage</name>
     <message>
-        <location filename="src/message.cpp" line="69"/>
+        <location filename="src/tab_message.cpp" line="69"/>
         <source>Private &amp;chat</source>
         <translation>Private &amp;chat</translation>
     </message>
     <message>
-        <location filename="src/message.cpp" line="70"/>
+        <location filename="src/tab_message.cpp" line="70"/>
         <source>&amp;Leave</source>
         <translation>&amp;Leave</translation>
     </message>
     <message>
-        <location filename="src/message.cpp" line="86"/>
+        <location filename="src/tab_message.cpp" line="86"/>
         <source>%1 - Private chat</source>
         <translation>%1 - Private chat</translation>
     </message>
     <message>
-        <location filename="src/message.cpp" line="113"/>
+        <location filename="src/tab_message.cpp" line="113"/>
         <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
         <translation>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</translation>
     </message>
     <message>
-        <location filename="src/message.cpp" line="151"/>
+        <location filename="src/tab_message.cpp" line="151"/>
         <source>Private message from</source>
         <translation>Private message from</translation>
     </message>
     <message>
-        <location filename="src/message.cpp" line="168"/>
+        <location filename="src/tab_message.cpp" line="168"/>
         <source>%1 has left the server.</source>
         <translation>%1 has left the server.</translation>
     </message>
     <message>
-        <location filename="src/message.cpp" line="174"/>
+        <location filename="src/tab_message.cpp" line="174"/>
         <source>%1 has joined the server.</source>
         <translation>%1 has joined the server.</translation>
     </message>
@@ -6006,64 +6006,64 @@ The more information you put in, the more specific your results will be.</transl
         <translation>Game replays</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="116"/>
+        <location filename="src/tab_replays.cpp" line="116"/>
         <source>Local file system</source>
         <translation>Local file system</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="117"/>
+        <location filename="src/tab_replays.cpp" line="117"/>
         <source>Server replay storage</source>
         <translation>Server replay storage</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="119"/>
-        <location filename="src/replays.cpp" line="121"/>
+        <location filename="src/tab_replays.cpp" line="119"/>
+        <location filename="src/tab_replays.cpp" line="121"/>
         <source>Watch replay</source>
         <translation>Watch replay</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="120"/>
-        <location filename="src/replays.cpp" line="124"/>
+        <location filename="src/tab_replays.cpp" line="120"/>
+        <location filename="src/tab_replays.cpp" line="124"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="122"/>
+        <location filename="src/tab_replays.cpp" line="122"/>
         <source>Download replay</source>
         <translation>Download replay</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="123"/>
+        <location filename="src/tab_replays.cpp" line="123"/>
         <source>Toggle expiration lock</source>
         <translation>Toggle expiration lock</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="149"/>
+        <location filename="src/tab_replays.cpp" line="149"/>
         <source>Delete local file</source>
         <translation>Delete local file</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="150"/>
+        <location filename="src/tab_replays.cpp" line="150"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>Are you sure you want to delete &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="199"/>
+        <location filename="src/tab_replays.cpp" line="199"/>
         <source>Downloading Replays</source>
         <translation>Downloading Replays</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="200"/>
+        <location filename="src/tab_replays.cpp" line="200"/>
         <source>Folder download is not yet supported. Please download replays individually.</source>
         <translation>Folder download is not yet supported. Please download replays individually.</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="268"/>
+        <location filename="src/tab_replays.cpp" line="268"/>
         <source>Delete remote replay</source>
         <translation>Delete remote replay</translation>
     </message>
     <message>
-        <location filename="src/replays.cpp" line="269"/>
+        <location filename="src/tab_replays.cpp" line="269"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation>Are you sure you want to delete the replay of game %1?</translation>
     </message>
@@ -6071,47 +6071,47 @@ The more information you put in, the more specific your results will be.</transl
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="src/room.cpp" line="148"/>
+        <location filename="src/tab_room.cpp" line="148"/>
         <source>&amp;Say:</source>
         <translation>&amp;Say:</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="149"/>
+        <location filename="src/tab_room.cpp" line="149"/>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="150"/>
+        <location filename="src/tab_room.cpp" line="150"/>
         <source>&amp;Room</source>
         <translation>&amp;Room</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="151"/>
+        <location filename="src/tab_room.cpp" line="151"/>
         <source>&amp;Leave room</source>
         <translation>&amp;Leave room</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="152"/>
+        <location filename="src/tab_room.cpp" line="152"/>
         <source>&amp;Clear chat</source>
         <translation>&amp;Clear chat</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="153"/>
+        <location filename="src/tab_room.cpp" line="153"/>
         <source>Chat Settings...</source>
         <translation>Chat Settings...</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="165"/>
+        <location filename="src/tab_room.cpp" line="165"/>
         <source> mentioned you.</source>
         <translation> mentioned you.</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="173"/>
+        <location filename="src/tab_room.cpp" line="173"/>
         <source>Click to view</source>
         <translation>Click to view</translation>
     </message>
     <message>
-        <location filename="src/room.cpp" line="216"/>
+        <location filename="src/tab_room.cpp" line="216"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>You are flooding the chat. Please wait a couple of seconds.</translation>
     </message>
@@ -6124,30 +6124,30 @@ The more information you put in, the more specific your results will be.</transl
         <translation>Server</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="209"/>
-        <location filename="src/server.cpp" line="214"/>
-        <location filename="src/server.cpp" line="219"/>
-        <location filename="src/server.cpp" line="224"/>
+        <location filename="src/tab_server.cpp" line="209"/>
+        <location filename="src/tab_server.cpp" line="214"/>
+        <location filename="src/tab_server.cpp" line="219"/>
+        <location filename="src/tab_server.cpp" line="224"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="210"/>
+        <location filename="src/tab_server.cpp" line="210"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
         <translation>Failed to join the server room: it doesn&apos;t exist on the server.</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="215"/>
+        <location filename="src/tab_server.cpp" line="215"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
         <translation>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="220"/>
+        <location filename="src/tab_server.cpp" line="220"/>
         <source>You do not have the required permission to join this server room.</source>
         <translation>You do not have the required permission to join this server room.</translation>
     </message>
     <message>
-        <location filename="src/server.cpp" line="225"/>
+        <location filename="src/tab_server.cpp" line="225"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
         <translation>Failed to join the server room due to an unknown error: %1.</translation>
     </message>
@@ -6155,32 +6155,32 @@ The more information you put in, the more specific your results will be.</transl
 <context>
     <name>TabSupervisor</name>
     <message>
-        <location filename="src/supervisor.cpp" line="174"/>
+        <location filename="src/tab_supervisor.cpp" line="174"/>
         <source>Are you sure?</source>
         <translation>Are you sure?</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="175"/>
+        <location filename="src/tab_supervisor.cpp" line="175"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>There are still open games. Are you sure you want to quit?</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="577"/>
+        <location filename="src/tab_supervisor.cpp" line="577"/>
         <source>Click to view</source>
         <translation>Click to view</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="605"/>
+        <location filename="src/tab_supervisor.cpp" line="605"/>
         <source>Your buddy %1 has signed on!</source>
         <translation>Your buddy %1 has signed on!</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="646"/>
+        <location filename="src/tab_supervisor.cpp" line="646"/>
         <source>Unknown Event</source>
         <translation>Unknown Event</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="647"/>
+        <location filename="src/tab_supervisor.cpp" line="647"/>
         <source>The server has sent you a message that your client does not understand.
 This message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
@@ -6191,39 +6191,39 @@ This message might mean there is a new version of Cockatrice available or this s
 To update your client, go to Help -&gt; Check for Updates.</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="652"/>
+        <location filename="src/tab_supervisor.cpp" line="652"/>
         <source>Idle Timeout</source>
         <translation>Idle Timeout</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="652"/>
+        <location filename="src/tab_supervisor.cpp" line="652"/>
         <source>You are about to be logged out due to inactivity.</source>
         <translation>You are about to be logged out due to inactivity.</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="656"/>
+        <location filename="src/tab_supervisor.cpp" line="656"/>
         <source>Promotion</source>
         <translation>Promotion</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="657"/>
+        <location filename="src/tab_supervisor.cpp" line="657"/>
         <source>You have been promoted. Please log out and back in for changes to take effect.</source>
         <translation>You have been promoted. Please log out and back in for changes to take effect.</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="661"/>
+        <location filename="src/tab_supervisor.cpp" line="661"/>
         <source>Warned</source>
         <translation>Warned</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="662"/>
+        <location filename="src/tab_supervisor.cpp" line="662"/>
         <source>You have received a warning due to %1.
 Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</source>
         <translation>You have received a warning due to %1.
 Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</translation>
     </message>
     <message>
-        <location filename="src/supervisor.cpp" line="676"/>
+        <location filename="src/tab_supervisor.cpp" line="676"/>
         <source>You have received the following message from the server.
 (custom messages like these could be untranslated)</source>
         <translation>You have received the following message from the server.
@@ -6282,42 +6282,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>TranslateCounterName</name>
     <message>
-        <location filename="src/translatecountername.cpp" line="4"/>
+        <location filename="src/translate_counter_name.cpp" line="4"/>
         <source>Life</source>
         <translation>Life</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="5"/>
+        <location filename="src/translate_counter_name.cpp" line="5"/>
         <source>White</source>
         <translation>White</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="6"/>
+        <location filename="src/translate_counter_name.cpp" line="6"/>
         <source>Blue</source>
         <translation>Blue</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="7"/>
+        <location filename="src/translate_counter_name.cpp" line="7"/>
         <source>Black</source>
         <translation>Black</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="8"/>
+        <location filename="src/translate_counter_name.cpp" line="8"/>
         <source>Red</source>
         <translation>Red</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="9"/>
+        <location filename="src/translate_counter_name.cpp" line="9"/>
         <source>Green</source>
         <translation>Green</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="10"/>
+        <location filename="src/translate_counter_name.cpp" line="10"/>
         <source>Colorless</source>
         <translation>Colorless</translation>
     </message>
     <message>
-        <location filename="src/translatecountername.cpp" line="11"/>
+        <location filename="src/translate_counter_name.cpp" line="11"/>
         <source>Other</source>
         <translation>Other</translation>
     </message>
@@ -6333,173 +6333,173 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserContextMenu</name>
     <message>
-        <location filename="src/context_menu.cpp" line="56"/>
+        <location filename="src/user_context_menu.cpp" line="56"/>
         <source>User &amp;details</source>
         <translation>User &amp;details</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="57"/>
+        <location filename="src/user_context_menu.cpp" line="57"/>
         <source>Private &amp;chat</source>
         <translation>Private &amp;chat</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="58"/>
+        <location filename="src/user_context_menu.cpp" line="58"/>
         <source>Show this user&apos;s &amp;games</source>
         <translation>Show this user&apos;s &amp;games</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="59"/>
+        <location filename="src/user_context_menu.cpp" line="59"/>
         <source>Add to &amp;buddy list</source>
         <translation>Add to &amp;buddy list</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="60"/>
+        <location filename="src/user_context_menu.cpp" line="60"/>
         <source>Remove from &amp;buddy list</source>
         <translation>Remove from &amp;buddy list</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="61"/>
+        <location filename="src/user_context_menu.cpp" line="61"/>
         <source>Add to &amp;ignore list</source>
         <translation>Add to &amp;ignore list</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="62"/>
+        <location filename="src/user_context_menu.cpp" line="62"/>
         <source>Remove from &amp;ignore list</source>
         <translation>Remove from &amp;ignore list</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="63"/>
+        <location filename="src/user_context_menu.cpp" line="63"/>
         <source>Kick from &amp;game</source>
         <translation>Kick from &amp;game</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="64"/>
+        <location filename="src/user_context_menu.cpp" line="64"/>
         <source>Warn user</source>
         <translation>Warn user</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="65"/>
+        <location filename="src/user_context_menu.cpp" line="65"/>
         <source>View user&apos;s war&amp;n history</source>
         <translation>View user&apos;s war&amp;n history</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="66"/>
+        <location filename="src/user_context_menu.cpp" line="66"/>
         <source>Ban from &amp;server</source>
         <translation>Ban from &amp;server</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="67"/>
+        <location filename="src/user_context_menu.cpp" line="67"/>
         <source>View user&apos;s &amp;ban history</source>
         <translation>View user&apos;s &amp;ban history</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="68"/>
+        <location filename="src/user_context_menu.cpp" line="68"/>
         <source>&amp;Promote user to moderator</source>
         <translation>&amp;Promote user to moderator</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="69"/>
+        <location filename="src/user_context_menu.cpp" line="69"/>
         <source>Dem&amp;ote user from moderator</source>
         <translation>Dem&amp;ote user from moderator</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="70"/>
+        <location filename="src/user_context_menu.cpp" line="70"/>
         <source>Promote user to &amp;judge</source>
         <translation>Promote user to &amp;judge</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="71"/>
+        <location filename="src/user_context_menu.cpp" line="71"/>
         <source>Demote user from judge</source>
         <translation>Demote user from judge</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="101"/>
+        <location filename="src/user_context_menu.cpp" line="101"/>
         <source>%1&apos;s games</source>
         <translation>%1&apos;s games</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="157"/>
-        <location filename="src/context_menu.cpp" line="180"/>
-        <location filename="src/context_menu.cpp" line="184"/>
+        <location filename="src/user_context_menu.cpp" line="157"/>
+        <location filename="src/user_context_menu.cpp" line="180"/>
+        <location filename="src/user_context_menu.cpp" line="184"/>
         <source>Ban History</source>
         <translation>Ban History</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="163"/>
+        <location filename="src/user_context_menu.cpp" line="163"/>
         <source>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</source>
         <translation>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="181"/>
+        <location filename="src/user_context_menu.cpp" line="181"/>
         <source>User has never been banned.</source>
         <translation>User has never been banned.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="185"/>
+        <location filename="src/user_context_menu.cpp" line="185"/>
         <source>Failed to collect ban information.</source>
         <translation>Failed to collect ban information.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="195"/>
-        <location filename="src/context_menu.cpp" line="216"/>
-        <location filename="src/context_menu.cpp" line="220"/>
+        <location filename="src/user_context_menu.cpp" line="195"/>
+        <location filename="src/user_context_menu.cpp" line="216"/>
+        <location filename="src/user_context_menu.cpp" line="220"/>
         <source>Warning History</source>
         <translation>Warning History</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="200"/>
+        <location filename="src/user_context_menu.cpp" line="200"/>
         <source>Warning Time;Moderator;User Name;Reason</source>
         <translation>Warning Time;Moderator;User Name;Reason</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="217"/>
+        <location filename="src/user_context_menu.cpp" line="217"/>
         <source>User has never been warned.</source>
         <translation>User has never been warned.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="221"/>
+        <location filename="src/user_context_menu.cpp" line="221"/>
         <source>Failed to collect warning information.</source>
         <translation>Failed to collect warning information.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="231"/>
-        <location filename="src/context_menu.cpp" line="234"/>
+        <location filename="src/user_context_menu.cpp" line="231"/>
+        <location filename="src/user_context_menu.cpp" line="234"/>
         <source>Success</source>
         <translation>Success</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="232"/>
+        <location filename="src/user_context_menu.cpp" line="232"/>
         <source>Successfully promoted user.</source>
         <translation>Successfully promoted user.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="234"/>
+        <location filename="src/user_context_menu.cpp" line="234"/>
         <source>Successfully demoted user.</source>
         <translation>Successfully demoted user.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="239"/>
-        <location filename="src/context_menu.cpp" line="241"/>
+        <location filename="src/user_context_menu.cpp" line="239"/>
+        <location filename="src/user_context_menu.cpp" line="241"/>
         <source>Failed</source>
         <translation>Failed</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="239"/>
+        <location filename="src/user_context_menu.cpp" line="239"/>
         <source>Failed to promote user.</source>
         <translation>Failed to promote user.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="241"/>
+        <location filename="src/user_context_menu.cpp" line="241"/>
         <source>Failed to demote user.</source>
         <translation>Failed to demote user.</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="316"/>
+        <location filename="src/user_context_menu.cpp" line="316"/>
         <source>Copy hash to clipboard</source>
         <translation>Copy hash to clipboard</translation>
     </message>
     <message>
-        <location filename="src/context_menu.cpp" line="336"/>
+        <location filename="src/user_context_menu.cpp" line="336"/>
         <source>Remove this user&apos;s messages</source>
         <translation>Remove this user&apos;s messages</translation>
     </message>
@@ -6935,22 +6935,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="src/view_widget.cpp" line="140"/>
+        <location filename="src/view_zone_widget.cpp" line="140"/>
         <source>sort by name</source>
         <translation>sort by name</translation>
     </message>
     <message>
-        <location filename="src/view_widget.cpp" line="141"/>
+        <location filename="src/view_zone_widget.cpp" line="141"/>
         <source>sort by type</source>
         <translation>sort by type</translation>
     </message>
     <message>
-        <location filename="src/view_widget.cpp" line="142"/>
+        <location filename="src/view_zone_widget.cpp" line="142"/>
         <source>shuffle when closing</source>
         <translation>shuffle when closing</translation>
     </message>
     <message>
-        <location filename="src/view_widget.cpp" line="143"/>
+        <location filename="src/view_zone_widget.cpp" line="143"/>
         <source>pile view</source>
         <translation>pile view</translation>
     </message>
@@ -6958,7 +6958,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>i18n</name>
     <message>
-        <location filename="src/cache.cpp" line="170"/>
+        <location filename="src/cache_settings.cpp" line="170"/>
         <source>English</source>
         <translation>English</translation>
     </message>
