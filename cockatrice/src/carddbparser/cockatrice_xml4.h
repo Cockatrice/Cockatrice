@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_XML4_H
 #define COCKATRICE_XML4_H
 
-#include "carddatabaseparser.h"
+#include "card_database_parser.h"
 
 #include <QXmlStreamReader>
 

@@ -1,7 +1,7 @@
 #ifndef CARDDATABASE_PARSER_H
 #define CARDDATABASE_PARSER_H
 
-#include "../carddatabase.h"
+#include "../game/cards/database.h"
 
 #include <QIODevice>
 #include <QString>
