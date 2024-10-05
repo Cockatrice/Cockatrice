@@ -1,12 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "abstractgraphicsitem.h"
-#include "carddatabase.h"
-#include "filter_string.h"
+#include "../client/tearoff_menu.h"
+#include "../game/board/abstract_graphics_item.h"
+#include "../game/cards/card_database.h"
+#include "../game/filter/filter_string.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
-#include "tearoffmenu.h"
 
 #include <QInputDialog>
 #include <QMap>

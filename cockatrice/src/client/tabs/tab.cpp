@@ -1,6 +1,6 @@
 #include "tab.h"
 
-#include "../../game/cards/info_widget.h"
+#include "../../game/cards/card_info_widget.h"
 
 #include <QApplication>
 #include <QDebug>

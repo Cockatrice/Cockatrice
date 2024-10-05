@@ -1,7 +1,7 @@
 #ifndef TAPPEDOUT_INTERFACE_H
 #define TAPPEDOUT_INTERFACE_H
 
-#include "../game/cards/database.h"
+#include "../game/cards/card_database.h"
 #include "decklist.h"
 
 #include <QObject>

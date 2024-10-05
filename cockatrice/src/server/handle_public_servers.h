@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 #define COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 
-#include "userconnection_information.h"
+#include "user/user_info_connection.h"
 
 class QNetworkReply;
 class QNetworkAccessManager;

@@ -1,7 +1,7 @@
-#include "arrowtarget.h"
+#include "arrow_target.h"
 
-#include "arrowitem.h"
-#include "player.h"
+#include "../../player/player.h"
+#include "arrow_item.h"
 
 ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), owner(_owner), beingPointedAt(false)

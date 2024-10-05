@@ -1,7 +1,7 @@
 #include "dlg_tip_of_the_day.h"
 
-#include "../settings/cache.h"
 #include "../client/tip_of_the_day.h"
+#include "../settings/cache_settings.h"
 
 #include <QCheckBox>
 #include <QDate>

@@ -1,5 +1,6 @@
 #include "abstract_card_drag_item.h"
-#include "carddatabase.h"
+
+#include "card_database.h"
 
 #include <QCursor>
 #include <QDebug>

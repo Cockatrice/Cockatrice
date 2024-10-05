@@ -1,8 +1,8 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include "chatview/chatview.h"
-#include "translation.h"
+#include "../chat_view/chat_view.h"
+#include "../client/translation.h"
 #include "user_level.h"
 
 class Player;
