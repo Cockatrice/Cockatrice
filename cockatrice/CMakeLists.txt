@@ -15,8 +15,8 @@ set(cockatrice_SOURCES
         src/game/cards/card_database.cpp
         src/game/cards/card_database_model.cpp
         src/card_database_parser/card_database_parser.cpp
-        src/card_database_parser/cockatrice_xml3.cpp
-        src/card_database_parser/cockatrice_xml4.cpp
+        src/card_database_parser/cockatrice_xml_3.cpp
+        src/card_database_parser/cockatrice_xml_4.cpp
         src/game/cards/card_drag_item.cpp
         src/game/filter/filter_card.cpp
         src/game/cards/card_frame.cpp
