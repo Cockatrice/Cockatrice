@@ -1,8 +1,7 @@
 #include "cardframe.h"
-
-#include "cardinfopicture.h"
 #include "cardinfotext.h"
 #include "carditem.h"
+#include "info_picture.h"
 #include "main.h"
 #include "settingscache.h"
 

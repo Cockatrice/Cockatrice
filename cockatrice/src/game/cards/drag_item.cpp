@@ -1,7 +1,6 @@
-#include "carddragitem.h"
-
 #include "carditem.h"
 #include "cardzone.h"
+#include "drag_item.h"
 #include "gamescene.h"
 #include "tablezone.h"
 #include "zoneviewzone.h"

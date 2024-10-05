@@ -1,7 +1,7 @@
 #ifndef CARDDRAGITEM_H
 #define CARDDRAGITEM_H
 
-#include "abstractcarddragitem.h"
+#include "abstract_card_drag_item.h"
 
 class CardItem;
 

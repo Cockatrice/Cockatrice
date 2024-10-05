@@ -1,7 +1,7 @@
 #ifndef ABSTRACTCARDDRAGITEM_H
 #define ABSTRACTCARDDRAGITEM_H
 
-#include "abstractcarditem.h"
+#include "abstract_card_item.h"
 
 class QGraphicsScene;
 class CardZone;

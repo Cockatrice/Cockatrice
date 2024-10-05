@@ -9,7 +9,7 @@
 #include "../game/board/counter_general.h"
 #include "../game/cards/carddatabase.h"
 #include "../game/cards/carditem.h"
-#include "../game/cards/cardlist.h"
+#include "../game/cards/list.h"
 #include "../game/gamescene.h"
 #include "../game/handcounter.h"
 #include "../game/zones/cardzone.h"

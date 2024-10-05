@@ -380,17 +380,17 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
 <context>
     <name>CardInfoText</name>
     <message>
-        <location filename="src/cardinfotext.cpp" line="40"/>
+        <location filename="src/info_text.cpp" line="40"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="src/cardinfotext.cpp" line="53"/>
+        <location filename="src/info_text.cpp" line="53"/>
         <source>Related cards:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/cardinfotext.cpp" line="70"/>
+        <location filename="src/info_text.cpp" line="70"/>
         <source>Unknown card:</source>
         <translation type="unfinished"/>
     </message>
@@ -4909,32 +4909,32 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
 <context>
     <name>SequenceEdit</name>
     <message>
-        <location filename="src/sequenceEdit/sequenceedit.cpp" line="43"/>
+        <location filename="src/sequence_edit/sequence_edit.cpp" line="43"/>
         <source>Choose an action from the table</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/sequenceEdit/sequenceedit.cpp" line="49"/>
+        <location filename="src/sequence_edit/sequence_edit.cpp" line="49"/>
         <source>Hit the key/combination of keys you want to set for this action</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/sequenceEdit/sequenceedit.cpp" line="172"/>
+        <location filename="src/sequence_edit/sequence_edit.cpp" line="172"/>
         <source>Shortcut already in use</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/sequenceEdit/sequenceedit.cpp" line="175"/>
+        <location filename="src/sequence_edit/sequence_edit.cpp" line="175"/>
         <source>Invalid key</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/sequenceEdit/sequenceedit.cpp" line="192"/>
+        <location filename="src/sequence_edit/sequence_edit.cpp" line="192"/>
         <source>Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/sequenceEdit/sequenceedit.cpp" line="193"/>
+        <location filename="src/sequence_edit/sequence_edit.cpp" line="193"/>
         <source>Restore default</source>
         <translation type="unfinished"/>
     </message>

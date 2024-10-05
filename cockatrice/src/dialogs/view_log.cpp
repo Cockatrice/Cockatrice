@@ -1,6 +1,6 @@
-#include "dlg_viewlog.h"
+#include "view_log.h"
 #include "logger.h"
-#include "settingscache.h"
+#include "../settings/cache.h"
 
 #include <QPlainTextEdit>
 #include <QVBoxLayout>

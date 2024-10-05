@@ -1,9 +1,9 @@
 #include "create_game.h"
 
 #include "pb/serverinfo_game.pb.h"
-#include "pending_command.h"
-#include "settingscache.h"
-#include "tab_room.h"
+#include "../server/pending_command.h"
+#include "../settings/cache.h"
+#include "../client/tabs/room.h"
 #include "trice_limits.h"
 
 #include <QApplication>

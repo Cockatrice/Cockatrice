@@ -1,10 +1,10 @@
 #include "manage_sets.h"
 
 #include "customlineedit.h"
-#include "main.h"
-#include "pictureloader.h"
+#include "../main.h"
+#include "../client/picture_loader.h"
 #include "setsmodel.h"
-#include "settingscache.h"
+#include "../settings/cache.h"
 
 #include <QAction>
 #include <QDebug>

@@ -1,8 +1,7 @@
-#include "cardinfowidget.h"
-
-#include "cardinfopicture.h"
 #include "cardinfotext.h"
+#include "cardinfowidget.h"
 #include "carditem.h"
+#include "info_picture.h"
 #include "main.h"
 
 #include <QApplication>

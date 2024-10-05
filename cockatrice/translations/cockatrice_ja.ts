@@ -380,17 +380,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardInfoText</name>
     <message>
-        <location filename="src/cardinfotext.cpp" line="40"/>
+        <location filename="src/info_text.cpp" line="40"/>
         <source>Name:</source>
         <translation>カード名:</translation>
     </message>
     <message>
-        <location filename="src/cardinfotext.cpp" line="53"/>
+        <location filename="src/info_text.cpp" line="53"/>
         <source>Related cards:</source>
         <translation>関連カード:</translation>
     </message>
     <message>
-        <location filename="src/cardinfotext.cpp" line="70"/>
+        <location filename="src/info_text.cpp" line="70"/>
         <source>Unknown card:</source>
         <translation>謎のカード:</translation>
     </message>
