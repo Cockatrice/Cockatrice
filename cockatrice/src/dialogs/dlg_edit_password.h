@@ -9,11 +9,11 @@ class QLabel;
 class QPushButton;
 class QCheckBox;
 
-class EditPassword : public QDialog
+class DlgEditPassword : public QDialog
 {
     Q_OBJECT
 public:
-    EditPassword(QWidget *parent = nullptr);
+    DlgEditPassword(QWidget *parent = nullptr);
     QString getOldPassword() const
     {
         return oldPasswordEdit->text();

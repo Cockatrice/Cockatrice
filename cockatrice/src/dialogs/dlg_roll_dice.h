@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QSpinBox>
 
-class RollDice : public QDialog
+class DlgRollDice : public QDialog
 {
     Q_OBJECT
 
@@ -18,7 +18,7 @@ class RollDice : public QDialog
     QDialogButtonBox *buttonBox;
 
 public:
-    explicit RollDice(QWidget *parent = nullptr);
+    explicit DlgRollDice(QWidget *parent = nullptr);
     [[nodiscard]] uint getDieSideCount() const;
     [[nodiscard]] uint getDiceToRollCount() const;
 };

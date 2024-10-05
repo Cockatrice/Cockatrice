@@ -9,7 +9,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-EditUser::EditUser(QWidget *parent, QString email, QString country, QString realName) : QDialog(parent)
+DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName) : QDialog(parent)
 {
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
@@ -61,7 +61,7 @@ EditUser::EditUser(QWidget *parent, QString email, QString country, QString real
     setMinimumWidth(300);
 }
 
-void EditUser::actOk()
+void DlgEditUser::actOk()
 {
     accept();
 }

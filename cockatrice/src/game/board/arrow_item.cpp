@@ -6,7 +6,7 @@
 #include "../../settings/cache_settings.h"
 #include "../cards/card_database.h"
 #include "../cards/card_item.h"
-#include "../zones/cardzone.h"
+#include "../zones/card_zone.h"
 #include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"

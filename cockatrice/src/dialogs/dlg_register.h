@@ -9,11 +9,11 @@ class QLabel;
 class QPushButton;
 class QCheckBox;
 
-class Register : public QDialog
+class DlgRegister : public QDialog
 {
     Q_OBJECT
 public:
-    Register(QWidget *parent = nullptr);
+    DlgRegister(QWidget *parent = nullptr);
     QString getHost() const
     {
         return hostEdit->text();

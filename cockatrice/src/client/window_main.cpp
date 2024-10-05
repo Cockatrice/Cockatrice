@@ -38,12 +38,12 @@
 #include "../server/remote/remote_client.h"
 #include "../settings/cache_settings.h"
 #include "get_text_with_max.h"
-#include "logger.h"
+#include "../utility/logger.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
-#include "tabs/supervisor.h"
+#include "tabs/tab_supervisor.h"
 #include "tabs/tab_game.h"
 #include "version_string.h"
 
@@ -189,7 +189,7 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    dlgConnect = new Connect(this);
+    dlgConnect = new DlgConnect(this);
     connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
 
     if (dlgConnect->exec()) {
@@ -330,7 +330,7 @@ void MainWindow::actTips()
         delete tip;
         tip = nullptr;
     }
-    tip = new TipOfTheDay(this);
+    tip = new DlgTipOfTheDay(this);
     if (tip->successfulInit) {
         tip->show();
     }
@@ -641,7 +641,7 @@ void MainWindow::retranslateUi()
 {
     setClientStatusTitle();
 
-    aConnect->setText(tr("&Connect..."));
+    aConnect->setText(tr("&DlgConnect..."));
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
@@ -864,7 +864,7 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
 
-    tip = new TipOfTheDay();
+    tip = new DlgTipOfTheDay();
 
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
@@ -1005,7 +1005,7 @@ void MainWindow::changeEvent(QEvent *event)
                 client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
             } else if (SettingsCache::instance().servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
-                Connect dlg(this);
+                DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                         dlg.getPassword());
             }

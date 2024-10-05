@@ -21,7 +21,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
-EditTokens::EditTokens(QWidget *parent) : QDialog(parent), currentCard(nullptr)
+DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nullptr)
 {
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
@@ -120,7 +120,7 @@ EditTokens::EditTokens(QWidget *parent) : QDialog(parent), currentCard(nullptr)
     setWindowTitle(tr("Edit custom tokens"));
 }
 
-void EditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)
+void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
 
@@ -144,7 +144,7 @@ void EditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelI
     }
 }
 
-void EditTokens::actAddToken()
+void DlgEditTokens::actAddToken()
 {
     QString name;
     for (;;) {
@@ -170,7 +170,7 @@ void EditTokens::actAddToken()
     databaseModel->getDatabase()->addCard(card);
 }
 
-void EditTokens::actRemoveToken()
+void DlgEditTokens::actRemoveToken()
 {
     if (currentCard) {
         CardInfoPtr cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
@@ -179,19 +179,19 @@ void EditTokens::actRemoveToken()
     }
 }
 
-void EditTokens::colorChanged(int colorIndex)
+void DlgEditTokens::colorChanged(int colorIndex)
 {
     if (currentCard)
         currentCard->setColors(QString(colorEdit->itemData(colorIndex).toChar()));
 }
 
-void EditTokens::ptChanged(const QString &_pt)
+void DlgEditTokens::ptChanged(const QString &_pt)
 {
     if (currentCard)
         currentCard->setPowTough(_pt);
 }
 
-void EditTokens::annotationChanged(const QString &_annotation)
+void DlgEditTokens::annotationChanged(const QString &_annotation)
 {
     if (currentCard)
         currentCard->setText(_annotation);

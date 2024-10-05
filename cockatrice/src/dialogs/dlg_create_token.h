@@ -17,11 +17,11 @@ class CardDatabaseModel;
 class TokenDisplayModel;
 class CardInfoPicture;
 
-class CreateToken : public QDialog
+class DlgCreateToken : public QDialog
 {
     Q_OBJECT
 public:
-    CreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
+    DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
     QString getName() const;
     QString getColor() const;
     QString getPT() const;

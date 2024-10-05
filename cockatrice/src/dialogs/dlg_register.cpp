@@ -12,7 +12,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-Register::Register(QWidget *parent) : QDialog(parent)
+DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
     ServersSettings &servers = SettingsCache::instance().servers();
     infoLabel = new QLabel(tr("Enter your information and the information of the server you'd like to register to.\n"
@@ -351,12 +351,12 @@ Register::Register(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Register to server"));
+    setWindowTitle(tr("DlgRegister to server"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
 
-void Register::actOk()
+void DlgRegister::actOk()
 {
     // TODO this stuff should be using qvalidators
     if (passwordEdit->text().length() < 8) {

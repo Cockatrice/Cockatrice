@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-LoadRemoteDeck::LoadRemoteDeck(AbstractClient *_client, QWidget *parent) : QDialog(parent), client(_client)
+DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent) : QDialog(parent), client(_client)
 {
     dirView = new RemoteDeckList_TreeWidget(client);
 
@@ -31,13 +31,13 @@ LoadRemoteDeck::LoadRemoteDeck(AbstractClient *_client, QWidget *parent) : QDial
             SLOT(currentItemChanged(const QModelIndex &, const QModelIndex &)));
 }
 
-void LoadRemoteDeck::currentItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+void DlgLoadRemoteDeck::currentItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     buttonBox->button(QDialogButtonBox::Ok)
         ->setEnabled(dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(dirView->getNode(current)));
 }
 
-int LoadRemoteDeck::getDeckId() const
+int DlgLoadRemoteDeck::getDeckId() const
 {
     return dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(
                dirView->getNode(dirView->selectionModel()->currentIndex()))

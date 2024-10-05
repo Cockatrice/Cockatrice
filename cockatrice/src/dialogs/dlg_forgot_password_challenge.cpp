@@ -11,7 +11,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-ForgotPasswordChallenge::ForgotPasswordChallenge(QWidget *parent) : QDialog(parent)
+DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialog(parent)
 {
     QString lastfphost;
     QString lastfpport;
@@ -91,7 +91,7 @@ ForgotPasswordChallenge::ForgotPasswordChallenge(QWidget *parent) : QDialog(pare
     setMinimumWidth(300);
 }
 
-void ForgotPasswordChallenge::actOk()
+void DlgForgotPasswordChallenge::actOk()
 {
     if (emailEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Reset Password Challenge Error"), tr("The email address can't be empty."));

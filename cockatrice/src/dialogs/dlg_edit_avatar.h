@@ -9,11 +9,11 @@ class QLabel;
 class QPushButton;
 class QCheckBox;
 
-class EditAvatar : public QDialog
+class DlgEditAvatar : public QDialog
 {
     Q_OBJECT
 public:
-    EditAvatar(QWidget *parent = nullptr);
+    DlgEditAvatar(QWidget *parent = nullptr);
     QByteArray getImage();
 private slots:
     void actOk();

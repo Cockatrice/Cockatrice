@@ -9,11 +9,11 @@ class QLabel;
 class QPushButton;
 class QCheckBox;
 
-class EditUser : public QDialog
+class DlgEditUser : public QDialog
 {
     Q_OBJECT
 public:
-    EditUser(QWidget *parent = nullptr,
+    DlgEditUser(QWidget *parent = nullptr,
              QString email = QString(),
              QString country = QString(),
              QString realName = QString());

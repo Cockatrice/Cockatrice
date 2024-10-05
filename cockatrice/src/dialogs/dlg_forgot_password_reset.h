@@ -9,11 +9,11 @@ class QLabel;
 class QPushButton;
 class QCheckBox;
 
-class ForgotPasswordReset : public QDialog
+class DlgForgotPasswordReset : public QDialog
 {
     Q_OBJECT
 public:
-    ForgotPasswordReset(QWidget *parent = nullptr);
+    DlgForgotPasswordReset(QWidget *parent = nullptr);
     QString getHost() const
     {
         return hostEdit->text();

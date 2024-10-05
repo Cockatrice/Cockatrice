@@ -13,7 +13,7 @@ class QComboBox;
 class QLineEdit;
 class QTreeView;
 
-class EditTokens : public QDialog
+class DlgEditTokens : public QDialog
 {
     Q_OBJECT
 private slots:
@@ -36,7 +36,7 @@ private:
     QTreeView *chooseTokenView;
 
 public:
-    explicit EditTokens(QWidget *parent = nullptr);
+    explicit DlgEditTokens(QWidget *parent = nullptr);
 };
 
 #endif

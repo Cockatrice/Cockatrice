@@ -1,7 +1,7 @@
 #include "card_drag_item.h"
 
 #include "../game_scene.h"
-#include "../zones/cardzone.h"
+#include "../zones/card_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
 #include "card_item.h"

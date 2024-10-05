@@ -12,7 +12,7 @@
 #include <QTextStream>
 #include <QVBoxLayout>
 
-LoadDeckFromClipboard::LoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
+DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
 {
     contentsEdit = new QPlainTextEdit;
 
@@ -38,18 +38,18 @@ LoadDeckFromClipboard::LoadDeckFromClipboard(QWidget *parent) : QDialog(parent),
     refreshShortcuts();
 }
 
-void LoadDeckFromClipboard::actRefresh()
+void DlgLoadDeckFromClipboard::actRefresh()
 {
     contentsEdit->setPlainText(QApplication::clipboard()->text());
 }
 
-void LoadDeckFromClipboard::refreshShortcuts()
+void DlgLoadDeckFromClipboard::refreshShortcuts()
 {
     refreshButton->setShortcut(
         SettingsCache::instance().shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
 }
 
-void LoadDeckFromClipboard::actOK()
+void DlgLoadDeckFromClipboard::actOK()
 {
     QString buffer = contentsEdit->toPlainText();
     QTextStream stream(&buffer);

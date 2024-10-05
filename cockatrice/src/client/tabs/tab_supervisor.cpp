@@ -24,6 +24,7 @@
 #include "tab_message.h"
 #include "tab_replays.h"
 #include "tab_room.h"
+#include "tab_server.h"
 
 #include <QApplication>
 #include <QDebug>

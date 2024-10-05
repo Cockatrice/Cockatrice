@@ -1635,7 +1635,7 @@ void Player::actRollDie()
 
 void Player::actCreateToken()
 {
-    CreateToken dlg(predefinedTokens, game);
+    DlgCreateToken dlg(predefinedTokens, game);
     if (!dlg.exec()) {
         return;
     }
