@@ -1,4 +1,4 @@
-#include "tappedout_interface.h"
+#include "tapped_out_interface.h"
 
 #include "decklist.h"
 

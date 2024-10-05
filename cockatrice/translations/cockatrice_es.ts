@@ -5117,48 +5117,48 @@ Por favor, revise su configuración de atajos.</translation>
 <context>
     <name>SpoilerBackgroundUpdater</name>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="100"/>
+        <location filename="src/spoiler_background_updater.cpp" line="100"/>
         <source>Spoilers season has ended</source>
         <translation>La temporada de Spoilers ha terminado</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="100"/>
+        <location filename="src/spoiler_background_updater.cpp" line="100"/>
         <source>Deleting spoiler.xml. Please run Oracle</source>
         <translation>Eliminando spoiler.xml Por favor, ejecute Oracle</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="110"/>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="117"/>
+        <location filename="src/spoiler_background_updater.cpp" line="110"/>
+        <location filename="src/spoiler_background_updater.cpp" line="117"/>
         <source>Spoilers download failed</source>
         <translation>Error al descargar Spoilers</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="110"/>
+        <location filename="src/spoiler_background_updater.cpp" line="110"/>
         <source>No internet connection</source>
         <translation>No hay conexión a internet</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="117"/>
+        <location filename="src/spoiler_background_updater.cpp" line="117"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="138"/>
+        <location filename="src/spoiler_background_updater.cpp" line="138"/>
         <source>Spoilers already up to date</source>
         <translation>Los spoilers ya están actualizados</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="138"/>
+        <location filename="src/spoiler_background_updater.cpp" line="138"/>
         <source>No new spoilers added</source>
         <translation>No se han añadido nuevos spoilers</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="179"/>
+        <location filename="src/spoiler_background_updater.cpp" line="179"/>
         <source>Spoilers have been updated!</source>
         <translation>Los Spoilers han sido actualizados!</translation>
     </message>
     <message>
-        <location filename="src/spoilerbackgroundupdater.cpp" line="179"/>
+        <location filename="src/spoiler_background_updater.cpp" line="179"/>
         <source>Last change:</source>
         <translation>Último cambio:</translation>
     </message>

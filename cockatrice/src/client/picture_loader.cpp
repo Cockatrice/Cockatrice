@@ -1,9 +1,9 @@
-#include "pictureloader.h"
+#include "picture_loader.h"
 
-#include "carddatabase.h"
-#include "main.h"
-#include "settingscache.h"
-#include "thememanager.h"
+#include "../game/cards/database.h"
+#include "../main.h"
+#include "../settings/cache.h"
+#include "theme_manager.h"
 
 #include <QApplication>
 #include <QBuffer>

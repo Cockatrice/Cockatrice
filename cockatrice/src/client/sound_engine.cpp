@@ -1,6 +1,6 @@
 #include "soundengine.h"
 
-#include "settingscache.h"
+#include "../settings/cache.h"
 
 #include <QDir>
 #include <QMediaPlayer>

@@ -1,6 +1,5 @@
-#include "localserverinterface.h"
-
-#include "localserver.h"
+#include "local_server.h"
+#include "local_server_interface.h"
 
 #include <QDebug>
 
