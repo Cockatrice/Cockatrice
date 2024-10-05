@@ -7,7 +7,7 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
         src/game/cards/abstract_card_drag_item.cpp
         src/game/cards/abstract_card_item.cpp
-        src/client/abstract_client.cpp
+        src/client/game_logic/abstract_client.cpp
         src/game/board/abstract_counter.cpp
         src/game/board/abstract_graphics_item.cpp
         src/game/board/arrow_item.cpp
@@ -65,8 +65,8 @@ set(cockatrice_SOURCES
         src/game/hand_counter.cpp
         src/server/handle_public_servers.cpp
         src/game/zones/hand_zone.cpp
-        src/client/key_signals.cpp
-        src/client/line_edit_completer.cpp
+        src/client/game_logic/key_signals.cpp
+        src/client/ui/line_edit_completer.cpp
         src/server/local_client.cpp
         src/server/local_server.cpp
         src/server/local_server_interface.cpp
@@ -75,21 +75,21 @@ set(cockatrice_SOURCES
         src/server/message_log_widget.cpp
         src/server/pending_command.cpp
         src/game/phase.cpp
-        src/client/phases_toolbar.cpp
-        src/client/picture_loader.cpp
+        src/client/ui/phases_toolbar.cpp
+        src/client/ui/picture_loader.cpp
         src/game/zones/pile_zone.cpp
-        src/client/pixel_map_generator.cpp
+        src/client/ui/pixel_map_generator.cpp
         src/player/player.cpp
         src/player/player_list_widget.cpp
         src/player/player_target.cpp
-        src/client/release_channel.cpp
+        src/client/network/release_channel.cpp
         src/server/remote/remote_client.cpp
         src/server/remote/remote_decklist_tree_widget.cpp
         src/server/remote/remote_replay_list_tree_widget.cpp
-        src/client/replay_timeline_widget.cpp
+        src/client/network/replay_timeline_widget.cpp
         src/game/zones/select_zone.cpp
         src/utility/sequence_edit.cpp
-        src/client/sets_model.cpp
+        src/client/network/sets_model.cpp
         src/settings/card_database_settings.cpp
         src/settings/download_settings.cpp
         src/settings/game_filters_settings.cpp
@@ -100,7 +100,7 @@ set(cockatrice_SOURCES
         src/settings/cache_settings.cpp
         src/settings/shortcuts_settings.cpp
         src/client/sound_engine.cpp
-        src/client/spoiler_background_updater.cpp
+        src/client/network/spoiler_background_updater.cpp
         src/game/zones/stack_zone.cpp
         src/client/tabs/tab.cpp
         src/client/tabs/tab_account.cpp
@@ -116,15 +116,15 @@ set(cockatrice_SOURCES
         src/client/tabs/tab_supervisor.cpp
         src/game/zones/table_zone.cpp
         src/client/tapped_out_interface.cpp
-        src/client/theme_manager.cpp
-        src/client/tip_of_the_day.cpp
+        src/client/ui/theme_manager.cpp
+        src/client/ui/tip_of_the_day.cpp
         src/client/translate_counter_name.cpp
         src/client/update_downloader.cpp
         src/server/user/user_context_menu.cpp
         src/server/user/user_info_connection.cpp
         src/server/user/user_info_box.cpp
         src/server/user/user_list.cpp
-        src/client/window_main.cpp
+        src/client/ui/window_main.cpp
         src/game/zones/view_zone_widget.cpp
         src/game/zones/view_zone.cpp
         ${VERSION_STRING_CPP}

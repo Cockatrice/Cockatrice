@@ -1,10 +1,10 @@
 #include "tab_supervisor.h"
 
-#include "../../client/abstract_client.h"
+#include "../../client/game_logic/abstract_client.h"
 #include "../../main.h"
 #include "../../server/user/user_list.h"
 #include "../../settings/cache_settings.h"
-#include "../pixel_map_generator.h"
+#include "../ui/pixel_map_generator.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_notify_user.pb.h"
 #include "pb/event_user_message.pb.h"

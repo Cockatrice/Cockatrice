@@ -1,6 +1,6 @@
 #include "abstract_client.h"
 
-#include "../server/pending_command.h"
+#include "../../server/pending_command.h"
 #include "featureset.h"
 #include "get_pb_extension.h"
 #include "pb/commands.pb.h"

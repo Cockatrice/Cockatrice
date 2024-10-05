@@ -1,8 +1,8 @@
 #include "picture_loader.h"
 
-#include "../game/cards/card_database.h"
-#include "../main.h"
-#include "../settings/cache_settings.h"
+#include "../../game/cards/card_database.h"
+#include "../../main.h"
+#include "../../settings/cache_settings.h"
 #include "theme_manager.h"
 
 #include <QApplication>

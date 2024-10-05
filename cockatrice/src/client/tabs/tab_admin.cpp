@@ -1,6 +1,6 @@
 #include "tab_admin.h"
 
-#include "../abstract_client.h"
+#include "../game_logic/abstract_client.h"
 #include "pb/admin_commands.pb.h"
 #include "trice_limits.h"
 

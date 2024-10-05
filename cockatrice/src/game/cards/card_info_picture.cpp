@@ -1,6 +1,6 @@
 #include "card_info_picture.h"
 
-#include "../../client/picture_loader.h"
+#include "../../client/ui/picture_loader.h"
 #include "../../main.h"
 #include "card_item.h"
 

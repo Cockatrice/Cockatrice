@@ -2,7 +2,7 @@
 
 #include "../client/get_text_with_max.h"
 #include "../client/tabs/tab_game.h"
-#include "../client/theme_manager.h"
+#include "../client/ui/theme_manager.h"
 #include "../deck/deck_loader.h"
 #include "../dialogs/dlg_create_token.h"
 #include "../dialogs/dlg_roll_dice.h"

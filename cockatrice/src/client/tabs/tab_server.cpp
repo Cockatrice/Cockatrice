@@ -1,6 +1,6 @@
 #include "tab_server.h"
 
-#include "../../client/abstract_client.h"
+#include "../../client/game_logic/abstract_client.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_list.h"
 #include "pb/event_list_rooms.pb.h"

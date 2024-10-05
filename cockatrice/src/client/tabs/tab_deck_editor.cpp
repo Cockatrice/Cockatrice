@@ -1,6 +1,6 @@
 #include "tab_deck_editor.h"
 
-#include "../../client/abstract_client.h"
+#include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
@@ -12,8 +12,8 @@
 #include "../../main.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
-#include "../picture_loader.h"
-#include "../pixel_map_generator.h"
+#include "../ui/picture_loader.h"
+#include "../ui/pixel_map_generator.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/response.pb.h"
 #include "tab_supervisor.h"

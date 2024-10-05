@@ -3,7 +3,7 @@
 #include "../../server/pending_command.h"
 #include "../../server/remote/remote_replay_list_tree_widget.h"
 #include "../../settings/cache_settings.h"
-#include "../abstract_client.h"
+#include "../game_logic/abstract_client.h"
 #include "pb/command_replay_delete_match.pb.h"
 #include "pb/command_replay_download.pb.h"
 #include "pb/command_replay_modify_match.pb.h"
