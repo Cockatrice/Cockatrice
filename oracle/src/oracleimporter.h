@@ -3,7 +3,7 @@
 
 #include <QMap>
 #include <QVariant>
-#include <carddatabase.h>
+#include <game/cards/card_database.h>
 #include <utility>
 
 // many users prefer not to see these sets with non english arts
