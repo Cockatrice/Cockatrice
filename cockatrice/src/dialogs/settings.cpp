@@ -1,15 +1,15 @@
 #include "settings.h"
 
-#include "carddatabase.h"
+#include "../game/cards/database.h"
 #include "gettextwithmax.h"
-#include "main.h"
-#include "pictureloader.h"
+#include "../main.h"
+#include "../client/picture_loader.h"
 #include "releasechannel.h"
-#include "sequenceEdit/sequenceedit.h"
-#include "settingscache.h"
-#include "soundengine.h"
-#include "spoilerbackgroundupdater.h"
-#include "thememanager.h"
+#include "../sequence_edit/sequence_edit.h"
+#include "../settings/cache.h"
+#include "../client/sound_engine.h"
+#include "../client/spoiler_background_updater.h"
+#include "../client/theme_manager.h"
 
 #include <QAction>
 #include <QApplication>

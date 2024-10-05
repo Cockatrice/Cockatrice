@@ -1,8 +1,8 @@
 #ifndef DLG_CONNECT_H
 #define DLG_CONNECT_H
 
-#include "handle_public_servers.h"
-#include "userconnection_information.h"
+#include "../server/handle_public_servers.h"
+#include "../server/user/connection_information.h"
 
 #include <QDialog>
 #include <QLineEdit>

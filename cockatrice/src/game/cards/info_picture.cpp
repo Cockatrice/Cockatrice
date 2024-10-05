@@ -1,6 +1,5 @@
-#include "cardinfopicture.h"
-
 #include "carditem.h"
+#include "info_picture.h"
 #include "main.h"
 #include "pictureloader.h"
 

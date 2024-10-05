@@ -1,7 +1,7 @@
-#include "dlg_update.h"
+#include "update.h"
 #include "releasechannel.h"
-#include "settingscache.h"
-#include "window_main.h"
+#include "../settings/cache.h"
+#include "../client/window_main.h"
 
 #include <QApplication>
 #include <QDesktopServices>

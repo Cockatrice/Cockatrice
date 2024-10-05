@@ -1,9 +1,9 @@
 #include "edit_tokens.h"
 
-#include "carddatabase.h"
-#include "carddatabasemodel.h"
+#include "../game/cards/database.h"
+#include "../game/cards/database_model.h"
 #include "gettextwithmax.h"
-#include "main.h"
+#include "../main.h"
 #include "trice_limits.h"
 
 #include <QAction>

@@ -6,9 +6,9 @@ set(dbconverter_SOURCES
     src/main.cpp
     src/mocks.cpp
         ../cockatrice/src/game/cards/database.cpp
-        ../cockatrice/src/carddbparser/card_database_parser.cpp
-        ../cockatrice/src/carddbparser/cockatrice_xml3.cpp
-        ../cockatrice/src/carddbparser/cockatrice_xml4.cpp
+        ../cockatrice/src/card_database_parser/card_database_parser.cpp
+        ../cockatrice/src/card_database_parser/cockatrice_xml3.cpp
+        ../cockatrice/src/card_database_parser/cockatrice_xml4.cpp
     ../cockatrice/src/settings/settingsmanager.cpp
     ${VERSION_STRING_CPP}
 )

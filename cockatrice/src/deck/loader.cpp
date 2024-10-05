@@ -1,8 +1,8 @@
-#include "deck_loader.h"
+#include "loader.h"
 
-#include "carddatabase.h"
+#include "../game/cards/database.h"
 #include "decklist.h"
-#include "main.h"
+#include "../main.h"
 
 #include <QDebug>
 #include <QFile>

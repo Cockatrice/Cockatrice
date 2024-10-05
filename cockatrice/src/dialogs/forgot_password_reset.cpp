@@ -1,6 +1,6 @@
 #include "forgot_password_reset.h"
 
-#include "settingscache.h"
+#include "../settings/cache.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

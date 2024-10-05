@@ -1,7 +1,7 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include "abstractcarditem.h"
+#include "abstract_card_item.h"
 #include "server_card.h"
 
 class CardDatabase;

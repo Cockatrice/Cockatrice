@@ -1,10 +1,10 @@
-#include "deckview.h"
+#include "view.h"
 
-#include "carddatabase.h"
+#include "../game/cards/database.h"
 #include "decklist.h"
-#include "main.h"
-#include "settingscache.h"
-#include "thememanager.h"
+#include "../main.h"
+#include "../settings/cache.h"
+#include "../client/theme_manager.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>

@@ -1,9 +1,9 @@
-#include "decklistmodel.h"
+#include "list_model.h"
 
-#include "carddatabase.h"
-#include "deck_loader.h"
-#include "main.h"
-#include "settingscache.h"
+#include "../game/cards/database.h"
+#include "loader.h"
+#include "../main.h"
+#include "../settings/cache.h"
 
 #include <QBrush>
 #include <QFile>

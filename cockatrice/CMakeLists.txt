@@ -5,8 +5,8 @@
 project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 set(cockatrice_SOURCES
-    src/game/cards/abstractcarddragitem.cpp
-    src/game/cards/abstractcarditem.cpp
+        src/game/cards/abstract_card_drag_item.cpp
+        src/game/cards/abstract_card_item.cpp
     src/client/abstract_client.cpp
     src/abstract/abstractcounter.cpp
     src/abstract/abstractgraphicsitem.cpp
@@ -14,17 +14,17 @@ set(cockatrice_SOURCES
         src/game/board/arrow_target.cpp
         src/game/cards/database.cpp
         src/game/cards/database_model.cpp
-        src/carddbparser/card_database_parser.cpp
-        src/carddbparser/cockatrice_xml3.cpp
-        src/carddbparser/cockatrice_xml4.cpp
-    src/game/cards/carddragitem.cpp
+        src/card_database_parser/card_database_parser.cpp
+        src/card_database_parser/cockatrice_xml3.cpp
+        src/card_database_parser/cockatrice_xml4.cpp
+        src/game/cards/drag_item.cpp
         src/game/filter/card.cpp
         src/game/cards/frame.cpp
-    src/game/cards/cardinfopicture.cpp
-    src/game/cards/cardinfotext.cpp
+        src/game/cards/info_picture.cpp
+        src/game/cards/info_text.cpp
         src/game/cards/info_widget.cpp
         src/game/cards/item.cpp
-    src/game/cards/cardlist.cpp
+        src/game/cards/list.cpp
     src/game/zones/cardzone.cpp
         src/chatview/chat_view.cpp
     src/game/board/counter_general.cpp
@@ -88,7 +88,7 @@ set(cockatrice_SOURCES
         src/server/remote/replay_list_tree_widget.cpp
         src/replaytimelinewidget.cpp
     src/game/zones/selectzone.cpp
-    src/sequenceEdit/sequenceedit.cpp
+        src/sequence_edit/sequence_edit.cpp
     src/setsmodel.cpp
     src/settings/carddatabasesettings.cpp
     src/settings/downloadsettings.cpp

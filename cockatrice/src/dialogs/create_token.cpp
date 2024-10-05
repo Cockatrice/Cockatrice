@@ -1,10 +1,10 @@
 #include "create_token.h"
 
-#include "carddatabasemodel.h"
-#include "cardinfopicture.h"
+#include "../game/cards/database_model.h"
+#include "../game/cards/info_picture.h"
 #include "decklist.h"
-#include "main.h"
-#include "settingscache.h"
+#include "../main.h"
+#include "../settings/cache.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

@@ -1,4 +1,4 @@
-#include "deckstats_interface.h"
+#include "stats_interface.h"
 
 #include "decklist.h"
 

@@ -1,7 +1,7 @@
 #include "load_deck_from_clipboard.h"
 
-#include "deck_loader.h"
-#include "settingscache.h"
+#include "../deck/loader.h"
+#include "../settings/cache.h"
 
 #include <QApplication>
 #include <QClipboard>

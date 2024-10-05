@@ -1,8 +1,8 @@
 #include "connect.h"
 
-#include "settingscache.h"
+#include "../settings/cache.h"
 #include "trice_limits.h"
-#include "userconnection_information.h"
+#include "../server/user/connection_information.h"
 
 #include <QCheckBox>
 #include <QComboBox>

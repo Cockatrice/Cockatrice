@@ -1,7 +1,6 @@
-#include "cardlist.h"
-
 #include "carddatabase.h"
 #include "carditem.h"
+#include "list.h"
 
 #include <algorithm>
 
