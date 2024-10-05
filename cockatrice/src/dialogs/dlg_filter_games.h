@@ -16,7 +16,7 @@ class QGroupBox;
 class QLineEdit;
 class QSpinBox;
 
-class FilterGames : public QDialog
+class DlgFilterGames : public QDialog
 {
     Q_OBJECT
 private:
@@ -46,7 +46,7 @@ private slots:
     void toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled);
 
 public:
-    FilterGames(const QMap<int, QString> &_allGameTypes,
+    DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                 const GamesProxyModel *_gamesProxyModel,
                 QWidget *parent = nullptr);
 

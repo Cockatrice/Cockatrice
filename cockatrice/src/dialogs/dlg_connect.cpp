@@ -17,7 +17,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 
-Connect::Connect(QWidget *parent) : QDialog(parent)
+DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
@@ -98,7 +98,7 @@ Connect::Connect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
-    btnConnect = new QPushButton(tr("&Connect"));
+    btnConnect = new QPushButton(tr("&DlgConnect"));
     connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
@@ -153,7 +153,7 @@ Connect::Connect(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Connect to Server"));
+    setWindowTitle(tr("DlgConnect to Server"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 
@@ -167,9 +167,9 @@ Connect::Connect(QWidget *parent) : QDialog(parent)
     playernameEdit->setFocus();
 }
 
-Connect::~Connect() = default;
+DlgConnect::~DlgConnect() = default;
 
-void Connect::downloadThePublicServers()
+void DlgConnect::downloadThePublicServers()
 {
     btnRefreshServers->setDisabled(true);
     previousHosts->clear();
@@ -177,7 +177,7 @@ void Connect::downloadThePublicServers()
     hps->downloadPublicServers();
 }
 
-void Connect::preRebuildComboBoxList()
+void DlgConnect::preRebuildComboBoxList()
 {
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
@@ -189,7 +189,7 @@ void Connect::preRebuildComboBoxList()
     }
 }
 
-void Connect::rebuildComboBoxList(int failure)
+void DlgConnect::rebuildComboBoxList(int failure)
 {
     Q_UNUSED(failure);
 
@@ -227,7 +227,7 @@ void Connect::rebuildComboBoxList(int failure)
     btnRefreshServers->setDisabled(false);
 }
 
-void Connect::previousHostSelected(bool state)
+void DlgConnect::previousHostSelected(bool state)
 {
     if (state) {
         saveEdit->setDisabled(true);
@@ -238,7 +238,7 @@ void Connect::previousHostSelected(bool state)
     }
 }
 
-void Connect::updateDisplayInfo(const QString &saveName)
+void DlgConnect::updateDisplayInfo(const QString &saveName)
 {
     if (saveEdit == nullptr || saveName == placeHolderText) {
         return;
@@ -269,7 +269,7 @@ void Connect::updateDisplayInfo(const QString &saveName)
     }
 }
 
-void Connect::newHostSelected(bool state)
+void DlgConnect::newHostSelected(bool state)
 {
     if (state) {
         previousHosts->setDisabled(true);
@@ -292,7 +292,7 @@ void Connect::newHostSelected(bool state)
     }
 }
 
-void Connect::passwordSaved(int state)
+void DlgConnect::passwordSaved(int state)
 {
     Q_UNUSED(state);
     if (savePasswordCheckBox->isChecked()) {
@@ -303,7 +303,7 @@ void Connect::passwordSaved(int state)
     }
 }
 
-void Connect::actOk()
+void DlgConnect::actOk()
 {
     ServersSettings &servers = SettingsCache::instance().servers();
 
@@ -325,14 +325,14 @@ void Connect::actOk()
     servers.setAutoConnect(autoConnectCheckBox->isChecked());
 
     if (playernameEdit->text().isEmpty()) {
-        QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
+        QMessageBox::critical(this, tr("DlgConnect Warning"), tr("The player name can't be empty."));
         return;
     }
 
     accept();
 }
 
-QString Connect::getHost() const
+QString DlgConnect::getHost() const
 {
     return hostEdit->text().trimmed();
 }
@@ -352,7 +352,7 @@ bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *o
     return QObject::eventFilter(obj, event);
 }
 
-void Connect::actForgotPassword()
+void DlgConnect::actForgotPassword()
 {
     ServersSettings &servers = SettingsCache::instance().servers();
     servers.setFPHostName(hostEdit->text());

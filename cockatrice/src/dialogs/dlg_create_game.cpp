@@ -20,7 +20,7 @@
 #include <QSpinBox>
 #include <QWizard>
 
-void CreateGame::sharedCtor()
+void DlgCreateGame::sharedCtor()
 {
     rememberGameSettings = new QCheckBox(tr("Re&member settings"));
     descriptionLabel = new QLabel(tr("&Description:"));
@@ -114,7 +114,7 @@ void CreateGame::sharedCtor()
     setFixedHeight(sizeHint().height());
 }
 
-CreateGame::CreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
+DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
     : QDialog(parent), room(_room), gameTypes(_gameTypes)
 {
     sharedCtor();
@@ -149,7 +149,7 @@ CreateGame::CreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWi
     setWindowTitle(tr("Create game"));
 }
 
-CreateGame::CreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString> &_gameTypes, QWidget *parent)
+DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString> &_gameTypes, QWidget *parent)
     : QDialog(parent), room(0), gameTypes(_gameTypes)
 {
     sharedCtor();
@@ -193,7 +193,7 @@ CreateGame::CreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString>
     setWindowTitle(tr("Game information"));
 }
 
-void CreateGame::actReset()
+void DlgCreateGame::actReset()
 {
     descriptionEdit->setText("");
     maxPlayersEdit->setValue(2);
@@ -220,7 +220,7 @@ void CreateGame::actReset()
     descriptionEdit->setFocus();
 }
 
-void CreateGame::actOK()
+void DlgCreateGame::actOK()
 {
     Command_CreateGame cmd;
     cmd.set_description(descriptionEdit->text().simplified().toStdString());
@@ -265,7 +265,7 @@ void CreateGame::actOK()
     buttonBox->setEnabled(false);
 }
 
-void CreateGame::checkResponse(const Response &response)
+void DlgCreateGame::checkResponse(const Response &response)
 {
     buttonBox->setEnabled(true);
 
@@ -277,7 +277,7 @@ void CreateGame::checkResponse(const Response &response)
     }
 }
 
-void CreateGame::spectatorsAllowedChanged(int state)
+void DlgCreateGame::spectatorsAllowedChanged(int state)
 {
     spectatorsNeedPasswordCheckBox->setEnabled(state);
     spectatorsCanTalkCheckBox->setEnabled(state);

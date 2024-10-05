@@ -21,7 +21,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
-CreateToken::CreateToken(const QStringList &_predefinedTokens, QWidget *parent)
+DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
 {
     pic = new CardInfoPicture();
@@ -144,13 +144,13 @@ CreateToken::CreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     restoreGeometry(SettingsCache::instance().getTokenDialogGeometry());
 }
 
-void CreateToken::closeEvent(QCloseEvent *event)
+void DlgCreateToken::closeEvent(QCloseEvent *event)
 {
     event->accept();
     SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
 }
 
-void CreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
+void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
 
@@ -177,26 +177,26 @@ void CreateToken::tokenSelectionChanged(const QModelIndex &current, const QModel
     pic->setCard(cardInfo);
 }
 
-void CreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const
+void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const
 {
     nameEdit->blockSignals(true);
     nameEdit->setText(newValue);
     nameEdit->blockSignals(false);
 }
 
-void CreateToken::updateSearch(const QString &search)
+void DlgCreateToken::updateSearch(const QString &search)
 {
     cardDatabaseDisplayModel->setCardName(search);
 }
 
-void CreateToken::actChooseTokenFromAll(bool checked)
+void DlgCreateToken::actChooseTokenFromAll(bool checked)
 {
     if (checked) {
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>());
     }
 }
 
-void CreateToken::actChooseTokenFromDeck(bool checked)
+void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 {
     if (checked) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -207,39 +207,39 @@ void CreateToken::actChooseTokenFromDeck(bool checked)
     }
 }
 
-void CreateToken::actOk()
+void DlgCreateToken::actOk()
 {
     SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
     accept();
 }
 
-void CreateToken::actReject()
+void DlgCreateToken::actReject()
 {
     SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
     reject();
 }
 
-QString CreateToken::getName() const
+QString DlgCreateToken::getName() const
 {
     return nameEdit->text();
 }
 
-QString CreateToken::getColor() const
+QString DlgCreateToken::getColor() const
 {
     return QString(colorEdit->itemData(colorEdit->currentIndex()).toChar());
 }
 
-QString CreateToken::getPT() const
+QString DlgCreateToken::getPT() const
 {
     return ptEdit->text();
 }
 
-QString CreateToken::getAnnotation() const
+QString DlgCreateToken::getAnnotation() const
 {
     return annotationEdit->text();
 }
 
-bool CreateToken::getDestroy() const
+bool DlgCreateToken::getDestroy() const
 {
     return destroyCheckBox->isChecked();
 }

@@ -7,7 +7,7 @@ class DeckLoader;
 class QPlainTextEdit;
 class QPushButton;
 
-class LoadDeckFromClipboard : public QDialog
+class DlgLoadDeckFromClipboard : public QDialog
 {
     Q_OBJECT
 private slots:
@@ -21,7 +21,7 @@ private:
     QPushButton *refreshButton;
 
 public:
-    explicit LoadDeckFromClipboard(QWidget *parent = nullptr);
+    explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
     DeckLoader *getDeckList() const
     {
         return deckList;

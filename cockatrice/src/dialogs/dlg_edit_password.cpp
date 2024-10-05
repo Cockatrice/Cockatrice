@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-EditPassword::EditPassword(QWidget *parent) : QDialog(parent)
+DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 {
     oldPasswordLabel = new QLabel(tr("Old password:"));
     oldPasswordEdit = new QLineEdit();
@@ -57,7 +57,7 @@ EditPassword::EditPassword(QWidget *parent) : QDialog(parent)
     setMinimumWidth(300);
 }
 
-void EditPassword::actOk()
+void DlgEditPassword::actOk()
 {
     // TODO this stuff should be using qvalidators
     if (newPasswordEdit->text().length() < 8) {

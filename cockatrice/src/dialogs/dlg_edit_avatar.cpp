@@ -12,7 +12,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-EditAvatar::EditAvatar(QWidget *parent) : QDialog(parent), image()
+DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
 {
     imageLabel = new QLabel(tr("No image chosen."));
     imageLabel->setFixedSize(400, 200);
@@ -43,12 +43,12 @@ EditAvatar::EditAvatar(QWidget *parent) : QDialog(parent), image()
     setMinimumWidth(300);
 }
 
-void EditAvatar::actOk()
+void DlgEditAvatar::actOk()
 {
     accept();
 }
 
-void EditAvatar::actBrowse()
+void DlgEditAvatar::actBrowse()
 {
     QString fileName =
         QFileDialog::getOpenFileName(this, tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.bmp)"));
@@ -68,7 +68,7 @@ void EditAvatar::actBrowse()
     imageLabel->setPixmap(QPixmap::fromImage(image).scaled(400, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-QByteArray EditAvatar::getImage()
+QByteArray DlgEditAvatar::getImage()
 {
     if (image.isNull()) {
         return QByteArray();

@@ -16,12 +16,12 @@ class Response;
 class ServerInfo_Game;
 class TabRoom;
 
-class CreateGame : public QDialog
+class DlgCreateGame : public QDialog
 {
     Q_OBJECT
 public:
-    CreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = nullptr);
-    CreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = nullptr);
+    DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = nullptr);
+    DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = nullptr);
 private slots:
     void actOK();
     void actReset();

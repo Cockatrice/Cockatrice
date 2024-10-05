@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-RollDice::RollDice(QWidget *parent) : QDialog(parent)
+DlgRollDice::DlgRollDice(QWidget *parent) : QDialog(parent)
 {
     numberOfSidesLabel = new QLabel(tr("Number of sides:"));
     numberOfSidesEdit = new QSpinBox(this);
@@ -41,12 +41,12 @@ RollDice::RollDice(QWidget *parent) : QDialog(parent)
     setWindowTitle(tr("Roll Dice"));
 }
 
-uint RollDice::getDieSideCount() const
+uint DlgRollDice::getDieSideCount() const
 {
     return numberOfSidesEdit->text().toUInt();
 }
 
-uint RollDice::getDiceToRollCount() const
+uint DlgRollDice::getDiceToRollCount() const
 {
     return numberOfDiceEdit->text().toUInt();
 }

@@ -11,7 +11,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-ForgotPasswordReset::ForgotPasswordReset(QWidget *parent) : QDialog(parent)
+DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent)
 {
     QString lastfphost;
     QString lastfpport;
@@ -106,7 +106,7 @@ ForgotPasswordReset::ForgotPasswordReset(QWidget *parent) : QDialog(parent)
     setMinimumWidth(300);
 }
 
-void ForgotPasswordReset::actOk()
+void DlgForgotPasswordReset::actOk()
 {
     if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Reset Password Error"), tr("The player name can't be empty."));

@@ -24,7 +24,7 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
-class Connect : public QDialog
+class DlgConnect : public QDialog
 {
     Q_OBJECT
 signals:
@@ -32,8 +32,8 @@ signals:
     void sigPublicServersDownloaded();
 
 public:
-    explicit Connect(QWidget *parent = nullptr);
-    ~Connect() override;
+    explicit DlgConnect(QWidget *parent = nullptr);
+    ~DlgConnect() override;
     QString getHost() const;
     int getPort() const
     {

@@ -1,6 +1,6 @@
 #include "cache_settings.h"
 
-#include "releasechannel.h"
+#include "../client/release_channel.h"
 
 #include <QApplication>
 #include <QDebug>

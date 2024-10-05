@@ -9,7 +9,7 @@ class AbstractClient;
 class QPushButton;
 class QDialogButtonBox;
 
-class LoadRemoteDeck : public QDialog
+class DlgLoadRemoteDeck : public QDialog
 {
     Q_OBJECT
 private:
@@ -20,7 +20,7 @@ private slots:
     void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
 
 public:
-    LoadRemoteDeck(AbstractClient *_client, QWidget *parent = nullptr);
+    DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = nullptr);
     int getDeckId() const;
 };
 
