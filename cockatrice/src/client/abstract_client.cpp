@@ -17,7 +17,7 @@
 #include "pb/event_user_left.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/server_message.pb.h"
-#include "pending_command.h"
+#include "../server/pending_command.h"
 
 #include <google/protobuf/descriptor.h>
 

@@ -1,7 +1,7 @@
 #ifndef PICTURELOADER_H
 #define PICTURELOADER_H
 
-#include "carddatabase.h"
+#include "../game/cards/database.h"
 
 #include <QList>
 #include <QMap>

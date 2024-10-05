@@ -67,9 +67,9 @@ set(cockatrice_SOURCES
     src/game/zones/handzone.cpp
     src/keysignals.cpp
     src/lineeditcompleter.cpp
-    src/server/localclient.cpp
-    src/server/localserver.cpp
-    src/server/localserverinterface.cpp
+        src/server/local_client.cpp
+        src/server/local_server.cpp
+        src/server/local_server_interface.cpp
     src/logger.cpp
     src/main.cpp
         src/server/message_log_widget.cpp
@@ -99,8 +99,8 @@ set(cockatrice_SOURCES
     src/settings/settingsmanager.cpp
         src/settings/cache.cpp
     src/settings/shortcutssettings.cpp
-    src/client/soundengine.cpp
-    src/client/spoilerbackgroundupdater.cpp
+        src/client/sound_engine.cpp
+        src/client/spoiler_background_updater.cpp
     src/game/zones/stackzone.cpp
     src/client/tabs/tab.cpp
         src/client/tabs/account.cpp

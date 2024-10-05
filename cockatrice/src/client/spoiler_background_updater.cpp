@@ -1,8 +1,8 @@
-#include "spoilerbackgroundupdater.h"
+#include "spoiler_background_updater.h"
 
-#include "carddatabase.h"
-#include "main.h"
-#include "settingscache.h"
+#include "../game/cards/database.h"
+#include "../main.h"
+#include "../settings/cache.h"
 #include "window_main.h"
 
 #include <QApplication>

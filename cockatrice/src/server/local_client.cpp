@@ -1,6 +1,6 @@
-#include "localclient.h"
+#include "local_client.h"
 
-#include "localserverinterface.h"
+#include "local_server_interface.h"
 #include "pb/session_commands.pb.h"
 
 LocalClient::LocalClient(LocalServerInterface *_lsi,
