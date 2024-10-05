@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - code-refractoring
 
 
 jobs:
