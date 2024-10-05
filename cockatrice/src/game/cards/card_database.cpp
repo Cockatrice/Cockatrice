@@ -2,8 +2,8 @@
 
 #include "../../card_database_parser/cockatrice_xml3.h"
 #include "../../card_database_parser/cockatrice_xml4.h"
-#include "../../client/picture_loader.h"
-#include "../../client/spoiler_background_updater.h"
+#include "../../client/ui/picture_loader.h"
+#include "../../client/network/spoiler_background_updater.h"
 #include "../../settings/cache_settings.h"
 #include "../game_specific_terms.h"
 

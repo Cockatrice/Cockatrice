@@ -1,6 +1,6 @@
 #include "counter_general.h"
 
-#include "../../client/pixel_map_generator.h"
+#include "../../client/ui/pixel_map_generator.h"
 #include "abstract_graphics_item.h"
 
 #include <QPainter>

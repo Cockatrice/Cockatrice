@@ -20,7 +20,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "abstract_client.h"
+#include "../game_logic/abstract_client.h"
 #include "pb/response.pb.h"
 
 #include <QList>

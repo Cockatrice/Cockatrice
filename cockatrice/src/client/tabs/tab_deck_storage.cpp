@@ -4,7 +4,7 @@
 #include "../../server/pending_command.h"
 #include "../../server/remote/remote_decklist_tree_widget.h"
 #include "../../settings/cache_settings.h"
-#include "../abstract_client.h"
+#include "../game_logic/abstract_client.h"
 #include "../get_text_with_max.h"
 #include "decklist.h"
 #include "pb/command_deck_del.pb.h"

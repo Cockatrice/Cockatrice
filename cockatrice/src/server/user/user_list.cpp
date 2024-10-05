@@ -1,7 +1,7 @@
 #include "user_list.h"
 
-#include "../../client/abstract_client.h"
-#include "../../client/pixel_map_generator.h"
+#include "../../client/game_logic/abstract_client.h"
+#include "../../client/ui/pixel_map_generator.h"
 #include "../../client/tabs/tab_account.h"
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../game/game_selector.h"

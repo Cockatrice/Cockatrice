@@ -1,7 +1,7 @@
 #include "dlg_update.h"
 
-#include "../client/release_channel.h"
-#include "../client/window_main.h"
+#include "../client/network/release_channel.h"
+#include "../client/ui/window_main.h"
 #include "../settings/cache_settings.h"
 
 #include <QApplication>

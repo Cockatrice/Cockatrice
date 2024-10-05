@@ -1,6 +1,6 @@
 #include "chat_view.h"
 
-#include "../client/pixel_map_generator.h"
+#include "../client/ui/pixel_map_generator.h"
 #include "../client/sound_engine.h"
 #include "../client/tabs/tab_account.h"
 #include "../server/user/user_context_menu.h"

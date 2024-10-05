@@ -3,7 +3,7 @@
 
 #include "../../deck/custom_line_edit.h"
 #include "../../game/cards/card_database.h"
-#include "../key_signals.h"
+#include "../game_logic/key_signals.h"
 #include "tab.h"
 
 #include <QAbstractItemModel>

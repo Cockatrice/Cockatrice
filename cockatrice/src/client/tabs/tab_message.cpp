@@ -5,7 +5,7 @@
 #include "../../main.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
-#include "../abstract_client.h"
+#include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/serverinfo_user.pb.h"

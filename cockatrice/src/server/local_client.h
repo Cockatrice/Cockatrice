@@ -1,7 +1,7 @@
 #ifndef LOCALCLIENT_H
 #define LOCALCLIENT_H
 
-#include "../client/abstract_client.h"
+#include "../client/game_logic/abstract_client.h"
 
 class LocalServerInterface;
 

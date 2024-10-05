@@ -1,6 +1,6 @@
 #include "game_selector.h"
 
-#include "../client/abstract_client.h"
+#include "../client/game_logic/abstract_client.h"
 #include "../client/get_text_with_max.h"
 #include "../client/tabs/tab_account.h"
 #include "../client/tabs/tab_game.h"
