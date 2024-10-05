@@ -1,8 +1,8 @@
 #include "dlg_connect.h"
 
-#include "../server/user/user_info_connection.h"
 #include "../settings/cache_settings.h"
 #include "trice_limits.h"
+#include "../server/user/user_info_connection.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -98,7 +98,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
-    btnConnect = new QPushButton(tr("&DlgConnect"));
+    btnConnect = new QPushButton(tr("&Connect"));
     connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
@@ -153,7 +153,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("DlgConnect to Server"));
+    setWindowTitle(tr("Connect to Server"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 
@@ -325,7 +325,7 @@ void DlgConnect::actOk()
     servers.setAutoConnect(autoConnectCheckBox->isChecked());
 
     if (playernameEdit->text().isEmpty()) {
-        QMessageBox::critical(this, tr("DlgConnect Warning"), tr("The player name can't be empty."));
+        QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
         return;
     }
 
