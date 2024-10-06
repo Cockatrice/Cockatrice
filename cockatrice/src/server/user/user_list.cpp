@@ -1,9 +1,9 @@
 #include "user_list.h"
 
 #include "../../client/game_logic/abstract_client.h"
-#include "../../client/ui/pixel_map_generator.h"
 #include "../../client/tabs/tab_account.h"
 #include "../../client/tabs/tab_supervisor.h"
+#include "../../client/ui/pixel_map_generator.h"
 #include "../../game/game_selector.h"
 #include "../pending_command.h"
 #include "pb/moderator_commands.pb.h"

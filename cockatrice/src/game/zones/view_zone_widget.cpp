@@ -1,10 +1,11 @@
+#include "view_zone_widget.h"
+
 #include "../../player/player.h"
 #include "../../settings/cache_settings.h"
 #include "../cards/card_item.h"
 #include "../game_scene.h"
 #include "pb/command_shuffle.pb.h"
 #include "view_zone.h"
-#include "view_zone_widget.h"
 
 #include <QCheckBox>
 #include <QGraphicsLinearLayout>

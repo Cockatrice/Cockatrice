@@ -1,3 +1,5 @@
+#include "view_zone.h"
+
 #include "../../player/player.h"
 #include "../../server/pending_command.h"
 #include "../cards/card_database.h"
@@ -7,7 +9,6 @@
 #include "pb/command_move_card.pb.h"
 #include "pb/response_dump_zone.pb.h"
 #include "pb/serverinfo_card.pb.h"
-#include "view_zone.h"
 
 #include <QBrush>
 #include <QDebug>

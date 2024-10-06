@@ -1,10 +1,10 @@
 #include "dlg_settings.h"
 
 #include "../client/get_text_with_max.h"
-#include "../client/ui/picture_loader.h"
 #include "../client/network/release_channel.h"
-#include "../client/sound_engine.h"
 #include "../client/network/spoiler_background_updater.h"
+#include "../client/sound_engine.h"
+#include "../client/ui/picture_loader.h"
 #include "../client/ui/theme_manager.h"
 #include "../game/cards/card_database.h"
 #include "../main.h"

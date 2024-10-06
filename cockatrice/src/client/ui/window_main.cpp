@@ -37,14 +37,14 @@
 #include "../../server/local_server_interface.h"
 #include "../../server/remote/remote_client.h"
 #include "../../settings/cache_settings.h"
-#include "../get_text_with_max.h"
 #include "../../utility/logger.h"
+#include "../get_text_with_max.h"
+#include "../tabs/tab_game.h"
+#include "../tabs/tab_supervisor.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
-#include "../tabs/tab_supervisor.h"
-#include "../tabs/tab_game.h"
 #include "version_string.h"
 
 #include <QAction>

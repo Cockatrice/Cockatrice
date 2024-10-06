@@ -1,8 +1,8 @@
 #ifndef CARDDATABASEMODEL_H
 #define CARDDATABASEMODEL_H
 
-#include "card_database.h"
 #include "../filter/filter_string.h"
+#include "card_database.h"
 
 #include <QAbstractListModel>
 #include <QList>
