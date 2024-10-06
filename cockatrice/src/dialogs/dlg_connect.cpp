@@ -1,8 +1,8 @@
 #include "dlg_connect.h"
 
+#include "../server/user/user_info_connection.h"
 #include "../settings/cache_settings.h"
 #include "trice_limits.h"
-#include "../server/user/user_info_connection.h"
 
 #include <QCheckBox>
 #include <QComboBox>

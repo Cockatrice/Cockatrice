@@ -1,7 +1,8 @@
+#include "select_zone.h"
+
 #include "../../settings/cache_settings.h"
 #include "../cards/card_item.h"
 #include "../game_scene.h"
-#include "select_zone.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>

@@ -1,4 +1,4 @@
-#include "../cockatrice/src/userinfobox.h"
+#include "../cockatrice/src/server/user/user_info_box.h"
 
 #include "gtest/gtest.h"
 

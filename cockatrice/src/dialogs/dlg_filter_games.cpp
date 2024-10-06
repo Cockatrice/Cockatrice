@@ -14,8 +14,8 @@
 #include <QVBoxLayout>
 
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
-                         const GamesProxyModel *_gamesProxyModel,
-                         QWidget *parent)
+                               const GamesProxyModel *_gamesProxyModel,
+                               QWidget *parent)
     : QDialog(parent), allGameTypes(_allGameTypes), gamesProxyModel(_gamesProxyModel),
       gameAgeMap({{QTime(), tr("no limit")},
                   {QTime(0, 5), tr("5 minutes")},
