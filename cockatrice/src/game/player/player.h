@@ -1,10 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../client/tearoff_menu.h"
-#include "../game/board/abstract_graphics_item.h"
-#include "../game/cards/card_database.h"
-#include "../game/filter/filter_string.h"
+#include "../../client/tearoff_menu.h"
+#include "../board/abstract_graphics_item.h"
+#include "../cards/card_database.h"
+#include "../filter/filter_string.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 

@@ -1,6 +1,6 @@
 #include "arrow_target.h"
 
-#include "../../player/player.h"
+#include "../player/player.h"
 #include "arrow_item.h"
 
 ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)

@@ -1,6 +1,6 @@
 #include "pile_zone.h"
 
-#include "../../player/player.h"
+#include "../player/player.h"
 #include "../cards/card_drag_item.h"
 #include "../cards/card_item.h"
 #include "pb/command_move_card.pb.h"

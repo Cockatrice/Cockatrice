@@ -1,6 +1,6 @@
 #include "card_zone.h"
 
-#include "../../player/player.h"
+#include "../player/player.h"
 #include "../cards/card_item.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"

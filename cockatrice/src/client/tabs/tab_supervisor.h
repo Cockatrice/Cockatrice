@@ -1,7 +1,7 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "../../chat_view/user_list_proxy.h"
+#include "../../server/chat_view/user_list_proxy.h"
 #include "../../deck/deck_loader.h"
 
 #include <QAbstractButton>

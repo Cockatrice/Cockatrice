@@ -1,8 +1,8 @@
 #ifndef PLAYERTARGET_H
 #define PLAYERTARGET_H
 
-#include "../game/board/abstract_counter.h"
-#include "../game/board/arrow_target.h"
+#include "../board/abstract_counter.h"
+#include "../board/arrow_target.h"
 
 #include <QFont>
 #include <QPixmap>
