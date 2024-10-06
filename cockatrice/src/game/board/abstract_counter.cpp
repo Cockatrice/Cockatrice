@@ -1,8 +1,8 @@
 #include "abstract_counter.h"
 
 #include "../../client/translate_counter_name.h"
-#include "../player/player.h"
 #include "../../settings/cache_settings.h"
+#include "../player/player.h"
 #include "expression.h"
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"

@@ -3,8 +3,8 @@
 #include "../../client/sound_engine.h"
 #include "../../client/tabs/tab_account.h"
 #include "../../client/ui/pixel_map_generator.h"
-#include "../user/user_context_menu.h"
 #include "../../settings/cache_settings.h"
+#include "../user/user_context_menu.h"
 #include "user_level.h"
 
 #include <QApplication>
