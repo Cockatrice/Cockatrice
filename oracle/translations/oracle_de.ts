@@ -4,22 +4,22 @@
 <context>
     <name>BetaReleaseChannel</name>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="206"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="206"/>
         <source>Beta Releases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="232"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="232"/>
         <source>No reply received from the release update server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="241"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="241"/>
         <source>Invalid reply received from the release update server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="274"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="274"/>
         <source>No reply received from the file update server.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -309,7 +309,7 @@
 <context>
     <name>PictureLoader</name>
     <message>
-        <location filename="../../cockatrice/src/client/picture_loader.cpp" line="359"/>
+        <location filename="../../cockatrice/src/client/ui/picture_loader.cpp" line="359"/>
         <source>en</source>
         <comment>code for scryfall&apos;s language property, not available for all languages</comment>
         <translation type="unfinished"></translation>
@@ -443,27 +443,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>StableReleaseChannel</name>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="92"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="92"/>
         <source>Stable Releases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="108"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="108"/>
         <source>No reply received from the release update server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="116"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="116"/>
         <source>Invalid reply received from the release update server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="172"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="172"/>
         <source>No reply received from the tag update server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cockatrice/src/client/release_channel.cpp" line="179"/>
+        <location filename="../../cockatrice/src/client/network/release_channel.cpp" line="179"/>
         <source>Invalid reply received from the tag update server.</source>
         <translation type="unfinished"></translation>
     </message>

@@ -1,10 +1,10 @@
 #include "view_zone.h"
 
-#include "../player/player.h"
 #include "../../server/pending_command.h"
 #include "../cards/card_database.h"
 #include "../cards/card_drag_item.h"
 #include "../cards/card_item.h"
+#include "../player/player.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/response_dump_zone.pb.h"

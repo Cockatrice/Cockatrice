@@ -1,8 +1,8 @@
 #include "tab_message.h"
 
-#include "../../server/chat_view/chat_view.h"
 #include "../../deck/custom_line_edit.h"
 #include "../../main.h"
+#include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
 #include "../game_logic/abstract_client.h"

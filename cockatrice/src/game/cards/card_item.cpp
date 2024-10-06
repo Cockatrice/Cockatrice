@@ -2,10 +2,10 @@
 
 #include "../../client/tabs/tab_game.h"
 #include "../../main.h"
-#include "../player/player.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../game_scene.h"
+#include "../player/player.h"
 #include "../zones/card_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
