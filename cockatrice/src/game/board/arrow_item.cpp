@@ -1,8 +1,8 @@
 #define _USE_MATH_DEFINES
 #include "arrow_item.h"
 
-#include "../../player/player.h"
-#include "../../player/player_target.h"
+#include "../player/player.h"
+#include "../player/player_target.h"
 #include "../../settings/cache_settings.h"
 #include "../cards/card_database.h"
 #include "../cards/card_item.h"

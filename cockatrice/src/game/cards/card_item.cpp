@@ -2,7 +2,7 @@
 
 #include "../../client/tabs/tab_game.h"
 #include "../../main.h"
-#include "../../player/player.h"
+#include "../player/player.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../game_scene.h"

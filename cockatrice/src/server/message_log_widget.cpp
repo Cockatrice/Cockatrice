@@ -5,7 +5,7 @@
 #include "../game/cards/card_item.h"
 #include "../game/phase.h"
 #include "../game/zones/card_zone.h"
-#include "../player/player.h"
+#include "../game/player/player.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/serverinfo_user.pb.h"

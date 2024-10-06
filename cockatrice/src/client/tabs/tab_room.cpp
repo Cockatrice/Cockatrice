@@ -1,6 +1,6 @@
 #include "tab_room.h"
 
-#include "../../chat_view/chat_view.h"
+#include "../../server/chat_view/chat_view.h"
 #include "../../client/game_logic/abstract_client.h"
 #include "../../dialogs/dlg_settings.h"
 #include "../../game/game_selector.h"

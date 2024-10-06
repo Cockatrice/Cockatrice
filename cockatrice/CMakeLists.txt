@@ -26,7 +26,7 @@ set(cockatrice_SOURCES
         src/game/cards/card_item.cpp
         src/game/cards/card_list.cpp
         src/game/zones/card_zone.cpp
-        src/chat_view/chat_view.cpp
+        src/server/chat_view/chat_view.cpp
         src/game/board/counter_general.cpp
         src/deck/custom_line_edit.cpp
         src/deck/deck_loader.cpp
@@ -79,9 +79,9 @@ set(cockatrice_SOURCES
         src/client/ui/picture_loader.cpp
         src/game/zones/pile_zone.cpp
         src/client/ui/pixel_map_generator.cpp
-        src/player/player.cpp
-        src/player/player_list_widget.cpp
-        src/player/player_target.cpp
+        src/game/player/player.cpp
+        src/game/player/player_list_widget.cpp
+        src/game/player/player_target.cpp
         src/client/network/release_channel.cpp
         src/server/remote/remote_client.cpp
         src/server/remote/remote_decklist_tree_widget.cpp

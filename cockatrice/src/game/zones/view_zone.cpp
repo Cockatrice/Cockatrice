@@ -1,6 +1,6 @@
 #include "view_zone.h"
 
-#include "../../player/player.h"
+#include "../player/player.h"
 #include "../../server/pending_command.h"
 #include "../cards/card_database.h"
 #include "../cards/card_drag_item.h"
