@@ -18,9 +18,9 @@ set(oracle_SOURCES
     src/qt-json/json.cpp
     ../cockatrice/src/game/cards/card_database.cpp
     ../cockatrice/src/client/ui/picture_loader.cpp
-    ../cockatrice/src/card_database_parser/card_database_parser.cpp
-    ../cockatrice/src/card_database_parser/cockatrice_xml_3.cpp
-    ../cockatrice/src/card_database_parser/cockatrice_xml_4.cpp
+    ../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
+    ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
+    ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
     ../cockatrice/src/settings/cache_settings.cpp
     ../cockatrice/src/settings/shortcuts_settings.cpp
     ../cockatrice/src/settings/card_database_settings.cpp
