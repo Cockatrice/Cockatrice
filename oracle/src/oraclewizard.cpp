@@ -2,7 +2,7 @@
 
 #include "main.h"
 #include "oracleimporter.h"
-#include "settingscache.h"
+#include "settings/cache_settings.h"
 #include "version_string.h"
 
 #include <QAbstractButton>
