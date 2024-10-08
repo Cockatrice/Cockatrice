@@ -29,22 +29,37 @@ Q_DECLARE_METATYPE(CardInfoPtr)
 
 class CardSet : public QList<CardInfoPtr>
 {
+public:
+    enum Priority
+    {
+        PriorityUndefined = 0,
+        PriorityPrimary = 10,
+        PrioritySecondary = 20,
+        PriorityReprint = 30,
+        PriorityOther = 40,
+        PriorityFallback = 50,
+        PriorityLowest = 100,
+    };
+
 private:
     QString shortName, longName;
     unsigned int sortKey;
     QDate releaseDate;
     QString setType;
+    Priority priority;
     bool enabled, isknown;
 
 public:
     explicit CardSet(const QString &_shortName = QString(),
                      const QString &_longName = QString(),
                      const QString &_setType = QString(),
-                     const QDate &_releaseDate = QDate());
+                     const QDate &_releaseDate = QDate(),
+                     const Priority _priority = PriorityUndefined);
     static CardSetPtr newInstance(const QString &_shortName = QString(),
                                   const QString &_longName = QString(),
                                   const QString &_setType = QString(),
-                                  const QDate &_releaseDate = QDate());
+                                  const QDate &_releaseDate = QDate(),
+                                  const Priority _priority = PriorityUndefined);
     QString getCorrectedShortName() const;
     QString getShortName() const
     {
@@ -62,6 +77,10 @@ public:
     {
         return releaseDate;
     }
+    Priority getPriority() const
+    {
+        return priority;
+    }
     void setLongName(const QString &_longName)
     {
         longName = _longName;
@@ -73,6 +92,10 @@ public:
     void setReleaseDate(const QDate &_releaseDate)
     {
         releaseDate = _releaseDate;
+    }
+    void setPriority(const Priority _priority)
+    {
+        priority = _priority;
     }
 
     void loadSetOptions();
@@ -113,6 +136,7 @@ public:
     int getEnabledSetsNum();
     int getUnknownSetsNum();
     QStringList getUnknownSetsNames();
+    void defaultSort();
 };
 
 class CardInfoPerSet
