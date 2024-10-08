@@ -277,86 +277,86 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
 <context>
     <name>CardFilter</name>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="7"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
         <translation>ORAZ</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="9"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
         <translation>LUB</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="11"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
         <translation>ORAZ NIE</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="13"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
         <translation>LUB NIE</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="23"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="23"/>
         <source>Name</source>
         <translation>Imię</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="25"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="25"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="27"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="27"/>
         <source>Color</source>
         <translation>Kolor</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="29"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="29"/>
         <source>Text</source>
         <translation>Tekst</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="31"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="31"/>
         <source>Set</source>
         <translation>Ustaw</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="33"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="33"/>
         <source>Mana Cost</source>
         <translation>Koszt Many</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="35"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="35"/>
         <source>Mana Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="37"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="37"/>
         <source>Rarity</source>
         <translation>Rzadkość</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="39"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="39"/>
         <source>Power</source>
         <translation>Siła</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="41"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="41"/>
         <source>Toughness</source>
         <translation>Wytrzymałość</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="43"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="43"/>
         <source>Loyalty</source>
         <translation>Lojalność</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="45"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="45"/>
         <source>Format</source>
         <translation>Format</translation>
     </message>
@@ -2087,7 +2087,7 @@ Być może konieczne jest samodzielne tworzenie ze źródła.</translation>
 <context>
     <name>FilterBuilder</name>
     <message>
-        <location filename="../src/game/filter/filter_builder.cpp" line="28"/>
+        <location filename="../src/game/filters/filter_builder.cpp" line="28"/>
         <source>Type your filter here</source>
         <translation>Podaj swój filtr</translation>
     </message>

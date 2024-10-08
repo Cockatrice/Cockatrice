@@ -14,11 +14,11 @@ set(cockatrice_SOURCES
     src/game/board/arrow_target.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_model.cpp
-    src/card_database_parser/card_database_parser.cpp
-    src/card_database_parser/cockatrice_xml_3.cpp
-    src/card_database_parser/cockatrice_xml_4.cpp
+    src/game/cards/card_database_parser/card_database_parser.cpp
+    src/game/cards/card_database_parser/cockatrice_xml_3.cpp
+    src/game/cards/card_database_parser/cockatrice_xml_4.cpp
     src/game/cards/card_drag_item.cpp
-    src/game/filter/filter_card.cpp
+    src/game/filters/filter_card.cpp
     src/game/cards/card_frame.cpp
     src/game/cards/card_info_picture.cpp
     src/game/cards/card_info_text.cpp
@@ -53,10 +53,10 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
-    src/game/filter/filter_string.cpp
-    src/game/filter/filter_builder.cpp
-    src/game/filter/filter_tree.cpp
-    src/game/filter/filter_tree_model.cpp
+    src/game/filters/filter_string.cpp
+    src/game/filters/filter_builder.cpp
+    src/game/filters/filter_tree.cpp
+    src/game/filters/filter_tree_model.cpp
     src/game/game_scene.cpp
     src/game/game_selector.cpp
     src/game/games_model.cpp

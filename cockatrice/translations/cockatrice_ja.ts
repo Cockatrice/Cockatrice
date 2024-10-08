@@ -277,86 +277,86 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFilter</name>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="7"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
         <translation>AND</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="9"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
         <translation>OR</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="11"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
         <translation>AND NOT</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="13"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
         <translation>OR NOT</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="23"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="23"/>
         <source>Name</source>
         <translation>カード名</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="25"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="25"/>
         <source>Type</source>
         <translation>タイプ</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="27"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="27"/>
         <source>Color</source>
         <translation>色</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="29"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="29"/>
         <source>Text</source>
         <translation>ルール文章</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="31"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="31"/>
         <source>Set</source>
         <translation>カードセット</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="33"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="33"/>
         <source>Mana Cost</source>
         <translation>マナ・コスト</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="35"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="35"/>
         <source>Mana Value</source>
         <translation>マナ総量</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="37"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="37"/>
         <source>Rarity</source>
         <translation>稀少度</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="39"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="39"/>
         <source>Power</source>
         <translation>パワー</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="41"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="41"/>
         <source>Toughness</source>
         <translation>タフネス</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="43"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="43"/>
         <source>Loyalty</source>
         <translation>忠誠度</translation>
     </message>
     <message>
-        <location filename="../src/game/filter/filter_card.cpp" line="45"/>
+        <location filename="../src/game/filters/filter_card.cpp" line="45"/>
         <source>Format</source>
         <translation>フォーマット</translation>
     </message>
@@ -2087,7 +2087,7 @@ You may have to build from source yourself.</source>
 <context>
     <name>FilterBuilder</name>
     <message>
-        <location filename="../src/game/filter/filter_builder.cpp" line="28"/>
+        <location filename="../src/game/filters/filter_builder.cpp" line="28"/>
         <source>Type your filter here</source>
         <translation>ここにフィルタを入力</translation>
     </message>

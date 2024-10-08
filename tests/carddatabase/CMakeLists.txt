@@ -19,9 +19,9 @@ add_executable(
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
   ../../cockatrice/src/game/cards/card_database.cpp
-  ../../cockatrice/src/card_database_parser/card_database_parser.cpp
-  ../../cockatrice/src/card_database_parser/cockatrice_xml_3.cpp
-  ../../cockatrice/src/card_database_parser/cockatrice_xml_4.cpp
+  ../../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
+  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
+  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
   ../../cockatrice/src/settings/settings_manager.cpp
   carddatabase_test.cpp
   mocks.cpp
@@ -31,12 +31,12 @@ add_executable(
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
   ../../cockatrice/src/game/cards/card_database.cpp
-  ../../cockatrice/src/card_database_parser/card_database_parser.cpp
-  ../../cockatrice/src/card_database_parser/cockatrice_xml_3.cpp
-  ../../cockatrice/src/card_database_parser/cockatrice_xml_4.cpp
-  ../../cockatrice/src/game/filter/filter_card.cpp
-  ../../cockatrice/src/game/filter/filter_string.cpp
-  ../../cockatrice/src/game/filter/filter_tree.cpp
+  ../../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
+  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
+  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
+  ../../cockatrice/src/game/filters/filter_card.cpp
+  ../../cockatrice/src/game/filters/filter_string.cpp
+  ../../cockatrice/src/game/filters/filter_tree.cpp
   ../../cockatrice/src/settings/settings_manager.cpp
   filter_string_test.cpp
   mocks.cpp
