@@ -1,6 +1,6 @@
 #include "card_database_model.h"
 
-#include "../filter/filter_tree.h"
+#include "../filters/filter_tree.h"
 
 #include <QMap>
 

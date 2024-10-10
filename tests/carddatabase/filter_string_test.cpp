@@ -1,4 +1,4 @@
-#include "../../cockatrice/src/game/filter/filter_string.h"
+#include "../../cockatrice/src/game/filters/filter_string.h"
 #include "mocks.h"
 
 #include "gtest/gtest.h"
