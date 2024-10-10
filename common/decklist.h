@@ -173,6 +173,7 @@ class DeckList : public QObject
 {
     Q_OBJECT
 private:
+    static constexpr unsigned int MAX_CARDS_TO_HASH = 100000;
     QString name, comments;
     QString deckHash;
     QMap<QString, SideboardPlan *> sideboardPlans;

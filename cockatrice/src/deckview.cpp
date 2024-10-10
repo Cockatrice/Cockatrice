@@ -334,12 +334,14 @@ void DeckViewScene::rebuildTree()
 {
     clearContents();
 
-    if (!deck)
+    if (!deck) {
         return;
+    }
 
+    unsigned int cardsRenderedAlready = 0;
     InnerDecklistNode *listRoot = deck->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+    for (const auto innerDecklistNode : *listRoot) {
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(innerDecklistNode);
 
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
         if (!container) {
@@ -349,12 +351,15 @@ void DeckViewScene::rebuildTree()
         }
 
         for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard)
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), currentZone->getName(), container);
+                if (++cardsRenderedAlready >= MAX_CARDS_TO_RENDER) {
+                    break; // We can't render anymore cards efficiently, evict early
+                }
+                auto *newCard = new DeckViewCard(currentCard->getName(), currentZone->getName(), container);
                 container->addCard(newCard);
                 emit newCardAdded(newCard);
             }
