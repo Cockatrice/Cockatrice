@@ -190,7 +190,7 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     QList<QString> picsPaths = QList<QString>();
-    QDirIterator it(customPicsPath, QDirIterator::Subdirectories);
+    QDirIterator it(customPicsPath, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
     // Recursively check all subdirectories of the CUSTOM folder
     while (it.hasNext()) {
