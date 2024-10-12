@@ -177,6 +177,10 @@ private:
     int tableRow;
     bool upsideDownArt;
 
+    // Specific printings params
+    QString cardSetCode;
+    QString collectorNumber;
+
 public:
     explicit CardInfo(const QString &_name = QString(),
                       const QString &_text = QString(),
@@ -344,6 +348,31 @@ public:
     }
     void refreshCachedSetNames();
 
+    void setPixmapCacheKey(const QString &cacheKey)
+    {
+        pixmapCacheKey = cacheKey;
+    }
+
+    void setCardSetCode(const QString &_cardSetCode)
+    {
+        cardSetCode = _cardSetCode;
+    }
+
+    QString getCardSetCode()
+    {
+        return cardSetCode;
+    }
+
+    void setCollectorNumber(const QString &_collectorNumber)
+    {
+        collectorNumber = _collectorNumber;
+    }
+
+    QString getCollectorNumber()
+    {
+        return collectorNumber;
+    }
+
     /**
      * Simplify a name to have no punctuation and lowercase all letters, for
      * less strict name-matching.
@@ -367,6 +396,7 @@ enum LoadStatus
 
 typedef QHash<QString, CardInfoPtr> CardNameMap;
 typedef QHash<QString, CardSetPtr> SetNameMap;
+typedef QHash<QString, QList<CardInfoPtr>> CardNameToPrintingsMap;
 
 class CardDatabase : public QObject
 {
@@ -381,6 +411,8 @@ protected:
      * The cards, indexed by their simple name.
      */
     CardNameMap simpleNameCards;
+
+    CardNameToPrintingsMap cardsAllPrintings;
 
     /*
      * The sets, indexed by short name.
@@ -407,8 +439,11 @@ public:
     ~CardDatabase() override;
     void clear();
     void removeCard(CardInfoPtr card);
-    CardInfoPtr getCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr
+    getCard(const QString &cardName, const QString &cardSetCode, const QString &cardCollectorNumber = QString()) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
+    QList<CardInfoPtr> getAllPrintingsOfCard(const QString &cardName) const;
     CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
