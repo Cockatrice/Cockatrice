@@ -258,6 +258,7 @@ private:
     QString previousMovingCardsUntilExpr = {};
     FilterString movingCardsUntilFilter;
 
+    bool isCreatingArrow;
     bool shortcutsActive;
     int defaultNumberTopCards = 1;
     int defaultNumberTopCardsToPlaceBelow = 1;
