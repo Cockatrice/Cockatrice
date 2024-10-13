@@ -104,6 +104,7 @@ signals:
     void sideboardPlanChanged();
 
 private:
+    static constexpr unsigned int MAX_CARDS_TO_RENDER = 300;
     bool locked;
     DeckList *deck;
     QMap<QString, DeckViewCardContainer *> cardContainers;
