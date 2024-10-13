@@ -139,6 +139,8 @@ private:
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
+    QString registerHostname, registerPort, registerUserName, registerPassword, registerEmail, registerCountry,
+        registerRealName;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
