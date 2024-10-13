@@ -1,4 +1,3 @@
-
 #ifndef FILTERTREE_H
 #define FILTERTREE_H
 
