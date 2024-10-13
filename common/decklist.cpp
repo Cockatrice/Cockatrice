@@ -87,8 +87,8 @@ int AbstractDecklistNode::depth() const
     }
 }
 
-InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistNode(_parent), name(other->getName())
+InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other)
+    : AbstractDecklistNode(other->parent), name(other->getName())
 {
     for (int i = 0; i < other->size(); ++i) {
         auto *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
@@ -268,9 +268,12 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                 InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 newZone->readElement(xml);
             } else if (childName == "card") {
+                int amount = xml->attributes().value("number").toString().toInt();
+                if (!addCardCount(amount)) {
+                    return false;
+                }
                 DecklistCardNode *newCard =
-                    new DecklistCardNode(xml->attributes().value("name").toString(),
-                                         xml->attributes().value("number").toString().toInt(), this);
+                    new DecklistCardNode(xml->attributes().value("name").toString(), amount, this);
                 newCard->readElement(xml);
             }
         } else if (xml->isEndElement() && (childName == "zone"))
@@ -286,6 +289,23 @@ void InnerDecklistNode::writeElement(QXmlStreamWriter *xml)
     for (int i = 0; i < size(); i++)
         at(i)->writeElement(xml);
     xml->writeEndElement(); // zone
+}
+
+bool InnerDecklistNode::addCardCount(qsizetype amount)
+{
+    if (parent == nullptr) {
+        if (limit == 0) {
+            return true;
+        }
+        if (amount < limit) {
+            limit -= amount;
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return dynamic_cast<InnerDecklistNode *>(parent)->addCardCount(amount);
+    }
 }
 
 bool AbstractDecklistCardNode::readElement(QXmlStreamReader *xml)
@@ -331,9 +351,9 @@ QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
     return result;
 }
 
-DeckList::DeckList()
+DeckList::DeckList(qsizetype limit)
 {
-    root = new InnerDecklistNode;
+    root = new InnerDecklistNode(limit);
 }
 
 // TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
@@ -350,9 +370,9 @@ DeckList::DeckList(const DeckList &other)
     updateDeckHash();
 }
 
-DeckList::DeckList(const QString &nativeString)
+DeckList::DeckList(const QString &nativeString, qsizetype limit)
 {
-    root = new InnerDecklistNode;
+    root = new InnerDecklistNode(limit);
     loadFromString_Native(nativeString);
 }
 
@@ -798,26 +818,51 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
 
 void DeckList::updateDeckHash()
 {
-    QStringList cardList;
-    QSet<QString> hashZones, optionalZones;
+    QMap<QByteArray, int> cardList;
+    QMap<QByteArray, int> sbCardList;
+    // all cards are sorted, yet as all cards are made lower case and SB: is added to all sideboard cards, they will
+    // always sort before mainboard cards
 
-    hashZones << DECK_ZONE_MAIN << DECK_ZONE_SIDE; // Zones in deck to be included in hashing process
-    optionalZones << DECK_ZONE_TOKENS;             // Optional zones in deck not included in hashing process
-
-    for (int i = 0; i < root->size(); i++) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        for (int j = 0; j < node->size(); j++) {
-            if (hashZones.contains(node->getName())) // Mainboard or Sideboard
-            {
-                auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-                for (int k = 0; k < card->getNumber(); ++k) {
-                    cardList.append((node->getName() == DECK_ZONE_SIDE ? "SB:" : "") + card->getName().toLower());
-                }
+    for (auto rootIter = root->cend() - 1, rootEnd = root->cbegin() - 1; rootIter != rootEnd; --rootIter) {
+        auto *node = dynamic_cast<InnerDecklistNode *>(*rootIter);
+        QString zone = node->getName();
+        if (zone == DECK_ZONE_SIDE) {
+            for (auto nodeIter = node->cend() - 1, nodeEnd = node->cbegin() - 1; nodeIter != nodeEnd; --nodeIter) {
+                auto *card = dynamic_cast<DecklistCardNode *>(*nodeIter);
+                sbCardList[card->getName().toLower().toUtf8()] += card->getNumber();
+            }
+        } else if (zone == DECK_ZONE_MAIN) {
+            for (auto nodeIter = node->cend() - 1, nodeEnd = node->cbegin() - 1; nodeIter != nodeEnd; --nodeIter) {
+                auto *card = dynamic_cast<DecklistCardNode *>(*nodeIter);
+                cardList[card->getName().toLower().toUtf8()] += card->getNumber();
             }
         }
     }
-    cardList.sort();
-    QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
+
+    QCryptographicHash hasher(QCryptographicHash::Sha1);
+    bool started = false;
+    for (auto i = sbCardList.cbegin(), end = sbCardList.cend(); i != end; ++i) {
+        for (int j = 0; j < i.value(); ++j) {
+            if (started) {
+                hasher.addData(";SB:");
+            } else {
+                hasher.addData("SB:");
+                started = true;
+            }
+            hasher.addData(i.key());
+        }
+    }
+    for (auto i = cardList.cbegin(), end = cardList.cend(); i != end; ++i) {
+        for (int j = 0; j < i.value(); ++j) {
+            if (started) {
+                hasher.addData(";");
+            } else {
+                started = true;
+            }
+            hasher.addData(i.key());
+        }
+    }
+    QByteArray deckHashArray = hasher.result();
     quint64 number = (((quint64)(unsigned char)deckHashArray[0]) << 32) +
                      (((quint64)(unsigned char)deckHashArray[1]) << 24) +
                      (((quint64)(unsigned char)deckHashArray[2] << 16)) +
