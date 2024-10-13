@@ -1,4 +1,4 @@
-FROM ubuntu:noble
+FROM ubuntu:22.04
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -15,8 +15,8 @@ RUN apt-get update && \
         libprotobuf-dev \
         libqt6multimedia6 \
         libqt6sql6-mysql \
-        qt6-svg-dev \
-        qt6-websockets-dev \
+        libqt6svg6-dev \
+        libqt6websockets6-dev \
         protobuf-compiler \
         qt6-image-formats-plugins \
         qt6-l10n-tools \
