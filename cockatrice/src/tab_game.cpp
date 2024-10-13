@@ -600,27 +600,19 @@ void TabGame::replayNextEvent()
 
 void TabGame::replayFinished()
 {
-    replayStartButton->setEnabled(true);
-    replayPauseButton->setEnabled(false);
+    replayPlayButton->setChecked(false);
     replayFastForwardButton->setEnabled(false);
 }
 
-void TabGame::replayStartButtonClicked()
+void TabGame::replayPlayButtonToggled(bool checked)
 {
-    replayStartButton->setEnabled(false);
-    replayPauseButton->setEnabled(true);
-    replayFastForwardButton->setEnabled(true);
-
-    timelineWidget->startReplay();
-}
-
-void TabGame::replayPauseButtonClicked()
-{
-    replayStartButton->setEnabled(true);
-    replayPauseButton->setEnabled(false);
-    replayFastForwardButton->setEnabled(false);
-
-    timelineWidget->stopReplay();
+    if (checked) { // start replay
+        replayFastForwardButton->setEnabled(true);
+        timelineWidget->startReplay();
+    } else { // pause replay
+        replayFastForwardButton->setEnabled(false);
+        timelineWidget->stopReplay();
+    }
 }
 
 void TabGame::replayFastForwardButtonToggled(bool checked)
@@ -1710,15 +1702,15 @@ void TabGame::createReplayDock()
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
     connect(timelineWidget, &ReplayTimelineWidget::rewound, messageLog, &ChatView::clearChat);
 
-    replayStartButton = new QToolButton;
-    replayStartButton->setIconSize(QSize(32, 32));
-    replayStartButton->setIcon(QPixmap("theme:replay/start"));
-    connect(replayStartButton, SIGNAL(clicked()), this, SLOT(replayStartButtonClicked()));
-    replayPauseButton = new QToolButton;
-    replayPauseButton->setIconSize(QSize(32, 32));
-    replayPauseButton->setEnabled(false);
-    replayPauseButton->setIcon(QPixmap("theme:replay/pause"));
-    connect(replayPauseButton, SIGNAL(clicked()), this, SLOT(replayPauseButtonClicked()));
+    replayPlayButton = new QToolButton;
+    replayPlayButton->setIconSize(QSize(32, 32));
+    QIcon playButtonIcon = QIcon();
+    playButtonIcon.addPixmap(QPixmap("theme:replay/start"), QIcon::Normal, QIcon::Off);
+    playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
+    replayPlayButton->setIcon(playButtonIcon);
+    replayPlayButton->setCheckable(true);
+    connect(replayPlayButton, SIGNAL(toggled(bool)), this, SLOT(replayPlayButtonToggled(bool)));
+    
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setEnabled(false);
@@ -1728,8 +1720,7 @@ void TabGame::createReplayDock()
 
     replayControlLayout = new QHBoxLayout;
     replayControlLayout->addWidget(timelineWidget, 10);
-    replayControlLayout->addWidget(replayStartButton);
-    replayControlLayout->addWidget(replayPauseButton);
+    replayControlLayout->addWidget(replayPlayButton);
     replayControlLayout->addWidget(replayFastForwardButton);
 
     replayControlWidget = new QWidget();
