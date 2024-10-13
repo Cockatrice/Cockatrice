@@ -351,7 +351,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("DlgRegister to server"));
+    setWindowTitle(tr("Register to server"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
