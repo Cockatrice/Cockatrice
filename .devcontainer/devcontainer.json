@@ -1,0 +1,30 @@
+{
+    "name": "Cockatrice Dev Container",
+    "build": {
+        "dockerfile": "devcontainer.Dockerfile",
+        "context": "../../"
+    },
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "features": {
+        "desktop-lite": {
+            "password": "vscode",
+            "webPort": "6080",
+            "vncPort": "5901"
+        }
+    },
+    "extensions": [
+        "ms-vscode.cpptools",
+        "ms-azuretools.vscode-docker",
+        "twxs.cmake"
+    ],
+    "runArgs": [
+        "--init"
+    ],
+    "remoteUser": "root",
+    "workspaceFolder": "/workspace",
+    "forwardPorts": [
+        6080
+    ]
+}
