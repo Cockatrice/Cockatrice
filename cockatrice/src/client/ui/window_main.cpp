@@ -641,7 +641,7 @@ void MainWindow::retranslateUi()
 {
     setClientStatusTitle();
 
-    aConnect->setText(tr("&DlgConnect..."));
+    aConnect->setText(tr("&Connect..."));
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
