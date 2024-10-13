@@ -14,7 +14,6 @@
 #include "pb/room_event.pb.h"
 #include "pb/serverinfo_room.pb.h"
 #include "pb/serverinfo_user.pb.h"
-#include "server.h"
 #include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_deck_editor.h"
