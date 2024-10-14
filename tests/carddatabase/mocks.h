@@ -10,8 +10,8 @@
 
 #define PICTURELOADER_H
 
-#include "../../cockatrice/src/carddatabase.h"
-#include "../../cockatrice/src/settingscache.h"
+#include "../../cockatrice/src/game/cards/card_database.h"
+#include "../../cockatrice/src/settings/cache_settings.h"
 
 extern SettingsCache *settingsCache;
 
