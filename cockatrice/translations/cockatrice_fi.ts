@@ -763,7 +763,7 @@ Tallennetaan moderaattoreita varten. Bännätty henkilö ei näe tätä. </trans
     <message>
         <location filename="src/dlg_connect.cpp" line="22"/>
         <source>Known Hosts</source>
-        <translation>Tunnetut Hostit</translation>
+        <translation>Tunnetut Isännät</translation>
     </message>
     <message>
         <location filename="src/dlg_connect.cpp" line="29"/>
@@ -773,7 +773,7 @@ Tallennetaan moderaattoreita varten. Bännätty henkilö ei näe tätä. </trans
     <message>
         <location filename="src/dlg_connect.cpp" line="39"/>
         <source>New Host</source>
-        <translation>Uusi Host</translation>
+        <translation>Lisää Isäntä</translation>
     </message>
     <message>
         <location filename="src/dlg_connect.cpp" line="41"/>
@@ -5724,12 +5724,12 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_game.cpp" line="687"/>
         <source>Leave game</source>
-        <translation type="unfinished"/>
+        <translation>Poistu pelistä</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="687"/>
         <source>Are you sure you want to leave this game?</source>
-        <translation type="unfinished"/>
+        <translation>Haluatko varmasti poistua pelistä?</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="965"/>
@@ -5739,7 +5739,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_game.cpp" line="1209"/>
         <source>A player has joined game #%1</source>
-        <translation type="unfinished"/>
+        <translation>Pelaaja on littynyt peliin #%1</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="1210"/>
@@ -5749,7 +5749,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_game.cpp" line="1221"/>
         <source>kicked by game host or moderator</source>
-        <translation type="unfinished"/>
+        <translation>Isäntä tai moderaattori poisti sinut pelistä</translation>
     </message>
     <message>
         <location filename="src/tab_game.cpp" line="1224"/>
@@ -5820,27 +5820,27 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_logs.cpp" line="150"/>
         <source>Username: </source>
-        <translation type="unfinished"/>
+        <translation>Käyttäjätunnus:</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="154"/>
         <source>IP Address: </source>
-        <translation type="unfinished"/>
+        <translation>IP-osoite:</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="158"/>
         <source>Game Name: </source>
-        <translation type="unfinished"/>
+        <translation>Pelin Nimi:</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="162"/>
         <source>GameID: </source>
-        <translation type="unfinished"/>
+        <translation>Peli-ID:</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="166"/>
         <source>Message: </source>
-        <translation type="unfinished"/>
+        <translation>Viesti:</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="171"/>
@@ -5865,7 +5865,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/tab_logs.cpp" line="176"/>
         <source>Today</source>
-        <translation type="unfinished"/>
+        <translation>Tänään</translation>
     </message>
     <message>
         <location filename="src/tab_logs.cpp" line="177"/>
@@ -6127,7 +6127,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="src/tab_supervisor.cpp" line="174"/>
         <source>Are you sure?</source>
-        <translation type="unfinished"/>
+        <translation>Oletko varma?</translation>
     </message>
     <message>
         <location filename="src/tab_supervisor.cpp" line="175"/>
@@ -6147,7 +6147,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="src/tab_supervisor.cpp" line="646"/>
         <source>Unknown Event</source>
-        <translation type="unfinished"/>
+        <translation>Tuntematon Tapahtuma</translation>
     </message>
     <message>
         <location filename="src/tab_supervisor.cpp" line="647"/>
@@ -6200,12 +6200,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/tab_account.h" line="56"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Tili</translation>
     </message>
     <message>
         <location filename="src/tab_account.cpp" line="65"/>
         <source>Add to Buddy List</source>
-        <translation type="unfinished"/>
+        <translation>Lisää Kaveriksi</translation>
     </message>
     <message>
         <location filename="src/tab_account.cpp" line="75"/>
@@ -6233,13 +6233,15 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="src/tip_of_the_day.cpp" line="25"/>
         <source>File does not exist.
 </source>
-        <translation type="unfinished"/>
+        <translation>Tiedostoa ei ole olemassa.
+</translation>
     </message>
     <message>
         <location filename="src/tip_of_the_day.cpp" line="28"/>
         <source>Failed to open file.
 </source>
-        <translation type="unfinished"/>
+        <translation>Tiedoston avaaminen epäonnistui.
+</translation>
     </message>
 </context>
 <context>
@@ -6252,37 +6254,37 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/translatecountername.cpp" line="5"/>
         <source>White</source>
-        <translation type="unfinished"/>
+        <translation>Valkoinen</translation>
     </message>
     <message>
         <location filename="src/translatecountername.cpp" line="6"/>
         <source>Blue</source>
-        <translation type="unfinished"/>
+        <translation>Sininen</translation>
     </message>
     <message>
         <location filename="src/translatecountername.cpp" line="7"/>
         <source>Black</source>
-        <translation type="unfinished"/>
+        <translation>Musta</translation>
     </message>
     <message>
         <location filename="src/translatecountername.cpp" line="8"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Punainen</translation>
     </message>
     <message>
         <location filename="src/translatecountername.cpp" line="9"/>
         <source>Green</source>
-        <translation type="unfinished"/>
+        <translation>Vihreä</translation>
     </message>
     <message>
         <location filename="src/translatecountername.cpp" line="10"/>
         <source>Colorless</source>
-        <translation type="unfinished"/>
+        <translation>Väritön</translation>
     </message>
     <message>
         <location filename="src/translatecountername.cpp" line="11"/>
         <source>Other</source>
-        <translation type="unfinished"/>
+        <translation>Muu</translation>
     </message>
 </context>
 <context>
@@ -6482,17 +6484,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/userinfobox.cpp" line="82"/>
         <source>Edit</source>
-        <translation type="unfinished"/>
+        <translation>Muokkaa</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="83"/>
         <source>Change password</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda Salasana</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="84"/>
         <source>Change avatar</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda avatar</translation>
     </message>
     <message>
         <location filename="src/userinfobox.cpp" line="113"/>
@@ -6671,12 +6673,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/dlg_settings.cpp" line="519"/>
         <source>Notifications settings</source>
-        <translation type="unfinished"/>
+        <translation>Ilmoitusasetukset</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="520"/>
         <source>Enable notifications in taskbar</source>
-        <translation type="unfinished"/>
+        <translation>Ota tehtäväpalkin ilmoitukset käyttöön</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="521"/>
@@ -6691,7 +6693,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/dlg_settings.cpp" line="523"/>
         <source>Animation settings</source>
-        <translation type="unfinished"/>
+        <translation>Animaatioasetukset</translation>
     </message>
     <message>
         <location filename="src/dlg_settings.cpp" line="524"/>
@@ -6709,7 +6711,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/userlist.cpp" line="380"/>
         <source>Users in this room: %1</source>
-        <translation type="unfinished"/>
+        <translation>Käyttäkiä tässä huoneessa: %1</translation>
     </message>
     <message>
         <location filename="src/userlist.cpp" line="383"/>
@@ -7156,7 +7158,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/shortcutssettings.h" line="218"/>
         <source>Save Deck</source>
-        <translation type="unfinished"/>
+        <translation>Tallenna Pakka</translation>
     </message>
     <message>
         <location filename="src/shortcutssettings.h" line="221"/>

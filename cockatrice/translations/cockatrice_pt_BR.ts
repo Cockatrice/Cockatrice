@@ -1734,12 +1734,12 @@ Seu e-mail será utilizado para verificar sua conta.</translation>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="13"/>
         <source>Number of sides:</source>
-        <translation type="unfinished"/>
+        <translation>Número de lados:</translation>
     </message>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="20"/>
         <source>Number of dice:</source>
-        <translation type="unfinished"/>
+        <translation>Número de dados:</translation>
     </message>
     <message>
         <location filename="src/dlg_roll_dice.cpp" line="41"/>
