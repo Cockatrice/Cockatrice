@@ -412,7 +412,11 @@ void SettingsCache::setPicsPath(const QString &_picsPath)
     picsPath = _picsPath;
     settings->setValue("paths/pics", picsPath);
     // get a new value for customPicsPath, currently derived from picsPath
-    customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
+    if (picsPath.endsWith("/")) {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
+    } else {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    }
     emit picsPathChanged();
 }
 
