@@ -1706,6 +1706,7 @@ void TabGame::createReplayDock()
     playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
     replayPlayButton->setIcon(playButtonIcon);
     replayPlayButton->setCheckable(true);
+    replayPlayButton->setShortcut(Qt::Key_Space);
     connect(replayPlayButton, SIGNAL(toggled(bool)), this, SLOT(replayPlayButtonToggled(bool)));
 
     replayFastForwardButton = new QToolButton;
