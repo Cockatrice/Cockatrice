@@ -257,6 +257,12 @@ void TabGame::refreshShortcuts()
     if (aFocusChat) {
         aFocusChat->setShortcuts(shortcuts.getShortcut("tab_game/aFocusChat"));
     }
+    if (replayPlayButton) {
+        replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
+    }
+    if (replayFastForwardButton) {
+        replayFastForwardButton->setShortcut(shortcuts.getSingleShortcut("Replays/fastForwardButton"));
+    }
 }
 
 void DeckViewContainer::loadLocalDeck()

@@ -28,7 +28,8 @@ public:
         Drawing,
         Chat_room,
         Game_window,
-        Load_deck
+        Load_deck,
+        Replays
     };
 
     static QString getGroupName(ShortcutGroup::Groups group)
@@ -68,6 +69,8 @@ public:
                 return QApplication::translate("shortcutsTab", "Game Window");
             case Load_deck:
                 return QApplication::translate("shortcutsTab", "Load Deck from Clipboard");
+            case Replays:
+                return QApplication::translate("shortcutsTab", "Replays");
         }
 
         return {};
@@ -586,7 +589,13 @@ private:
                                             ShortcutGroup::Game_window)},
         {"DlgLoadDeckFromClipboard/refreshButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Refresh"),
                                                                parseSequenceString("F5"),
-                                                               ShortcutGroup::Load_deck)}};
+                                                               ShortcutGroup::Load_deck)},
+        {"Replays/playButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play/Pause"),
+                                           parseSequenceString("Space"),
+                                           ShortcutGroup::Replays)},
+        {"Replays/fastForwardButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Fast Forward"),
+                                                  parseSequenceString("Ctrl+Right"),
+                                                  ShortcutGroup::Replays)}};
 };
 
 #endif // SHORTCUTSSETTINGS_H
