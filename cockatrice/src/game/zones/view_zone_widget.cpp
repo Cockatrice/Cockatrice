@@ -96,9 +96,12 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
     // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
     if (numberCards < 0) {
-        connect(&sortByNameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByName(int)));
-        connect(&sortByTypeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByType(int)));
-        connect(&pileViewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSetPileView(int)));
+        connect(&sortByNameCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
+                SLOT(processSortByName(QT_STATE_CHANGED_T)));
+        connect(&sortByTypeCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
+                SLOT(processSortByType(QT_STATE_CHANGED_T)));
+        connect(&pileViewCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
+                SLOT(processSetPileView(QT_STATE_CHANGED_T)));
         sortByNameCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByName());
         sortByTypeCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByType());
         pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
@@ -114,7 +117,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     zone->initializeCards(cardList);
 }
 
-void ZoneViewWidget::processSortByType(int value)
+void ZoneViewWidget::processSortByType(QT_STATE_CHANGED_T value)
 {
     pileViewCheckBox.setEnabled(value);
     SettingsCache::instance().setZoneViewSortByType(value);
@@ -122,13 +125,13 @@ void ZoneViewWidget::processSortByType(int value)
     zone->setSortByType(value);
 }
 
-void ZoneViewWidget::processSortByName(int value)
+void ZoneViewWidget::processSortByName(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().setZoneViewSortByName(value);
     zone->setSortByName(value);
 }
 
-void ZoneViewWidget::processSetPileView(int value)
+void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().setZoneViewPileView(value);
     zone->setPileView(value);

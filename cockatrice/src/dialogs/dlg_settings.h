@@ -1,6 +1,8 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
+#include "../utility/macros.h"
+
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
@@ -187,8 +189,8 @@ private slots:
     void actRemove();
     void updateColor(const QString &value);
     void updateHighlightColor(const QString &value);
-    void updateTextColor(int value);
-    void updateTextHighlightColor(int value);
+    void updateTextColor(QT_STATE_CHANGED_T value);
+    void updateTextHighlightColor(QT_STATE_CHANGED_T value);
 
 private:
     QListWidget *messageList;

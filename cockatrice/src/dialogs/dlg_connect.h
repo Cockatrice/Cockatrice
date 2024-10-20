@@ -3,6 +3,7 @@
 
 #include "../server/handle_public_servers.h"
 #include "../server/user/user_info_connection.h"
+#include "../utility/macros.h"
 
 #include <QDialog>
 #include <QLineEdit>
@@ -54,7 +55,7 @@ public slots:
 private slots:
     void actOk();
 
-    void passwordSaved(int state);
+    void passwordSaved(QT_STATE_CHANGED_T state);
     void previousHostSelected(bool state);
     void newHostSelected(bool state);
     void actForgotPassword();
