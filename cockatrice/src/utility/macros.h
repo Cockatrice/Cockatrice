@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_MACROS_H
 #define COCKATRICE_MACROS_H
 
-#include <QCheckBox>
+#include <QtGlobal>
 
 // Qt6.7 changed how stateChanged functionality
 // of QCheckBoxes work.
