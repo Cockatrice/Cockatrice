@@ -591,11 +591,11 @@ private:
                                                                parseSequenceString("F5"),
                                                                ShortcutGroup::Load_deck)},
         {"Replays/playButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play/Pause"),
-                                         parseSequenceString("Space"),
-                                         ShortcutGroup::Replays)},
+                                           parseSequenceString("Space"),
+                                           ShortcutGroup::Replays)},
         {"Replays/fastForwardButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Fast Forward"),
-                                         parseSequenceString("Ctrl+Right"),
-                                         ShortcutGroup::Replays)}};
+                                                  parseSequenceString("Ctrl+Right"),
+                                                  ShortcutGroup::Replays)}};
 };
 
 #endif // SHORTCUTSSETTINGS_H
