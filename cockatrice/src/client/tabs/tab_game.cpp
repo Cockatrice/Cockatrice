@@ -1713,6 +1713,7 @@ void TabGame::createReplayDock()
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
     replayFastForwardButton->setCheckable(true);
+    replayFastForwardButton->setShortcut(Qt::CTRL | Qt::Key_Right);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
 
     replayControlLayout = new QHBoxLayout;
