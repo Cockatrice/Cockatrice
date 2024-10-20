@@ -146,7 +146,7 @@ private:
     int currentReplayStep;
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
-    QToolButton *replayStartButton, *replayPauseButton, *replayFastForwardButton;
+    QToolButton *replayPlayButton, *replayFastForwardButton;
 
     CardFrame *cardInfo;
     PlayerListWidget *playerListWidget;
@@ -220,8 +220,7 @@ signals:
 private slots:
     void replayNextEvent();
     void replayFinished();
-    void replayStartButtonClicked();
-    void replayPauseButtonClicked();
+    void replayPlayButtonToggled(bool checked);
     void replayFastForwardButtonToggled(bool checked);
 
     void incrementGameTime();

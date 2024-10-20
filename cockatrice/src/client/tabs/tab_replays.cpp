@@ -146,6 +146,9 @@ void TabReplays::actOpenLocalReplay()
 void TabReplays::actDeleteLocalReplay()
 {
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
+    if (!curLeft.isValid())
+        return;
+
     if (QMessageBox::warning(this, tr("Delete local file"),
                              tr("Are you sure you want to delete \"%1\"?").arg(localDirModel->fileName(curLeft)),
                              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
