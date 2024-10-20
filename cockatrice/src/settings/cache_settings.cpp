@@ -3,6 +3,7 @@
 #include "../client/network/release_channel.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QGlobalStatic>
