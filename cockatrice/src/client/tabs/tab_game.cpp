@@ -257,6 +257,12 @@ void TabGame::refreshShortcuts()
     if (aFocusChat) {
         aFocusChat->setShortcuts(shortcuts.getShortcut("tab_game/aFocusChat"));
     }
+    if (replayPlayButton) {
+        replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
+    }
+    if (replayFastForwardButton) {
+        replayFastForwardButton->setShortcut(shortcuts.getSingleShortcut("Replays/fastForwardButton"));
+    }
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -1706,14 +1712,12 @@ void TabGame::createReplayDock()
     playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
     replayPlayButton->setIcon(playButtonIcon);
     replayPlayButton->setCheckable(true);
-    replayPlayButton->setShortcut(Qt::Key_Space);
     connect(replayPlayButton, SIGNAL(toggled(bool)), this, SLOT(replayPlayButtonToggled(bool)));
 
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
     replayFastForwardButton->setCheckable(true);
-    replayFastForwardButton->setShortcut(Qt::CTRL | Qt::Key_Right);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
 
     replayControlLayout = new QHBoxLayout;
