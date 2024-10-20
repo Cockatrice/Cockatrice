@@ -94,7 +94,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case CREATED: {
             switch (role) {
                 case Qt::DisplayRole: {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
                     auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), QTimeZone::UTC);
 #else
                     auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), Qt::UTC);
@@ -492,7 +492,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, QTimeZone::UTC).date();
 #elif (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
     static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, Qt::UTC).date();
