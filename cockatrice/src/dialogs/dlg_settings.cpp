@@ -447,8 +447,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     specNotificationsEnabledCheckBox.setChecked(SettingsCache::instance().getSpectatorNotificationsEnabled());
     specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)),
-            &SettingsCache::instance(), SLOT(setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T)));
+    connect(&specNotificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
+            SLOT(setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T)));
 
     buddyConnectNotificationsEnabledCheckBox.setChecked(
         SettingsCache::instance().getBuddyConnectNotificationsEnabled());
