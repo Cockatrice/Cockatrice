@@ -13,14 +13,21 @@ class DlgRegister : public QDialog
 {
     Q_OBJECT
 public:
-    DlgRegister(QWidget *parent = nullptr);
+    DlgRegister(QWidget *parent,
+                QString hostname,
+                QString port,
+                QString playerName,
+                QString password,
+                QString email,
+                QString country,
+                QString realname);
     QString getHost() const
     {
         return hostEdit->text();
     }
-    int getPort() const
+    QString getPort() const
     {
-        return portEdit->text().toInt();
+        return portEdit->text();
     }
     QString getPlayerName() const
     {
