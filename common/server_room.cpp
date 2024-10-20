@@ -26,10 +26,11 @@ Server_Room::Server_Room(int _id,
                          bool _autoJoin,
                          const QString &_joinMessage,
                          const QStringList &_gameTypes,
+                         qsizetype limit,
                          Server *parent)
     : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description),
       permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin),
-      joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
+      joinMessage(_joinMessage), gameTypes(_gameTypes), cardLimit(limit), gamesLock(QReadWriteLock::Recursive)
 {
     connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)),
             Qt::QueuedConnection);

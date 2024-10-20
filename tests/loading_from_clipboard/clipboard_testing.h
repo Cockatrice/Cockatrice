@@ -27,7 +27,7 @@ struct Result
 };
 
 void testEmpty(const QString &clipboard);
-
+void testHash(const QString &clipboard, const std::string &hash);
 void testDeck(const QString &clipboard, const Result &result);
 
 #endif // CLIPBOARD_TESTING_H
