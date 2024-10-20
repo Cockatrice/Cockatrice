@@ -11,7 +11,7 @@
 #define QT_STATE_CHANGED_T Qt::CheckState
 #else
 #define QT_STATE_CHANGED stateChanged
-#deinfe QT_STATE_CHANGED_T int
+#define QT_STATE_CHANGED_T int
 #endif
 
 #endif // COCKATRICE_MACROS_H
