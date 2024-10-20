@@ -280,7 +280,6 @@ void DlgCreateGame::checkResponse(const Response &response)
 
 void DlgCreateGame::spectatorsAllowedChanged(QT_STATE_CHANGED_T state)
 {
-    qDebug() << "ZACH" << state;
     spectatorsNeedPasswordCheckBox->setEnabled(state);
     spectatorsCanTalkCheckBox->setEnabled(state);
     spectatorsSeeEverythingCheckBox->setEnabled(state);
