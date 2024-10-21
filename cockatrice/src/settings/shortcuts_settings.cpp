@@ -151,7 +151,7 @@ void ShortcutsSettings::clearAllShortcuts()
 bool ShortcutsSettings::isKeyAllowed(const QString &name, const QString &Sequences) const
 {
     // if the shortcut is not to be used in deck-editor then it doesn't matter
-    if (name.startsWith("Player")) {
+    if (name.startsWith("Player") || name.startsWith("Replays")) {
         return true;
     }
     QString checkSequence = Sequences.split(sep).last();

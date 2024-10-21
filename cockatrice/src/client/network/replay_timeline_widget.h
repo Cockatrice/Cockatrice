@@ -25,6 +25,8 @@ private:
     qreal timeScaleFactor;
     int currentTime;
     int currentEvent;
+
+    void skipToTime(int newTime);
 private slots:
     void replayTimerTimeout();
 
@@ -41,6 +43,7 @@ public:
 public slots:
     void startReplay();
     void stopReplay();
+    void skipByAmount(int amount); // use a negative amount to skip backwards
 
 protected:
     void paintEvent(QPaintEvent *event) override;
