@@ -5,9 +5,15 @@ CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardDatabase.ini", parent)
 {
 }
-void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */){};
-void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */){};
-void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */){};
+void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */)
+{
+}
+void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */)
+{
+}
+void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */)
+{
+}
 unsigned int CardDatabaseSettings::getSortKey(QString /* shortName */)
 {
     return 0;
