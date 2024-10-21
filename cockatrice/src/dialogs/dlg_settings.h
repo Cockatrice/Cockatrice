@@ -83,6 +83,7 @@ class AppearanceSettingsPage : public AbstractSettingsPage
 private slots:
     void themeBoxChanged(int index);
     void openThemeLocation();
+    void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
 
 private:
     QLabel themeLabel;

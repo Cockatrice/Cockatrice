@@ -326,6 +326,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     // Menu settings
     showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
+    connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
+
     auto *menuGrid = new QGridLayout;
     menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
 
@@ -424,6 +426,12 @@ void AppearanceSettingsPage::openThemeLocation()
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Could not create themes directory at '%1'.").arg(dir));
     }
+}
+
+void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
+{
+    SettingsCache::instance().setShowShortcuts(value);
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
 }
 
 void AppearanceSettingsPage::retranslateUi()
