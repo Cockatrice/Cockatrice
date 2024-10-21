@@ -2,33 +2,42 @@
 #include "mocks.h"
 
 CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent)
-    : SettingsManager(settingPath + "cardDatabase.ini", parent){}
-
-void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */){}
-void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */){}
-void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */){}
-unsigned int CardDatabaseSettings::getSortKey(QString /* shortName */){
+    : SettingsManager(settingPath + "cardDatabase.ini", parent)
+{
+}
+void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */){};
+void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */){};
+void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */){};
+unsigned int CardDatabaseSettings::getSortKey(QString /* shortName */)
+{
     return 0;
-}
-bool CardDatabaseSettings::isEnabled(QString /* shortName */){
+};
+bool CardDatabaseSettings::isEnabled(QString /* shortName */)
+{
     return true;
-}
-bool CardDatabaseSettings::isKnown(QString /* shortName */){
+};
+bool CardDatabaseSettings::isKnown(QString /* shortName */)
+{
     return true;
-}
+};
 
-QString SettingsCache::getDataPath(){
+QString SettingsCache::getDataPath()
+{
     return "";
 }
-QString SettingsCache::getSettingsPath(){
+QString SettingsCache::getSettingsPath()
+{
     return "";
 }
-void SettingsCache::translateLegacySettings(){
+void SettingsCache::translateLegacySettings()
+{
 }
-QString SettingsCache::getSafeConfigPath(QString /* configEntry */, QString defaultPath) const{
+QString SettingsCache::getSafeConfigPath(QString /* configEntry */, QString defaultPath) const
+{
     return defaultPath;
 }
-QString SettingsCache::getSafeConfigFilePath(QString /* configEntry */, QString defaultPath) const{
+QString SettingsCache::getSafeConfigFilePath(QString /* configEntry */, QString defaultPath) const
+{
     return defaultPath;
 }
 SettingsCache::SettingsCache()
