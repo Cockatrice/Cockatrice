@@ -25,6 +25,8 @@ private:
     qreal timeScaleFactor;
     int currentTime;
     int currentEvent;
+
+    void skipToTime(int newTime);
 private slots:
     void replayTimerTimeout();
 

@@ -67,6 +67,11 @@ void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 #else
     int newTime = static_cast<int>((qint64)maxTime * (qint64)event->x() / width());
 #endif
+    skipToTime(newTime);
+}
+
+void ReplayTimelineWidget::skipToTime(int newTime)
+{
     newTime -= newTime % 200; // Time should always be a multiple of 200
     if (newTime < currentTime) {
         currentTime = 0;
