@@ -263,6 +263,12 @@ void TabGame::refreshShortcuts()
     if (aReplaySkipBackward) {
         aReplaySkipBackward->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackward"));
     }
+    if (aReplaySkipForwardBig) {
+        aReplaySkipForwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipForwardBig"));
+    }
+    if (aReplaySkipBackwardBig) {
+        aReplaySkipBackwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackwardBig"));
+    }
     if (replayPlayButton) {
         replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
     }
@@ -1705,20 +1711,35 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 
 void TabGame::createReplayDock()
 {
+    // timeline widget
     timelineWidget = new ReplayTimelineWidget;
     timelineWidget->setTimeline(replayTimeline);
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
     connect(timelineWidget, &ReplayTimelineWidget::rewound, messageLog, &ChatView::clearChat);
 
+    // timeline skip shortcuts
     aReplaySkipForward = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipForward);
-    connect(aReplaySkipForward, &QAction::triggered, this, [=](bool _) { timelineWidget->skipByAmount(1000); });
+    connect(aReplaySkipForward, &QAction::triggered, this,
+            [=](bool _) { timelineWidget->skipByAmount(SKIP_AMOUNT_SMALL); });
 
     aReplaySkipBackward = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipBackward);
-    connect(aReplaySkipBackward, &QAction::triggered, this, [=](bool _) { timelineWidget->skipByAmount(-1000); });
+    connect(aReplaySkipBackward, &QAction::triggered, this,
+            [=](bool _) { timelineWidget->skipByAmount(-SKIP_AMOUNT_SMALL); });
 
+    aReplaySkipForwardBig = new QAction(timelineWidget);
+    timelineWidget->addAction(aReplaySkipForwardBig);
+    connect(aReplaySkipForwardBig, &QAction::triggered, this,
+            [=](bool _) { timelineWidget->skipByAmount(SKIP_AMOUNT_BIG); });
+
+    aReplaySkipBackwardBig = new QAction(timelineWidget);
+    timelineWidget->addAction(aReplaySkipBackwardBig);
+    connect(aReplaySkipBackwardBig, &QAction::triggered, this,
+            [=](bool _) { timelineWidget->skipByAmount(-SKIP_AMOUNT_BIG); });
+
+    // buttons
     replayPlayButton = new QToolButton;
     replayPlayButton->setIconSize(QSize(32, 32));
     QIcon playButtonIcon = QIcon();
@@ -1734,6 +1755,7 @@ void TabGame::createReplayDock()
     replayFastForwardButton->setCheckable(true);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
 
+    // putting everything together
     replayControlLayout = new QHBoxLayout;
     replayControlLayout->addWidget(timelineWidget, 10);
     replayControlLayout->addWidget(replayPlayButton);

@@ -142,12 +142,14 @@ private:
     QStackedWidget *mainWidget;
 
     // Replay related members
+    const int SKIP_AMOUNT_SMALL = 1000;
+    const int SKIP_AMOUNT_BIG = 10000;
     GameReplay *replay;
     int currentReplayStep;
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayPlayButton, *replayFastForwardButton;
-    QAction *aReplaySkipForward, *aReplaySkipBackward;
+    QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
     CardFrame *cardInfo;
     PlayerListWidget *playerListWidget;
