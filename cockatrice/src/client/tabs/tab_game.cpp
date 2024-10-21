@@ -257,6 +257,12 @@ void TabGame::refreshShortcuts()
     if (aFocusChat) {
         aFocusChat->setShortcuts(shortcuts.getShortcut("tab_game/aFocusChat"));
     }
+    if (aReplaySkipForward) {
+        aReplaySkipForward->setShortcuts(shortcuts.getShortcut("Replays/aSkipForward"));
+    }
+    if (aReplaySkipBackward) {
+        aReplaySkipBackward->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackward"));
+    }
     if (replayPlayButton) {
         replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
     }
@@ -1704,6 +1710,14 @@ void TabGame::createReplayDock()
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
     connect(timelineWidget, &ReplayTimelineWidget::rewound, messageLog, &ChatView::clearChat);
+
+    aReplaySkipForward = new QAction(timelineWidget);
+    timelineWidget->addAction(aReplaySkipForward);
+    connect(aReplaySkipForward, &QAction::triggered, this, [=](bool _) { timelineWidget->skipByAmount(1000); });
+
+    aReplaySkipBackward = new QAction(timelineWidget);
+    timelineWidget->addAction(aReplaySkipBackward);
+    connect(aReplaySkipBackward, &QAction::triggered, this, [=](bool _) { timelineWidget->skipByAmount(-1000); });
 
     replayPlayButton = new QToolButton;
     replayPlayButton->setIconSize(QSize(32, 32));

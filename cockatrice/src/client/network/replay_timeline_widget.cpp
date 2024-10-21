@@ -124,3 +124,8 @@ void ReplayTimelineWidget::stopReplay()
 {
     replayTimer->stop();
 }
+
+void ReplayTimelineWidget::skipByAmount(int amount)
+{
+    skipToTime(currentTime + amount);
+}

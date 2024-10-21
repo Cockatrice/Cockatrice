@@ -147,6 +147,7 @@ private:
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayPlayButton, *replayFastForwardButton;
+    QAction *aReplaySkipForward, *aReplaySkipBackward;
 
     CardFrame *cardInfo;
     PlayerListWidget *playerListWidget;
