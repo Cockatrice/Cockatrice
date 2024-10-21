@@ -321,14 +321,14 @@ void SettingsCache::setMasterVolume(int _masterVolume)
     emit masterVolumeChanged(masterVolume);
 }
 
-void SettingsCache::setLeftJustified(const int _leftJustified)
+void SettingsCache::setLeftJustified(const QT_STATE_CHANGED_T _leftJustified)
 {
     leftJustified = (bool)_leftJustified;
     settings->setValue("interface/leftjustified", leftJustified);
     emit handJustificationChanged();
 }
 
-void SettingsCache::setCardScaling(const int _scaleCards)
+void SettingsCache::setCardScaling(const QT_STATE_CHANGED_T _scaleCards)
 {
     scaleCards = (bool)_scaleCards;
     settings->setValue("cards/scaleCards", scaleCards);
@@ -340,19 +340,19 @@ void SettingsCache::setStackCardOverlapPercent(const int _verticalCardOverlapPer
     settings->setValue("cards/verticalCardOverlapPercent", verticalCardOverlapPercent);
 }
 
-void SettingsCache::setShowMessagePopups(const int _showMessagePopups)
+void SettingsCache::setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups)
 {
     showMessagePopups = (bool)_showMessagePopups;
     settings->setValue("chat/showmessagepopups", showMessagePopups);
 }
 
-void SettingsCache::setShowMentionPopups(const int _showMentionPopus)
+void SettingsCache::setShowMentionPopups(const QT_STATE_CHANGED_T _showMentionPopus)
 {
     showMentionPopups = (bool)_showMentionPopus;
     settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
-void SettingsCache::setRoomHistory(const int _roomHistory)
+void SettingsCache::setRoomHistory(const QT_STATE_CHANGED_T _roomHistory)
 {
     roomHistory = (bool)_roomHistory;
     settings->setValue("chat/roomhistory", roomHistory);
@@ -448,38 +448,38 @@ void SettingsCache::setThemeName(const QString &_themeName)
     emit themeChanged();
 }
 
-void SettingsCache::setPicDownload(int _picDownload)
+void SettingsCache::setPicDownload(QT_STATE_CHANGED_T _picDownload)
 {
     picDownload = static_cast<bool>(_picDownload);
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
 }
 
-void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
+void SettingsCache::setNotificationsEnabled(QT_STATE_CHANGED_T _notificationsEnabled)
 {
     notificationsEnabled = static_cast<bool>(_notificationsEnabled);
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
-void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled)
+void SettingsCache::setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T _spectatorNotificationsEnabled)
 {
     spectatorNotificationsEnabled = static_cast<bool>(_spectatorNotificationsEnabled);
     settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
 }
 
-void SettingsCache::setBuddyConnectNotificationsEnabled(int _buddyConnectNotificationsEnabled)
+void SettingsCache::setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T _buddyConnectNotificationsEnabled)
 {
     buddyConnectNotificationsEnabled = static_cast<bool>(_buddyConnectNotificationsEnabled);
     settings->setValue("interface/buddyconnectnotificationsenabled", buddyConnectNotificationsEnabled);
 }
 
-void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
+void SettingsCache::setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay)
 {
     doubleClickToPlay = static_cast<bool>(_doubleClickToPlay);
     settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
-void SettingsCache::setPlayToStack(int _playToStack)
+void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T _playToStack)
 {
     playToStack = static_cast<bool>(_playToStack);
     settings->setValue("interface/playtostack", playToStack);
@@ -491,7 +491,7 @@ void SettingsCache::setStartingHandSize(int _startingHandSize)
     settings->setValue("interface/startinghandsize", startingHandSize);
 }
 
-void SettingsCache::setAnnotateTokens(int _annotateTokens)
+void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens)
 {
     annotateTokens = static_cast<bool>(_annotateTokens);
     settings->setValue("interface/annotatetokens", annotateTokens);
@@ -503,21 +503,21 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
     settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
 }
 
-void SettingsCache::setDisplayCardNames(int _displayCardNames)
+void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
 {
     displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
 }
 
-void SettingsCache::setHorizontalHand(int _horizontalHand)
+void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)
 {
     horizontalHand = static_cast<bool>(_horizontalHand);
     settings->setValue("hand/horizontal", horizontalHand);
     emit horizontalHandChanged();
 }
 
-void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
+void SettingsCache::setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate)
 {
     invertVerticalCoordinate = static_cast<bool>(_invertVerticalCoordinate);
     settings->setValue("table/invert_vertical", invertVerticalCoordinate);
@@ -531,32 +531,32 @@ void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiCol
     emit minPlayersForMultiColumnLayoutChanged();
 }
 
-void SettingsCache::setTapAnimation(int _tapAnimation)
+void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T _tapAnimation)
 {
     tapAnimation = static_cast<bool>(_tapAnimation);
     settings->setValue("cards/tapanimation", tapAnimation);
 }
 
-void SettingsCache::setChatMention(int _chatMention)
+void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)
 {
     chatMention = static_cast<bool>(_chatMention);
     settings->setValue("chat/mention", chatMention);
 }
 
-void SettingsCache::setChatMentionCompleter(const int _enableMentionCompleter)
+void SettingsCache::setChatMentionCompleter(const QT_STATE_CHANGED_T _enableMentionCompleter)
 {
     chatMentionCompleter = (bool)_enableMentionCompleter;
     settings->setValue("chat/mentioncompleter", chatMentionCompleter);
     emit chatMentionCompleterChanged();
 }
 
-void SettingsCache::setChatMentionForeground(int _chatMentionForeground)
+void SettingsCache::setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground)
 {
     chatMentionForeground = static_cast<bool>(_chatMentionForeground);
     settings->setValue("chat/mentionforeground", chatMentionForeground);
 }
 
-void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground)
+void SettingsCache::setChatHighlightForeground(QT_STATE_CHANGED_T _chatHighlightForeground)
 {
     chatHighlightForeground = static_cast<bool>(_chatHighlightForeground);
     settings->setValue("chat/highlightforeground", chatHighlightForeground);
@@ -574,25 +574,25 @@ void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor)
     settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
 
-void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
+void SettingsCache::setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName)
 {
     zoneViewSortByName = static_cast<bool>(_zoneViewSortByName);
     settings->setValue("zoneview/sortbyname", zoneViewSortByName);
 }
 
-void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
+void SettingsCache::setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType)
 {
     zoneViewSortByType = static_cast<bool>(_zoneViewSortByType);
     settings->setValue("zoneview/sortbytype", zoneViewSortByType);
 }
 
-void SettingsCache::setZoneViewPileView(int _zoneViewPileView)
+void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView)
 {
     zoneViewPileView = static_cast<bool>(_zoneViewPileView);
     settings->setValue("zoneview/pileview", zoneViewPileView);
 }
 
-void SettingsCache::setSoundEnabled(int _soundEnabled)
+void SettingsCache::setSoundEnabled(QT_STATE_CHANGED_T _soundEnabled)
 {
     soundEnabled = static_cast<bool>(_soundEnabled);
     settings->setValue("sound/enabled", soundEnabled);
@@ -606,13 +606,13 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
     emit soundThemeChanged();
 }
 
-void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
+void SettingsCache::setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T _ignoreUnregisteredUsers)
 {
     ignoreUnregisteredUsers = static_cast<bool>(_ignoreUnregisteredUsers);
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
 }
 
-void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages)
+void SettingsCache::setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages)
 {
     ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
@@ -985,13 +985,13 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
     settings->setValue("game/remembergamesettings", rememberGameSettings);
 }
 
-void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
+void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate)
 {
     notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
 
-void SettingsCache::setNotifyAboutNewVersion(int _notifyaboutnewversion)
+void SettingsCache::setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion)
 {
     notifyAboutNewVersion = static_cast<bool>(_notifyaboutnewversion);
     settings->setValue("personal/newversionnotification", notifyAboutNewVersion);

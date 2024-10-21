@@ -1,6 +1,8 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
+#include "../../utility/macros.h"
+
 #include <QCheckBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
@@ -50,9 +52,9 @@ private:
 signals:
     void closePressed(ZoneViewWidget *zv);
 private slots:
-    void processSortByType(int value);
-    void processSortByName(int value);
-    void processSetPileView(int value);
+    void processSortByType(QT_STATE_CHANGED_T value);
+    void processSortByName(QT_STATE_CHANGED_T value);
+    void processSetPileView(QT_STATE_CHANGED_T value);
     void resizeToZoneContents();
     void handleScrollBarChange(int value);
     void zoneDeleted();

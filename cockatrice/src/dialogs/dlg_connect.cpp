@@ -2,6 +2,7 @@
 
 #include "../server/user/user_info_connection.h"
 #include "../settings/cache_settings.h"
+#include "../utility/macros.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>
@@ -79,7 +80,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
         autoConnectCheckBox->setEnabled(false);
     }
 
-    connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
+    connect(savePasswordCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
+            SLOT(passwordSaved(QT_STATE_CHANGED_T)));
 
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
@@ -292,7 +294,7 @@ void DlgConnect::newHostSelected(bool state)
     }
 }
 
-void DlgConnect::passwordSaved(int state)
+void DlgConnect::passwordSaved(QT_STATE_CHANGED_T state)
 {
     Q_UNUSED(state);
     if (savePasswordCheckBox->isChecked()) {

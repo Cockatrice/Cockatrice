@@ -1,6 +1,7 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
+#include "../utility/macros.h"
 #include "card_database_settings.h"
 #include "download_settings.h"
 #include "game_filters_settings.h"
@@ -523,39 +524,39 @@ public slots:
     void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
-    void setPicDownload(int _picDownload);
-    void setNotificationsEnabled(int _notificationsEnabled);
-    void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
-    void setBuddyConnectNotificationsEnabled(int _buddyConnectNotificationsEnabled);
-    void setDoubleClickToPlay(int _doubleClickToPlay);
-    void setPlayToStack(int _playToStack);
+    void setPicDownload(QT_STATE_CHANGED_T _picDownload);
+    void setNotificationsEnabled(QT_STATE_CHANGED_T _notificationsEnabled);
+    void setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T _spectatorNotificationsEnabled);
+    void setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T _buddyConnectNotificationsEnabled);
+    void setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay);
+    void setPlayToStack(QT_STATE_CHANGED_T _playToStack);
     void setStartingHandSize(int _startingHandSize);
-    void setAnnotateTokens(int _annotateTokens);
+    void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
-    void setDisplayCardNames(int _displayCardNames);
-    void setHorizontalHand(int _horizontalHand);
-    void setInvertVerticalCoordinate(int _invertVerticalCoordinate);
+    void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
+    void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
+    void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
-    void setTapAnimation(int _tapAnimation);
-    void setChatMention(int _chatMention);
-    void setChatMentionCompleter(int _chatMentionCompleter);
-    void setChatMentionForeground(int _chatMentionForeground);
-    void setChatHighlightForeground(int _chatHighlightForeground);
-    void setZoneViewSortByName(int _zoneViewSortByName);
-    void setZoneViewSortByType(int _zoneViewSortByType);
-    void setZoneViewPileView(int _zoneViewPileView);
-    void setSoundEnabled(int _soundEnabled);
+    void setTapAnimation(QT_STATE_CHANGED_T _tapAnimation);
+    void setChatMention(QT_STATE_CHANGED_T _chatMention);
+    void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
+    void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
+    void setChatHighlightForeground(QT_STATE_CHANGED_T _chatHighlightForeground);
+    void setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName);
+    void setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType);
+    void setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView);
+    void setSoundEnabled(QT_STATE_CHANGED_T _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
-    void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
-    void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
+    void setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T _ignoreUnregisteredUsers);
+    void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
-    void setCardScaling(const int _scaleCards);
+    void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
     void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
-    void setShowMessagePopups(const int _showMessagePopups);
-    void setShowMentionPopups(const int _showMentionPopups);
-    void setRoomHistory(const int _roomHistory);
-    void setLeftJustified(const int _leftJustified);
+    void setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups);
+    void setShowMentionPopups(const QT_STATE_CHANGED_T _showMentionPopups);
+    void setRoomHistory(const QT_STATE_CHANGED_T _roomHistory);
+    void setLeftJustified(const QT_STATE_CHANGED_T _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
     void setHighlightWords(const QString &_highlightWords);
@@ -570,8 +571,8 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setRememberGameSettings(const bool _rememberGameSettings);
-    void setNotifyAboutUpdate(int _notifyaboutupdate);
-    void setNotifyAboutNewVersion(int _notifyaboutnewversion);
+    void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
+    void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
 };

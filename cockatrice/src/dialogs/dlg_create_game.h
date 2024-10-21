@@ -1,6 +1,8 @@
 #ifndef DLG_CREATEGAME_H
 #define DLG_CREATEGAME_H
 
+#include "../utility/macros.h"
+
 #include <QDialog>
 #include <QMap>
 
@@ -26,7 +28,7 @@ private slots:
     void actOK();
     void actReset();
     void checkResponse(const Response &response);
-    void spectatorsAllowedChanged(int state);
+    void spectatorsAllowedChanged(QT_STATE_CHANGED_T state);
 
 private:
     TabRoom *room;

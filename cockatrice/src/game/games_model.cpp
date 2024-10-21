@@ -11,6 +11,7 @@
 #include <QIcon>
 #include <QStringList>
 #include <QTime>
+#include <QTimeZone>
 
 enum GameListColumn
 {
@@ -93,7 +94,11 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         case CREATED: {
             switch (role) {
                 case Qt::DisplayRole: {
-                    QDateTime then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), Qt::UTC);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+                    auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), QTimeZone::UTC);
+#else
+                    auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), Qt::UTC);
+#endif
                     int secs = then.secsTo(QDateTime::currentDateTimeUtc());
                     return getGameCreatedString(secs);
                 }
@@ -487,7 +492,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
 
 bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, QTimeZone::UTC).date();
+#elif (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
     static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, Qt::UTC).date();
 #else
     static const QDate epochDate = QDateTime::fromTime_t(0, Qt::UTC).date();

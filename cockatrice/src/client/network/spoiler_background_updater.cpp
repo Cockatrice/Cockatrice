@@ -172,7 +172,11 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
                 timeStamp.chop(6); // Remove " (UTC)"
 
                 auto utcTime = QLocale().toDateTime(timeStamp, "ddd, MMM dd yyyy, hh:mm:ss");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+                utcTime.setTimeZone(QTimeZone::UTC);
+#else
                 utcTime.setTimeSpec(Qt::UTC);
+#endif
 
                 QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
 
