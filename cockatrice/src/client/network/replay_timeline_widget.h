@@ -27,6 +27,7 @@ private:
     int currentEvent;
 
     void skipToTime(int newTime);
+    void processNewEvents();
 private slots:
     void replayTimerTimeout();
 

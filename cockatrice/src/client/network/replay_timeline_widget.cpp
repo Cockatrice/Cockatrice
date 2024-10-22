@@ -82,12 +82,11 @@ void ReplayTimelineWidget::skipToTime(int newTime)
 
     newTime -= newTime % 200; // Time should always be a multiple of 200
     if (newTime < currentTime) {
-        currentTime = 0;
         currentEvent = 0;
         emit rewound();
     }
-    currentTime = newTime - 200; // 200 is added back in replayTimerTimeout
-    replayTimerTimeout();
+    currentTime = newTime;
+    processNewEvents();
     update();
 }
 
@@ -104,6 +103,16 @@ QSize ReplayTimelineWidget::minimumSizeHint() const
 void ReplayTimelineWidget::replayTimerTimeout()
 {
     currentTime += 200;
+
+    processNewEvents();
+
+    if (!(currentTime % 1000))
+        update();
+}
+
+/// Processes all unprocessed events up to the current time.
+void ReplayTimelineWidget::processNewEvents()
+{
     while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
         emit processNextEvent();
         ++currentEvent;
@@ -112,9 +121,6 @@ void ReplayTimelineWidget::replayTimerTimeout()
         emit replayFinished();
         replayTimer->stop();
     }
-
-    if (!(currentTime % 1000))
-        update();
 }
 
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
