@@ -18,6 +18,8 @@ signals:
 
 private:
     QTimer *replayTimer;
+    static const int REWIND_THROTTLE_TIMEOUT_MS = 180;
+    QTimer *rewindThrottlingTimer;
     QList<int> replayTimeline;
     QList<int> histogram;
     static const int binLength;
@@ -27,6 +29,8 @@ private:
     int currentEvent;
 
     void skipToTime(int newTime);
+    void handleBackwardsSkip();
+    void processRewind();
     void processNewEvents();
 private slots:
     void replayTimerTimeout();

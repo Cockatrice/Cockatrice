@@ -81,13 +81,58 @@ void ReplayTimelineWidget::skipToTime(int newTime)
     }
 
     newTime -= newTime % 200; // Time should always be a multiple of 200
-    if (newTime < currentTime) {
-        currentEvent = 0;
-        emit rewound();
-    }
+
+    const bool isBackwardsSkip = newTime < currentTime;
     currentTime = newTime;
-    processNewEvents();
+
+    if (isBackwardsSkip) {
+        handleBackwardsSkip();
+    } else {
+        processNewEvents();
+    }
+
     update();
+}
+
+/// To reduce the amount of reprocessing done, if multiple backward skips are made in quick succession, only a single
+/// rewind is processed at the end.
+/// This process is monitered by a timer that becomes active once two backward skips are made within quick succession.
+void ReplayTimelineWidget::handleBackwardsSkip()
+{
+    // if the timer is already active, then restart the timer instead of proccessing the rewind.
+    if (rewindThrottlingTimer && rewindThrottlingTimer->isActive()) {
+        // stop previous timer
+        rewindThrottlingTimer->stop();
+        rewindThrottlingTimer->deleteLater();
+
+        // start new timer
+        rewindThrottlingTimer = new QTimer(this);
+        rewindThrottlingTimer->setSingleShot(true);
+        connect(rewindThrottlingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
+        rewindThrottlingTimer->start(REWIND_THROTTLE_TIMEOUT_MS);
+    } else {
+        // otherwise, do process the rewind
+        processRewind();
+    }
+}
+
+void ReplayTimelineWidget::processRewind()
+{
+    // queue up timer deletion first
+    if (rewindThrottlingTimer) {
+        rewindThrottlingTimer->stop();
+        rewindThrottlingTimer->deleteLater();
+    }
+
+    // process the rewind
+    currentEvent = 0;
+    emit rewound();
+    processNewEvents();
+
+    // then start a new dummy timer to throttle any rewinds that happen too quickly afterwards
+    rewindThrottlingTimer = new QTimer(this);
+    rewindThrottlingTimer->setSingleShot(true);
+    rewindThrottlingTimer->start(REWIND_THROTTLE_TIMEOUT_MS);
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
