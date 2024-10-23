@@ -606,7 +606,7 @@ private:
                                            parseSequenceString("Space"),
                                            ShortcutGroup::Replays)},
         {"Replays/fastForwardButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Fast Forward"),
-                                                  parseSequenceString("Ctrl+F"),
+                                                  parseSequenceString("Ctrl+P"),
                                                   ShortcutGroup::Replays)}};
 };
 
