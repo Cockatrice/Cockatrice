@@ -10,6 +10,10 @@ ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
 {
     replayTimer = new QTimer(this);
     connect(replayTimer, SIGNAL(timeout()), this, SLOT(replayTimerTimeout()));
+
+    rewindBufferingTimer = new QTimer(this);
+    rewindBufferingTimer->setSingleShot(true);
+    connect(rewindBufferingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
 }
 
 const int ReplayTimelineWidget::binLength = 5000;
@@ -102,15 +106,8 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
     if (doRewindBuffering) {
         // We use a one-shot timer to implement the rewind buffering.
         // The rewind only happens once the timer runs out.
-        // If a backwards skip happens while the timer is already running, we just reset the timer instead of rewinding.
-        if (rewindBufferingTimer) {
-            rewindBufferingTimer->stop();
-            rewindBufferingTimer->deleteLater();
-        }
-
-        rewindBufferingTimer = new QTimer(this);
-        rewindBufferingTimer->setSingleShot(true);
-        connect(rewindBufferingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
+        // If another backwards skip happens, the timer will just get reset instead of rewinding.
+        rewindBufferingTimer->stop();
         rewindBufferingTimer->start(REWIND_BUFFERING_TIMEOUT_MS);
     } else {
         // otherwise, process the rewind immediately
@@ -120,19 +117,13 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
 
 void ReplayTimelineWidget::processRewind()
 {
-    // queue up timer deletion first
-    if (rewindBufferingTimer) {
-        rewindBufferingTimer->stop();
-        rewindBufferingTimer->deleteLater();
-    }
+    // stop any queued-up rewinds
+    rewindBufferingTimer->stop();
 
     // process the rewind
     currentEvent = 0;
     emit rewound();
     processNewEvents();
-
-    // create a dummy timer here because otherwise it segfaults for some reason
-    rewindBufferingTimer = new QTimer(this);
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
