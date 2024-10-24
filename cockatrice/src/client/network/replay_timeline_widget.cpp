@@ -130,6 +130,9 @@ void ReplayTimelineWidget::processRewind()
     currentEvent = 0;
     emit rewound();
     processNewEvents();
+
+    // create a dummy timer here because otherwise it segfaults for some reason
+    rewindBufferingTimer = new QTimer(this);
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
