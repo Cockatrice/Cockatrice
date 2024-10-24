@@ -99,12 +99,14 @@ void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindBuffering)
 /// is processed at the end. When false, the backwards skip will always cause an immediate rewind
 void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
 {
-    if (doRewindBuffering && rewindBufferingTimer && rewindBufferingTimer->isActive()) {
+    if (doRewindBuffering) {
         // We use a one-shot timer to implement the rewind buffering.
         // The rewind only happens once the timer runs out.
         // If a backwards skip happens while the timer is already running, we just reset the timer instead of rewinding.
-        rewindBufferingTimer->stop();
-        rewindBufferingTimer->deleteLater();
+        if (rewindBufferingTimer) {
+            rewindBufferingTimer->stop();
+            rewindBufferingTimer->deleteLater();
+        }
 
         rewindBufferingTimer = new QTimer(this);
         rewindBufferingTimer->setSingleShot(true);
@@ -128,11 +130,6 @@ void ReplayTimelineWidget::processRewind()
     currentEvent = 0;
     emit rewound();
     processNewEvents();
-
-    // then start a new dummy timer to buffer any rewinds that happen too quickly afterwards
-    rewindBufferingTimer = new QTimer(this);
-    rewindBufferingTimer->setSingleShot(true);
-    rewindBufferingTimer->start(REWIND_BUFFERING_TIMEOUT_MS);
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
