@@ -67,10 +67,11 @@ void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 #else
     int newTime = static_cast<int>((qint64)maxTime * (qint64)event->x() / width());
 #endif
-    skipToTime(newTime);
+    // don't throttle rewinds from clicks, since clicks usually don't happen fast enough to require throttling
+    skipToTime(newTime, false);
 }
 
-void ReplayTimelineWidget::skipToTime(int newTime)
+void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindThrottling)
 {
     // check boundary conditions
     if (newTime < 0) {
@@ -86,7 +87,7 @@ void ReplayTimelineWidget::skipToTime(int newTime)
     currentTime = newTime;
 
     if (isBackwardsSkip) {
-        handleBackwardsSkip();
+        handleBackwardsSkip(doRewindThrottling);
     } else {
         processNewEvents();
     }
@@ -94,24 +95,23 @@ void ReplayTimelineWidget::skipToTime(int newTime)
     update();
 }
 
-/// To reduce the amount of reprocessing done, if multiple backward skips are made in quick succession, only a single
-/// rewind is processed at the end.
-/// This process is monitered by a timer that becomes active once two backward skips are made within quick succession.
-void ReplayTimelineWidget::handleBackwardsSkip()
+/// @param doRewindThrottling When true, if multiple backward skips are made in quick succession, only a single rewind
+/// is processed at the end. When false, the backwards skip will always cause an immediate rewind
+void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindThrottling)
 {
-    // if the timer is already active, then restart the timer instead of proccessing the rewind.
-    if (rewindThrottlingTimer && rewindThrottlingTimer->isActive()) {
-        // stop previous timer
+    if (doRewindThrottling && rewindThrottlingTimer && rewindThrottlingTimer->isActive()) {
+        // We use a one-shot timer to implement the rewind throttling.
+        // The rewind only happens once the timer runs out.
+        // If a backwards skip happens while the timer is already running, we just reset the timer instead of rewinding.
         rewindThrottlingTimer->stop();
         rewindThrottlingTimer->deleteLater();
 
-        // start new timer
         rewindThrottlingTimer = new QTimer(this);
         rewindThrottlingTimer->setSingleShot(true);
         connect(rewindThrottlingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
         rewindThrottlingTimer->start(REWIND_THROTTLE_TIMEOUT_MS);
     } else {
-        // otherwise, do process the rewind
+        // otherwise, process the rewind immediately
         processRewind();
     }
 }
@@ -186,5 +186,5 @@ void ReplayTimelineWidget::stopReplay()
 
 void ReplayTimelineWidget::skipByAmount(int amount)
 {
-    skipToTime(currentTime + amount);
+    skipToTime(currentTime + amount, true);
 }

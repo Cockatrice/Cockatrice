@@ -28,8 +28,8 @@ private:
     int currentTime;
     int currentEvent;
 
-    void skipToTime(int newTime);
-    void handleBackwardsSkip();
+    void skipToTime(int newTime, bool doRewindThrottling);
+    void handleBackwardsSkip(bool doRewindThrottling);
     void processRewind();
     void processNewEvents();
 private slots:
