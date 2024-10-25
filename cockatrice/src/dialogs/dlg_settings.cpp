@@ -440,6 +440,7 @@ void AppearanceSettingsPage::retranslateUi()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
+    // general settings and notification settings
     notificationsEnabledCheckBox.setChecked(SettingsCache::instance().getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
             SLOT(setNotificationsEnabled(QT_STATE_CHANGED_T)));
@@ -490,6 +491,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     notificationsGroupBox = new QGroupBox;
     notificationsGroupBox->setLayout(notificationsGrid);
 
+    // animation settings
     tapAnimationCheckBox.setChecked(SettingsCache::instance().getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
             SLOT(setTapAnimation(QT_STATE_CHANGED_T)));
@@ -500,6 +502,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
 
+    // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(notificationsGroupBox);
