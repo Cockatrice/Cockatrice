@@ -765,6 +765,11 @@ void TabDeckEditor::closeRequest()
 
 void TabDeckEditor::actNewDeck()
 {
+    if (SettingsCache::instance().getOpenDeckInNewTab()) {
+        emit openDeckEditor(nullptr);
+        return;
+    }
+
     if (!confirmClose())
         return;
 
@@ -778,7 +783,9 @@ void TabDeckEditor::actNewDeck()
 
 void TabDeckEditor::actLoadDeck()
 {
-    if (!confirmClose())
+    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab();
+
+    if (!openInNewTab && !confirmClose())
         return;
 
     QFileDialog dialog(this, tr("Load deck"));
@@ -792,8 +799,12 @@ void TabDeckEditor::actLoadDeck()
 
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt)) {
-        setSaveStatus(false);
-        setDeck(l);
+        if (openInNewTab) {
+            emit openDeckEditor(l);
+        } else {
+            setSaveStatus(false);
+            setDeck(l);
+        }
     } else
         delete l;
     setSaveStatus(true);
@@ -865,15 +876,22 @@ bool TabDeckEditor::actSaveDeckAs()
 
 void TabDeckEditor::actLoadDeckFromClipboard()
 {
-    if (!confirmClose())
+    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab();
+
+    if (!openInNewTab && !confirmClose())
         return;
 
     DlgLoadDeckFromClipboard dlg(this);
     if (!dlg.exec())
         return;
 
-    setDeck(dlg.getDeckList());
-    setModified(true);
+    if (openInNewTab) {
+        emit openDeckEditor(dlg.getDeckList());
+    } else {
+        setDeck(dlg.getDeckList());
+        setModified(true);
+    }
+
     setSaveStatus(true);
 }
 
