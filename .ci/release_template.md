@@ -10,8 +10,8 @@ include different targets -->
 <b>Pre-compiled binaries we serve:</b>
  - <kbd>Windows 7+</kbd>
  - <kbd>Windows 10+</kbd>
- - <kbd>macOS 12+</kbd> ("Monterey") / Intel
- - <kbd>macOS 14+</kbd> ("Sonoma") / Apple M
+ - <kbd>macOS 13+</kbd> ("Ventura") / Intel
+ - <kbd>macOS 13+</kbd> ("Ventura") / Apple M
  - <kbd>Ubuntu 18.04 LTS</kbd> ("Bionic Beaver")
  - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
  - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
