@@ -494,6 +494,7 @@ void ChatView::clearChat()
 {
     document()->clear();
     lastSender = "";
+    evenNumber = true;
 }
 
 void ChatView::redactMessages(const QString &userName, int amount)
