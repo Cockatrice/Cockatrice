@@ -1,9 +1,9 @@
 import protobuf from 'protobufjs';
 
-import { RoomEvents, SessionEvents } from '../events';
+import { CommonEvents, GameEvents, RoomEvents, SessionEvents } from '../events';
 import { SessionPersistence } from '../persistence';
 import { WebClient } from '../WebClient';
-
+import { SessionCommands } from 'websocket';
 import ProtoFiles from '../../proto-files.json';
 
 export interface ProtobufEvents {
@@ -55,6 +55,14 @@ export class ProtobufService {
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
+  public sendAdminCommand(adminCmd: number, callback?: Function) {
+    const cmd = this.controller.CommandContainer.create({
+      'adminCommand': [adminCmd]
+    });
+
+    this.sendCommand(cmd, (raw) => callback && callback(raw));
+  }
+
   public sendCommand(cmd: number, callback: Function) {
     this.cmdId++;
 
@@ -67,11 +75,7 @@ export class ProtobufService {
   }
 
   public sendKeepAliveCommand(pingReceived: Function) {
-    const command = this.controller.SessionCommand.create({
-      '.Command_Ping.ext': this.controller.Command_Ping.create()
-    });
-
-    this.sendSessionCommand(command, pingReceived);
+    SessionCommands.ping(pingReceived);
   }
 
   public handleMessageEvent({ data }: MessageEvent): void {
@@ -91,7 +95,10 @@ export class ProtobufService {
             this.processSessionEvent(msg.sessionEvent, msg);
             break;
           case this.controller.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
-          // @TODO
+            this.processGameEvent(msg.gameEvent, msg);
+            break;
+          default:
+            console.log(msg);
             break;
         }
       }
@@ -109,12 +116,20 @@ export class ProtobufService {
     }
   }
 
+  private processCommonEvent(response: any, raw: any) {
+    this.processEvent(response, CommonEvents, raw);
+  }
+
   private processRoomEvent(response: any, raw: any) {
     this.processEvent(response, RoomEvents, raw);
   }
 
   private processSessionEvent(response: any, raw: any) {
     this.processEvent(response, SessionEvents, raw);
+  }
+
+  private processGameEvent(response: any, raw: any): void {
+    this.processEvent(response, GameEvents, raw);
   }
 
   private processEvent(response: any, events: ProtobufEvents, raw: any) {

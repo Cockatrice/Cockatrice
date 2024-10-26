@@ -1,6 +1,6 @@
 #include "debug_pb_message.h"
 
-#include "stringsizes.h"
+#include "trice_limits.h"
 
 #include <QList>
 #include <QString>

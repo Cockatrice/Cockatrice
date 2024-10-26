@@ -1,4 +1,5 @@
-import { Log, SortBy, User, UserSortField, WebSocketConnectOptions } from 'types';
+import { WarnHistoryItem, BanHistoryItem, LogItem, SortBy, User, UserSortField, WebSocketConnectOptions, WarnListItem } from 'types';
+import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
 export interface ServerConnectParams {
   host: string;
@@ -49,6 +50,23 @@ export interface ServerState {
   users: User[];
   sortUsersBy: ServerStateSortUsersBy;
   connectOptions: WebSocketConnectOptions;
+  messages: {
+    [userName: string]: UserMessageData[];
+  }
+  userInfo: {
+    [userName: string]: User;
+  }
+  notifications: NotifyUserData[];
+  serverShutdown: ServerShutdownData;
+  banUser: string;
+  banHistory: {
+    [userName: string]: BanHistoryItem[];
+  };
+  warnHistory: {
+    [userName: string]: WarnHistoryItem[];
+  };
+  warnListOptions: WarnListItem[];
+  warnUser: string;
 }
 
 export interface ServerStateStatus {
@@ -63,9 +81,9 @@ export interface ServerStateInfo {
 }
 
 export interface ServerStateLogs {
-  room: Log[];
-  game: Log[];
-  chat: Log[];
+  room: LogItem[];
+  game: LogItem[];
+  chat: LogItem[];
 }
 
 export interface ServerStateSortUsersBy extends SortBy {

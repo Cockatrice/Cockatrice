@@ -323,11 +323,15 @@ void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAs
     info->set_name(name.toStdString());
     info->set_type(type);
     info->set_with_coords(has_coords);
-    info->set_card_count(cards.size());
+    info->set_card_count(static_cast<int>(cards.size()));
     info->set_always_reveal_top_card(alwaysRevealTopCard);
     info->set_always_look_at_top_card(alwaysLookAtTopCard);
-    if ((((playerWhosAsking == player) || omniscient) && (type != ServerInfo_Zone::HiddenZone)) ||
-        ((playerWhosAsking != player) && (type == ServerInfo_Zone::PublicZone))) {
+
+    const auto selfPlayerAsking = playerWhosAsking == player || omniscient;
+    const auto zonesSelfCanSee = type != ServerInfo_Zone::HiddenZone;
+    const auto otherPlayerAsking = playerWhosAsking != player;
+    const auto zonesOthersCanSee = type == ServerInfo_Zone::PublicZone;
+    if ((selfPlayerAsking && zonesSelfCanSee) || (otherPlayerAsking && zonesOthersCanSee)) {
         QListIterator<Server_Card *> cardIterator(cards);
         while (cardIterator.hasNext())
             cardIterator.next()->getInfo(info->add_card_list());

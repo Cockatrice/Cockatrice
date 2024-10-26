@@ -119,5 +119,62 @@ export const Dispatch = {
   },
   resetPasswordSuccess: () => {
     store.dispatch(Actions.resetPasswordSuccess());
-  }
+  },
+  adjustMod: (userName, shouldBeMod, shouldBeJudge) => {
+    store.dispatch(Actions.adjustMod(userName, shouldBeMod, shouldBeJudge));
+  },
+  reloadConfig: () => {
+    store.dispatch(Actions.reloadConfig());
+  },
+  shutdownServer: () => {
+    store.dispatch(Actions.shutdownServer());
+  },
+  updateServerMessage: () => {
+    store.dispatch(Actions.updateServerMessage());
+  },
+  accountPasswordChange: () => {
+    store.dispatch(Actions.accountPasswordChange());
+  },
+  accountEditChanged: (user) => {
+    store.dispatch(Actions.accountEditChanged(user));
+  },
+  accountImageChanged: (user) => {
+    store.dispatch(Actions.accountImageChanged(user));
+  },
+  directMessageSent: (userName, message) => {
+    store.dispatch(Actions.directMessageSent(userName, message));
+  },
+  getUserInfo: (userInfo) => {
+    store.dispatch(Actions.getUserInfo(userInfo));
+  },
+  notifyUser: (notification) => {
+    store.dispatch(Actions.notifyUser(notification))
+  },
+  serverShutdown: (data) => {
+    store.dispatch(Actions.serverShutdown(data))
+  },
+  userMessage: (messageData) => {
+    store.dispatch(Actions.userMessage(messageData))
+  },
+  addToList: (list, userName) => {
+    store.dispatch(Actions.addToList(list, userName))
+  },
+  removeFromList: (list, userName) => {
+    store.dispatch(Actions.removeFromList(list, userName))
+  },
+  banFromServer: (userName) => {
+    store.dispatch(Actions.banFromServer(userName));
+  },
+  banHistory: (userName, banHistory) => {
+    store.dispatch(Actions.banHistory(userName, banHistory))
+  },
+  warnHistory: (userName, warnHistory) => {
+    store.dispatch(Actions.warnHistory(userName, warnHistory))
+  },
+  warnListOptions: (warnList) => {
+    store.dispatch(Actions.warnListOptions(warnList))
+  },
+  warnUser: (userName) => {
+    store.dispatch(Actions.warnUser(userName))
+  },
 }

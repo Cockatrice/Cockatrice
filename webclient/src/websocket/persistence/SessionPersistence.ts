@@ -1,8 +1,18 @@
 import { ServerDispatch } from 'store';
-import { Log, StatusEnum, User, WebSocketConnectOptions } from 'types';
+import { DeckStorageTreeItem, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
+import {
+  GameJoinedData,
+  NotifyUserData,
+  PlayerGamePropertiesData,
+  ServerShutdownData,
+  UserMessageData
+} from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
+import { DeckList } from 'types';
+import { common } from 'protobufjs';
+import IBytesValue = common.IBytesValue;
 
 export class SessionPersistence {
   static initialized() {
@@ -89,10 +99,6 @@ export class SessionPersistence {
     ServerDispatch.userLeft(userName);
   }
 
-  static viewLogs(logs: Log[]) {
-    ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
-  }
-
   static serverMessage(message: string) {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
@@ -117,8 +123,10 @@ export class SessionPersistence {
     ServerDispatch.registrationSuccess();
   }
 
-  static registrationFailed(error: string) {
-    ServerDispatch.registrationFailed(error);
+  static registrationFailed(reason: string, endTime?: number) {
+    const reasonMsg = endTime ? NormalizeService.normalizeBannedUserError(reason, endTime) : reason;
+
+    ServerDispatch.registrationFailed(reasonMsg);
   }
 
   static registrationEmailError(error: string) {
@@ -148,4 +156,82 @@ export class SessionPersistence {
   static resetPasswordFailed() {
     ServerDispatch.resetPasswordFailed();
   }
+
+  static accountPasswordChange(): void {
+    ServerDispatch.accountPasswordChange();
+  }
+
+  static accountEditChanged(realName?: string, email?: string, country?: string): void {
+    ServerDispatch.accountEditChanged({ realName, email, country });
+  }
+
+  static accountImageChanged(avatarBmp: IBytesValue): void {
+    ServerDispatch.accountImageChanged({ avatarBmp });
+  }
+
+  static directMessageSent(userName: string, message: string): void {
+    ServerDispatch.directMessageSent(userName, message);
+  }
+
+  static getUserInfo(userInfo: User) {
+    ServerDispatch.getUserInfo(userInfo);
+  }
+
+  static getGamesOfUser(userName: string, response: any): void {
+    console.log('getGamesOfUser');
+  }
+
+  static gameJoined(gameJoinedData: GameJoinedData): void {
+    console.log('gameJoined', gameJoinedData);
+  }
+
+  static notifyUser(notification: NotifyUserData): void {
+    ServerDispatch.notifyUser(notification);
+  }
+
+  static playerPropertiesChanged(payload: PlayerGamePropertiesData): void {
+    console.log('playerPropertiesChanged', payload);
+  }
+
+  static serverShutdown(data: ServerShutdownData): void {
+    ServerDispatch.serverShutdown(data);
+  }
+
+  static userMessage(messageData: UserMessageData): void {
+    ServerDispatch.userMessage(messageData);
+  }
+
+  static addToList(list: string, userName: string): void {
+    ServerDispatch.addToList(list, userName)
+  }
+
+  static removeFromList(list: string, userName: string): void {
+    ServerDispatch.removeFromList(list, userName);
+  }
+
+  static deckDelete(deckId: number): void {
+    console.log('deckDelete', deckId);
+  }
+
+  static deckDeleteDir(path: string): void {
+    console.log('deckDeleteDir', path);
+  }
+
+  static deckDownload(deckId: number): void {
+    console.log('deckDownload', deckId);
+  }
+
+  static deckList(deckList: DeckList): void {
+    console.log('deckList', deckList);
+  }
+
+  static deckNewDir(path: string, dirName: string): void {
+    console.log('deckNewDir', path, dirName);
+  }
+
+  static deckUpload(treeItem: DeckStorageTreeItem): void {
+    console.log('deckUpload', treeItem);
+  }
 }
+
+

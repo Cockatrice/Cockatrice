@@ -5,10 +5,10 @@ import webClient from '../../WebClient';
 import { SessionPersistence } from '../../persistence';
 
 import {
-  activateAccount,
+  activate,
   disconnect,
   login,
-  resetPassword,
+  forgotPasswordReset,
   updateStatus
 } from './';
 
@@ -20,11 +20,8 @@ export function requestPasswordSalt(options: WebSocketConnectOptions): void {
     userName,
   };
 
-  const CmdRequestPasswordSalt = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_RequestPasswordSalt.ext': CmdRequestPasswordSalt
-  });
+  const command = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_RequestPasswordSalt.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, raw => {
     switch (raw.responseCode) {
@@ -33,12 +30,12 @@ export function requestPasswordSalt(options: WebSocketConnectOptions): void {
 
         switch (options.reason) {
           case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
-            activateAccount(options, passwordSalt);
+            activate(options, passwordSalt);
             break;
           }
 
           case WebSocketConnectReason.PASSWORD_RESET: {
-            resetPassword(options, passwordSalt);
+            forgotPasswordReset(options, passwordSalt);
             break;
           }
 

@@ -144,7 +144,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/oraclewizard.cpp" line="540"/>
         <source>Failed to interpret downloaded data.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile interpretare i dati scaricati.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="553"/>
@@ -303,7 +303,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/oraclewizard.cpp" line="626"/>
         <source>A cockatrice database file of %1 MB has been downloaded.</source>
-        <translation type="unfinished"/>
+        <translation>È stato scaricato un file database di Cockatrice di %1 MB.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="629"/>
@@ -401,7 +401,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile inizializzare o caricare libreria zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1177"/>
@@ -411,7 +411,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile creare o aprile il file.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
@@ -529,7 +529,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Errore sconosciuto.</translation>
     </message>
 </context>
 <context>

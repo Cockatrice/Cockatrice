@@ -1,6 +1,6 @@
 #include "oracleimporter.h"
 
-#include "carddbparser/cockatricexml4.h"
+#include "game/cards/card_database_parser/cockatrice_xml_4.h"
 #include "qt-json/json.h"
 
 #include <QtWidgets>
@@ -141,9 +141,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // DETECT CARD POSITIONING INFO
 
     // cards that enter the field tapped
-    bool cipt = text.contains(" it enters the battlefield tapped") ||
-                (text.contains(name + " enters the battlefield tapped") &&
-                 !text.contains(name + " enters the battlefield tapped unless"));
+    QRegularExpression ciptRegex("( it|" + QRegularExpression::escape(name) +
+                                 ") enters( the battlefield)? tapped(?! unless)");
+    bool cipt = ciptRegex.match(text).hasMatch();
 
     // table row
     int tableRow = 1;

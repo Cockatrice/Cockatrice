@@ -48,4 +48,16 @@ export class RoomPersistence {
   static userLeft(roomId: number, name: string) {
     RoomsDispatch.userLeft(roomId, name);
   }
+
+  static removeMessages(roomId: number, name: string, amount: number): void {
+    RoomsDispatch.removeMessages(roomId, name, amount);
+  };
+
+  static gameCreated(roomId: number) {
+    RoomsDispatch.gameCreated(roomId);
+  }
+
+  static joinedGame(roomId: number, gameId: number) {
+    RoomsDispatch.joinedGame(roomId, gameId);
+  }
 }

@@ -1,7 +1,7 @@
 import { StatusEnum, User, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
 import { SessionCommands, webClient } from 'websocket';
 
-export default class AuthenticationService {
+export class AuthenticationService {
   static login(options: WebSocketConnectOptions): void {
     SessionCommands.connect(options, WebSocketConnectReason.LOGIN);
   }

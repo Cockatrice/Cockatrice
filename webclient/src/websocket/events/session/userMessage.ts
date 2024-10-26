@@ -1,3 +1,8 @@
-export function userMessage(payload) {
-  console.info('Event_UserMessage', payload);
+import { SessionPersistence } from '../../persistence';
+import { UserMessageData } from './interfaces';
+
+
+
+export function userMessage(payload: UserMessageData): void {
+  SessionPersistence.userMessage(payload);
 }

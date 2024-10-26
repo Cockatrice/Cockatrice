@@ -1,4 +1,4 @@
-import { Game, GametypeMap, Log, LogGroups, Message, Room } from 'types';
+import { Game, GametypeMap, LogItem, LogGroups, Message, Room } from 'types';
 
 export default class NormalizeService {
   // Flatten room gameTypes into map object
@@ -26,7 +26,7 @@ export default class NormalizeService {
   }
 
   // Flatten logs[] into object mapped by targetType (room, game, chat)
-  static normalizeLogs(logs: Log[]): LogGroups {
+  static normalizeLogs(logs: LogItem[]): LogGroups {
     return logs.reduce((obj, log) => {
       const { targetType } = log;
       obj[targetType] = obj[targetType] || [];

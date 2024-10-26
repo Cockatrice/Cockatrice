@@ -1,4 +1,5 @@
 import webClient from '../../WebClient';
+import { SessionPersistence } from '../../persistence';
 
 export function addToBuddyList(userName: string): void {
   addToList('buddy', userName);
@@ -9,13 +10,16 @@ export function addToIgnoreList(userName: string): void {
 }
 
 export function addToList(list: string, userName: string): void {
-  const CmdAddToList = webClient.protobuf.controller.Command_AddToList.create({ list, userName });
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_AddToList.ext': CmdAddToList
-  });
+  const command = webClient.protobuf.controller.Command_AddToList.create({ list, userName });
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_AddToList.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, ({ responseCode }) => {
-    // @TODO: filter responseCode, pop snackbar for error
+    switch (responseCode) {
+      case webClient.protobuf.controller.Response.ResponseCode.RespOk:
+        SessionPersistence.addToList(list, userName);
+        break;
+      default:
+        console.error('Failed to add to list', responseCode);
+    }
   });
 }

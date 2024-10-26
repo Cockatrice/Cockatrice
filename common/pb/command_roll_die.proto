@@ -5,4 +5,5 @@ message Command_RollDie {
         optional Command_RollDie ext = 1005;
     }
     optional uint32 sides = 1;
+    optional uint32 count = 2;
 }

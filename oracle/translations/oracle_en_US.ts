@@ -143,7 +143,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="540"/>
         <source>Failed to interpret downloaded data.</source>
-        <translation type="unfinished"/>
+        <translation>Failed to interpret downloaded data.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="553"/>
@@ -302,7 +302,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="626"/>
         <source>A cockatrice database file of %1 MB has been downloaded.</source>
-        <translation type="unfinished"/>
+        <translation>A cockatrice database file of %1 MB has been downloaded.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="629"/>
@@ -395,87 +395,87 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>ZIP operation completed successfully.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Failed to initialize or load zlib library.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1177"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>zlib library error.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Unable to create or open file.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Partially corrupted archive. Some files might be extracted.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Corrupted archive.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Wrong password.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>No archive has been created yet.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1183"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>File or directory does not exist.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1184"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>File read error.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1185"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>File write error.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1186"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>File seek error.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1187"/>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>Unable to create a directory.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1188"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Invalid device.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1189"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Invalid or incompatible zip archive.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1190"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation>Inconsistent headers. Archive might be corrupted.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Unknown error.</translation>
     </message>
 </context>
 <context>
@@ -483,52 +483,52 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1604"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>ZIP operation completed successfully.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1605"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Failed to initialize or load zlib library.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>zlib library error.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Unable to create or open file.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>No archive has been created yet.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1609"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>File or directory does not exist.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>File read error.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>File write error.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>File seek error.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Unknown error.</translation>
     </message>
 </context>
 <context>

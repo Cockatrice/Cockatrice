@@ -74,7 +74,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 2.9.1)
+project("Cockatrice" VERSION 2.10.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
@@ -270,7 +270,7 @@ if(UNIX)
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
       if(Qt6_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia")
+        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
       elseif(Qt5_FOUND)
         set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
       endif()
@@ -292,7 +292,7 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
       if(Qt6_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins")
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
       elseif(Qt5_FOUND)
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
       endif()

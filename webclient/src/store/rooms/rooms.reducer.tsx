@@ -9,7 +9,9 @@ import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
 
 const initialState: RoomsState = {
   rooms: {},
-  joined: {},
+  games: {},
+  joinedRoomIds: {},
+  joinedGameIds: {},
   messages: {},
   sortGamesBy: {
     field: GameSortField.START_TIME,
@@ -28,6 +30,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         ...initialState
       };
     }
+
     case Types.UPDATE_ROOMS: {
       const rooms = {
         ...state.rooms
@@ -52,9 +55,10 @@ export const roomsReducer = (state = initialState, action: any) => {
 
       return { ...state, rooms };
     }
+
     case Types.JOIN_ROOM: {
       const { roomInfo } = action;
-      const { joined, rooms, sortGamesBy, sortUsersBy } = state;
+      const { joinedRoomIds, rooms, sortGamesBy, sortUsersBy } = state;
 
       const { roomId } = roomInfo;
 
@@ -81,18 +85,19 @@ export const roomsReducer = (state = initialState, action: any) => {
           }
         },
 
-        joined: {
-          ...joined,
+        joinedRoomIds: {
+          ...joinedRoomIds,
           [roomId]: true
         },
       }
     }
+
     case Types.LEAVE_ROOM: {
       const { roomId } = action;
-      const { joined, messages } = state;
+      const { joinedRoomIds, messages } = state;
 
       const _joined = {
-        ...joined
+        ...joinedRoomIds
       };
 
       const _messages = {
@@ -105,10 +110,11 @@ export const roomsReducer = (state = initialState, action: any) => {
       return {
         ...state,
 
-        joined: _joined,
+        joinedRoomIds: _joined,
         messages: _messages,
       }
     }
+
     case Types.ADD_MESSAGE: {
       const { roomId, message } = action;
       const { messages } = state;
@@ -134,6 +140,7 @@ export const roomsReducer = (state = initialState, action: any) => {
       }
     }
     // @TODO improve this reducer, likely by improving the store model
+
     case Types.UPDATE_GAMES: {
       const { roomId, games } = action;
       const { rooms, sortGamesBy } = state;
@@ -196,6 +203,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         }
       }
     }
+
     case Types.USER_JOINED: {
       const { roomId, user } = action;
       const { rooms, sortUsersBy } = state;
@@ -220,6 +228,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         }
       };
     }
+
     case Types.USER_LEFT: {
       const { roomId, name } = action;
       const { rooms } = state;
@@ -238,6 +247,7 @@ export const roomsReducer = (state = initialState, action: any) => {
         }
       };
     }
+
     case Types.SORT_GAMES: {
       const { field, order, roomId } = action;
       const { rooms } = state;
@@ -264,6 +274,52 @@ export const roomsReducer = (state = initialState, action: any) => {
         sortGamesBy
       }
     }
+
+    case Types.REMOVE_MESSAGES: {
+      const { name, amount, roomId } = action;
+      const { messages } = state;
+      let amountRemoved = 0;
+
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [roomId]: messages[roomId]
+            .reverse()
+            .filter(({ message }) => {
+              if (amount === amountRemoved) {
+                return true;
+              }
+
+              const keep = message.indexOf(`${name}:`) !== 0;
+
+              if (!keep) {
+                amountRemoved++;
+              }
+
+              return keep;
+            })
+            .reverse()
+        }
+      }
+    }
+
+    case Types.JOINED_GAME: {
+      const { gameId, roomId } = action;
+      const { joinedGameIds } = state;
+
+      return {
+        ...state,
+        joinedGameIds: {
+          ...joinedGameIds,
+          [roomId]: {
+            ...joinedGameIds[roomId],
+            [gameId]: true,
+          }
+        }
+      }
+    }
+
     default:
       return state;
   }

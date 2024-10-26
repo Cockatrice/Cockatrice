@@ -2,16 +2,13 @@ import webClient from '../../WebClient';
 import { RoomPersistence } from '../../persistence';
 
 export function joinRoom(roomId: number): void {
-  const CmdJoinRoom = webClient.protobuf.controller.Command_JoinRoom.create({ roomId });
-
-  const sc = webClient.protobuf.controller.SessionCommand.create({
-    '.Command_JoinRoom.ext': CmdJoinRoom
-  });
+  const command = webClient.protobuf.controller.Command_JoinRoom.create({ roomId });
+  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_JoinRoom.ext': command });
 
   webClient.protobuf.sendSessionCommand(sc, (raw) => {
     const { responseCode } = raw;
 
-    let error;
+    let error: string;
 
     switch (responseCode) {
       case webClient.protobuf.controller.Response.ResponseCode.RespOk:

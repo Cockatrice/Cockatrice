@@ -7,13 +7,8 @@ export function roomSay(roomId: number, message: string): void {
     return;
   }
 
-  const CmdRoomSay = webClient.protobuf.controller.Command_RoomSay.create({
-    'message': trimmed
-  });
-
-  const rc = webClient.protobuf.controller.RoomCommand.create({
-    '.Command_RoomSay.ext': CmdRoomSay
-  });
+  const command = webClient.protobuf.controller.Command_RoomSay.create({ 'message': trimmed });
+  const rc = webClient.protobuf.controller.RoomCommand.create({ '.Command_RoomSay.ext': command });
 
   webClient.protobuf.sendRoomCommand(roomId, rc);
 }

@@ -2,21 +2,21 @@ import { StatusEnum, WebSocketConnectReason } from 'types';
 
 import webClient from '../../WebClient';
 import {
-  activateAccount,
+  activate,
   disconnect,
   login,
   register,
   requestPasswordSalt,
-  resetPassword,
-  resetPasswordChallenge,
-  resetPasswordRequest,
+  forgotPasswordChallenge,
+  forgotPasswordRequest,
+  forgotPasswordReset,
   updateStatus,
 } from '../../commands/session';
 import { generateSalt, passwordSaltSupported } from '../../utils';
 import { ServerIdentificationData } from './interfaces';
 import { SessionPersistence } from '../../persistence';
 
-export function serverIdentification(info: ServerIdentificationData) {
+export function serverIdentification(info: ServerIdentificationData): void {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;
   if (protocolVersion !== webClient.protocolVersion) {
     updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
@@ -44,20 +44,20 @@ export function serverIdentification(info: ServerIdentificationData) {
       if (getPasswordSalt) {
         requestPasswordSalt(options);
       } else {
-        activateAccount(options);
+        activate(options);
       }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
-      resetPasswordRequest(options);
+      forgotPasswordRequest(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
-      resetPasswordChallenge(options);
+      forgotPasswordChallenge(options);
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
       if (getPasswordSalt) {
         requestPasswordSalt(options);
       } else {
-        resetPassword(options);
+        forgotPasswordReset(options);
       }
       break;
     default:

@@ -49,5 +49,23 @@ export const Actions = {
     roomId,
     field,
     order
-  })
+  }),
+
+  removeMessages: (roomId, name, amount) => ({
+    type: Types.REMOVE_MESSAGES,
+    roomId,
+    name,
+    amount
+  }),
+
+  gameCreated: (roomId) => ({
+    type: Types.GAME_CREATED,
+    roomId
+  }),
+
+  joinedGame: (roomId, gameId) => ({
+    type: Types.JOINED_GAME,
+    roomId,
+    gameId
+  }),
 }
