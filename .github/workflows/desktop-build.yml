@@ -201,28 +201,28 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 12
+          - target: 13
             soc: Intel
-            os: macos-12
-            xcode: "14.0.1"
+            os: macos-13
+            xcode: "14.3.1"
             type: Release
             make_package: 1
 
-          - target: 14
+          - target: 13
             soc: Apple
             os: macos-14
-            xcode: "15.4"
+            xcode: "14.3.1"
             type: Release
             make_package: 1
 
-          - target: 14
+          - target: 13
             soc: Apple
             os: macos-14
-            xcode: "15.4"
+            xcode: "14.3.1"
             type: Debug
             make_package: 0
 
-    name: macOS ${{matrix.target}} ${{ matrix.type == 'Debug' && 'Debug' || '' }}
+    name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
