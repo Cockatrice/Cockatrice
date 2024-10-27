@@ -19,7 +19,7 @@ include different targets -->
  - <kbd>Debian 11</kbd> ("Bullseye")
  - <kbd>Fedora 40</kbd> 
  - <kbd>Fedora 39</kbd>
-<kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
+<kbd>We are also packaged in Arch Linux's official "extra" repository, courtesy of @FFY00</kbd></i>
 <kbd>General Linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
 
