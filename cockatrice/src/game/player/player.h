@@ -226,6 +226,13 @@ private slots:
 
     void initSayMenu();
 
+public:
+    enum EventProcessingOption
+    {
+        SKIP_REVEAL_WINDOW = 0x0001
+    };
+    Q_DECLARE_FLAGS(EventProcessingOptions, EventProcessingOption)
+
 private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
@@ -479,6 +486,8 @@ public:
 
     void setLastToken(CardInfoPtr cardInfo);
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Player::EventProcessingOptions)
 
 class AnnotationDialog : public QInputDialog
 {
