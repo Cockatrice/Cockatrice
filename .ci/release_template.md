@@ -8,17 +8,17 @@ git push -d origin --REPLACE-WITH-BETA-LIST--
 include different targets -->
 <pre>
 <b>Pre-compiled binaries we serve:</b>
- - <kbd>Windows 7+</kbd>
  - <kbd>Windows 10+</kbd>
- - <kbd>macOS 13+</kbd> ("Ventura") / Intel
+ - <kbd>Windows 7+</kbd>
  - <kbd>macOS 13+</kbd> ("Ventura") / Apple M
- - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
- - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
+ - <kbd>macOS 13+</kbd> ("Ventura") / Intel
  - <kbd>Ubuntu 24.04 LTS</kbd> ("Noble Numbat")
- - <kbd>Debian 11</kbd> ("Bullseye")
+ - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
+ - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
  - <kbd>Debian 12</kbd> ("Bookworm")
+ - <kbd>Debian 11</kbd> ("Bullseye")
+ - <kbd>Fedora 40</kbd> 
  - <kbd>Fedora 39</kbd>
- - <kbd>Fedora 40</kbd>
 <kbd>We are also packaged in Arch Linux's official community repository, courtesy of @FFY00</kbd></i>
 <kbd>General Linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
