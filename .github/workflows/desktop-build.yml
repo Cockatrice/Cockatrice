@@ -37,13 +37,13 @@ jobs:
         shell: bash
         run: |
           tag_regex='^refs/tags/'
-          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then # pull request
+          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then    # pull request
             sha="${{github.event.pull_request.head.sha}}"
-          elif [[ $GITHUB_REF =~ $tag_regex ]]; then # release
+          elif [[ $GITHUB_REF =~ $tag_regex ]]; then    # release
             sha="$GITHUB_SHA"
             tag="${GITHUB_REF/refs\/tags\//}"
             echo "tag=$tag" >>"$GITHUB_OUTPUT"
-          else # push to branch
+          else    # push to branch
             sha="$GITHUB_SHA"
           fi
           echo "sha=$sha" >>"$GITHUB_OUTPUT"
@@ -266,7 +266,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
-          name: macOS${{matrix.target}}_${{matrix.soc}}-dmg
+          name: macOS${{matrix.target}}${{ matrix.soc == 'Intel' && '_Intel' || '' }}-dmg
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
