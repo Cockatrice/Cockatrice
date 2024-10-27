@@ -252,9 +252,15 @@ jobs:
           MAKE_TEST: 1
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
-        # macOS runner have only 3 cores:
-        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
-        run: .ci/compile.sh --server --parallel 3
+        # macOS runner have 3 cores usually - only the macos-13 image has 4:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+        # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+        run: |
+          if [[ ${{ matrix.os }} == macos-13 ]]; then
+            .ci/compile.sh --server --parallel 4
+          else
+            .ci/compile.sh --server --parallel 3
+          fi
 
       - name: Upload artifact
         if: matrix.make_package
