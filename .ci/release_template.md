@@ -12,7 +12,6 @@ include different targets -->
  - <kbd>Windows 10+</kbd>
  - <kbd>macOS 13+</kbd> ("Ventura") / Intel
  - <kbd>macOS 13+</kbd> ("Ventura") / Apple M
- - <kbd>Ubuntu 18.04 LTS</kbd> ("Bionic Beaver")
  - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
  - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
  - <kbd>Ubuntu 24.04 LTS</kbd> ("Noble Numbat")
