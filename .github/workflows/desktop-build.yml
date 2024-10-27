@@ -123,7 +123,7 @@ jobs:
             version: 24.04
             package: DEB
 
-    name: ${{matrix.distro}} ${{matrix.version}}
+    name: ${{matrix.distro}} ${{matrix.version}}${{ (split(matrix.version, '.')[0] | tonumber) % 2 == 0 && split(matrix.version, '.')[1] == '04' && ' LTS' || '' }}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
