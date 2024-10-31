@@ -97,10 +97,10 @@ jobs:
           - distro: Debian12
             package: DEB
 
-          - distro: Fedora39
+          - distro: Fedora40
             package: RPM
 
-          - distro: Fedora40
+          - distro: Fedora41
             package: RPM
 
           - distro: UbuntuBionic
