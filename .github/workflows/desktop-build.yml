@@ -220,7 +220,7 @@ jobs:
             os: macos-14
             xcode: "14.3.1"
             type: Debug
-            make_package: 0
+            make_package: 1
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
