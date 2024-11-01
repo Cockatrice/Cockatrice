@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include <QPair>
 
 class ServerInfo_User;
 class AbstractClient;
@@ -27,12 +28,8 @@ public:
     UserInfoBox(AbstractClient *_client, bool editable, QWidget *parent = nullptr, Qt::WindowFlags flags = {});
     void retranslateUi();
 
-    inline static QPair<int, int> getDaysAndYearsBetween(const QDate &then, const QDate &now)
-    {
-        int years = now.addDays(1 - then.dayOfYear()).year() - then.year(); // there is no yearsTo
-        int days = then.addYears(years).daysTo(now);
-        return {days, years};
-    }
+    static QPair<int, int> getDaysAndYearsBetween(const QDate &then, const QDate &now);
+
 private slots:
     void processResponse(const Response &r);
     void processEditResponse(const Response &r);

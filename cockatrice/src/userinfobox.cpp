@@ -17,6 +17,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPair>
 
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)
@@ -365,4 +366,31 @@ void UserInfoBox::resizeEvent(QResizeEvent *event)
     QPixmap resizedPixmap = avatarPixmap.scaled(avatarPic.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     avatarPic.setPixmap(resizedPixmap);
     QWidget::resizeEvent(event);
+}
+
+QPair<int, int> UserInfoBox::getDaysAndYearsBetween(const QDate &then, const QDate &now)
+{
+    // set dates chronologically
+    int sign = 1;
+    QDate start;
+    QDate end;
+
+    if (then < now) {
+        start = then;
+        end = now;
+    } else {
+        start = now;
+        end = then;
+        sign = -sign; 
+    }
+
+    // calculate years and days
+    int years = 0;
+    while (start.addYears(years + 1) <= end) years++;
+    start = start.addYears(years);
+
+    int days = start.daysTo(end);
+
+    // if then > now, return values will be negative
+    return {sign * days, sign * years};
 }
