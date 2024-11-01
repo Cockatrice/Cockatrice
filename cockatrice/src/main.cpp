@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
+    QCoreApplication::setApplicationDisplayName("Cockatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
 #ifdef Q_OS_MAC
