@@ -1,13 +1,13 @@
 #ifndef CARDINFOTEXT_H
 #define CARDINFOTEXT_H
 
-#include "card_database.h"
+#include "../../../../game/cards/card_database.h"
 
 #include <QFrame>
 class QLabel;
 class QTextEdit;
 
-class CardInfoText : public QFrame
+class CardInfoTextWidget : public QFrame
 {
     Q_OBJECT
 
@@ -17,7 +17,7 @@ private:
     CardInfoPtr info;
 
 public:
-    explicit CardInfoText(QWidget *parent = nullptr);
+    explicit CardInfoTextWidget(QWidget *parent = nullptr);
     void retranslateUi();
     void setInvalidCardName(const QString &cardName);
 

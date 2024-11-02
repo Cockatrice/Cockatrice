@@ -5,7 +5,7 @@
 
 class QMenu;
 class TabSupervisor;
-class CardInfoWidget;
+class CardInfoDisplayWidget;
 
 class Tab : public QMainWindow
 {
@@ -27,7 +27,7 @@ protected slots:
 private:
     QString currentCardName;
     bool contentsChanged;
-    CardInfoWidget *infoPopup;
+    CardInfoDisplayWidget *infoPopup;
     QList<QMenu *> tabMenus;
 
 public:

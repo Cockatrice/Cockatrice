@@ -14,7 +14,7 @@ class CardDatabaseDisplayModel;
 class DeckListModel;
 class QTreeView;
 
-class CardFrame;
+class CardInfoFrameWidget;
 class QTextEdit;
 class QLabel;
 class DeckLoader;
@@ -113,7 +113,7 @@ private:
 
     QTreeView *deckView;
     KeySignals deckViewKeySignals;
-    CardFrame *cardInfo;
+    CardInfoFrameWidget *cardInfo;
     SearchLineEdit *searchEdit;
     KeySignals searchKeySignals;
 

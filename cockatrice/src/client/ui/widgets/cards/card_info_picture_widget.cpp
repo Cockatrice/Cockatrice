@@ -1,18 +1,18 @@
-#include "card_info_picture.h"
+#include "card_info_picture_widget.h"
 
-#include "../../client/ui/picture_loader.h"
-#include "../../main.h"
-#include "card_item.h"
+#include "../../picture_loader.h"
+#include "../../../../main.h"
+#include "../../../../game/cards/card_item.h"
 
 #include <QStylePainter>
 #include <QWidget>
 
-CardInfoPicture::CardInfoPicture(QWidget *parent) : QWidget(parent), info(nullptr), pixmapDirty(true)
+CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent) : QWidget(parent), info(nullptr), pixmapDirty(true)
 {
     setMinimumHeight(100);
 }
 
-void CardInfoPicture::setCard(CardInfoPtr card)
+void CardInfoPictureWidget::setCard(CardInfoPtr card)
 {
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
@@ -27,18 +27,18 @@ void CardInfoPicture::setCard(CardInfoPtr card)
     updatePixmap();
 }
 
-void CardInfoPicture::resizeEvent(QResizeEvent *)
+void CardInfoPictureWidget::resizeEvent(QResizeEvent *)
 {
     updatePixmap();
 }
 
-void CardInfoPicture::updatePixmap()
+void CardInfoPictureWidget::updatePixmap()
 {
     pixmapDirty = true;
     update();
 }
 
-void CardInfoPicture::loadPixmap()
+void CardInfoPictureWidget::loadPixmap()
 {
     if (info)
         PictureLoader::getPixmap(resizedPixmap, info, size());
@@ -46,7 +46,7 @@ void CardInfoPicture::loadPixmap()
         PictureLoader::getCardBackPixmap(resizedPixmap, size());
 }
 
-void CardInfoPicture::paintEvent(QPaintEvent *)
+void CardInfoPictureWidget::paintEvent(QPaintEvent *)
 {
     if (width() == 0 || height() == 0)
         return;
