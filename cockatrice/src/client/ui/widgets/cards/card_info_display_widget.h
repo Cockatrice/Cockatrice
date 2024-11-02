@@ -1,28 +1,28 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include "card_database.h"
+#include "../../../../game/cards/card_database.h"
 
 #include <QComboBox>
 #include <QFrame>
 #include <QStringList>
 
-class CardInfoPicture;
-class CardInfoText;
+class CardInfoPictureWidget;
+class CardInfoTextWidget;
 class AbstractCardItem;
 
-class CardInfoWidget : public QFrame
+class CardInfoDisplayWidget : public QFrame
 {
     Q_OBJECT
 
 private:
     qreal aspectRatio;
     CardInfoPtr info;
-    CardInfoPicture *pic;
-    CardInfoText *text;
+    CardInfoPictureWidget *pic;
+    CardInfoTextWidget *text;
 
 public:
-    explicit CardInfoWidget(const QString &cardName, QWidget *parent = nullptr, Qt::WindowFlags f = {});
+    explicit CardInfoDisplayWidget(const QString &cardName, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
 public slots:
     void setCard(CardInfoPtr card);

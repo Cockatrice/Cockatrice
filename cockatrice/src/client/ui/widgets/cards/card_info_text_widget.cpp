@@ -1,14 +1,13 @@
-#include "card_info_text.h"
+#include "card_info_text_widget.h"
 
-#include "../../game/game_specific_terms.h"
-#include "../../main.h"
-#include "card_item.h"
+#include "../../../../game/game_specific_terms.h"
+#include "../../../../game/cards/card_item.h"
 
 #include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
 
-CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
+CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(nullptr)
 {
     nameLabel = new QLabel;
     nameLabel->setOpenExternalLinks(false);
@@ -27,7 +26,7 @@ CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
     retranslateUi();
 }
 
-void CardInfoText::setCard(CardInfoPtr card)
+void CardInfoTextWidget::setCard(CardInfoPtr card)
 {
     if (card == nullptr) {
         nameLabel->setText("");
@@ -65,13 +64,13 @@ void CardInfoText::setCard(CardInfoPtr card)
     textLabel->setText(card->getText());
 }
 
-void CardInfoText::setInvalidCardName(const QString &cardName)
+void CardInfoTextWidget::setInvalidCardName(const QString &cardName)
 {
     nameLabel->setText(tr("Unknown card:") + " " + cardName);
     textLabel->setText("");
 }
 
-void CardInfoText::retranslateUi()
+void CardInfoTextWidget::retranslateUi()
 {
     /*
      * There's no way we can really translate the text currently being rendered.

@@ -16,7 +16,7 @@ class CardDatabase;
 class GameView;
 class DeckView;
 class GameScene;
-class CardFrame;
+class CardInfoFrameWidget;
 class MessageLogWidget;
 class QTimer;
 class QSplitter;
@@ -149,7 +149,7 @@ private:
     QToolButton *replayPlayButton, *replayFastForwardButton;
     QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
-    CardFrame *cardInfo;
+    CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;

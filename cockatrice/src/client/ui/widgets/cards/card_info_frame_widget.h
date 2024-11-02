@@ -1,23 +1,23 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include "card_database.h"
+#include "../../../../game/cards/card_database.h"
 
 #include <QTabWidget>
 
 class AbstractCardItem;
-class CardInfoPicture;
-class CardInfoText;
+class CardInfoPictureWidget;
+class CardInfoTextWidget;
 class QVBoxLayout;
 class QSplitter;
 
-class CardFrame : public QTabWidget
+class CardInfoFrameWidget : public QTabWidget
 {
     Q_OBJECT
 private:
     CardInfoPtr info;
-    CardInfoPicture *pic;
-    CardInfoText *text;
+    CardInfoPictureWidget *pic;
+    CardInfoTextWidget *text;
     bool cardTextOnly;
     QWidget *tab1, *tab2, *tab3;
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
@@ -30,7 +30,7 @@ public:
         TextOnlyView,
         ImageAndTextView
     };
-    explicit CardFrame(const QString &cardName = QString(), QWidget *parent = nullptr);
+    explicit CardInfoFrameWidget(const QString &cardName = QString(), QWidget *parent = nullptr);
     void retranslateUi();
 
 public slots:

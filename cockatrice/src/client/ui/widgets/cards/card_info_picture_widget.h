@@ -1,13 +1,13 @@
 #ifndef CARDINFOPICTURE_H
 #define CARDINFOPICTURE_H
 
-#include "card_database.h"
+#include "../../../../game/cards/card_database.h"
 
 #include <QWidget>
 
 class AbstractCardItem;
 
-class CardInfoPicture : public QWidget
+class CardInfoPictureWidget : public QWidget
 {
     Q_OBJECT
 
@@ -17,7 +17,7 @@ private:
     bool pixmapDirty;
 
 public:
-    CardInfoPicture(QWidget *parent = nullptr);
+    CardInfoPictureWidget(QWidget *parent = nullptr);
 
 protected:
     void resizeEvent(QResizeEvent *event);

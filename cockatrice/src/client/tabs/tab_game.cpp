@@ -7,8 +7,8 @@
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/cards/card_database.h"
+#include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../game/cards/card_database_manager.h"
-#include "../../game/cards/card_frame.h"
 #include "../../game/cards/card_item.h"
 #include "../../game/game_scene.h"
 #include "../../game/game_view.h"
@@ -597,7 +597,7 @@ void TabGame::retranslateUi()
 
     aResetLayout->setText(tr("Reset layout"));
 
-    cardInfo->retranslateUi();
+    cardInfoFrameWidget->retranslateUi();
 
     QMapIterator<int, Player *> i(players);
     while (i.hasNext())
@@ -1380,7 +1380,7 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event,
 
 void TabGame::newCardAdded(AbstractCardItem *card)
 {
-    connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfo, SLOT(setCard(AbstractCardItem *)));
+    connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfoFrameWidget, SLOT(setCard(AbstractCardItem *)));
     connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(card, SIGNAL(cardShiftClicked(QString)), this, SLOT(linkCardToChat(QString)));
@@ -1809,18 +1809,18 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
 
 void TabGame::viewCardInfo(const QString &cardName)
 {
-    cardInfo->setCard(cardName);
+    cardInfoFrameWidget->setCard(cardName);
 }
 
 void TabGame::createCardInfoDock(bool bReplay)
 {
     Q_UNUSED(bReplay);
 
-    cardInfo = new CardFrame();
+    cardInfoFrameWidget = new CardInfoFrameWidget();
     cardHInfoLayout = new QHBoxLayout;
     cardVInfoLayout = new QVBoxLayout;
     cardVInfoLayout->setContentsMargins(0, 0, 0, 0);
-    cardVInfoLayout->addWidget(cardInfo);
+    cardVInfoLayout->addWidget(cardInfoFrameWidget);
     cardVInfoLayout->addLayout(cardHInfoLayout);
 
     cardBoxLayoutWidget = new QWidget;
@@ -1862,7 +1862,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 void TabGame::createMessageDock(bool bReplay)
 {
     messageLog = new MessageLogWidget(tabSupervisor, tabSupervisor, this);
-    connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
+    connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfoFrameWidget, SLOT(setCard(QString)));
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 

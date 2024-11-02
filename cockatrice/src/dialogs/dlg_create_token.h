@@ -15,7 +15,7 @@ class QTreeView;
 class DeckList;
 class CardDatabaseModel;
 class TokenDisplayModel;
-class CardInfoPicture;
+class CardInfoPictureWidget;
 
 class DlgCreateToken : public QDialog
 {
@@ -47,7 +47,7 @@ private:
     QLineEdit *nameEdit, *ptEdit, *annotationEdit;
     QCheckBox *destroyCheckBox;
     QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
-    CardInfoPicture *pic;
+    CardInfoPictureWidget *pic;
     QTreeView *chooseTokenView;
 
     void updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const;

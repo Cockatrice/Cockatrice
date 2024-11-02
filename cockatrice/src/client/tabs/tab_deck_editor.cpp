@@ -7,7 +7,7 @@
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
-#include "../../game/cards/card_frame.h"
+#include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../game/filters/filter_builder.h"
 #include "../../game/filters/filter_tree_model.h"
 #include "../../main.h"
@@ -187,7 +187,7 @@ void TabDeckEditor::createDeckDock()
 
 void TabDeckEditor::createCardInfoDock()
 {
-    cardInfo = new CardFrame();
+    cardInfo = new CardInfoFrameWidget();
     cardInfo->setObjectName("cardInfo");
     auto *cardInfoFrame = new QVBoxLayout;
     cardInfoFrame->setObjectName("cardInfoFrame");

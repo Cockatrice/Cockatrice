@@ -1,23 +1,23 @@
-#include "card_info_widget.h"
+#include "card_info_display_widget.h"
 
-#include "../../main.h"
+#include "../../../../main.h"
 #include "card_database_manager.h"
-#include "card_info_picture.h"
-#include "card_info_text.h"
-#include "card_item.h"
+#include "card_info_picture_widget.h"
+#include "card_info_text_widget.h"
+#include "../../../../game/cards/card_item.h"
 
 #include <QApplication>
 #include <QScreen>
 #include <QVBoxLayout>
 #include <utility>
 
-CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
+CardInfoDisplayWidget::CardInfoDisplayWidget(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
     : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH), info(nullptr)
 {
     setContentsMargins(3, 3, 3, 3);
-    pic = new CardInfoPicture();
+    pic = new CardInfoPictureWidget();
     pic->setObjectName("pic");
-    text = new CardInfoText();
+    text = new CardInfoTextWidget();
     text->setObjectName("text");
     connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
@@ -43,7 +43,7 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     resize(width(), sizeHint().height());
 }
 
-void CardInfoWidget::setCard(CardInfoPtr card)
+void CardInfoDisplayWidget::setCard(CardInfoPtr card)
 {
     if (info)
         disconnect(info.data(), nullptr, this, nullptr);
@@ -55,7 +55,7 @@ void CardInfoWidget::setCard(CardInfoPtr card)
     pic->setCard(info);
 }
 
-void CardInfoWidget::setCard(const QString &cardName)
+void CardInfoDisplayWidget::setCard(const QString &cardName)
 {
     setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
     if (info == nullptr) {
@@ -63,12 +63,12 @@ void CardInfoWidget::setCard(const QString &cardName)
     }
 }
 
-void CardInfoWidget::setCard(AbstractCardItem *card)
+void CardInfoDisplayWidget::setCard(AbstractCardItem *card)
 {
     setCard(card->getInfo());
 }
 
-void CardInfoWidget::clear()
+void CardInfoDisplayWidget::clear()
 {
     setCard((CardInfoPtr) nullptr);
 }
