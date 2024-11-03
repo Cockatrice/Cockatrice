@@ -118,8 +118,8 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
 /// The timeout scales based on the current event number, up to a limit
 int ReplayTimelineWidget::calcRewindBufferingTimeout() const
 {
-    int extraTime = std::min(currentEvent / 100, 100);
-    return BASE_REWIND_BUFFERING_TIMEOUT_MS + extraTime;
+    int extraTime = currentEvent / 100;
+    return std::min(BASE_REWIND_BUFFERING_TIMEOUT_MS + extraTime, MAX_REWIND_BUFFERING_TIMEOUT_MS);
 }
 
 void ReplayTimelineWidget::processRewind()
