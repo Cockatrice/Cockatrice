@@ -93,7 +93,7 @@ void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindBuffering)
     if (isBackwardsSkip) {
         handleBackwardsSkip(doRewindBuffering);
     } else {
-        processNewEvents();
+        processNewEvents(FORWARD_SKIP);
     }
 
     update();
@@ -130,7 +130,7 @@ void ReplayTimelineWidget::processRewind()
     // process the rewind
     currentEvent = 0;
     emit rewound();
-    processNewEvents();
+    processNewEvents(BACKWARD_SKIP);
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
@@ -147,17 +147,24 @@ void ReplayTimelineWidget::replayTimerTimeout()
 {
     currentTime += 200;
 
-    processNewEvents();
+    processNewEvents(NORMAL_PLAYBACK);
 
     if (!(currentTime % 1000))
         update();
 }
 
 /// Processes all unprocessed events up to the current time.
-void ReplayTimelineWidget::processNewEvents()
+void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 {
     while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
-        emit processNextEvent({});
+        Player::EventProcessingOptions options;
+
+        // backwards skip => always skip reveal windows
+        // forwards skip => skip reveal windows that don't happen within 10 seconds of the target
+        if (playbackMode == BACKWARD_SKIP || currentTime - replayTimeline[currentEvent] > 10000)
+            options |= Player::EventProcessingOption::SKIP_REVEAL_WINDOW;
+
+        emit processNextEvent(options);
         ++currentEvent;
     }
     if (currentEvent == replayTimeline.size()) {

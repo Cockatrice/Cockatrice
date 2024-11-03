@@ -19,6 +19,13 @@ signals:
     void rewound();
 
 private:
+    enum PlaybackMode
+    {
+        NORMAL_PLAYBACK,
+        FORWARD_SKIP,
+        BACKWARD_SKIP
+    };
+
     QTimer *replayTimer;
     static constexpr int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
     static constexpr int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
@@ -35,7 +42,7 @@ private:
     void handleBackwardsSkip(bool doRewindBuffering);
     int calcRewindBufferingTimeout() const;
     void processRewind();
-    void processNewEvents();
+    void processNewEvents(PlaybackMode playbackMode);
 private slots:
     void replayTimerTimeout();
 
