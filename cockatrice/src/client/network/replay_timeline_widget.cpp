@@ -157,7 +157,7 @@ void ReplayTimelineWidget::replayTimerTimeout()
 void ReplayTimelineWidget::processNewEvents()
 {
     while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
-        emit processNextEvent();
+        emit processNextEvent({});
         ++currentEvent;
     }
     if (currentEvent == replayTimeline.size()) {

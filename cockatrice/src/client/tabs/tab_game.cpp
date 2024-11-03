@@ -614,9 +614,9 @@ void TabGame::closeRequest()
     actLeaveGame();
 }
 
-void TabGame::replayNextEvent()
+void TabGame::replayNextEvent(Player::EventProcessingOptions options)
 {
-    processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()), nullptr);
+    processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()), nullptr, options);
 }
 
 void TabGame::replayFinished()
@@ -862,7 +862,9 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     return newPlayer;
 }
 
-void TabGame::processGameEventContainer(const GameEventContainer &cont, AbstractClient *client)
+void TabGame::processGameEventContainer(const GameEventContainer &cont,
+                                        AbstractClient *client,
+                                        Player::EventProcessingOptions options)
 {
     const GameEventContext &context = cont.context();
     messageLog->containerProcessingStarted(context);
@@ -937,7 +939,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                         qDebug() << "unhandled game event: invalid player id";
                         break;
                     }
-                    player->processGameEvent(eventType, event, context);
+                    player->processGameEvent(eventType, event, context, options);
                     emitUserEvent();
                 }
             }
@@ -1731,7 +1733,8 @@ void TabGame::createReplayDock()
     // timeline widget
     timelineWidget = new ReplayTimelineWidget;
     timelineWidget->setTimeline(replayTimeline);
-    connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
+    connect(timelineWidget, SIGNAL(processNextEvent(Player::EventProcessingOptions)), this,
+            SLOT(replayNextEvent(Player::EventProcessingOptions)));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
     connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &TabGame::replayRewind);
 

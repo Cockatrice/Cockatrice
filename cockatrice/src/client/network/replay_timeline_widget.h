@@ -1,6 +1,8 @@
 #ifndef REPLAY_TIMELINE_WIDGET
 #define REPLAY_TIMELINE_WIDGET
 
+#include "../../game/player/player.h"
+
 #include <QList>
 #include <QMouseEvent>
 #include <QWidget>
@@ -12,7 +14,7 @@ class ReplayTimelineWidget : public QWidget
 {
     Q_OBJECT
 signals:
-    void processNextEvent();
+    void processNextEvent(Player::EventProcessingOptions options);
     void replayFinished();
     void rewound();
 

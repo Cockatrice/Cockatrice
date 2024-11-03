@@ -2,6 +2,7 @@
 #define TAB_GAME_H
 
 #include "../../client/tearoff_menu.h"
+#include "../../game/player/player.h"
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
@@ -47,7 +48,6 @@ class Event_Ping;
 class Event_GameSay;
 class Event_Kicked;
 class Event_ReverseTurn;
-class Player;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
@@ -221,7 +221,7 @@ signals:
     void openDeckEditor(const DeckLoader *deck);
     void notIdle();
 private slots:
-    void replayNextEvent();
+    void replayNextEvent(Player::EventProcessingOptions options);
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
     void replayFastForwardButtonToggled(bool checked);
@@ -307,7 +307,9 @@ public:
         return activeCard;
     }
 
-    void processGameEventContainer(const GameEventContainer &cont, AbstractClient *client);
+    void processGameEventContainer(const GameEventContainer &cont,
+                                   AbstractClient *client,
+                                   Player::EventProcessingOptions options);
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
 public slots:
