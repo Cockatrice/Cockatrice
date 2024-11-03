@@ -18,8 +18,8 @@ signals:
 
 private:
     QTimer *replayTimer;
-    static const int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
-    static const int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
+    static constexpr int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
+    static constexpr int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
     QTimer *rewindBufferingTimer;
     QList<int> replayTimeline;
     QList<int> histogram;
