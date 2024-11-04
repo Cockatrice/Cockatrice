@@ -5,6 +5,7 @@
 #include "../../settings/cache_settings.h"
 #include "../game_scene.h"
 #include "card_database.h"
+#include "card_database_manager.h"
 
 #include <QCursor>
 #include <QGraphicsScene>
@@ -49,7 +50,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::cardInfoUpdated()
 {
-    info = db->getCard(name);
+    info = CardDatabaseManager::getInstance()->getCard(name);
 
     if (!info && !name.isEmpty()) {
         QVariantHash properties = QVariantHash();

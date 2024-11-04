@@ -5,6 +5,7 @@
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
 #include "../../game/cards/card_frame.h"
 #include "../../game/filters/filter_builder.h"
@@ -406,7 +407,7 @@ void TabDeckEditor::createCentralFrame()
     connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));
     connect(help, &QAction::triggered, this, &TabDeckEditor::showSearchSyntaxHelp);
 
-    databaseModel = new CardDatabaseModel(db, true, this);
+    databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
     databaseModel->setObjectName("databaseModel");
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
     databaseDisplayModel->setSourceModel(databaseModel);
@@ -975,7 +976,7 @@ CardInfoPtr TabDeckEditor::currentCardInfo() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
-    return db->getCard(cardName);
+    return CardDatabaseManager::getInstance()->getCard(cardName);
 }
 
 void TabDeckEditor::addCardHelper(QString zoneName)
@@ -1112,7 +1113,8 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     deckView->expandAll();
     setModified(false);
 
-    PictureLoader::cacheCardPixmaps(db->getCards(deckModel->getDeckList()->getCardList()));
+    PictureLoader::cacheCardPixmaps(
+        CardDatabaseManager::getInstance()->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
 

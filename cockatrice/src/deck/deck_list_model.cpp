@@ -1,6 +1,7 @@
 #include "deck_list_model.h"
 
 #include "../game/cards/card_database.h"
+#include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "deck_loader.h"
@@ -49,7 +50,7 @@ void DeckListModel::rebuildTree()
                 continue;
             }
 
-            CardInfoPtr info = db->getCard(currentCard->getName());
+            CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
             QString cardType = info ? info->getMainCardType() : "unknown";
 
             auto *cardTypeNode = dynamic_cast<InnerDecklistNode *>(node->findChild(cardType));
@@ -289,7 +290,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName, cons
         return nullptr;
     }
 
-    info = db->getCard(cardName);
+    info = CardDatabaseManager::getInstance()->getCard(cardName);
     if (!info) {
         return nullptr;
     }
@@ -317,7 +318,7 @@ QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zone
 
 QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    CardInfoPtr info = db->getCard(cardName);
+    CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(cardName);
     if (info == nullptr) {
         if (abAddAnyway) {
             // We need to keep this card added no matter what

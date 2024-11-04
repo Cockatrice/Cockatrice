@@ -2,6 +2,7 @@
 
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
+#include "card_database_manager.h"
 #include "card_info_picture.h"
 #include "card_info_text.h"
 #include "card_item.h"
@@ -57,7 +58,7 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
 
     setViewMode(SettingsCache::instance().getCardInfoViewMode());
 
-    setCard(db->getCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->getCard(cardName));
 }
 
 void CardFrame::retranslateUi()
@@ -107,7 +108,7 @@ void CardFrame::setCard(CardInfoPtr card)
 
 void CardFrame::setCard(const QString &cardName)
 {
-    setCard(db->guessCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
 }
 
 void CardFrame::setCard(AbstractCardItem *card)

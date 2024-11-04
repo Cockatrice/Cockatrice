@@ -1,5 +1,6 @@
 #include "dlg_create_token.h"
 
+#include "../game/cards/card_database_manager.h"
 #include "../game/cards/card_database_model.h"
 #include "../game/cards/card_info_picture.h"
 #include "../main.h"
@@ -72,7 +73,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
 
-    cardDatabaseModel = new CardDatabaseModel(db, false, this);
+    cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
 

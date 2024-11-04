@@ -47,7 +47,6 @@
 #include <QTranslator>
 #include <QtPlugin>
 
-CardDatabase *db;
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
@@ -151,7 +150,6 @@ int main(int argc, char *argv[])
     rng = new RNG_SFMT;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
-    db = new CardDatabase;
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;
@@ -188,7 +186,6 @@ int main(int argc, char *argv[])
     app.exec();
 
     qDebug("Event loop finished, terminating...");
-    delete db;
     delete rng;
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();

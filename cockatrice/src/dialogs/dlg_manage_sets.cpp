@@ -3,6 +3,7 @@
 #include "../client/network/sets_model.h"
 #include "../client/ui/picture_loader.h"
 #include "../deck/custom_line_edit.h"
+#include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 
@@ -79,7 +80,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     filterBox->addWidget(defaultSortButton);
 
     // view
-    model = new SetsModel(db, this);
+    model = new SetsModel(CardDatabaseManager::getInstance(), this);
     displayModel = new SetsDisplayModel(this);
     displayModel->setSourceModel(model);
     displayModel->setDynamicSortFilter(false);
@@ -239,14 +240,14 @@ void WndSets::rebuildMainLayout(int actionToTake)
 
 void WndSets::actSave()
 {
-    model->save(db);
+    model->save(CardDatabaseManager::getInstance());
     PictureLoader::clearPixmapCache();
     close();
 }
 
 void WndSets::actRestore()
 {
-    model->restore(db);
+    model->restore(CardDatabaseManager::getInstance());
     close();
 }
 

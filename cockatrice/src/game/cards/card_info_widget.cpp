@@ -1,6 +1,7 @@
 #include "card_info_widget.h"
 
 #include "../../main.h"
+#include "card_database_manager.h"
 #include "card_info_picture.h"
 #include "card_info_text.h"
 #include "card_item.h"
@@ -56,7 +57,7 @@ void CardInfoWidget::setCard(CardInfoPtr card)
 
 void CardInfoWidget::setCard(const QString &cardName)
 {
-    setCard(db->guessCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
     if (info == nullptr) {
         text->setInvalidCardName(cardName);
     }
