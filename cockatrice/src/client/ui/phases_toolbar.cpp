@@ -93,7 +93,13 @@ void PhaseButton::reset()
 {
     activeAnimationTimer->stop();
     active = false;
-    activeAnimationCounter = highlightable ? 0 : 9;
+
+    if (highlightable) {
+        activeAnimationCounter = 0;
+    } else {
+        activeAnimationCounter = 9;
+    }
+
     update();
 }
 
