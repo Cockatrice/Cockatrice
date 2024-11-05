@@ -433,6 +433,9 @@ public:
     CardInfoPerSet getPreferredSetForCard(const QString &cardName);
     QString getPreferredPrintingUUIDForCard(const QString &cardName);
     CardInfoPtr guessCard(const QString &cardName) const;
+    CardInfoPerSet getPreferredSetForCard(const QString &cardName);
+    QString getPreferredPrintingUUIDForCard(const QString &cardName);
+
 
     /*
      * Get a card by its simple name. The name will be simplified in this
