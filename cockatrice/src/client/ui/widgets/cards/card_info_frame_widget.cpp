@@ -3,7 +3,7 @@
 #include "../../../../game/cards/card_item.h"
 #include "../../../../main.h"
 #include "../../../../settings/cache_settings.h"
-#include "card_database_manager.h"
+#include "../../../../game/cards/card_database_manager.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 
