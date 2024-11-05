@@ -74,13 +74,32 @@ void PhaseButton::updateAnimation()
     if (!highlightable)
         return;
 
-    if (active) {
-        if (++activeAnimationCounter >= 10)
-            activeAnimationTimer->stop();
+    // the counter ticks up to 10 when active and down to 0 when inactive
+    if (active && activeAnimationCounter < 10) {
+        ++activeAnimationCounter;
+    } else if (!active && activeAnimationCounter > 0) {
+        --activeAnimationCounter;
     } else {
-        if (--activeAnimationCounter <= 0)
-            activeAnimationTimer->stop();
+        activeAnimationTimer->stop();
     }
+
+    update();
+}
+
+/**
+ * @brief Immediately resets the button to the inactive state, without going through the animation.
+ */
+void PhaseButton::reset()
+{
+    activeAnimationTimer->stop();
+    active = false;
+
+    if (highlightable) {
+        activeAnimationCounter = 0;
+    } else {
+        activeAnimationCounter = 9;
+    }
+
     update();
 }
 
@@ -247,6 +266,16 @@ void PhasesToolbar::phaseButtonClicked()
     cmd.set_phase(static_cast<google::protobuf::uint32>(buttonList.indexOf(button)));
 
     emit sendGameCommand(cmd, -1);
+}
+
+/**
+ * @brief Immediately resets the toolbar to its initial state, with all phases inactive.
+ */
+void PhasesToolbar::reset()
+{
+    for (auto &i : buttonList) {
+        i->reset();
+    }
 }
 
 void PhasesToolbar::actNextTurn()
