@@ -138,17 +138,21 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 QString UserInfoBox::getAgeString(int ageSeconds)
 {
     QString accountAgeString = tr("Unknown");
-    if (ageSeconds == 0)
+    if (ageSeconds <= 0)
         return accountAgeString;
 
-    auto date = QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch() - ageSeconds).date();
+    // secsSinceEpoch is in utc
+    auto secsSinceEpoch = QDateTime::currentSecsSinceEpoch() - ageSeconds;
+    // the date is in local time, fromSecsSinceEpoch expects a timestamp from utc and converts it to local time
+    auto date = QDateTime::fromSecsSinceEpoch(secsSinceEpoch).date();
     if (!date.isValid())
         return accountAgeString;
 
-    QString dateString = QLocale().toString(date, QLocale::ShortFormat);
+    // now can be local time as the date is also local time
     auto now = QDate::currentDate();
     auto daysAndYears = getDaysAndYearsBetween(date, now);
 
+    QString dateString = QLocale().toString(date, QLocale::ShortFormat);
     QString yearString;
     if (daysAndYears.second > 0) {
         yearString = tr("%n Year(s), ", "amount of years (only shown if more than 0)", daysAndYears.second);
