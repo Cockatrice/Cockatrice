@@ -1,6 +1,7 @@
 #include "spoiler_background_updater.h"
 
 #include "../../game/cards/card_database.h"
+#include "../../game/cards/card_database_manager.h"
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
 #include "../ui/window_main.h"
@@ -159,7 +160,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     // Data written, so reload the card database
     qDebug() << "Spoiler Service Data Written";
-    const auto reloadOk = QtConcurrent::run([] { db->loadCardDatabases(); });
+    const auto reloadOk = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 
     // If the user has notifications enabled, let them know
     // when the database was last updated

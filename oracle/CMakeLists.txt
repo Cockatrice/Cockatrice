@@ -17,6 +17,7 @@ set(oracle_SOURCES
     src/pagetemplates.cpp
     src/qt-json/json.cpp
     ../cockatrice/src/game/cards/card_database.cpp
+    ../cockatrice/src/game/cards/card_database_manager.cpp
     ../cockatrice/src/client/ui/picture_loader.cpp
     ../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp

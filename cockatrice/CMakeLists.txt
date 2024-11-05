@@ -13,6 +13,7 @@ set(cockatrice_SOURCES
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
     src/game/cards/card_database.cpp
+    src/game/cards/card_database_manager.cpp
     src/game/cards/card_database_model.cpp
     src/game/cards/card_database_parser/card_database_parser.cpp
     src/game/cards/card_database_parser/cockatrice_xml_3.cpp

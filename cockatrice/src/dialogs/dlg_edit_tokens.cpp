@@ -2,6 +2,7 @@
 
 #include "../client/get_text_with_max.h"
 #include "../game/cards/card_database.h"
+#include "../game/cards/card_database_manager.h"
 #include "../game/cards/card_database_model.h"
 #include "../main.h"
 #include "trice_limits.h"
@@ -66,7 +67,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
 
-    databaseModel = new CardDatabaseModel(db, false, this);
+    databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     databaseModel->setObjectName("databaseModel");
     cardDatabaseDisplayModel = new TokenEditModel(this);
     cardDatabaseDisplayModel->setSourceModel(databaseModel);

@@ -7,6 +7,7 @@
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/cards/card_database.h"
+#include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_frame.h"
 #include "../../game/cards/card_item.h"
 #include "../../game/game_scene.h"
@@ -325,7 +326,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    PictureLoader::cacheCardPixmaps(db->getCards(newDeck.getCardList()));
+    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
 }
 
@@ -1109,7 +1110,8 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                    PictureLoader::cacheCardPixmaps(db->getCards(newDeck.getCardList()));
+                    PictureLoader::cacheCardPixmaps(
+                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
                     deckViewContainer->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }

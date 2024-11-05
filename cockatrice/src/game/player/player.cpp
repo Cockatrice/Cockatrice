@@ -11,6 +11,7 @@
 #include "../board/arrow_item.h"
 #include "../board/counter_general.h"
 #include "../cards/card_database.h"
+#include "../cards/card_database_manager.h"
 #include "../cards/card_item.h"
 #include "../cards/card_list.h"
 #include "../game_scene.h"
@@ -1642,7 +1643,7 @@ void Player::actCreateToken()
 
     lastTokenName = dlg.getName();
     lastTokenPT = dlg.getPT();
-    CardInfoPtr correctedCard = db->guessCard(lastTokenName);
+    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard(lastTokenName);
     if (correctedCard) {
         lastTokenName = correctedCard->getName();
         lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard->getTableRow());
@@ -1680,7 +1681,7 @@ void Player::actCreateAnotherToken()
 void Player::actCreatePredefinedToken()
 {
     auto *action = static_cast<QAction *>(sender());
-    CardInfoPtr cardInfo = db->getCard(action->text());
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(action->text());
     if (!cardInfo) {
         return;
     }
@@ -1706,7 +1707,7 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = db->getCard(cardRelation->getName());
+        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -1786,7 +1787,7 @@ void Player::actCreateAllRelatedCards()
      * then assign the first to the "Create another" shortcut.
      */
     if (cardRelation != nullptr && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = db->getCard(cardRelation->getName());
+        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -1825,7 +1826,7 @@ void Player::createCard(const CardItem *sourceCard,
                         CardRelation::AttachType attachType,
                         bool persistent)
 {
-    CardInfoPtr cardInfo = db->getCard(dbCardName);
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr) {
         return;
@@ -3632,7 +3633,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
         if (relatedCard != nullptr) {
             atLeastOneGoodRelationFound = true;
             break;
@@ -3672,7 +3673,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
         if (relatedCard == nullptr)
             continue;
 
