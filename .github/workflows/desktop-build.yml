@@ -206,21 +206,23 @@ jobs:
             os: macos-13
             xcode: "14.3.1"
             type: Release
+            core_count: 4
             make_package: 1
 
-          - target: 13
+          - target: 14
             soc: Apple
             os: macos-14
             xcode: "14.3.1"
             type: Release
+            core_count: 3
             make_package: 1
 
-          - target: 13
+          - target: 14
             soc: Apple
             os: macos-14
             xcode: "14.3.1"
             type: Debug
-            make_package: 1
+            core_count: 3
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -255,12 +257,7 @@ jobs:
         # macOS runner have 3 cores usually - only the macos-13 image has 4:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
         # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-        run: |
-          if [[ ${{ matrix.os }} == macos-13 ]]; then
-            .ci/compile.sh --server --parallel 4
-          else
-            .ci/compile.sh --server --parallel 3
-          fi
+        run: .ci/compile.sh --server --parallel ${{matrix.core_count}}
 
       - name: Upload artifact
         if: matrix.make_package
