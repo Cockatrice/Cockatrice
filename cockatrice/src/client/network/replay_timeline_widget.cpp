@@ -10,6 +10,10 @@ ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
 {
     replayTimer = new QTimer(this);
     connect(replayTimer, SIGNAL(timeout()), this, SLOT(replayTimerTimeout()));
+
+    rewindBufferingTimer = new QTimer(this);
+    rewindBufferingTimer->setSingleShot(true);
+    connect(rewindBufferingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
 }
 
 const int ReplayTimelineWidget::binLength = 5000;
@@ -67,10 +71,11 @@ void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 #else
     int newTime = static_cast<int>((qint64)maxTime * (qint64)event->x() / width());
 #endif
-    skipToTime(newTime);
+    // don't buffer rewinds from clicks, since clicks usually don't happen fast enough to require buffering
+    skipToTime(newTime, false);
 }
 
-void ReplayTimelineWidget::skipToTime(int newTime)
+void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindBuffering)
 {
     // check boundary conditions
     if (newTime < 0) {
@@ -81,14 +86,51 @@ void ReplayTimelineWidget::skipToTime(int newTime)
     }
 
     newTime -= newTime % 200; // Time should always be a multiple of 200
-    if (newTime < currentTime) {
-        currentTime = 0;
-        currentEvent = 0;
-        emit rewound();
+
+    const bool isBackwardsSkip = newTime < currentTime;
+    currentTime = newTime;
+
+    if (isBackwardsSkip) {
+        handleBackwardsSkip(doRewindBuffering);
+    } else {
+        processNewEvents();
     }
-    currentTime = newTime - 200; // 200 is added back in replayTimerTimeout
-    replayTimerTimeout();
+
     update();
+}
+
+/// @param doRewindBuffering When true, if multiple backward skips are made in quick succession, only a single rewind
+/// is processed at the end. When false, the backwards skip will always cause an immediate rewind
+void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
+{
+    if (doRewindBuffering) {
+        // We use a one-shot timer to implement the rewind buffering.
+        // The rewind only happens once the timer runs out.
+        // If another backwards skip happens, the timer will just get reset instead of rewinding.
+        rewindBufferingTimer->stop();
+        rewindBufferingTimer->start(calcRewindBufferingTimeout());
+    } else {
+        // otherwise, process the rewind immediately
+        processRewind();
+    }
+}
+
+/// The timeout scales based on the current event number, up to a limit
+int ReplayTimelineWidget::calcRewindBufferingTimeout() const
+{
+    int extraTime = currentEvent / 100;
+    return std::min(BASE_REWIND_BUFFERING_TIMEOUT_MS + extraTime, MAX_REWIND_BUFFERING_TIMEOUT_MS);
+}
+
+void ReplayTimelineWidget::processRewind()
+{
+    // stop any queued-up rewinds
+    rewindBufferingTimer->stop();
+
+    // process the rewind
+    currentEvent = 0;
+    emit rewound();
+    processNewEvents();
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
@@ -104,6 +146,16 @@ QSize ReplayTimelineWidget::minimumSizeHint() const
 void ReplayTimelineWidget::replayTimerTimeout()
 {
     currentTime += 200;
+
+    processNewEvents();
+
+    if (!(currentTime % 1000))
+        update();
+}
+
+/// Processes all unprocessed events up to the current time.
+void ReplayTimelineWidget::processNewEvents()
+{
     while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
         emit processNextEvent();
         ++currentEvent;
@@ -112,9 +164,6 @@ void ReplayTimelineWidget::replayTimerTimeout()
         emit replayFinished();
         replayTimer->stop();
     }
-
-    if (!(currentTime % 1000))
-        update();
 }
 
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
@@ -135,5 +184,5 @@ void ReplayTimelineWidget::stopReplay()
 
 void ReplayTimelineWidget::skipByAmount(int amount)
 {
-    skipToTime(currentTime + amount);
+    skipToTime(currentTime + amount, true);
 }

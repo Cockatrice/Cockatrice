@@ -18,6 +18,9 @@ signals:
 
 private:
     QTimer *replayTimer;
+    static constexpr int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
+    static constexpr int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
+    QTimer *rewindBufferingTimer;
     QList<int> replayTimeline;
     QList<int> histogram;
     static const int binLength;
@@ -26,7 +29,11 @@ private:
     int currentTime;
     int currentEvent;
 
-    void skipToTime(int newTime);
+    void skipToTime(int newTime, bool doRewindBuffering);
+    void handleBackwardsSkip(bool doRewindBuffering);
+    int calcRewindBufferingTimeout() const;
+    void processRewind();
+    void processNewEvents();
 private slots:
     void replayTimerTimeout();
 
