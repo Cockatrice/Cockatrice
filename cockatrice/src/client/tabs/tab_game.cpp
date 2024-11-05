@@ -327,6 +327,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
+    // TODO CHANGE THIS TO BE SELECTED BY UUID
     PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
 }
