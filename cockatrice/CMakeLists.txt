@@ -72,9 +72,8 @@ set(cockatrice_SOURCES
     src/server/local_server.cpp
     src/server/local_server_interface.cpp
     src/utility/logger.cpp
-        src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
-        src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
-    src/client/ui/widgets/general/display/labeled_input.cpp
+    src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
+    src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
     src/main.cpp
     src/server/message_log_widget.cpp
     src/server/pending_command.cpp

@@ -205,7 +205,6 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
  */
 void CardInfoPictureWidget::showEnlargedPixmap()
 {
-    qDebug() << "lol";
     if (info) {
         QSize enlargedSize(size().width() * scaleFactor, static_cast<int>(size().width() * aspectRatio * scaleFactor));
         qDebug() << enlargedSize;
