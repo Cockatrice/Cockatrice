@@ -444,7 +444,7 @@ QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 CardInfoPtr CardDatabase::getCardByNameAndUUID(const QString &cardName, const QString &uuid) const
 {
     auto info = getCard(cardName);
-    for (const auto& set : info->getSets()) {
+    for (const auto &set : info->getSets()) {
         if (set.getProperty("uuid") == uuid) {
             CardInfoPtr cardFromSpecificSet = info->clone();
             cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(set.getProperty("uuid")));

@@ -178,7 +178,8 @@ void PictureLoaderWorker::processLoadQueue()
         qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
                            << "]: Trying to load picture";
 
-        if (CardDatabaseManager::getInstance()->isUuidForPreferredPrinting(cardName, cardBeingLoaded.getCard()->getPixmapCacheKey())) {
+        if (CardDatabaseManager::getInstance()->isUuidForPreferredPrinting(
+                cardName, cardBeingLoaded.getCard()->getPixmapCacheKey())) {
             if (cardImageExistsOnDisk(setName, correctedCardName)) {
                 continue;
             }
