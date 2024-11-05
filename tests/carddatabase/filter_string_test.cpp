@@ -4,8 +4,6 @@
 
 #include "gtest/gtest.h"
 
-CardDatabase *db;
-
 #define QUERY(name, card, query, match)                                                                                \
     TEST_F(CardQuery, name)                                                                                            \
     {                                                                                                                  \
@@ -60,7 +58,7 @@ QUERY(Color4, cat, "c!gw", false)
 int main(int argc, char **argv)
 {
     settingsCache = new SettingsCache;
-    CardDatabaseManager::getInstance()->loadCardDatabases();;
+    CardDatabaseManager::getInstance()->loadCardDatabases();
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
