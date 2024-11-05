@@ -76,9 +76,9 @@ void PhaseButton::updateAnimation()
 
     // the counter ticks up to 10 when active and down to 0 when inactive
     if (active && activeAnimationCounter < 10) {
-        activeAnimationCounter++;
+        ++activeAnimationCounter;
     } else if (!active && activeAnimationCounter > 0) {
-        activeAnimationCounter--;
+        --activeAnimationCounter;
     } else {
         activeAnimationTimer->stop();
     }
