@@ -637,6 +637,19 @@ void TabGame::replayFastForwardButtonToggled(bool checked)
     timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
 }
 
+/**
+ * @brief Handles everything that needs to be reset when doing a replay rewind.
+ */
+void TabGame::replayRewind()
+{
+    // reset chat log
+    messageLog->clearChat();
+
+    // reset phase markers
+    currentPhase = -1;
+    phasesToolbar->reset();
+}
+
 void TabGame::incrementGameTime()
 {
     int seconds = ++secondsElapsed;
@@ -1718,7 +1731,7 @@ void TabGame::createReplayDock()
     timelineWidget->setTimeline(replayTimeline);
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
-    connect(timelineWidget, &ReplayTimelineWidget::rewound, messageLog, &ChatView::clearChat);
+    connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &TabGame::replayRewind);
 
     // timeline skip shortcuts
     aReplaySkipForward = new QAction(timelineWidget);

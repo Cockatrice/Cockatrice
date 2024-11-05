@@ -84,6 +84,17 @@ void PhaseButton::updateAnimation()
     update();
 }
 
+/**
+ * @brief Immediately resets the button to the inactive state, without going through the animation.
+ */
+void PhaseButton::reset()
+{
+    activeAnimationTimer->stop();
+    active = false;
+    activeAnimationCounter = highlightable ? 0 : 9;
+    update();
+}
+
 void PhaseButton::mousePressEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
     emit clicked();
@@ -247,6 +258,16 @@ void PhasesToolbar::phaseButtonClicked()
     cmd.set_phase(static_cast<google::protobuf::uint32>(buttonList.indexOf(button)));
 
     emit sendGameCommand(cmd, -1);
+}
+
+/**
+ * @brief Immediately resets the toolbar to its initial state, with all phases inactive.
+ */
+void PhasesToolbar::reset()
+{
+    for (auto &i : buttonList) {
+        i->reset();
+    }
 }
 
 void PhasesToolbar::actNextTurn()
