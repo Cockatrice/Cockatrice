@@ -47,8 +47,8 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
         for (const auto &set : card->getSets()) {
             if (QLatin1String("card_") + QString(set.getProperty("uuid")) == card->getPixmapCacheKey()) {
                 long long setIndex = sortedSets.indexOf(set.getPtr());
-                CardSetPtr set_for_card_uuid = sortedSets.takeAt(setIndex);
-                sortedSets.prepend(set_for_card_uuid);
+                CardSetPtr setForCardUUID = sortedSets.takeAt(setIndex);
+                sortedSets.prepend(setForCardUUID);
             }
         }
         // The first time called, nextSet will also populate the Urls for the first set.
