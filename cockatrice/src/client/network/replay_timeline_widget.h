@@ -27,6 +27,7 @@ private:
     };
 
     static constexpr int TIMER_INTERVAL_MS = 200;
+    static constexpr int BIN_LENGTH = 5000;
     static constexpr int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
     static constexpr int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
 
@@ -34,7 +35,6 @@ private:
     QTimer *rewindBufferingTimer;
     QList<int> replayTimeline;
     QList<int> histogram;
-    static const int binLength;
     int maxBinValue, maxTime;
     qreal timeScaleFactor;
     int currentTime;

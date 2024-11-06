@@ -16,25 +16,23 @@ ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     connect(rewindBufferingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
 }
 
-const int ReplayTimelineWidget::binLength = 5000;
-
 void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
 {
     replayTimeline = _replayTimeline;
     histogram.clear();
-    int binEndTime = binLength - 1;
+    int binEndTime = BIN_LENGTH - 1;
     int binValue = 0;
     for (int i : replayTimeline) {
         if (i > binEndTime) {
             histogram.append(binValue);
             if (binValue > maxBinValue)
                 maxBinValue = binValue;
-            while (i > binEndTime + binLength) {
+            while (i > binEndTime + BIN_LENGTH) {
                 histogram.append(0);
-                binEndTime += binLength;
+                binEndTime += BIN_LENGTH;
             }
             binValue = 1;
-            binEndTime += binLength;
+            binEndTime += BIN_LENGTH;
         } else
             ++binValue;
     }
