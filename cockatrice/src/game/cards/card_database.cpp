@@ -444,6 +444,10 @@ QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 CardInfoPtr CardDatabase::getCardByNameAndUUID(const QString &cardName, const QString &uuid) const
 {
     auto info = getCard(cardName);
+    if (uuid.isNull() || uuid.isEmpty()) {
+        return info;
+    }
+
     for (const auto &set : info->getSets()) {
         if (set.getProperty("uuid") == uuid) {
             CardInfoPtr cardFromSpecificSet = info->clone();
