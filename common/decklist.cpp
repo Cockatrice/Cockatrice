@@ -88,7 +88,8 @@ int AbstractDecklistNode::depth() const
 }
 
 InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistNode(_parent), name(other->getName())
+: AbstractDecklistNode(_parent), name(other->getName()), cardSetCode(other->getCardUuid()),
+  cardCollectorNumber(other->getCardCollectorNumber())
 {
     for (int i = 0; i < other->size(); ++i) {
         auto *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
@@ -139,7 +140,8 @@ void InnerDecklistNode::clearTree()
 }
 
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber())
+: AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()),
+  cardSetName(other->getCardUuid()), cardSetNumber(other->getCardCollectorNumber())
 {
 }
 
@@ -268,9 +270,10 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                 InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 newZone->readElement(xml);
             } else if (childName == "card") {
-                DecklistCardNode *newCard =
-                    new DecklistCardNode(xml->attributes().value("name").toString(),
-                                         xml->attributes().value("number").toString().toInt(), this);
+                DecklistCardNode *newCard = new DecklistCardNode(xml->attributes().value("name").toString(),
+                                                 xml->attributes().value("number").toString().toInt(),
+                                                 this, xml->attributes().value("uuid").toString(),
+                                                 xml->attributes().value("collectorNumber").toString());
                 newCard->readElement(xml);
             }
         } else if (xml->isEndElement() && (childName == "zone"))
@@ -303,6 +306,13 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
     xml->writeEmptyElement("card");
     xml->writeAttribute("number", QString::number(getNumber()));
     xml->writeAttribute("name", getName());
+
+    if (getCardUuid() != "") {
+        xml->writeAttribute("uuid", getCardUuid());
+        if (getCardCollectorNumber() != "") {
+            xml->writeAttribute("collectorNumber", getCardCollectorNumber());
+        }
+    }
 }
 
 QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
@@ -740,14 +750,17 @@ int DeckList::getSideboardSize() const
     return size;
 }
 
-DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zoneName)
+DecklistCardNode *DeckList::addCard(const QString &cardName,
+                                    const QString &zoneName,
+                                    const QString &cardSetName,
+                                    const QString &cardSetCollectorNumber)
 {
     auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (zoneNode == nullptr) {
         zoneNode = new InnerDecklistNode(zoneName, root);
     }
 
-    auto *node = new DecklistCardNode(cardName, 1, zoneNode);
+    auto *node = new DecklistCardNode(cardName, 1, zoneNode, cardSetName, cardSetCollectorNumber);
     updateDeckHash();
 
     return node;
