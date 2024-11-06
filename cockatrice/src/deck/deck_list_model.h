@@ -37,6 +37,22 @@ public:
     {
         dataNode->setName(_name);
     }
+    QString getCardUuid() const override
+    {
+        return dataNode->getCardUuid();
+    }
+    void setCardSetCode(const QString &_cardSetName) override
+    {
+        dataNode->setCardSetCode(_cardSetName);
+    }
+    QString getCardCollectorNumber() const override
+    {
+        return dataNode->getCardCollectorNumber();
+    }
+    void setCardCollectorNumber(const QString &_cardSetNumber) override
+    {
+        dataNode->setCardCollectorNumber(_cardSetNumber);
+    }
     DecklistCardNode *getDataNode() const
     {
         return dataNode;

@@ -1,6 +1,7 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
+#include <QDebug>
 #include <QList>
 #include <QMap>
 #include <QObject>
@@ -13,6 +14,7 @@
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 #include <common/pb/move_card_to_zone.pb.h>
+#include <utility>
 
 class CardDatabase;
 class QIODevice;
@@ -68,6 +70,8 @@ public:
         sortMethod = method;
     }
     virtual QString getName() const = 0;
+    virtual QString getCardUuid() const = 0;
+    virtual QString getCardCollectorNumber() const = 0;
     InnerDecklistNode *getParent() const
     {
         return parent;
@@ -82,8 +86,9 @@ public:
 
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *>
 {
-private:
     QString name;
+    QString cardSetCode;
+    QString cardCollectorNumber;
     class compareFunctor;
 
 public:
@@ -94,7 +99,7 @@ public:
     explicit InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = nullptr);
     ~InnerDecklistNode() override;
     void setSortMethod(DeckSortMethod method) override;
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return name;
     }
@@ -103,7 +108,24 @@ public:
         name = _name;
     }
     static QString visibleNameFromName(const QString &_name);
-    virtual QString getVisibleName() const;
+    [[nodiscard]] virtual QString getVisibleName() const;
+    [[nodiscard]] QString getCardUuid() const override
+    {
+        return cardSetCode;
+    }
+    void setCardSetCode(const QString &_cardSetCode)
+    {
+        cardSetCode = _cardSetCode;
+    }
+    [[nodiscard]] QString getCardCollectorNumber() const override
+    {
+        return cardCollectorNumber;
+    }
+    void setCardCollectorNumber(const QString &_cardCollectorNumber)
+    {
+        cardCollectorNumber = _cardCollectorNumber;
+    }
+
     void clearTree();
     AbstractDecklistNode *findChild(const QString &_name);
     int height() const override;
@@ -127,6 +149,10 @@ public:
     virtual void setNumber(int _number) = 0;
     QString getName() const override = 0;
     virtual void setName(const QString &_name) = 0;
+    virtual QString getCardUuid() const override = 0;
+    virtual void setCardSetCode(const QString &_cardSetName) = 0;
+    virtual QString getCardCollectorNumber() const override = 0;
+    virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;
     int height() const override
     {
         return 0;
@@ -141,14 +167,21 @@ public:
 
 class DecklistCardNode : public AbstractDecklistCardNode
 {
-private:
     QString name;
     int number;
+    QString cardSetName;
+    QString cardSetNumber;
 
 public:
-    explicit DecklistCardNode(QString _name = QString(), int _number = 1, InnerDecklistNode *_parent = nullptr)
-        : AbstractDecklistCardNode(_parent), name(std::move(_name)), number(_number)
+    explicit DecklistCardNode(QString _name = QString(),
+                              int _number = 1,
+                              InnerDecklistNode *_parent = nullptr,
+                              QString _cardSetName = QString(),
+                              QString _cardSetNumber = QString())
+        : AbstractDecklistCardNode(_parent), name(std::move(_name)), number(_number),
+          cardSetName(std::move(_cardSetName)), cardSetNumber(std::move(_cardSetNumber))
     {
+        qDebug() << "Adding" << name << number << cardSetName << cardSetNumber;
     }
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
     int getNumber() const override
@@ -166,6 +199,22 @@ public:
     void setName(const QString &_name) override
     {
         name = _name;
+    }
+    QString getCardUuid() const override
+    {
+        return cardSetName;
+    }
+    void setCardSetCode(const QString &_cardSetName) override
+    {
+        cardSetName = _cardSetName;
+    }
+    QString getCardCollectorNumber() const override
+    {
+        return cardSetNumber;
+    }
+    void setCardCollectorNumber(const QString &_cardSetNumber) override
+    {
+        cardSetNumber = _cardSetNumber;
     }
 };
 
@@ -255,7 +304,10 @@ public:
     {
         return root;
     }
-    DecklistCardNode *addCard(const QString &cardName, const QString &zoneName);
+    DecklistCardNode *addCard(const QString &cardName,
+                              const QString &zoneName,
+                              const QString &cardSetName = QString(),
+                              const QString &cardSetCollectorNumber = QString());
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 
     /**
