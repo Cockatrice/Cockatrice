@@ -25,6 +25,7 @@
 #include <QSet>
 #include <QSvgRenderer>
 #include <QThread>
+#include <QTimer>
 #include <QUrl>
 #include <algorithm>
 #include <utility>
@@ -135,6 +136,12 @@ PictureLoaderWorker::PictureLoaderWorker()
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
+
+    // Rate limit our requests to comply with scryfall's rate limits
+    // urls are added to a queue and dequeued with a timer
+    requestTimer = new QTimer(this);
+    connect(requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::makeNextRequest);
+    requestTimer->start(50);
 
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
@@ -402,7 +409,7 @@ void PictureLoaderWorker::startNextPicDownload()
         qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
                            << " set: " << cardBeingDownloaded.getSetName() << "]: Trying to fetch picture from url "
                            << url.toDisplayString();
-        makeRequest(url);
+        requestQueue.enqueue(url);
     }
 }
 
@@ -442,6 +449,17 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
     return networkManager->get(req);
 }
 
+/**
+ * @brief makes the request for the next url in the request queue
+ */
+void PictureLoaderWorker::makeNextRequest()
+{
+    if (!requestQueue.isEmpty()) {
+        auto url = requestQueue.dequeue();
+        makeRequest(url);
+    }
+}
+
 void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 {
     bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
@@ -455,7 +473,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 
             networkManager->cache()->remove(reply->url());
 
-            makeRequest(reply->url());
+            requestQueue.enqueue(reply->url());
         } else {
             qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
                                << " set: " << cardBeingDownloaded.getSetName()
@@ -478,7 +496,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
                            << " set: " << cardBeingDownloaded.getSetName() << "]: following "
                            << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
-        makeRequest(redirectUrl);
+        requestQueue.enqueue(redirectUrl);
         reply->deleteLater();
         return;
     }

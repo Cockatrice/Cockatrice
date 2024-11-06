@@ -7,9 +7,11 @@
 #include <QMap>
 #include <QMutex>
 #include <QNetworkRequest>
+#include <QQueue>
 class QNetworkAccessManager;
 class QNetworkReply;
 class QThread;
+class QTimer;
 
 class PictureToLoad
 {
@@ -86,12 +88,16 @@ private:
     QList<PictureToLoad> cardsToDownload;
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
+    QQueue<QUrl> requestQueue;
+    QTimer *requestTimer;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
     bool imageIsBlackListed(const QByteArray &);
     QNetworkReply *makeRequest(const QUrl &url);
 private slots:
+    void makeNextRequest();
+
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
 
