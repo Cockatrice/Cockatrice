@@ -414,8 +414,6 @@ protected:
 private:
     CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
-    CardInfoPerSet getPreferredSetForCard(const QString &cardName);
-    QString getPreferredPrintingUUIDForCard(const QString &cardName);
     void refreshCachedReverseRelatedCards();
 
     QBasicMutex *reloadDatabaseMutex = new QBasicMutex(), *clearDatabaseMutex = new QBasicMutex(),
@@ -432,6 +430,8 @@ public:
     CardInfoPtr getCard(const QString &cardName) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
     CardInfoPtr getCardByNameAndUUID(const QString &cardName, const QString &uuid) const;
+    CardInfoPerSet getPreferredSetForCard(const QString &cardName);
+    QString getPreferredPrintingUUIDForCard(const QString &cardName);
     CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
