@@ -142,8 +142,6 @@ private:
     QStackedWidget *mainWidget;
 
     // Replay related members
-    static const int SMALL_SKIP_AMOUNT_MS = 1000;
-    static const int BIG_SKIP_AMOUNT_MS = 10000;
     GameReplay *replay;
     int currentReplayStep;
     QList<int> replayTimeline;
