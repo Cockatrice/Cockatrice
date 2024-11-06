@@ -229,7 +229,8 @@ private slots:
 public:
     enum EventProcessingOption
     {
-        SKIP_REVEAL_WINDOW = 0x0001
+        SKIP_REVEAL_WINDOW = 0x0001,
+        SKIP_TAP_ANIMATION = 0x0002
     };
     Q_DECLARE_FLAGS(EventProcessingOptions, EventProcessingOption)
 
@@ -301,7 +302,8 @@ private:
                            CardItem *card,
                            CardAttribute attribute,
                            const QString &avalue,
-                           bool allCards);
+                           bool allCards,
+                           EventProcessingOptions options);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard,
@@ -328,7 +330,8 @@ private:
     void eventCreateArrow(const Event_CreateArrow &event);
     void eventDeleteArrow(const Event_DeleteArrow &event);
     void eventCreateToken(const Event_CreateToken &event);
-    void eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context);
+    void
+    eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context, EventProcessingOptions options);
     void eventSetCardCounter(const Event_SetCardCounter &event);
     void eventCreateCounter(const Event_CreateCounter &event);
     void eventSetCounter(const Event_SetCounter &event);
