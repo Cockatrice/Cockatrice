@@ -25,6 +25,7 @@ private:
 
 public:
     DeckViewCard(const QString &_name = QString(),
+                 const QString &_uuid = QString(),
                  const QString &_originZone = QString(),
                  QGraphicsItem *parent = nullptr);
     ~DeckViewCard();

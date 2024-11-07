@@ -13,8 +13,8 @@
 #include <QPainter>
 #include <algorithm>
 
-AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id, QGraphicsItem *parent)
-    : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0),
+AbstractCardItem::AbstractCardItem(const QString &_name, const QString &_uuid, Player *_owner, int _id, QGraphicsItem *parent)
+    : ArrowTarget(_owner, parent), id(_id), name(_name), uuid(_uuid), tapped(false), facedown(false), tapAngle(0),
       bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
