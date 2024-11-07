@@ -93,6 +93,8 @@ set(cockatrice_SOURCES
     src/game/player/player.cpp
     src/game/player/player_list_widget.cpp
     src/game/player/player_target.cpp
+        src/client/ui/widgets/printing_selector/printing_selector.cpp
+        src/client/ui/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/client/network/release_channel.cpp
     src/server/remote/remote_client.cpp
     src/server/remote/remote_decklist_tree_widget.cpp

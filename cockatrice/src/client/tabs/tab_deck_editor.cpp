@@ -15,6 +15,7 @@
 #include "../../settings/cache_settings.h"
 #include "../ui/picture_loader.h"
 #include "../ui/pixel_map_generator.h"
+#include "../ui/widgets/printing_selector/printing_selector.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/response.pb.h"
 #include "tab_supervisor.h"
@@ -78,9 +79,11 @@ void TabDeckEditor::createDeckDock()
     deckView->sortByColumn(1, Qt::AscendingOrder);
     deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     deckView->installEventFilter(&deckViewKeySignals);
+    deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
+    connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(decklistCustomMenu(QPoint)));
     connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
@@ -497,6 +500,27 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     }
     menu.exec(databaseView->mapToGlobal(point));
 }
+
+void TabDeckEditor::decklistCustomMenu(QPoint point)
+{
+    QMenu menu;
+    const CardInfoPtr info = currentCardInfo();
+
+    // filling out the related cards submenu
+    QAction *selectPrinting = menu.addAction("Select Printing");
+
+    connect(selectPrinting, &QAction::triggered, this,
+            [this, info] { this->createPrintingSelector(info); });
+
+    menu.exec(deckView->mapToGlobal(point));
+}
+
+void TabDeckEditor::createPrintingSelector(CardInfoPtr selectedCard)
+{
+    PrintingSelector *selector = new PrintingSelector(deckModel, deckView, selectedCard);
+    this->centralFrame->addWidget(selector);
+}
+
 
 void TabDeckEditor::restartLayout()
 {
