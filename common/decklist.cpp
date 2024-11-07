@@ -155,6 +155,16 @@ AbstractDecklistNode *InnerDecklistNode::findChild(const QString &_name)
     return nullptr;
 }
 
+AbstractDecklistNode *InnerDecklistNode::findChild(const QString &_name, const QString &_uuid)
+{
+    for (int i = 0; i < size(); i++) {
+        if (at(i)->getName() == _name && at(i)->getCardUuid() == _uuid) {
+            return at(i);
+        }
+    }
+    return nullptr;
+}
+
 int InnerDecklistNode::height() const
 {
     return at(0)->height() + 1;

@@ -128,6 +128,7 @@ public:
 
     void clearTree();
     AbstractDecklistNode *findChild(const QString &_name);
+    AbstractDecklistNode *findChild(const QString &_name, const QString &_uuid);
     int height() const override;
     int recursiveCount(bool countTotalCards = false) const;
     bool compare(AbstractDecklistNode *other) const override;

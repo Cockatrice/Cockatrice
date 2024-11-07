@@ -56,9 +56,9 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
 {
     if (!cardList.isEmpty()) {
         for (int i = 0; i < cardList.size(); ++i)
-            addCard(
-                new CardItem(player, QString::fromStdString(cardList[i]->name()), cardList[i]->id(), revealZone, this),
-                false, i);
+            addCard(new CardItem(player, QString::fromStdString(cardList[i]->name()),
+                                 QString::fromStdString(cardList[i]->uuid()), cardList[i]->id(), revealZone, this),
+                    false, i);
         reorganizeCards();
     } else if (!origZone->contentsKnown()) {
         Command_DumpZone cmd;
@@ -75,7 +75,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
         for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
-            addCard(new CardItem(player, card->getName(), card->getId(), revealZone, this), false, i);
+            addCard(new CardItem(player, card->getName(), card->getUUID(), card->getId(), revealZone, this), false, i);
         }
         reorganizeCards();
     }
@@ -88,7 +88,8 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
     for (int i = 0; i < respCardListSize; ++i) {
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
         auto cardName = QString::fromStdString(cardInfo.name());
-        auto *card = new CardItem(player, cardName, cardInfo.id(), revealZone, this, this);
+        auto cardUuid = QString::fromStdString(cardInfo.uuid());
+        auto *card = new CardItem(player, cardName, cardUuid, cardInfo.id(), revealZone, this, this);
         cards.insert(i, card);
     }
     reorganizeCards();

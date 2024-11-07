@@ -24,8 +24,8 @@ CardItem::CardItem(Player *_owner,
                    bool _revealedCard,
                    QGraphicsItem *parent,
                    CardZone *_zone)
-    : AbstractCardItem(_name, _uuid, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
+    : AbstractCardItem(_name, _uuid, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard),
+      attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
@@ -243,6 +243,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     }
 
     setId(_info.id());
+    setUUID(QString::fromStdString(_info.uuid()));
     setName(QString::fromStdString(_info.name()));
     setAttacking(_info.attacking());
     setFaceDown(_info.face_down());
