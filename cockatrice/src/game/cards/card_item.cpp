@@ -1,7 +1,6 @@
 #include "card_item.h"
 
 #include "../../client/tabs/tab_game.h"
-#include "../../main.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../game_scene.h"
@@ -20,11 +19,12 @@
 
 CardItem::CardItem(Player *_owner,
                    const QString &_name,
+                   const QString &_uuid,
                    int _cardid,
                    bool _revealedCard,
                    QGraphicsItem *parent,
                    CardZone *_zone)
-    : AbstractCardItem(_name, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
+    : AbstractCardItem(_name, _uuid, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
       destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);

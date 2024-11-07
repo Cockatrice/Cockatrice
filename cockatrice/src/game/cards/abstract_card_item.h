@@ -16,6 +16,7 @@ protected:
     CardInfoPtr info;
     int id;
     QString name;
+    QString uuid;
     bool tapped;
     bool facedown;
     int tapAngle;
@@ -49,6 +50,7 @@ public:
         return Type;
     }
     AbstractCardItem(const QString &_name = QString(),
+                     const QString &_uuid = QString(),
                      Player *_owner = nullptr,
                      int _id = -1,
                      QGraphicsItem *parent = nullptr);
@@ -75,6 +77,14 @@ public:
         return name;
     }
     void setName(const QString &_name = QString());
+    QString getUUID() const
+    {
+        return uuid;
+    }
+    void setUUID(QString _uuid)
+    {
+        uuid = _uuid;
+    }
     qreal getRealZValue() const
     {
         return realZValue;
