@@ -130,6 +130,7 @@ void Server_Card::getInfo(ServerInfo_Card *info)
     QString displayedName = facedown ? QString() : name;
 
     info->set_id(id);
+    info->set_uuid(uuid.toStdString());
     info->set_name(displayedName.toStdString());
     info->set_x(coord_x);
     info->set_y(coord_y);

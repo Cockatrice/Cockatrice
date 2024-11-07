@@ -2031,7 +2031,7 @@ void Player::eventCreateToken(const Event_CreateToken &event)
         return;
     }
 
-    CardItem *card = new CardItem(this, QString::fromStdString(event.card_name()), event.card_id());
+    CardItem *card = new CardItem(this, QString::fromStdString(event.card_name()), QString(), event.card_id());
     // use db PT if not provided in event
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
@@ -2326,6 +2326,7 @@ void Player::eventDrawCards(const Event_DrawCards &event)
         for (int i = 0; i < listSize; ++i) {
             const ServerInfo_Card &cardInfo = event.cards(i);
             CardItem *card = _deck->takeCard(0, cardInfo.id());
+            card->setUUID(QString::fromStdString(cardInfo.uuid()));
             card->setName(QString::fromStdString(cardInfo.name()));
             _hand->addCard(card, false, -1);
         }

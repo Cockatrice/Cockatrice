@@ -354,7 +354,7 @@ void DeckViewScene::rebuildTree()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), currentZone->getName(), container);
+                DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), currentCard->getCardUuid(), currentZone->getName(), container);
                 container->addCard(newCard);
                 emit newCardAdded(newCard);
             }

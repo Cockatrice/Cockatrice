@@ -1,7 +1,6 @@
 #include "abstract_card_item.h"
 
 #include "../../client/ui/picture_loader.h"
-#include "../../main.h"
 #include "../../settings/cache_settings.h"
 #include "../game_scene.h"
 #include "card_database.h"
@@ -13,7 +12,11 @@
 #include <QPainter>
 #include <algorithm>
 
-AbstractCardItem::AbstractCardItem(const QString &_name, const QString &_uuid, Player *_owner, int _id, QGraphicsItem *parent)
+AbstractCardItem::AbstractCardItem(const QString &_name,
+                                   const QString &_uuid,
+                                   Player *_owner,
+                                   int _id,
+                                   QGraphicsItem *parent)
     : ArrowTarget(_owner, parent), id(_id), name(_name), uuid(_uuid), tapped(false), facedown(false), tapAngle(0),
       bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
@@ -50,7 +53,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::cardInfoUpdated()
 {
-    info = CardDatabaseManager::getInstance()->getCard(name);
+    info = CardDatabaseManager::getInstance()->getCardByNameAndUUID(name, uuid);
 
     if (!info && !name.isEmpty()) {
         QVariantHash properties = QVariantHash();
