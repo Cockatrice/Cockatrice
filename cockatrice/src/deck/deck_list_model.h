@@ -66,6 +66,10 @@ public:
     {
         return dataNode;
     }
+    [[nodiscard]] bool isDeckHeader() const override
+    {
+        return false;
+    }
 };
 
 class DeckListModel : public QAbstractItemModel

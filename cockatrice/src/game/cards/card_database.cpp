@@ -606,7 +606,7 @@ void CardDatabase::refreshPreferredPrintings()
     }
 }
 
-CardInfoPerSet CardDatabase::getPreferredSetForCard(const QString &cardName)
+CardInfoPerSet CardDatabase::getPreferredSetForCard(const QString &cardName) const
 {
     CardInfoPtr cardInfo = getCard(cardName);
     if (!cardInfo) {
@@ -653,6 +653,10 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, cons
         if (cardInfoForSet.getProperty("uuid") == providerId) {
             return cardInfoForSet;
         }
+    }
+
+    if (providerId.isNull()) {
+        return getPreferredSetForCard(cardName);
     }
 
     return CardInfoPerSet(nullptr);

@@ -92,7 +92,7 @@ void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
  */
 void CardInfoPictureWidget::setScaleFactor(const int scale)
 {
-    const int newWidth = baseWidth + scale * 20;
+    const int newWidth = baseWidth * scale / 100;
     const int newHeight = static_cast<int>(newWidth * aspectRatio);
 
     scaleFactor = scale;
@@ -119,10 +119,11 @@ void CardInfoPictureWidget::updatePixmap()
  */
 void CardInfoPictureWidget::loadPixmap()
 {
+    PictureLoader::getCardBackLoadingInProgressPixmap(resizedPixmap, size());
     if (info) {
         PictureLoader::getPixmap(resizedPixmap, info, size());
     } else {
-        PictureLoader::getCardBackPixmap(resizedPixmap, size());
+        PictureLoader::getCardBackLoadingFailedPixmap(resizedPixmap, size());
     }
 
     pixmapDirty = false;
