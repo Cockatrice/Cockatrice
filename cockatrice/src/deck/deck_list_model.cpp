@@ -332,9 +332,6 @@ DeckListModel::findCardNode(const QString &cardName, const QString &zoneName, co
         return nullptr;
     }
 
-    if (providerId.isEmpty()) {
-        return dynamic_cast<DecklistModelCardNode *>(typeNode->findChild(cardName));
-    }
     return dynamic_cast<DecklistModelCardNode *>(typeNode->findCardChildByNameAndProviderId(cardName, providerId));
 }
 

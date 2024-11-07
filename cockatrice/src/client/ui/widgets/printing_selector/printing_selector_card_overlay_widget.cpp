@@ -1,0 +1,63 @@
+#include "printing_selector_card_overlay_widget.h"
+
+#include "../../../../game/cards/card_database_manager.h"
+
+#include <QVBoxLayout>
+
+PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
+                                                                     TabDeckEditor *deckEditor,
+                                                                     DeckListModel *deckModel,
+                                                                     QTreeView *deckView,
+                                                                     QSlider *cardSizeSlider,
+                                                                     CardInfoPtr rootCard,
+                                                                     CardInfoPerSet setInfoForCard)
+    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), rootCard(rootCard),
+      setInfoForCard(setInfoForCard)
+{
+    // Set up the main layout
+    auto *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    setLayout(mainLayout);
+
+    // Add CardInfoPictureWidget
+    cardInfoPicture = new CardInfoPictureWidget(this);
+    cardInfoPicture->setMinimumSize(0, 0);
+    cardInfoPicture->setScaleFactor(cardSizeSlider->value());
+    setCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(rootCard->getName(),
+                                                                             setInfoForCard.getProperty("uuid"));
+    cardInfoPicture->setCard(setCard);
+    mainLayout->addWidget(cardInfoPicture);
+
+    // Add AllZonesCardAmountWidget
+    allZonesCardAmountWidget =
+        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, setCard, setInfoForCard);
+
+    allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
+    allZonesCardAmountWidget->setVisible(false);
+
+    connect(cardSizeSlider, &QSlider::valueChanged, cardInfoPicture, &CardInfoPictureWidget::setScaleFactor);
+}
+
+void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
+{
+    // Ensure the amount widget matches the parent size
+    QWidget::resizeEvent(event);
+    if (allZonesCardAmountWidget) {
+        allZonesCardAmountWidget->resize(cardInfoPicture->size());
+    }
+    resize(cardInfoPicture->size());
+}
+
+void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
+{
+    QWidget::enterEvent(event);
+    allZonesCardAmountWidget->setVisible(true);
+    deckEditor->updateCardInfo(setCard);
+}
+
+void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
+{
+    QWidget::leaveEvent(event);
+    allZonesCardAmountWidget->setVisible(false);
+}

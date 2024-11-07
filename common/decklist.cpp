@@ -319,13 +319,13 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
     xml->writeAttribute("number", QString::number(getNumber()));
     xml->writeAttribute("name", getName());
 
-    if (getCardSetShortName().isEmpty()) {
+    if (!getCardSetShortName().isEmpty()) {
         xml->writeAttribute("setShortName", getCardSetShortName());
     }
-    if (getCardCollectorNumber().isEmpty()) {
+    if (!getCardCollectorNumber().isEmpty()) {
         xml->writeAttribute("collectorNumber", getCardCollectorNumber());
     }
-    if (getCardProviderId().isEmpty()) {
+    if (!getCardProviderId().isEmpty()) {
         xml->writeAttribute("uuid", getCardProviderId());
     }
 }

@@ -450,19 +450,19 @@ public:
     ~CardDatabase() override;
     void clear();
     void removeCard(CardInfoPtr card);
-    CardInfoPtr getCard(const QString &cardName) const;
-    QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
-    CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
-    CardInfoPerSet getPreferredSetForCard(const QString &cardName);
-    CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
+    [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
+    [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
+    [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
+    [[nodiscard]] CardInfoPerSet getPreferredSetForCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
     QString getPreferredPrintingProviderIdForCard(const QString &cardName);
-    CardInfoPtr guessCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
      * function, so you don't need to simplify it beforehand.
      */
-    CardInfoPtr getCardBySimpleName(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
     CardSetPtr getSet(const QString &setName);
     bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);

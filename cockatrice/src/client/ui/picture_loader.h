@@ -142,6 +142,8 @@ private:
 public:
     static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
     static void getCardBackPixmap(QPixmap &pixmap, QSize size);
+    static void getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize size);
+    static void getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size);
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfoPtr> cards);

@@ -4,6 +4,7 @@
 #include "../../deck/custom_line_edit.h"
 #include "../../game/cards/card_database.h"
 #include "../game_logic/key_signals.h"
+#include "../ui/widgets/printing_selector/printing_selector.h"
 #include "tab.h"
 
 #include <QAbstractItemModel>
@@ -55,8 +56,12 @@ private slots:
     void updateHash();
     void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
     void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
+    void updatePrintingSelectorDatabase(const QModelIndex &current, const QModelIndex &previous);
+    void updatePrintingSelectorDeckView(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
     void databaseCustomMenu(QPoint point);
+    void decklistCustomMenu(QPoint point);
+    void showPrintingSelector();
 
     void actNewDeck();
     void actLoadDeck();
@@ -129,6 +134,7 @@ private:
     QTreeView *deckView;
     KeySignals deckViewKeySignals;
     CardInfoFrameWidget *cardInfo;
+    PrintingSelector *printingSelector;
     SearchLineEdit *searchEdit;
     KeySignals searchKeySignals;
 
@@ -143,8 +149,8 @@ private:
     KeySignals filterViewKeySignals;
     QWidget *filterBox;
 
-    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu,
-        *saveDeckToClipboardMenu;
+    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu,
+        *analyzeDeckMenu, *saveDeckToClipboardMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard,
         *aSaveDeckToClipboardRaw, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout,
         *aClose;
@@ -152,7 +158,7 @@ private:
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating, *aFilterDockVisible,
-        *aFilterDockFloating;
+        *aFilterDockFloating, *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
 
     bool modified;
     QVBoxLayout *centralFrame;
@@ -160,6 +166,7 @@ private:
     QDockWidget *cardInfoDock;
     QDockWidget *deckDock;
     QDockWidget *filterDock;
+    QDockWidget *printingSelectorDock;
     QWidget *centralWidget;
 
 public:
@@ -173,8 +180,10 @@ public:
     void createDeckDock();
     void createCardInfoDock();
     void createFiltersDock();
+    void createPrintingSelectorDock();
     void createMenus();
     void createCentralFrame();
+    void updateCardInfo(CardInfoPtr _card);
 
 public slots:
     void closeRequest() override;
