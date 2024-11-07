@@ -1,20 +1,28 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y\
-  build-essential\
-  cmake\
-  git\
-  libprotobuf-dev\
-  libqt5sql5-mysql\
-  libmysqlclient-dev\
-  libqt5websockets5-dev\
-  protobuf-compiler\
-  qt5-qmake\
-  qtbase5-dev\
-  qttools5-dev-tools\
-  qttools5-dev
+  build-essential \
+        ccache \
+        clang-format \
+        cmake \
+        file \
+        g++ \
+        git \
+        libgl-dev \
+        liblzma-dev \
+        libmariadb-dev-compat \
+        libprotobuf-dev \
+        libqt6multimedia6 \
+        libqt6sql6-mysql \
+        qt6-svg-dev \
+        qt6-websockets-dev \
+        protobuf-compiler \
+        qt6-l10n-tools \
+        qt6-multimedia-dev \
+        qt6-tools-dev \
+        qt6-tools-dev-tools
 
 COPY . /home/servatrice/code/
 WORKDIR /home/servatrice/code
