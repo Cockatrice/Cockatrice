@@ -7,6 +7,7 @@
 #include "../client/ui/picture_loader.h"
 #include "../client/ui/theme_manager.h"
 #include "../game/cards/card_database.h"
+#include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "../utility/sequence_edit.h"
@@ -1429,7 +1430,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 {
     bool showLoadError = true;
     QString loadErrorMessage = tr("Unknown Error loading card database");
-    LoadStatus loadStatus = db->getLoadStatus();
+    LoadStatus loadStatus = CardDatabaseManager::getInstance()->getLoadStatus();
     qDebug() << "Card Database load status: " << loadStatus;
     switch (loadStatus) {
         case Ok:

@@ -7,6 +7,7 @@
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/cards/card_database.h"
+#include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_frame.h"
 #include "../../game/cards/card_item.h"
 #include "../../game/game_scene.h"
@@ -325,7 +326,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    PictureLoader::cacheCardPixmaps(db->getCards(newDeck.getCardList()));
+    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
 }
 
@@ -635,6 +636,19 @@ void TabGame::replayPlayButtonToggled(bool checked)
 void TabGame::replayFastForwardButtonToggled(bool checked)
 {
     timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
+}
+
+/**
+ * @brief Handles everything that needs to be reset when doing a replay rewind.
+ */
+void TabGame::replayRewind()
+{
+    // reset chat log
+    messageLog->clearChat();
+
+    // reset phase markers
+    currentPhase = -1;
+    phasesToolbar->reset();
 }
 
 void TabGame::incrementGameTime()
@@ -1096,7 +1110,8 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                    PictureLoader::cacheCardPixmaps(db->getCards(newDeck.getCardList()));
+                    PictureLoader::cacheCardPixmaps(
+                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
                     deckViewContainer->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }
@@ -1718,7 +1733,7 @@ void TabGame::createReplayDock()
     timelineWidget->setTimeline(replayTimeline);
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
-    connect(timelineWidget, &ReplayTimelineWidget::rewound, messageLog, &ChatView::clearChat);
+    connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &TabGame::replayRewind);
 
     // timeline skip shortcuts
     aReplaySkipForward = new QAction(timelineWidget);

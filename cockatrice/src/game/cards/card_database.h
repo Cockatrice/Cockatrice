@@ -441,6 +441,7 @@ public slots:
 protected slots:
     LoadStatus loadCardDatabase(const QString &path);
 signals:
+    void cardDatabaseLoadingFinished();
     void cardDatabaseLoadingFailed();
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
     void cardDatabaseAllNewSetsEnabled();

@@ -613,7 +613,8 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
 
         const QDateTime regDate = query->value(7).toDateTime();
         if (!regDate.toString(Qt::ISODate).isEmpty()) {
-            qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
+            // the registration date is in utc
+            qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTimeUtc());
             result.set_accountage_secs(accountAgeInSeconds);
         }
 

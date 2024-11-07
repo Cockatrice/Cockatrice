@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:24.04
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -9,18 +9,19 @@ RUN apt-get update && \
         file \
         g++ \
         git \
+        libgl-dev \
         liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
-        libqt5multimedia5-plugins \
-        libqt5sql5-mysql \
-        libqt5svg5-dev \
-        libqt5websockets5-dev \
+        libqt6multimedia6 \
+        libqt6sql6-mysql \
+        qt6-svg-dev \
+        qt6-websockets-dev \
         protobuf-compiler \
-        qt5-default \
-        qt5-image-formats-plugins \
-        qtmultimedia5-dev \
-        qttools5-dev \
-        qttools5-dev-tools \
+        qt6-image-formats-plugins \
+        qt6-l10n-tools \
+        qt6-multimedia-dev \
+        qt6-tools-dev \
+        qt6-tools-dev-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

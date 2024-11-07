@@ -225,6 +225,7 @@ private slots:
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
     void replayFastForwardButtonToggled(bool checked);
+    void replayRewind();
 
     void incrementGameTime();
     void adminLockChanged(bool lock);

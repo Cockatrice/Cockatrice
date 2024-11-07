@@ -31,6 +31,7 @@
 #include "../../dialogs/dlg_update.h"
 #include "../../dialogs/dlg_view_log.h"
 #include "../../game/cards/card_database.h"
+#include "../../game/cards/card_database_manager.h"
 #include "../../main.h"
 #include "../../server/local_client.h"
 #include "../../server/local_server.h"
@@ -858,11 +859,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
-
-    connect(db, SIGNAL(cardDatabaseLoadingFailed()), this, SLOT(cardDatabaseLoadingFailed()));
-    connect(db, SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this,
+    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFailed()), this,
+            SLOT(cardDatabaseLoadingFailed()));
+    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this,
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
-    connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
+    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseAllNewSetsEnabled()), this,
+            SLOT(cardDatabaseAllNewSetsEnabled()));
 
     tip = new DlgTipOfTheDay();
 
@@ -884,13 +886,13 @@ void MainWindow::startupConfigCheck()
         if (SettingsCache::instance().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         } else {
-            const auto reloadOk0 = QtConcurrent::run([] { db->loadCardDatabases(); });
+            const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qDebug() << "Startup: found config with current version";
-        const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
+        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
@@ -1075,12 +1077,12 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     msgBox.exec();
 
     if (msgBox.clickedButton() == yesButton) {
-        db->enableAllUnknownSets();
-        const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
+        CardDatabaseManager::getInstance()->enableAllUnknownSets();
+        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
     } else if (msgBox.clickedButton() == noButton) {
-        db->markAllSetsAsKnown();
+        CardDatabaseManager::getInstance()->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
-        db->markAllSetsAsKnown();
+        CardDatabaseManager::getInstance()->markAllSetsAsKnown();
         actManageSets();
     }
 }
@@ -1167,7 +1169,7 @@ void MainWindow::exitCardDatabaseUpdate()
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
 
-    const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
+    const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1297,7 +1299,7 @@ void MainWindow::actAddCustomSet()
         QMessageBox::information(
             this, tr("Load sets/cards"),
             tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
-        const auto reloadOk1 = QtConcurrent::run([] { db->loadCardDatabases(); });
+        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
     } else {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
     }
@@ -1328,7 +1330,7 @@ void MainWindow::actEditTokens()
 {
     DlgEditTokens dlg(this);
     dlg.exec();
-    db->saveCustomTokensToFile();
+    CardDatabaseManager::getInstance()->saveCustomTokensToFile();
 }
 
 void MainWindow::actForgotPasswordRequest()
