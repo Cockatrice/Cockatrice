@@ -17,8 +17,8 @@ include different targets -->
  - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
  - <kbd>Debian 12</kbd> ("Bookworm")
  - <kbd>Debian 11</kbd> ("Bullseye")
- - <kbd>Fedora 40</kbd> 
- - <kbd>Fedora 39</kbd>
+ - <kbd>Fedora 41</kbd>
+ - <kbd>Fedora 40</kbd>
 <kbd>We are also packaged in Arch Linux's official "extra" repository, courtesy of @FFY00</kbd></i>
 <kbd>General Linux support is available via a flatpak package (Flathub)</kbd></i>
 </pre>
