@@ -226,6 +226,13 @@ private slots:
 
     void initSayMenu();
 
+public:
+    enum EventProcessingOption
+    {
+        SKIP_REVEAL_WINDOW = 0x0001
+    };
+    Q_DECLARE_FLAGS(EventProcessingOptions, EventProcessingOption)
+
 private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
@@ -332,7 +339,7 @@ private:
     void eventDestroyCard(const Event_DestroyCard &event);
     void eventAttachCard(const Event_AttachCard &event);
     void eventDrawCards(const Event_DrawCards &event);
-    void eventRevealCards(const Event_RevealCards &event);
+    void eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
@@ -470,7 +477,10 @@ public:
     void processPlayerInfo(const ServerInfo_Player &info);
     void processCardAttachment(const ServerInfo_Player &info);
 
-    void processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context);
+    void processGameEvent(GameEvent::GameEventType type,
+                          const GameEvent &event,
+                          const GameEventContext &context,
+                          EventProcessingOptions options);
 
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
@@ -479,6 +489,8 @@ public:
 
     void setLastToken(CardInfoPtr cardInfo);
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Player::EventProcessingOptions)
 
 class AnnotationDialog : public QInputDialog
 {

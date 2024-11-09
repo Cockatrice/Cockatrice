@@ -2341,7 +2341,7 @@ void Player::eventDrawCards(const Event_DrawCards &event)
     emit logDrawCards(this, event.number(), _deck->getCards().size() == 0);
 }
 
-void Player::eventRevealCards(const Event_RevealCards &event)
+void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options)
 {
     CardZone *zone = zones.value(QString::fromStdString(event.zone_name()));
     if (!zone) {
@@ -2388,7 +2388,7 @@ void Player::eventRevealCards(const Event_RevealCards &event)
                 showZoneView = false;
             }
         }
-        if (showZoneView && !cardList.isEmpty()) {
+        if (!options.testFlag(SKIP_REVEAL_WINDOW) && showZoneView && !cardList.isEmpty()) {
             static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
         }
 
@@ -2415,7 +2415,10 @@ void Player::eventChangeZoneProperties(const Event_ChangeZoneProperties &event)
     }
 }
 
-void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &event, const GameEventContext &context)
+void Player::processGameEvent(GameEvent::GameEventType type,
+                              const GameEvent &event,
+                              const GameEventContext &context,
+                              EventProcessingOptions options)
 {
     switch (type) {
         case GameEvent::GAME_SAY:
@@ -2470,7 +2473,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
             eventDrawCards(event.GetExtension(Event_DrawCards::ext));
             break;
         case GameEvent::REVEAL_CARDS:
-            eventRevealCards(event.GetExtension(Event_RevealCards::ext));
+            eventRevealCards(event.GetExtension(Event_RevealCards::ext), options);
             break;
         case GameEvent::CHANGE_ZONE_PROPERTIES:
             eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext));
