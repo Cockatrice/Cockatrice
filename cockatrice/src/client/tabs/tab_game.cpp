@@ -635,7 +635,7 @@ void TabGame::replayPlayButtonToggled(bool checked)
 
 void TabGame::replayFastForwardButtonToggled(bool checked)
 {
-    timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
+    timelineWidget->setTimeScaleFactor(checked ? ReplayTimelineWidget::FAST_FORWARD_SCALE_FACTOR : 1.0);
 }
 
 /**
@@ -1742,22 +1742,22 @@ void TabGame::createReplayDock()
     aReplaySkipForward = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipForward);
     connect(aReplaySkipForward, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(SMALL_SKIP_AMOUNT_MS); });
+            [=]() { timelineWidget->skipByAmount(ReplayTimelineWidget::SMALL_SKIP_MS); });
 
     aReplaySkipBackward = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipBackward);
     connect(aReplaySkipBackward, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(-SMALL_SKIP_AMOUNT_MS); });
+            [=]() { timelineWidget->skipByAmount(-ReplayTimelineWidget::SMALL_SKIP_MS); });
 
     aReplaySkipForwardBig = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipForwardBig);
     connect(aReplaySkipForwardBig, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(BIG_SKIP_AMOUNT_MS); });
+            [=]() { timelineWidget->skipByAmount(ReplayTimelineWidget::BIG_SKIP_MS); });
 
     aReplaySkipBackwardBig = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipBackwardBig);
     connect(aReplaySkipBackwardBig, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(-BIG_SKIP_AMOUNT_MS); });
+            [=]() { timelineWidget->skipByAmount(-ReplayTimelineWidget::BIG_SKIP_MS); });
 
     // buttons
     replayPlayButton = new QToolButton;

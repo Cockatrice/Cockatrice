@@ -16,25 +16,23 @@ ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     connect(rewindBufferingTimer, &QTimer::timeout, this, &ReplayTimelineWidget::processRewind);
 }
 
-const int ReplayTimelineWidget::binLength = 5000;
-
 void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
 {
     replayTimeline = _replayTimeline;
     histogram.clear();
-    int binEndTime = binLength - 1;
+    int binEndTime = BIN_LENGTH - 1;
     int binValue = 0;
     for (int i : replayTimeline) {
         if (i > binEndTime) {
             histogram.append(binValue);
             if (binValue > maxBinValue)
                 maxBinValue = binValue;
-            while (i > binEndTime + binLength) {
+            while (i > binEndTime + BIN_LENGTH) {
                 histogram.append(0);
-                binEndTime += binLength;
+                binEndTime += BIN_LENGTH;
             }
             binValue = 1;
-            binEndTime += binLength;
+            binEndTime += BIN_LENGTH;
         } else
             ++binValue;
     }
@@ -85,7 +83,7 @@ void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindBuffering)
         newTime = maxTime;
     }
 
-    newTime -= newTime % 200; // Time should always be a multiple of 200
+    newTime -= newTime % TIMER_INTERVAL_MS; // Time should always be a multiple of the interval
 
     const bool isBackwardsSkip = newTime < currentTime;
     currentTime = newTime;
@@ -145,7 +143,7 @@ QSize ReplayTimelineWidget::minimumSizeHint() const
 
 void ReplayTimelineWidget::replayTimerTimeout()
 {
-    currentTime += 200;
+    currentTime += TIMER_INTERVAL_MS;
 
     processNewEvents(NORMAL_PLAYBACK);
 
@@ -160,8 +158,8 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
         Player::EventProcessingOptions options;
 
         // backwards skip => always skip reveal windows
-        // forwards skip => skip reveal windows that don't happen within 10 seconds of the target
-        if (playbackMode == BACKWARD_SKIP || currentTime - replayTimeline[currentEvent] > 10000)
+        // forwards skip => skip reveal windows that don't happen within a big skip of the target
+        if (playbackMode == BACKWARD_SKIP || currentTime - replayTimeline[currentEvent] > BIG_SKIP_MS)
             options |= Player::EventProcessingOption::SKIP_REVEAL_WINDOW;
 
         emit processNextEvent(options);
@@ -176,12 +174,12 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
 {
     timeScaleFactor = _timeScaleFactor;
-    replayTimer->setInterval(static_cast<int>(200 / timeScaleFactor));
+    replayTimer->setInterval(static_cast<int>(TIMER_INTERVAL_MS / timeScaleFactor));
 }
 
 void ReplayTimelineWidget::startReplay()
 {
-    replayTimer->start(static_cast<int>(200 / timeScaleFactor));
+    replayTimer->start(static_cast<int>(TIMER_INTERVAL_MS / timeScaleFactor));
 }
 
 void ReplayTimelineWidget::stopReplay()

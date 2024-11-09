@@ -26,13 +26,15 @@ private:
         BACKWARD_SKIP
     };
 
-    QTimer *replayTimer;
+    static constexpr int TIMER_INTERVAL_MS = 200;
+    static constexpr int BIN_LENGTH = 5000;
     static constexpr int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
     static constexpr int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
+
+    QTimer *replayTimer;
     QTimer *rewindBufferingTimer;
     QList<int> replayTimeline;
     QList<int> histogram;
-    static const int binLength;
     int maxBinValue, maxTime;
     qreal timeScaleFactor;
     int currentTime;
@@ -47,6 +49,10 @@ private slots:
     void replayTimerTimeout();
 
 public:
+    static constexpr int SMALL_SKIP_MS = 1000;
+    static constexpr int BIG_SKIP_MS = 10000;
+    static constexpr qreal FAST_FORWARD_SCALE_FACTOR = 10.0;
+
     explicit ReplayTimelineWidget(QWidget *parent = nullptr);
     void setTimeline(const QList<int> &_replayTimeline);
     QSize sizeHint() const override;
