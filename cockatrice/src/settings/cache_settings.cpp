@@ -243,6 +243,7 @@ SettingsCache::SettingsCache()
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
+    openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
@@ -535,6 +536,12 @@ void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T _tapAnimation)
 {
     tapAnimation = static_cast<bool>(_tapAnimation);
     settings->setValue("cards/tapanimation", tapAnimation);
+}
+
+void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab)
+{
+    openDeckInNewTab = static_cast<bool>(_openDeckInNewTab);
+    settings->setValue("editor/openDeckInNewTab", openDeckInNewTab);
 }
 
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)

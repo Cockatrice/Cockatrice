@@ -440,6 +440,7 @@ void AppearanceSettingsPage::retranslateUi()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
+    // general settings and notification settings
     notificationsEnabledCheckBox.setChecked(SettingsCache::instance().getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
             SLOT(setNotificationsEnabled(QT_STATE_CHANGED_T)));
@@ -490,6 +491,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     notificationsGroupBox = new QGroupBox;
     notificationsGroupBox->setLayout(notificationsGrid);
 
+    // animation settings
     tapAnimationCheckBox.setChecked(SettingsCache::instance().getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
             SLOT(setTapAnimation(QT_STATE_CHANGED_T)));
@@ -500,10 +502,23 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
 
+    // deck editor settings
+    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().getOpenDeckInNewTab());
+    connect(&openDeckInNewTabCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
+            SLOT(setOpenDeckInNewTab(QT_STATE_CHANGED_T)));
+
+    auto *deckEditorGrid = new QGridLayout;
+    deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
+
+    deckEditorGroupBox = new QGroupBox;
+    deckEditorGroupBox->setLayout(deckEditorGrid);
+
+    // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(notificationsGroupBox);
     mainLayout->addWidget(animationGroupBox);
+    mainLayout->addWidget(deckEditorGroupBox);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
@@ -532,6 +547,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
+    deckEditorGroupBox->setTitle(tr("Deck editor settings"));
+    openDeckInNewTabCheckBox.setText(tr("Always open deck in new tab"));
 }
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()

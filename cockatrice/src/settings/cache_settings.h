@@ -96,6 +96,7 @@ private:
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
+    bool openDeckInNewTab;
     bool chatMention;
     bool chatMentionCompleter;
     QString chatMentionColor;
@@ -294,6 +295,10 @@ public:
     bool getTapAnimation() const
     {
         return tapAnimation;
+    }
+    bool getOpenDeckInNewTab() const
+    {
+        return openDeckInNewTab;
     }
     bool getChatMention() const
     {
@@ -538,6 +543,7 @@ public slots:
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(QT_STATE_CHANGED_T _tapAnimation);
+    void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);

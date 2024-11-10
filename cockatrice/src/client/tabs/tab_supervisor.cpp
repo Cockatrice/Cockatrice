@@ -496,6 +496,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
     connect(tab, SIGNAL(deckEditorClosing(TabDeckEditor *)), this, SLOT(deckEditorClosed(TabDeckEditor *)));
+    connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     deckEditorTabs.append(tab);

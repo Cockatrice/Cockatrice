@@ -124,9 +124,11 @@ private:
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
+    QCheckBox openDeckInNewTabCheckBox;
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
+    QGroupBox *deckEditorGroupBox;
 
 public:
     UserInterfaceSettingsPage();
