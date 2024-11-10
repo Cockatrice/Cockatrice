@@ -188,6 +188,14 @@ public:
                       bool _cipt = false,
                       int _tableRow = 0,
                       bool _upsideDownArt = false);
+    CardInfo(const CardInfo &other)
+        : QObject(other.parent()), name(other.name), simpleName(other.simpleName), pixmapCacheKey(other.pixmapCacheKey),
+          text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
+          reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
+          sets(other.sets), setsNames(other.setsNames), cipt(other.cipt), tableRow(other.tableRow),
+          upsideDownArt(other.upsideDownArt)
+    {
+    }
     ~CardInfo() override;
 
     static CardInfoPtr newInstance(const QString &_name = QString(),
@@ -200,6 +208,14 @@ public:
                                    bool _cipt = false,
                                    int _tableRow = 0,
                                    bool _upsideDownArt = false);
+
+    CardInfoPtr clone() const
+    {
+        // Use the copy constructor to create a new instance
+        CardInfoPtr newCardInfo = CardInfoPtr(new CardInfo(*this));
+        newCardInfo->setSmartPointer(newCardInfo); // Set the smart pointer for the new instance
+        return newCardInfo;
+    }
 
     void setSmartPointer(CardInfoPtr _ptr)
     {
@@ -214,6 +230,10 @@ public:
     const QString &getSimpleName() const
     {
         return simpleName;
+    }
+    void setPixmapCacheKey(QString _pixmapCacheKey)
+    {
+        pixmapCacheKey = _pixmapCacheKey;
     }
     const QString &getPixmapCacheKey() const
     {
@@ -394,6 +414,8 @@ protected:
 private:
     CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
+    CardInfoPerSet getPreferredSetForCard(const QString &cardName);
+    QString getPreferredPrintingUUIDForCard(const QString &cardName);
     void refreshCachedReverseRelatedCards();
 
     QBasicMutex *reloadDatabaseMutex = new QBasicMutex(), *clearDatabaseMutex = new QBasicMutex(),
@@ -409,6 +431,7 @@ public:
     void removeCard(CardInfoPtr card);
     CardInfoPtr getCard(const QString &cardName) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
+    CardInfoPtr getCardByNameAndUUID(const QString &cardName, const QString &uuid) const;
     CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
@@ -418,6 +441,7 @@ public:
     CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
     CardSetPtr getSet(const QString &setName);
+    bool isUuidForPreferredPrinting(const QString &cardName, const QString &uuid);
     QList<CardInfoPtr> getCardList() const
     {
         return cards.values();
@@ -436,6 +460,7 @@ public:
 
 public slots:
     LoadStatus loadCardDatabases();
+    void refreshPreferredPrintings();
     void addCard(CardInfoPtr card);
     void addSet(CardSetPtr set);
 protected slots:
