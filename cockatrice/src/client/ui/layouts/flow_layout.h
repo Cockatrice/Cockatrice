@@ -29,6 +29,8 @@ public:
     int getParentScrollAreaHeight() const;
 
     void setGeometry(const QRect &rect) override;
+    virtual int layoutRows(int originX, int originY, int availableWidth);
+    virtual void layoutRow(const QVector<QLayoutItem *> &rowItems, int x, int y);
     QSize sizeHint() const override;
     QSize minimumSize() const override;
 
