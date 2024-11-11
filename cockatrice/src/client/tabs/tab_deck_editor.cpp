@@ -1014,7 +1014,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
+    QModelIndex newCardIndex = deckModel->addPreferredPrintingCard(info->getName(), zoneName, false);
     recursiveExpand(newCardIndex);
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);
@@ -1037,7 +1037,7 @@ void TabDeckEditor::actSwapCard()
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     // Third argument (true) says create the card no mater what, even if not in DB
-    QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName, true);
+    QModelIndex newCardIndex = deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
     recursiveExpand(newCardIndex);
 
     setModified(true);
