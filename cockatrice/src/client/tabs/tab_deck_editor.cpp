@@ -783,7 +783,7 @@ void TabDeckEditor::actNewDeck()
 
 void TabDeckEditor::actLoadDeck()
 {
-    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab();
+    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab() && !isBlankNewDeck();
 
     if (!openInNewTab && !confirmClose())
         return;
@@ -876,7 +876,7 @@ bool TabDeckEditor::actSaveDeckAs()
 
 void TabDeckEditor::actLoadDeckFromClipboard()
 {
-    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab();
+    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab() && !isBlankNewDeck();
 
     if (!openInNewTab && !confirmClose())
         return;
@@ -983,6 +983,15 @@ void TabDeckEditor::recursiveExpand(const QModelIndex &index)
     if (index.parent().isValid())
         recursiveExpand(index.parent());
     deckView->expand(index);
+}
+
+/**
+ * @brief Returns true if this tab is a blank newly opened tab, as if it was just created with the `New Deck` action.
+ */
+bool TabDeckEditor::isBlankNewDeck() const
+{
+    DeckLoader *const deck = deckModel->getDeckList();
+    return !modified && deck->getLastFileName().isEmpty() && deck->getLastRemoteDeckId() == -1;
 }
 
 CardInfoPtr TabDeckEditor::currentCardInfo() const

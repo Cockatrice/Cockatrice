@@ -100,6 +100,7 @@ private slots:
     void showSearchSyntaxHelp();
 
 private:
+    bool isBlankNewDeck() const;
     CardInfoPtr currentCardInfo() const;
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
