@@ -4,8 +4,12 @@
  * @brief Constructs a VerticalFlowLayout instance with the specified parent widget.
  *        This layout arranges items in rows within the given width, automatically adjusting its height.
  * @param parent The parent widget to which this layout belongs.
+ * @param margin The layout margin.
+ * @param hSpacing The horizontal spacing between items.
+ * @param vSpacing The vertical spacing between items.
  */
-VerticalFlowLayout::VerticalFlowLayout(QWidget *parent) : FlowLayout(parent)
+VerticalFlowLayout::VerticalFlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+    : FlowLayout(parent, margin, hSpacing, vSpacing)
 {
 }
 
@@ -42,9 +46,9 @@ int VerticalFlowLayout::heightForWidth(int width) const
     int rowHeight = 0;
 
     for (QLayoutItem *item : items) {
-        int itemWidth = item->sizeHint().width();
+        int itemWidth = item->sizeHint().width() + horizontalSpacing();
         if (rowWidth + itemWidth > width) {
-            height += rowHeight;
+            height += rowHeight + verticalSpacing();
             rowWidth = itemWidth;
             rowHeight = item->sizeHint().height();
         } else {
@@ -92,18 +96,21 @@ int VerticalFlowLayout::layoutRows(int originX, int originY, int availableWidth)
 
     for (QLayoutItem *item : items) {
         QSize itemSize = item->sizeHint();
-        if (currentXPosition + itemSize.width() > availableWidth) {
+        int itemWidth = itemSize.width() + horizontalSpacing();
+
+        if (currentXPosition + itemWidth > availableWidth) {
             layoutRow(rowItems, originX, currentYPosition);
             rowItems.clear();
             currentXPosition = originX;
-            currentYPosition += rowHeight;
+            currentYPosition += rowHeight + verticalSpacing();
             rowWidth = 0;
             rowHeight = 0;
         }
+
         rowItems.append(item);
-        rowWidth += itemSize.width();
+        rowWidth += itemWidth;
         rowHeight = qMax(rowHeight, itemSize.height());
-        currentXPosition += itemSize.width();
+        currentXPosition += itemWidth;
     }
 
     layoutRow(rowItems, originX, currentYPosition);
@@ -124,6 +131,6 @@ void VerticalFlowLayout::layoutRow(const QVector<QLayoutItem *> &rowItems, int x
         int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
         int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
         item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
-        x += itemWidth;
+        x += itemWidth + horizontalSpacing(); // Include horizontal spacing between items
     }
 }

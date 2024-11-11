@@ -38,7 +38,7 @@ FlowWidget::FlowWidget(QWidget *parent, Qt::ScrollBarPolicy horizontalPolicy, Qt
     } else if (horizontalPolicy == Qt::ScrollBarAlwaysOff && verticalPolicy != Qt::ScrollBarAlwaysOff) {
         flow_layout = new VerticalFlowLayout(container);
     } else {
-        flow_layout = new FlowLayout(container);
+        flow_layout = new FlowLayout(container, 0, 0, 0);
     }
 
     container->setLayout(flow_layout);
@@ -110,7 +110,7 @@ void FlowWidget::clearLayout()
                    scrollArea->verticalScrollBarPolicy() != Qt::ScrollBarAlwaysOff) {
             flow_layout = new VerticalFlowLayout(container);
         } else {
-            flow_layout = new FlowLayout(container);
+            flow_layout = new FlowLayout(container, 0, 0, 0);
         }
         this->container->setLayout(flow_layout);
     }

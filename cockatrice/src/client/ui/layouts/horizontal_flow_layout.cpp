@@ -4,8 +4,12 @@
  * @brief Constructs a HorizontalFlowLayout instance with the specified parent widget.
  *        This layout arranges items in columns within the given height, automatically adjusting its width.
  * @param parent The parent widget to which this layout belongs.
+ * @param margin The layout margin.
+ * @param hSpacing The horizontal spacing between items.
+ * @param vSpacing The vertical spacing between items.
  */
-HorizontalFlowLayout::HorizontalFlowLayout(QWidget *parent) : FlowLayout(parent)
+HorizontalFlowLayout::HorizontalFlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+: FlowLayout(parent, margin, hSpacing, vSpacing)
 {
 }
 
@@ -38,21 +42,21 @@ bool HorizontalFlowLayout::hasHeightForWidth() const
 int HorizontalFlowLayout::heightForWidth(int height) const
 {
     int width = 0;
-    int rowWidth = 0;
-    int rowHeight = 0;
+    int colWidth = 0;
+    int colHeight = 0;
 
     for (QLayoutItem *item : items) {
         int itemHeight = item->sizeHint().height();
-        if (rowHeight + itemHeight > height) {
-            width += rowWidth;
-            rowHeight = itemHeight;
-            rowWidth = item->sizeHint().width();
+        if (colHeight + itemHeight > height) {
+            width += colWidth;
+            colHeight = itemHeight;
+            colWidth = item->sizeHint().width();
         } else {
-            rowHeight += itemHeight;
-            rowWidth = qMax(rowWidth, item->sizeHint().width());
+            colHeight += itemHeight;
+            colWidth = qMax(colWidth, item->sizeHint().width());
         }
     }
-    width += rowWidth; // Add width of the last column
+    width += colWidth; // Add width of the last column
     return width;
 }
 
@@ -64,11 +68,11 @@ void HorizontalFlowLayout::setGeometry(const QRect &rect)
 {
     int availableHeight = qMax(rect.height(), getParentScrollAreaHeight());
 
-    int totalWidth = layoutRows(rect.x(), rect.y(), availableHeight);
+    int totalWidth = layoutColumns(rect.x(), rect.y(), availableHeight);
 
     QWidget *parentWidgetPtr = parentWidget();
     if (parentWidgetPtr) {
-        parentWidgetPtr->setMinimumSize(availableHeight, totalWidth);
+        parentWidgetPtr->setMinimumSize(totalWidth, availableHeight);
     }
 }
 
@@ -80,45 +84,45 @@ void HorizontalFlowLayout::setGeometry(const QRect &rect)
  * @param availableHeight The height within which each column is constrained.
  * @return The total width after arranging all columns.
  */
-int HorizontalFlowLayout::layoutRows(int originX, int originY, int availableHeight)
+int HorizontalFlowLayout::layoutColumns(int originX, int originY, int availableHeight)
 {
-    QVector<QLayoutItem *> rowItems;
+    QVector<QLayoutItem *> colItems;
     int currentXPosition = originX;
     int currentYPosition = originY;
 
-    int rowWidth = 0;
-    int rowHeight = 0;
+    int colWidth = 0;
+    int colHeight = 0;
 
     for (QLayoutItem *item : items) {
         QSize itemSize = item->sizeHint();
         if (currentYPosition + itemSize.height() > availableHeight) {
-            layoutRow(rowItems, currentXPosition, originY);
-            rowItems.clear();
+            layoutColumn(colItems, currentXPosition, originY);
+            colItems.clear();
             currentYPosition = originY;
-            currentXPosition += rowWidth;
-            rowWidth = 0;
-            rowHeight = 0;
+            currentXPosition += colWidth;
+            colWidth = 0;
+            colHeight = 0;
         }
-        rowItems.append(item);
-        rowHeight += itemSize.height();
-        rowWidth = qMax(rowWidth, itemSize.width());
+        colItems.append(item);
+        colHeight += itemSize.height();
+        colWidth = qMax(colWidth, itemSize.width());
         currentYPosition += itemSize.height();
     }
 
-    layoutRow(rowItems, currentXPosition, originY);
+    layoutColumn(colItems, currentXPosition, originY);
 
-    return currentXPosition + rowWidth;
+    return currentXPosition + colWidth;
 }
 
 /**
  * @brief Arranges a single column of items within specified x and y starting positions.
- * @param rowItems A list of items to be arranged in the column.
+ * @param colItems A list of items to be arranged in the column.
  * @param x The starting x-coordinate for the column.
  * @param y The starting y-coordinate for the column.
  */
-void HorizontalFlowLayout::layoutRow(const QVector<QLayoutItem *> &rowItems, int x, int y)
+void HorizontalFlowLayout::layoutColumn(const QVector<QLayoutItem *> &colItems, int x, int y)
 {
-    for (QLayoutItem *item : rowItems) {
+    for (QLayoutItem *item : colItems) {
         QSize itemMaxSize = item->widget()->maximumSize();
         int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
         int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());

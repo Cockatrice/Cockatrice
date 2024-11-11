@@ -11,13 +11,19 @@
 #include <QDebug>
 #include <QLayoutItem>
 #include <QScrollArea>
+#include <QStyle>
 
 /**
- * @brief Constructs a FlowLayout instance with the specified parent widget.
+ * @brief Constructs a FlowLayout instance with the specified parent widget, margin, and spacing values.
  * @param parent The parent widget for this layout.
+ * @param margin The layout margin.
+ * @param hSpacing The horizontal spacing between items.
+ * @param vSpacing The vertical spacing between items.
  */
-FlowLayout::FlowLayout(QWidget *parent) : QLayout(parent)
+FlowLayout::FlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+    : QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing)
 {
+    setContentsMargins(margin, margin, margin, margin);
 }
 
 /**
@@ -26,7 +32,7 @@ FlowLayout::FlowLayout(QWidget *parent) : QLayout(parent)
 FlowLayout::~FlowLayout()
 {
     QLayoutItem *item;
-    while ((item = FlowLayout::takeAt(0))) {
+    while ((item = takeAt(0))) {
         delete item;
     }
 }
@@ -56,23 +62,7 @@ bool FlowLayout::hasHeightForWidth() const
  */
 int FlowLayout::heightForWidth(int width) const
 {
-    int height = 0;
-    int rowWidth = 0;
-    int rowHeight = 0;
-
-    for (QLayoutItem *item : items) {
-        int itemWidth = item->sizeHint().width();
-        if (rowWidth + itemWidth > width) { // Start a new row if the row width exceeds available width
-            height += rowHeight;
-            rowWidth = itemWidth;
-            rowHeight = item->sizeHint().height();
-        } else {
-            rowWidth += itemWidth;
-            rowHeight = qMax(rowHeight, item->sizeHint().height());
-        }
-    }
-    height += rowHeight; // Add the final row's height
-    return height;
+    return doLayout(QRect(0, 0, width, 0), true);
 }
 
 /**
@@ -82,67 +72,7 @@ int FlowLayout::heightForWidth(int width) const
 void FlowLayout::setGeometry(const QRect &rect)
 {
     QLayout::setGeometry(rect);
-    int availableWidth = qMax(rect.width(), getParentScrollAreaWidth());
-    int totalHeight = layoutRows(rect.x(), rect.y(), availableWidth);
-
-    QWidget *parentWidgetPtr = parentWidget();
-    if (parentWidgetPtr) {
-        parentWidgetPtr->setMinimumSize(availableWidth, totalHeight);
-    }
-}
-
-/**
- * @brief Arranges items in rows based on the available width.
- * @param originX The starting x-coordinate for the row layout.
- * @param originY The starting y-coordinate for the row layout.
- * @param availableWidth The available width to lay out items.
- * @return The y-coordinate of the final row's end position.
- */
-int FlowLayout::layoutRows(int originX, int originY, int availableWidth)
-{
-    QVector<QLayoutItem *> rowItems;
-    int currentXPosition = originX;
-    int currentYPosition = originY;
-
-    int rowWidth = 0;
-    int rowHeight = 0;
-
-    for (QLayoutItem *item : items) {
-        QSize itemSize = item->sizeHint();
-        if (currentXPosition + itemSize.width() > availableWidth) {
-            layoutRow(rowItems, originX, currentYPosition);
-            rowItems.clear();
-            currentXPosition = originX;
-            currentYPosition += rowHeight;
-            rowWidth = 0;
-            rowHeight = 0;
-        }
-        rowItems.append(item);
-        rowWidth += itemSize.width();
-        rowHeight = qMax(rowHeight, itemSize.height());
-        currentXPosition += itemSize.width();
-    }
-
-    layoutRow(rowItems, originX, currentYPosition);
-
-    return currentYPosition + rowHeight;
-}
-
-/**
- * @brief Helper function for arranging a single row of items within specified bounds.
- * @param rowItems Items to be arranged in the row.
- * @param x The x-coordinate for starting the row.
- * @param y The y-coordinate for starting the row.
- */
-void FlowLayout::layoutRow(const QVector<QLayoutItem *> &rowItems, int x, int y)
-{
-    for (QLayoutItem *item : rowItems) {
-        QSize itemMaxSize = item->widget()->maximumSize();
-        int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
-        int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
-        item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
-        x += itemWidth;
-    }
+    doLayout(rect, false);
 }
 
 /**
@@ -151,11 +81,7 @@ void FlowLayout::layoutRow(const QVector<QLayoutItem *> &rowItems, int x, int y)
  */
 QSize FlowLayout::sizeHint() const
 {
-    QSize size;
-    for (QLayoutItem *item : items) {
-        size = size.expandedTo(item->sizeHint());
-    }
-    return size.isValid() ? size : QSize(0, 0);
+    return minimumSize();
 }
 
 /**
@@ -169,10 +95,9 @@ QSize FlowLayout::minimumSize() const
         size = size.expandedTo(item->minimumSize());
     }
 
-    size.setWidth(qMin(size.width(), getParentScrollAreaWidth()));
-    size.setHeight(qMin(size.height(), getParentScrollAreaHeight()));
-
-    return size.isValid() ? size : QSize(0, 0);
+    const QMargins margins = contentsMargins();
+    size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+    return size;
 }
 
 /**
@@ -211,6 +136,80 @@ QLayoutItem *FlowLayout::itemAt(int index) const
 QLayoutItem *FlowLayout::takeAt(int index)
 {
     return (index >= 0 && index < items.size()) ? items.takeAt(index) : nullptr;
+}
+
+/**
+ * @brief Gets the horizontal spacing between items.
+ * @return The horizontal spacing if set, otherwise a smart default.
+ */
+int FlowLayout::horizontalSpacing() const
+{
+    return (m_hSpace >= 0) ? m_hSpace : smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
+}
+
+/**
+ * @brief Gets the vertical spacing between items.
+ * @return The vertical spacing if set, otherwise a smart default.
+ */
+int FlowLayout::verticalSpacing() const
+{
+    return (m_vSpace >= 0) ? m_vSpace : smartSpacing(QStyle::PM_LayoutVerticalSpacing);
+}
+
+/**
+ * @brief Main layout function that arranges items with spacing and margins.
+ * @param rect The rectangle available for layout.
+ * @param testOnly If true, only calculates height without applying geometry.
+ * @return The calculated height after layout.
+ */
+int FlowLayout::doLayout(const QRect &rect, bool testOnly) const
+{
+    int left, top, right, bottom;
+    getContentsMargins(&left, &top, &right, &bottom);
+    QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
+    int x = effectiveRect.x();
+    int y = effectiveRect.y();
+    int lineHeight = 0;
+
+    for (QLayoutItem *item : items) {
+        int spaceX = horizontalSpacing();
+        int spaceY = verticalSpacing();
+
+        int nextX = x + item->sizeHint().width() + spaceX;
+        if (nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
+            x = effectiveRect.x();
+            y = y + lineHeight + spaceY;
+            nextX = x + item->sizeHint().width() + spaceX;
+            lineHeight = 0;
+        }
+
+        if (!testOnly) {
+            item->setGeometry(QRect(QPoint(x, y), item->sizeHint()));
+        }
+
+        x = nextX;
+        lineHeight = qMax(lineHeight, item->sizeHint().height());
+    }
+
+    return y + lineHeight - rect.y() + bottom;
+}
+
+/**
+ * @brief Calculates smart spacing based on the parent widget style.
+ * @param pm The pixel metric to calculate.
+ * @return The calculated spacing value.
+ */
+int FlowLayout::smartSpacing(QStyle::PixelMetric pm) const
+{
+    QObject *parent = this->parent();
+    if (!parent) {
+        return -1;
+    } else if (parent->isWidgetType()) {
+        QWidget *pw = static_cast<QWidget *>(parent);
+        return pw->style()->pixelMetric(pm, nullptr, pw);
+    } else {
+        return static_cast<QLayout *>(parent)->spacing();
+    }
 }
 
 /**
