@@ -108,9 +108,9 @@ int VerticalFlowLayout::layoutRows(int originX, int originY, int availableWidth)
         }
 
         rowItems.append(item);
-        rowWidth += itemWidth;
+        rowWidth += itemWidth + horizontalSpacing();
         rowHeight = qMax(rowHeight, itemSize.height());
-        currentXPosition += itemWidth;
+        currentXPosition += itemWidth + horizontalSpacing();
     }
 
     layoutRow(rowItems, originX, currentYPosition);
