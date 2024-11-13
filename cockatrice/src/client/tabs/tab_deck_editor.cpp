@@ -1029,6 +1029,7 @@ void TabDeckEditor::actSwapCard()
     if (!currentIndex.isValid())
         return;
     const QString cardName = currentIndex.sibling(currentIndex.row(), 1).data().toString();
+    const QString cardUUID = currentIndex.sibling(currentIndex.row(), 2).data().toString();
     const QModelIndex gparent = currentIndex.parent().parent();
 
     if (!gparent.isValid())
@@ -1038,8 +1039,9 @@ void TabDeckEditor::actSwapCard()
     actDecrement();
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
-    // Third argument (true) says create the card no mater what, even if not in DB
-    QModelIndex newCardIndex = deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
+    // Third argument (true) says create the card no matter what, even if not in DB
+    QModelIndex newCardIndex = deckModel->addCard(
+        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardUUID), otherZoneName, true);
     recursiveExpand(newCardIndex);
 
     setModified(true);
