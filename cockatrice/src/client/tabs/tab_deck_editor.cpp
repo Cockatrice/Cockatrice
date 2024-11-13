@@ -504,7 +504,7 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
 void TabDeckEditor::decklistCustomMenu(QPoint point)
 {
     QMenu menu;
-    const CardInfoPtr info = currentCardInfo();
+    const CardInfoPtr info = cardInfo->getInfo();
 
     // filling out the related cards submenu
     QAction *selectPrinting = menu.addAction("Select Printing");
@@ -518,7 +518,7 @@ void TabDeckEditor::decklistCustomMenu(QPoint point)
 void TabDeckEditor::createPrintingSelector(CardInfoPtr selectedCard)
 {
     PrintingSelector *selector = new PrintingSelector(deckModel, deckView, selectedCard);
-    this->centralFrame->addWidget(selector);
+    selector->show();
 }
 
 
