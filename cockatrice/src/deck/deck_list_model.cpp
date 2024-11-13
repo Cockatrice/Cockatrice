@@ -324,7 +324,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName, cons
     if (uuid.isEmpty()) {
         return dynamic_cast<DecklistModelCardNode *>(typeNode->findChild(cardName));
     }
-    return dynamic_cast<DecklistModelCardNode *>(typeNode->findChild(cardName, uuid));
+    return dynamic_cast<DecklistModelCardNode *>(typeNode->findCardChildByNameAndUUID(cardName, uuid));
 }
 
 QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zoneName, const QString &uuid) const
@@ -366,7 +366,8 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const CardInfoPerSet
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
 
     const QModelIndex parentIndex = nodeToIndex(cardTypeNode);
-    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findChild(cardName, cardInfoSet.getProperty("uuid")));
+    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(
+        cardTypeNode->findCardChildByNameAndUUID(cardName, cardInfoSet.getProperty("uuid")));
     if (!cardNode) {
         auto *decklistCard = deckList->addCard(
             cardInfo->getName(), zoneName, cardInfoSet.getProperty("uuid"), cardInfoSet.getProperty("num"));
