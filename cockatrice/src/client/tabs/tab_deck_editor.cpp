@@ -724,8 +724,10 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 {
     if (!current.isValid())
         return;
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0)))
-        cardInfo->setCard(current.sibling(current.row(), 1).data().toString());
+    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+        cardInfo->setCard(current.sibling(current.row(), 1).data().toString(),
+                          current.sibling(current.row(), 2).data().toString());
+    }
 }
 
 void TabDeckEditor::updateSearch(const QString &search)
