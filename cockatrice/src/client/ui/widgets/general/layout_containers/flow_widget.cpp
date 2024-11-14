@@ -96,7 +96,7 @@ void FlowWidget::clearLayout()
     if (flow_layout != nullptr) {
         QLayoutItem *item;
         while ((item = flow_layout->takeAt(0)) != nullptr) {
-            delete item->widget(); // Delete the widget
+            item->widget()->deleteLater(); // Delete the widget
             delete item;           // Delete the layout item
         }
     }
