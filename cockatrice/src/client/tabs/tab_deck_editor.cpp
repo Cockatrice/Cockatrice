@@ -517,8 +517,8 @@ void TabDeckEditor::decklistCustomMenu(QPoint point)
 
 void TabDeckEditor::createPrintingSelector(CardInfoPtr selectedCard)
 {
-    PrintingSelector *selector = new PrintingSelector(deckModel, deckView, selectedCard);
-    selector->show();
+    printingSelector->setCard(selectedCard);
+    printingSelector->show();
 }
 
 
@@ -640,6 +640,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     createDeckDock();
     createCardInfoDock();
     createFiltersDock();
+
+    printingSelector = new PrintingSelector(deckModel, deckView);
 
     this->installEventFilter(this);
 

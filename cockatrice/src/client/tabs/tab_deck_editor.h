@@ -4,6 +4,7 @@
 #include "../../deck/custom_line_edit.h"
 #include "../../game/cards/card_database.h"
 #include "../game_logic/key_signals.h"
+#include "../ui/widgets/printing_selector/printing_selector.h"
 #include "tab.h"
 
 #include <QAbstractItemModel>
@@ -116,6 +117,7 @@ private:
     QTreeView *deckView;
     KeySignals deckViewKeySignals;
     CardInfoFrameWidget *cardInfo;
+    PrintingSelector *printingSelector;
     SearchLineEdit *searchEdit;
     KeySignals searchKeySignals;
 
