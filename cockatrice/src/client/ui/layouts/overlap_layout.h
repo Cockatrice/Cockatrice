@@ -20,6 +20,10 @@ public:
     QSize sizeHint() const override;
     void setMaxColumns(int newValue);
     void setMaxRows(int newValue);
+    int calculateMaxColumns() const;
+    int calculateRowsForColumns(int columns) const;
+    int calculateMaxRows() const;
+    int calculateColumnsForRows(int rows) const;
     void setDirection(Qt::Orientation direction);
 
 private:

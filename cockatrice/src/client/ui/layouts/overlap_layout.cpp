@@ -300,3 +300,106 @@ void OverlapLayout::setMaxRows(int newValue)
 {
     maxRows = newValue;
 }
+
+/**
+ * @brief Calculates the maximum number of columns for a vertical overlap layout based on the current width.
+ *
+ * This function determines the maximum number of columns that can fit within the layout's width
+ * given the overlap percentage and item size, based on the current layout direction.
+ *
+ * @return Maximum number of columns that can fit within the layout width.
+ */
+int OverlapLayout::calculateMaxColumns() const
+{
+    if (direction != Qt::Vertical || itemList.isEmpty()) {
+        return 1; // Only relevant if the layout direction is vertical
+    }
+
+    // Determine maximum item width
+    int maxItemWidth = 0;
+    for (const QLayoutItem *item : itemList) {
+        if (item->widget()) {
+            QSize itemSize = item->widget()->sizeHint();
+            maxItemWidth = std::max(maxItemWidth, itemSize.width());
+        }
+    }
+
+    int availableWidth = parentWidget() ? parentWidget()->width() : 0;
+    // Determine the maximum number of columns that can fit
+    int columns = availableWidth / maxItemWidth;
+
+    return columns > 0 ? columns : 1;
+}
+
+/**
+ * @brief Calculates the maximum number of rows needed for a given number of columns in a vertical overlap layout.
+ *
+ * Determines how many rows are required to arrange all items given the calculated or specified number of columns.
+ *
+ * @param columns The number of columns available.
+ * @return The total number of rows required.
+ */
+int OverlapLayout::calculateRowsForColumns(int columns) const
+{
+    if (direction != Qt::Vertical || itemList.isEmpty() || columns <= 0) {
+        return 1; // Only relevant if the layout direction is vertical and there are items
+    }
+
+    int totalItems = itemList.size();
+    int rows = std::ceil(static_cast<double>(totalItems) / columns);
+
+    return rows;
+}
+
+/**
+ * @brief Calculates the maximum number of rows for a horizontal overlap layout based on the current height.
+ *
+ * This function determines the maximum number of rows that can fit within the layout's height
+ * given the overlap percentage and item size, based on the current layout direction.
+ *
+ * @return Maximum number of rows that can fit within the layout height.
+ */
+int OverlapLayout::calculateMaxRows() const
+{
+    if (direction != Qt::Horizontal || itemList.isEmpty()) {
+        return 1; // Only relevant if the layout direction is horizontal
+    }
+
+    // Determine maximum item height
+    int maxItemHeight = 0;
+    for (const QLayoutItem *item : itemList) {
+        if (item->widget()) {
+            QSize itemSize = item->widget()->sizeHint();
+            maxItemHeight = std::max(maxItemHeight, itemSize.height());
+        }
+    }
+
+    // Calculate the effective height of each item with the overlap applied
+    int overlapOffsetHeight = (maxItemHeight * (100 - overlapPercentage)) / 100;
+    int availableHeight = parentWidget() ? parentWidget()->height() : 0;
+
+    // Determine the maximum number of rows that can fit
+    int rows = availableHeight / overlapOffsetHeight;
+
+    return rows > 0 ? rows : 1;
+}
+
+/**
+ * @brief Calculates the maximum number of columns needed for a given number of rows in a horizontal overlap layout.
+ *
+ * Determines how many columns are required to arrange all items given the calculated or specified number of rows.
+ *
+ * @param rows The number of rows available.
+ * @return The total number of columns required.
+ */
+int OverlapLayout::calculateColumnsForRows(int rows) const
+{
+    if (direction != Qt::Horizontal || itemList.isEmpty() || rows <= 0) {
+        return 1; // Only relevant if the layout direction is horizontal and there are items
+    }
+
+    int totalItems = itemList.size();
+    int columns = std::ceil(static_cast<double>(totalItems) / rows);
+
+    return columns;
+}
