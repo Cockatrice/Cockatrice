@@ -62,7 +62,8 @@ int VerticalFlowLayout::heightForWidth(int width) const
  */
 void VerticalFlowLayout::setGeometry(const QRect &rect)
 {
-    int availableWidth = qMax(rect.width(), getParentScrollAreaWidth());
+    // If we have a parent scroll area, we're clamped to that, else we use our own rectangle.
+    int availableWidth = getParentScrollAreaWidth() == 0 ? rect.width() : getParentScrollAreaWidth();
 
     int totalHeight = layoutRows(rect.x(), rect.y(), availableWidth);
 
