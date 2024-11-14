@@ -169,6 +169,8 @@ void CardInfoPictureWidget::enterEvent(QEnterEvent *event)
     if (hoverToZoomEnabled) {
         hoverTimer->start(500);
     }
+
+    emit hoveredOnCard(info);
 }
 
 /**
@@ -207,7 +209,6 @@ void CardInfoPictureWidget::showEnlargedPixmap()
 {
     if (info) {
         QSize enlargedSize(size().width() * scaleFactor, static_cast<int>(size().width() * aspectRatio * scaleFactor));
-        qDebug() << enlargedSize;
         enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
 
         QPointF cursorPos = QCursor::pos();

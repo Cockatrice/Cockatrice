@@ -16,8 +16,20 @@ class CardInfoPictureWidget : public QWidget
 
 public:
     CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false);
+    CardInfoPtr getInfo()
+    {
+        return info;
+    }
     QSize sizeHint() const override;
     void setHoverToZoomEnabled(bool enabled);
+
+public slots:
+    void setCard(CardInfoPtr card);
+    void setScaleFactor(int scale); // New slot for scaling
+    void updatePixmap();
+
+signals:
+    void hoveredOnCard(CardInfoPtr hoveredCard);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -28,16 +40,13 @@ protected:
     void loadPixmap();
     const QPixmap& getResizedPixmap() const { return resizedPixmap; }
     void showEnlargedPixmap();
-public slots:
-    void setCard(CardInfoPtr card);
-    void setScaleFactor(int scale); // New slot for scaling
-    void updatePixmap();
+
 
 private:
     CardInfoPtr info;
     qreal aspectRatio = 1.396;
-    int baseWidth = 100;
-    int baseHeight = 100;
+    int baseWidth = 200;
+    int baseHeight = 200;
     double scaleFactor = 1.5;
     QPixmap resizedPixmap;
     bool pixmapDirty;

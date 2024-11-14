@@ -22,10 +22,14 @@ public:
     void setOutlineColor(const QColor &color);
     void setFontSize(int size);
     void setTextAlignment(Qt::Alignment alignment);
+
     QSize sizeHint() const override;
+signals:
+    void imageClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
     QSize minimumSizeHint() const override;
 
 private:
