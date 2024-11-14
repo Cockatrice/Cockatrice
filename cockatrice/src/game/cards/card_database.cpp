@@ -672,6 +672,9 @@ QString CardDatabase::getPreferredPrintingUUIDForCard(const QString &cardName)
 
 bool CardDatabase::isUuidForPreferredPrinting(const QString &cardName, const QString &uuid)
 {
+    if (uuid.startsWith("card_")) {
+        return uuid == QLatin1String("card_") + getPreferredPrintingUUIDForCard(cardName);
+    }
     return uuid == getPreferredPrintingUUIDForCard(cardName);
 }
 
