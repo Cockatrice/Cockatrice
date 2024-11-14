@@ -635,6 +635,27 @@ CardInfoPerSet CardDatabase::getPreferredSetForCard(const QString &cardName)
     return CardInfoPerSet(nullptr);
 }
 
+CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, const QString &uuid) const
+{
+    CardInfoPtr cardInfo = getCard(cardName);
+    if (!cardInfo) {
+        return CardInfoPerSet(nullptr);
+    }
+
+    CardInfoPerSetMap setMap = cardInfo->getSets();
+    if (setMap.empty()) {
+        return CardInfoPerSet(nullptr);
+    }
+
+    for (auto &cardInfoForSet : setMap) {
+        if (cardInfoForSet.getProperty("uuid") == uuid) {
+            return cardInfoForSet;
+        }
+    }
+
+    return CardInfoPerSet(nullptr);
+}
+
 QString CardDatabase::getPreferredPrintingUUIDForCard(const QString &cardName)
 {
     CardInfoPerSet preferredSetCardInfo = getPreferredSetForCard(cardName);
