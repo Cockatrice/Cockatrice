@@ -8,6 +8,7 @@
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
+#include "../general/layout_containers/flow_widget.h"
 
 #include <QHBoxLayout>
 #include <QPainter>
@@ -19,13 +20,14 @@ class PrintingSelector : public QWidget
     Q_OBJECT
 
 public:
-    PrintingSelector(DeckListModel *deckModel, QTreeView *deckView, CardInfoPtr &selectedCard, QWidget *parent = nullptr);
+    PrintingSelector(DeckListModel *deckModel, QTreeView *deckView, QWidget *parent = nullptr);
+    void setCard(CardInfoPtr newCard);
     CardInfoPerSet getSetForUUID(QString uuid);
     void getAllSetsForCurrentCard();
-    void populateCards();
 
 private:
     QHBoxLayout *layout;
+    FlowWidget *flowWidget;
     DeckListModel *deckModel;
     QTreeView *deckView;
     CardInfoPtr selectedCard;
