@@ -4,7 +4,7 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="81"/>
         <source>&amp;Set counter...</source>
-        <translation>&amp;Teller instellen...</translation>
+        <translation>&amp;Set counter...</translation>
     </message>
 </context>
 <context>
@@ -12,12 +12,12 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="199"/>
         <source>Set counter</source>
-        <translation>Teller instellen</translation>
+        <translation>Set counter</translation>
     </message>
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="200"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>Nieuwe waarde voor teller &apos;%1&apos;:</translation>
+        <translation>New value for counter &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -30,7 +30,7 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="408"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
-        <translation>Kon de themes map niet aanmaken op &apos;%1&apos;.</translation>
+        <translation>Kon de themamappen niet aanmaken op &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="414"/>
@@ -45,7 +45,7 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="416"/>
         <source>Open themes folder</source>
-        <translation>Open thema folder</translation>
+        <translation>Open themafolder</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="418"/>
@@ -55,7 +55,7 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="419"/>
         <source>Display card names on cards having a picture</source>
-        <translation>Kaartnamen altijd weergeven</translation>
+        <translation>Kaartnamen altijd weergeven op kaarten met een afbeelding</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="420"/>
@@ -7063,7 +7063,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Replays</source>
-        <translation type="unfinished"/>
+        <translation>Herhalingen</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="143"/>
@@ -7744,17 +7744,17 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="590"/>
         <source>Refresh</source>
-        <translation>Verversen</translation>
+        <translation>Refresh</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="593"/>
         <source>Play/Pause</source>
-        <translation type="unfinished"/>
+        <translation>Start/Stop</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="596"/>
         <source>Toggle Fast Forward</source>
-        <translation type="unfinished"/>
+        <translation>Versneling Schakelen</translation>
     </message>
 </context>
 </TS>
