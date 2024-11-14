@@ -82,6 +82,8 @@ void TabDeckEditor::createDeckDock()
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
+    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
+            SLOT(updatePrintingSelector(const QModelIndex &, const QModelIndex &)));
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
     connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(decklistCustomMenu(QPoint)));
     connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
@@ -640,8 +642,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     createDeckDock();
     createCardInfoDock();
     createFiltersDock();
-
-    printingSelector = new PrintingSelector(deckModel, deckView);
+    printingSelector = new PrintingSelector(deckModel, deckView, nullptr);
 
     this->installEventFilter(this);
 
@@ -753,6 +754,16 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         cardInfo->setCard(current.sibling(current.row(), 1).data().toString(),
                           current.sibling(current.row(), 2).data().toString());
+    }
+}
+
+void TabDeckEditor::updatePrintingSelector(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+    if (!current.isValid())
+        return;
+    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+        printingSelector->setCard(CardDatabaseManager::getInstance()->getCardByNameAndUUID(
+            current.sibling(current.row(), 1).data().toString(), current.sibling(current.row(), 2).data().toString()));
     }
 }
 
