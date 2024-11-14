@@ -431,6 +431,7 @@ public:
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
     CardInfoPtr getCardByNameAndUUID(const QString &cardName, const QString &uuid) const;
     CardInfoPerSet getPreferredSetForCard(const QString &cardName);
+    CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &uuid) const;
     QString getPreferredPrintingUUIDForCard(const QString &cardName);
     CardInfoPtr guessCard(const QString &cardName) const;
 
