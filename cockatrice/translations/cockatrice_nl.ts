@@ -4,7 +4,7 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="81"/>
         <source>&amp;Set counter...</source>
-        <translation>&amp;Set counter...</translation>
+        <translation>&amp;Teller instellen...</translation>
     </message>
 </context>
 <context>
@@ -12,12 +12,12 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="199"/>
         <source>Set counter</source>
-        <translation>Set counter</translation>
+        <translation>Teller instellen</translation>
     </message>
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="200"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>New value for counter &apos;%1&apos;:</translation>
+        <translation>Nieuwe waarde voor teller &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -30,7 +30,7 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="408"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
-        <translation>Kon de themamappen niet aanmaken op &apos;%1&apos;.</translation>
+        <translation>Kon de themes map niet aanmaken op &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="414"/>
@@ -7063,7 +7063,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Replays</source>
-        <translation>Herhalingen</translation>
+        <translation>Replays</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="143"/>
@@ -7754,7 +7754,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="596"/>
         <source>Toggle Fast Forward</source>
-        <translation>Versneling Schakelen</translation>
+        <translation>Versnelling Schakelen</translation>
     </message>
 </context>
 </TS>
