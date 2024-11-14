@@ -5,22 +5,26 @@
 #include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
 #include "../../../../game/cards/card_database_manager.h"
-#include "../../../../game/cards/card_info_picture.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
 
-PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(DeckListModel *deckModel, QTreeView *deckView, CardInfoPtr &rootCard, CardInfoPerSet &setInfoForCard, QWidget *parent)
+PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(DeckListModel *deckModel,
+                                                                     QTreeView *deckView,
+                                                                     CardInfoPtr &rootCard,
+                                                                     CardInfoPerSet &setInfoForCard,
+                                                                     QWidget *parent)
     : QWidget(parent), deckModel(deckModel), deckView(deckView), rootCard(rootCard), setInfoForCard(setInfoForCard)
 {
     layout = new QVBoxLayout();
     setLayout(layout);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    cardInfoPicture = new CardInfoPicture();
+    cardInfoPicture = new CardInfoPictureWidget();
     cardInfoPicture->setMinimumSize(0, 0);
     qDebug() << rootCard->getName() << " " << setInfoForCard.getProperty("uuid") << " " << countCards();
-    setCard = CardDatabaseManager::getInstance()->getCardByNameAndUUID(rootCard->getName(), setInfoForCard.getProperty("uuid"));
+    setCard = CardDatabaseManager::getInstance()->getCardByNameAndUUID(rootCard->getName(),
+                                                                       setInfoForCard.getProperty("uuid"));
     cardInfoPicture->setCard(setCard);
     layout->addWidget(cardInfoPicture);
 

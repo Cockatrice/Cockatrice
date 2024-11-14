@@ -1,10 +1,10 @@
 #ifndef PRINTING_SELECTOR_CARD_DISPLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_DISPLAY_WIDGET_H
 
+#include "../../../../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
-#include "../../../../game/cards/card_info_picture.h"
 
 #include <QLabel>
 #include <QPainter>
@@ -36,7 +36,7 @@ private:
     CardInfoPtr setCard;
     CardInfoPerSet setInfoForCard;
 
-    CardInfoPicture *cardInfoPicture;
+    CardInfoPictureWidget *cardInfoPicture;
     QLabel *cardCount;
     QLabel *setName;
     QLabel *setNumber;
