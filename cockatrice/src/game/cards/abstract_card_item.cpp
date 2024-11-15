@@ -188,6 +188,19 @@ void AbstractCardItem::setName(const QString &_name)
     cardInfoUpdated();
 }
 
+void AbstractCardItem::setUUID(const QString &_uuid)
+{
+    if (uuid == _uuid)
+        return;
+
+    emit deleteCardInfoPopup(name);
+    if (info)
+        disconnect(info.data(), nullptr, this, nullptr);
+    uuid = _uuid;
+
+    cardInfoUpdated();
+}
+
 void AbstractCardItem::setHovered(bool _hovered)
 {
     if (isHovered == _hovered)
