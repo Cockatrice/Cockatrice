@@ -625,8 +625,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 eventOthers.set_new_card_id(card->getId());
             }
 
-            eventPrivate.set_new_card_uuid(card->getUUID().toStdString());
-            eventOthers.set_new_card_uuid(card->getUUID().toStdString());
             ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
             ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 
