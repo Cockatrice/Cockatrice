@@ -133,10 +133,9 @@ int FlowLayout::layoutAllRows(int originX, int originY, int availableWidth)
     for (QLayoutItem *item : items) {
         if (!(item == nullptr || item->isEmpty())) {
             QSize itemSize = item->sizeHint();                      // The suggested size for the item.
-            int itemWidth = itemSize.width() + horizontalSpacing(); // Includes spacing.
 
             // Check if the item fits in the current row's remaining width.
-            if (currentXPosition + itemWidth > availableWidth) {
+            if (int itemWidth = itemSize.width() + horizontalSpacing(); currentXPosition + itemWidth > availableWidth) {
                 // If not, layout the current row and start a new row.
                 layoutSingleRow(rowItems, originX, currentYPosition);
                 rowItems.clear();                                  // Clear the temporary storage for the new row.
@@ -253,7 +252,7 @@ QLayoutItem *FlowLayout::itemAt(int index) const
  */
 QLayoutItem *FlowLayout::takeAt(int index)
 {
-    return items.takeAt(index);
+    return (index >= 0 && index < items.size()) ? items.takeAt(index) : nullptr;
 }
 
 /**
