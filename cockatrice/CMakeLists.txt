@@ -22,7 +22,6 @@ set(cockatrice_SOURCES
         src/game/filters/filter_card.cpp
         src/client/ui/widgets/cards/card_info_frame_widget.cpp
         src/client/ui/widgets/cards/card_info_picture_widget.cpp
-        src/client/ui/widgets/cards/card_info_picture_foil_widget.cpp
         src/client/ui/widgets/cards/card_info_text_widget.cpp
         src/client/ui/widgets/cards/card_info_display_widget.cpp
         src/game/cards/card_item.cpp
