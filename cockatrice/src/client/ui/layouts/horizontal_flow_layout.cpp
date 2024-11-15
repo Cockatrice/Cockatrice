@@ -84,7 +84,6 @@ int HorizontalFlowLayout::layoutAllColumns(int originX, int originY, int availab
     int currentYPosition = originY;  // Tracks the y-coordinate, resetting for each new column
 
     int colWidth = 0;  // Tracks the maximum width of items in the current column
-    int colHeight = 0; // Tracks the cumulative height of items in the current column
 
     for (QLayoutItem *item : items) {
         QSize itemSize = item->sizeHint(); // The suggested size for the current item
@@ -97,12 +96,10 @@ int HorizontalFlowLayout::layoutAllColumns(int originX, int originY, int availab
             currentYPosition = originY;   // Reset y-position to the column's start
             currentXPosition += colWidth; // Move x-position to the next column
             colWidth = 0;                 // Reset column width for the new column
-            colHeight = 0;                // Reset column height for the new column
         }
 
         // Add the item to the current column
         colItems.append(item);
-        colHeight += itemSize.height();              // Accumulate the column's total height
         colWidth = qMax(colWidth, itemSize.width()); // Update the column's width to the widest item
         currentYPosition += itemSize.height();       // Move y-position for the next item
     }

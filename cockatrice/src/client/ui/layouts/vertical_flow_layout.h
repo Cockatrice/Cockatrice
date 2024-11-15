@@ -12,8 +12,8 @@ public:
     int heightForWidth(int width) const override;
 
     void setGeometry(const QRect &rect) override;
-    int layoutAllRows(int originX, int originY, int availableWidth);
-    void layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y);
+    int layoutAllRows(int originX, int originY, int availableWidth) override;
+    void layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y) override;
 };
 
 #endif // VERTICAL_FLOW_LAYOUT_H
