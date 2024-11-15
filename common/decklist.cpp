@@ -1,7 +1,5 @@
 #include "decklist.h"
 
-#include "../cockatrice/src/game/cards/card_database_manager.h"
-
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
@@ -284,39 +282,10 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                 InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 newZone->readElement(xml);
             } else if (childName == "card") {
-                QString uuid = xml->attributes().value("uuid").toString();
-                QString collectorNumber = xml->attributes().value("collectorNumber").toString();
-                if (uuid.isEmpty() || collectorNumber.isEmpty()) {
-                    CardInfoPerSet preferredSetForCard = CardDatabaseManager::getInstance()->getPreferredSetForCard(
-                        xml->attributes().value("name").toString());
-
-                    // If we don't have a UUID and the preferred set has one, we use that as a default.
-                    if (!preferredSetForCard.getProperty("uuid").isEmpty() && uuid.isEmpty()) {
-                        uuid = preferredSetForCard.getProperty("uuid");
-                    }
-
-                    // If we don't have a collectorsNumber, the preferred Set has one, AND we've already set the UUID
-                    // to the preferred Set, we use the one from the preferred set.
-                    if (!preferredSetForCard.getProperty("num").isEmpty() && collectorNumber.isEmpty() &&
-                        preferredSetForCard.getProperty("uuid") == uuid) {
-                        collectorNumber = preferredSetForCard.getProperty("num");
-
-                        // Otherwise check which Set has the UUID we've set or reused and use the collectorNumber from
-                        // there.
-                    } else if (!preferredSetForCard.getProperty("num").isEmpty() && collectorNumber.isEmpty()) {
-                        CardInfoPtr card_by_name_and_uuid = CardDatabaseManager::getInstance()->getCardByNameAndUUID(
-                            xml->attributes().value("name").toString(), uuid);
-                        for (auto &set : card_by_name_and_uuid->getSets()) {
-                            if (set.getProperty("uuid") == uuid) {
-                                collectorNumber = set.getProperty("num");
-                            }
-                        }
-                    }
-                }
-
                 DecklistCardNode *newCard = new DecklistCardNode(xml->attributes().value("name").toString(),
                                                                  xml->attributes().value("number").toString().toInt(),
-                                                                 this, uuid, collectorNumber);
+                                                                 this, xml->attributes().value("uuid").toString(),
+                                                                 xml->attributes().value("collectorNumber").toString());
                 newCard->readElement(xml);
             }
         } else if (xml->isEndElement() && (childName == "zone"))

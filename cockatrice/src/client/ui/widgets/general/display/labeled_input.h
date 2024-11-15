@@ -1,7 +1,3 @@
-//
-// Created by ascor on 10/11/24.
-//
-
 #ifndef LABELED_INPUT_H
 #define LABELED_INPUT_H
 
