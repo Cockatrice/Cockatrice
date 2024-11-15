@@ -2168,6 +2168,9 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     if (event.has_card_name()) {
         card->setName(QString::fromStdString(event.card_name()));
     }
+    if (event.has_new_card_uuid()) {
+        card->setUUID(QString::fromStdString(event.new_card_uuid()));
+    }
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
         CardItem *parentCard = card->getAttachedTo();
