@@ -127,7 +127,6 @@ int FlowLayout::layoutAllRows(int originX, int originY, int availableWidth)
     int currentXPosition = originX;  // Tracks the x-coordinate for placing items in the current row.
     int currentYPosition = originY;  // Tracks the y-coordinate, updated after each row.
 
-    int rowWidth = 0;  // Tracks the cumulative width of items in the current row.
     int rowHeight = 0; // Tracks the maximum height of items in the current row.
 
     // Iterate through all layout items to arrange them.
@@ -143,13 +142,11 @@ int FlowLayout::layoutAllRows(int originX, int originY, int availableWidth)
                 rowItems.clear();                                  // Clear the temporary storage for the new row.
                 currentXPosition = originX;                        // Reset x-position to the start of the new row.
                 currentYPosition += rowHeight + verticalSpacing(); // Move y-position down for the new row.
-                rowWidth = 0;                                      // Reset row width for the new row.
                 rowHeight = 0;                                     // Reset row height for the new row.
             }
 
             // Add the item to the current row.
             rowItems.append(item);
-            rowWidth += itemSize.width() + horizontalSpacing();         // Accumulate row width.
             rowHeight = qMax(rowHeight, itemSize.height());             // Update the row height to the tallest item.
             currentXPosition += itemSize.width() + horizontalSpacing(); // Move x-position for the next item.
         }

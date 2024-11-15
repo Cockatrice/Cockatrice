@@ -84,7 +84,6 @@ int VerticalFlowLayout::layoutAllRows(int originX, int originY, int availableWid
     int currentXPosition = originX;  // Tracks the x-coordinate while placing items
     int currentYPosition = originY;  // Tracks the y-coordinate, moving down after each row
 
-    int rowWidth = 0;  // Tracks the cumulative width of items in the current row
     int rowHeight = 0; // Tracks the maximum height of items in the current row
 
     for (QLayoutItem *item : items) {
@@ -98,13 +97,11 @@ int VerticalFlowLayout::layoutAllRows(int originX, int originY, int availableWid
             rowItems.clear();                                  // Reset the list for the new row
             currentXPosition = originX;                        // Reset x-position to the row's start
             currentYPosition += rowHeight + verticalSpacing(); // Move y-position down to the next row
-            rowWidth = 0;                                      // Reset row width for the new row
             rowHeight = 0;                                     // Reset row height for the new row
         }
 
         // Add the item to the current row
         rowItems.append(item);
-        rowWidth += itemWidth + horizontalSpacing();         // Accumulate the row's total width
         rowHeight = qMax(rowHeight, itemSize.height());      // Update the row's height to the tallest item
         currentXPosition += itemWidth + horizontalSpacing(); // Move x-position for the next item
     }
