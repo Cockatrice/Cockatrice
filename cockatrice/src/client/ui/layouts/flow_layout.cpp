@@ -132,7 +132,7 @@ int FlowLayout::layoutAllRows(int originX, int originY, int availableWidth)
     // Iterate through all layout items to arrange them.
     for (QLayoutItem *item : items) {
         if (!(item == nullptr || item->isEmpty())) {
-            QSize itemSize = item->sizeHint();                      // The suggested size for the item.
+            QSize itemSize = item->sizeHint(); // The suggested size for the item.
 
             // Check if the item fits in the current row's remaining width.
             if (int itemWidth = itemSize.width() + horizontalSpacing(); currentXPosition + itemWidth > availableWidth) {

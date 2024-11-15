@@ -83,7 +83,7 @@ int HorizontalFlowLayout::layoutAllColumns(int originX, int originY, int availab
     int currentXPosition = originX;  // Tracks the x-coordinate while placing items
     int currentYPosition = originY;  // Tracks the y-coordinate, resetting for each new column
 
-    int colWidth = 0;  // Tracks the maximum width of items in the current column
+    int colWidth = 0; // Tracks the maximum width of items in the current column
 
     for (QLayoutItem *item : items) {
         QSize itemSize = item->sizeHint(); // The suggested size for the current item
