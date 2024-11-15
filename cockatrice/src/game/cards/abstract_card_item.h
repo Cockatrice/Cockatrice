@@ -81,10 +81,7 @@ public:
     {
         return uuid;
     }
-    void setUUID(QString _uuid)
-    {
-        uuid = _uuid;
-    }
+    void setUUID(const QString &_uuid = QString());
     qreal getRealZValue() const
     {
         return realZValue;
