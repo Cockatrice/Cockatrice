@@ -42,7 +42,7 @@ OverlapWidget::OverlapWidget(QWidget *parent,
       direction(direction), adjustOnResize(adjustOnResize)
 {
     this->setMinimumSize(0, 0);
-    overlap_layout = new OverlapLayout(overlapPercentage, maxColumns, maxRows, direction, this);
+    overlap_layout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
     this->setLayout(overlap_layout);
 }
 
@@ -79,7 +79,7 @@ void OverlapWidget::clearLayout()
 
     // If layout is null, create a new layout; otherwise, reuse the existing one
     if (overlap_layout == nullptr) {
-        overlap_layout = new OverlapLayout(overlapPercentage, maxColumns, maxRows, direction, this);
+        overlap_layout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
         this->setLayout(overlap_layout);
     }
 }

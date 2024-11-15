@@ -13,8 +13,8 @@ public:
     int heightForWidth(int width) const override;
 
     void setGeometry(const QRect &rect) override;
-    int layoutColumns(int originX, int originY, int availableWidth);
-    void layoutColumn(const QVector<QLayoutItem *> &rowItems, int x, int y);
+    int layoutAllColumns(int originX, int originY, int availableWidth);
+    void layoutSingleColumn(const QVector<QLayoutItem *> &rowItems, int x, int y);
 };
 
 #endif // HORIZONTAL_FLOW_LAYOUT_H

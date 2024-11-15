@@ -44,14 +44,18 @@ protected:
 
 private:
     CardInfoPtr info;
-    qreal aspectRatio = 1.396;
+    qreal magicTheGatheringCardAspectRatio = 1.396;
+    qreal yuGiOhCardAspectRatio = 1.457;
+    qreal aspectRatio = magicTheGatheringCardAspectRatio;
     int baseWidth = 200;
     int baseHeight = 200;
     double scaleFactor = 1.5;
     QPixmap resizedPixmap;
     bool pixmapDirty;
     bool hoverToZoomEnabled;
+    int hoverActivateThresholdInMs = 500;
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget;
+    int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
 };
 

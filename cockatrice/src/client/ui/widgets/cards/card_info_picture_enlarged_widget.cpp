@@ -62,11 +62,13 @@ void CardInfoPictureEnlargedWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
-    if (width() == 0 || height() == 0 || enlargedPixmap.isNull())
+    if (width() == 0 || height() == 0 || enlargedPixmap.isNull()) {
         return;
+    }
 
-    if (pixmapDirty)
+    if (pixmapDirty) {
         loadPixmap(size());
+    }
 
     // Scale the size of the pixmap to fit the widget while maintaining the aspect ratio
     QSize scaledSize = enlargedPixmap.size().scaled(size().width(), size().height(), Qt::KeepAspectRatio);

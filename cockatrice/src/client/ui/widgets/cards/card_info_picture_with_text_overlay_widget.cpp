@@ -18,16 +18,13 @@
  * Sets the widget's size policy and default border style.
  */
 CardInfoPictureWithTextOverlayWidget::CardInfoPictureWithTextOverlayWidget(QWidget *parent,
-                                                       bool hoverToZoomEnabled,
-                                                       const QColor &textColor,
-                                                       const QColor &outlineColor,
-                                                       int fontSize,
-                                                       Qt::Alignment alignment)
-    : CardInfoPictureWidget(parent, hoverToZoomEnabled),
-      textColor(textColor),
-      outlineColor(outlineColor),
-      fontSize(fontSize),
-      textAlignment(alignment)
+                                                                           bool hoverToZoomEnabled,
+                                                                           const QColor &textColor,
+                                                                           const QColor &outlineColor,
+                                                                           int fontSize,
+                                                                           Qt::Alignment alignment)
+    : CardInfoPictureWidget(parent, hoverToZoomEnabled), textColor(textColor), outlineColor(outlineColor),
+      fontSize(fontSize), textAlignment(alignment)
 {
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
@@ -41,7 +38,7 @@ CardInfoPictureWithTextOverlayWidget::CardInfoPictureWithTextOverlayWidget(QWidg
 void CardInfoPictureWithTextOverlayWidget::setOverlayText(const QString &text)
 {
     overlayText = text;
-    update();  // Trigger a redraw to display the updated text
+    update(); // Trigger a redraw to display the updated text
 }
 
 /**
@@ -84,7 +81,8 @@ void CardInfoPictureWithTextOverlayWidget::setTextAlignment(Qt::Alignment alignm
     update();
 }
 
-void CardInfoPictureWithTextOverlayWidget::mousePressEvent(QMouseEvent *event) {
+void CardInfoPictureWithTextOverlayWidget::mousePressEvent(QMouseEvent *event)
+{
     emit imageClicked(event, this);
 }
 
@@ -100,58 +98,59 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     CardInfoPictureWidget::paintEvent(event);
 
     // Now add the custom text overlay on top of the image
-    if (!overlayText.isEmpty()) {
-        QStylePainter painter(this);
+    if (overlayText.isEmpty()) {
+        return;
+    }
+    QStylePainter painter(this);
 
-        // Set text properties
-        QFont font = painter.font();
-        font.setPointSize(fontSize);
-        painter.setFont(font);
+    // Set text properties
+    QFont font = painter.font();
+    font.setPointSize(fontSize);
+    painter.setFont(font);
 
-        // Get the pixmap from the base class using the getter
-        const QPixmap &pixmap = getResizedPixmap();
-        if (!pixmap.isNull()) {
-            // Calculate size and position for drawing
-            QSize scaledSize = pixmap.size().scaled(size(), Qt::KeepAspectRatio);
-            QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
-            QRect pixmapRect(topLeft, scaledSize);
+    // Get the pixmap from the base class using the getter
+    const QPixmap &pixmap = getResizedPixmap();
+    if (!pixmap.isNull()) {
+        // Calculate size and position for drawing
+        QSize scaledSize = pixmap.size().scaled(size(), Qt::KeepAspectRatio);
+        QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
+        QRect pixmapRect(topLeft, scaledSize);
 
-            // Prepare text wrapping
-            QFontMetrics fontMetrics(font);
-            int lineHeight = fontMetrics.height();
-            int textWidth = pixmapRect.width();
-            QString wrappedText;
+        // Prepare text wrapping
+        QFontMetrics fontMetrics(font);
+        int lineHeight = fontMetrics.height();
+        int textWidth = pixmapRect.width();
+        QString wrappedText;
 
-            // Break the text into multiple lines to fit within the pixmap width
-            QString currentLine;
-            QStringList words = overlayText.split(' ');
-            for (const QString &word : words) {
-                if (fontMetrics.horizontalAdvance(currentLine + " " + word) > textWidth) {
-                    wrappedText += currentLine + '\n';
-                    currentLine = word;
-                } else {
-                    if (!currentLine.isEmpty()) {
-                        currentLine += " ";
-                    }
-                    currentLine += word;
+        // Break the text into multiple lines to fit within the pixmap width
+        QString currentLine;
+        QStringList words = overlayText.split(' ');
+        for (const QString &word : words) {
+            if (fontMetrics.horizontalAdvance(currentLine + " " + word) > textWidth) {
+                wrappedText += currentLine + '\n';
+                currentLine = word;
+            } else {
+                if (!currentLine.isEmpty()) {
+                    currentLine += " ";
                 }
+                currentLine += word;
             }
-            wrappedText += currentLine;
-
-            // Calculate total text block height
-            int totalTextHeight = wrappedText.count('\n') * lineHeight + lineHeight;
-
-            // Set up the text layout options
-            QTextOption textOption;
-            textOption.setAlignment(textAlignment);
-
-            // Create a text rectangle centered within the pixmap rect
-            QRect textRect = QRect(pixmapRect.left(), pixmapRect.top(), pixmapRect.width(), totalTextHeight);
-            textRect.moveTop((pixmapRect.height() - totalTextHeight) / 2 + pixmapRect.top());
-
-            // Draw the outlined text
-            drawOutlinedText(painter, textRect, wrappedText, textOption);
         }
+        wrappedText += currentLine;
+
+        // Calculate total text block height
+        int totalTextHeight = wrappedText.count('\n') * lineHeight + lineHeight;
+
+        // Set up the text layout options
+        QTextOption textOption;
+        textOption.setAlignment(textAlignment);
+
+        // Create a text rectangle centered within the pixmap rect
+        QRect textRect = QRect(pixmapRect.left(), pixmapRect.top(), pixmapRect.width(), totalTextHeight);
+        textRect.moveTop((pixmapRect.height() - totalTextHeight) / 2 + pixmapRect.top());
+
+        // Draw the outlined text
+        drawOutlinedText(painter, textRect, wrappedText, textOption);
     }
 }
 
@@ -164,7 +163,10 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
  *
  * Draws an outline around the text to enhance readability before drawing the main text.
  */
-void CardInfoPictureWithTextOverlayWidget::drawOutlinedText(QPainter &painter, const QRect &textRect, const QString &text, const QTextOption &textOption)
+void CardInfoPictureWithTextOverlayWidget::drawOutlinedText(QPainter &painter,
+                                                            const QRect &textRect,
+                                                            const QString &text,
+                                                            const QTextOption &textOption)
 {
     // Draw the black outline (outlineColor)
     painter.setPen(outlineColor);
@@ -195,7 +197,8 @@ QSize CardInfoPictureWithTextOverlayWidget::sizeHint() const
  * @brief Provides the minimum recommended size for this widget.
  * @return The minimum widget size.
  */
-QSize CardInfoPictureWithTextOverlayWidget::minimumSizeHint() const {
+QSize CardInfoPictureWithTextOverlayWidget::minimumSizeHint() const
+{
     // Same as sizeHint, but ensure that there is at least some space for the pixmap
     const QPixmap &pixmap = getResizedPixmap();
     QSize pixmapSize = pixmap.isNull() ? QSize(0, 0) : pixmap.size();

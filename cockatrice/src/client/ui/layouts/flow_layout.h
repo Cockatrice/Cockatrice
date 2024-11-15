@@ -29,15 +29,15 @@ public:
     int getParentScrollAreaHeight() const;
 
     void setGeometry(const QRect &rect) override;
-    virtual int layoutRows(int originX, int originY, int availableWidth);
-    virtual void layoutRow(const QVector<QLayoutItem *> &rowItems, int x, int y);
+    virtual int layoutAllRows(int originX, int originY, int availableWidth);
+    virtual void layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y);
     QSize sizeHint() const override;
     QSize minimumSize() const override;
 
 protected:
     QList<QLayoutItem *> items; // List to store layout items
-    int m_hSpace;
-    int m_vSpace;
+    int horizontalMargin;
+    int verticalMargin;
 };
 
 #endif // FLOWLAYOUT_H
