@@ -1,8 +1,8 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "decklist.h"
 #include "../game/cards/card_database.h"
+#include "decklist.h"
 
 #include <QAbstractItemModel>
 #include <QList>
@@ -101,7 +101,8 @@ private:
     Qt::SortOrder lastKnownOrder;
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
-    DecklistModelCardNode *findCardNode(const QString &cardName, const QString &zoneName, const QString &uuid = "") const;
+    DecklistModelCardNode *
+    findCardNode(const QString &cardName, const QString &zoneName, const QString &uuid = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 

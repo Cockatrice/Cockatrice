@@ -2,12 +2,12 @@
 
 #include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
+#include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
-#include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../game/filters/filter_builder.h"
 #include "../../game/filters/filter_tree_model.h"
 #include "../../main.h"

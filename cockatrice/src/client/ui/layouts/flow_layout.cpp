@@ -185,7 +185,6 @@ void FlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, 
     }
 }
 
-
 /**
  * @brief Returns the preferred size for this layout.
  * @return The maximum of all item size hints as a QSize.

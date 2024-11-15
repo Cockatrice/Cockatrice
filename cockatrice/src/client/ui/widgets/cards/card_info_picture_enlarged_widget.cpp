@@ -22,7 +22,8 @@ CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent)
  * @brief Loads the pixmap based on the given size and card information.
  * @param size The desired size for the loaded pixmap.
  *
- * If card information is available, it loads the card's specific pixmap. Otherwise, it loads a default card back pixmap.
+ * If card information is available, it loads the card's specific pixmap. Otherwise, it loads a default card back
+ * pixmap.
  */
 void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
 {
@@ -88,6 +89,6 @@ void CardInfoPictureEnlargedWidget::paintEvent(QPaintEvent *event)
     painter.setClipPath(shape); // Set the clipping path
 
     // Draw the pixmap scaled to the calculated size
-    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter ,enlargedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter,
+                           enlargedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
-

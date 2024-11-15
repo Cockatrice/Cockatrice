@@ -1,10 +1,10 @@
 #include "card_info_display_widget.h"
 
-#include "../../../../main.h"
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/cards/card_item.h"
+#include "../../../../main.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
-#include "../../../../game/cards/card_item.h"
 
 #include <QApplication>
 #include <QScreen>

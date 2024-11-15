@@ -11,7 +11,12 @@ class OverlapWidget : public QWidget
     Q_OBJECT
 
 public:
-    OverlapWidget(QWidget *parent, int overlapPercentage, int maxColumns, int maxRows, Qt::Orientation direction, bool adjustOnResize = false);
+    OverlapWidget(QWidget *parent,
+                  int overlapPercentage,
+                  int maxColumns,
+                  int maxRows,
+                  Qt::Orientation direction,
+                  bool adjustOnResize = false);
     void addWidget(QWidget *widget_to_add);
     void clearLayout();
     void adjustMaxColumnsAndRows();
@@ -30,8 +35,6 @@ private:
     int maxRows;
     Qt::Orientation direction;
     bool adjustOnResize = false;
-
 };
 
-
-#endif //OVERLAP_WIDGET_H
+#endif // OVERLAP_WIDGET_H

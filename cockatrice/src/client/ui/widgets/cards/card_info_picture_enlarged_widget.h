@@ -2,8 +2,9 @@
 #define CARD_PICTURE_ENLARGED_WIDGET_H
 
 #include "../../../../game/cards/card_database.h"
-#include <QWidget>
+
 #include <QPixmap>
+#include <QWidget>
 
 class CardInfoPictureEnlargedWidget : public QWidget
 {
@@ -34,5 +35,4 @@ private:
     void loadPixmap(const QSize &size);
 };
 
-
-#endif //CARD_PICTURE_ENLARGED_WIDGET_H
+#endif // CARD_PICTURE_ENLARGED_WIDGET_H

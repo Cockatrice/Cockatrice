@@ -68,7 +68,10 @@ void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
-DeckViewCard::DeckViewCard(const QString &_name, const QString &_uuid, const QString &_originZone, QGraphicsItem *parent)
+DeckViewCard::DeckViewCard(const QString &_name,
+                           const QString &_uuid,
+                           const QString &_originZone,
+                           QGraphicsItem *parent)
     : AbstractCardItem(_name, _uuid, 0, -1, parent), originZone(_originZone), dragItem(0)
 {
     setAcceptHoverEvents(true);
@@ -354,7 +357,8 @@ void DeckViewScene::rebuildTree()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), currentCard->getCardUuid(), currentZone->getName(), container);
+                DeckViewCard *newCard = new DeckViewCard(currentCard->getName(), currentCard->getCardUuid(),
+                                                         currentZone->getName(), container);
                 container->addCard(newCard);
                 emit newCardAdded(newCard);
             }

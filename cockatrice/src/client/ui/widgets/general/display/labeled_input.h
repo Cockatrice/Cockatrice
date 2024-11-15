@@ -5,10 +5,10 @@
 #ifndef LABELED_INPUT_H
 #define LABELED_INPUT_H
 
-#include <QLabel>
-#include <QSpinBox>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QSpinBox>
 #include <QWidget>
 
 class LabeledInput : public QWidget
@@ -19,22 +19,22 @@ public:
     LabeledInput(const QString &labelText, QWidget *parent = nullptr);
 
     // Add a QSpinBox (for arbitrary numbers)
-    QSpinBox* addSpinBox(int minValue, int maxValue, int defaultValue = 0);
+    QSpinBox *addSpinBox(int minValue, int maxValue, int defaultValue = 0);
 
     // Add a QComboBox (for arbitrary selections)
-    QComboBox* addComboBox(const QStringList &items, const QString &defaultItem = QString());
+    QComboBox *addComboBox(const QStringList &items, const QString &defaultItem = QString());
 
     // Add a QComboBox specifically for Qt Directions
-    QComboBox* addDirectionComboBox();
+    QComboBox *addDirectionComboBox();
 
-    signals:
-        void spinBoxValueChanged(int newValue);  // Declare the valueChanged signal
-        void comboBoxValueChanged(int newValue);
-        void directionComboBoxChanged(QString newDirection);
+signals:
+    void spinBoxValueChanged(int newValue); // Declare the valueChanged signal
+    void comboBoxValueChanged(int newValue);
+    void directionComboBoxChanged(QString newDirection);
+
 private:
     QLabel *label;
     QHBoxLayout *layout;
 };
 
-
-#endif //LABELED_INPUT_H
+#endif // LABELED_INPUT_H

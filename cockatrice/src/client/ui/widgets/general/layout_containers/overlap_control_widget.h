@@ -29,7 +29,6 @@ private:
     int maxColumns;
     int maxRows;
     Qt::Orientation direction;
-
 };
 
-#endif //OVERLAP_CONTROL_WIDGET_H
+#endif // OVERLAP_CONTROL_WIDGET_H

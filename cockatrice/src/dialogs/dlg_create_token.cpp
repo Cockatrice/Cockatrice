@@ -1,9 +1,8 @@
 #include "dlg_create_token.h"
 
+#include "../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../game/cards/card_database_manager.h"
 #include "../game/cards/card_database_model.h"
-#include "../client/ui/widgets/cards/card_info_picture_widget.h"
-#include "../main.h"
 #include "../settings/cache_settings.h"
 #include "decklist.h"
 #include "trice_limits.h"
@@ -20,7 +19,6 @@
 #include <QLineEdit>
 #include <QRadioButton>
 #include <QTreeView>
-#include <QVBoxLayout>
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)

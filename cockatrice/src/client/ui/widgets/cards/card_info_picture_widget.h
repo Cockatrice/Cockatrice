@@ -4,15 +4,14 @@
 #include "../../../../game/cards/card_database.h"
 #include "card_info_picture_enlarged_widget.h"
 
-#include <QWidget>
 #include <QTimer>
+#include <QWidget>
 
 class AbstractCardItem;
 
 class CardInfoPictureWidget : public QWidget
 {
     Q_OBJECT
-
 
 public:
     CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false);
@@ -38,9 +37,11 @@ protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void loadPixmap();
-    const QPixmap& getResizedPixmap() const { return resizedPixmap; }
+    const QPixmap &getResizedPixmap() const
+    {
+        return resizedPixmap;
+    }
     void showEnlargedPixmap();
-
 
 private:
     CardInfoPtr info;

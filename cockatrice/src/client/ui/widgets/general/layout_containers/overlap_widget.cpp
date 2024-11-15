@@ -93,7 +93,8 @@ void OverlapWidget::clearLayout()
  *
  * @param event The resize event containing the new size information.
  */
-void OverlapWidget::resizeEvent(QResizeEvent* event) {
+void OverlapWidget::resizeEvent(QResizeEvent *event)
+{
     QWidget::resizeEvent(event);
 
     // Trigger the layout to recalculate

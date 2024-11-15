@@ -1,15 +1,13 @@
 #include "labeled_input.h"
 
-LabeledInput::LabeledInput(const QString &labelText, QWidget *parent)
-        : QWidget(parent)
+LabeledInput::LabeledInput(const QString &labelText, QWidget *parent) : QWidget(parent)
 {
     label = new QLabel(labelText, this);
     layout = new QHBoxLayout(this);
     layout->addWidget(label);
-
 }
 
-QSpinBox* LabeledInput::addSpinBox(int minValue, int maxValue, int defaultValue)
+QSpinBox *LabeledInput::addSpinBox(int minValue, int maxValue, int defaultValue)
 {
     QSpinBox *spinBox = new QSpinBox(this);
     spinBox->setRange(minValue, maxValue);
@@ -20,7 +18,7 @@ QSpinBox* LabeledInput::addSpinBox(int minValue, int maxValue, int defaultValue)
 }
 
 // Add a QComboBox (for arbitrary selections)
-QComboBox* LabeledInput::addComboBox(const QStringList &items, const QString &defaultItem)
+QComboBox *LabeledInput::addComboBox(const QStringList &items, const QString &defaultItem)
 {
     QComboBox *comboBox = new QComboBox(this);
     comboBox->addItems(items);
@@ -32,7 +30,7 @@ QComboBox* LabeledInput::addComboBox(const QStringList &items, const QString &de
 }
 
 // Add a QComboBox specifically for Qt Directions
-QComboBox* LabeledInput::addDirectionComboBox()
+QComboBox *LabeledInput::addDirectionComboBox()
 {
     QStringList directions = {"Qt::Horizontal", "Qt::Vertical"};
     auto comboBox = addComboBox(directions, "Qt::Vertical");

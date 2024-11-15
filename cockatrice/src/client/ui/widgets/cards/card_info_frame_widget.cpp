@@ -1,5 +1,6 @@
 #include "card_info_frame_widget.h"
 
+#include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../main.h"
 #include "../../../../settings/cache_settings.h"
@@ -11,7 +12,8 @@
 #include <QVBoxLayout>
 #include <utility>
 
-CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *parent) : QTabWidget(parent), info(nullptr), cardTextOnly(false)
+CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *parent)
+    : QTabWidget(parent), info(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPictureWidget();
