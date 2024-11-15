@@ -8,7 +8,6 @@
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/cards/card_database.h"
-#include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_item.h"
 #include "../../game/game_scene.h"
