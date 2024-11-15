@@ -5,6 +5,7 @@
 add_subdirectory(pb)
 
 set(common_SOURCES
+        ../cockatrice/src/game/cards/card_database_manager.cpp
     debug_pb_message.cpp
     decklist.cpp
     expression.cpp
