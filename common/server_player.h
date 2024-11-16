@@ -169,7 +169,7 @@ public:
     void addCounter(Server_Counter *counter);
 
     void clearZones();
-    void setupZones();
+    void setupZones(const QStringList& gameTypes);
 
     Response::ResponseCode drawCards(GameEventStorage &ges, int number);
     Response::ResponseCode moveCard(GameEventStorage &ges,
