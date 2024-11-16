@@ -20,7 +20,7 @@
  * @param hSpacing The horizontal spacing between items.
  * @param vSpacing The vertical spacing between items.
  */
-FlowLayout::FlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+FlowLayout::FlowLayout(QWidget *parent, const int margin, const int hSpacing, const int vSpacing)
     : QLayout(parent), horizontalMargin(hSpacing), verticalMargin(vSpacing)
 {
     setContentsMargins(margin, margin, margin, margin);
@@ -60,7 +60,7 @@ bool FlowLayout::hasHeightForWidth() const
  * @param width The available width for arranging items.
  * @return The total height needed to fit all items in rows constrained by the specified width.
  */
-int FlowLayout::heightForWidth(int width) const
+int FlowLayout::heightForWidth(const int width) const
 {
     int height = 0;
     int rowWidth = 0;
@@ -70,6 +70,7 @@ int FlowLayout::heightForWidth(int width) const
         if (item == nullptr || item->isEmpty()) {
             continue;
         }
+
         int itemWidth = item->sizeHint().width() + horizontalSpacing();
         if (rowWidth + itemWidth > width) { // Start a new row if the row width exceeds available width
             height += rowHeight + verticalSpacing();
@@ -134,6 +135,7 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
         if (item == nullptr || item->isEmpty()) {
             continue;
         }
+
         QSize itemSize = item->sizeHint(); // The suggested size for the item.
         const int itemWidth = itemSize.width() + horizontalSpacing();
 
@@ -235,8 +237,8 @@ void FlowLayout::addItem(QLayoutItem *item)
  */
 int FlowLayout::count() const
 {
-    // Ensure safe conversion by explicitly casting to int. Necessary to silence warnings about narrowing conversion.
-    assert(items.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
+    // Ensure safe conversion by casting the maximum limit to the same type as items.size()
+    assert(items.size() <= static_cast<qsizetype>(std::numeric_limits<int>::max()));
     return static_cast<int>(items.size());
 }
 
