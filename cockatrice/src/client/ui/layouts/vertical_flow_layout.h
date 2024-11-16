@@ -9,7 +9,6 @@ public:
     explicit VerticalFlowLayout(QWidget *parent = nullptr, int margin = 0, int hSpacing = 0, int vSpacing = 0);
     ~VerticalFlowLayout() override;
 
-    bool hasHeightForWidth() const override;
     int heightForWidth(int width) const override;
 
     void setGeometry(const QRect &rect) override;
