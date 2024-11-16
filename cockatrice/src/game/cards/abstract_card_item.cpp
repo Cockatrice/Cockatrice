@@ -190,12 +190,14 @@ void AbstractCardItem::setName(const QString &_name)
 
 void AbstractCardItem::setUUID(const QString &_uuid)
 {
-    if (uuid == _uuid)
+    if (uuid == _uuid) {
         return;
+    }
 
     emit deleteCardInfoPopup(name);
-    if (info)
+    if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
+    }
     uuid = _uuid;
 
     cardInfoUpdated();
