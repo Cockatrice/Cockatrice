@@ -79,6 +79,7 @@ void CardInfoPictureWidget::setHoverToZoomEnabled(const bool enabled)
  */
 void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
 {
+    QWidget::resizeEvent(event);
     updatePixmap();
 }
 
@@ -135,6 +136,7 @@ void CardInfoPictureWidget::loadPixmap()
  */
 void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 {
+    QWidget::paintEvent(event);
     if (width() == 0 || height() == 0)
         return;
 
