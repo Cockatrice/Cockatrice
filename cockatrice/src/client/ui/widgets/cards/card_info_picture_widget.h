@@ -14,12 +14,12 @@ class CardInfoPictureWidget : public QWidget
     Q_OBJECT
 
 public:
-    CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false);
+    explicit CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false);
     CardInfoPtr getInfo()
     {
         return info;
     }
-    QSize sizeHint() const override;
+    [[nodiscard]] QSize sizeHint() const override;
     void setHoverToZoomEnabled(bool enabled);
 
 public slots:
@@ -31,8 +31,8 @@ signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
 
 protected:
-    void resizeEvent(QResizeEvent *event);
-    void paintEvent(QPaintEvent *);
+    void resizeEvent(QResizeEvent *event) override;
+    void paintEvent(QPaintEvent *) override;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
