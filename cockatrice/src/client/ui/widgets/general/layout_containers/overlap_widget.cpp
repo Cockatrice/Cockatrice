@@ -4,7 +4,6 @@
 #include "../../../layouts/flow_layout.h"
 
 #include <QWidget>
-#include <qsizepolicy.h>
 
 /**
  * @class OverlapWidget
@@ -30,20 +29,21 @@
  * @param maxColumns The maximum number of columns for the layout (0 for unlimited).
  * @param maxRows The maximum number of rows for the layout (0 for unlimited).
  * @param direction The orientation of the layout, either Qt::Horizontal or Qt::Vertical.
+ * @param adjustOnResize If the overlap widgets should adjust its max columns/rows on resize to fit.
  * @param parent The parent widget of this OverlapWidget.
  */
 OverlapWidget::OverlapWidget(QWidget *parent,
-                             int overlapPercentage,
-                             int maxColumns,
-                             int maxRows,
-                             Qt::Orientation direction,
-                             bool adjustOnResize)
+                             const int overlapPercentage,
+                             const int maxColumns,
+                             const int maxRows,
+                             const Qt::Orientation direction,
+                             const bool adjustOnResize)
     : QWidget(parent), overlapPercentage(overlapPercentage), maxColumns(maxColumns), maxRows(maxRows),
       direction(direction), adjustOnResize(adjustOnResize)
 {
     this->setMinimumSize(0, 0);
-    overlap_layout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
-    this->setLayout(overlap_layout);
+    overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
+    this->setLayout(overlapLayout);
 }
 
 /**
@@ -53,11 +53,11 @@ OverlapWidget::OverlapWidget(QWidget *parent,
  * it to be arranged with the existing child widgets. The widget's visibility and
  * behavior will be managed by the layout.
  *
- * @param widget_to_add A pointer to the QWidget to be added to the layout.
+ * @param widgetToAdd A pointer to the QWidget to be added to the layout.
  */
-void OverlapWidget::addWidget(QWidget *widget_to_add)
+void OverlapWidget::addWidget(QWidget *widgetToAdd) const
 {
-    this->overlap_layout->addWidget(widget_to_add);
+    this->overlapLayout->addWidget(widgetToAdd);
 }
 
 /**
@@ -69,18 +69,18 @@ void OverlapWidget::addWidget(QWidget *widget_to_add)
  */
 void OverlapWidget::clearLayout()
 {
-    if (overlap_layout != nullptr) {
+    if (overlapLayout != nullptr) {
         QLayoutItem *item;
-        while ((item = overlap_layout->takeAt(0)) != nullptr) {
+        while ((item = overlapLayout->takeAt(0)) != nullptr) {
             delete item->widget(); // Delete the widget
             delete item;           // Delete the layout item
         }
     }
 
     // If layout is null, create a new layout; otherwise, reuse the existing one
-    if (overlap_layout == nullptr) {
-        overlap_layout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
-        this->setLayout(overlap_layout);
+    if (overlapLayout == nullptr) {
+        overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
+        this->setLayout(overlapLayout);
     }
 }
 
@@ -98,9 +98,9 @@ void OverlapWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 
     // Trigger the layout to recalculate
-    if (overlap_layout != nullptr) {
-        overlap_layout->invalidate(); // Marks the layout as dirty and requires recalculation
-        overlap_layout->activate();   // Recalculate the layout based on the new size
+    if (overlapLayout != nullptr) {
+        overlapLayout->invalidate(); // Marks the layout as dirty and requires recalculation
+        overlapLayout->activate();   // Recalculate the layout based on the new size
     }
 
     if (adjustOnResize) {
@@ -119,30 +119,30 @@ void OverlapWidget::adjustMaxColumnsAndRows()
 {
     if (direction == Qt::Vertical) {
         // Calculate columns based on width for vertical layout
-        int calculatedColumns = overlap_layout->calculateMaxColumns();
+        const int calculatedColumns = overlapLayout->calculateMaxColumns();
         maxColumns = calculatedColumns;
-        overlap_layout->setMaxColumns(calculatedColumns);
+        overlapLayout->setMaxColumns(calculatedColumns);
 
         // Calculate rows based on total item count and columns
-        int calculatedRows = overlap_layout->calculateRowsForColumns(calculatedColumns);
+        const int calculatedRows = overlapLayout->calculateRowsForColumns(calculatedColumns);
         maxRows = calculatedRows;
-        overlap_layout->setMaxRows(calculatedRows);
+        overlapLayout->setMaxRows(calculatedRows);
         qDebug() << "MaxColumns: " << maxColumns << " MaxRows: " << maxRows;
     } else {
         // Calculate rows based on height for horizontal layout
-        int calculatedRows = overlap_layout->calculateMaxRows();
+        const int calculatedRows = overlapLayout->calculateMaxRows();
         maxRows = calculatedRows;
-        overlap_layout->setMaxRows(calculatedRows);
+        overlapLayout->setMaxRows(calculatedRows);
 
         // Calculate columns based on total item count and rows
-        int calculatedColumns = overlap_layout->calculateColumnsForRows(calculatedRows);
+        const int calculatedColumns = overlapLayout->calculateColumnsForRows(calculatedRows);
         maxColumns = calculatedColumns;
-        overlap_layout->setMaxColumns(calculatedColumns);
+        overlapLayout->setMaxColumns(calculatedColumns);
         qDebug() << " MaxRows: " << maxRows << "MaxColumns: " << maxColumns;
     }
 
-    overlap_layout->invalidate();
-    overlap_layout->activate();
+    overlapLayout->invalidate();
+    overlapLayout->activate();
 }
 
 /**
@@ -154,23 +154,23 @@ void OverlapWidget::adjustMaxColumnsAndRows()
  *
  * @param newValue The new maximum number of overlapping items allowed in the layout.
  */
-void OverlapWidget::maxOverlapItemsChanged(int newValue)
+void OverlapWidget::maxOverlapItemsChanged(const int newValue)
 {
     if (direction == Qt::Horizontal) {
         maxRows = 0;
-        overlap_layout->setMaxRows(0);
+        overlapLayout->setMaxRows(0);
 
         maxColumns = newValue;
-        overlap_layout->setMaxColumns(newValue);
+        overlapLayout->setMaxColumns(newValue);
     } else {
         maxRows = newValue;
-        overlap_layout->setMaxRows(newValue);
+        overlapLayout->setMaxRows(newValue);
 
         maxColumns = 0;
-        overlap_layout->setMaxColumns(0);
+        overlapLayout->setMaxColumns(0);
     }
     this->adjustSize();
-    overlap_layout->invalidate();
+    overlapLayout->invalidate();
 }
 
 /**
@@ -182,15 +182,15 @@ void OverlapWidget::maxOverlapItemsChanged(int newValue)
  *
  * @param newDirection The new layout direction as a QString.
  */
-void OverlapWidget::overlapDirectionChanged(QString newDirection)
+void OverlapWidget::overlapDirectionChanged(const QString &newDirection)
 {
     if (newDirection.compare("Qt::Horizontal", Qt::CaseInsensitive) == 0) {
         direction = Qt::Horizontal;
-        overlap_layout->setDirection(direction);
+        overlapLayout->setDirection(direction);
     } else if (newDirection.compare("Qt::Vertical", Qt::CaseInsensitive) == 0) {
         direction = Qt::Vertical;
-        overlap_layout->setDirection(direction);
+        overlapLayout->setDirection(direction);
     }
     this->adjustSize();
-    overlap_layout->invalidate();
+    overlapLayout->invalidate();
 }

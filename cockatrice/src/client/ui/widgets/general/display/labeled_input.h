@@ -7,12 +7,12 @@
 #include <QSpinBox>
 #include <QWidget>
 
-class LabeledInput : public QWidget
+class LabeledInput final : public QWidget
 {
     Q_OBJECT
 
 public:
-    LabeledInput(const QString &labelText, QWidget *parent = nullptr);
+    explicit LabeledInput(const QString &labelText, QWidget *parent = nullptr);
 
     // Add a QSpinBox (for arbitrary numbers)
     QSpinBox *addSpinBox(int minValue, int maxValue, int defaultValue = 0);
