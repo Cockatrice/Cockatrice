@@ -323,7 +323,7 @@ void Server_Game::doStartGameIfReady()
     }
     for (Server_Player *player : players.values()) {
         if (!player->getSpectator())
-            player->setupZones();
+            player->setupZones(room->getGameTypes());
     }
 
     gameStarted = true;
