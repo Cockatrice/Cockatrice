@@ -1,7 +1,5 @@
 #include "server_player.h"
 
-#include "../servatrice/src/main.h"
-#include "../servatrice/src/server_logger.h"
 #include "color.h"
 #include "decklist.h"
 #include "get_pb_extension.h"
