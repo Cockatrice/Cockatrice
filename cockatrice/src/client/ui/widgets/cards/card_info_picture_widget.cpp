@@ -10,7 +10,8 @@
 
 /**
  * @class CardInfoPictureWidget
- * @brief Widget that displays an enlarged image of a card, loading the image based on the card's info or showing a default image.
+ * @brief Widget that displays an enlarged image of a card, loading the image based on the card's info or showing a
+ * default image.
  *
  * This widget can optionally display a larger version of the card's image when hovered over,
  * depending on the `hoverToZoomEnabled` parameter.
@@ -26,7 +27,7 @@
 CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, bool hoverToZoomEnabled)
     : QWidget(parent), info(nullptr), pixmapDirty(true), hoverToZoomEnabled(hoverToZoomEnabled)
 {
-    setMinimumHeight(100);
+    setMinimumHeight(baseHeight);
     if (hoverToZoomEnabled)
         setMouseTracking(true);
 
@@ -116,10 +117,11 @@ void CardInfoPictureWidget::updatePixmap()
  */
 void CardInfoPictureWidget::loadPixmap()
 {
-    if (info)
+    if (info) {
         PictureLoader::getPixmap(resizedPixmap, info, size());
-    else
+    } else {
         PictureLoader::getCardBackPixmap(resizedPixmap, size());
+    }
 
     pixmapDirty = false;
 }
@@ -156,7 +158,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *)
  */
 QSize CardInfoPictureWidget::sizeHint() const
 {
-    return QSize(baseWidth * scaleFactor, baseHeight * scaleFactor);
+    return {static_cast<int>(baseWidth * scaleFactor), static_cast<int>(baseHeight * scaleFactor)};
 }
 
 /**
@@ -167,7 +169,7 @@ void CardInfoPictureWidget::enterEvent(QEnterEvent *event)
 {
     QWidget::enterEvent(event);
     if (hoverToZoomEnabled) {
-        hoverTimer->start(500);
+        hoverTimer->start(hoverActivateThresholdInMs);
     }
 
     emit hoveredOnCard(info);
@@ -195,7 +197,7 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
     QWidget::mouseMoveEvent(event);
     if (hoverToZoomEnabled && enlargedPixmapWidget->isVisible()) {
         QPointF cursorPos = QCursor::pos();
-        enlargedPixmapWidget->move(QPoint(cursorPos.x() + 10, cursorPos.y() + 10));
+        enlargedPixmapWidget->move(QPoint(cursorPos.x() + enlargedPixmapOffset, cursorPos.y() + enlargedPixmapOffset));
     }
 }
 
@@ -207,13 +209,14 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
  */
 void CardInfoPictureWidget::showEnlargedPixmap()
 {
-    if (info) {
-        QSize enlargedSize(size().width() * scaleFactor, static_cast<int>(size().width() * aspectRatio * scaleFactor));
-        enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
-
-        QPointF cursorPos = QCursor::pos();
-        enlargedPixmapWidget->move(cursorPos.x() + 10, cursorPos.y() + 10);
-
-        enlargedPixmapWidget->show();
+    if (!info) {
+        return;
     }
+    QSize enlargedSize(size().width() * scaleFactor, static_cast<int>(size().width() * aspectRatio * scaleFactor));
+    enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
+
+    QPointF cursorPos = QCursor::pos();
+    enlargedPixmapWidget->move(cursorPos.x() + 10, cursorPos.y() + 10);
+
+    enlargedPixmapWidget->show();
 }
