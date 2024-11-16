@@ -22,16 +22,17 @@
  * no limit in that respective dimension.
  *
  * @param overlapPercentage An integer representing the percentage of overlap between items (0-100).
- * @param maxColumns The maximum number of columns allowed in the layout when in horizontal orientation (0 for unlimited).
+ * @param maxColumns The maximum number of columns allowed in the layout when in horizontal orientation (0 for
+ * unlimited).
  * @param maxRows The maximum number of rows allowed in the layout when in vertical orientation (0 for unlimited).
  * @param direction The orientation direction of the layout, either Qt::Horizontal or Qt::Vertical.
  * @param parent The parent widget of this layout.
  */
-OverlapLayout::OverlapLayout(int overlapPercentage,
+OverlapLayout::OverlapLayout(QWidget *parent,
+                             int overlapPercentage,
                              int maxColumns,
                              int maxRows,
-                             Qt::Orientation direction,
-                             QWidget *parent)
+                             Qt::Orientation direction)
     : QLayout(parent), overlapPercentage(overlapPercentage), maxColumns(maxColumns), maxRows(maxRows),
       direction(direction)
 {
@@ -62,7 +63,9 @@ OverlapLayout::~OverlapLayout()
  */
 void OverlapLayout::addItem(QLayoutItem *item)
 {
-    itemList.append(item);
+    if (item != nullptr) {
+        itemList.append(item);
+    }
 }
 
 /**
@@ -103,74 +106,97 @@ QLayoutItem *OverlapLayout::itemAt(int index) const
  */
 QLayoutItem *OverlapLayout::takeAt(int index)
 {
-    if (index >= 0 && index < itemList.size()) {
-        return itemList.takeAt(index);
-    }
-    return nullptr;
+    return itemList.takeAt(index);
 }
 
 /**
  * @brief Sets the geometry for the layout items, arranging them with the specified overlap.
- *
- * Positions each QLayoutItem within the specified rectangle `rect`, respecting
- * the layout’s direction, overlap percentage, and row/column limits. The method
- * calculates the maximum allowable size for each item based on the parent widget’s dimensions.
- * Items are then arranged with an offset based on the overlap percentage, either horizontally
- * or vertically, depending on the layout direction. The geometry of each item is then set
- * within the calculated bounds.
- *
  * @param rect The rectangle defining the area within which the layout should arrange items.
  */
 void OverlapLayout::setGeometry(const QRect &rect)
 {
+    // Call the base class implementation to ensure standard layout behavior.
     QLayout::setGeometry(rect);
 
-    if (itemList.isEmpty())
+    // If there are no items to layout, exit early.
+    if (itemList.isEmpty()) {
         return;
+    }
 
+    // Get the parent widget for size and margin calculations.
     QWidget *parentWidget = this->parentWidget();
-    if (parentWidget) {
-        int availableWidth = parentWidget->width();
-        int availableHeight = parentWidget->height();
+    if (!parentWidget) {
+        return;
+    }
 
-        QMargins margins = parentWidget->contentsMargins();
-        availableWidth -= margins.left() + margins.right();
-        availableHeight -= margins.top() + margins.bottom();
+    // Calculate available width and height, subtracting the parent's margins.
+    int availableWidth = parentWidget->width();
+    int availableHeight = parentWidget->height();
+    QMargins margins = parentWidget->contentsMargins();
+    availableWidth -= margins.left() + margins.right();
+    availableHeight -= margins.top() + margins.bottom();
 
-        int maxItemWidth = 0;
-        int maxItemHeight = 0;
-
-        for (const QLayoutItem *item : itemList) {
-            if (item->widget()) {
-                QSize itemSize = item->widget()->sizeHint();
-                maxItemWidth = std::max(maxItemWidth, itemSize.width());
-                maxItemHeight = std::max(maxItemHeight, itemSize.height());
-            }
+    // Determine the maximum item width and height among all layout items.
+    int maxItemWidth = 0;
+    int maxItemHeight = 0;
+    for (const QLayoutItem *item : itemList) {
+        if (item->widget()) {
+            QSize itemSize = item->widget()->sizeHint();
+            maxItemWidth = std::max(maxItemWidth, itemSize.width());
+            maxItemHeight = std::max(maxItemHeight, itemSize.height());
         }
+    }
 
-        int overlapOffsetWidth = (direction == Qt::Horizontal) ? (maxItemWidth * overlapPercentage / 100) : 0;
-        int overlapOffsetHeight = (direction == Qt::Vertical) ? (maxItemHeight * overlapPercentage / 100) : 0;
+    // Calculate the overlap offsets based on the layout direction and overlap percentage.
+    int overlapOffsetWidth = (direction == Qt::Horizontal) ? (maxItemWidth * overlapPercentage / 100) : 0;
+    int overlapOffsetHeight = (direction == Qt::Vertical) ? (maxItemHeight * overlapPercentage / 100) : 0;
 
-        int columns = (direction == Qt::Horizontal)
-                          ? (maxColumns > 0 ? std::min(maxColumns, (availableWidth + overlapOffsetWidth) /
-                                                                       (maxItemWidth - overlapOffsetWidth))
-                                            : INT_MAX)
-                          : INT_MAX;
-        int rows = (direction == Qt::Vertical)
-                       ? (maxRows > 0 ? std::min(maxRows, (availableHeight + overlapOffsetHeight) /
-                                                              (maxItemHeight - overlapOffsetHeight))
-                                      : INT_MAX)
-                       : INT_MAX;
+    // Determine the number of columns and rows based on layout constraints and available space.
 
-        int currentRow = 0;
-        int currentColumn = 0;
+    int columns =
+        (direction == Qt::Horizontal) // If the layout is horizontal,
+            ? (maxColumns > 0         // Check if a maximum column count is defined.
+                   ? std::min(maxColumns,
+                              (availableWidth + overlapOffsetWidth) /
+                                  (maxItemWidth -
+                                   overlapOffsetWidth)) // If defined,
+                                                        // Calculate the number of columns that can fit in the available
+                                                        // width, considering the item size and overlap. Use `std::min`
+                                                        // to ensure we do not exceed the maximum allowed columns.
+                   : INT_MAX) // If maxColumns is not defined (0 or negative), allow as many columns as possible.
+            : INT_MAX; // If the layout is not horizontal (likely vertical), set columns to an arbitrarily large number
+                       // (INT_MAX),
+    // because column count is not relevant in vertical layouts.
 
-        for (int i = 0; i < itemList.size(); ++i) {
-            QLayoutItem *item = itemList.at(i);
+    int rows =
+        (direction == Qt::Vertical) // If the layout is vertical,
+            ? (maxRows > 0          // Check if a maximum row count is defined.
+                   ? std::min(
+                         maxRows,
+                         (availableHeight + overlapOffsetHeight) /
+                             (maxItemHeight -
+                              overlapOffsetHeight)) // If defined,
+                                                    // Calculate the number of rows that can fit in the available
+                                                    // height, considering the item size and overlap. Use `std::min` to
+                                                    // ensure we do not exceed the maximum allowed rows.
+                   : INT_MAX) // If maxRows is not defined (0 or negative), allow as many rows as possible.
+            : INT_MAX; // If the layout is not vertical (likely horizontal), set rows to an arbitrarily large number
+                       // (INT_MAX), because row count is not relevant in horizontal layouts.
+
+    // Initialize row and column indices.
+    int currentRow = 0;
+    int currentColumn = 0;
+
+    // Loop through all items and position them based on the calculated offsets.
+    for (int i = 0; i < itemList.size(); ++i) {
+        QLayoutItem *item = itemList.at(i);
+        if (item != nullptr) {
+            // Calculate the position of the current item.
             int xPos = rect.left() + currentColumn * (maxItemWidth - overlapOffsetWidth);
             int yPos = rect.top() + currentRow * (maxItemHeight - overlapOffsetHeight);
             item->setGeometry(QRect(xPos, yPos, maxItemWidth, maxItemHeight));
 
+            // Update row and column indices based on the layout direction.
             if (direction == Qt::Horizontal) {
                 currentColumn++;
                 if (currentColumn >= columns) {
@@ -190,54 +216,89 @@ void OverlapLayout::setGeometry(const QRect &rect)
 
 /**
  * @brief Calculates the preferred size for the layout, considering overlap and orientation.
- *
- * Determines an optimal size for the layout by calculating the area needed to arrange all
- * items with the desired overlap. This calculation considers the number of rows/columns,
- * item size, overlap offset, and the layout's direction. Useful for setting a size hint
- * when the layout is used within other widgets.
- *
  * @return The preferred layout size as a QSize object.
  */
 QSize OverlapLayout::calculatePreferredSize() const
 {
+    // Initialize the preferred size to zero.
     QSize preferredSize(0, 0);
 
+    // Determine the maximum item dimensions.
     int maxItemWidth = 0;
     int maxItemHeight = 0;
-
     for (const QLayoutItem *item : itemList) {
-        if (item->widget()) {
-            QSize itemSize = item->widget()->sizeHint();
-            maxItemWidth = std::max(maxItemWidth, itemSize.width());
-            maxItemHeight = std::max(maxItemHeight, itemSize.height());
+        if (item != nullptr) {
+            if (item->widget()) {
+                QSize itemSize = item->widget()->sizeHint();
+                maxItemWidth = std::max(maxItemWidth, itemSize.width());
+                maxItemHeight = std::max(maxItemHeight, itemSize.height());
+            }
         }
     }
 
+    // Calculate the overlap offsets.
     int extra_for_overlap = (100 - overlapPercentage);
     int overlapOffsetWidth =
         (direction == Qt::Horizontal) ? static_cast<int>(std::round((maxItemWidth / 100.0) * extra_for_overlap)) : 0;
     int overlapOffsetHeight =
         (direction == Qt::Vertical) ? static_cast<int>(std::round((maxItemHeight / 100.0) * extra_for_overlap)) : 0;
 
+    // Variables to hold the total dimensions based on layout orientation.
     int totalWidth = 0;
     int totalHeight = 0;
 
+    // Calculate the total size based on the layout direction and constraints.
     if (direction == Qt::Horizontal) {
+        // Determine the number of columns:
+        // - Use maxColumns if it is greater than 0 (constraint set by the user).
+        // - Otherwise, set the number of columns to the total number of items in the layout.
         int numColumns = (maxColumns > 0) ? maxColumns : itemList.size();
+
+        // Calculate the extra space required for overlaps between columns:
+        // - Each overlap reduces the effective width of subsequent items.
         int extra_space_for_overlaps = overlapOffsetWidth * (numColumns - 1);
+
+        // Total width:
+        // - The first item's width is fully included (maxItemWidth).
+        // - Add the space for all overlaps between adjacent items.
         totalWidth = maxItemWidth + extra_space_for_overlaps;
 
-        int numRows = (maxColumns > 0) ? ceil(itemList.size() / static_cast<double>(maxRows)) : 1;
+        // Determine the number of rows:
+        // - Use maxRows if maxColumns is set (to constrain the number of rows).
+        // - Otherwise, assume a single row.
+        int numRows = (maxColumns > 0) ? ceil(itemList.size() / static_cast<double>(numColumns)) : 1;
+
+        // Total height:
+        // - Multiply the number of rows by the item height (maxItemHeight).
+        // - Subtract the height overlap between rows to avoid double-counting.
         totalHeight = maxItemHeight * numRows - (numRows - 1) * overlapOffsetHeight;
     } else if (direction == Qt::Vertical) {
+        // Determine the number of columns:
+        // - Use maxRows to calculate how many columns are needed if a row constraint exists.
+        // - Otherwise, assume a single column.
         int numColumns = (maxRows != 0) ? ceil(itemList.size() / static_cast<double>(maxRows)) : 1;
+
+        // Total width:
+        // - Multiply the number of columns by the item width (maxItemWidth).
+        // - Subtract the width overlap between columns to avoid double-counting.
         totalWidth = maxItemWidth * numColumns - (numColumns - 1) * overlapOffsetWidth;
 
+        // Determine the number of rows:
+        // - Use maxRows if it is greater than 0 (constraint set by the user).
+        // - Otherwise, set the number of rows to the total number of items in the layout.
         int numRows = (maxRows > 0) ? maxRows : itemList.size();
+
+        // Calculate the extra space required for overlaps between rows:
+        // - Each overlap reduces the effective height of subsequent items.
         int extra_space_for_overlaps = overlapOffsetHeight * (numRows - 1);
+
+        // Total height:
+        // - The first item's height is fully included (maxItemHeight).
+        // - Add the space for all overlaps between adjacent items.
         totalHeight = maxItemHeight + extra_space_for_overlaps;
     }
 
+    // Assign the calculated dimensions to the preferred size.
     preferredSize = QSize(totalWidth, totalHeight);
 
     return preferredSize;
@@ -270,7 +331,6 @@ QSize OverlapLayout::minimumSize() const
     return calculatePreferredSize();
 }
 
-
 /**
  * @brief Sets the layout's orientation direction.
  *
@@ -288,7 +348,9 @@ void OverlapLayout::setDirection(Qt::Orientation new_direction)
  */
 void OverlapLayout::setMaxColumns(int newValue)
 {
-    maxColumns = newValue;
+    if (newValue >= 0) {
+        maxColumns = newValue;
+    }
 }
 
 /**
@@ -298,7 +360,9 @@ void OverlapLayout::setMaxColumns(int newValue)
  */
 void OverlapLayout::setMaxRows(int newValue)
 {
-    maxRows = newValue;
+    if (newValue >= 0) {
+        maxRows = newValue;
+    }
 }
 
 /**
@@ -328,7 +392,7 @@ int OverlapLayout::calculateMaxColumns() const
     // Determine the maximum number of columns that can fit
     int columns = availableWidth / maxItemWidth;
 
-    return columns > 0 ? columns : 1;
+    return qMax(1, columns);
 }
 
 /**
@@ -381,7 +445,7 @@ int OverlapLayout::calculateMaxRows() const
     // Determine the maximum number of rows that can fit
     int rows = availableHeight / overlapOffsetHeight;
 
-    return rows > 0 ? rows : 1;
+    return qMax(1, rows);
 }
 
 /**

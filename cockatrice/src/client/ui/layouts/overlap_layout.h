@@ -5,17 +5,21 @@
 #include <QList>
 #include <QWidget>
 
-
-class OverlapLayout : public QLayout {
+class OverlapLayout : public QLayout
+{
 public:
-    OverlapLayout(int overlapPercentage = 10, int maxColumns = 2, int maxRows = 2, Qt::Orientation direction = Qt::Horizontal, QWidget* parent = nullptr);
+    OverlapLayout(QWidget *parent = nullptr,
+                  int overlapPercentage = 10,
+                  int maxColumns = 2,
+                  int maxRows = 2,
+                  Qt::Orientation direction = Qt::Horizontal);
     ~OverlapLayout();
 
-    void addItem(QLayoutItem* item) override;
+    void addItem(QLayoutItem *item) override;
     int count() const override;
-    QLayoutItem* itemAt(int index) const override;
-    QLayoutItem* takeAt(int index) override;
-    void setGeometry(const QRect& rect) override;
+    QLayoutItem *itemAt(int index) const override;
+    QLayoutItem *takeAt(int index) override;
+    void setGeometry(const QRect &rect) override;
     QSize minimumSize() const override;
     QSize sizeHint() const override;
     void setMaxColumns(int newValue);
@@ -27,7 +31,7 @@ public:
     void setDirection(Qt::Orientation direction);
 
 private:
-    QList<QLayoutItem*> itemList;
+    QList<QLayoutItem *> itemList;
     int overlapPercentage;
     int maxColumns;
     int maxRows;

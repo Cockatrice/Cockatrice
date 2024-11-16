@@ -99,10 +99,7 @@ void FlowWidget::clearLayout()
             item->widget()->deleteLater(); // Delete the widget
             delete item;           // Delete the layout item
         }
-    }
-
-    // If layout is null, create a new layout, otherwise reuse the existing one
-    if (flow_layout == nullptr) {
+    } else {
         if (scrollArea->horizontalScrollBarPolicy() != Qt::ScrollBarAlwaysOff &&
             scrollArea->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOff) {
             flow_layout = new HorizontalFlowLayout(container);
