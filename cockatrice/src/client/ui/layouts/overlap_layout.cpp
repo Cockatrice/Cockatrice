@@ -158,8 +158,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
     if (direction == Qt::Horizontal) {
         if (maxColumns > 0) {
             // Calculate the maximum possible columns given the available width and overlap.
-            const int availableColumns = (availableWidth + overlapOffsetWidth) /
-                                   (maxItemWidth - overlapOffsetWidth);
+            const int availableColumns = (availableWidth + overlapOffsetWidth) / (maxItemWidth - overlapOffsetWidth);
             // Use the smaller of maxColumns and availableColumns.
             columns = std::min(maxColumns, availableColumns);
         } else {
@@ -176,8 +175,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
     if (direction == Qt::Vertical) {
         if (maxRows > 0) {
             // Calculate the maximum possible rows given the available height and overlap.
-            const int availableRows = (availableHeight + overlapOffsetHeight) /
-                                (maxItemHeight - overlapOffsetHeight);
+            const int availableRows = (availableHeight + overlapOffsetHeight) / (maxItemHeight - overlapOffsetHeight);
             // Use the smaller of maxRows and availableRows.
             rows = std::min(maxRows, availableRows);
         } else {
