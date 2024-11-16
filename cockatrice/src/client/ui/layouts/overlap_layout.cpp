@@ -153,37 +153,41 @@ void OverlapLayout::setGeometry(const QRect &rect)
     const int overlapOffsetWidth = (direction == Qt::Horizontal) ? (maxItemWidth * overlapPercentage / 100) : 0;
     const int overlapOffsetHeight = (direction == Qt::Vertical) ? (maxItemHeight * overlapPercentage / 100) : 0;
 
-    // Determine the number of columns and rows based on layout constraints and available space.
+    // Determine the number of columns based on layout constraints and available space.
+    int columns;
+    if (direction == Qt::Horizontal) {
+        if (maxColumns > 0) {
+            // Calculate the maximum possible columns given the available width and overlap.
+            const int availableColumns = (availableWidth + overlapOffsetWidth) /
+                                   (maxItemWidth - overlapOffsetWidth);
+            // Use the smaller of maxColumns and availableColumns.
+            columns = std::min(maxColumns, availableColumns);
+        } else {
+            // If no maxColumns constraint, allow as many columns as possible.
+            columns = INT_MAX;
+        }
+    } else {
+        // If not a horizontal layout, column count is irrelevant.
+        columns = INT_MAX;
+    }
 
-    const int columns =
-        (direction == Qt::Horizontal) // If the layout is horizontal,
-            ? (maxColumns > 0         // Check if a maximum column count is defined.
-                   ? std::min(maxColumns,
-                              (availableWidth + overlapOffsetWidth) /
-                                  (maxItemWidth -
-                                   overlapOffsetWidth)) // If defined,
-                                                        // Calculate the number of columns that can fit in the available
-                                                        // width, considering the item size and overlap. Use `std::min`
-                                                        // to ensure we do not exceed the maximum allowed columns.
-                   : INT_MAX) // If maxColumns is not defined (0 or negative), allow as many columns as possible.
-            : INT_MAX; // If the layout is not horizontal (likely vertical), set columns to an arbitrarily large number
-                       // (INT_MAX),
-    // because column count is not relevant in vertical layouts.
-
-    const int rows =
-        (direction == Qt::Vertical) // If the layout is vertical,
-            ? (maxRows > 0          // Check if a maximum row count is defined.
-                   ? std::min(
-                         maxRows,
-                         (availableHeight + overlapOffsetHeight) /
-                             (maxItemHeight -
-                              overlapOffsetHeight)) // If defined,
-                                                    // Calculate the number of rows that can fit in the available
-                                                    // height, considering the item size and overlap. Use `std::min` to
-                                                    // ensure we do not exceed the maximum allowed rows.
-                   : INT_MAX) // If maxRows is not defined (0 or negative), allow as many rows as possible.
-            : INT_MAX; // If the layout is not vertical (likely horizontal), set rows to an arbitrarily large number
-                       // (INT_MAX), because row count is not relevant in horizontal layouts.
+    // Determine the number of rows based on layout constraints and available space.
+    int rows;
+    if (direction == Qt::Vertical) {
+        if (maxRows > 0) {
+            // Calculate the maximum possible rows given the available height and overlap.
+            const int availableRows = (availableHeight + overlapOffsetHeight) /
+                                (maxItemHeight - overlapOffsetHeight);
+            // Use the smaller of maxRows and availableRows.
+            rows = std::min(maxRows, availableRows);
+        } else {
+            // If no maxRows constraint, allow as many rows as possible.
+            rows = INT_MAX;
+        }
+    } else {
+        // If not a vertical layout, row count is irrelevant.
+        rows = INT_MAX;
+    }
 
     // Initialize row and column indices.
     int currentRow = 0;
