@@ -8,7 +8,7 @@
  * @param hSpacing The horizontal spacing between items.
  * @param vSpacing The vertical spacing between items.
  */
-HorizontalFlowLayout::HorizontalFlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+HorizontalFlowLayout::HorizontalFlowLayout(QWidget *parent, const int margin, const int hSpacing, const int vSpacing)
     : FlowLayout(parent, margin, hSpacing, vSpacing)
 {
 }
@@ -30,23 +30,25 @@ HorizontalFlowLayout::~HorizontalFlowLayout()
  * @param height The available height for arranging layout items.
  * @return The total width required to fit all items, organized in columns constrained by the given height.
  */
-int HorizontalFlowLayout::heightForWidth(int height) const
+int HorizontalFlowLayout::heightForWidth(const int height) const
 {
     int width = 0;
     int colWidth = 0;
     int colHeight = 0;
 
-    for (QLayoutItem *item : items) {
-        if (!(item == nullptr || item->isEmpty())) {
-            int itemHeight = item->sizeHint().height();
-            if (colHeight + itemHeight > height) {
-                width += colWidth;
-                colHeight = itemHeight;
-                colWidth = item->sizeHint().width();
-            } else {
-                colHeight += itemHeight;
-                colWidth = qMax(colWidth, item->sizeHint().width());
-            }
+    for (const QLayoutItem *item : items) {
+        if (item == nullptr || item->isEmpty()) {
+            continue;
+        }
+
+        int itemHeight = item->sizeHint().height();
+        if (colHeight + itemHeight > height) {
+            width += colWidth;
+            colHeight = itemHeight;
+            colWidth = item->sizeHint().width();
+        } else {
+            colHeight += itemHeight;
+            colWidth = qMax(colWidth, item->sizeHint().width());
         }
     }
     width += colWidth; // Add width of the last column
@@ -59,12 +61,11 @@ int HorizontalFlowLayout::heightForWidth(int height) const
  */
 void HorizontalFlowLayout::setGeometry(const QRect &rect)
 {
-    int availableHeight = qMax(rect.height(), getParentScrollAreaHeight());
+    const int availableHeight = qMax(rect.height(), getParentScrollAreaHeight());
 
-    int totalWidth = layoutAllColumns(rect.x(), rect.y(), availableHeight);
+    const int totalWidth = layoutAllColumns(rect.x(), rect.y(), availableHeight);
 
-    QWidget *parentWidgetPtr = parentWidget();
-    if (parentWidgetPtr) {
+    if (QWidget *parentWidgetPtr = parentWidget()) {
         parentWidgetPtr->setMinimumSize(totalWidth, availableHeight);
     }
 }
@@ -77,7 +78,7 @@ void HorizontalFlowLayout::setGeometry(const QRect &rect)
  * @param availableHeight The height within which each column is constrained.
  * @return The total width after arranging all columns.
  */
-int HorizontalFlowLayout::layoutAllColumns(int originX, int originY, int availableHeight)
+int HorizontalFlowLayout::layoutAllColumns(const int originX, const int originY, const int availableHeight)
 {
     QVector<QLayoutItem *> colItems; // Holds items for the current column
     int currentXPosition = originX;  // Tracks the x-coordinate while placing items
@@ -86,6 +87,10 @@ int HorizontalFlowLayout::layoutAllColumns(int originX, int originY, int availab
     int colWidth = 0; // Tracks the maximum width of items in the current column
 
     for (QLayoutItem *item : items) {
+        if (item == nullptr || item->isEmpty()) {
+            continue;
+        }
+
         QSize itemSize = item->sizeHint(); // The suggested size for the current item
 
         // Check if the current item fits in the remaining height of the current column
@@ -117,15 +122,15 @@ int HorizontalFlowLayout::layoutAllColumns(int originX, int originY, int availab
  * @param x The starting x-coordinate for the column.
  * @param y The starting y-coordinate for the column.
  */
-void HorizontalFlowLayout::layoutSingleColumn(const QVector<QLayoutItem *> &colItems, int x, int y)
+void HorizontalFlowLayout::layoutSingleColumn(const QVector<QLayoutItem *> &colItems, const int x, int y)
 {
     for (QLayoutItem *item : colItems) {
         if (!(item == nullptr || item->isEmpty())) {
             // Get the maximum allowed size for the item
             QSize itemMaxSize = item->widget()->maximumSize();
             // Constrain the item's width and height to its size hint or maximum size
-            int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
-            int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
+            const int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
+            const int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
             // Set the item's geometry based on the computed size and position
             item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
             // Move the y-position down by the item's height to place the next item below

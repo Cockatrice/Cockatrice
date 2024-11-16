@@ -8,7 +8,7 @@
  * @param hSpacing The horizontal spacing between items.
  * @param vSpacing The vertical spacing between items.
  */
-VerticalFlowLayout::VerticalFlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
+VerticalFlowLayout::VerticalFlowLayout(QWidget *parent, const int margin, const int hSpacing, const int vSpacing)
     : FlowLayout(parent, margin, hSpacing, vSpacing)
 {
 }
@@ -30,23 +30,25 @@ VerticalFlowLayout::~VerticalFlowLayout()
  * @param width The available width for arranging layout items.
  * @return The total height required to fit all items, organized in rows constrained by the given width.
  */
-int VerticalFlowLayout::heightForWidth(int width) const
+int VerticalFlowLayout::heightForWidth(const int width) const
 {
     int height = 0;
     int rowWidth = 0;
     int rowHeight = 0;
 
-    for (QLayoutItem *item : items) {
-        if (!(item == nullptr || item->isEmpty())) {
-            int itemWidth = item->sizeHint().width() + horizontalSpacing();
-            if (rowWidth + itemWidth > width) {
-                height += rowHeight + verticalSpacing();
-                rowWidth = itemWidth;
-                rowHeight = item->sizeHint().height();
-            } else {
-                rowWidth += itemWidth;
-                rowHeight = qMax(rowHeight, item->sizeHint().height());
-            }
+    for (const QLayoutItem *item : items) {
+        if (item == nullptr || item->isEmpty()) {
+            continue;
+        }
+
+        int itemWidth = item->sizeHint().width() + horizontalSpacing();
+        if (rowWidth + itemWidth > width) {
+            height += rowHeight + verticalSpacing();
+            rowWidth = itemWidth;
+            rowHeight = item->sizeHint().height();
+        } else {
+            rowWidth += itemWidth;
+            rowHeight = qMax(rowHeight, item->sizeHint().height());
         }
     }
     height += rowHeight; // Add height of the last row
@@ -60,12 +62,11 @@ int VerticalFlowLayout::heightForWidth(int width) const
 void VerticalFlowLayout::setGeometry(const QRect &rect)
 {
     // If we have a parent scroll area, we're clamped to that, else we use our own rectangle.
-    int availableWidth = getParentScrollAreaWidth() == 0 ? rect.width() : getParentScrollAreaWidth();
+    const int availableWidth = getParentScrollAreaWidth() == 0 ? rect.width() : getParentScrollAreaWidth();
 
-    int totalHeight = layoutAllRows(rect.x(), rect.y(), availableWidth);
+    const int totalHeight = layoutAllRows(rect.x(), rect.y(), availableWidth);
 
-    QWidget *parentWidgetPtr = parentWidget();
-    if (parentWidgetPtr) {
+    if (QWidget *parentWidgetPtr = parentWidget()) {
         parentWidgetPtr->setMinimumSize(availableWidth, totalHeight);
     }
 }
@@ -78,7 +79,7 @@ void VerticalFlowLayout::setGeometry(const QRect &rect)
  * @param availableWidth The width within which each row is constrained.
  * @return The total height after arranging all rows.
  */
-int VerticalFlowLayout::layoutAllRows(int originX, int originY, int availableWidth)
+int VerticalFlowLayout::layoutAllRows(const int originX, const int originY, const int availableWidth)
 {
     QVector<QLayoutItem *> rowItems; // Holds items for the current row
     int currentXPosition = originX;  // Tracks the x-coordinate while placing items
@@ -87,6 +88,10 @@ int VerticalFlowLayout::layoutAllRows(int originX, int originY, int availableWid
     int rowHeight = 0; // Tracks the maximum height of items in the current row
 
     for (QLayoutItem *item : items) {
+        if (item == nullptr || item->isEmpty()) {
+            continue;
+        }
+
         QSize itemSize = item->sizeHint();                      // The suggested size for the current item
         int itemWidth = itemSize.width() + horizontalSpacing(); // Item width plus spacing
 
@@ -119,15 +124,15 @@ int VerticalFlowLayout::layoutAllRows(int originX, int originY, int availableWid
  * @param x The starting x-coordinate for the row.
  * @param y The starting y-coordinate for the row.
  */
-void VerticalFlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y)
+void VerticalFlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, const int y)
 {
     for (QLayoutItem *item : rowItems) {
         if (!(item == nullptr || item->isEmpty())) {
             // Get the maximum allowed size for the item
             QSize itemMaxSize = item->widget()->maximumSize();
             // Constrain the item's width and height to its size hint or maximum size
-            int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
-            int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
+            const int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
+            const int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
             // Set the item's geometry based on the computed size and position
             item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
             // Move the x-position to the right, leaving space for horizontal spacing
