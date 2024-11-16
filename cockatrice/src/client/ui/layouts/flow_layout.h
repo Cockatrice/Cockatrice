@@ -11,28 +11,28 @@ class FlowLayout : public QLayout
 public:
     explicit FlowLayout(QWidget *parent = nullptr);
     FlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing);
-    ~FlowLayout();
+    ~FlowLayout() override;
 
     void addItem(QLayoutItem *item) override;
-    int count() const override;
-    QLayoutItem *itemAt(int index) const override;
+    [[nodiscard]] int count() const override;
+    [[nodiscard]] QLayoutItem *itemAt(int index) const override;
     QLayoutItem *takeAt(int index) override;
-    int horizontalSpacing() const;
+    [[nodiscard]] int horizontalSpacing() const;
 
-    Qt::Orientations expandingDirections() const override;
-    bool hasHeightForWidth() const override;
-    int heightForWidth(int width) const override;
-    int verticalSpacing() const;
-    int doLayout(const QRect &rect, bool testOnly) const;
-    int smartSpacing(QStyle::PixelMetric pm) const;
-    int getParentScrollAreaWidth() const;
-    int getParentScrollAreaHeight() const;
+    [[nodiscard]] Qt::Orientations expandingDirections() const override;
+    [[nodiscard]] bool hasHeightForWidth() const override;
+    [[nodiscard]] int heightForWidth(int width) const override;
+    [[nodiscard]] int verticalSpacing() const;
+    [[nodiscard]] int doLayout(const QRect &rect, bool testOnly) const;
+    [[nodiscard]] int smartSpacing(QStyle::PixelMetric pm) const;
+    [[nodiscard]] int getParentScrollAreaWidth() const;
+    [[nodiscard]] int getParentScrollAreaHeight() const;
 
     void setGeometry(const QRect &rect) override;
     virtual int layoutAllRows(int originX, int originY, int availableWidth);
     virtual void layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y);
-    QSize sizeHint() const override;
-    QSize minimumSize() const override;
+    [[nodiscard]] QSize sizeHint() const override;
+    [[nodiscard]] QSize minimumSize() const override;
 
 protected:
     QList<QLayoutItem *> items; // List to store layout items
@@ -40,4 +40,4 @@ protected:
     int verticalMargin;
 };
 
-#endif // FLOWLAYOUT_H
+#endif // FLOW_LAYOUT_H
