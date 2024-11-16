@@ -265,7 +265,10 @@ QSize OverlapLayout::calculatePreferredSize() const
         // Determine the number of rows:
         // - Use maxRows if maxColumns is set (to constrain the number of rows).
         // - Otherwise, assume a single row.
-        const int numRows = (maxColumns > 0) ? static_cast<int>(ceil(static_cast<double>(itemList.size()) / static_cast<double>(numColumns))) : 1;
+        const int numRows =
+            (maxColumns > 0)
+                ? static_cast<int>(ceil(static_cast<double>(itemList.size()) / static_cast<double>(numColumns)))
+                : 1;
 
         // Total height:
         // - Multiply the number of rows by the item height (maxItemHeight).
@@ -275,7 +278,9 @@ QSize OverlapLayout::calculatePreferredSize() const
         // Determine the number of columns:
         // - Use maxRows to calculate how many columns are needed if a row constraint exists.
         // - Otherwise, assume a single column.
-        const int numColumns = (maxRows != 0) ? static_cast<int>(ceil(static_cast<double>(itemList.size()) / static_cast<double>(maxRows))) : 1;
+        const int numColumns =
+            (maxRows != 0) ? static_cast<int>(ceil(static_cast<double>(itemList.size()) / static_cast<double>(maxRows)))
+                           : 1;
 
         // Total width:
         // - Multiply the number of columns by the item width (maxItemWidth).
