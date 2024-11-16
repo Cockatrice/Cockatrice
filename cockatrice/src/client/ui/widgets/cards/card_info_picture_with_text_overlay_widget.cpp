@@ -66,7 +66,7 @@ void CardInfoPictureWithTextOverlayWidget::setOutlineColor(const QColor &color)
  */
 void CardInfoPictureWithTextOverlayWidget::setFontSize(const int size)
 {
-    fontSize = size;
+    fontSize = size > 0 ? size : 1;
     update();
 }
 
@@ -109,48 +109,50 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
 
     // Get the pixmap from the base class using the getter
     const QPixmap &pixmap = getResizedPixmap();
-    if (!pixmap.isNull()) {
-        // Calculate size and position for drawing
-        const QSize scaledSize = pixmap.size().scaled(size(), Qt::KeepAspectRatio);
-        const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
-        const QRect pixmapRect(topLeft, scaledSize);
-
-        // Prepare text wrapping
-        const QFontMetrics fontMetrics(font);
-        const int lineHeight = fontMetrics.height();
-        const int textWidth = pixmapRect.width();
-        QString wrappedText;
-
-        // Break the text into multiple lines to fit within the pixmap width
-        QString currentLine;
-        QStringList words = overlayText.split(' ');
-        for (const QString &word : words) {
-            if (fontMetrics.horizontalAdvance(currentLine + " " + word) > textWidth) {
-                wrappedText += currentLine + '\n';
-                currentLine = word;
-            } else {
-                if (!currentLine.isEmpty()) {
-                    currentLine += " ";
-                }
-                currentLine += word;
-            }
-        }
-        wrappedText += currentLine;
-
-        // Calculate total text block height
-        const int totalTextHeight = static_cast<int>(wrappedText.count('\n')) * lineHeight + lineHeight;
-
-        // Set up the text layout options
-        QTextOption textOption;
-        textOption.setAlignment(textAlignment);
-
-        // Create a text rectangle centered within the pixmap rect
-        auto textRect = QRect(pixmapRect.left(), pixmapRect.top(), pixmapRect.width(), totalTextHeight);
-        textRect.moveTop((pixmapRect.height() - totalTextHeight) / 2 + pixmapRect.top());
-
-        // Draw the outlined text
-        drawOutlinedText(painter, textRect, wrappedText, textOption);
+    if (pixmap.isNull()) {
+        return;
     }
+
+    // Calculate size and position for drawing
+    const QSize scaledSize = pixmap.size().scaled(size(), Qt::KeepAspectRatio);
+    const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
+    const QRect pixmapRect(topLeft, scaledSize);
+
+    // Prepare text wrapping
+    const QFontMetrics fontMetrics(font);
+    const int lineHeight = fontMetrics.height();
+    const int textWidth = pixmapRect.width();
+    QString wrappedText;
+
+    // Break the text into multiple lines to fit within the pixmap width
+    QString currentLine;
+    QStringList words = overlayText.split(' ');
+    for (const QString &word : words) {
+        if (fontMetrics.horizontalAdvance(currentLine + " " + word) > textWidth) {
+            wrappedText += currentLine + '\n';
+            currentLine = word;
+        } else {
+            if (!currentLine.isEmpty()) {
+                currentLine += " ";
+            }
+            currentLine += word;
+        }
+    }
+    wrappedText += currentLine;
+
+    // Calculate total text block height
+    const int totalTextHeight = static_cast<int>(wrappedText.count('\n')) * lineHeight + lineHeight;
+
+    // Set up the text layout options
+    QTextOption textOption;
+    textOption.setAlignment(textAlignment);
+
+    // Create a text rectangle centered within the pixmap rect
+    auto textRect = QRect(pixmapRect.left(), pixmapRect.top(), pixmapRect.width(), totalTextHeight);
+    textRect.moveTop((pixmapRect.height() - totalTextHeight) / 2 + pixmapRect.top());
+
+    // Draw the outlined text
+    drawOutlinedText(painter, textRect, wrappedText, textOption);
 }
 
 /**

@@ -127,16 +127,18 @@ int VerticalFlowLayout::layoutAllRows(const int originX, const int originY, cons
 void VerticalFlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, const int y)
 {
     for (QLayoutItem *item : rowItems) {
-        if (!(item == nullptr || item->isEmpty())) {
-            // Get the maximum allowed size for the item
-            QSize itemMaxSize = item->widget()->maximumSize();
-            // Constrain the item's width and height to its size hint or maximum size
-            const int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
-            const int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
-            // Set the item's geometry based on the computed size and position
-            item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
-            // Move the x-position to the right, leaving space for horizontal spacing
-            x += itemWidth + horizontalSpacing();
+        if (item == nullptr || item->isEmpty()) {
+            continue;
         }
+
+        // Get the maximum allowed size for the item
+        QSize itemMaxSize = item->widget()->maximumSize();
+        // Constrain the item's width and height to its size hint or maximum size
+        const int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
+        const int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
+        // Set the item's geometry based on the computed size and position
+        item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
+        // Move the x-position to the right, leaving space for horizontal spacing
+        x += itemWidth + horizontalSpacing();
     }
 }

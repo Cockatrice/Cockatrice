@@ -1,6 +1,6 @@
 #include "labeled_input.h"
 
-LabeledInput::LabeledInput(const QString &labelText, QWidget *parent) : QWidget(parent)
+LabeledInput::LabeledInput(QWidget *parent, const QString &labelText) : QWidget(parent)
 {
     label = new QLabel(labelText, this);
     layout = new QHBoxLayout(this);

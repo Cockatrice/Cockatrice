@@ -78,8 +78,6 @@ void OverlapLayout::addItem(QLayoutItem *item)
  */
 int OverlapLayout::count() const
 {
-    // Ensure safe conversion by casting the maximum limit to the same type as itemList.size()
-    assert(itemList.size() <= static_cast<qsizetype>(std::numeric_limits<int>::max()));
     return static_cast<int>(itemList.size());
 }
 
@@ -94,7 +92,7 @@ int OverlapLayout::count() const
  */
 QLayoutItem *OverlapLayout::itemAt(const int index) const
 {
-    return itemList.value(index);
+    return (index >= 0 && index < itemList.size()) ? itemList.value(index) : nullptr;
 }
 
 /**
@@ -108,7 +106,7 @@ QLayoutItem *OverlapLayout::itemAt(const int index) const
  */
 QLayoutItem *OverlapLayout::takeAt(const int index)
 {
-    return itemList.takeAt(index);
+    return (index >= 0 && index < itemList.size()) ? itemList.takeAt(index) : nullptr;
 }
 
 /**
@@ -142,10 +140,12 @@ void OverlapLayout::setGeometry(const QRect &rect)
     int maxItemWidth = 0;
     int maxItemHeight = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item->widget()) {
-            QSize itemSize = item->widget()->sizeHint();
-            maxItemWidth = std::max(maxItemWidth, itemSize.width());
-            maxItemHeight = std::max(maxItemHeight, itemSize.height());
+        if (item != nullptr) {
+            if (item->widget()) {
+                QSize itemSize = item->widget()->sizeHint();
+                maxItemWidth = std::max(maxItemWidth, itemSize.width());
+                maxItemHeight = std::max(maxItemHeight, itemSize.height());
+            }
         }
     }
 
@@ -193,25 +193,27 @@ void OverlapLayout::setGeometry(const QRect &rect)
 
     // Loop through all items and position them based on the calculated offsets.
     for (const auto item : itemList) {
-        if (item != nullptr) {
-            // Calculate the position of the current item.
-            const int xPos = rect.left() + currentColumn * (maxItemWidth - overlapOffsetWidth);
-            const int yPos = rect.top() + currentRow * (maxItemHeight - overlapOffsetHeight);
-            item->setGeometry(QRect(xPos, yPos, maxItemWidth, maxItemHeight));
+        if (item == nullptr) {
+            continue;
+        }
 
-            // Update row and column indices based on the layout direction.
-            if (direction == Qt::Horizontal) {
-                currentColumn++;
-                if (currentColumn >= columns) {
-                    currentColumn = 0;
-                    currentRow++;
-                }
-            } else {
+        // Calculate the position of the current item.
+        const int xPos = rect.left() + currentColumn * (maxItemWidth - overlapOffsetWidth);
+        const int yPos = rect.top() + currentRow * (maxItemHeight - overlapOffsetHeight);
+        item->setGeometry(QRect(xPos, yPos, maxItemWidth, maxItemHeight));
+
+        // Update row and column indices based on the layout direction.
+        if (direction == Qt::Horizontal) {
+            currentColumn++;
+            if (currentColumn >= columns) {
+                currentColumn = 0;
                 currentRow++;
-                if (currentRow >= rows) {
-                    currentRow = 0;
-                    currentColumn++;
-                }
+            }
+        } else {
+            currentRow++;
+            if (currentRow >= rows) {
+                currentRow = 0;
+                currentColumn++;
             }
         }
     }
@@ -228,13 +230,16 @@ QSize OverlapLayout::calculatePreferredSize() const
     int maxItemWidth = 0;
     int maxItemHeight = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item != nullptr) {
-            if (item->widget()) {
-                QSize itemSize = item->widget()->sizeHint();
-                maxItemWidth = std::max(maxItemWidth, itemSize.width());
-                maxItemHeight = std::max(maxItemHeight, itemSize.height());
-            }
+        if (item == nullptr) {
+            continue;
         }
+        if (!item->widget()) {
+            continue;
+        }
+
+        QSize itemSize = item->widget()->sizeHint();
+        maxItemWidth = std::max(maxItemWidth, itemSize.width());
+        maxItemHeight = std::max(maxItemHeight, itemSize.height());
     }
 
     // Calculate the overlap offsets.
@@ -385,10 +390,15 @@ int OverlapLayout::calculateMaxColumns() const
     // Determine maximum item width
     int maxItemWidth = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item->widget()) {
-            QSize itemSize = item->widget()->sizeHint();
-            maxItemWidth = std::max(maxItemWidth, itemSize.width());
+        if (item == nullptr) {
+            continue;
         }
+        if (!item->widget()) {
+            continue;
+        }
+
+        QSize itemSize = item->widget()->sizeHint();
+        maxItemWidth = std::max(maxItemWidth, itemSize.width());
     }
 
     const int availableWidth = parentWidget() ? parentWidget()->width() : 0;
@@ -413,9 +423,8 @@ int OverlapLayout::calculateRowsForColumns(const int columns) const
     }
 
     const int totalItems = static_cast<int>(itemList.size());
-    const int rows = std::ceil(static_cast<double>(totalItems) / columns);
 
-    return rows;
+    return std::ceil(static_cast<double>(totalItems) / columns);
 }
 
 /**
@@ -435,10 +444,15 @@ int OverlapLayout::calculateMaxRows() const
     // Determine maximum item height
     int maxItemHeight = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item->widget()) {
-            QSize itemSize = item->widget()->sizeHint();
-            maxItemHeight = std::max(maxItemHeight, itemSize.height());
+        if (item == nullptr) {
+            continue;
         }
+        if (!item->widget()) {
+            continue;
+        }
+
+        QSize itemSize = item->widget()->sizeHint();
+        maxItemHeight = std::max(maxItemHeight, itemSize.height());
     }
 
     // Calculate the effective height of each item with the overlap applied
@@ -466,7 +480,6 @@ int OverlapLayout::calculateColumnsForRows(const int rows) const
     }
 
     const int totalItems = static_cast<int>(itemList.size());
-    const int columns = std::ceil(static_cast<double>(totalItems) / rows);
 
-    return columns;
+    return std::ceil(static_cast<double>(totalItems) / rows);
 }

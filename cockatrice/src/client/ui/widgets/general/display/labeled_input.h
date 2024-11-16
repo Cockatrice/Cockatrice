@@ -12,7 +12,7 @@ class LabeledInput final : public QWidget
     Q_OBJECT
 
 public:
-    explicit LabeledInput(const QString &labelText, QWidget *parent = nullptr);
+    explicit LabeledInput(QWidget *parent, const QString &labelText);
 
     // Add a QSpinBox (for arbitrary numbers)
     QSpinBox *addSpinBox(int minValue, int maxValue, int defaultValue = 0);

@@ -158,8 +158,8 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
     // Layout the final row if there are remaining items.
     layoutSingleRow(rowItems, originX, currentYPosition);
 
-    // Return the total y-coordinate at the bottom of the last row.
-    return currentYPosition + rowHeight;
+    currentYPosition += rowHeight; // Add the final row's height
+    return currentYPosition;
 }
 
 /**
@@ -175,6 +175,7 @@ void FlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, 
         if (item == nullptr || item->isEmpty()) {
             continue;
         }
+
         QSize itemMaxSize = item->widget()->maximumSize(); // Get the item's maximum allowable size.
         // Constrain the item's width and height to its size hint or maximum size.
         int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
@@ -194,8 +195,10 @@ QSize FlowLayout::sizeHint() const
 {
     QSize size;
     for (const QLayoutItem *item : items) {
-        if (!(item == nullptr || item->isEmpty())) {
-            size = size.expandedTo(item->sizeHint());
+        if (item != nullptr) {
+            if (!item->isEmpty()) {
+                size = size.expandedTo(item->sizeHint());
+            }
         }
     }
     return size.isValid() ? size : QSize(0, 0);
@@ -209,8 +212,10 @@ QSize FlowLayout::minimumSize() const
 {
     QSize size;
     for (const QLayoutItem *item : items) {
-        if (!(item == nullptr || item->isEmpty())) {
-            size = size.expandedTo(item->minimumSize());
+        if (item != nullptr) {
+            if (!item->isEmpty()) {
+                size = size.expandedTo(item->minimumSize());
+            }
         }
     }
 
@@ -237,8 +242,6 @@ void FlowLayout::addItem(QLayoutItem *item)
  */
 int FlowLayout::count() const
 {
-    // Ensure safe conversion by casting the maximum limit to the same type as items.size()
-    assert(items.size() <= static_cast<qsizetype>(std::numeric_limits<int>::max()));
     return static_cast<int>(items.size());
 }
 
@@ -249,7 +252,7 @@ int FlowLayout::count() const
  */
 QLayoutItem *FlowLayout::itemAt(const int index) const
 {
-    return items.value(index);
+    return (index >= 0 && index < items.size()) ? items.value(index) : nullptr;
 }
 
 /**
@@ -288,13 +291,16 @@ int FlowLayout::verticalSpacing() const
 int FlowLayout::smartSpacing(const QStyle::PixelMetric pm) const
 {
     QObject *parent = this->parent();
+
     if (!parent) {
         return -1;
     }
+
     if (parent->isWidgetType()) {
         const auto *pw = dynamic_cast<QWidget *>(parent);
         return pw->style()->pixelMetric(pm, nullptr, pw);
     }
+
     return dynamic_cast<QLayout *>(parent)->spacing();
 }
 
@@ -305,12 +311,14 @@ int FlowLayout::smartSpacing(const QStyle::PixelMetric pm) const
 int FlowLayout::getParentScrollAreaWidth() const
 {
     QWidget *parent = parentWidget();
+
     while (parent) {
         if (const auto *scrollArea = qobject_cast<QScrollArea *>(parent)) {
             return scrollArea->viewport()->width();
         }
         parent = parent->parentWidget();
     }
+
     return 0;
 }
 
@@ -321,11 +329,13 @@ int FlowLayout::getParentScrollAreaWidth() const
 int FlowLayout::getParentScrollAreaHeight() const
 {
     QWidget *parent = parentWidget();
+
     while (parent) {
         if (const auto *scrollArea = qobject_cast<QScrollArea *>(parent)) {
             return scrollArea->viewport()->height();
         }
         parent = parent->parentWidget();
     }
+
     return 0;
 }

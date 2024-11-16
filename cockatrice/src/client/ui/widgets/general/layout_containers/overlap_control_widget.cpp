@@ -21,11 +21,11 @@ OverlapControlWidget::OverlapControlWidget(int overlapPercentage,
     card_size_slider = new QSlider(Qt::Horizontal);
     card_size_slider->setRange(1, 10); // Example range for scaling, adjust as needed
 
-    amount_of_items_to_overlap = new LabeledInput("Cards to overlap:", this);
+    amount_of_items_to_overlap = new LabeledInput(this, tr("Cards to overlap:"));
     amount_of_items_to_overlap->addSpinBox(0, 999, 10);
-    overlap_percentage_input = new LabeledInput("Overlap percentage:", this);
+    overlap_percentage_input = new LabeledInput(this, tr("Overlap percentage:"));
     overlap_percentage_input->addSpinBox(0, 100, 80);
-    overlap_direction = new LabeledInput("Overlap direction:", this);
+    overlap_direction = new LabeledInput(this, tr("Overlap direction:"));
     overlap_direction->addDirectionComboBox();
 
     layout->addWidget(card_size_slider);
