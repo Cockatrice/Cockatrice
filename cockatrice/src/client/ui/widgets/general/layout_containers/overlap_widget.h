@@ -3,10 +3,9 @@
 
 #include "../../../layouts/overlap_layout.h"
 
-#include <QHBoxLayout>
 #include <QWidget>
 
-class OverlapWidget : public QWidget
+class OverlapWidget final : public QWidget
 {
     Q_OBJECT
 
@@ -17,19 +16,19 @@ public:
                   int maxRows,
                   Qt::Orientation direction,
                   bool adjustOnResize = false);
-    void addWidget(QWidget *widget_to_add);
+    void addWidget(QWidget *widgetToAdd) const;
     void clearLayout();
     void adjustMaxColumnsAndRows();
 
 public slots:
     void maxOverlapItemsChanged(int newValue);
-    void overlapDirectionChanged(QString newDirection);
+    void overlapDirectionChanged(const QString &newDirection);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
-    OverlapLayout *overlap_layout;
+    OverlapLayout *overlapLayout;
     int overlapPercentage;
     int maxColumns;
     int maxRows;

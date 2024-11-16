@@ -7,7 +7,7 @@
 #include <QSlider>
 #include <QWidget>
 
-class OverlapControlWidget : public QWidget
+class OverlapControlWidget final : public QWidget
 {
     Q_OBJECT
 

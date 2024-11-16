@@ -6,12 +6,12 @@
 #include <QWidget>
 #include <qscrollarea.h>
 
-class FlowWidget : public QWidget
+class FlowWidget final : public QWidget
 {
     Q_OBJECT
 
 public:
-    FlowWidget(QWidget *parent, Qt::ScrollBarPolicy hPolicy, Qt::ScrollBarPolicy vPolicy);
+    FlowWidget(QWidget *parent, Qt::ScrollBarPolicy horizontalPolicy, Qt::ScrollBarPolicy verticalPolicy);
     void addWidget(QWidget *widget_to_add) const;
     void clearLayout();
 

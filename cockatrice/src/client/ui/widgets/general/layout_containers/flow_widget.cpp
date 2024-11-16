@@ -21,7 +21,9 @@
  * @param horizontalPolicy The horizontal scroll bar policy for the scroll area.
  * @param verticalPolicy The vertical scroll bar policy for the scroll area.
  */
-FlowWidget::FlowWidget(QWidget *parent, Qt::ScrollBarPolicy horizontalPolicy, Qt::ScrollBarPolicy verticalPolicy)
+FlowWidget::FlowWidget(QWidget *parent,
+                       const Qt::ScrollBarPolicy horizontalPolicy,
+                       const Qt::ScrollBarPolicy verticalPolicy)
     : QWidget(parent)
 {
     // Main Widget and Layout
