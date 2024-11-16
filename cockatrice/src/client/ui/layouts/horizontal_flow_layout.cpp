@@ -9,7 +9,7 @@
  * @param vSpacing The vertical spacing between items.
  */
 HorizontalFlowLayout::HorizontalFlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
-: FlowLayout(parent, margin, hSpacing, vSpacing)
+    : FlowLayout(parent, margin, hSpacing, vSpacing)
 {
 }
 

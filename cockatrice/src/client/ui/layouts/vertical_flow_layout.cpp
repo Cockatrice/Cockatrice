@@ -138,4 +138,3 @@ void VerticalFlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems,
         }
     }
 }
-
