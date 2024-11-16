@@ -7,7 +7,7 @@
 #include <QSize>
 #include <QTextOption>
 
-class CardInfoPictureWithTextOverlayWidget : public CardInfoPictureWidget
+class CardInfoPictureWithTextOverlayWidget final : public CardInfoPictureWidget
 {
     Q_OBJECT
 
@@ -25,17 +25,20 @@ public:
     void setFontSize(int size);
     void setTextAlignment(Qt::Alignment alignment);
 
-    QSize sizeHint() const override;
+    [[nodiscard]] QSize sizeHint() const override;
 signals:
     void imageClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
-    QSize minimumSizeHint() const override;
+    [[nodiscard]] QSize minimumSizeHint() const override;
 
 private:
-    void drawOutlinedText(QPainter &painter, const QRect &textRect, const QString &text, const QTextOption &textOption);
+    void drawOutlinedText(QPainter &painter,
+                          const QRect &textRect,
+                          const QString &text,
+                          const QTextOption &textOption) const;
 
     QString overlayText;
     QColor textColor;
