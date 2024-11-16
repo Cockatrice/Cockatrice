@@ -6,7 +6,7 @@
 #include <QPixmap>
 #include <QWidget>
 
-class CardInfoPictureEnlargedWidget : public QWidget
+class CardInfoPictureEnlargedWidget final : public QWidget
 {
     Q_OBJECT
 

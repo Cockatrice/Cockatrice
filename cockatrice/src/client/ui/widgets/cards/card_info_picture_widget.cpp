@@ -1,12 +1,12 @@
 #include "card_info_picture_widget.h"
 
 #include "../../../../game/cards/card_item.h"
-#include "../../../../main.h"
 #include "../../picture_loader.h"
 
 #include <QMouseEvent>
 #include <QStylePainter>
 #include <QWidget>
+#include <utility>
 
 /**
  * @class CardInfoPictureWidget
@@ -24,7 +24,7 @@
  *
  * Initializes the widget with a minimum height and sets the pixmap to a dirty state for initial loading.
  */
-CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, bool hoverToZoomEnabled)
+CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverToZoomEnabled)
     : QWidget(parent), info(nullptr), pixmapDirty(true), hoverToZoomEnabled(hoverToZoomEnabled)
 {
     setMinimumHeight(baseHeight);
@@ -52,7 +52,7 @@ void CardInfoPictureWidget::setCard(CardInfoPtr card)
         disconnect(info.data(), nullptr, this, nullptr);
     }
 
-    info = card;
+    info = std::move(card);
 
     if (info) {
         connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
@@ -65,7 +65,7 @@ void CardInfoPictureWidget::setCard(CardInfoPtr card)
  * @brief Sets the hover to zoom feature.
  * @param enabled If true, enables the hover-to-zoom functionality; otherwise, disables it.
  */
-void CardInfoPictureWidget::setHoverToZoomEnabled(bool enabled)
+void CardInfoPictureWidget::setHoverToZoomEnabled(const bool enabled)
 {
     hoverToZoomEnabled = enabled;
     setMouseTracking(enabled);
@@ -77,7 +77,7 @@ void CardInfoPictureWidget::setHoverToZoomEnabled(bool enabled)
  *
  * Calls `updatePixmap()` to ensure the image scales appropriately when the widget is resized.
  */
-void CardInfoPictureWidget::resizeEvent(QResizeEvent *)
+void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
 {
     updatePixmap();
 }
@@ -88,10 +88,10 @@ void CardInfoPictureWidget::resizeEvent(QResizeEvent *)
  *
  * Adjusts the widget's size according to the scale factor and updates the pixmap.
  */
-void CardInfoPictureWidget::setScaleFactor(int scale)
+void CardInfoPictureWidget::setScaleFactor(const int scale)
 {
-    int newWidth = baseWidth + scale * 20;
-    int newHeight = static_cast<int>(newWidth * aspectRatio);
+    const int newWidth = baseWidth + scale * 20;
+    const int newHeight = static_cast<int>(newWidth * aspectRatio);
 
     scaleFactor = scale;
 
@@ -133,7 +133,7 @@ void CardInfoPictureWidget::loadPixmap()
  * Checks if the pixmap needs to be reloaded. Then, calculates the size and position for centering the
  * scaled pixmap within the widget, applies rounded corners, and draws the pixmap.
  */
-void CardInfoPictureWidget::paintEvent(QPaintEvent *)
+void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 {
     if (width() == 0 || height() == 0)
         return;
@@ -197,7 +197,8 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
     QWidget::mouseMoveEvent(event);
     if (hoverToZoomEnabled && enlargedPixmapWidget->isVisible()) {
         QPointF cursorPos = QCursor::pos();
-        enlargedPixmapWidget->move(QPoint(cursorPos.x() + enlargedPixmapOffset, cursorPos.y() + enlargedPixmapOffset));
+        enlargedPixmapWidget->move(QPoint(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
+                                          static_cast<int>(cursorPos.y()) + enlargedPixmapOffset));
     }
 }
 
@@ -207,16 +208,18 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
  * If card information is available, the enlarged pixmap is loaded, positioned near the cursor,
  * and displayed.
  */
-void CardInfoPictureWidget::showEnlargedPixmap()
+void CardInfoPictureWidget::showEnlargedPixmap() const
 {
     if (!info) {
         return;
     }
-    QSize enlargedSize(size().width() * scaleFactor, static_cast<int>(size().width() * aspectRatio * scaleFactor));
+    const QSize enlargedSize(static_cast<int>(size().width() * scaleFactor),
+                             static_cast<int>(size().width() * aspectRatio * scaleFactor));
     enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
 
-    QPointF cursorPos = QCursor::pos();
-    enlargedPixmapWidget->move(cursorPos.x() + 10, cursorPos.y() + 10);
+    const QPointF cursorPos = QCursor::pos();
+    enlargedPixmapWidget->move(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
+                               static_cast<int>(cursorPos.y()) + enlargedPixmapOffset);
 
     enlargedPixmapWidget->show();
 }

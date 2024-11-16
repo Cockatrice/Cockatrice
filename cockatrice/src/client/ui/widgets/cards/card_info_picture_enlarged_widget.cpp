@@ -4,6 +4,7 @@
 
 #include <QPainterPath>
 #include <QStylePainter>
+#include <utility>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.
@@ -42,9 +43,9 @@ void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
  *
  * Sets the widget's pixmap to the card image and resizes the widget to match the specified size. Triggers a repaint.
  */
-void CardInfoPictureEnlargedWidget::setCardPixmap(CardInfoPtr card, QSize size)
+void CardInfoPictureEnlargedWidget::setCardPixmap(CardInfoPtr card, const QSize size)
 {
-    info = card;
+    info = std::move(card);
     loadPixmap(size);
 
     setFixedSize(size); // Set the widget size to the enlarged size

@@ -1,5 +1,5 @@
-#ifndef CARDINFOPICTURE_H
-#define CARDINFOPICTURE_H
+#ifndef CARD_INFO_PICTURE_H
+#define CARD_INFO_PICTURE_H
 
 #include "../../../../game/cards/card_database.h"
 #include "card_info_picture_enlarged_widget.h"
@@ -37,11 +37,11 @@ protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void loadPixmap();
-    const QPixmap &getResizedPixmap() const
+    [[nodiscard]] const QPixmap &getResizedPixmap() const
     {
         return resizedPixmap;
     }
-    void showEnlargedPixmap();
+    void showEnlargedPixmap() const;
 
 private:
     CardInfoPtr info;
