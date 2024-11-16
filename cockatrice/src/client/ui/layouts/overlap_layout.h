@@ -22,13 +22,13 @@ public:
     void setGeometry(const QRect &rect) override;
     QSize minimumSize() const override;
     QSize sizeHint() const override;
-    void setMaxColumns(int newValue);
-    void setMaxRows(int newValue);
+    void setMaxColumns(int _maxColumns);
+    void setMaxRows(int _maxRows);
     int calculateMaxColumns() const;
     int calculateRowsForColumns(int columns) const;
     int calculateMaxRows() const;
     int calculateColumnsForRows(int rows) const;
-    void setDirection(Qt::Orientation direction);
+    void setDirection(Qt::Orientation _direction);
 
 private:
     QList<QLayoutItem *> itemList;
