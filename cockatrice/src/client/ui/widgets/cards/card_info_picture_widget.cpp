@@ -141,9 +141,9 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     if (pixmapDirty)
         loadPixmap();
 
-    QSize scaledSize = resizedPixmap.size().scaled(size(), Qt::KeepAspectRatio);
-    QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
-    qreal radius = 0.05 * scaledSize.width();
+    const QSize scaledSize = resizedPixmap.size().scaled(size(), Qt::KeepAspectRatio);
+    const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
+    const qreal radius = 0.05 * scaledSize.width();
 
     QStylePainter painter(this);
     QPainterPath shape;
@@ -196,7 +196,7 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
     if (hoverToZoomEnabled && enlargedPixmapWidget->isVisible()) {
-        QPointF cursorPos = QCursor::pos();
+        const QPointF cursorPos = QCursor::pos();
         enlargedPixmapWidget->move(QPoint(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
                                           static_cast<int>(cursorPos.y()) + enlargedPixmapOffset));
     }
@@ -213,6 +213,7 @@ void CardInfoPictureWidget::showEnlargedPixmap() const
     if (!info) {
         return;
     }
+
     const QSize enlargedSize(static_cast<int>(size().width() * scaleFactor),
                              static_cast<int>(size().width() * aspectRatio * scaleFactor));
     enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
