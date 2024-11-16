@@ -28,8 +28,9 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverTo
     : QWidget(parent), info(nullptr), pixmapDirty(true), hoverToZoomEnabled(hoverToZoomEnabled)
 {
     setMinimumHeight(baseHeight);
-    if (hoverToZoomEnabled)
+    if (hoverToZoomEnabled) {
         setMouseTracking(true);
+    }
 
     enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(this);
     enlargedPixmapWidget->hide();
@@ -137,11 +138,13 @@ void CardInfoPictureWidget::loadPixmap()
 void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
-    if (width() == 0 || height() == 0)
+    if (width() == 0 || height() == 0) {
         return;
+    }
 
-    if (pixmapDirty)
+    if (pixmapDirty) {
         loadPixmap();
+    }
 
     const QSize scaledSize = resizedPixmap.size().scaled(size(), Qt::KeepAspectRatio);
     const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
