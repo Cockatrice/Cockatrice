@@ -1,22 +1,22 @@
-#include "card_frame.h"
+#include "card_info_frame_widget.h"
 
-#include "../../main.h"
-#include "../../settings/cache_settings.h"
-#include "card_database_manager.h"
-#include "card_info_picture.h"
-#include "card_info_text.h"
-#include "card_item.h"
+#include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/cards/card_item.h"
+#include "../../../../settings/cache_settings.h"
+#include "card_info_picture_widget.h"
+#include "card_info_text_widget.h"
 
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <utility>
 
-CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(parent), info(nullptr), cardTextOnly(false)
+CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *parent)
+    : QTabWidget(parent), info(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
-    pic = new CardInfoPicture();
+    pic = new CardInfoPictureWidget();
     pic->setObjectName("pic");
-    text = new CardInfoText();
+    text = new CardInfoTextWidget();
     text->setObjectName("text");
     connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
@@ -61,14 +61,14 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
     setCard(CardDatabaseManager::getInstance()->getCard(cardName));
 }
 
-void CardFrame::retranslateUi()
+void CardInfoFrameWidget::retranslateUi()
 {
     setTabText(ImageOnlyView, tr("Image"));
     setTabText(TextOnlyView, tr("Description"));
     setTabText(ImageAndTextView, tr("Both"));
 }
 
-void CardFrame::setViewMode(int mode)
+void CardInfoFrameWidget::setViewMode(int mode)
 {
     if (currentIndex() != mode)
         setCurrentIndex(mode);
@@ -90,7 +90,7 @@ void CardFrame::setViewMode(int mode)
     SettingsCache::instance().setCardInfoViewMode(mode);
 }
 
-void CardFrame::setCard(CardInfoPtr card)
+void CardInfoFrameWidget::setCard(CardInfoPtr card)
 {
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
@@ -106,19 +106,19 @@ void CardFrame::setCard(CardInfoPtr card)
     pic->setCard(info);
 }
 
-void CardFrame::setCard(const QString &cardName)
+void CardInfoFrameWidget::setCard(const QString &cardName)
 {
     setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
 }
 
-void CardFrame::setCard(AbstractCardItem *card)
+void CardInfoFrameWidget::setCard(AbstractCardItem *card)
 {
     if (card) {
         setCard(card->getInfo());
     }
 }
 
-void CardFrame::clearCard()
+void CardInfoFrameWidget::clearCard()
 {
     setCard((CardInfoPtr) nullptr);
 }

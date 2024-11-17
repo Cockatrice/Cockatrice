@@ -20,10 +20,10 @@ set(cockatrice_SOURCES
     src/game/cards/card_database_parser/cockatrice_xml_4.cpp
     src/game/cards/card_drag_item.cpp
     src/game/filters/filter_card.cpp
-    src/game/cards/card_frame.cpp
-    src/game/cards/card_info_picture.cpp
-    src/game/cards/card_info_text.cpp
-    src/game/cards/card_info_widget.cpp
+    src/client/ui/widgets/cards/card_info_frame_widget.cpp
+    src/client/ui/widgets/cards/card_info_picture_widget.cpp
+    src/client/ui/widgets/cards/card_info_text_widget.cpp
+    src/client/ui/widgets/cards/card_info_display_widget.cpp
     src/game/cards/card_item.cpp
     src/game/cards/card_list.cpp
     src/game/zones/card_zone.cpp
@@ -72,6 +72,8 @@ set(cockatrice_SOURCES
     src/server/local_server.cpp
     src/server/local_server_interface.cpp
     src/utility/logger.cpp
+    src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
+    src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
     src/main.cpp
     src/server/message_log_widget.cpp
     src/server/pending_command.cpp

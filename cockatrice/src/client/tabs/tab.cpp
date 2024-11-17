@@ -1,6 +1,6 @@
 #include "tab.h"
 
-#include "../../game/cards/card_info_widget.h"
+#include "../ui/widgets/cards/card_info_display_widget.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -18,7 +18,7 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
         infoPopup->deleteLater();
     }
     currentCardName = cardName;
-    infoPopup = new CardInfoWidget(
+    infoPopup = new CardInfoDisplayWidget(
         cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
 
