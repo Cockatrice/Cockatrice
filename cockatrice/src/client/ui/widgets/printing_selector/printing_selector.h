@@ -19,7 +19,7 @@ public:
     PrintingSelector(DeckListModel *deckModel, QTreeView *deckView, QWidget *parent = nullptr);
     void setCard(const CardInfoPtr &newCard);
     CardInfoPerSet getSetForUUID(const QString &uuid);
-    CardInfoPerSetMap sortSets();
+    QList<CardInfoPerSet> sortSets();
     void getAllSetsForCurrentCard();
 
 public slots:

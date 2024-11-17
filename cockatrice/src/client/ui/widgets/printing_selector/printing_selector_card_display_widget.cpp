@@ -41,7 +41,10 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(DeckListMod
     buttonBox->addWidget(cardCount, 0, Qt::AlignmentFlag::AlignCenter);
     buttonBox->addWidget(incrementButton);
 
-    layout->addLayout(buttonBox);
+    QWidget *buttonBoxContainer = new QWidget();
+    buttonBoxContainer->setLayout(buttonBox);
+    buttonBoxContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    layout->addWidget(buttonBoxContainer, 0, Qt::AlignCenter);
 
     setName = new QLabel(setInfoForCard.getPtr()->getLongName() + " (" + setInfoForCard.getPtr()->getShortName() + ")");
     layout->addWidget(setName, 0, Qt::AlignmentFlag::AlignCenter);

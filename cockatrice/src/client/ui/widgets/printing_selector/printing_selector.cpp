@@ -54,11 +54,16 @@ CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
     return CardInfoPerSet();
 }
 
-CardInfoPerSetMap PrintingSelector::sortSets()
+QList<CardInfoPerSet> PrintingSelector::sortSets()
 {
     CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
     if (sortOptionsSelector->currentText() == "Alphabetical") {
-        return cardInfoPerSets;
+        // Convert CardInfoPerSetMap to QList<CardInfoPerSet> and return
+        QList<CardInfoPerSet> result;
+        for (const auto &entry : cardInfoPerSets) {
+            result << entry;
+        }
+        return result;
     }
 
     QList<CardSetPtr> sortedSets;
@@ -71,21 +76,31 @@ CardInfoPerSetMap PrintingSelector::sortSets()
     }
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
-    auto sortedMap = CardInfoPerSetMap(cardInfoPerSets);
-    sortedMap.clear();
+    QList<CardInfoPerSet> sortedCardInfoPerSets;
 
-    int count = 0;
+    // Debug: Output sorted set names
+    qDebug() << "Sorted sets:";
+    for (const auto &set : sortedSets) {
+        qDebug() << set->getLongName();
+    }
 
+    // Reconstruct sorted list of CardInfoPerSet
     for (const auto &set : sortedSets) {
         for (auto it = cardInfoPerSets.begin(); it != cardInfoPerSets.end(); ++it) {
             if (it.value().getPtr() == set) {
-                sortedMap.insert(QString::fromStdString(std::to_string(count)), it.value());
-                count++;
+                qDebug() << "Adding: " << it.value().getPtr()->getLongName();
+                sortedCardInfoPerSets << it.value();
             }
         }
     }
 
-    return sortedMap;
+    // Debug: Output final sorted list
+    qDebug() << "Sorted CardInfoPerSet:";
+    for (const auto &cardInfo : sortedCardInfoPerSets) {
+        qDebug() << cardInfo.getPtr()->getLongName();
+    }
+
+    return sortedCardInfoPerSets;
 }
 
 void PrintingSelector::getAllSetsForCurrentCard()
