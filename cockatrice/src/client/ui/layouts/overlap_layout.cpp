@@ -140,12 +140,10 @@ void OverlapLayout::setGeometry(const QRect &rect)
     int maxItemWidth = 0;
     int maxItemHeight = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item != nullptr) {
-            if (item->widget()) {
-                QSize itemSize = item->widget()->sizeHint();
-                maxItemWidth = std::max(maxItemWidth, itemSize.width());
-                maxItemHeight = std::max(maxItemHeight, itemSize.height());
-            }
+        if (item != nullptr && item->widget()) {
+            QSize itemSize = item->widget()->sizeHint();
+            maxItemWidth = std::max(maxItemWidth, itemSize.width());
+            maxItemHeight = std::max(maxItemHeight, itemSize.height());
         }
     }
 
@@ -390,10 +388,7 @@ int OverlapLayout::calculateMaxColumns() const
     // Determine maximum item width
     int maxItemWidth = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item == nullptr) {
-            continue;
-        }
-        if (!item->widget()) {
+        if (item == nullptr || !item->widget()) {
             continue;
         }
 
@@ -444,10 +439,7 @@ int OverlapLayout::calculateMaxRows() const
     // Determine maximum item height
     int maxItemHeight = 0;
     for (const QLayoutItem *item : itemList) {
-        if (item == nullptr) {
-            continue;
-        }
-        if (!item->widget()) {
+        if (item == nullptr || !item->widget()) {
             continue;
         }
 

@@ -195,10 +195,8 @@ QSize FlowLayout::sizeHint() const
 {
     QSize size;
     for (const QLayoutItem *item : items) {
-        if (item != nullptr) {
-            if (!item->isEmpty()) {
-                size = size.expandedTo(item->sizeHint());
-            }
+        if (item != nullptr && !item->isEmpty()) {
+            size = size.expandedTo(item->sizeHint());
         }
     }
     return size.isValid() ? size : QSize(0, 0);
@@ -212,10 +210,8 @@ QSize FlowLayout::minimumSize() const
 {
     QSize size;
     for (const QLayoutItem *item : items) {
-        if (item != nullptr) {
-            if (!item->isEmpty()) {
-                size = size.expandedTo(item->minimumSize());
-            }
+        if (item != nullptr && !item->isEmpty()) {
+            size = size.expandedTo(item->minimumSize());
         }
     }
 

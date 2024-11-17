@@ -125,19 +125,18 @@ int HorizontalFlowLayout::layoutAllColumns(const int originX, const int originY,
 void HorizontalFlowLayout::layoutSingleColumn(const QVector<QLayoutItem *> &colItems, const int x, int y)
 {
     for (QLayoutItem *item : colItems) {
-        if (item != nullptr) {
-            if (item->isEmpty()) {
-                continue;
-            }
-            // Get the maximum allowed size for the item
-            QSize itemMaxSize = item->widget()->maximumSize();
-            // Constrain the item's width and height to its size hint or maximum size
-            const int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
-            const int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
-            // Set the item's geometry based on the computed size and position
-            item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
-            // Move the y-position down by the item's height to place the next item below
-            y += itemHeight;
+        if (item != nullptr && item->isEmpty()) {
+            continue;
         }
+
+        // Get the maximum allowed size for the item
+        QSize itemMaxSize = item->widget()->maximumSize();
+        // Constrain the item's width and height to its size hint or maximum size
+        const int itemWidth = qMin(item->sizeHint().width(), itemMaxSize.width());
+        const int itemHeight = qMin(item->sizeHint().height(), itemMaxSize.height());
+        // Set the item's geometry based on the computed size and position
+        item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
+        // Move the y-position down by the item's height to place the next item below
+        y += itemHeight;
     }
 }
