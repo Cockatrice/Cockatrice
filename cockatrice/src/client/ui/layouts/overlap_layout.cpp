@@ -1,6 +1,6 @@
 #include "overlap_layout.h"
 
-#include <QDebug>
+#include <QtMath>
 
 /**
  * @class OverlapLayout
@@ -139,7 +139,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
     // Determine the maximum item width and height among all layout items.
     int maxItemWidth = 0;
     int maxItemHeight = 0;
-    for (const QLayoutItem *item : itemList) {
+    for (QLayoutItem *item : itemList) {
         if (item != nullptr && item->widget()) {
             QSize itemSize = item->widget()->sizeHint();
             maxItemWidth = qMax(maxItemWidth, itemSize.width());
@@ -227,7 +227,7 @@ QSize OverlapLayout::calculatePreferredSize() const
     // Determine the maximum item dimensions.
     int maxItemWidth = 0;
     int maxItemHeight = 0;
-    for (const QLayoutItem *item : itemList) {
+    for (QLayoutItem *item : itemList) {
         if (item == nullptr) {
             continue;
         }
@@ -271,9 +271,7 @@ QSize OverlapLayout::calculatePreferredSize() const
         // - Use maxRows if maxColumns is set (to constrain the number of rows).
         // - Otherwise, assume a single row.
         const int numRows =
-            (maxColumns > 0)
-                ? static_cast<int>(ceil(static_cast<double>(itemList.size()) / static_cast<double>(numColumns)))
-                : 1;
+            (maxColumns > 0) ? qCeil(static_cast<double>(itemList.size()) / static_cast<double>(numColumns)) : 1;
 
         // Total height:
         // - Multiply the number of rows by the item height (maxItemHeight).
@@ -284,8 +282,7 @@ QSize OverlapLayout::calculatePreferredSize() const
         // - Use maxRows to calculate how many columns are needed if a row constraint exists.
         // - Otherwise, assume a single column.
         const int numColumns =
-            (maxRows != 0) ? static_cast<int>(ceil(static_cast<double>(itemList.size()) / static_cast<double>(maxRows)))
-                           : 1;
+            (maxRows != 0) ? qCeil(static_cast<double>(itemList.size()) / static_cast<double>(maxRows)) : 1;
 
         // Total width:
         // - Multiply the number of columns by the item width (maxItemWidth).
@@ -387,7 +384,7 @@ int OverlapLayout::calculateMaxColumns() const
 
     // Determine maximum item width
     int maxItemWidth = 0;
-    for (const QLayoutItem *item : itemList) {
+    for (QLayoutItem *item : itemList) {
         if (item == nullptr || !item->widget()) {
             continue;
         }
@@ -438,7 +435,7 @@ int OverlapLayout::calculateMaxRows() const
 
     // Determine maximum item height
     int maxItemHeight = 0;
-    for (const QLayoutItem *item : itemList) {
+    for (QLayoutItem *item : itemList) {
         if (item == nullptr || !item->widget()) {
             continue;
         }

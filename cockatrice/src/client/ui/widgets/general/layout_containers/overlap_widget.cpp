@@ -127,7 +127,6 @@ void OverlapWidget::adjustMaxColumnsAndRows()
         const int calculatedRows = overlapLayout->calculateRowsForColumns(calculatedColumns);
         maxRows = calculatedRows;
         overlapLayout->setMaxRows(calculatedRows);
-        qDebug() << "MaxColumns: " << maxColumns << " MaxRows: " << maxRows;
     } else {
         // Calculate rows based on height for horizontal layout
         const int calculatedRows = overlapLayout->calculateMaxRows();
@@ -138,7 +137,6 @@ void OverlapWidget::adjustMaxColumnsAndRows()
         const int calculatedColumns = overlapLayout->calculateColumnsForRows(calculatedRows);
         maxColumns = calculatedColumns;
         overlapLayout->setMaxColumns(calculatedColumns);
-        qDebug() << " MaxRows: " << maxRows << "MaxColumns: " << maxColumns;
     }
 
     overlapLayout->invalidate();
