@@ -58,6 +58,10 @@ set(cockatrice_SOURCES
     src/game/filters/filter_builder.cpp
     src/game/filters/filter_tree.cpp
     src/game/filters/filter_tree_model.cpp
+    src/client/ui/layouts/flow_layout.cpp
+    src/client/ui/layouts/horizontal_flow_layout.cpp
+    src/client/ui/layouts/vertical_flow_layout.cpp
+    src/client/ui/widgets/general/layout_containers/flow_widget.cpp
     src/game/game_scene.cpp
     src/game/game_selector.cpp
     src/game/games_model.cpp
@@ -74,8 +78,12 @@ set(cockatrice_SOURCES
     src/utility/logger.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
+    src/client/ui/widgets/general/display/labeled_input.cpp
     src/main.cpp
     src/server/message_log_widget.cpp
+    src/client/ui/layouts/overlap_layout.cpp
+    src/client/ui/widgets/general/layout_containers/overlap_widget.cpp
+    src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp
     src/server/pending_command.cpp
     src/game/phase.cpp
     src/client/ui/phases_toolbar.cpp
