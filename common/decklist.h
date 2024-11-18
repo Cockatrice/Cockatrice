@@ -1,20 +1,13 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
-#include <QDebug>
-#include <QList>
 #include <QMap>
-#include <QObject>
-#include <QPair>
-#include <QSet>
-#include <QStringList>
 #include <QVector>
 
 // Required on Mac. Forward declaration doesn't work. Don't ask why.
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 #include <common/pb/move_card_to_zone.pb.h>
-#include <utility>
 
 class CardDatabase;
 class QIODevice;
@@ -182,7 +175,6 @@ public:
         : AbstractDecklistCardNode(_parent), name(std::move(_name)), number(_number),
           cardSetName(std::move(_cardSetName)), cardSetNumber(std::move(_cardSetNumber))
     {
-        qDebug() << "Adding" << name << number << cardSetName << cardSetNumber;
     }
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
     int getNumber() const override
