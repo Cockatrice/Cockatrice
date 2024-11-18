@@ -726,7 +726,7 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
         return;
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         cardInfo->setCard(current.sibling(current.row(), 1).data().toString(),
-                          current.sibling(current.row(), 2).data().toString());
+                          current.sibling(current.row(), 4).data().toString());
     }
 }
 

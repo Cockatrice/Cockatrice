@@ -42,9 +42,17 @@ public:
     {
         return dataNode->getCardUuid();
     }
-    void setCardSetCode(const QString &_cardSetName) override
+    void setCardUUID(const QString &_cardUUID) override
     {
-        dataNode->setCardSetCode(_cardSetName);
+        dataNode->setCardUUID(_cardUUID);
+    }
+    QString getCardSetShortName() const override
+    {
+        return dataNode->getCardSetShortName();
+    }
+    void setCardSetShortName(const QString &_cardSetShortName) override
+    {
+        dataNode->setCardSetShortName(_cardSetShortName);
     }
     QString getCardCollectorNumber() const override
     {
