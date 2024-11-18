@@ -45,7 +45,8 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
         std::sort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
         for (const auto &set : card->getSets()) {
-            if (QLatin1String("card_") + QString(set.getProperty("uuid")) == card->getPixmapCacheKey()) {
+            if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                card->getPixmapCacheKey()) {
                 long long setIndex = sortedSets.indexOf(set.getPtr());
                 CardSetPtr setForCardUUID = sortedSets.takeAt(setIndex);
                 sortedSets.prepend(setForCardUUID);

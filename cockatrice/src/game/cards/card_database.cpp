@@ -451,7 +451,8 @@ CardInfoPtr CardDatabase::getCardByNameAndUUID(const QString &cardName, const QS
     for (const auto &set : info->getSets()) {
         if (set.getProperty("uuid") == uuid) {
             CardInfoPtr cardFromSpecificSet = info->clone();
-            cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(set.getProperty("uuid")));
+            cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(info->getName()) + QString("_") +
+                                                   QString(set.getProperty("uuid")));
             return cardFromSpecificSet;
         }
     }
@@ -600,7 +601,8 @@ LoadStatus CardDatabase::loadCardDatabases()
 void CardDatabase::refreshPreferredPrintings()
 {
     for (const CardInfoPtr &card : cards) {
-        card->setPixmapCacheKey(QLatin1String("card_") + QString(getPreferredPrintingUUIDForCard(card->getName())));
+        card->setPixmapCacheKey(QLatin1String("card_") + QString(card->getName()) + QString("_") +
+                                QString(getPreferredPrintingUUIDForCard(card->getName())));
     }
 }
 
@@ -673,7 +675,7 @@ QString CardDatabase::getPreferredPrintingUUIDForCard(const QString &cardName)
 bool CardDatabase::isUuidForPreferredPrinting(const QString &cardName, const QString &uuid)
 {
     if (uuid.startsWith("card_")) {
-        return uuid == QLatin1String("card_") + getPreferredPrintingUUIDForCard(cardName);
+        return uuid == QLatin1String("card_") + cardName + QString("_") + getPreferredPrintingUUIDForCard(cardName);
     }
     return uuid == getPreferredPrintingUUIDForCard(cardName);
 }
