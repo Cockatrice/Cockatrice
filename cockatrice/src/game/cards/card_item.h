@@ -50,10 +50,11 @@ public:
         return Type;
     }
     CardItem(Player *_owner,
+             QGraphicsItem *parent = nullptr,
              const QString &_name = QString(),
+             const QString &_providerId = QString(),
              int _cardid = -1,
              bool revealedCard = false,
-             QGraphicsItem *parent = nullptr,
              CardZone *_zone = nullptr);
     ~CardItem();
     void retranslateUi();

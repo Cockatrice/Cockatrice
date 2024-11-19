@@ -1,7 +1,6 @@
 #include "card_item.h"
 
 #include "../../client/tabs/tab_game.h"
-#include "../../main.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../game_scene.h"
@@ -19,13 +18,14 @@
 #include <QPainter>
 
 CardItem::CardItem(Player *_owner,
+                   QGraphicsItem *parent,
                    const QString &_name,
+                   const QString &_providerId,
                    int _cardid,
                    bool _revealedCard,
-                   QGraphicsItem *parent,
                    CardZone *_zone)
-    : AbstractCardItem(_name, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
+    : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), revealedCard(_revealedCard),
+      attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
@@ -243,6 +243,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     }
 
     setId(_info.id());
+    setProviderId(QString::fromStdString(_info.provider_id()));
     setName(QString::fromStdString(_info.name()));
     setAttacking(_info.attacking());
     setFaceDown(_info.face_down());

@@ -209,7 +209,9 @@ void Server_Player::setupZones()
                 continue;
             }
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                z->insertCard(new Server_Card(currentCard->getName(), nextCardId++, 0, 0, z), -1, 0);
+                z->insertCard(
+                    new Server_Card(currentCard->getName(), currentCard->getCardProviderId(), nextCardId++, 0, 0, z),
+                    -1, 0);
             }
         }
     }
@@ -338,6 +340,7 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
         ServerInfo_Card *cardInfo = eventPrivate.add_cards();
         cardInfo->set_id(card->getId());
         cardInfo->set_name(card->getName().toStdString());
+        cardInfo->set_provider_id(card->getProviderId().toStdString());
     }
 
     ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
@@ -585,6 +588,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             if (sourceKnownToPlayer || !(faceDown || targetzone->getType() == ServerInfo_Zone::HiddenZone)) {
                 QString privateCardName = card->getName();
                 eventPrivate.set_card_name(privateCardName.toStdString());
+                eventPrivate.set_new_card_provider_id(card->getProviderId().toStdString());
             }
             if (startzone->getType() == ServerInfo_Zone::HiddenZone) {
                 eventPrivate.set_position(position);
@@ -617,6 +621,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 if (!(sourceHiddenToOthers && targetHiddenToOthers)) {
                     QString publicCardName = card->getName();
                     eventOthers.set_card_name(publicCardName.toStdString());
+                    eventOthers.set_new_card_provider_id(card->getProviderId().toStdString());
                 }
                 eventOthers.set_new_card_id(card->getId());
             }
@@ -1406,7 +1411,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         yCoord = 0;
     }
 
-    auto *card = new Server_Card(cardName, newCardId(), xCoord, yCoord);
+    auto *card = new Server_Card(cardName, QString(), newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
     card->setPT(nameFromStdString(cmd.pt()));
     card->setColor(nameFromStdString(cmd.color()));
@@ -1941,6 +1946,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
         Server_Card *card = cards[i];
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
         ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
+        cardInfo->set_provider_id(card->getProviderId().toStdString());
         cardInfo->set_name(displayedName.toStdString());
         if (zone->getType() == ServerInfo_Zone::HiddenZone) {
             cardInfo->set_id(i);
@@ -2058,6 +2064,7 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
         ServerInfo_Card *cardInfo = eventPrivate.add_cards();
 
         cardInfo->set_id(card->getId());
+        cardInfo->set_provider_id(card->getProviderId().toStdString());
         cardInfo->set_name(card->getName().toStdString());
         cardInfo->set_x(card->getX());
         cardInfo->set_y(card->getY());

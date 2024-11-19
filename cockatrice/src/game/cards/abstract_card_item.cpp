@@ -1,7 +1,6 @@
 #include "abstract_card_item.h"
 
 #include "../../client/ui/picture_loader.h"
-#include "../../main.h"
 #include "../../settings/cache_settings.h"
 #include "../game_scene.h"
 #include "card_database.h"
@@ -13,9 +12,13 @@
 #include <QPainter>
 #include <algorithm>
 
-AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id, QGraphicsItem *parent)
-    : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0)
+AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
+                                   const QString &_name,
+                                   const QString &_providerId,
+                                   Player *_owner,
+                                   int _id)
+    : ArrowTarget(_owner, parent), id(_id), name(_name), providerId(_providerId), tapped(false), facedown(false),
+      tapAngle(0), bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
@@ -50,7 +53,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::cardInfoUpdated()
 {
-    info = CardDatabaseManager::getInstance()->getCard(name);
+    info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(name, providerId);
 
     if (!info && !name.isEmpty()) {
         QVariantHash properties = QVariantHash();
@@ -181,6 +184,21 @@ void AbstractCardItem::setName(const QString &_name)
     if (info)
         disconnect(info.data(), nullptr, this, nullptr);
     name = _name;
+
+    cardInfoUpdated();
+}
+
+void AbstractCardItem::setProviderId(const QString &_providerId)
+{
+    if (providerId == _providerId) {
+        return;
+    }
+
+    emit deleteCardInfoPopup(name);
+    if (info) {
+        disconnect(info.data(), nullptr, this, nullptr);
+    }
+    providerId = _providerId;
 
     cardInfoUpdated();
 }

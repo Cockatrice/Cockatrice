@@ -16,6 +16,7 @@ protected:
     CardInfoPtr info;
     int id;
     QString name;
+    QString providerId;
     bool tapped;
     bool facedown;
     int tapAngle;
@@ -48,10 +49,11 @@ public:
     {
         return Type;
     }
-    AbstractCardItem(const QString &_name = QString(),
+    AbstractCardItem(QGraphicsItem *parent = nullptr,
+                     const QString &_name = QString(),
+                     const QString &_providerId = QString(),
                      Player *_owner = nullptr,
-                     int _id = -1,
-                     QGraphicsItem *parent = nullptr);
+                     int _id = -1);
     ~AbstractCardItem();
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -75,6 +77,11 @@ public:
         return name;
     }
     void setName(const QString &_name = QString());
+    QString getProviderId() const
+    {
+        return providerId;
+    }
+    void setProviderId(const QString &_providerId = QString());
     qreal getRealZValue() const
     {
         return realZValue;

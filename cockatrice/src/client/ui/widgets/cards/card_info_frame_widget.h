@@ -36,6 +36,7 @@ public:
 public slots:
     void setCard(CardInfoPtr card);
     void setCard(const QString &cardName);
+    void setCard(const QString &cardName, const QString &providerId);
     void setCard(AbstractCardItem *card);
     void clearCard();
     void setViewMode(int mode);

@@ -1,12 +1,7 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
-#include <QList>
 #include <QMap>
-#include <QObject>
-#include <QPair>
-#include <QSet>
-#include <QStringList>
 #include <QVector>
 
 // Required on Mac. Forward declaration doesn't work. Don't ask why.
@@ -68,6 +63,9 @@ public:
         sortMethod = method;
     }
     virtual QString getName() const = 0;
+    virtual QString getCardProviderId() const = 0;
+    virtual QString getCardSetShortName() const = 0;
+    virtual QString getCardCollectorNumber() const = 0;
     InnerDecklistNode *getParent() const
     {
         return parent;
@@ -82,8 +80,10 @@ public:
 
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *>
 {
-private:
     QString name;
+    QString cardSetShortName;
+    QString cardCollectorNumber;
+    QString cardProviderId;
     class compareFunctor;
 
 public:
@@ -94,7 +94,7 @@ public:
     explicit InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = nullptr);
     ~InnerDecklistNode() override;
     void setSortMethod(DeckSortMethod method) override;
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return name;
     }
@@ -103,9 +103,35 @@ public:
         name = _name;
     }
     static QString visibleNameFromName(const QString &_name);
-    virtual QString getVisibleName() const;
+    [[nodiscard]] virtual QString getVisibleName() const;
+    [[nodiscard]] QString getCardProviderId() const override
+    {
+        return cardProviderId;
+    }
+    void setCardProviderId(const QString &_cardProviderId)
+    {
+        cardProviderId = _cardProviderId;
+    }
+    [[nodiscard]] QString getCardSetShortName() const override
+    {
+        return cardSetShortName;
+    }
+    void setCardSetShortName(const QString &_cardSetShortName)
+    {
+        cardSetShortName = _cardSetShortName;
+    }
+    [[nodiscard]] QString getCardCollectorNumber() const override
+    {
+        return cardCollectorNumber;
+    }
+    void setCardCollectorNumber(const QString &_cardCollectorNumber)
+    {
+        cardCollectorNumber = _cardCollectorNumber;
+    }
+
     void clearTree();
     AbstractDecklistNode *findChild(const QString &_name);
+    AbstractDecklistNode *findCardChildByNameAndProviderId(const QString &_name, const QString &_providerId);
     int height() const override;
     int recursiveCount(bool countTotalCards = false) const;
     bool compare(AbstractDecklistNode *other) const override;
@@ -127,6 +153,12 @@ public:
     virtual void setNumber(int _number) = 0;
     QString getName() const override = 0;
     virtual void setName(const QString &_name) = 0;
+    virtual QString getCardProviderId() const override = 0;
+    virtual void setCardProviderId(const QString &_cardProviderId) = 0;
+    virtual QString getCardSetShortName() const override = 0;
+    virtual void setCardSetShortName(const QString &_cardSetShortName) = 0;
+    virtual QString getCardCollectorNumber() const override = 0;
+    virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;
     int height() const override
     {
         return 0;
@@ -141,13 +173,22 @@ public:
 
 class DecklistCardNode : public AbstractDecklistCardNode
 {
-private:
     QString name;
     int number;
+    QString cardSetShortName;
+    QString cardSetNumber;
+    QString cardProviderId;
 
 public:
-    explicit DecklistCardNode(QString _name = QString(), int _number = 1, InnerDecklistNode *_parent = nullptr)
-        : AbstractDecklistCardNode(_parent), name(std::move(_name)), number(_number)
+    explicit DecklistCardNode(QString _name = QString(),
+                              int _number = 1,
+                              InnerDecklistNode *_parent = nullptr,
+                              QString _cardSetShortName = QString(),
+                              QString _cardSetNumber = QString(),
+                              QString _cardProviderId = QString())
+        : AbstractDecklistCardNode(_parent), name(std::move(_name)), number(_number),
+          cardSetShortName(std::move(_cardSetShortName)), cardSetNumber(std::move(_cardSetNumber)),
+          cardProviderId(std::move(_cardProviderId))
     {
     }
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
@@ -166,6 +207,31 @@ public:
     void setName(const QString &_name) override
     {
         name = _name;
+    }
+    QString getCardProviderId() const override
+    {
+        return cardProviderId;
+    }
+    void setCardProviderId(const QString &_providerId) override
+    {
+        cardProviderId = _providerId;
+    }
+
+    QString getCardSetShortName() const override
+    {
+        return cardSetShortName;
+    }
+    void setCardSetShortName(const QString &_cardSetShortName) override
+    {
+        cardSetShortName = _cardSetShortName;
+    }
+    QString getCardCollectorNumber() const override
+    {
+        return cardSetNumber;
+    }
+    void setCardCollectorNumber(const QString &_cardSetNumber) override
+    {
+        cardSetNumber = _cardSetNumber;
     }
 };
 
@@ -255,7 +321,11 @@ public:
     {
         return root;
     }
-    DecklistCardNode *addCard(const QString &cardName, const QString &zoneName);
+    DecklistCardNode *addCard(const QString &cardName,
+                              const QString &zoneName,
+                              const QString &cardSetName = QString(),
+                              const QString &cardSetCollectorNumber = QString(),
+                              const QString &cardProviderId = QString());
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 
     /**
