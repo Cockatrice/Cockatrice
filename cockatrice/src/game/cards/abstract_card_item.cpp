@@ -12,13 +12,13 @@
 #include <QPainter>
 #include <algorithm>
 
-AbstractCardItem::AbstractCardItem(const QString &_name,
+AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
+                                   const QString &_name,
                                    const QString &_providerId,
                                    Player *_owner,
-                                   int _id,
-                                   QGraphicsItem *parent)
-    : ArrowTarget(_owner, parent), id(_id), name(_name), providerId(_providerId), tapped(false), facedown(false), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0)
+                                   int _id)
+    : ArrowTarget(_owner, parent), id(_id), name(_name), providerId(_providerId), tapped(false), facedown(false),
+      tapAngle(0), bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);

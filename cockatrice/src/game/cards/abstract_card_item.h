@@ -49,11 +49,11 @@ public:
     {
         return Type;
     }
-    AbstractCardItem(const QString &_name = QString(),
+    AbstractCardItem(QGraphicsItem *parent = nullptr,
+                     const QString &_name = QString(),
                      const QString &_providerId = QString(),
                      Player *_owner = nullptr,
-                     int _id = -1,
-                     QGraphicsItem *parent = nullptr);
+                     int _id = -1);
     ~AbstractCardItem();
     QRectF boundingRect() const override;
     QPainterPath shape() const override;

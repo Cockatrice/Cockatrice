@@ -24,7 +24,7 @@ CardItem::CardItem(Player *_owner,
                    bool _revealedCard,
                    QGraphicsItem *parent,
                    CardZone *_zone)
-    : AbstractCardItem(_name, _providerId, _owner, _cardid, parent), zone(_zone), revealedCard(_revealedCard),
+    : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), revealedCard(_revealedCard),
       attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
