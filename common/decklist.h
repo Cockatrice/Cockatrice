@@ -221,7 +221,7 @@ public:
     {
         return cardSetShortName;
     }
-    void setCardSetShortName(const QString &_cardSetShortName)
+    void setCardSetShortName(const QString &_cardSetShortName) override
     {
         cardSetShortName = _cardSetShortName;
     }
