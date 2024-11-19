@@ -18,11 +18,11 @@
 #include <QPainter>
 
 CardItem::CardItem(Player *_owner,
+                   QGraphicsItem *parent,
                    const QString &_name,
                    const QString &_providerId,
                    int _cardid,
                    bool _revealedCard,
-                   QGraphicsItem *parent,
                    CardZone *_zone)
     : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), revealedCard(_revealedCard),
       attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)

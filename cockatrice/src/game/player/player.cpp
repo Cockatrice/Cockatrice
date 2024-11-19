@@ -2031,7 +2031,7 @@ void Player::eventCreateToken(const Event_CreateToken &event)
         return;
     }
 
-    CardItem *card = new CardItem(this, QString::fromStdString(event.card_name()), QString(), event.card_id());
+    CardItem *card = new CardItem(this, nullptr, QString::fromStdString(event.card_name()), QString(), event.card_id());
     // use db PT if not provided in event
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
