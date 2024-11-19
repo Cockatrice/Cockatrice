@@ -111,9 +111,9 @@ void CardInfoFrameWidget::setCard(const QString &cardName)
     setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
 }
 
-void CardInfoFrameWidget::setCard(const QString &cardName, const QString &uuid)
+void CardInfoFrameWidget::setCard(const QString &cardName, const QString &providerId)
 {
-    setCard(CardDatabaseManager::getInstance()->getCardByNameAndUUID(cardName, uuid));
+    setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, providerId));
 }
 
 void CardInfoFrameWidget::setCard(AbstractCardItem *card)

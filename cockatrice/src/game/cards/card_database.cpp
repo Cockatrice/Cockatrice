@@ -441,15 +441,15 @@ QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
     return cardInfos;
 }
 
-CardInfoPtr CardDatabase::getCardByNameAndUUID(const QString &cardName, const QString &uuid) const
+CardInfoPtr CardDatabase::getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const
 {
     auto info = getCard(cardName);
-    if (uuid.isNull() || uuid.isEmpty() || info.isNull()) {
+    if (providerId.isNull() || providerId.isEmpty() || info.isNull()) {
         return info;
     }
 
     for (const auto &set : info->getSets()) {
-        if (set.getProperty("uuid") == uuid) {
+        if (set.getProperty("uuid") == providerId) {
             CardInfoPtr cardFromSpecificSet = info->clone();
             cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(info->getName()) + QString("_") +
                                                    QString(set.getProperty("uuid")));
@@ -602,7 +602,7 @@ void CardDatabase::refreshPreferredPrintings()
 {
     for (const CardInfoPtr &card : cards) {
         card->setPixmapCacheKey(QLatin1String("card_") + QString(card->getName()) + QString("_") +
-                                QString(getPreferredPrintingUUIDForCard(card->getName())));
+                                QString(getPreferredPrintingProviderIdForCard(card->getName())));
     }
 }
 
@@ -637,7 +637,7 @@ CardInfoPerSet CardDatabase::getPreferredSetForCard(const QString &cardName)
     return CardInfoPerSet(nullptr);
 }
 
-CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, const QString &uuid) const
+CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, const QString &providerId) const
 {
     CardInfoPtr cardInfo = getCard(cardName);
     if (!cardInfo) {
@@ -650,7 +650,7 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, cons
     }
 
     for (auto &cardInfoForSet : setMap) {
-        if (cardInfoForSet.getProperty("uuid") == uuid) {
+        if (cardInfoForSet.getProperty("uuid") == providerId) {
             return cardInfoForSet;
         }
     }
@@ -658,26 +658,26 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, cons
     return CardInfoPerSet(nullptr);
 }
 
-QString CardDatabase::getPreferredPrintingUUIDForCard(const QString &cardName)
+QString CardDatabase::getPreferredPrintingProviderIdForCard(const QString &cardName)
 {
     CardInfoPerSet preferredSetCardInfo = getPreferredSetForCard(cardName);
-    QString preferredPrintingUUID = preferredSetCardInfo.getProperty(QString("uuid"));
-    if (preferredPrintingUUID.isEmpty()) {
+    QString preferredPrintingProviderId = preferredSetCardInfo.getProperty(QString("uuid"));
+    if (preferredPrintingProviderId.isEmpty()) {
         CardInfoPtr defaultCardInfo = getCard(cardName);
         if (defaultCardInfo.isNull()) {
             return cardName;
         }
         return defaultCardInfo->getName();
     }
-    return preferredPrintingUUID;
+    return preferredPrintingProviderId;
 }
 
-bool CardDatabase::isUuidForPreferredPrinting(const QString &cardName, const QString &uuid)
+bool CardDatabase::isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId)
 {
-    if (uuid.startsWith("card_")) {
-        return uuid == QLatin1String("card_") + cardName + QString("_") + getPreferredPrintingUUIDForCard(cardName);
+    if (providerId.startsWith("card_")) {
+        return providerId == QLatin1String("card_") + cardName + QString("_") + getPreferredPrintingProviderIdForCard(cardName);
     }
-    return uuid == getPreferredPrintingUUIDForCard(cardName);
+    return providerId == getPreferredPrintingProviderIdForCard(cardName);
 }
 
 void CardDatabase::refreshCachedReverseRelatedCards()

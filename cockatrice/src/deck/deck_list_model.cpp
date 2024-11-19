@@ -120,7 +120,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                         return node->getCardCollectorNumber();
                     }
                     case 4: {
-                        return node->getCardUuid();
+                        return node->getCardProviderId();
                     }
                     default:
                         return {};
@@ -150,7 +150,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                     case 3:
                         return card->getCardCollectorNumber();
                     case 4:
-                        return card->getCardUuid();
+                        return card->getCardProviderId();
                     default:
                         return {};
                 }
@@ -257,7 +257,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
             node->setCardCollectorNumber(value.toString());
             break;
         case 4:
-            node->setCardUUID(value.toString());
+            node->setCardProviderId(value.toString());
             break;
         default:
             return false;
@@ -310,7 +310,7 @@ InnerDecklistNode *DeckListModel::createNodeIfNeeded(const QString &name, InnerD
 }
 
 DecklistModelCardNode *
-DeckListModel::findCardNode(const QString &cardName, const QString &zoneName, const QString &uuid) const
+DeckListModel::findCardNode(const QString &cardName, const QString &zoneName, const QString &providerId) const
 {
     InnerDecklistNode *zoneNode, *typeNode;
     CardInfoPtr info;
@@ -332,17 +332,17 @@ DeckListModel::findCardNode(const QString &cardName, const QString &zoneName, co
         return nullptr;
     }
 
-    if (uuid.isEmpty()) {
+    if (providerId.isEmpty()) {
         return dynamic_cast<DecklistModelCardNode *>(typeNode->findChild(cardName));
     }
-    return dynamic_cast<DecklistModelCardNode *>(typeNode->findCardChildByNameAndUUID(cardName, uuid));
+    return dynamic_cast<DecklistModelCardNode *>(typeNode->findCardChildByNameAndProviderId(cardName, providerId));
 }
 
-QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zoneName, const QString &uuid) const
+QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zoneName, const QString &providerId) const
 {
     DecklistModelCardNode *cardNode;
 
-    cardNode = findCardNode(cardName, zoneName, uuid);
+    cardNode = findCardNode(cardName, zoneName, providerId);
     if (!cardNode) {
         return {};
     }
@@ -362,7 +362,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
                                    bool abAddAnyway)
 {
     CardInfoPtr cardInfo =
-        CardDatabaseManager::getInstance()->getCardByNameAndUUID(cardName, cardInfoSet.getProperty("uuid"));
+        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardInfoSet.getProperty("uuid"));
 
     if (cardInfo == nullptr) {
         if (abAddAnyway) {
@@ -383,7 +383,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
 
     const QModelIndex parentIndex = nodeToIndex(cardTypeNode);
     auto *cardNode = dynamic_cast<DecklistModelCardNode *>(
-        cardTypeNode->findCardChildByNameAndUUID(cardName, cardInfoSet.getProperty("uuid")));
+        cardTypeNode->findCardChildByNameAndProviderId(cardName, cardInfoSet.getProperty("uuid")));
     if (!cardNode) {
         auto *decklistCard =
             deckList->addCard(cardInfo->getName(), zoneName, cardInfoSet.getPtr()->getCorrectedShortName(),
@@ -395,7 +395,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
         cardNode->setNumber(cardNode->getNumber() + 1);
         cardNode->setCardSetShortName(cardInfoSet.getPtr()->getCorrectedShortName());
         cardNode->setCardCollectorNumber(cardInfoSet.getProperty("num"));
-        cardNode->setCardUUID(cardInfoSet.getProperty("uuid"));
+        cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
         deckList->updateDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);

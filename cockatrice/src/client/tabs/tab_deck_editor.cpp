@@ -1029,7 +1029,7 @@ void TabDeckEditor::actSwapCard()
     if (!currentIndex.isValid())
         return;
     const QString cardName = currentIndex.sibling(currentIndex.row(), 1).data().toString();
-    const QString cardUUID = currentIndex.sibling(currentIndex.row(), 2).data().toString();
+    const QString cardProviderID = currentIndex.sibling(currentIndex.row(), 2).data().toString();
     const QModelIndex gparent = currentIndex.parent().parent();
 
     if (!gparent.isValid())
@@ -1041,7 +1041,7 @@ void TabDeckEditor::actSwapCard()
 
     // Third argument (true) says create the card no matter what, even if not in DB
     QModelIndex newCardIndex = deckModel->addCard(
-        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardUUID), otherZoneName, true);
+        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardProviderID), otherZoneName, true);
     recursiveExpand(newCardIndex);
 
     setModified(true);

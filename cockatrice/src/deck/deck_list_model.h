@@ -38,13 +38,13 @@ public:
     {
         dataNode->setName(_name);
     }
-    QString getCardUuid() const override
+    QString getCardProviderId() const override
     {
-        return dataNode->getCardUuid();
+        return dataNode->getCardProviderId();
     }
-    void setCardUUID(const QString &_cardUUID) override
+    void setCardProviderId(const QString &_cardProviderId) override
     {
-        dataNode->setCardUUID(_cardUUID);
+        dataNode->setCardProviderId(_cardProviderId);
     }
     QString getCardSetShortName() const override
     {
@@ -90,7 +90,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
-    QModelIndex findCard(const QString &cardName, const QString &zoneName, const QString &uuid = "") const;
+    QModelIndex findCard(const QString &cardName, const QString &zoneName, const QString &providerId = "") const;
     QModelIndex addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway);
     QModelIndex
     addCard(const ::QString &cardName, CardInfoPerSet cardInfoSet, const QString &zoneName, bool abAddAnyway = false);
@@ -110,7 +110,7 @@ private:
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
     DecklistModelCardNode *
-    findCardNode(const QString &cardName, const QString &zoneName, const QString &uuid = "") const;
+    findCardNode(const QString &cardName, const QString &zoneName, const QString &providerId = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 

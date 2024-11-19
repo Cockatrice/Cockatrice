@@ -18,5 +18,5 @@ message ServerInfo_Card {
     optional sint32 attach_player_id = 14 [default = -1];
     optional string attach_zone = 15;
     optional sint32 attach_card_id = 16 [default = -1];
-    optional string uuid = 17;
+    optional string provider_id = 17;
 }

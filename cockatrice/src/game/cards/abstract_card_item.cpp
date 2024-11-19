@@ -13,11 +13,11 @@
 #include <algorithm>
 
 AbstractCardItem::AbstractCardItem(const QString &_name,
-                                   const QString &_uuid,
+                                   const QString &_providerId,
                                    Player *_owner,
                                    int _id,
                                    QGraphicsItem *parent)
-    : ArrowTarget(_owner, parent), id(_id), name(_name), uuid(_uuid), tapped(false), facedown(false), tapAngle(0),
+    : ArrowTarget(_owner, parent), id(_id), name(_name), providerId(_providerId), tapped(false), facedown(false), tapAngle(0),
       bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
@@ -53,7 +53,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::cardInfoUpdated()
 {
-    info = CardDatabaseManager::getInstance()->getCardByNameAndUUID(name, uuid);
+    info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(name, providerId);
 
     if (!info && !name.isEmpty()) {
         QVariantHash properties = QVariantHash();
@@ -188,9 +188,9 @@ void AbstractCardItem::setName(const QString &_name)
     cardInfoUpdated();
 }
 
-void AbstractCardItem::setUUID(const QString &_uuid)
+void AbstractCardItem::setProviderId(const QString &_providerId)
 {
-    if (uuid == _uuid) {
+    if (providerId == _providerId) {
         return;
     }
 
@@ -198,7 +198,7 @@ void AbstractCardItem::setUUID(const QString &_uuid)
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
     }
-    uuid = _uuid;
+    providerId = _providerId;
 
     cardInfoUpdated();
 }

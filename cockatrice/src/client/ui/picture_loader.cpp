@@ -48,8 +48,8 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
             if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
                 card->getPixmapCacheKey()) {
                 long long setIndex = sortedSets.indexOf(set.getPtr());
-                CardSetPtr setForCardUUID = sortedSets.takeAt(setIndex);
-                sortedSets.prepend(setForCardUUID);
+                CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+                sortedSets.prepend(setForCardProviderID);
             }
         }
         // The first time called, nextSet will also populate the Urls for the first set.
@@ -179,7 +179,7 @@ void PictureLoaderWorker::processLoadQueue()
         qDebug().nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
                            << "]: Trying to load picture";
 
-        if (CardDatabaseManager::getInstance()->isUuidForPreferredPrinting(
+        if (CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(
                 cardName, cardBeingLoaded.getCard()->getPixmapCacheKey())) {
             if (cardImageExistsOnDisk(setName, correctedCardName)) {
                 continue;

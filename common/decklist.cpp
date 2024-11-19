@@ -89,7 +89,7 @@ int AbstractDecklistNode::depth() const
 
 InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
     : AbstractDecklistNode(_parent), name(other->getName()), cardSetShortName(other->getCardSetShortName()),
-      cardCollectorNumber(other->getCardCollectorNumber()), cardUUID(other->getCardUuid())
+      cardCollectorNumber(other->getCardCollectorNumber()), cardProviderId(other->getCardProviderId())
 {
     for (int i = 0; i < other->size(); ++i) {
         auto *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
@@ -142,7 +142,7 @@ void InnerDecklistNode::clearTree()
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
     : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()),
       cardSetShortName(other->getCardSetShortName()), cardSetNumber(other->getCardCollectorNumber()),
-      cardUUID(other->getCardUuid())
+      cardProviderId(other->getCardProviderId())
 {
 }
 
@@ -156,10 +156,11 @@ AbstractDecklistNode *InnerDecklistNode::findChild(const QString &_name)
     return nullptr;
 }
 
-AbstractDecklistNode *InnerDecklistNode::findCardChildByNameAndUUID(const QString &_name, const QString &_uuid)
+AbstractDecklistNode *InnerDecklistNode::findCardChildByNameAndProviderId(const QString &_name,
+                                                                          const QString &_providerId)
 {
     for (int i = 0; i < size(); i++) {
-        if (at(i) != nullptr && at(i)->getName() == _name && at(i)->getCardUuid() == _uuid) {
+        if (at(i) != nullptr && at(i)->getName() == _name && at(i)->getCardProviderId() == _providerId) {
             return at(i);
         }
     }
@@ -318,14 +319,14 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
     xml->writeAttribute("number", QString::number(getNumber()));
     xml->writeAttribute("name", getName());
 
-    if (getCardSetShortName() != "") {
+    if (getCardSetShortName().isEmpty()) {
         xml->writeAttribute("setShortName", getCardSetShortName());
     }
-    if (getCardCollectorNumber() != "") {
+    if (getCardCollectorNumber().isEmpty()) {
         xml->writeAttribute("collectorNumber", getCardCollectorNumber());
     }
-    if (getCardUuid() != "") {
-        xml->writeAttribute("uuid", getCardUuid());
+    if (getCardProviderId().isEmpty()) {
+        xml->writeAttribute("uuid", getCardProviderId());
     }
 }
 
@@ -768,14 +769,14 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const QString &zoneName,
                                     const QString &cardSetName,
                                     const QString &cardSetCollectorNumber,
-                                    const QString &cardUUID)
+                                    const QString &cardProviderId)
 {
     auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (zoneNode == nullptr) {
         zoneNode = new InnerDecklistNode(zoneName, root);
     }
 
-    auto *node = new DecklistCardNode(cardName, 1, zoneNode, cardSetName, cardSetCollectorNumber, cardUUID);
+    auto *node = new DecklistCardNode(cardName, 1, zoneNode, cardSetName, cardSetCollectorNumber, cardProviderId);
     updateDeckHash();
 
     return node;

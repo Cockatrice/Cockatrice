@@ -429,10 +429,10 @@ public:
     void removeCard(CardInfoPtr card);
     CardInfoPtr getCard(const QString &cardName) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
-    CardInfoPtr getCardByNameAndUUID(const QString &cardName, const QString &uuid) const;
+    CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
     CardInfoPerSet getPreferredSetForCard(const QString &cardName);
-    CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &uuid) const;
-    QString getPreferredPrintingUUIDForCard(const QString &cardName);
+    CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
+    QString getPreferredPrintingProviderIdForCard(const QString &cardName);
     CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
@@ -442,7 +442,7 @@ public:
     CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
     CardSetPtr getSet(const QString &setName);
-    bool isUuidForPreferredPrinting(const QString &cardName, const QString &uuid);
+    bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
     QList<CardInfoPtr> getCardList() const
     {
         return cards.values();

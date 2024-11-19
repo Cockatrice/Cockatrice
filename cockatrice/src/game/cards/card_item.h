@@ -51,7 +51,7 @@ public:
     }
     CardItem(Player *_owner,
              const QString &_name = QString(),
-             const QString &_uuid = QString(),
+             const QString &_providerId = QString(),
              int _cardid = -1,
              bool revealedCard = false,
              QGraphicsItem *parent = nullptr,
