@@ -188,7 +188,7 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
         case 3:
             return tr("Number");
         case 4:
-            return tr("UUID");
+            return tr("Provider ID");
         default:
             return {};
     }
