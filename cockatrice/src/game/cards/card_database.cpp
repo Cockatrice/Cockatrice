@@ -675,7 +675,8 @@ QString CardDatabase::getPreferredPrintingProviderIdForCard(const QString &cardN
 bool CardDatabase::isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId)
 {
     if (providerId.startsWith("card_")) {
-        return providerId == QLatin1String("card_") + cardName + QString("_") + getPreferredPrintingProviderIdForCard(cardName);
+        return providerId ==
+               QLatin1String("card_") + cardName + QString("_") + getPreferredPrintingProviderIdForCard(cardName);
     }
     return providerId == getPreferredPrintingProviderIdForCard(cardName);
 }

@@ -1041,7 +1041,8 @@ void TabDeckEditor::actSwapCard()
 
     // Third argument (true) says create the card no matter what, even if not in DB
     QModelIndex newCardIndex = deckModel->addCard(
-        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardProviderID), otherZoneName, true);
+        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardProviderID), otherZoneName,
+        true);
     recursiveExpand(newCardIndex);
 
     setModified(true);
