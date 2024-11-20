@@ -1016,9 +1016,20 @@ TabDeckEditor::DeckOpenLocation TabDeckEditor::confirmOpen(const bool openInSame
 
     // do the save confirmation dialogue
     tabSupervisor->setCurrentWidget(this);
-    QMessageBox::StandardButton ret = QMessageBox::warning(
-        this, tr("Are you sure?"), tr("The decklist has been modified.\nDo you want to save the changes?"),
-        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setWindowTitle(tr("Are you sure?"));
+    msgBox.setText(tr("The decklist has been modified.\nDo you want to save the changes?"));
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    QPushButton *newTabButton = msgBox.addButton(tr("Open in new tab"), QMessageBox::ApplyRole);
+
+    int ret = msgBox.exec();
+
+    // `exec()` returns an opaque value if a non-standard button was clicked.
+    // Directly check if newTabButton was clicked before switching over the standard buttons.
+    if (msgBox.clickedButton() == newTabButton)
+        return NEW_TAB;
 
     switch (ret) {
         case QMessageBox::Save:
