@@ -769,8 +769,9 @@ void TabDeckEditor::actNewDeck()
 {
     auto deckOpenLocation = confirmOpen(false);
 
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor(nullptr);
@@ -789,8 +790,9 @@ void TabDeckEditor::actLoadDeck()
 {
     auto deckOpenLocation = confirmOpen();
 
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     QFileDialog dialog(this, tr("Load deck"));
     dialog.setDirectory(SettingsCache::instance().getDeckPath());
@@ -882,8 +884,9 @@ void TabDeckEditor::actLoadDeckFromClipboard()
 {
     auto deckOpenLocation = confirmOpen();
 
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     DlgLoadDeckFromClipboard dlg(this);
     if (!dlg.exec())
@@ -1028,8 +1031,9 @@ TabDeckEditor::DeckOpenLocation TabDeckEditor::confirmOpen(const bool openInSame
 
     // `exec()` returns an opaque value if a non-standard button was clicked.
     // Directly check if newTabButton was clicked before switching over the standard buttons.
-    if (msgBox.clickedButton() == newTabButton)
+    if (msgBox.clickedButton() == newTabButton) {
         return NEW_TAB;
+    }
 
     switch (ret) {
         case QMessageBox::Save:
