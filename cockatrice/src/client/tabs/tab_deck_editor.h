@@ -100,6 +100,18 @@ private slots:
     void showSearchSyntaxHelp();
 
 private:
+    /**
+     * @brief Which tab to open the new deck in
+     */
+    enum DeckOpenLocation
+    {
+        CANCELLED,
+        SAME_TAB,
+        NEW_TAB
+    };
+
+    DeckOpenLocation confirmOpen(const bool openInSameTabIfBlank = true);
+
     bool isBlankNewDeck() const;
     CardInfoPtr currentCardInfo() const;
     void addCardHelper(QString zoneName);

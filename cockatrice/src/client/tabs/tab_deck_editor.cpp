@@ -767,13 +767,15 @@ void TabDeckEditor::closeRequest()
 
 void TabDeckEditor::actNewDeck()
 {
-    if (SettingsCache::instance().getOpenDeckInNewTab()) {
+    auto deckOpenLocation = confirmOpen(false);
+
+    if (deckOpenLocation == CANCELLED)
+        return;
+
+    if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor(nullptr);
         return;
     }
-
-    if (!confirmClose())
-        return;
 
     deckModel->cleanList();
     nameEdit->setText(QString());
@@ -785,9 +787,9 @@ void TabDeckEditor::actNewDeck()
 
 void TabDeckEditor::actLoadDeck()
 {
-    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab() && !isBlankNewDeck();
+    auto deckOpenLocation = confirmOpen();
 
-    if (!openInNewTab && !confirmClose())
+    if (deckOpenLocation == CANCELLED)
         return;
 
     QFileDialog dialog(this, tr("Load deck"));
@@ -801,7 +803,7 @@ void TabDeckEditor::actLoadDeck()
 
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt)) {
-        if (openInNewTab) {
+        if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
         } else {
             setSaveStatus(false);
@@ -878,16 +880,16 @@ bool TabDeckEditor::actSaveDeckAs()
 
 void TabDeckEditor::actLoadDeckFromClipboard()
 {
-    bool openInNewTab = SettingsCache::instance().getOpenDeckInNewTab() && !isBlankNewDeck();
+    auto deckOpenLocation = confirmOpen();
 
-    if (!openInNewTab && !confirmClose())
+    if (deckOpenLocation == CANCELLED)
         return;
 
     DlgLoadDeckFromClipboard dlg(this);
     if (!dlg.exec())
         return;
 
-    if (openInNewTab) {
+    if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor(dlg.getDeckList());
     } else {
         setDeck(dlg.getDeckList());
@@ -985,6 +987,47 @@ void TabDeckEditor::recursiveExpand(const QModelIndex &index)
     if (index.parent().isValid())
         recursiveExpand(index.parent());
     deckView->expand(index);
+}
+
+/**
+ * @brief Displays the save confirmation dialogue that is shown before loading a deck, if required. Takes into
+ * account the `openDeckInNewTab` settting.
+ *
+ * @param openInSameTabIfBlank Open the deck in the same tab instead of a new tab if the current tab is completely
+ * blank. Only relevant when the `openDeckInNewTab` setting is enabled.
+ *
+ * @returns An enum that indicates if and where to load the deck
+ */
+TabDeckEditor::DeckOpenLocation TabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
+{
+    // handle `openDeckInNewTab` setting
+    if (SettingsCache::instance().getOpenDeckInNewTab()) {
+        if (openInSameTabIfBlank && isBlankNewDeck()) {
+            return SAME_TAB;
+        } else {
+            return NEW_TAB;
+        }
+    }
+
+    // early return if deck is unmodified
+    if (!modified) {
+        return SAME_TAB;
+    }
+
+    // do the save confirmation dialogue
+    tabSupervisor->setCurrentWidget(this);
+    QMessageBox::StandardButton ret = QMessageBox::warning(
+        this, tr("Are you sure?"), tr("The decklist has been modified.\nDo you want to save the changes?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+    switch (ret) {
+        case QMessageBox::Save:
+            return actSaveDeck() ? SAME_TAB : CANCELLED;
+        case QMessageBox::Discard:
+            return SAME_TAB;
+        default:
+            return CANCELLED;
+    }
 }
 
 /**
