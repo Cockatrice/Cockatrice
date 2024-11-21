@@ -22,6 +22,7 @@ class Response;
 class FilterTreeModel;
 class FilterBuilder;
 class QGroupBox;
+class QMessageBox;
 class QHBoxLayout;
 class QVBoxLayout;
 class QPushButton;
@@ -111,6 +112,7 @@ private:
     };
 
     DeckOpenLocation confirmOpen(const bool openInSameTabIfBlank = true);
+    QMessageBox *createSaveConfirmationWindow();
 
     bool isBlankNewDeck() const;
     CardInfoPtr currentCardInfo() const;

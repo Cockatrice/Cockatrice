@@ -748,9 +748,7 @@ bool TabDeckEditor::confirmClose()
 {
     if (modified) {
         tabSupervisor->setCurrentWidget(this);
-        QMessageBox::StandardButton ret = QMessageBox::warning(
-            this, tr("Are you sure?"), tr("The decklist has been modified.\nDo you want to save the changes?"),
-            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        int ret = createSaveConfirmationWindow()->exec();
         if (ret == QMessageBox::Save)
             return actSaveDeck();
         else if (ret == QMessageBox::Cancel)
@@ -1020,18 +1018,14 @@ TabDeckEditor::DeckOpenLocation TabDeckEditor::confirmOpen(const bool openInSame
     // do the save confirmation dialogue
     tabSupervisor->setCurrentWidget(this);
 
-    QMessageBox msgBox;
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setWindowTitle(tr("Are you sure?"));
-    msgBox.setText(tr("The decklist has been modified.\nDo you want to save the changes?"));
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    QPushButton *newTabButton = msgBox.addButton(tr("Open in new tab"), QMessageBox::ApplyRole);
+    QMessageBox *msgBox = createSaveConfirmationWindow();
+    QPushButton *newTabButton = msgBox->addButton(tr("Open in new tab"), QMessageBox::ApplyRole);
 
-    int ret = msgBox.exec();
+    int ret = msgBox->exec();
 
     // `exec()` returns an opaque value if a non-standard button was clicked.
     // Directly check if newTabButton was clicked before switching over the standard buttons.
-    if (msgBox.clickedButton() == newTabButton) {
+    if (msgBox->clickedButton() == newTabButton) {
         return NEW_TAB;
     }
 
@@ -1043,6 +1037,21 @@ TabDeckEditor::DeckOpenLocation TabDeckEditor::confirmOpen(const bool openInSame
         default:
             return CANCELLED;
     }
+}
+
+/**
+ * @brief Creates the base save confirmation dialogue box.
+ *
+ * @returns A QMessageBox that can be further modified
+ */
+QMessageBox *TabDeckEditor::createSaveConfirmationWindow()
+{
+    QMessageBox *msgBox = new QMessageBox(this);
+    msgBox->setIcon(QMessageBox::Warning);
+    msgBox->setWindowTitle(tr("Are you sure?"));
+    msgBox->setText(tr("The decklist has been modified.\nDo you want to save the changes?"));
+    msgBox->setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    return msgBox;
 }
 
 /**
