@@ -24,7 +24,7 @@ CardSet::Priority OracleImporter::getSetPriority(QString &setType, QString &shor
     if (!setTypePriorities.contains(setType.toLower())) {
         qDebug() << "warning: Set type" << setType << "unrecognized for prioritization";
     }
-    CardSet::Priority priority = setTypePriorities.value(setType.toLower(), CardSet::PriorityUndefined);
+    CardSet::Priority priority = setTypePriorities.value(setType.toLower(), CardSet::PriorityFallback);
     if (nonEnglishSets.contains(shortName)) {
         priority = CardSet::PriorityLowest;
     }
