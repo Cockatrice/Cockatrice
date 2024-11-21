@@ -110,11 +110,13 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
                             //qDebug() << info->getCardType();
 
                             CardInfoPerSetMap setMap = info->getSets();
-                            OverlapWidget *printings_group_widget = new OverlapWidget(80, 0, 0, Qt::Orientation::Vertical, this);
+                            OverlapWidget *printings_group_widget =
+                                new OverlapWidget(this, 80, 0, 0, Qt::Orientation::Vertical);
                             for (auto set : setMap) {
-                                //qDebug() << set.getPtr()->getLongName();
-                                CardInfoPtr set_info = CardDatabaseManager::getInstance()->getCardByNameAndUUID(currentCard->getName(), set.getProperty("uuid"));
-                                CardInfoPictureWithTextOverlayWidget* display = new CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
+                                // qDebug() << set.getPtr()->getLongName();
+                                CardInfoPtr set_info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                                    currentCard->getName(), set.getProperty("uuid"));
+                                CardInfoPictureWithTextOverlayWidget * display = new CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
                                 display->setCard(set_info);
                                 display->setOverlayText(deck_loader->getName());
                                 display->setFontSize(24);
