@@ -33,11 +33,11 @@ public:
     enum Priority
     {
         PriorityUndefined = 0,
+        PriorityFallback = 1,
         PriorityPrimary = 10,
         PrioritySecondary = 20,
         PriorityReprint = 30,
         PriorityOther = 40,
-        PriorityFallback = 50,
         PriorityLowest = 100,
     };
 
