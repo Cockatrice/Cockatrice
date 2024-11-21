@@ -120,6 +120,12 @@ public:
     bool canFetchMore(const QModelIndex &parent) const override;
     void fetchMore(const QModelIndex &parent) override;
 
+public slots:
+    void modelDirty()
+    {
+        dirty();
+    }
+
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
     static int lessThanNumerically(const QString &left, const QString &right);
