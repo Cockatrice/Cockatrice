@@ -25,6 +25,8 @@
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
+#include "visual_deck_editor/tab_deck_editor_visual.h"
+#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
@@ -777,6 +779,14 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab()
+{
+    TabDeckEditorVisual *tab = new TabDeckEditorVisual(this);
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }
