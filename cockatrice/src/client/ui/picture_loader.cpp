@@ -147,7 +147,7 @@ PictureLoaderWorker::PictureLoaderWorker()
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
-    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + "cacheSettings.ini";
+    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
     cleanStaleEntries();
 
@@ -512,9 +512,9 @@ void PictureLoaderWorker::loadRedirectCache()
     int size = settings.beginReadArray("redirects");
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
-        QUrl originalUrl = settings.value("original").toUrl();
-        QUrl redirectUrl = settings.value("redirect").toUrl();
-        QDateTime timestamp = settings.value("timestamp").toDateTime();
+        QUrl originalUrl = settings.value(REDIRECT_ORIGINAL_URL).toUrl();
+        QUrl redirectUrl = settings.value(REDIRECT_URL).toUrl();
+        QDateTime timestamp = settings.value(REDIRECT_TIMESTAMP).toDateTime();
 
         if (originalUrl.isValid() && redirectUrl.isValid()) {
             redirectCache[originalUrl] = qMakePair(redirectUrl, timestamp);
@@ -532,9 +532,9 @@ void PictureLoaderWorker::saveRedirectCache() const
     int index = 0;
     for (auto it = redirectCache.cbegin(); it != redirectCache.cend(); ++it) {
         settings.setArrayIndex(index++);
-        settings.setValue("original", it.key());
-        settings.setValue("redirect", it.value().first);
-        settings.setValue("timestamp", it.value().second);
+        settings.setValue(REDIRECT_ORIGINAL_URL, it.key());
+        settings.setValue(REDIRECT_URL, it.value().first);
+        settings.setValue(REDIRECT_TIMESTAMP, it.value().second);
     }
     settings.endArray();
 }

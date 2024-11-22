@@ -1030,7 +1030,7 @@ void SettingsCache::loadPaths()
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
-    redirectCachePath = getSafeConfigPath("paths/redirects", dataPath + "/pics/redirects/");
+    redirectCachePath = getSafeConfigPath("paths/redirects", getCachePath() + "/redirects/");
     // this has never been exposed as an user-configurable setting
     if (picsPath.endsWith("/")) {
         customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
