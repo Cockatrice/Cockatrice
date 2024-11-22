@@ -459,7 +459,9 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
     // Check if the redirect is cached
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
-        qDebug() << "Using cached redirect for" << url << "to" << cachedRedirect;
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Using cached redirect for "
+                           << url.toDisplayString() << " to " << cachedRedirect.toDisplayString();
         return makeRequest(cachedRedirect); // Use the cached redirect
     }
 
@@ -481,7 +483,9 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
             }
 
             cacheRedirect(url, redirectUrl);
-            qDebug() << "Caching redirect from" << url << "to" << redirectUrl;
+            qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                               << " set: " << cardBeingDownloaded.getSetName() << "]: Caching redirect from "
+                               << url.toDisplayString() << " to " << redirectUrl.toDisplayString();
         }
 
         reply->deleteLater();
@@ -525,7 +529,6 @@ void PictureLoaderWorker::loadRedirectCache()
 
 void PictureLoaderWorker::saveRedirectCache() const
 {
-    qDebug() << "Saving redirect cache";
     QSettings settings(cacheFilePath, QSettings::IniFormat);
 
     settings.beginWriteArray("redirects", redirectCache.size());
