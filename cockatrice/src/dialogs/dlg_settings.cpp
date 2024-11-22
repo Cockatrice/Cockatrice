@@ -844,7 +844,7 @@ void DeckEditorSettingsPage::retranslateUi()
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
-    networkCacheLabel.setText(tr("Downloaded images directory size:"));
+    networkCacheLabel.setText(tr("Network Cache Size:"));
     networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));

@@ -136,6 +136,8 @@ PictureLoaderWorker::PictureLoaderWorker()
 #endif
     auto cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
+    cache->setMaximumCacheSize(1024L * 1024L *
+                               static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
     // Note: the settings is in MB, but QNetworkDiskCache uses bytes
     connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache,
             [cache](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
