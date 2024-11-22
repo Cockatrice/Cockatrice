@@ -11,6 +11,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QThread;
 
+#define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"
 #define REDIRECT_URL "redirect"
 #define REDIRECT_TIMESTAMP "timestamp"
@@ -90,7 +91,7 @@ private:
     QNetworkAccessManager *networkManager;
     QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
     QString cacheFilePath;                             // Path to persistent storage
-    static constexpr int CacheTTLInDays = 30;
+    static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
     QList<PictureToLoad> cardsToDownload;
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;

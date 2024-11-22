@@ -1,17 +1,14 @@
 #include "picture_loader.h"
 
-#include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../settings/cache_settings.h"
-#include "theme_manager.h"
 
 #include <QApplication>
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QDebug>
-#include <QDir>
 #include <QDirIterator>
-#include <QFile>
+#include <QFileInfo>
 #include <QImageReader>
 #include <QMovie>
 #include <QNetworkAccessManager>
@@ -23,7 +20,6 @@
 #include <QRegularExpression>
 #include <QScreen>
 #include <QSet>
-#include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
 #include <algorithm>
@@ -505,7 +501,7 @@ QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
     if (redirectCache.contains(originalUrl)) {
         return redirectCache[originalUrl].first;
     }
-    return QUrl();
+    return {};
 }
 
 void PictureLoaderWorker::loadRedirectCache()
@@ -513,7 +509,7 @@ void PictureLoaderWorker::loadRedirectCache()
     QSettings settings(cacheFilePath, QSettings::IniFormat);
 
     redirectCache.clear();
-    int size = settings.beginReadArray("redirects");
+    int size = settings.beginReadArray(REDIRECT_HEADER_NAME);
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
         QUrl originalUrl = settings.value(REDIRECT_ORIGINAL_URL).toUrl();
@@ -531,7 +527,7 @@ void PictureLoaderWorker::saveRedirectCache() const
 {
     QSettings settings(cacheFilePath, QSettings::IniFormat);
 
-    settings.beginWriteArray("redirects", redirectCache.size());
+    settings.beginWriteArray(REDIRECT_HEADER_NAME, static_cast<int>(redirectCache.size()));
     int index = 0;
     for (auto it = redirectCache.cbegin(); it != redirectCache.cend(); ++it) {
         settings.setArrayIndex(index++);
