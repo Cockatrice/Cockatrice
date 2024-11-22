@@ -145,9 +145,12 @@ PictureLoaderWorker::PictureLoaderWorker()
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
-    cacheFilePath = "redirectCache.ini";
+    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + "cacheSettings.ini";
     loadRedirectCache();
     cleanStaleEntries();
+
+    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,
+            &PictureLoaderWorker::saveRedirectCache);
 
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
@@ -156,7 +159,6 @@ PictureLoaderWorker::PictureLoaderWorker()
 
 PictureLoaderWorker::~PictureLoaderWorker()
 {
-    saveRedirectCache();
     pictureLoaderThread->deleteLater();
 }
 
@@ -489,6 +491,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
 void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)
 {
     redirectCache[originalUrl] = qMakePair(redirectUrl, QDateTime::currentDateTimeUtc());
+    saveRedirectCache();
 }
 
 QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
@@ -520,6 +523,7 @@ void PictureLoaderWorker::loadRedirectCache()
 
 void PictureLoaderWorker::saveRedirectCache() const
 {
+    qDebug() << "Saving redirect cache";
     QSettings settings(cacheFilePath, QSettings::IniFormat);
 
     settings.beginWriteArray("redirects", redirectCache.size());

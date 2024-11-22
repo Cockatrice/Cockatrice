@@ -73,7 +73,7 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
+    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
@@ -182,6 +182,10 @@ public:
     QString getPicsPath() const
     {
         return picsPath;
+    }
+    QString getRedirectCachePath() const
+    {
+        return redirectCachePath;
     }
     QString getCustomPicsPath() const
     {
