@@ -83,6 +83,9 @@ private:
     QList<PictureToLoad> loadQueue;
     QMutex mutex;
     QNetworkAccessManager *networkManager;
+    QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
+    QString cacheFilePath;                             // Path to persistent storage
+    int CacheTTLInDays = 30;
     QList<PictureToLoad> cardsToDownload;
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
@@ -91,6 +94,12 @@ private:
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
     bool imageIsBlackListed(const QByteArray &);
     QNetworkReply *makeRequest(const QUrl &url);
+    void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
+    QUrl getCachedRedirect(const QUrl &originalUrl) const;
+    void loadRedirectCache();
+    void saveRedirectCache() const;
+    void cleanStaleEntries();
+
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
