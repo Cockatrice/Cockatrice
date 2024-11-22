@@ -73,8 +73,8 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
-        spoilerDatabasePath, tokenDatabasePath, themeName;
+    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
+        customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
