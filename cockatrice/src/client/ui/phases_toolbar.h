@@ -45,7 +45,6 @@ public:
     {
         return active;
     }
-    void reset();
     void triggerDoubleClickAction();
 signals:
     void clicked();
@@ -86,7 +85,6 @@ public:
 public slots:
     void setActivePhase(int phase);
     void triggerPhaseAction(int phase);
-    void reset();
 private slots:
     void phaseButtonClicked();
     void actNextTurn();
