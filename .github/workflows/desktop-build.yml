@@ -277,10 +277,6 @@ jobs:
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-
   build-windows:
     strategy:
       fail-fast: false
