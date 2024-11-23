@@ -6,6 +6,7 @@
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
    <a href="#get-involved-">Get Involved</a> <b>|</b>
+   <a href="#related-projects">Related Projects</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#translations-">Translations</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
@@ -55,6 +56,14 @@ For both tags, we're willing to provide help to contributors in showing them whe
 We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
 Cockatrice uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
+
+
+# Related Projects
+
+- Magic-Cards: Script to generate MtG card data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+- [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
+- [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Project webpage
 
 
 # Community Resources
