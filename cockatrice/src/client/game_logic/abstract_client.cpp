@@ -49,6 +49,8 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<QList<QString>>("missingFeatures");
     qRegisterMetaType<PendingCommand *>("pendingCommand");
 
+
+    
     FeatureSet features;
     features.initalizeFeatureList(clientFeatures);
 
