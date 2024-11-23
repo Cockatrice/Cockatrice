@@ -648,8 +648,7 @@ void TabGame::replayRewind()
     messageLog->clearChat();
 
     // reset phase markers
-    currentPhase = -1;
-    phasesToolbar->reset();
+    setActivePhase(-1);
 }
 
 void TabGame::incrementGameTime()
