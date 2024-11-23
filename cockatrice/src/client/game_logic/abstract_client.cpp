@@ -50,7 +50,7 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<PendingCommand *>("pendingCommand");
 
 
-    
+
     FeatureSet features;
     features.initalizeFeatureList(clientFeatures);
 
