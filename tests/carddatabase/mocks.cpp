@@ -224,6 +224,9 @@ void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
 void SettingsCache::setNetworkCacheSizeInMB(const int /* _networkCacheSize */)
 {
 }
+void SettingsCache::setNetworkRedirectCacheTtl(const int /* _redirectCacheTtl */)
+{
+}
 void SettingsCache::setClientID(const QString & /* _clientID */)
 {
 }

@@ -221,6 +221,7 @@ SettingsCache::SettingsCache()
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
 
     networkCacheSize = settings->value("personal/networkCacheSize", NETWORK_CACHE_SIZE_DEFAULT).toInt();
+    redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
 
@@ -657,6 +658,13 @@ void SettingsCache::setNetworkCacheSizeInMB(const int _networkCacheSize)
     emit networkCacheSizeChanged(networkCacheSize);
 }
 
+void SettingsCache::setNetworkRedirectCacheTtl(const int _redirectCacheTtl)
+{
+    redirectCacheTtl = _redirectCacheTtl;
+    settings->setValue("personal/redirectCacheSize", redirectCacheTtl);
+    emit redirectCacheTtlChanged(redirectCacheTtl);
+}
+
 void SettingsCache::setClientID(const QString &_clientID)
 {
     clientID = _clientID;
@@ -1030,6 +1038,7 @@ void SettingsCache::loadPaths()
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
+    redirectCachePath = getSafeConfigPath("paths/redirects", getCachePath() + "/redirects/");
     // this has never been exposed as an user-configurable setting
     if (picsPath.endsWith("/")) {
         customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");

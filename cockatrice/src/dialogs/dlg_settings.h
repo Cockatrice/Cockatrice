@@ -174,6 +174,8 @@ private:
     QPushButton *updateNowButton;
     QLabel networkCacheLabel;
     QSpinBox networkCacheEdit;
+    QLabel networkRedirectCacheTtlLabel;
+    QSpinBox networkRedirectCacheTtlEdit;
     QSpinBox pixmapCacheEdit;
     QLabel pixmapCacheLabel;
 };

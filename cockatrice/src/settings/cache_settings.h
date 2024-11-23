@@ -16,15 +16,20 @@
 
 class ReleaseChannel;
 
-// size should be a multiple of 64
-#define PIXMAPCACHE_SIZE_DEFAULT 2047
+// In MB (Increments of 64)
+#define PIXMAPCACHE_SIZE_DEFAULT 2048
 #define PIXMAPCACHE_SIZE_MIN 64
-#define PIXMAPCACHE_SIZE_MAX 2047
+#define PIXMAPCACHE_SIZE_MAX 4096
 
 // In MB
 constexpr int NETWORK_CACHE_SIZE_DEFAULT = 1024 * 4; // 4 GB
 constexpr int NETWORK_CACHE_SIZE_MIN = 1;            // 1 MB
 constexpr int NETWORK_CACHE_SIZE_MAX = 1024 * 1024;  // 1 TB
+
+// In Days
+#define NETWORK_REDIRECT_CACHE_TTL_DEFAULT 30
+#define NETWORK_REDIRECT_CACHE_TTL_MIN 1
+#define NETWORK_REDIRECT_CACHE_TTL_MAX 90
 
 #define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
@@ -53,6 +58,7 @@ signals:
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void networkCacheSizeChanged(int newSizeInMBs);
+    void redirectCacheTtlChanged(int newTtl);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
@@ -73,8 +79,8 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
-        spoilerDatabasePath, tokenDatabasePath, themeName;
+    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
+        customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
@@ -116,6 +122,7 @@ private:
     bool useTearOffMenus;
     int pixmapCacheSize;
     int networkCacheSize;
+    int redirectCacheTtl;
     bool scaleCards;
     int verticalCardOverlapPercent;
     bool showMessagePopups;
@@ -182,6 +189,10 @@ public:
     QString getPicsPath() const
     {
         return picsPath;
+    }
+    QString getRedirectCachePath() const
+    {
+        return redirectCachePath;
     }
     QString getCustomPicsPath() const
     {
@@ -355,6 +366,10 @@ public:
     int getNetworkCacheSizeInMB() const
     {
         return networkCacheSize;
+    }
+    int getRedirectCacheTtl() const
+    {
+        return redirectCacheTtl;
     }
     bool getScaleCards() const
     {
@@ -557,6 +572,7 @@ public slots:
     void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
+    void setNetworkRedirectCacheTtl(const int _redirectCacheTtl);
     void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
     void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups);
