@@ -658,7 +658,7 @@ void SettingsCache::setNetworkCacheSizeInMB(const int _networkCacheSize)
     emit networkCacheSizeChanged(networkCacheSize);
 }
 
-void SettingsCache::setRedirectCacheTtl(const int _redirectCacheTtl)
+void SettingsCache::setNetworkRedirectCacheTtl(const int _redirectCacheTtl)
 {
     redirectCacheTtl = _redirectCacheTtl;
     settings->setValue("personal/redirectCacheSize", redirectCacheTtl);

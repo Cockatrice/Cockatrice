@@ -572,7 +572,7 @@ public slots:
     void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
-    void setRedirectCacheTtl(const int _redirectCacheTtl);
+    void setNetworkRedirectCacheTtl(const int _redirectCacheTtl);
     void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
     void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups);

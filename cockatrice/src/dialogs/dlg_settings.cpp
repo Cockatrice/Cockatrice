@@ -669,15 +669,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
-    // On a change to the check box, hide/unhide the other fields
+    // On a change to the checkbox, hide/un-hide the other fields
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
             SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
-    connect(&networkRedirectCacheTtlEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
-            SLOT(setNetworkRedirectCacheTtl(int)));
     connect(&networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
             SLOT(setNetworkCacheSizeInMB(int)));
+    connect(&networkRedirectCacheTtlEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+            SLOT(setNetworkRedirectCacheTtl(int)));
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
