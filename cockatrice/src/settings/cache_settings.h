@@ -16,10 +16,10 @@
 
 class ReleaseChannel;
 
-// size should be a multiple of 64
-#define PIXMAPCACHE_SIZE_DEFAULT 2047
+// In MB (Increments of 64)
+#define PIXMAPCACHE_SIZE_DEFAULT 2048
 #define PIXMAPCACHE_SIZE_MIN 64
-#define PIXMAPCACHE_SIZE_MAX 2047
+#define PIXMAPCACHE_SIZE_MAX 4096
 
 // In MB
 constexpr int NETWORK_CACHE_SIZE_DEFAULT = 1024 * 4; // 4 GB

@@ -655,8 +655,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
     lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
-    lpGeneralGrid->addLayout(networkRedirectCacheLayout, 3, 0, 1, 2);
-    lpGeneralGrid->addLayout(pixmapCacheLayout, 4, 0, 1, 2);
+    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 0, 1, 2);
+    lpGeneralGrid->addLayout(networkRedirectCacheLayout, 4, 0, 1, 2);
     lpGeneralGrid->addWidget(&urlLinkLabel, 5, 0);
     lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 5, 1);
 
@@ -860,9 +860,9 @@ void DeckEditorSettingsPage::retranslateUi()
     resetDownloadURLs.setText(tr("Reset Download URLs"));
     networkCacheLabel.setText(tr("Network Cache Size:"));
     networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
-    networkRedirectCacheTtlLabel.setText(tr("Redirect cache expiration time in days"));
+    networkRedirectCacheTtlLabel.setText(tr("Redirect Cache TTL:"));
     networkRedirectCacheTtlEdit.setToolTip(tr("How long cached redirects for urls are valid for."));
-    pixmapCacheLabel.setText(tr("Picture cache size:"));
+    pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
 }
 
