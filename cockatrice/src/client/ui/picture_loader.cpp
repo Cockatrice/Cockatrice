@@ -544,7 +544,7 @@ void PictureLoaderWorker::cleanStaleEntries()
 
     auto it = redirectCache.begin();
     while (it != redirectCache.end()) {
-        if (it.value().second.addDays(CacheTTLInDays) < now) {
+        if (it.value().second.addDays(SettingsCache::instance().getRedirectCacheTtl()) < now) {
             it = redirectCache.erase(it); // Remove stale entry
         } else {
             ++it;

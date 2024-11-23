@@ -629,10 +629,21 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
     networkCacheEdit.setSuffix(" MB");
 
+    networkRedirectCacheTtlEdit.setMinimum(NETWORK_REDIRECT_CACHE_TTL_MIN);
+    networkRedirectCacheTtlEdit.setMaximum(NETWORK_REDIRECT_CACHE_TTL_MAX);
+    networkRedirectCacheTtlEdit.setSingleStep(1);
+    networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
+    networkRedirectCacheTtlEdit.setSuffix(" Days");
+
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
     networkCacheLayout->addWidget(&networkCacheLabel);
     networkCacheLayout->addWidget(&networkCacheEdit);
+
+    auto networkRedirectCacheLayout = new QHBoxLayout;
+    networkRedirectCacheLayout->addStretch();
+    networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlLabel);
+    networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlEdit);
 
     auto pixmapCacheLayout = new QHBoxLayout;
     pixmapCacheLayout->addStretch();
@@ -644,9 +655,10 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
     lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
-    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 0, 1, 2);
-    lpGeneralGrid->addWidget(&urlLinkLabel, 4, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 4, 1);
+    lpGeneralGrid->addLayout(networkRedirectCacheLayout, 3, 0, 1, 2);
+    lpGeneralGrid->addLayout(pixmapCacheLayout, 4, 0, 1, 2);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 5, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 5, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -662,6 +674,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
             SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
+    connect(&networkRedirectCacheTtlEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
+            SLOT(setNetworkRedirectCacheTtl(int)));
     connect(&networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
             SLOT(setNetworkCacheSizeInMB(int)));
 
@@ -846,6 +860,8 @@ void DeckEditorSettingsPage::retranslateUi()
     resetDownloadURLs.setText(tr("Reset Download URLs"));
     networkCacheLabel.setText(tr("Network Cache Size:"));
     networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
+    networkRedirectCacheTtlLabel.setText(tr("Redirect cache expiration time in days"));
+    networkRedirectCacheTtlEdit.setToolTip(tr("How long cached redirects for urls are valid for."));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
 }
