@@ -162,6 +162,10 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
         if (playbackMode == BACKWARD_SKIP || currentTime - replayTimeline[currentEvent] > BIG_SKIP_MS)
             options |= Player::EventProcessingOption::SKIP_REVEAL_WINDOW;
 
+        // backwards skip => always skip tap animation
+        if (playbackMode == BACKWARD_SKIP)
+            options |= Player::EventProcessingOption::SKIP_TAP_ANIMATION;
+
         emit processNextEvent(options);
         ++currentEvent;
     }

@@ -1893,7 +1893,8 @@ void Player::setCardAttrHelper(const GameEventContext &context,
                                CardItem *card,
                                CardAttribute attribute,
                                const QString &avalue,
-                               bool allCards)
+                               bool allCards,
+                               EventProcessingOptions options)
 {
     if (card == nullptr) {
         return;
@@ -1907,7 +1908,8 @@ void Player::setCardAttrHelper(const GameEventContext &context,
                 if (!allCards) {
                     emit logSetTapped(this, card, tapped);
                 }
-                card->setTapped(tapped, !moveCardContext);
+                bool canAnimate = !options.testFlag(SKIP_TAP_ANIMATION) && !moveCardContext;
+                card->setTapped(tapped, canAnimate);
             }
             break;
         }
@@ -2049,7 +2051,9 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     zone->addCard(card, true, event.x(), event.y());
 }
 
-void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context)
+void Player::eventSetCardAttr(const Event_SetCardAttr &event,
+                              const GameEventContext &context,
+                              EventProcessingOptions options)
 {
     CardZone *zone = zones.value(QString::fromStdString(event.zone_name()), 0);
     if (!zone) {
@@ -2059,8 +2063,8 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventCon
     if (!event.has_card_id()) {
         const CardList &cards = zone->getCards();
         for (int i = 0; i < cards.size(); ++i) {
-            setCardAttrHelper(context, cards.at(i), event.attribute(), QString::fromStdString(event.attr_value()),
-                              true);
+            setCardAttrHelper(context, cards.at(i), event.attribute(), QString::fromStdString(event.attr_value()), true,
+                              options);
         }
         if (event.attribute() == AttrTapped) {
             emit logSetTapped(this, nullptr, event.attr_value() == "1");
@@ -2071,7 +2075,7 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event, const GameEventCon
             qWarning() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
         }
-        setCardAttrHelper(context, card, event.attribute(), QString::fromStdString(event.attr_value()), false);
+        setCardAttrHelper(context, card, event.attribute(), QString::fromStdString(event.attr_value()), false, options);
     }
 }
 
@@ -2444,7 +2448,7 @@ void Player::processGameEvent(GameEvent::GameEventType type,
             eventCreateToken(event.GetExtension(Event_CreateToken::ext));
             break;
         case GameEvent::SET_CARD_ATTR:
-            eventSetCardAttr(event.GetExtension(Event_SetCardAttr::ext), context);
+            eventSetCardAttr(event.GetExtension(Event_SetCardAttr::ext), context, options);
             break;
         case GameEvent::SET_CARD_COUNTER:
             eventSetCardCounter(event.GetExtension(Event_SetCardCounter::ext));
