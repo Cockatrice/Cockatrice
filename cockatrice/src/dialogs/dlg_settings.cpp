@@ -633,7 +633,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkRedirectCacheTtlEdit.setMaximum(NETWORK_REDIRECT_CACHE_TTL_MAX);
     networkRedirectCacheTtlEdit.setSingleStep(1);
     networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
-    networkRedirectCacheTtlEdit.setSuffix(" Days");
+    networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));
 
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
