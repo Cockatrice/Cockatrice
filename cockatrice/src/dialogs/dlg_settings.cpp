@@ -588,8 +588,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(urlList->model(), SIGNAL(rowsMoved(const QModelIndex, int, int, const QModelIndex, int)), this,
             SLOT(urlListChanged(const QModelIndex, int, int, const QModelIndex, int)));
 
-    foreach (QString url, SettingsCache::instance().downloads().getAllURLs())
+    for (QString url : SettingsCache::instance().downloads().getAllURLs()) {
         urlList->addItem(url);
+    }
 
     auto aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
