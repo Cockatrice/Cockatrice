@@ -14,16 +14,8 @@ public:
     explicit DownloadSettings(const QString &, QObject *);
 
     QStringList getAllURLs();
-    QString getDownloadUrlAt(int);
-    void setDownloadUrlAt(int, const QString &);
-    int getCount();
-    void clear();
-
-private:
-    QStringList downloadURLs;
-
-private:
-    void populateDefaultURLs();
+    void setDownloadUrls(const QStringList &downloadURLs);
+    void resetToDefaultURLs();
 };
 
 #endif // COCKATRICE_DOWNLOADSETTINGS_H
