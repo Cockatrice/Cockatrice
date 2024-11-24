@@ -38,9 +38,9 @@ Available Installer/Binaries:
 Available binaries for easy installation:
 Available pre-compiled binaries for installation:
 
-  <b>Windows</b>
-   • <kbd>Windows 10+</kbd>
-   • <kbd>Windows 7+</kbd>
+  Windows
+   • <b>Windows 10+</b>
+   • <b>Windows 7+</b>
 
  • macOS
    ◦ macOS 12+ <kbd><i>Monterey</i></kbd>
@@ -49,12 +49,12 @@ Available pre-compiled binaries for installation:
  • <b>Linux</b>
    - <b>Ubuntu 23.04</b> <kbd>Lunar Lobster</kbd>
    - <b>Ubuntu 22.04 LTS</b> <kbd><i>Jammy Jellyfish</i></kbd>
-   - <kbd>Ubuntu 20.04 LTS</kbd> <sub><i>Focal Fossa</i></sub>
-   - <kbd>Ubuntu 18.04 LTS</kbd> <sub><i>Bionic Beaver</i></sub>
-   - <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
-   - <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
-   - <kbd>Fedora 38</kbd>
-   - <kbd>Fedora 37</kbd>
+   - <b>Ubuntu 20.04 LTS</b> <sub><i>Focal Fossa</i></sub>
+   - <b>Ubuntu 18.04 LTS</b> <sub><i>Bionic Beaver</i></sub>
+   - <b>Debian 12</b> <sub><i>Bookworm</i></sub>
+   - <b>Debian 11</b> <sub><i>Bullseye</i></sub>
+   - <b>Fedora 38</b>
+   - <b>Fedora 37</b>
 
 <sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
 <sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
