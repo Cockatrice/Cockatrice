@@ -524,7 +524,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     setLayout(mainLayout);
 }
 
-void UserInterfaceSettingsPage::setNotificationEnabled(int i)
+void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
 {
     specNotificationsEnabledCheckBox.setEnabled(i != 0);
     buddyConnectNotificationsEnabledCheckBox.setEnabled(i != 0);

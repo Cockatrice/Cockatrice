@@ -113,7 +113,7 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
 {
     Q_OBJECT
 private slots:
-    void setNotificationEnabled(int);
+    void setNotificationEnabled(QT_STATE_CHANGED_T);
 
 private:
     QCheckBox notificationsEnabledCheckBox;
