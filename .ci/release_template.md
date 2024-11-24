@@ -7,20 +7,25 @@ git push -d origin --REPLACE-WITH-BETA-LIST--
 <!-- This list of binaries should be updated every time the ci is changed to
 include different targets -->
 <pre>
-<b>Pre-compiled binaries we serve:</b>
-  Windows
-   - <kbd>Windows 10+</kbd>
-   - <kbd>Windows 7+</kbd>
-  macOS
-   - <kbd>macOS 12+</kbd> ("Monterey")
-   - <kbd>macOS 10.15+</kbd> ("Catalina")
-  Linux
-   - <kbd>Ubuntu 23.04</kbd> ("Lunar Lobster")
-   - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
-   - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
-   - <kbd>Ubuntu 18.04 LTS</kbd> ("Bionic Beaver")
-   - <kbd>Debian 12</kbd> ("Bookworm")
-   - <kbd>Debian 11</kbd> ("Bullseye")
+Available Installer/Binaries:
+Available binaries for easy installation:
+Available pre-compiled binaries for installation:
+
+  <b>Windows</b>
+   • <kbd>Windows 10+</kbd>
+   • <kbd>Windows 7+</kbd>
+
+ • <b>macOS</b>
+   ◦ <kbd>macOS 12+</kbd> <sub><i>Monterey</i></sub>
+   ◦ <kbd>macOS 10.15+</kbd> <sub><i>Catalina</i></sub>
+
+ • <b>Linux</b>
+   - <kbd>Ubuntu 23.04</kbd> <sub><i>Lunar Lobster</i></sub>
+   - <kbd>Ubuntu 22.04 LTS</kbd> <sub><i>Jammy Jellyfish</i></sub>
+   - <kbd>Ubuntu 20.04 LTS</kbd> <sub><i>Focal Fossa</i></sub>
+   - <kbd>Ubuntu 18.04 LTS</kbd> <sub><i>Bionic Beaver</i></sub>
+   - <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
+   - <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
    - <kbd>Fedora 38</kbd>
    - <kbd>Fedora 37</kbd>
 
@@ -28,6 +33,32 @@ include different targets -->
 <sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
 </pre>
 
+<pre>
+Available Installer/Binaries:
+Available binaries for easy installation:
+Available pre-compiled binaries for installation:
+
+  <b>Windows</b>
+   • <kbd>Windows 10+</kbd>
+   • <kbd>Windows 7+</kbd>
+
+ • macOS
+   ◦ macOS 12+ <kbd><i>Monterey</i></kbd>
+   ◦ macOS 10.15+ <kbd><i>Catalina</i></kbd>
+
+ • <b>Linux</b>
+   - <b>Ubuntu 23.04</b> <kbd>Lunar Lobster</kbd>
+   - <b>Ubuntu 22.04 LTS</b> <kbd><i>Jammy Jellyfish</i></kbd>
+   - <kbd>Ubuntu 20.04 LTS</kbd> <sub><i>Focal Fossa</i></sub>
+   - <kbd>Ubuntu 18.04 LTS</kbd> <sub><i>Bionic Beaver</i></sub>
+   - <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
+   - <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
+   - <kbd>Fedora 38</kbd>
+   - <kbd>Fedora 37</kbd>
+
+<sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
+<sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
+</pre>
 
 ## General Notes
 
