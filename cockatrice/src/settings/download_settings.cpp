@@ -12,19 +12,9 @@ void DownloadSettings::setDownloadUrls(const QStringList &downloadURLs)
     setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
 }
 
-/**
- * If reset or first run, this method contains the default URLs we will populate
- */
 QStringList DownloadSettings::getAllURLs()
 {
-    auto downloadURLs = getValue("urls", "downloads").toStringList();
-
-    // First run, these will be empty
-    if (downloadURLs.count() == 0) {
-        resetToDefaultURLs();
-    }
-
-    return downloadURLs;
+    return getValue("urls", "downloads").toStringList();
 }
 
 void DownloadSettings::resetToDefaultURLs()

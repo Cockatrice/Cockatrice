@@ -878,6 +878,7 @@ void MainWindow::startupConfigCheck()
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
+        SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
