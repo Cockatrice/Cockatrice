@@ -666,6 +666,7 @@ void MainWindow::retranslateUi()
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
+    aReloadCardDatabase->setText(tr("Reload card database"));
 
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
@@ -714,6 +715,8 @@ void MainWindow::createActions()
     connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
     aAddCustomSet = new QAction(QString(), this);
     connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+    aReloadCardDatabase = new QAction(QString(), this);
+    connect(aReloadCardDatabase, SIGNAL(triggered()), this, SLOT(actReloadCardDatabase()));
 
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
@@ -788,6 +791,8 @@ void MainWindow::createMenus()
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
     dbMenu->addAction(aAddCustomSet);
+    dbMenu->addSeparator();
+    dbMenu->addAction(aReloadCardDatabase);
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
@@ -1322,6 +1327,11 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
     }
 
     return maxIndex + 1;
+}
+
+void MainWindow::actReloadCardDatabase()
+{
+    const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 }
 
 void MainWindow::actManageSets()
