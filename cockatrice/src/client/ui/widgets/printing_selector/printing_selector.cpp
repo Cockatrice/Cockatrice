@@ -312,6 +312,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
                 new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
                                                       selectedCard, prependedSets[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
+            cardDisplayWidget->clampSetNameToPicture();
         }
 
         // Stop timer when done

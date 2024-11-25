@@ -99,6 +99,8 @@ void CardInfoPictureWidget::setScaleFactor(const int scale)
 
     setFixedSize(newWidth, newHeight);
     updatePixmap();
+
+    emit cardScaleFactorChanged(scale);
 }
 
 /**
