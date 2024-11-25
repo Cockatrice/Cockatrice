@@ -707,6 +707,25 @@ bool CardDatabase::isProviderIdForPreferredPrinting(const QString &cardName, con
     return providerId == getPreferredPrintingProviderIdForCard(cardName);
 }
 
+CardInfoPerSet CardDatabase::getSetInfoForCard(const CardInfoPtr &_card)
+{
+    const CardInfoPerSetMap &setMap = _card->getSets();
+    if (setMap.empty()) {
+        return CardInfoPerSet(nullptr);
+    }
+
+    for (const auto &x : setMap) {
+        for (auto &cardInfoForSet : x) {
+            if (QLatin1String("card_") + _card->getName() + QString("_") + cardInfoForSet.getProperty("uuid") ==
+                _card->getPixmapCacheKey()) {
+                return cardInfoForSet;
+            }
+        }
+    }
+
+    return CardInfoPerSet(nullptr);
+}
+
 void CardDatabase::refreshCachedReverseRelatedCards()
 {
     for (const CardInfoPtr &card : cards)

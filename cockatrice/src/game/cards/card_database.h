@@ -487,6 +487,7 @@ public:
 
     CardSetPtr getSet(const QString &setName);
     bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
+    static CardInfoPerSet getSetInfoForCard(const CardInfoPtr &_card);
     QList<CardInfoPtr> getCardList() const
     {
         return cards.values();

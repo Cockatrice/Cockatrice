@@ -1740,7 +1740,8 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+            cardRelation->getName(), sourceCard->getProviderId());
         setLastToken(cardInfo);
     }
 }
@@ -1903,11 +1904,13 @@ void Player::createCard(const CardItem *sourceCard,
         case CardRelation::AttachTo:
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
+            cmd.set_card_provider_id(sourceCard->getProviderId().toStdString());
             break;
 
         case CardRelation::TransformInto:
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::TRANSFORM_INTO);
+            cmd.set_card_provider_id(sourceCard->getProviderId().toStdString());
             break;
     }
 
@@ -2066,7 +2069,8 @@ void Player::eventCreateToken(const Event_CreateToken &event)
         return;
     }
 
-    CardItem *card = new CardItem(this, nullptr, QString::fromStdString(event.card_name()), QString(), event.card_id());
+    CardItem *card = new CardItem(this, nullptr, QString::fromStdString(event.card_name()),
+                                  QString::fromStdString(event.card_provider_id()), event.card_id());
     // use db PT if not provided in event
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
@@ -3712,13 +3716,17 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
+    const auto &currentCardSet = CardDatabase::getSetInfoForCard(cardInfo);
+
     cardMenu->addSeparator();
     auto viewRelatedCards = new QMenu(tr("View related cards"));
     cardMenu->addMenu(viewRelatedCards);
     for (const CardRelation *relatedCard : relatedCards) {
         QString relatedCardName = relatedCard->getName();
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        connect(viewCard, &QAction::triggered, game, [this, relatedCardName] { game->viewCardInfo(relatedCardName); });
+        connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
+            game->viewCardInfo(relatedCardName, currentCardSet.getProperty("uuid"));
+        });
     }
 }
 
@@ -3737,13 +3745,20 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
+    const auto &currentCardSet = CardDatabase::getSetInfoForCard(cardInfo);
+
     cardMenu->addSeparator();
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
-        if (relatedCard == nullptr)
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+            cardRelation->getName(), currentCardSet.getProperty("uuid"));
+        if (relatedCard == nullptr) {
+            relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        }
+        if (relatedCard == nullptr) {
             continue;
+        }
 
         QString relatedCardName;
         if (relatedCard->getPowTough().size() > 0) {
