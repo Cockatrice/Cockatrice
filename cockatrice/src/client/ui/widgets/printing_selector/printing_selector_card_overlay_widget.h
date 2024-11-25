@@ -30,6 +30,8 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void customMenu(QPoint point);
 
 private:
     CardInfoPictureWidget *cardInfoPicture;
