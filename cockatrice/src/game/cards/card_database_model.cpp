@@ -97,9 +97,11 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    for (const auto &set : card->getSets()) {
-        if (set.getPtr()->getEnabled())
-            return true;
+    for (const auto &x : card->getSets()) {
+        for (const auto &set : x) {
+            if (set.getPtr()->getEnabled())
+                return true;
+        }
     }
 
     return false;

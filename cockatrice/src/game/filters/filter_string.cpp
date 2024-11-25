@@ -109,9 +109,11 @@ static void setupParserRules()
     search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         StringMatcher matcher = sv[0].get<StringMatcher>();
         return [=](CardData x) -> bool {
-            for (const auto &set : x->getSets().values()) {
-                if (matcher(set.getProperty("rarity")))
-                    return true;
+            for (const auto &y : x->getSets().values()) {
+                for (const auto &set : y) {
+                    if (matcher(set.getProperty("rarity")))
+                        return true;
+                }
             }
             return false;
         };

@@ -167,9 +167,11 @@ CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
 {
     CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
 
-    for (const auto &cardInfoPerSet : cardInfoPerSets) {
-        if (cardInfoPerSet.getProperty("uuid") == uuid) {
-            return cardInfoPerSet;
+    for (const auto &x : cardInfoPerSets) {
+        for (const auto &cardInfoPerSet : x) {
+            if (cardInfoPerSet.getProperty("uuid") == uuid) {
+                return cardInfoPerSet;
+            }
         }
     }
 
@@ -182,15 +184,18 @@ QList<CardInfoPerSet> PrintingSelector::prependPrintingsInDeck(const QList<CardI
     QList<QPair<CardInfoPerSet, int>> countList;
 
     // Collect sets with their counts
-    for (const auto &cardInfoPerSet : cardInfoPerSets) {
-        QModelIndex find_card =
-            deckModel->findCard(selectedCard->getName(), DECK_ZONE_MAIN, cardInfoPerSet.getProperty("uuid"));
-        if (find_card.isValid()) {
-            int count =
-                deckModel->data(find_card, Qt::DisplayRole).toInt(); // Ensure the count is treated as an integer
-            if (count > 0) {
-                countList.append(qMakePair(cardInfoPerSet, count));
+    for (const auto &x : cardInfoPerSets) {
+        for (const auto &cardInfoPerSet : x) {
+            QModelIndex find_card =
+                deckModel->findCard(selectedCard->getName(), DECK_ZONE_MAIN, cardInfoPerSet.getProperty("uuid"));
+            if (find_card.isValid()) {
+                int count =
+                    deckModel->data(find_card, Qt::DisplayRole).toInt(); // Ensure the count is treated as an integer
+                if (count > 0) {
+                    countList.append(qMakePair(cardInfoPerSet, count));
+                }
             }
+            break;
         }
     }
 
@@ -226,8 +231,11 @@ QList<CardInfoPerSet> PrintingSelector::sortSets()
 
     QList<CardSetPtr> sortedSets;
 
-    for (const auto &set : cardInfoPerSets) {
-        sortedSets << set.getPtr();
+    for (const auto &x : cardInfoPerSets) {
+        for (const auto &set : x) {
+            sortedSets << set.getPtr();
+            break;
+        }
     }
 
     if (sortedSets.empty()) {
@@ -244,8 +252,11 @@ QList<CardInfoPerSet> PrintingSelector::sortSets()
     // Reconstruct sorted list of CardInfoPerSet
     for (const auto &set : sortedSets) {
         for (auto it = cardInfoPerSets.begin(); it != cardInfoPerSets.end(); ++it) {
-            if (it.value().getPtr() == set) {
-                sortedCardInfoPerSets << it.value();
+            for (const auto &x : it.value()) {
+                if (x.getPtr() == set) {
+                    sortedCardInfoPerSets << it.value();
+                    break;
+                }
             }
         }
     }
