@@ -23,7 +23,7 @@ class ICardDatabaseParser;
 typedef QMap<QString, QString> QStringMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
-typedef QMap<QString, CardInfoPerSet> CardInfoPerSetMap;
+typedef QMap<QString, QList<CardInfoPerSet>> CardInfoPerSetMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
@@ -306,15 +306,36 @@ public:
     {
         if (!sets.contains(setName))
             return "";
-        return sets[setName].getProperty(propertyName);
-    }
-    void setSetProperty(const QString &setName, const QString &_name, const QString &_value)
-    {
-        if (!sets.contains(setName))
-            return;
 
-        sets[setName].setProperty(_name, _value);
-        emit cardInfoChanged(smartThis);
+        /*
+        for (const auto &x : card->getSets()) {
+            for (const auto &set : x) {
+                if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                    card->getPixmapCacheKey()) {
+                    long long setIndex = sortedSets.indexOf(set.getPtr());
+                    CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+                    sortedSets.prepend(setForCardProviderID);
+                    }
+            }
+        }
+        */
+
+        for (const auto &set : sets[setName]) {
+            if (QLatin1String("card_") + this->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                this->getPixmapCacheKey()) {
+                return set.getProperty(propertyName);
+            }
+        }
+
+        return sets[setName][0].getProperty(propertyName);
+    }
+    void setSetProperty(const QString &, const QString &, const QString &)
+    {
+        // if (!sets.contains(setName))
+        //     return;
+        //
+        // sets[setName].setProperty(_name, _value);
+        // emit cardInfoChanged(smartThis);
     }
 
     // related cards

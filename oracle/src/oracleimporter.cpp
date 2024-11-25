@@ -176,7 +176,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
     CardInfoPerSetMap setsInfo;
-    setsInfo.insert(setInfo.getPtr()->getShortName(), setInfo);
+    setsInfo[setInfo.getPtr()->getShortName()].append(setInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, tableRow, upsideDown);
 
@@ -193,9 +193,7 @@ QString OracleImporter::getStringPropertyFromMap(const QVariantMap &card, const 
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
 
-int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
-                                       const QList<QVariant> &cardsList,
-                                       bool skipSpecialCards)
+int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList)
 {
     // mtgjson name => xml name
     static const QMap<QString, QString> cardProperties{
@@ -224,11 +222,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
     for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
-
-        // skip alternatives
-        if (getStringPropertyFromMap(card, "isAlternative") == "true") {
-            continue;
-        }
 
         /* Currently used layouts are:
          * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
@@ -286,42 +279,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         }
 
         QString numComponent{};
-        if (skipSpecialCards) {
-            QString numProperty = setInfo.getProperty("num");
-            // skip promo cards if it's not the only print, cards with two faces are different cards
-            if (allNameProps.contains(faceName)) {
-                // check for alternative versions
-                if (layout != "normal")
-                    continue;
-
-                // alternative versions have a letter in the end of num like abc
-                // note this will also catch p and s, those will get removed later anyway
-                QChar lastChar = numProperty.at(numProperty.size() - 1);
-                if (!lastChar.isLetter())
-                    continue;
-
-                numComponent = " (" + QString(lastChar) + ")";
-                faceName += numComponent; // add to facename to make it unique
-            }
-            if (getStringPropertyFromMap(card, "isPromo") == "true") {
-                specialPromoCards.insert(faceName, cardVar);
-                continue;
-            }
-            bool skip = false;
-            // skip cards containing special stuff in the collectors number like promo cards
-            for (const QString &specialChar : specialNumChars) {
-                if (numProperty.contains(specialChar)) {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip) {
-                specialPromoCards.insert(faceName, cardVar);
-                continue;
-            } else {
-                allNameProps.append(faceName);
-            }
-        }
 
         // special handling properties
         colors = card.value("colors").toStringList().join("");
@@ -463,18 +420,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         numCards++;
     }
 
-    // only add the unique promo cards that didn't already exist in the set
-    if (skipSpecialCards) {
-        QList<QVariant> nonDuplicatePromos;
-        for (auto cardIter = specialPromoCards.constBegin(); cardIter != specialPromoCards.constEnd(); ++cardIter) {
-            if (!allNameProps.contains(cardIter.key())) {
-                nonDuplicatePromos.append(cardIter.value());
-            }
-        }
-        if (!nonDuplicatePromos.isEmpty()) {
-            numCards += importCardsFromSet(currentSet, nonDuplicatePromos, false);
-        }
-    }
     return numCards;
 }
 

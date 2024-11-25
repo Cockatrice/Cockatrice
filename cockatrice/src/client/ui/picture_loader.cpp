@@ -32,20 +32,24 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
     : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
-        for (const auto &set : card->getSets()) {
-            sortedSets << set.getPtr();
+        for (const auto &x : card->getSets()) {
+            for (const auto &set : x) {
+                sortedSets << set.getPtr();
+            }
         }
         if (sortedSets.empty()) {
             sortedSets << CardSet::newInstance("", "", "", QDate());
         }
         std::sort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-        for (const auto &set : card->getSets()) {
-            if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
-                card->getPixmapCacheKey()) {
-                long long setIndex = sortedSets.indexOf(set.getPtr());
-                CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
-                sortedSets.prepend(setForCardProviderID);
+        for (const auto &x : card->getSets()) {
+            for (const auto &set : x) {
+                if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                    card->getPixmapCacheKey()) {
+                    long long setIndex = sortedSets.indexOf(set.getPtr());
+                    CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+                    sortedSets.prepend(setForCardProviderID);
+                }
             }
         }
         // The first time called, nextSet will also populate the Urls for the first set.
