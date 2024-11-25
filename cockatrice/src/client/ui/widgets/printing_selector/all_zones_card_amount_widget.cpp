@@ -49,9 +49,9 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-void AllZonesCardAmountWidget::enterEvent(QEnterEvent *event)
+void AllZonesCardAmountWidget::enterEvent(QEnterEvent *event) override
 #else
-void AllZonesCardAmountWidget::enterEvent(QEvent *event)
+void AllZonesCardAmountWidget::enterEvent(QEvent *event) override
 #endif
 {
     QWidget::enterEvent(event);
