@@ -13,6 +13,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#define BATCH_SIZE 10
+
 class TabDeckEditor;
 class PrintingSelector : public QWidget
 {
@@ -61,6 +63,7 @@ private:
     QTreeView *deckView;
     CardInfoPtr selectedCard;
     QString currentZone;
+    int currentIndex = 0;
     void selectCard(int changeBy);
 };
 
