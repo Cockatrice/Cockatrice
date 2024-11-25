@@ -604,16 +604,16 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     aRemove->setToolTip(tr("Remove URL"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemoveURL()));
 
-    auto *messageToolBar = new QToolBar;
-    messageToolBar->setOrientation(Qt::Vertical);
-    messageToolBar->addAction(aAdd);
-    messageToolBar->addAction(aRemove);
-    messageToolBar->addAction(aEdit);
-    messageToolBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+    auto *urlToolBar = new QToolBar;
+    urlToolBar->setOrientation(Qt::Vertical);
+    urlToolBar->addAction(aAdd);
+    urlToolBar->addAction(aRemove);
+    urlToolBar->addAction(aEdit);
+    urlToolBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
-    auto *messageListLayout = new QHBoxLayout;
-    messageListLayout->addWidget(messageToolBar);
-    messageListLayout->addWidget(urlList);
+    auto *urlListLayout = new QHBoxLayout;
+    urlListLayout->addWidget(urlToolBar);
+    urlListLayout->addWidget(urlList);
 
     // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
@@ -653,7 +653,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
-    lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
+    lpGeneralGrid->addLayout(urlListLayout, 1, 0, 1, 2);
     lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
     lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 0, 1, 2);
     lpGeneralGrid->addLayout(networkRedirectCacheLayout, 4, 0, 1, 2);
