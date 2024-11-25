@@ -7744,7 +7744,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="590"/>
         <source>Refresh</source>
-        <translation>Refresh</translation>
+        <translation>Verversen</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="593"/>
