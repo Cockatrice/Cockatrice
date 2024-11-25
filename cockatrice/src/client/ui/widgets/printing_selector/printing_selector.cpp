@@ -26,6 +26,7 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout();
     setLayout(layout);
+    timer = new QTimer(this);
 
     sortToolBar = new QHBoxLayout(this);
 
@@ -103,6 +104,8 @@ void PrintingSelector::updateSortOrder()
 
 void PrintingSelector::updateDisplay()
 {
+    timer->stop();
+    timer = new QTimer(this);
     flowWidget->clearLayout();
     if (selectedCard != nullptr) {
         setWindowTitle(selectedCard->getName());
@@ -301,7 +304,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
 
     // Defer widget creation
     currentIndex = 0;
-    QTimer *timer = new QTimer(this);
+
     connect(timer, &QTimer::timeout, this, [=]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < prependedSets.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget =
