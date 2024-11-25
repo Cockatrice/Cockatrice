@@ -242,6 +242,8 @@ SettingsCache::SettingsCache()
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
+    overrideAllCardArtWithPersonalPreference =
+        settings->value("cards/overrideallcardartwithpersonalpreference", false).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -525,6 +527,13 @@ void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
     displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
+}
+
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt)
+{
+    overrideAllCardArtWithPersonalPreference = static_cast<bool>(_overrideAllCardArt);
+    settings->setValue("cards/overrideallcardartwithpersonalpreference", overrideAllCardArtWithPersonalPreference);
+    emit overrideAllCardArtWithPersonalPreferenceChanged();
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

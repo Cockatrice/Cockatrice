@@ -338,6 +338,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
     connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
 
+    overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(settings.getOverrideAllCardArtWithPersonalPreference());
+    connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
+            SLOT(setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T)));
+
     cardScalingCheckBox.setChecked(settings.getScaleCards());
     connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
 
@@ -354,6 +358,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
+    cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 2, 0, 1, 2);
     cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 2, 0, 1, 1);
     cardsGrid->addWidget(&verticalCardOverlapPercentBox, 2, 1, 1, 1);
     cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 3, 0);
@@ -452,6 +457,9 @@ void AppearanceSettingsPage::retranslateUi()
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
+    overrideAllCardArtWithPersonalPreferenceCheckBox.setText(
+        tr("Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client "
+           "restart]"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
