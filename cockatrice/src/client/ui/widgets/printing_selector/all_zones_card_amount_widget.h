@@ -24,7 +24,6 @@ public:
     void enterEvent(QEvent *event) override;
 #endif
 
-
 private:
     QVBoxLayout *layout;
     TabDeckEditor *deckEditor;
