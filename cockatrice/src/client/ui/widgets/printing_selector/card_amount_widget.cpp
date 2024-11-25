@@ -65,9 +65,6 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     // React to model changes
     connect(deckModel, &DeckListModel::dataChanged, this, &CardAmountWidget::updateCardCount);
     connect(deckModel, &QAbstractItemModel::rowsRemoved, this, &CardAmountWidget::updateCardCount);
-
-    // Initially hide UI elements
-    fadeAnimation = new QPropertyAnimation(this, "opacity");
 }
 
 void CardAmountWidget::paintEvent(QPaintEvent *event)
