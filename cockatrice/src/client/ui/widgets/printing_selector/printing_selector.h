@@ -63,6 +63,7 @@ private:
     QTreeView *deckView;
     CardInfoPtr selectedCard;
     QString currentZone;
+    QTimer *timer;
     int currentIndex = 0;
     void selectCard(int changeBy);
 };
