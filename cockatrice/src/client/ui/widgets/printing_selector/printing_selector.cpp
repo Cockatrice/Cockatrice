@@ -120,7 +120,9 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_curre
     if (isVisible()) {
         updateDisplay();
     }
+    flowWidget->setMinimumSizeToMaxSizeHint();
     flowWidget->scrollArea->verticalScrollBar()->setValue(0);
+    flowWidget->repaint();
 }
 
 void PrintingSelector::selectPreviousCard()
@@ -297,9 +299,23 @@ void PrintingSelector::getAllSetsForCurrentCard()
     const QList<CardInfoPerSet> filteredSets = filterSets(sortedSets);
     const QList<CardInfoPerSet> prependedSets = prependPrintingsInDeck(filteredSets);
 
-    for (const auto &cardInfoPerSet : prependedSets) {
-        auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(
-            this, deckEditor, deckModel, deckView, cardSizeSlider, selectedCard, cardInfoPerSet, currentZone);
-        flowWidget->addWidget(cardDisplayWidget);
-    }
+    // Defer widget creation
+    int batchSize = 10;
+    int currentIndex = 0;
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [=]() mutable {
+        for (int i = 0; i < batchSize && currentIndex < prependedSets.size(); ++i, ++currentIndex) {
+            auto *cardDisplayWidget =
+                new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
+                                                      selectedCard, prependedSets[currentIndex], currentZone);
+            flowWidget->addWidget(cardDisplayWidget);
+        }
+
+        // Stop timer when done
+        if (currentIndex >= prependedSets.size()) {
+            timer->stop();
+            timer->deleteLater();
+        }
+    });
+    timer->start(0); // Process as soon as possible
 }
