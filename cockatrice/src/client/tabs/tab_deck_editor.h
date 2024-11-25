@@ -61,7 +61,6 @@ private slots:
     void updateSearch(const QString &search);
     void databaseCustomMenu(QPoint point);
     void decklistCustomMenu(QPoint point);
-    void showPrintingSelector();
 
     void actNewDeck();
     void actLoadDeck();
@@ -187,6 +186,7 @@ public:
 
 public slots:
     void closeRequest() override;
+    void showPrintingSelector();
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
     void deckEditorClosing(TabDeckEditor *tab);

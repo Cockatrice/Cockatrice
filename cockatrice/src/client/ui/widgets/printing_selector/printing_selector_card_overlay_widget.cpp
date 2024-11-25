@@ -3,6 +3,8 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "printing_selector_card_display_widget.h"
 
+#include <QMenu>
+#include <QMouseEvent>
 #include <QVBoxLayout>
 
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
@@ -46,6 +48,15 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     connect(cardSizeSlider, &QSlider::valueChanged, cardInfoPicture, &CardInfoPictureWidget::setScaleFactor);
 }
 
+void PrintingSelectorCardOverlayWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton) {
+        customMenu(event->pos());
+    } else {
+        QWidget::mousePressEvent(event); // Pass other events to the base class
+    }
+}
+
 void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
 {
     // Ensure the amount widget matches the parent size
@@ -67,4 +78,26 @@ void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
     allZonesCardAmountWidget->setVisible(false);
+}
+
+void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
+{
+    QMenu menu;
+    // filling out the related cards submenu
+    auto *relatedMenu = new QMenu(tr("Show Related cards"));
+    menu.addMenu(relatedMenu);
+    auto relatedCards = rootCard->getAllRelatedCards();
+    if (relatedCards.isEmpty()) {
+        relatedMenu->setDisabled(true);
+    } else {
+        for (const CardRelation *rel : relatedCards) {
+            const QString &relatedCardName = rel->getName();
+            QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+            connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
+                deckEditor->updateCardInfo(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+                deckEditor->showPrintingSelector();
+            });
+        }
+    }
+    menu.exec(this->mapToGlobal(point));
 }
