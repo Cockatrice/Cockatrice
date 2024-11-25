@@ -529,7 +529,6 @@ void PictureLoaderWorker::loadRedirectCache()
 
 void PictureLoaderWorker::saveRedirectCache() const
 {
-    qDebug() << "Saving redirect cache";
     QSettings settings(cacheFilePath, QSettings::IniFormat);
 
     settings.beginWriteArray(REDIRECT_HEADER_NAME, static_cast<int>(redirectCache.size()));
