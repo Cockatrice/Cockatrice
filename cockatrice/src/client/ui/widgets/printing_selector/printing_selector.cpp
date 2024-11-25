@@ -105,6 +105,7 @@ void PrintingSelector::updateSortOrder()
 void PrintingSelector::updateDisplay()
 {
     timer->stop();
+    timer->deleteLater();
     timer = new QTimer(this);
     flowWidget->clearLayout();
     if (selectedCard != nullptr) {
@@ -316,7 +317,6 @@ void PrintingSelector::getAllSetsForCurrentCard()
         // Stop timer when done
         if (currentIndex >= prependedSets.size()) {
             timer->stop();
-            timer->deleteLater();
         }
     });
     currentIndex = 0;
