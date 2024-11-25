@@ -31,8 +31,9 @@ public:
                                       CardInfoPtr rootCard,
                                       CardInfoPerSet setInfoForCard,
                                       QString &currentZone);
-    void enterEvent(QEnterEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+
+public slots:
+    void clampSetNameToPicture();
 
 private:
     QVBoxLayout *layout;

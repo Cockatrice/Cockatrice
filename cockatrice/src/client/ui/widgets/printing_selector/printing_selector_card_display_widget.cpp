@@ -33,21 +33,14 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     setNameAndCollectorsNumberDisplayWidget =
         new SetNameAndCollectorsNumberDisplayWidget(this, combinedSetName, setInfoForCard.getProperty("num"));
 
-    layout->addWidget(overlayWidget);
+    layout->addWidget(overlayWidget, 0, Qt::AlignHCenter);
     layout->addWidget(setNameAndCollectorsNumberDisplayWidget, 1, Qt::AlignHCenter | Qt::AlignBottom);
-    setMouseTracking(true);
 }
 
-void PrintingSelectorCardDisplayWidget::enterEvent(QEnterEvent *event)
+void PrintingSelectorCardDisplayWidget::clampSetNameToPicture()
 {
-    QWidget::enterEvent(event);
+    if (overlayWidget != nullptr && setNameAndCollectorsNumberDisplayWidget != nullptr) {
+        setNameAndCollectorsNumberDisplayWidget->setMaximumWidth(overlayWidget->width());
+    }
     update();
-}
-
-void PrintingSelectorCardDisplayWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event); // Ensure the parent class handles the event first
-
-    // Set the maximum width for the setName QLabel
-    setNameAndCollectorsNumberDisplayWidget->setMaximumWidth(overlayWidget->width());
 }

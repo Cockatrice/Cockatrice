@@ -1,6 +1,7 @@
 #include "printing_selector_card_overlay_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "printing_selector_card_display_widget.h"
 
 #include <QVBoxLayout>
 
@@ -35,6 +36,12 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
     allZonesCardAmountWidget->setVisible(false);
+
+    // Attempt to cast the parent to PrintingSelectorCardDisplayWidget
+    if (const auto *parentWidget = qobject_cast<PrintingSelectorCardDisplayWidget *>(parent)) {
+        connect(cardInfoPicture, &CardInfoPictureWidget::cardScaleFactorChanged, parentWidget,
+                &PrintingSelectorCardDisplayWidget::clampSetNameToPicture);
+    }
 
     connect(cardSizeSlider, &QSlider::valueChanged, cardInfoPicture, &CardInfoPictureWidget::setScaleFactor);
 }
