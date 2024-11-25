@@ -41,14 +41,18 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
             sortedSets << CardSet::newInstance("", "", "", QDate());
         }
         std::sort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
-        // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-        for (const auto &x : card->getSets()) {
-            for (const auto &set : x) {
-                if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
-                    card->getPixmapCacheKey()) {
-                    long long setIndex = sortedSets.indexOf(set.getPtr());
-                    CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
-                    sortedSets.prepend(setForCardProviderID);
+
+        // If the user hasn't disabled arts other than their personal preference...
+        if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+            // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
+            for (const auto &x : card->getSets()) {
+                for (const auto &set : x) {
+                    if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                        card->getPixmapCacheKey()) {
+                        long long setIndex = sortedSets.indexOf(set.getPtr());
+                        CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+                        sortedSets.prepend(setForCardProviderID);
+                    }
                 }
             }
         }

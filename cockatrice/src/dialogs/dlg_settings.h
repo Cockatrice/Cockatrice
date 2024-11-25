@@ -91,6 +91,7 @@ private:
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
     QCheckBox displayCardNamesCheckBox;
+    QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
     QCheckBox cardScalingCheckBox;
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
