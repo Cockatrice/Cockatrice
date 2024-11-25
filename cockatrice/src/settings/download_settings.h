@@ -10,6 +10,8 @@ class DownloadSettings : public SettingsManager
     Q_OBJECT
     friend class SettingsCache;
 
+    static const QStringList DEFAULT_DOWNLOAD_URLS;
+
 public:
     explicit DownloadSettings(const QString &, QObject *);
 

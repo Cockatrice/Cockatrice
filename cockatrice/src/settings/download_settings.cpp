@@ -2,6 +2,12 @@
 
 #include "settings_manager.h"
 
+const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
+    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!",
+    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image",
+    "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
+    "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
+
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
     : SettingsManager(settingPath + "downloads.ini", parent)
 {
@@ -19,10 +25,5 @@ QStringList DownloadSettings::getAllURLs()
 
 void DownloadSettings::resetToDefaultURLs()
 {
-    auto downloadURLs = QStringList();
-    downloadURLs.append("https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!");
-    downloadURLs.append("https://api.scryfall.com/cards/multiverse/!set:muid!?format=image");
-    downloadURLs.append("https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card");
-    downloadURLs.append("https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card");
-    setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
+    setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls", "downloads");
 }
