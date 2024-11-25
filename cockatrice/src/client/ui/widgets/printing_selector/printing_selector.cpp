@@ -31,12 +31,13 @@ PrintingSelector::PrintingSelector(QWidget *parent,
 
     sortOptionsSelector = new QComboBox(this);
     sortOptionsSelector->addItems(SORT_OPTIONS);
+    sortOptionsSelector->setCurrentIndex(2);
     connect(sortOptionsSelector, &QComboBox::currentTextChanged, this, &PrintingSelector::updateDisplay);
     sortToolBar->addWidget(sortOptionsSelector);
 
     toggleSortOrder = new QPushButton(this);
-    toggleSortOrder->setText(tr("Ascending"));
-    descendingSort = false;
+    toggleSortOrder->setText(tr("Descending"));
+    descendingSort = true;
     connect(toggleSortOrder, &QPushButton::clicked, this, &PrintingSelector::updateSortOrder);
     sortToolBar->addWidget(toggleSortOrder);
 
