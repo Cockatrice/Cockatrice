@@ -18,7 +18,12 @@ public:
                                       QTreeView *deckView,
                                       CardInfoPtr rootCard,
                                       CardInfoPerSet setInfoForCard);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void enterEvent(QEnterEvent *event) override;
+#else
+    void enterEvent(QEvent *event) override;
+#endif
+
 
 private:
     QVBoxLayout *layout;
