@@ -300,11 +300,10 @@ void PrintingSelector::getAllSetsForCurrentCard()
     const QList<CardInfoPerSet> prependedSets = prependPrintingsInDeck(filteredSets);
 
     // Defer widget creation
-    int batchSize = 10;
-    int currentIndex = 0;
+    currentIndex = 0;
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [=]() mutable {
-        for (int i = 0; i < batchSize && currentIndex < prependedSets.size(); ++i, ++currentIndex) {
+        for (int i = 0; i < BATCH_SIZE && currentIndex < prependedSets.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget =
                 new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
                                                       selectedCard, prependedSets[currentIndex], currentZone);
@@ -317,5 +316,6 @@ void PrintingSelector::getAllSetsForCurrentCard()
             timer->deleteLater();
         }
     });
+    currentIndex = 0;
     timer->start(0); // Process as soon as possible
 }
