@@ -588,8 +588,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(urlList->model(), SIGNAL(rowsMoved(const QModelIndex, int, int, const QModelIndex, int)), this,
             SLOT(urlListChanged(const QModelIndex, int, int, const QModelIndex, int)));
 
-    for (int i = 0; i < SettingsCache::instance().downloads().getCount(); i++)
-        urlList->addItem(SettingsCache::instance().downloads().getDownloadUrlAt(i));
+    urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
 
     auto aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
@@ -694,7 +693,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 {
-    SettingsCache::instance().downloads().clear();
+    SettingsCache::instance().downloads().resetToDefaultURLs();
     urlList->clear();
     urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
     QMessageBox::information(this, tr("Success"), tr("Download URLs have been reset."));
@@ -774,11 +773,13 @@ void DeckEditorSettingsPage::actEditURL()
 void DeckEditorSettingsPage::storeSettings()
 {
     qInfo() << "URL Priority Reset";
-    SettingsCache::instance().downloads().clear();
+
+    QStringList downloadUrls;
     for (int i = 0; i < urlList->count(); i++) {
         qInfo() << "Priority" << i << ":" << urlList->item(i)->text();
-        SettingsCache::instance().downloads().setDownloadUrlAt(i, urlList->item(i)->text());
+        downloadUrls << urlList->item(i)->text();
     }
+    SettingsCache::instance().downloads().setDownloadUrls(downloadUrls);
 }
 
 void DeckEditorSettingsPage::urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int)
