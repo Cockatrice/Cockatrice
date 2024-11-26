@@ -68,9 +68,9 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
+void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event) override
 #else
-void CardInfoPictPrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
+void CardInfoPictPrintingSelectorCardOverlayWidget::enterEvent(QEvent *event) override
 #endif
 {
     QWidget::enterEvent(event);
