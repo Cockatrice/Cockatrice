@@ -3,6 +3,7 @@
 #include "game/cards/card_database_parser/cockatrice_xml_4.h"
 #include "qt-json/json.h"
 
+#include <QDebug>
 #include <QRegularExpression>
 #include <algorithm>
 #include <climits>
