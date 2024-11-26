@@ -9,21 +9,26 @@ CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_co
 {
 }
 
-CardItem *CardList::findCard(const int id) const
+/**
+ * @brief Finds the CardItem with the given id in the list.
+ * If contentsKnown is false, then this just returns the first element of the list.
+ *
+ * @param cardId The id of the card to find.
+ *
+ * @returns A pointer to the CardItem, or a nullptr if not found.
+ */
+CardItem *CardList::findCard(const int cardId) const
 {
-    if (!contentsKnown) {
-        if (empty())
-            return 0;
-        CardItem *temp = at(0);
-        return temp;
-    } else
-        for (int i = 0; i < size(); i++) {
-            CardItem *temp = at(i);
-            if (temp->getId() == id) {
-                return temp;
+    if (!contentsKnown && !empty()) {
+        return at(0);
+    } else {
+        for (auto *cardItem : *this) {
+            if (cardItem->getId() == cardId) {
+                return cardItem;
             }
         }
-    return 0;
+    }
+    return nullptr;
 }
 
 class CardList::compareFunctor
