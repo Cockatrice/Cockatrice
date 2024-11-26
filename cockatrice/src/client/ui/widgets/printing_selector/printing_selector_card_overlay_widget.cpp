@@ -67,7 +67,11 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
     resize(cardInfoPicture->size());
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
+#else
+void CardInfoPictPrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
+#endif
 {
     QWidget::enterEvent(event);
     allZonesCardAmountWidget->setVisible(true);
