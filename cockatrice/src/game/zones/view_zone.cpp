@@ -161,13 +161,13 @@ void ZoneViewZone::reorganizeCards()
         }
     }
 
+    int totalRows = (pileView && sortByType) ? longestRow : rows;
+    int totalColumns = (pileView && sortByType) ? qMax(typeColumn + 1, 3) : qMax(cols, 1);
+
     qreal aleft = 0;
     qreal atop = 0;
-    qreal awidth = (pileView && sortByType)
-                       ? qMax(typeColumn + 1, 3) * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING
-                       : qMax(cols, 1) * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
-    qreal aheight = (pileView && sortByType) ? (longestRow * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3
-                                             : (rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
+    qreal awidth = totalColumns * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
+    qreal aheight = (totalRows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
     optimumRect = QRectF(aleft, atop, awidth, aheight);
 
     updateGeometry();
