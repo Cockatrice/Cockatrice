@@ -151,6 +151,9 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray & /* _tabGameSplitt
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T /* _displayCardNames */)
 {
 }
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T /* _displayCardNames */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }
