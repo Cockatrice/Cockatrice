@@ -3,7 +3,7 @@
 #include "game/cards/card_database_parser/cockatrice_xml_4.h"
 #include "qt-json/json.h"
 
-#include <QtWidgets>
+#include <QRegularExpression>
 #include <algorithm>
 #include <climits>
 
@@ -42,7 +42,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         return false;
     }
 
-    QListIterator<QVariant> it(setsMap.values());
+    QListIterator it(setsMap.values());
     QVariantMap map;
 
     QString shortName;
@@ -211,13 +211,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, maintype, faceName;
-    static const bool isToken = false;
+    QString layout, name, text, colors, colorIdentity, faceName;
+    static constexpr bool isToken = false;
+    static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
-    static const QList<QString> specialNumChars = {"★", "s", "†"};
-    QMap<QString, QVariant> specialPromoCards;
     QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
@@ -244,7 +243,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // card properties
         properties.clear();
-        QMapIterator<QString, QString> it(cardProperties);
+        QMapIterator it(cardProperties);
         while (it.hasNext()) {
             it.next();
             QString mtgjsonProperty = it.key();
@@ -256,7 +255,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // per-set properties
         setInfo = CardInfoPerSet(currentSet);
-        QMapIterator<QString, QString> it2(setInfoProperties);
+        QMapIterator it2(setInfoProperties);
         while (it2.hasNext()) {
             it2.next();
             QString mtgjsonProperty = it2.key();
@@ -267,7 +266,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // Identifiers
-        QMapIterator<QString, QString> it3(identifierProperties);
+        QMapIterator it3(identifierProperties);
         while (it3.hasNext()) {
             it3.next();
             auto mtgjsonProperty = it3.key();
@@ -278,7 +277,16 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             }
         }
 
-        QString numComponent{};
+        QString numComponent;
+        const QString numProperty = setInfo.getProperty("num");
+        const QChar lastChar = numProperty.at(numProperty.size() - 1);
+
+        // Un-Sets do some wonky stuff. Split up these cards as individual entries.
+        if (setsWithCardsWithSameNameButDifferentText.contains(currentSet->getShortName()) &&
+            allNameProps.contains(faceName) && layout == "normal" && lastChar.isLetter()) {
+            numComponent = " (" + QString(lastChar).toLower() + ")";
+        }
+        allNameProps.append(faceName);
 
         // special handling properties
         colors = card.value("colors").toStringList().join("");
