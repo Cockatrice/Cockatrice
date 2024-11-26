@@ -145,26 +145,27 @@ void ZoneViewZone::reorganizeCards()
             }
 
             lastCardType = cardType;
-            qreal x = 7 + (typeColumn * CARD_WIDTH);
+            qreal x = typeColumn * CARD_WIDTH;
             qreal y = typeRow * CARD_HEIGHT / 3;
-            c->setPos(x + 5, y + 5);
+            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
             c->setRealZValue(i);
             longestRow = qMax(typeRow, longestRow);
         }
     } else {
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cardsToDisplay.at(i);
-            qreal x = 7 + ((i / rows) * CARD_WIDTH);
+            qreal x = (i / rows) * CARD_WIDTH;
             qreal y = (i % rows) * CARD_HEIGHT / 3;
-            c->setPos(x + 5, y + 5);
+            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
             c->setRealZValue(i);
         }
     }
 
     qreal aleft = 0;
     qreal atop = 0;
-    qreal awidth = (pileView && sortByType) ? qMax(typeColumn + 1, 3) * CARD_WIDTH + (CARD_WIDTH / 2) + 12
-                                            : qMax(cols, 1) * CARD_WIDTH + (CARD_WIDTH / 2) + 12;
+    qreal awidth = (pileView && sortByType)
+                       ? qMax(typeColumn + 1, 3) * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING
+                       : qMax(cols, 1) * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
     qreal aheight = (pileView && sortByType) ? (longestRow * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3
                                              : (rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
     optimumRect = QRectF(aleft, atop, awidth, aheight);
