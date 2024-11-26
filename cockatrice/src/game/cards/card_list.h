@@ -7,9 +7,6 @@ class CardItem;
 
 class CardList : public QList<CardItem *>
 {
-private:
-    class compareFunctor;
-
 protected:
     bool contentsKnown;
 

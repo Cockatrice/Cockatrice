@@ -31,17 +31,9 @@ CardItem *CardList::findCard(const int cardId) const
     return nullptr;
 }
 
-class CardList::compareFunctor
+void CardList::sort(int flags)
 {
-private:
-    int flags;
-
-public:
-    explicit compareFunctor(int _flags) : flags(_flags)
-    {
-    }
-    inline bool operator()(CardItem *a, CardItem *b) const
-    {
+    auto comparator = [flags](CardItem *a, CardItem *b) {
         if (flags & SortByType) {
             QString t1 = a->getInfo() ? a->getInfo()->getMainCardType() : QString();
             QString t2 = b->getInfo() ? b->getInfo()->getMainCardType() : QString();
@@ -50,11 +42,7 @@ public:
             return t1 < t2;
         } else
             return a->getName() < b->getName();
-    }
-};
+    };
 
-void CardList::sort(int flags)
-{
-    compareFunctor cf(flags);
-    std::sort(begin(), end(), cf);
+    std::sort(begin(), end(), comparator);
 }
