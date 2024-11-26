@@ -142,7 +142,7 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
-    CardItem *c = cards.findCard(cardId, false);
+    CardItem *c = cards.findCard(cardId);
     if (!c) {
         qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
         return 0;

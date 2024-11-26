@@ -20,7 +20,7 @@ public:
         SortByType = 2
     };
     CardList(bool _contentsKnown);
-    CardItem *findCard(const int id, const bool remove, int *position = NULL);
+    CardItem *findCard(const int id) const;
     bool getContentsKnown() const
     {
         return contentsKnown;
