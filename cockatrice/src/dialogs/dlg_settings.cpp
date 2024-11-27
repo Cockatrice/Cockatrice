@@ -74,10 +74,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
-    connect(&updateNotificationCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setNotifyAboutUpdate(QT_STATE_CHANGED_T)));
-    connect(&newVersionOracleCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setNotifyAboutNewVersion(QT_STATE_CHANGED_T)));
+    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
+    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setNotifyAboutNewVersion);
     connect(&showTipsOnStartup, SIGNAL(clicked(bool)), &settings, SLOT(setShowTipsOnStartup(bool)));
 
     auto *personalGrid = new QGridLayout;
@@ -324,12 +323,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGroupBox->setLayout(themeGrid);
 
     displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
-    connect(&displayCardNamesCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setDisplayCardNames(QT_STATE_CHANGED_T)));
+    connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
 
     cardScalingCheckBox.setChecked(settings.getScaleCards());
-    connect(&cardScalingCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setCardScaling(QT_STATE_CHANGED_T)));
+    connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
 
     verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
     verticalCardOverlapPercentBox.setRange(0, 80);
@@ -346,12 +343,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGroupBox->setLayout(cardsGrid);
 
     horizontalHandCheckBox.setChecked(settings.getHorizontalHand());
-    connect(&horizontalHandCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setHorizontalHand(QT_STATE_CHANGED_T)));
+    connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setHorizontalHand);
 
     leftJustifiedHandCheckBox.setChecked(settings.getLeftJustified());
-    connect(&leftJustifiedHandCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setLeftJustified(QT_STATE_CHANGED_T)));
+    connect(&leftJustifiedHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setLeftJustified);
 
     auto *handGrid = new QGridLayout;
     handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
@@ -361,8 +356,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox->setLayout(handGrid);
 
     invertVerticalCoordinateCheckBox.setChecked(settings.getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setInvertVerticalCoordinate(QT_STATE_CHANGED_T)));
+    connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setInvertVerticalCoordinate);
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
     minPlayersForMultiColumnLayoutEdit.setValue(settings.getMinPlayersForMultiColumnLayout());
@@ -442,37 +437,37 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings and notification settings
     notificationsEnabledCheckBox.setChecked(SettingsCache::instance().getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setNotificationsEnabled(QT_STATE_CHANGED_T)));
-    connect(&notificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(setNotificationEnabled(QT_STATE_CHANGED_T)));
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setNotificationsEnabled);
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &UserInterfaceSettingsPage::setNotificationEnabled);
 
     specNotificationsEnabledCheckBox.setChecked(SettingsCache::instance().getSpectatorNotificationsEnabled());
     specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T)));
+    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setSpectatorNotificationsEnabled);
 
     buddyConnectNotificationsEnabledCheckBox.setChecked(
         SettingsCache::instance().getBuddyConnectNotificationsEnabled());
     buddyConnectNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
-    connect(&buddyConnectNotificationsEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)),
-            &SettingsCache::instance(), SLOT(setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T)));
+    connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setBuddyConnectNotificationsEnabled);
 
     doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().getDoubleClickToPlay());
-    connect(&doubleClickToPlayCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setDoubleClickToPlay(QT_STATE_CHANGED_T)));
+    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setDoubleClickToPlay);
 
     playToStackCheckBox.setChecked(SettingsCache::instance().getPlayToStack());
-    connect(&playToStackCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setPlayToStack(QT_STATE_CHANGED_T)));
+    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setPlayToStack);
 
     annotateTokensCheckBox.setChecked(SettingsCache::instance().getAnnotateTokens());
-    connect(&annotateTokensCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setAnnotateTokens(QT_STATE_CHANGED_T)));
+    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setAnnotateTokens);
 
     useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            [](QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
+            [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
@@ -493,8 +488,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     // animation settings
     tapAnimationCheckBox.setChecked(SettingsCache::instance().getTapAnimation());
-    connect(&tapAnimationCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setTapAnimation(QT_STATE_CHANGED_T)));
+    connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setTapAnimation);
 
     auto *animationGrid = new QGridLayout;
     animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
@@ -504,8 +499,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     // deck editor settings
     openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().getOpenDeckInNewTab());
-    connect(&openDeckInNewTabCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setOpenDeckInNewTab(QT_STATE_CHANGED_T)));
+    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setOpenDeckInNewTab);
 
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
@@ -554,8 +549,8 @@ void UserInterfaceSettingsPage::retranslateUi()
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
     picDownloadCheckBox.setChecked(SettingsCache::instance().getPicDownload());
-    connect(&picDownloadCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setPicDownload(QT_STATE_CHANGED_T)));
+    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setPicDownload);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -870,30 +865,29 @@ void DeckEditorSettingsPage::retranslateUi()
 MessagesSettingsPage::MessagesSettingsPage()
 {
     chatMentionCheckBox.setChecked(SettingsCache::instance().getChatMention());
-    connect(&chatMentionCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setChatMention(QT_STATE_CHANGED_T)));
+    connect(&chatMentionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setChatMention);
 
     chatMentionCompleterCheckbox.setChecked(SettingsCache::instance().getChatMentionCompleter());
-    connect(&chatMentionCompleterCheckbox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setChatMentionCompleter(QT_STATE_CHANGED_T)));
+    connect(&chatMentionCompleterCheckbox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setChatMentionCompleter);
 
     explainMessagesLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     explainMessagesLabel.setOpenExternalLinks(true);
 
     ignoreUnregUsersMainChat.setChecked(SettingsCache::instance().getIgnoreUnregisteredUsers());
     ignoreUnregUserMessages.setChecked(SettingsCache::instance().getIgnoreUnregisteredUserMessages());
-    connect(&ignoreUnregUsersMainChat, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T)));
-    connect(&ignoreUnregUserMessages, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T)));
+    connect(&ignoreUnregUsersMainChat, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setIgnoreUnregisteredUsers);
+    connect(&ignoreUnregUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setIgnoreUnregisteredUserMessages);
 
     invertMentionForeground.setChecked(SettingsCache::instance().getChatMentionForeground());
-    connect(&invertMentionForeground, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(updateTextColor(QT_STATE_CHANGED_T)));
+    connect(&invertMentionForeground, &QCheckBox::QT_STATE_CHANGED, this, &MessagesSettingsPage::updateTextColor);
 
     invertHighlightForeground.setChecked(SettingsCache::instance().getChatHighlightForeground());
-    connect(&invertHighlightForeground, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(updateTextHighlightColor(QT_STATE_CHANGED_T)));
+    connect(&invertHighlightForeground, &QCheckBox::QT_STATE_CHANGED, this,
+            &MessagesSettingsPage::updateTextHighlightColor);
 
     mentionColor = new QLineEdit();
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
@@ -901,16 +895,15 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
 
     messagePopups.setChecked(SettingsCache::instance().getShowMessagePopup());
-    connect(&messagePopups, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setShowMessagePopups(QT_STATE_CHANGED_T)));
+    connect(&messagePopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowMessagePopups);
 
     mentionPopups.setChecked(SettingsCache::instance().getShowMentionPopup());
-    connect(&mentionPopups, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setShowMentionPopups(QT_STATE_CHANGED_T)));
+    connect(&mentionPopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowMentionPopups);
 
     roomHistory.setChecked(SettingsCache::instance().getRoomHistory());
-    connect(&roomHistory, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setRoomHistory(QT_STATE_CHANGED_T)));
+    connect(&roomHistory, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(), &SettingsCache::setRoomHistory);
 
     customAlertString = new QLineEdit();
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
@@ -1112,8 +1105,8 @@ void MessagesSettingsPage::retranslateUi()
 SoundSettingsPage::SoundSettingsPage()
 {
     soundEnabledCheckBox.setChecked(SettingsCache::instance().getSoundEnabled());
-    connect(&soundEnabledCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &SettingsCache::instance(),
-            SLOT(setSoundEnabled(QT_STATE_CHANGED_T)));
+    connect(&soundEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setSoundEnabled);
 
     QString themeName = SettingsCache::instance().getSoundThemeName();
 
