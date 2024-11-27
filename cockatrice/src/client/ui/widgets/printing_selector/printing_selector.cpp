@@ -2,6 +2,7 @@
 
 #include "../../../../utility/card_set_comparator.h"
 #include "printing_selector_card_display_widget.h"
+#include "../../../../settings/cache_settings.h"
 
 #include <QComboBox>
 #include <QDebug>
@@ -306,22 +307,28 @@ void PrintingSelector::getAllSetsForCurrentCard()
 {
     const QList<CardInfoPerSet> sortedSets = sortSets();
     const QList<CardInfoPerSet> filteredSets = filterSets(sortedSets);
-    const QList<CardInfoPerSet> prependedSets = prependPrintingsInDeck(filteredSets);
+    QList<CardInfoPerSet> setsToUse;
+
+    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
+        setsToUse = prependPrintingsInDeck(filteredSets);
+    } else {
+        setsToUse = filteredSets;
+    }
 
     // Defer widget creation
     currentIndex = 0;
 
     connect(timer, &QTimer::timeout, this, [=]() mutable {
-        for (int i = 0; i < BATCH_SIZE && currentIndex < prependedSets.size(); ++i, ++currentIndex) {
+        for (int i = 0; i < BATCH_SIZE && currentIndex < setsToUse.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget =
                 new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
-                                                      selectedCard, prependedSets[currentIndex], currentZone);
+                                                      selectedCard, setsToUse[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
         }
 
         // Stop timer when done
-        if (currentIndex >= prependedSets.size()) {
+        if (currentIndex >= setsToUse.size()) {
             timer->stop();
         }
     });

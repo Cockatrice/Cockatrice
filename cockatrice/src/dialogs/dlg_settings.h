@@ -94,6 +94,7 @@ private:
     QCheckBox showShortcutsCheckBox;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
+    QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
     QCheckBox cardScalingCheckBox;
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
