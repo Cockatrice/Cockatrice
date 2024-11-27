@@ -20,7 +20,9 @@
 /**
  * @param _player the player the cards were revealed to.
  * @param _origZone the zone the cards were revealed from.
- * @param numberCards num of cards to reveal from the zone. Ex: scry the top 3 cards. Use -1 to reveal the entire zone.
+ * @param numberCards num of cards to reveal from the zone. Ex: scry the top 3 cards.
+ * Pass in a negative number to reveal the entire zone.
+ * -1 specifically will give the option to shuffle the zone upon closing the window.
  * @param _revealZone if false, the cards will be face down.
  * @param _writeableRevealZone whether the player can interact with the revealed cards.
  */
@@ -40,7 +42,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
     QGraphicsLinearLayout *hPilebox = 0;
 
-    // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
+    // If the number is < 0, then it means that we can give the option to make the area sorted
     if (numberCards < 0) {
         hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -66,7 +68,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         pileViewProxy->setWidget(&pileViewCheckBox);
         hPilebox->addItem(pileViewProxy);
 
-        if (_origZone->getIsShufflable()) {
+        if (_origZone->getIsShufflable() && numberCards == -1) {
             shuffleCheckBox.setChecked(true);
             QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
             shuffleProxy->setWidget(&shuffleCheckBox);
