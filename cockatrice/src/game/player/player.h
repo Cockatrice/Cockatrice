@@ -68,6 +68,9 @@ class ZoneViewZone;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
+/**
+ * The entire graphical area belonging to a single player.
+ */
 class PlayerArea : public QObject, public QGraphicsItem
 {
     Q_OBJECT

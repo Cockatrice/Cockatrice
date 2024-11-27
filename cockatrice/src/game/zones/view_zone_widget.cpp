@@ -17,6 +17,13 @@
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
 
+/**
+ * @param _player the player the cards were revealed to.
+ * @param _origZone the zone the cards were revealed from.
+ * @param numberCards num of cards to reveal from the zone. Ex: scry the top 3 cards. Use -1 to reveal the entire zone.
+ * @param _revealZone if false, the cards will be face down.
+ * @param _writeableRevealZone whether the player can interact with the revealed cards.
+ */
 ZoneViewWidget::ZoneViewWidget(Player *_player,
                                CardZone *_origZone,
                                int numberCards,

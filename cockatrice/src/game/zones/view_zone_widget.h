@@ -31,6 +31,12 @@ public slots:
     }
 };
 
+/**
+ * A QGraphicsWidget that holds a ZoneViewZone.
+ *
+ * Some zone views allow sorting.
+ * This widget will display the sort options when relevant, and forward the values of the options to the ZoneViewZone.
+ */
 class ZoneViewWidget : public QGraphicsWidget
 {
     Q_OBJECT

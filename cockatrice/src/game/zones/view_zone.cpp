@@ -16,6 +16,13 @@
 #include <QPainter>
 #include <QtMath>
 
+/**
+ * @param _p the player that the cards are revealed to.
+ * @param _origZone the zone the cards were revealed from.
+ * @param _revealZone if false, the cards will be face down.
+ * @param _writeableRevealZone whether the player can interact with the revealed cards.
+ * @param parent the parent QGraphicsWidget containing the reveal zone
+ */
 ZoneViewZone::ZoneViewZone(Player *_p,
                            CardZone *_origZone,
                            int _numberCards,
