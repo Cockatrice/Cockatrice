@@ -40,6 +40,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
     QGraphicsLinearLayout *hPilebox = 0;
 
+    // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
     if (numberCards < 0) {
         hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -64,13 +65,13 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
         hPilebox->addItem(pileViewProxy);
-    }
 
-    if (_origZone->getIsShufflable() && (numberCards == -1)) {
-        shuffleCheckBox.setChecked(true);
-        QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
-        shuffleProxy->setWidget(&shuffleCheckBox);
-        hPilebox->addItem(shuffleProxy);
+        if (_origZone->getIsShufflable()) {
+            shuffleCheckBox.setChecked(true);
+            QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
+            shuffleProxy->setWidget(&shuffleCheckBox);
+            hPilebox->addItem(shuffleProxy);
+        }
     }
 
     vbox->addItem(hPilebox);
@@ -100,8 +101,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
             SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
 
-    // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
-    // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
+    // only wire up sort options after creating ZoneViewZone, since it segfaults otherwise.
     if (numberCards < 0) {
         connect(&sortByNameCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
                 SLOT(processSortByName(QT_STATE_CHANGED_T)));
