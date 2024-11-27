@@ -1,8 +1,8 @@
 #include "printing_selector.h"
 
+#include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_set_comparator.h"
 #include "printing_selector_card_display_widget.h"
-#include "../../../../settings/cache_settings.h"
 
 #include <QComboBox>
 #include <QDebug>

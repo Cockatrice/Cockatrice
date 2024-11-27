@@ -340,11 +340,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(settings.getOverrideAllCardArtWithPersonalPreference());
     connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setOverrideAllCardArtWithPersonalPreference);
+        &SettingsCache::setOverrideAllCardArtWithPersonalPreference);
 
     bumpSetsWithCardsInDeckToTopCheckBox.setChecked(settings.getBumpSetsWithCardsInDeckToTop());
     connect(&bumpSetsWithCardsInDeckToTopCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-                &SettingsCache::setBumpSetsWithCardsInDeckToTop);
+        &SettingsCache::setBumpSetsWithCardsInDeckToTop);
 
     cardScalingCheckBox.setChecked(settings.getScaleCards());
     connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
