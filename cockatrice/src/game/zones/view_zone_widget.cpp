@@ -40,11 +40,10 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     setFlag(ItemIgnoresTransformations);
 
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
-    QGraphicsLinearLayout *hPilebox = 0;
 
     // If the number is < 0, then it means that we can give the option to make the area sorted
     if (numberCards < 0) {
-        hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
+        QGraphicsLinearLayout *hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
 
         QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
@@ -74,9 +73,9 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
             shuffleProxy->setWidget(&shuffleCheckBox);
             hPilebox->addItem(shuffleProxy);
         }
-    }
 
-    vbox->addItem(hPilebox);
+        vbox->addItem(hPilebox);
+    }
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
     resize(150, 150);
