@@ -37,7 +37,12 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
         new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, setCard, setInfoForCard);
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
-    allZonesCardAmountWidget->setVisible(false);
+    // Set initial visibility based on amounts
+    if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
+        allZonesCardAmountWidget->setVisible(true);
+    } else {
+        allZonesCardAmountWidget->setVisible(false);
+    }
 
     // Attempt to cast the parent to PrintingSelectorCardDisplayWidget
     if (const auto *parentWidget = qobject_cast<PrintingSelectorCardDisplayWidget *>(parent)) {
@@ -74,13 +79,29 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
 #endif
 {
     QWidget::enterEvent(event);
-    allZonesCardAmountWidget->setVisible(true);
     deckEditor->updateCardInfo(setCard);
+
+    // Check if either mainboard or sideboard amount is greater than 0
+    if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
+        // Don't change visibility if amounts are greater than 0
+        return;
+    }
+
+    // Show the widget if amounts are 0
+    allZonesCardAmountWidget->setVisible(true);
 }
 
 void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
+
+    // Check if either mainboard or sideboard amount is greater than 0
+    if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
+        // Don't hide the widget if amounts are greater than 0
+        return;
+    }
+
+    // Hide the widget if amounts are 0
     allZonesCardAmountWidget->setVisible(false);
 }
 

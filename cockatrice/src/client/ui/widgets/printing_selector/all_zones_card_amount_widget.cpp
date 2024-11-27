@@ -48,6 +48,16 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     setMouseTracking(true);
 }
 
+int AllZonesCardAmountWidget::getMainboardAmount()
+{
+    return buttonBoxMainboard->countCardsInZone(DECK_ZONE_MAIN);
+}
+
+int AllZonesCardAmountWidget::getSideboardAmount()
+{
+    return buttonBoxSideboard->countCardsInZone(DECK_ZONE_SIDE);
+}
+
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void AllZonesCardAmountWidget::enterEvent(QEnterEvent *event)
 #else
