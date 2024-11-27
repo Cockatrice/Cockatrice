@@ -96,12 +96,9 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
     // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
     if (numberCards < 0) {
-        connect(&sortByNameCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-                SLOT(processSortByName(QT_STATE_CHANGED_T)));
-        connect(&sortByTypeCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-                SLOT(processSortByType(QT_STATE_CHANGED_T)));
-        connect(&pileViewCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-                SLOT(processSetPileView(QT_STATE_CHANGED_T)));
+        connect(&sortByNameCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSortByName);
+        connect(&sortByTypeCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSortByType);
+        connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
         sortByNameCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByName());
         sortByTypeCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByType());
         pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
