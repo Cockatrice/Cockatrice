@@ -1,13 +1,11 @@
 #include "deck_list_model.h"
 
-#include "../game/cards/card_database.h"
 #include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "deck_loader.h"
 
 #include <QBrush>
-#include <QFile>
 #include <QFont>
 #include <QPrinter>
 #include <QProgressDialog>
@@ -381,16 +379,17 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
     const QModelIndex parentIndex = nodeToIndex(cardTypeNode);
     auto *cardNode = dynamic_cast<DecklistModelCardNode *>(
         cardTypeNode->findCardChildByNameAndProviderId(cardName, cardInfoSet.getProperty("uuid")));
+    const auto cardSetName = cardInfoSet.getPtr().isNull() ? "" : cardInfoSet.getPtr()->getCorrectedShortName();
+
     if (!cardNode) {
-        auto *decklistCard =
-            deckList->addCard(cardInfo->getName(), zoneName, cardInfoSet.getPtr()->getCorrectedShortName(),
-                              cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, cardSetName,
+                                               cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
         beginInsertRows(parentIndex, static_cast<int>(cardTypeNode->size()), static_cast<int>(cardTypeNode->size()));
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
-        cardNode->setCardSetShortName(cardInfoSet.getPtr()->getCorrectedShortName());
+        cardNode->setCardSetShortName(cardSetName);
         cardNode->setCardCollectorNumber(cardInfoSet.getProperty("num"));
         cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
         deckList->updateDeckHash();
