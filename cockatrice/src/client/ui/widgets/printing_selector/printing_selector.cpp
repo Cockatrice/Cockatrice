@@ -89,6 +89,11 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     cardSelectionBarLayout->addWidget(nextCardButton);
 
     layout->addWidget(cardSelectionBar);
+
+    connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
+        // We have to delay this or else we hit a race condition where the data isn't actually updated yet.
+        QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
+    });
 }
 
 void PrintingSelector::updateSortOrder()
