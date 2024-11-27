@@ -9,42 +9,31 @@ CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_co
 {
 }
 
-CardItem *CardList::findCard(const int id, const bool remove, int *position)
+/**
+ * @brief Finds the CardItem with the given id in the list.
+ * If contentsKnown is false, then this just returns the first element of the list.
+ *
+ * @param cardId The id of the card to find.
+ *
+ * @returns A pointer to the CardItem, or a nullptr if not found.
+ */
+CardItem *CardList::findCard(const int cardId) const
 {
-    if (!contentsKnown) {
-        if (empty())
-            return 0;
-        CardItem *temp = at(0);
-        if (remove)
-            removeAt(0);
-        if (position)
-            *position = id;
-        return temp;
-    } else
-        for (int i = 0; i < size(); i++) {
-            CardItem *temp = at(i);
-            if (temp->getId() == id) {
-                if (remove)
-                    removeAt(i);
-                if (position)
-                    *position = i;
-                return temp;
+    if (!contentsKnown && !empty()) {
+        return at(0);
+    } else {
+        for (auto *cardItem : *this) {
+            if (cardItem->getId() == cardId) {
+                return cardItem;
             }
         }
-    return 0;
+    }
+    return nullptr;
 }
 
-class CardList::compareFunctor
+void CardList::sort(int flags)
 {
-private:
-    int flags;
-
-public:
-    explicit compareFunctor(int _flags) : flags(_flags)
-    {
-    }
-    inline bool operator()(CardItem *a, CardItem *b) const
-    {
+    auto comparator = [flags](CardItem *a, CardItem *b) {
         if (flags & SortByType) {
             QString t1 = a->getInfo() ? a->getInfo()->getMainCardType() : QString();
             QString t2 = b->getInfo() ? b->getInfo()->getMainCardType() : QString();
@@ -53,11 +42,7 @@ public:
             return t1 < t2;
         } else
             return a->getName() < b->getName();
-    }
-};
+    };
 
-void CardList::sort(int flags)
-{
-    compareFunctor cf(flags);
-    std::sort(begin(), end(), cf);
+    std::sort(begin(), end(), comparator);
 }
