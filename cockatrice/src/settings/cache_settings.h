@@ -49,6 +49,7 @@ signals:
     void picDownloadChanged();
     void displayCardNamesChanged();
     void overrideAllCardArtWithPersonalPreferenceChanged();
+    void bumpSetsWithCardsInDeckToTopChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -100,6 +101,7 @@ private:
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
     bool overrideAllCardArtWithPersonalPreference;
+    bool bumpSetsWithCardsInDeckToTop;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -297,6 +299,10 @@ public:
     bool getOverrideAllCardArtWithPersonalPreference() const
     {
         return overrideAllCardArtWithPersonalPreference;
+    }
+    bool getBumpSetsWithCardsInDeckToTop() const
+    {
+        return bumpSetsWithCardsInDeckToTop;
     }
     bool getHorizontalHand() const
     {
@@ -568,6 +574,7 @@ public slots:
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
     void setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt);
+    void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

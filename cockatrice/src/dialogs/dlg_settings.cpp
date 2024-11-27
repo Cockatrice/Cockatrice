@@ -326,8 +326,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
 
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(settings.getOverrideAllCardArtWithPersonalPreference());
-    connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), &settings,
-            SLOT(setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T)));
+    connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setOverrideAllCardArtWithPersonalPreference);
+
+    bumpSetsWithCardsInDeckToTopCheckBox.setChecked(settings.getBumpSetsWithCardsInDeckToTop());
+    connect(&bumpSetsWithCardsInDeckToTopCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+                &SettingsCache::setBumpSetsWithCardsInDeckToTop);
 
     cardScalingCheckBox.setChecked(settings.getScaleCards());
     connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
@@ -341,8 +345,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
     cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 2, 0, 1, 2);
-    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 3, 0, 1, 1);
-    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 3, 1, 1, 1);
+    cardsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 3, 0, 1, 2);
+    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 4, 0, 1, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 4, 1, 1, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -427,6 +432,7 @@ void AppearanceSettingsPage::retranslateUi()
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(
         tr("Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client "
            "restart]"));
+    bumpSetsWithCardsInDeckToTopCheckBox.setText(tr("Bump sets that the deck contains cards from to the top in the printing selector"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
