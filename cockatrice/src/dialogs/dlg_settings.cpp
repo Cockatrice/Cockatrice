@@ -340,11 +340,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(settings.getOverrideAllCardArtWithPersonalPreference());
     connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-        &SettingsCache::setOverrideAllCardArtWithPersonalPreference);
+            &SettingsCache::setOverrideAllCardArtWithPersonalPreference);
 
     bumpSetsWithCardsInDeckToTopCheckBox.setChecked(settings.getBumpSetsWithCardsInDeckToTop());
     connect(&bumpSetsWithCardsInDeckToTopCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-        &SettingsCache::setBumpSetsWithCardsInDeckToTop);
+            &SettingsCache::setBumpSetsWithCardsInDeckToTop);
 
     cardScalingCheckBox.setChecked(settings.getScaleCards());
     connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
@@ -465,7 +465,8 @@ void AppearanceSettingsPage::retranslateUi()
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(
         tr("Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client "
            "restart]"));
-    bumpSetsWithCardsInDeckToTopCheckBox.setText(tr("Bump sets that the deck contains cards from to the top in the printing selector"));
+    bumpSetsWithCardsInDeckToTopCheckBox.setText(
+        tr("Bump sets that the deck contains cards from to the top in the printing selector"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
