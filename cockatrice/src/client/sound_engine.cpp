@@ -15,8 +15,8 @@
 SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(nullptr)
 {
     ensureThemeDirectoryExists();
-    connect(&SettingsCache::instance(), SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
-    connect(&SettingsCache::instance(), SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
+    connect(&SettingsCache::instance(), &SettingsCache::soundThemeChanged, this, &SoundEngine::themeChangedSlot);
+    connect(&SettingsCache::instance(), &SettingsCache::soundEnabledChanged, this, &SoundEngine::soundEnabledChanged);
 
     soundEnabledChanged();
     themeChangedSlot();

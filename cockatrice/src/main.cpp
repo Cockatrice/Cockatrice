@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+    QObject::connect(&app, QApplication::lastWindowClosed, &app, QApplication::quit);
 
     qInstallMessageHandler(CockatriceLogger);
 #ifdef Q_OS_WIN
