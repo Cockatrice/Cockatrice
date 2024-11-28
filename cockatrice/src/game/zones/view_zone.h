@@ -10,6 +10,15 @@ class Response;
 class ServerInfo_Card;
 class QGraphicsSceneWheelEvent;
 
+/**
+ * A CardZone that is a view into another CardZone.
+ * If this zone is writable, then modifications to this zone will be reflected in the underlying zone.
+ *
+ * Most interactions with StackZones are handled through a zone view.
+ * For example, viewing the deck/graveyard/exile is handled through a view.
+ *
+ * Handles both limited reveals (eg. look at top X cards) and full zone reveals (eg. searching the deck).
+ */
 class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem
 {
     Q_OBJECT

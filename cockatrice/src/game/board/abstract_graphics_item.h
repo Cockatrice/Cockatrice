@@ -13,6 +13,9 @@ enum GraphicsItemType
     typeOther = QGraphicsItem::UserType + 6
 };
 
+/**
+ * Parent class of all objects that appear in a game.
+ */
 class AbstractGraphicsItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT

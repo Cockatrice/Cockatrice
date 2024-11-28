@@ -14,6 +14,12 @@ class QAction;
 class QPainter;
 class CardDragItem;
 
+/**
+ * A zone in the game that can contain cards.
+ * This class contains methods to get and modify the cards that are contained inside this zone.
+ *
+ * The cards are stored as a list of `CardItem*`.
+ */
 class CardZone : public AbstractGraphicsItem
 {
     Q_OBJECT

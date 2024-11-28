@@ -3,6 +3,9 @@
 
 #include "card_zone.h"
 
+/**
+ * A CardZone where the cards are laid out, with each card directly interactable by clicking.
+ */
 class SelectZone : public CardZone
 {
     Q_OBJECT
