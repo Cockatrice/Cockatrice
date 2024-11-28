@@ -133,8 +133,8 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, bo
 {
     int cardCount = cards.size();
     if (groupByType) {
-        int typeRow = 0;
-        int typeColumn = 0;
+        int row = 0;
+        int col = 0;
         int longestRow = 0;
         QString lastCardType;
         for (int i = 0; i < cardCount; i++) {
@@ -143,22 +143,22 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, bo
 
             if (i) { // if not the first card
                 if (cardType == lastCardType)
-                    typeRow++; // add below current card
-                else {         // if no match then move card to next column
-                    typeColumn++;
-                    typeRow = 0;
+                    row++; // add below current card
+                else {     // if no match then move card to next column
+                    col++;
+                    row = 0;
                 }
             }
 
             lastCardType = cardType;
-            qreal x = typeColumn * CARD_WIDTH;
-            qreal y = typeRow * CARD_HEIGHT / 3;
+            qreal x = col * CARD_WIDTH;
+            qreal y = row * CARD_HEIGHT / 3;
             c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
             c->setRealZValue(i);
-            longestRow = qMax(typeRow, longestRow);
+            longestRow = qMax(row, longestRow);
         }
 
-        return GridSize{longestRow, qMax(typeColumn + 1, 3)};
+        return GridSize{longestRow, qMax(col + 1, 3)};
 
     } else {
         int cols = qFloor(qSqrt((double)cardCount / 2));
