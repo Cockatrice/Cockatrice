@@ -163,12 +163,13 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, bo
     } else {
         int cols = qMin(qFloor(qSqrt((double)cardCount / 2)), 7);
         int rows = qMax(qCeil((double)cardCount / cols), 1);
-        if (minRows == 0)
+        if (minRows == 0) {
             minRows = rows;
-        else if (rows < minRows) {
+        } else if (rows < minRows) {
             rows = minRows;
             cols = qCeil((double)cardCount / minRows);
         }
+
         if (cols < 2)
             cols = 2;
 
