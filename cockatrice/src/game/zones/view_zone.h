@@ -26,6 +26,14 @@ private:
     bool sortByName, sortByType;
     bool pileView;
 
+    struct GridSize
+    {
+        int rows;
+        int cols;
+    };
+
+    GridSize positionCardsForDisplay(CardList &cards, bool groupByType = false);
+
 public:
     ZoneViewZone(Player *_p,
                  CardZone *_origZone,
