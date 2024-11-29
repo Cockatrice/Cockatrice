@@ -141,11 +141,25 @@ void ZoneViewWidget::processGroupBy(int index)
     auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
     SettingsCache::instance().setZoneViewGroupBy(option);
     zone->setGroupBy(option);
+
+    // reset sortBy if it has the same value as groupBy
+    if (option != CardList::NoSort &&
+        option == static_cast<CardList::SortOption>(sortBySelector.currentData().toInt())) {
+        sortBySelector.setCurrentIndex(1); // set to SortByName
+    }
 }
 
 void ZoneViewWidget::processSortBy(int index)
 {
     auto option = static_cast<CardList::SortOption>(sortBySelector.itemData(index).toInt());
+
+    // set to SortByName instead if it has the same value as groupBy
+    if (option != CardList::NoSort &&
+        option == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
+        sortBySelector.setCurrentIndex(1); // set to SortByName
+        return;
+    }
+
     SettingsCache::instance().setZoneViewSortBy(option);
     zone->setSortBy(option);
 }
