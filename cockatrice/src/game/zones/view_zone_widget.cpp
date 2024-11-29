@@ -125,8 +125,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         connect(&sortBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
                 &ZoneViewWidget::processSortBy);
         connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
-        groupBySelector.setCurrentIndex(groupBySelector.findData(SettingsCache::instance().getZoneViewGroupByIndex()));
-        sortBySelector.setCurrentIndex(sortBySelector.findData(SettingsCache::instance().getZoneViewSortByIndex()));
+        groupBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewGroupByIndex());
+        sortBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewSortByIndex());
         pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
 
         if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
@@ -154,7 +154,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 void ZoneViewWidget::processGroupBy(int index)
 {
     auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
-    SettingsCache::instance().setZoneViewGroupByIndex(option);
+    SettingsCache::instance().setZoneViewGroupByIndex(index);
     zone->setGroupBy(option);
 
     // disable pile view checkbox if we're not grouping by anything
@@ -178,7 +178,7 @@ void ZoneViewWidget::processSortBy(int index)
         return;
     }
 
-    SettingsCache::instance().setZoneViewSortByIndex(option);
+    SettingsCache::instance().setZoneViewSortByIndex(index);
     zone->setSortBy(option);
 }
 
