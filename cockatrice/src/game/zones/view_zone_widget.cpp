@@ -142,6 +142,9 @@ void ZoneViewWidget::processGroupBy(int index)
     SettingsCache::instance().setZoneViewGroupBy(option);
     zone->setGroupBy(option);
 
+    // disable pile view checkbox if we're not grouping by anything
+    pileViewCheckBox.setEnabled(option != CardList::NoSort);
+
     // reset sortBy if it has the same value as groupBy
     if (option != CardList::NoSort &&
         option == static_cast<CardList::SortOption>(sortBySelector.currentData().toInt())) {
