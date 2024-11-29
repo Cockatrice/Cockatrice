@@ -126,6 +126,10 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         groupBySelector.setCurrentIndex(groupBySelector.findData(SettingsCache::instance().getZoneViewGroupBy()));
         sortBySelector.setCurrentIndex(sortBySelector.findData(SettingsCache::instance().getZoneViewSortBy()));
         pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
+
+        if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
+            pileViewCheckBox.setEnabled(false);
+        }
     }
 
     retranslateUi();
