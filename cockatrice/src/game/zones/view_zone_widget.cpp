@@ -120,8 +120,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     // only wire up sort options after creating ZoneViewZone, since it segfaults otherwise.
     if (numberCards < 0) {
-        connect(&groupBySelector, &QComboBox::currentIndexChanged, this, &ZoneViewWidget::processGroupBy);
-        connect(&sortBySelector, &QComboBox::currentIndexChanged, this, &ZoneViewWidget::processSortBy);
+        connect(&groupBySelector, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ZoneViewWidget::processGroupBy);
+        connect(&sortBySelector, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ZoneViewWidget::processSortBy);
         connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
         groupBySelector.setCurrentIndex(groupBySelector.findData(SettingsCache::instance().getZoneViewGroupBy()));
         sortBySelector.setCurrentIndex(sortBySelector.findData(SettingsCache::instance().getZoneViewSortBy()));
