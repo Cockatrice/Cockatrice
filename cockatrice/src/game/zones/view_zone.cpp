@@ -31,7 +31,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
                            QGraphicsItem *parent)
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
-      writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
+      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -116,20 +116,25 @@ void ZoneViewZone::reorganizeCards()
 
     // sort cards
     QList<CardList::SortOption> sortOptions;
-    if (sortByType) {
-        sortOptions << CardList::SortByType;
+    if (groupBy != CardList::NoSort) {
+        sortOptions << groupBy;
     }
 
-    if (sortByName) {
-        sortOptions << CardList::SortByName;
+    if (sortBy != CardList::NoSort) {
+        sortOptions << sortBy;
+
+        // implicitly sort by name at the end so that cards with the same name appear together
+        if (sortBy != CardList::SortByName) {
+            sortOptions << CardList::SortByName;
+        }
     }
 
     cardsToDisplay.sortBy(sortOptions);
 
     // position cards
     GridSize gridSize;
-    if (pileView && sortByType) {
-        gridSize = positionCardsForDisplay(cardsToDisplay, CardList::SortByType);
+    if (pileView) {
+        gridSize = positionCardsForDisplay(cardsToDisplay, groupBy);
     } else {
         gridSize = positionCardsForDisplay(cardsToDisplay);
     }
@@ -217,17 +222,15 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
     }
 }
 
-void ZoneViewZone::setSortByName(int _sortByName)
+void ZoneViewZone::setGroupBy(CardList::SortOption _groupBy)
 {
-    sortByName = _sortByName;
+    groupBy = _groupBy;
     reorganizeCards();
 }
 
-void ZoneViewZone::setSortByType(int _sortByType)
+void ZoneViewZone::setSortBy(CardList::SortOption _sortBy)
 {
-    sortByType = _sortByType;
-    if (!sortByType)
-        pileView = false;
+    sortBy = _sortBy;
     reorganizeCards();
 }
 
