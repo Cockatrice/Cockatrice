@@ -3,6 +3,7 @@
 #include "card_database.h"
 #include "card_item.h"
 
+#include <QDebug>
 #include <algorithm>
 
 CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_contentsKnown)
@@ -67,7 +68,7 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
 {
     switch (option) {
         case NoSort:
-            return [](CardItem *c) { return ""; };
+            return [](CardItem *) { return ""; };
         case SortByName:
             return [](CardItem *c) { return c->getName(); };
         case SortByType:
@@ -76,4 +77,8 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
             // getCmc returns the int as a string. We pad with 0's so that string comp also works on it
             return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getCmc().rightJustified(4, '0') : ""; };
     }
+
+    // this line should never be reached
+    qDebug() << "cardlist.cpp: Could not find extractor for SortOption" << option;
+    return [](CardItem *) { return ""; };
 }
