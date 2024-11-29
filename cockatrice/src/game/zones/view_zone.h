@@ -41,7 +41,7 @@ private:
         int cols;
     };
 
-    GridSize positionCardsForDisplay(CardList &cards, bool groupByType = false);
+    GridSize positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption = CardList::NoSort);
 
 public:
     ZoneViewZone(Player *_p,

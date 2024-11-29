@@ -31,18 +31,49 @@ CardItem *CardList::findCard(const int cardId) const
     return nullptr;
 }
 
-void CardList::sort(int flags)
+/**
+ * @brief sorts the list by using string comparison on properties extracted from the CardItem
+ * The cards are compared using each property in order.
+ * If two cards have the same value for a property, then the next property in the list is used.
+ *
+ * @param option the option to compare the cards by, in order of usage.
+ */
+void CardList::sortBy(const QList<SortOption> &option)
 {
-    auto comparator = [flags](CardItem *a, CardItem *b) {
-        if (flags & SortByType) {
-            QString t1 = a->getInfo() ? a->getInfo()->getMainCardType() : QString();
-            QString t2 = b->getInfo() ? b->getInfo()->getMainCardType() : QString();
-            if ((t1 == t2) && (flags & SortByName))
-                return a->getName() < b->getName();
-            return t1 < t2;
-        } else
-            return a->getName() < b->getName();
+    // early return if we know we won't be sorting
+    if (option.isEmpty()) {
+        return;
+    }
+
+    auto comparator = [&option](CardItem *a, CardItem *b) {
+        for (auto prop : option) {
+            auto extractor = getExtractorFor(prop);
+            QString t1 = extractor(a);
+            QString t2 = extractor(b);
+            if (t1 != t2) {
+                return t1 < t2;
+            }
+        }
+        return false;
     };
 
     std::sort(begin(), end(), comparator);
+}
+
+/**
+ * @brief returns the function that extracts the given property from the CardItem.
+ */
+std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
+{
+    switch (option) {
+        case NoSort:
+            return [](CardItem *c) { return ""; };
+        case SortByName:
+            return [](CardItem *c) { return c->getName(); };
+        case SortByType:
+            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getMainCardType() : ""; };
+        case SortByManaValue:
+            // getCmc returns the int as a string. We pad with 0's so that string comp also works on it
+            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getCmc().rightJustified(4, '0') : ""; };
+    }
 }
