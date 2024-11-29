@@ -31,7 +31,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
                            QGraphicsItem *parent)
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
-      writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
+      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -113,11 +113,33 @@ void ZoneViewZone::reorganizeCards()
             cards[i]->setId(i);
 
     CardList cardsToDisplay(cards);
-    if (sortByName || sortByType)
-        cardsToDisplay.sort((sortByName ? CardList::SortByName : 0) | (sortByType ? CardList::SortByType : 0));
 
-    auto gridSize = positionCardsForDisplay(cardsToDisplay, pileView && sortByType);
+    // sort cards
+    QList<CardList::SortOption> sortOptions;
+    if (groupBy != CardList::NoSort) {
+        sortOptions << groupBy;
+    }
 
+    if (sortBy != CardList::NoSort) {
+        sortOptions << sortBy;
+
+        // implicitly sort by name at the end so that cards with the same name appear together
+        if (sortBy != CardList::SortByName) {
+            sortOptions << CardList::SortByName;
+        }
+    }
+
+    cardsToDisplay.sortBy(sortOptions);
+
+    // position cards
+    GridSize gridSize;
+    if (pileView) {
+        gridSize = positionCardsForDisplay(cardsToDisplay, groupBy);
+    } else {
+        gridSize = positionCardsForDisplay(cardsToDisplay);
+    }
+
+    // determine bounding rect
     qreal aleft = 0;
     qreal atop = 0;
     qreal awidth = gridSize.cols * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
@@ -132,24 +154,30 @@ void ZoneViewZone::reorganizeCards()
  * @brief Sets the position of each card to the proper position for the view
  *
  * @param cards The cards to reposition. Will modify the cards in the list.
- * @param groupByType Whether to make piles by card type. If true, then expects `cards` to be sorted by type.
+ * @param pileOption Property used to group cards for the piles. Expects `cards` to be sorted by that property. Pass in
+ * NoSort to not make piles.
  *
  * @returns The number of rows and columns to display
  */
-ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, bool groupByType)
+ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption)
 {
     int cardCount = cards.size();
-    if (groupByType) {
+
+    if (pileOption != CardList::NoSort) {
         int row = 0;
         int col = 0;
         int longestRow = 0;
-        QString lastCardType;
+
+        QString lastColumnProp;
+
+        const auto extractor = CardList::getExtractorFor(pileOption);
+
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
-            QString cardType = c->getInfo() ? c->getInfo()->getMainCardType() : "";
+            QString columnProp = extractor(c);
 
             if (i) { // if not the first card
-                if (cardType == lastCardType)
+                if (columnProp == lastColumnProp)
                     row++; // add below current card
                 else {     // if no match then move card to next column
                     col++;
@@ -157,7 +185,7 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, bo
                 }
             }
 
-            lastCardType = cardType;
+            lastColumnProp = columnProp;
             qreal x = col * CARD_WIDTH;
             qreal y = row * CARD_HEIGHT / 3;
             c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
@@ -194,17 +222,15 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, bo
     }
 }
 
-void ZoneViewZone::setSortByName(int _sortByName)
+void ZoneViewZone::setGroupBy(CardList::SortOption _groupBy)
 {
-    sortByName = _sortByName;
+    groupBy = _groupBy;
     reorganizeCards();
 }
 
-void ZoneViewZone::setSortByType(int _sortByType)
+void ZoneViewZone::setSortBy(CardList::SortOption _sortBy)
 {
-    sortByType = _sortByType;
-    if (!sortByType)
-        pileView = false;
+    sortBy = _sortBy;
     reorganizeCards();
 }
 

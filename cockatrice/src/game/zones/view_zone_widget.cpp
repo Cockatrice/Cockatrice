@@ -46,16 +46,30 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         QGraphicsLinearLayout *hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
 
-        QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
-        sortByNameProxy->setWidget(&sortByNameCheckBox);
-        hFilterbox->addItem(sortByNameProxy);
+        // groupBy options
+        groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
+        groupBySelector.addItem(tr("Group by Type"), CardList::SortByType);
+        groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
 
-        QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
-        sortByTypeProxy->setWidget(&sortByTypeCheckBox);
-        hFilterbox->addItem(sortByTypeProxy);
+        QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
+        groupBySelectorProxy->setWidget(&groupBySelector);
+        groupBySelectorProxy->setZValue(2000000008);
+        hFilterbox->addItem(groupBySelectorProxy);
+
+        // sortBy options
+        sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
+        sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
+        sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
+        sortBySelector.addItem(tr("Sort by Mana Value"), CardList::SortByManaValue);
+
+        QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
+        sortBySelectorProxy->setWidget(&sortBySelector);
+        sortBySelectorProxy->setZValue(2000000007);
+        hFilterbox->addItem(sortBySelectorProxy);
 
         vbox->addItem(hFilterbox);
 
+        // line
         QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
         QFrame *line = new QFrame;
         line->setFrameShape(QFrame::HLine);
@@ -63,10 +77,12 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         lineProxy->setWidget(line);
         vbox->addItem(lineProxy);
 
+        // pile view options
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
         hPilebox->addItem(pileViewProxy);
 
+        // shuffle options
         if (_origZone->getIsShufflable() && numberCards == -1) {
             shuffleCheckBox.setChecked(true);
             QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
@@ -104,14 +120,18 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     // only wire up sort options after creating ZoneViewZone, since it segfaults otherwise.
     if (numberCards < 0) {
-        connect(&sortByNameCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSortByName);
-        connect(&sortByTypeCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSortByType);
+        connect(&groupBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+                &ZoneViewWidget::processGroupBy);
+        connect(&sortBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+                &ZoneViewWidget::processSortBy);
         connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
-        sortByNameCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByName());
-        sortByTypeCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByType());
+        groupBySelector.setCurrentIndex(groupBySelector.findData(SettingsCache::instance().getZoneViewGroupBy()));
+        sortBySelector.setCurrentIndex(sortBySelector.findData(SettingsCache::instance().getZoneViewSortBy()));
         pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
-        if (!SettingsCache::instance().getZoneViewSortByType())
+
+        if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
             pileViewCheckBox.setEnabled(false);
+        }
     }
 
     retranslateUi();
@@ -122,18 +142,35 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     zone->initializeCards(cardList);
 }
 
-void ZoneViewWidget::processSortByType(QT_STATE_CHANGED_T value)
+void ZoneViewWidget::processGroupBy(int index)
 {
-    pileViewCheckBox.setEnabled(value);
-    SettingsCache::instance().setZoneViewSortByType(value);
-    zone->setPileView(pileViewCheckBox.isChecked());
-    zone->setSortByType(value);
+    auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
+    SettingsCache::instance().setZoneViewGroupBy(option);
+    zone->setGroupBy(option);
+
+    // disable pile view checkbox if we're not grouping by anything
+    pileViewCheckBox.setEnabled(option != CardList::NoSort);
+
+    // reset sortBy if it has the same value as groupBy
+    if (option != CardList::NoSort &&
+        option == static_cast<CardList::SortOption>(sortBySelector.currentData().toInt())) {
+        sortBySelector.setCurrentIndex(1); // set to SortByName
+    }
 }
 
-void ZoneViewWidget::processSortByName(QT_STATE_CHANGED_T value)
+void ZoneViewWidget::processSortBy(int index)
 {
-    SettingsCache::instance().setZoneViewSortByName(value);
-    zone->setSortByName(value);
+    auto option = static_cast<CardList::SortOption>(sortBySelector.itemData(index).toInt());
+
+    // set to SortByName instead if it has the same value as groupBy
+    if (option != CardList::NoSort &&
+        option == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
+        sortBySelector.setCurrentIndex(1); // set to SortByName
+        return;
+    }
+
+    SettingsCache::instance().setZoneViewSortBy(option);
+    zone->setSortBy(option);
 }
 
 void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
@@ -145,8 +182,6 @@ void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 void ZoneViewWidget::retranslateUi()
 {
     setWindowTitle(zone->getTranslatedName(false, CaseNominative));
-    sortByNameCheckBox.setText(tr("sort by name"));
-    sortByTypeCheckBox.setText(tr("sort by type"));
     shuffleCheckBox.setText(tr("shuffle when closing"));
     pileViewCheckBox.setText(tr("pile view"));
 }

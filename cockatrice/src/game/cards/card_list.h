@@ -11,10 +11,12 @@ protected:
     bool contentsKnown;
 
 public:
-    enum SortFlags
+    enum SortOption
     {
-        SortByName = 1,
-        SortByType = 2
+        NoSort,
+        SortByName,
+        SortByType,
+        SortByManaValue
     };
     CardList(bool _contentsKnown);
     CardItem *findCard(const int cardId) const;
@@ -22,7 +24,10 @@ public:
     {
         return contentsKnown;
     }
-    void sort(int flags = SortByName);
+
+    void sortBy(const QList<SortOption> &options);
+
+    static std::function<QString(CardItem *)> getExtractorFor(SortOption option);
 };
 
 #endif

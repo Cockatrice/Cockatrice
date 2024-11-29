@@ -32,7 +32,7 @@ private:
     void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
     CardZone *origZone;
     bool revealZone, writeableRevealZone;
-    bool sortByName, sortByType;
+    CardList::SortOption groupBy, sortBy;
     bool pileView;
 
     struct GridSize
@@ -41,7 +41,7 @@ private:
         int cols;
     };
 
-    GridSize positionCardsForDisplay(CardList &cards, bool groupByType = false);
+    GridSize positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption = CardList::NoSort);
 
 public:
     ZoneViewZone(Player *_p,
@@ -75,8 +75,8 @@ public:
     }
     void setWriteableRevealZone(bool _writeableRevealZone);
 public slots:
-    void setSortByName(int _sortByName);
-    void setSortByType(int _sortByType);
+    void setGroupBy(CardList::SortOption _groupBy);
+    void setSortBy(CardList::SortOption _sortBy);
     void setPileView(int _pileView);
 private slots:
     void zoneDumpReceived(const Response &r);

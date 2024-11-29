@@ -4,6 +4,7 @@
 #include "../../utility/macros.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 
@@ -14,7 +15,6 @@ class ZoneViewZone;
 class Player;
 class CardDatabase;
 class QScrollBar;
-class QCheckBox;
 class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
@@ -47,8 +47,8 @@ private:
     QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
-    QCheckBox sortByNameCheckBox;
-    QCheckBox sortByTypeCheckBox;
+    QComboBox groupBySelector;
+    QComboBox sortBySelector;
     QCheckBox shuffleCheckBox;
     QCheckBox pileViewCheckBox;
 
@@ -58,8 +58,8 @@ private:
 signals:
     void closePressed(ZoneViewWidget *zv);
 private slots:
-    void processSortByType(QT_STATE_CHANGED_T value);
-    void processSortByName(QT_STATE_CHANGED_T value);
+    void processGroupBy(int value);
+    void processSortBy(int value);
     void processSetPileView(QT_STATE_CHANGED_T value);
     void resizeToZoneContents();
     void handleScrollBarChange(int value);

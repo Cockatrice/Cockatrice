@@ -109,7 +109,8 @@ private:
     QString chatHighlightColor;
     bool chatMentionForeground;
     bool chatHighlightForeground;
-    bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
+    int zoneViewSortBy, zoneViewGroupBy;
+    bool zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
     bool ignoreUnregisteredUsers;
@@ -327,13 +328,13 @@ public:
     {
         return chatHighlightForeground;
     }
-    bool getZoneViewSortByName() const
+    int getZoneViewGroupBy() const
     {
-        return zoneViewSortByName;
+        return zoneViewGroupBy;
     }
-    bool getZoneViewSortByType() const
+    int getZoneViewSortBy() const
     {
-        return zoneViewSortByType;
+        return zoneViewSortBy;
     }
     /**
        Returns if the view should be sorted into pile view.
@@ -563,8 +564,8 @@ public slots:
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
     void setChatHighlightForeground(QT_STATE_CHANGED_T _chatHighlightForeground);
-    void setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName);
-    void setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType);
+    void setZoneViewGroupBy(const int _zoneViewGroupBy);
+    void setZoneViewSortBy(const int _zoneViewSortBy);
     void setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView);
     void setSoundEnabled(QT_STATE_CHANGED_T _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
