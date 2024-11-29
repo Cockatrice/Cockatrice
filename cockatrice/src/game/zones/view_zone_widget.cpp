@@ -140,6 +140,15 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
     connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
     zone->initializeCards(cardList);
+
+    auto *lastResizeBeforeVisibleTimer = new QTimer(this);
+    connect(lastResizeBeforeVisibleTimer, &QTimer::timeout, this, [=] {
+        resizeToZoneContents();
+        disconnect(lastResizeBeforeVisibleTimer);
+        lastResizeBeforeVisibleTimer->deleteLater();
+    });
+    lastResizeBeforeVisibleTimer->setSingleShot(true);
+    lastResizeBeforeVisibleTimer->start(1);
 }
 
 void ZoneViewWidget::processGroupBy(int index)
