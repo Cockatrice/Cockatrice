@@ -252,7 +252,7 @@ SettingsCache::SettingsCache()
     chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
     chatHighlightColor = settings->value("chat/highlightcolor", "A6120D").toString();
 
-    zoneViewGroupByIndex = settings->value("zoneview/groupby", 2).toInt();
+    zoneViewGroupByIndex = settings->value("zoneview/groupby", 1).toInt();
     zoneViewSortByIndex = settings->value("zoneview/sortby", 1).toInt();
     zoneViewPileView = settings->value("zoneview/pileview", true).toBool();
 
