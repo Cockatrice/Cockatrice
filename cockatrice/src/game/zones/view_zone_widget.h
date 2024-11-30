@@ -7,8 +7,8 @@
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
+#include <QLabel>
 
-class QLabel;
 class QPushButton;
 class CardZone;
 class ZoneViewZone;
@@ -47,6 +47,8 @@ private:
     QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
+    QLabel groupByLabel;
+    QLabel sortByLabel;
     QComboBox groupBySelector;
     QComboBox sortBySelector;
     QCheckBox shuffleCheckBox;

@@ -45,13 +45,37 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     if (numberCards < 0) {
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
 
+        // groupBy label
+        groupByLabel.setFixedHeight(23);
+        groupByLabel.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        groupByLabel.setAlignment(Qt::AlignLeft);
+
+        QGraphicsProxyWidget *groupByLabelProxy = new QGraphicsProxyWidget;
+        groupByLabelProxy->setWidget(&groupByLabel);
+        groupByLabelProxy->setZValue(2000000008);
+        hFilterbox->addItem(groupByLabelProxy);
+
         // groupBy options
+        groupBySelector.setFixedHeight(23);
+
         QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
         groupBySelectorProxy->setWidget(&groupBySelector);
         groupBySelectorProxy->setZValue(2000000008);
         hFilterbox->addItem(groupBySelectorProxy);
 
+        // sortBy label
+        sortByLabel.setFixedHeight(23);
+        sortByLabel.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sortByLabel.setAlignment(Qt::AlignLeft);
+
+        QGraphicsProxyWidget *sortByLabelProxy = new QGraphicsProxyWidget;
+        sortByLabelProxy->setWidget(&sortByLabel);
+        sortByLabelProxy->setZValue(2000000007);
+        hFilterbox->addItem(sortByLabelProxy);
+
         // sortBy options
+        sortBySelector.setFixedHeight(23);
+
         QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
         sortBySelectorProxy->setWidget(&sortBySelector);
         sortBySelectorProxy->setZValue(2000000007);
@@ -185,22 +209,25 @@ void ZoneViewWidget::retranslateUi()
 {
     setWindowTitle(zone->getTranslatedName(false, CaseNominative));
 
+    groupByLabel.setText(tr("Group by"));
+    sortByLabel.setText(tr("Sort by"));
+
     { // We can't change the strings after they're put into the QComboBox, so this is our workaround
         int oldIndex = sortBySelector.currentIndex();
         sortBySelector.clear();
-        sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
-        sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
-        sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
-        sortBySelector.addItem(tr("Sort by Mana Value"), CardList::SortByManaValue);
+        sortBySelector.addItem(tr("---"), CardList::NoSort);
+        sortBySelector.addItem(tr("Name"), CardList::SortByName);
+        sortBySelector.addItem(tr("Type"), CardList::SortByType);
+        sortBySelector.addItem(tr("Mana Value"), CardList::SortByManaValue);
         sortBySelector.setCurrentIndex(oldIndex);
     }
 
     {
         int oldIndex = groupBySelector.currentIndex();
         groupBySelector.clear();
-        groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
-        groupBySelector.addItem(tr("Group by Type"), CardList::SortByType);
-        groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
+        groupBySelector.addItem(tr("---"), CardList::NoSort);
+        groupBySelector.addItem(tr("Type"), CardList::SortByType);
+        groupBySelector.addItem(tr("Mana Value"), CardList::SortByManaValue);
         groupBySelector.setCurrentIndex(oldIndex);
     }
 
