@@ -43,7 +43,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     // If the number is < 0, then it means that we can give the option to make the area sorted
     if (numberCards < 0) {
-        QGraphicsLinearLayout *hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
+        // top row
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // groupBy options
@@ -67,6 +67,9 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         line->setFrameShadow(QFrame::Sunken);
         lineProxy->setWidget(line);
         vbox->addItem(lineProxy);
+
+        // bottom row
+        QGraphicsLinearLayout *hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // pile view options
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
