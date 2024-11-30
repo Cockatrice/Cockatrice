@@ -61,6 +61,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
         groupBySelectorProxy->setWidget(&groupBySelector);
         groupBySelectorProxy->setZValue(2000000008);
+        groupBySelectorProxy->setMinimumWidth(120);
         hFilterbox->addItem(groupBySelectorProxy);
 
         // sortBy label
@@ -79,6 +80,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
         sortBySelectorProxy->setWidget(&sortBySelector);
         sortBySelectorProxy->setZValue(2000000007);
+        sortBySelectorProxy->setMinimumWidth(120);
         hFilterbox->addItem(sortBySelectorProxy);
 
         vbox->addItem(hFilterbox);
