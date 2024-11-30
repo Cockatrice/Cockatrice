@@ -188,10 +188,10 @@ void SettingsCache::setChatMentionColor(const QString & /* _chatMentionColor */)
 void SettingsCache::setChatHighlightColor(const QString & /* _chatHighlightColor */)
 {
 }
-void SettingsCache::setZoneViewGroupBy(int /* _zoneViewGroupBy */)
+void SettingsCache::setZoneViewGroupByIndex(int /* _zoneViewGroupByIndex */)
 {
 }
-void SettingsCache::setZoneViewSortBy(int /* _zoneViewSortBy */)
+void SettingsCache::setZoneViewSortByIndex(int /* _zoneViewSortByIndex */)
 {
 }
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T /* _zoneViewPileView */)

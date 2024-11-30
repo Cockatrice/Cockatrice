@@ -252,8 +252,8 @@ SettingsCache::SettingsCache()
     chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
     chatHighlightColor = settings->value("chat/highlightcolor", "A6120D").toString();
 
-    zoneViewGroupBy = settings->value("zoneview/groupby", 2).toInt();
-    zoneViewSortBy = settings->value("zoneview/sortby", 1).toInt();
+    zoneViewGroupByIndex = settings->value("zoneview/groupby", 1).toInt();
+    zoneViewSortByIndex = settings->value("zoneview/sortby", 1).toInt();
     zoneViewPileView = settings->value("zoneview/pileview", true).toBool();
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
@@ -582,16 +582,16 @@ void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor)
     settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
 
-void SettingsCache::setZoneViewGroupBy(int _zoneViewGroupBy)
+void SettingsCache::setZoneViewGroupByIndex(int _zoneViewGroupByIndex)
 {
-    zoneViewGroupBy = _zoneViewGroupBy;
-    settings->setValue("zoneview/groupby", zoneViewGroupBy);
+    zoneViewGroupByIndex = _zoneViewGroupByIndex;
+    settings->setValue("zoneview/groupby", zoneViewGroupByIndex);
 }
 
-void SettingsCache::setZoneViewSortBy(int _zoneViewSortBy)
+void SettingsCache::setZoneViewSortByIndex(int _zoneViewSortByIndex)
 {
-    zoneViewSortBy = _zoneViewSortBy;
-    settings->setValue("zoneview/sortby", zoneViewSortBy);
+    zoneViewSortByIndex = _zoneViewSortByIndex;
+    settings->setValue("zoneview/sortby", zoneViewSortByIndex);
 }
 
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView)
