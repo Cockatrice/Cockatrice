@@ -44,21 +44,21 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     // If the number is < 0, then it means that we can give the option to make the area sorted
     if (numberCards < 0) {
         // top row
-        QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
+        QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // groupBy options
         QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
         groupBySelectorProxy->setWidget(&groupBySelector);
         groupBySelectorProxy->setZValue(2000000008);
-        hFilterbox->addItem(groupBySelectorProxy);
+        hTopRow->addItem(groupBySelectorProxy);
 
         // sortBy options
         QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
         sortBySelectorProxy->setWidget(&sortBySelector);
         sortBySelectorProxy->setZValue(2000000007);
-        hFilterbox->addItem(sortBySelectorProxy);
+        hTopRow->addItem(sortBySelectorProxy);
 
-        vbox->addItem(hFilterbox);
+        vbox->addItem(hTopRow);
 
         // line
         QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
@@ -69,22 +69,22 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         vbox->addItem(lineProxy);
 
         // bottom row
-        QGraphicsLinearLayout *hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
+        QGraphicsLinearLayout *hBottomRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // pile view options
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
-        hPilebox->addItem(pileViewProxy);
+        hBottomRow->addItem(pileViewProxy);
 
         // shuffle options
         if (_origZone->getIsShufflable() && numberCards == -1) {
             shuffleCheckBox.setChecked(true);
             QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
             shuffleProxy->setWidget(&shuffleCheckBox);
-            hPilebox->addItem(shuffleProxy);
+            hBottomRow->addItem(shuffleProxy);
         }
 
-        vbox->addItem(hPilebox);
+        vbox->addItem(hBottomRow);
     }
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
