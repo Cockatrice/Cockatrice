@@ -47,21 +47,12 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // groupBy options
-        groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
-        groupBySelector.addItem(tr("Group by Type"), CardList::SortByType);
-        groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
-
         QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
         groupBySelectorProxy->setWidget(&groupBySelector);
         groupBySelectorProxy->setZValue(2000000008);
         hFilterbox->addItem(groupBySelectorProxy);
 
         // sortBy options
-        sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
-        sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
-        sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
-        sortBySelector.addItem(tr("Sort by Mana Value"), CardList::SortByManaValue);
-
         QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
         sortBySelectorProxy->setWidget(&sortBySelector);
         sortBySelectorProxy->setZValue(2000000007);
@@ -118,6 +109,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
             SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
 
+    retranslateUi();
+
     // only wire up sort options after creating ZoneViewZone, since it segfaults otherwise.
     if (numberCards < 0) {
         connect(&groupBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
@@ -134,7 +127,6 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         }
     }
 
-    retranslateUi();
     setLayout(vbox);
 
     connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
@@ -191,6 +183,26 @@ void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 void ZoneViewWidget::retranslateUi()
 {
     setWindowTitle(zone->getTranslatedName(false, CaseNominative));
+
+    { // We can't change the strings after they're put into the QComboBox, so this is our workaround
+        int oldIndex = sortBySelector.currentIndex();
+        sortBySelector.clear();
+        sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
+        sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
+        sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
+        sortBySelector.addItem(tr("Sort by Mana Value"), CardList::SortByManaValue);
+        sortBySelector.setCurrentIndex(oldIndex);
+    }
+
+    {
+        int oldIndex = groupBySelector.currentIndex();
+        groupBySelector.clear();
+        groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
+        groupBySelector.addItem(tr("Group by Type"), CardList::SortByType);
+        groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
+        groupBySelector.setCurrentIndex(oldIndex);
+    }
+
     shuffleCheckBox.setText(tr("shuffle when closing"));
     pileViewCheckBox.setText(tr("pile view"));
 }
