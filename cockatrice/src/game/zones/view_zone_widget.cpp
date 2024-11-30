@@ -54,6 +54,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         groupByLabelProxy->setWidget(&groupByLabel);
         groupByLabelProxy->setZValue(2000000008);
         hFilterbox->addItem(groupByLabelProxy);
+        hFilterbox->setItemSpacing(0, 0);
 
         // groupBy options
         groupBySelector.setFixedHeight(23);
@@ -63,6 +64,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         groupBySelectorProxy->setZValue(2000000008);
         groupBySelectorProxy->setMinimumWidth(120);
         hFilterbox->addItem(groupBySelectorProxy);
+        hFilterbox->setItemSpacing(1, 1);
 
         // sortBy label
         sortByLabel.setFixedHeight(23);
@@ -73,6 +75,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         sortByLabelProxy->setWidget(&sortByLabel);
         sortByLabelProxy->setZValue(2000000007);
         hFilterbox->addItem(sortByLabelProxy);
+        hFilterbox->setItemSpacing(2, 0);
 
         // sortBy options
         sortBySelector.setFixedHeight(23);
@@ -82,6 +85,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         sortBySelectorProxy->setZValue(2000000007);
         sortBySelectorProxy->setMinimumWidth(120);
         hFilterbox->addItem(sortBySelectorProxy);
+        hFilterbox->setItemSpacing(3, 1);
 
         vbox->addItem(hFilterbox);
 
