@@ -5,10 +5,9 @@
 <p align='center'>
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
-   <a href="#get-involved-">Get Involved</a> <b>|</b>
    <a href="#related-projects">Related Projects</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
-   <a href="#translations-">Translations</a> <b>|</b>
+   <a href="#contribute-">Contribute</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
@@ -19,7 +18,7 @@
 <br><pre><p align='center'>
 <b>To get started &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
 <b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development, see how to [get involved](#get-involved-)</b>
+<b>To help with development &#8674; check [how to contribute](#contribute-)</b>
 </pre><p><br>
 
 
@@ -41,7 +40,7 @@ Downloads are available for full releases and the current beta version in develo
    - To be a Cockatrice Beta Tester, use this version. Find more information [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)!
    
 
-# Get Involved [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
+# Contribute [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
 
 Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with the project, contributors or fellow users of the app. Come here to talk about the application, features, or just to hang out.<br>
 For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
@@ -57,6 +56,11 @@ We try to be responsive to new issues. We'll provide advice on how best to imple
 
 Cockatrice uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
+### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
+
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice, Oracle and Webatrice to your language or just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
+
+Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 # Related Projects
 
@@ -72,13 +76,6 @@ Cockatrice uses the [Google Developer Documentation Style Guide](https://develop
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 - [Cockatrice Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
-
-
-# Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
-
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice, Oracle and Webatrice to your language or just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
-
-Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
 # Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
