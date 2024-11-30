@@ -196,7 +196,7 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         return GridSize{longestRow, qMax(col + 1, 3)};
 
     } else {
-        int cols = qMin(qFloor(qSqrt((double)cardCount / 2)), 7);
+        int cols = qBound(1, qFloor(qSqrt((double)cardCount / 2)), 7);
         int rows = qMax(qCeil((double)cardCount / cols), 1);
         if (minRows == 0) {
             minRows = rows;
