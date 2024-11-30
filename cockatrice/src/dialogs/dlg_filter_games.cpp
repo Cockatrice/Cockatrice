@@ -276,7 +276,7 @@ int DlgFilterGames::getMaxPlayersFilterMax() const
     return maxPlayersFilterMaxSpinBox->value();
 }
 
-const QTime &DlgFilterGames::getMaxGameAge() const
+QTime DlgFilterGames::getMaxGameAge() const
 {
     int index = maxGameAgeComboBox->currentIndex();
     if (index < 0 || index >= gameAgeMap.size()) { // index is out of bounds
