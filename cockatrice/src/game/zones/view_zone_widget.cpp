@@ -213,6 +213,15 @@ void ZoneViewWidget::retranslateUi()
     sortByLabel.setText(tr("Sort by"));
 
     { // We can't change the strings after they're put into the QComboBox, so this is our workaround
+        int oldIndex = groupBySelector.currentIndex();
+        groupBySelector.clear();
+        groupBySelector.addItem(tr("---"), CardList::NoSort);
+        groupBySelector.addItem(tr("Type"), CardList::SortByType);
+        groupBySelector.addItem(tr("Mana Value"), CardList::SortByManaValue);
+        groupBySelector.setCurrentIndex(oldIndex);
+    }
+
+    {
         int oldIndex = sortBySelector.currentIndex();
         sortBySelector.clear();
         sortBySelector.addItem(tr("---"), CardList::NoSort);
@@ -220,15 +229,6 @@ void ZoneViewWidget::retranslateUi()
         sortBySelector.addItem(tr("Type"), CardList::SortByType);
         sortBySelector.addItem(tr("Mana Value"), CardList::SortByManaValue);
         sortBySelector.setCurrentIndex(oldIndex);
-    }
-
-    {
-        int oldIndex = groupBySelector.currentIndex();
-        groupBySelector.clear();
-        groupBySelector.addItem(tr("---"), CardList::NoSort);
-        groupBySelector.addItem(tr("Type"), CardList::SortByType);
-        groupBySelector.addItem(tr("Mana Value"), CardList::SortByManaValue);
-        groupBySelector.setCurrentIndex(oldIndex);
     }
 
     shuffleCheckBox.setText(tr("shuffle when closing"));
