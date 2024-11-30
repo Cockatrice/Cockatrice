@@ -45,7 +45,7 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="416"/>
         <source>Open themes folder</source>
-        <translation>Open thema folder</translation>
+        <translation>Open themafolder</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="418"/>
@@ -55,7 +55,7 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="419"/>
         <source>Display card names on cards having a picture</source>
-        <translation>Kaartnamen altijd weergeven</translation>
+        <translation>Kaartnamen altijd weergeven op kaarten met een afbeelding</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="420"/>
@@ -7063,7 +7063,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Replays</source>
-        <translation type="unfinished"/>
+        <translation>Replays</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="143"/>
@@ -7749,12 +7749,12 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="593"/>
         <source>Play/Pause</source>
-        <translation type="unfinished"/>
+        <translation>Start/Stop</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="596"/>
         <source>Toggle Fast Forward</source>
-        <translation type="unfinished"/>
+        <translation>Versnelling Schakelen</translation>
     </message>
 </context>
 </TS>
