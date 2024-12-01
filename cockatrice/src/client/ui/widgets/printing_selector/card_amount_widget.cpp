@@ -87,12 +87,14 @@ void CardAmountWidget::updateCardCount()
 
 void CardAmountWidget::addPrinting(const QString &zone)
 {
-    const auto newCardIndex = deckModel->addCard(rootCard->getName(), setInfoForCard, zone);
+    auto newCardIndex = deckModel->addCard(rootCard->getName(), setInfoForCard, zone);
     recursiveExpand(newCardIndex);
     QModelIndex find_card = deckModel->findCard(rootCard->getName(), zone);
     if (find_card.isValid() && find_card != newCardIndex) {
         deckModel->removeRow(find_card.row(), find_card.parent());
     };
+    newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"));
+    deckView->setCurrentIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
 }
 
