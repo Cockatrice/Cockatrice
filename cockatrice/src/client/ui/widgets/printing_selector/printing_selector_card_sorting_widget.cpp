@@ -44,8 +44,8 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSet
 {
     QList<CardSetPtr> sortedSets;
 
-    for (const auto &x : cardInfoPerSets) {
-        for (const auto &set : x) {
+    for (const auto &cardInfoPerSetList : cardInfoPerSets) {
+        for (const auto &set : cardInfoPerSetList) {
             sortedSets << set.getPtr();
             break;
         }
@@ -66,8 +66,8 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSet
     // Reconstruct sorted list of CardInfoPerSet
     for (const auto &set : sortedSets) {
         for (auto it = cardInfoPerSets.begin(); it != cardInfoPerSets.end(); ++it) {
-            for (const auto &x : it.value()) {
-                if (x.getPtr() == set) {
+            for (const auto &cardInfoPerSet : it.value()) {
+                if (cardInfoPerSet.getPtr() == set) {
                     sortedCardInfoPerSets << it.value();
                     break;
                 }
@@ -115,8 +115,8 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(
     QList<QPair<CardInfoPerSet, int>> countList;
 
     // Collect sets with their counts
-    for (const auto &x : cardInfoPerSets) {
-        for (const auto &cardInfoPerSet : x) {
+    for (const auto &cardInfoPerSetList : cardInfoPerSets) {
+        for (const auto &cardInfoPerSet : cardInfoPerSetList) {
             QModelIndex find_card =
                 deckModel->findCard(selectedCard->getName(), DECK_ZONE_MAIN, cardInfoPerSet.getProperty("uuid"));
             if (find_card.isValid()) {

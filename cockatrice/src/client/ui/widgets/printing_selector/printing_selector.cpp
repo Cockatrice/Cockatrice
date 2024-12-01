@@ -116,8 +116,8 @@ CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
 {
     CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
 
-    for (const auto &x : cardInfoPerSets) {
-        for (const auto &cardInfoPerSet : x) {
+    for (const auto &cardInfoPerSetList : cardInfoPerSets) {
+        for (const auto &cardInfoPerSet : cardInfoPerSetList) {
             if (cardInfoPerSet.getProperty("uuid") == uuid) {
                 return cardInfoPerSet;
             }
