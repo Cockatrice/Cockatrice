@@ -283,7 +283,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     for (const auto &cardInfoPerSetList : info->getSets()) {
         for (const CardInfoPerSet &set : cardInfoPerSetList) {
             xml.writeStartElement("set");
-            for (const QString& propName : set.getProperties()) {
+            for (const QString &propName : set.getProperties()) {
                 xml.writeAttribute(propName, set.getProperty(propName));
             }
 
