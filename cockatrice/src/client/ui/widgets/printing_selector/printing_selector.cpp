@@ -257,6 +257,7 @@ QList<CardInfoPerSet> PrintingSelector::sortSets()
 
     if (sortOptionsSelector->currentText() == SORT_OPTIONS_PREFERENCE) {
         std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
+        std::reverse(sortedSets.begin(), sortedSets.end());
     } else if (sortOptionsSelector->currentText() == SORT_OPTIONS_RELEASE_DATE) {
         std::sort(sortedSets.begin(), sortedSets.end(), SetReleaseDateComparator());
     }
