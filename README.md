@@ -99,32 +99,35 @@ Oracle can *optionally* use some packages to load compressed card files:
 - [zlib](https://www.zlib.net/)
 
 To compile:
-
-    mkdir build
-    cd build
-    cmake ..
-    make
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
 
 You can then run
-
-    make install
+```bash
+make install
+```
 
 to get a cockatrice installation inside the `release` folder, or:
-
-    make package
-
+```
+make package
+```
 to create a system-specific installation package.
 
 The following flags can be passed to `cmake`:
-
-- `-DWITH_SERVER=1` Whether to build the server (default 0 = no).
-- `-DWITH_CLIENT=0` Whether to build the client (default 1 = yes).
-- `-DWITH_ORACLE=0` Whether to build oracle (default 1 = yes).
-- `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings (default `Release`).
-- `-DWARNING_AS_ERROR=0` Whether to treat compilation warnings as errors in debug mode (default 1 = yes).
-- `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
-- `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
-- `-DFORCE_USE_QT5=1` Skip looking for Qt6 before trying to find Qt5
+| Flag | Description | Default Value |
+| --- | --- | --- |
+| `-DWITH_SERVER=1` | Build Servatrice server | 0 (no) |
+| `-DWITH_CLIENT=0` | Build Cockatrice client | 1 (yes) |
+| `-DWITH_ORACLE=0` | Build Oracle card database tool | 1 (yes) |
+| `-DCMAKE_BUILD_TYPE=Debug` | Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings | Release |
+| `-DWARNING_AS_ERROR=0` | Treat compilation warnings as errors in debug mode | 1 (yes) |
+| `-DUPDATE_TRANSLATIONS=1` | Configure `make` to update the translation .ts files for new strings in the source code.<br> **Note:** Running `make clean` will remove the .ts files | 0 (no) |
+| `-DTEST=1` | Enable regression tests.<br> **Note:** needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```. | 0 (no) |
+| `-DFORCE_USE_QT5=1` | Skip looking for Qt6 before trying to find Qt5 | 0 (no) |
 
 
 # Run
