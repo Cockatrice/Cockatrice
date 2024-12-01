@@ -4,6 +4,7 @@
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
+#include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 
 #include <QComboBox>
@@ -51,10 +52,7 @@ private:
     QLineEdit *searchBar;
     QTimer *searchDebounceTimer;
     FlowWidget *flowWidget;
-    QWidget *cardSizeWidget;
-    QHBoxLayout *cardSizeLayout;
-    QLabel *cardSizeLabel;
-    QSlider *cardSizeSlider;
+    CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
     TabDeckEditor *deckEditor;
     DeckListModel *deckModel;

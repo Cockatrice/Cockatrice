@@ -24,6 +24,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_info_picture_widget.cpp
     src/client/ui/widgets/cards/card_info_text_widget.cpp
     src/client/ui/widgets/cards/card_info_display_widget.cpp
+        src/client/ui/widgets/cards/card_size_widget.cpp
     src/game/cards/card_item.cpp
     src/game/cards/card_list.cpp
     src/game/zones/card_zone.cpp
@@ -99,6 +100,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/printing_selector/printing_selector.cpp
     src/client/ui/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
+        src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/client/ui/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/client/network/release_channel.cpp
     src/server/remote/remote_client.cpp
