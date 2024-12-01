@@ -3,25 +3,25 @@
 
 #include "../general/layout_containers/flow_widget.h"
 
-#include <QWidget>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSlider>
+#include <QWidget>
 
 class CardSizeWidget : public QWidget
 {
     Q_OBJECT
 
-    public:
-        explicit CardSizeWidget(QWidget *parent, FlowWidget* flowWidget = nullptr);
-        QSlider* getSlider() const;
+public:
+    explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr);
+    QSlider *getSlider() const;
 
 private:
     QWidget *parent;
-    FlowWidget* flowWidget;
+    FlowWidget *flowWidget;
     QHBoxLayout *cardSizeLayout;
     QLabel *cardSizeLabel;
     QSlider *cardSizeSlider;
 };
 
-#endif //CARD_SIZE_WIDGET_H
+#endif // CARD_SIZE_WIDGET_H
