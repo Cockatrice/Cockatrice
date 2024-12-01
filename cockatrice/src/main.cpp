@@ -21,18 +21,18 @@
 #include "main.h"
 
 #include "QtNetwork/QNetworkInterface"
-#include "carddatabase.h"
-#include "dlg_settings.h"
+#include "client/network/spoiler_background_updater.h"
+#include "client/sound_engine.h"
+#include "client/ui/pixel_map_generator.h"
+#include "client/ui/theme_manager.h"
+#include "client/ui/window_main.h"
+#include "dialogs/dlg_settings.h"
 #include "featureset.h"
-#include "logger.h"
-#include "pixmapgenerator.h"
+#include "game/cards/card_database.h"
 #include "rng_sfmt.h"
-#include "settingscache.h"
-#include "soundengine.h"
-#include "spoilerbackgroundupdater.h"
-#include "thememanager.h"
+#include "settings/cache_settings.h"
+#include "utility/logger.h"
 #include "version_string.h"
-#include "window_main.h"
 
 #include <QApplication>
 #include <QCryptographicHash>
@@ -47,7 +47,6 @@
 #include <QTranslator>
 #include <QtPlugin>
 
-CardDatabase *db;
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
@@ -151,7 +150,6 @@ int main(int argc, char *argv[])
     rng = new RNG_SFMT;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
-    db = new CardDatabase;
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;
@@ -188,7 +186,6 @@ int main(int argc, char *argv[])
     app.exec();
 
     qDebug("Event loop finished, terminating...");
-    delete db;
     delete rng;
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();

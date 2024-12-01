@@ -189,6 +189,12 @@ fi
 
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
+  
+  if [[ $RUNNER_OS == macOS ]]; then
+    # Workaround https://github.com/actions/runner-images/issues/7522
+    echo "killing XProtectBehaviorService"; sudo pkill -9 XProtect >/dev/null || true;
+    echo "waiting for XProtectBehaviorService kill"; while pgrep "XProtect"; do sleep 3; done;
+  fi
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 

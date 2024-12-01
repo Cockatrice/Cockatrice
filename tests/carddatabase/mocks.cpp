@@ -5,9 +5,15 @@ CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardDatabase.ini", parent)
 {
 }
-void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */){};
-void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */){};
-void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */){};
+void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */)
+{
+}
+void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */)
+{
+}
+void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */)
+{
+}
 unsigned int CardDatabaseSettings::getSortKey(QString /* shortName */)
 {
     return 0;
@@ -65,22 +71,22 @@ void SettingsCache::setHighlightWords(const QString & /* _highlightWords */)
 void SettingsCache::setMasterVolume(int /* _masterVolume */)
 {
 }
-void SettingsCache::setLeftJustified(const int /* _leftJustified */)
+void SettingsCache::setLeftJustified(const QT_STATE_CHANGED_T /* _leftJustified */)
 {
 }
-void SettingsCache::setCardScaling(const int /* _scaleCards */)
+void SettingsCache::setCardScaling(const QT_STATE_CHANGED_T /* _scaleCards */)
 {
 }
 void SettingsCache::setStackCardOverlapPercent(const int /* _verticalCardOverlapPercent */)
 {
 }
-void SettingsCache::setShowMessagePopups(const int /* _showMessagePopups */)
+void SettingsCache::setShowMessagePopups(const QT_STATE_CHANGED_T /* _showMessagePopups */)
 {
 }
-void SettingsCache::setShowMentionPopups(const int /* _showMentionPopus */)
+void SettingsCache::setShowMentionPopups(const QT_STATE_CHANGED_T /* _showMentionPopus */)
 {
 }
-void SettingsCache::setRoomHistory(const int /* _roomHistory */)
+void SettingsCache::setRoomHistory(const QT_STATE_CHANGED_T /* _roomHistory */)
 {
 }
 void SettingsCache::setLang(const QString & /* _lang */)
@@ -119,58 +125,61 @@ void SettingsCache::setTokenDatabasePath(const QString & /* _tokenDatabasePath *
 void SettingsCache::setThemeName(const QString & /* _themeName */)
 {
 }
-void SettingsCache::setPicDownload(int /* _picDownload */)
+void SettingsCache::setPicDownload(QT_STATE_CHANGED_T /* _picDownload */)
 {
 }
-void SettingsCache::setNotificationsEnabled(int /* _notificationsEnabled */)
+void SettingsCache::setNotificationsEnabled(QT_STATE_CHANGED_T /* _notificationsEnabled */)
 {
 }
-void SettingsCache::setSpectatorNotificationsEnabled(int /* _spectatorNotificationsEnabled */)
+void SettingsCache::setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T /* _spectatorNotificationsEnabled */)
 {
 }
-void SettingsCache::setBuddyConnectNotificationsEnabled(int /* _buddyConnectNotificationsEnabled */)
+void SettingsCache::setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T /* _buddyConnectNotificationsEnabled */)
 {
 }
-void SettingsCache::setDoubleClickToPlay(int /* _doubleClickToPlay */)
+void SettingsCache::setDoubleClickToPlay(QT_STATE_CHANGED_T /* _doubleClickToPlay */)
 {
 }
-void SettingsCache::setPlayToStack(int /* _playToStack */)
+void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T /* _playToStack */)
 {
 }
 void SettingsCache::setStartingHandSize(int /* _startingHandSize */)
 {
 }
-void SettingsCache::setAnnotateTokens(int /* _annotateTokens */)
+void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T /* _annotateTokens */)
 {
 }
 void SettingsCache::setTabGameSplitterSizes(const QByteArray & /* _tabGameSplitterSizes */)
 {
 }
-void SettingsCache::setDisplayCardNames(int /* _displayCardNames */)
+void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T /* _displayCardNames */)
 {
 }
-void SettingsCache::setHorizontalHand(int /* _horizontalHand */)
+void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }
-void SettingsCache::setInvertVerticalCoordinate(int /* _invertVerticalCoordinate */)
+void SettingsCache::setInvertVerticalCoordinate(QT_STATE_CHANGED_T /* _invertVerticalCoordinate */)
 {
 }
 void SettingsCache::setMinPlayersForMultiColumnLayout(int /* _minPlayersForMultiColumnLayout */)
 {
 }
-void SettingsCache::setTapAnimation(int /* _tapAnimation */)
+void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T /* _tapAnimation */)
 {
 }
-void SettingsCache::setChatMention(int /* _chatMention */)
+void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T /* _openDeckInNewTab */)
 {
 }
-void SettingsCache::setChatMentionCompleter(const int /* _enableMentionCompleter */)
+void SettingsCache::setChatMention(QT_STATE_CHANGED_T /* _chatMention */)
 {
 }
-void SettingsCache::setChatMentionForeground(int /* _chatMentionForeground */)
+void SettingsCache::setChatMentionCompleter(const QT_STATE_CHANGED_T /* _enableMentionCompleter */)
 {
 }
-void SettingsCache::setChatHighlightForeground(int /* _chatHighlightForeground */)
+void SettingsCache::setChatMentionForeground(QT_STATE_CHANGED_T /* _chatMentionForeground */)
+{
+}
+void SettingsCache::setChatHighlightForeground(QT_STATE_CHANGED_T /* _chatHighlightForeground */)
 {
 }
 void SettingsCache::setChatMentionColor(const QString & /* _chatMentionColor */)
@@ -179,25 +188,25 @@ void SettingsCache::setChatMentionColor(const QString & /* _chatMentionColor */)
 void SettingsCache::setChatHighlightColor(const QString & /* _chatHighlightColor */)
 {
 }
-void SettingsCache::setZoneViewSortByName(int /* _zoneViewSortByName */)
+void SettingsCache::setZoneViewGroupByIndex(int /* _zoneViewGroupByIndex */)
 {
 }
-void SettingsCache::setZoneViewSortByType(int /* _zoneViewSortByType */)
+void SettingsCache::setZoneViewSortByIndex(int /* _zoneViewSortByIndex */)
 {
 }
-void SettingsCache::setZoneViewPileView(int /* _zoneViewPileView */)
+void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T /* _zoneViewPileView */)
 {
 }
-void SettingsCache::setSoundEnabled(int /* _soundEnabled */)
+void SettingsCache::setSoundEnabled(QT_STATE_CHANGED_T /* _soundEnabled */)
 {
 }
 void SettingsCache::setSoundThemeName(const QString & /* _soundThemeName */)
 {
 }
-void SettingsCache::setIgnoreUnregisteredUsers(int /* _ignoreUnregisteredUsers */)
+void SettingsCache::setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T /* _ignoreUnregisteredUsers */)
 {
 }
-void SettingsCache::setIgnoreUnregisteredUserMessages(int /* _ignoreUnregisteredUserMessages */)
+void SettingsCache::setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T /* _ignoreUnregisteredUserMessages */)
 {
 }
 void SettingsCache::setMainWindowGeometry(const QByteArray & /* _mainWindowGeometry */)
@@ -213,6 +222,9 @@ void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
 {
 }
 void SettingsCache::setNetworkCacheSizeInMB(const int /* _networkCacheSize */)
+{
+}
+void SettingsCache::setNetworkRedirectCacheTtl(const int /* _redirectCacheTtl */)
 {
 }
 void SettingsCache::setClientID(const QString & /* _clientID */)
@@ -259,10 +271,10 @@ void SettingsCache::setCreateGameAsSpectator(const bool /* _createGameAsSpectato
 void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings */)
 {
 }
-void SettingsCache::setNotifyAboutUpdate(int /* _notifyaboutupdate */)
+void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T /* _notifyaboutupdate */)
 {
 }
-void SettingsCache::setNotifyAboutNewVersion(int /* _notifyaboutnewversion */)
+void SettingsCache::setNotifyAboutNewVersion(QT_STATE_CHANGED_T /* _notifyaboutnewversion */)
 {
 }
 void SettingsCache::setDownloadSpoilerStatus(bool /* _spoilerStatus */)

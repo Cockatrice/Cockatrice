@@ -1,6 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include "utility/macros.h"
+
 class CardDatabase;
 class QString;
 class QSystemTrayIcon;

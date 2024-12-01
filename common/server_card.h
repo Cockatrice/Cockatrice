@@ -39,6 +39,7 @@ private:
     int id;
     int coord_x, coord_y;
     QString name;
+    QString provider_id;
     QMap<int, int> counters;
     bool tapped;
     bool attacking;
@@ -54,7 +55,12 @@ private:
     Server_Card *stashedCard;
 
 public:
-    Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = nullptr);
+    Server_Card(QString _name,
+                QString _provider_id,
+                int _id,
+                int _coord_x,
+                int _coord_y,
+                Server_CardZone *_zone = nullptr);
     ~Server_Card() override;
 
     Server_CardZone *getZone() const
@@ -69,6 +75,10 @@ public:
     int getId() const
     {
         return id;
+    }
+    QString getProviderId() const
+    {
+        return provider_id;
     }
     int getX() const
     {

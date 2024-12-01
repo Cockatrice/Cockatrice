@@ -1,9 +1,8 @@
-#include "../../cockatrice/src/filter_string.h"
+#include "../../cockatrice/src/game/cards/card_database_manager.h"
+#include "../../cockatrice/src/game/filters/filter_string.h"
 #include "mocks.h"
 
 #include "gtest/gtest.h"
-
-CardDatabase *db;
 
 #define QUERY(name, card, query, match)                                                                                \
     TEST_F(CardQuery, name)                                                                                            \
@@ -19,7 +18,7 @@ class CardQuery : public ::testing::Test
 protected:
     void SetUp() override
     {
-        cat = db->getCardBySimpleName("Cat");
+        cat = CardDatabaseManager::getInstance()->getCardBySimpleName("Cat");
     }
 
     // void TearDown() override {}
@@ -59,8 +58,7 @@ QUERY(Color4, cat, "c!gw", false)
 int main(int argc, char **argv)
 {
     settingsCache = new SettingsCache;
-    db = new CardDatabase;
-    db->loadCardDatabases();
+    CardDatabaseManager::getInstance()->loadCardDatabases();
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
