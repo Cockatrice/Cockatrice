@@ -16,6 +16,7 @@
 
 #define BATCH_SIZE 10
 
+class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
 class TabDeckEditor;
@@ -37,8 +38,7 @@ public slots:
 private:
     QVBoxLayout *layout;
     PrintingSelectorCardSortingWidget *sortToolBar;
-    QLineEdit *searchBar;
-    QTimer *searchDebounceTimer;
+    PrintingSelectorCardSearchWidget *searchBar;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
@@ -47,7 +47,7 @@ private:
     QTreeView *deckView;
     CardInfoPtr selectedCard;
     QString currentZone;
-    QTimer *timer;
+    QTimer *widgetLoadingBufferTimer;
     int currentIndex = 0;
     void selectCard(int changeBy);
 };

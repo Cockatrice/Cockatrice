@@ -2,6 +2,7 @@
 
 #include "../../../../settings/cache_settings.h"
 #include "printing_selector_card_display_widget.h"
+#include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 
@@ -9,7 +10,6 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QScrollBar>
-
 
 PrintingSelector::PrintingSelector(QWidget *parent,
                                    TabDeckEditor *deckEditor,
@@ -20,23 +20,14 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout();
     setLayout(layout);
-    timer = new QTimer(this);
+    widgetLoadingBufferTimer = new QTimer(this);
 
     sortToolBar = new PrintingSelectorCardSortingWidget(this);
     layout->addWidget(sortToolBar);
 
     // Add the search bar
-    searchBar = new QLineEdit(this);
-    searchBar->setPlaceholderText(tr("Search by set name or set code"));
+    searchBar = new PrintingSelectorCardSearchWidget(this);
     layout->addWidget(searchBar);
-
-    // Add a debounce timer for the search bar
-    searchDebounceTimer = new QTimer(this);
-    searchDebounceTimer->setSingleShot(true);
-    connect(searchBar, &QLineEdit::textChanged, this, [this]() {
-        searchDebounceTimer->start(300); // 300ms debounce
-    });
-    connect(searchDebounceTimer, &QTimer::timeout, this, &PrintingSelector::updateDisplay);
 
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
@@ -55,9 +46,9 @@ PrintingSelector::PrintingSelector(QWidget *parent,
 
 void PrintingSelector::updateDisplay()
 {
-    timer->stop();
-    timer->deleteLater();
-    timer = new QTimer(this);
+    widgetLoadingBufferTimer->stop();
+    widgetLoadingBufferTimer->deleteLater();
+    widgetLoadingBufferTimer = new QTimer(this);
     flowWidget->clearLayout();
     if (selectedCard != nullptr) {
         setWindowTitle(selectedCard->getName());
@@ -144,7 +135,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
 
     CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
     const QList<CardInfoPerSet> sortedSets = sortToolBar->sortSets(cardInfoPerSets);
-    const QList<CardInfoPerSet> filteredSets = sortToolBar->filterSets(sortedSets, searchBar->text().trimmed().toLower());
+    const QList<CardInfoPerSet> filteredSets =
+        sortToolBar->filterSets(sortedSets, searchBar->getSearchText().trimmed().toLower());
     QList<CardInfoPerSet> setsToUse;
 
     if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
@@ -156,7 +148,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
     // Defer widget creation
     currentIndex = 0;
 
-    connect(timer, &QTimer::timeout, this, [=]() mutable {
+    connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < setsToUse.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
                                                                             cardSizeWidget->getSlider(), selectedCard,
@@ -167,9 +159,9 @@ void PrintingSelector::getAllSetsForCurrentCard()
 
         // Stop timer when done
         if (currentIndex >= setsToUse.size()) {
-            timer->stop();
+            widgetLoadingBufferTimer->stop();
         }
     });
     currentIndex = 0;
-    timer->start(0); // Process as soon as possible
+    widgetLoadingBufferTimer->start(0); // Process as soon as possible
 }
