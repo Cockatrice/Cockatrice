@@ -62,20 +62,7 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
-    cardSizeWidget = new QWidget(this);
-    cardSizeLayout = new QHBoxLayout(this);
-    cardSizeWidget->setLayout(cardSizeLayout);
-
-    cardSizeLabel = new QLabel(tr("Card Size"), cardSizeWidget);
-    cardSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    cardSizeSlider = new QSlider(Qt::Horizontal, cardSizeWidget);
-    cardSizeSlider->setRange(25, 250);
-    cardSizeSlider->setValue(100);
-    connect(cardSizeSlider, &QSlider::valueChanged, flowWidget, &FlowWidget::setMinimumSizeToMaxSizeHint);
-
-    cardSizeLayout->addWidget(cardSizeLabel);
-    cardSizeLayout->addWidget(cardSizeSlider);
-
+    cardSizeWidget = new CardSizeWidget(this);
     layout->addWidget(cardSizeWidget);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);
@@ -311,9 +298,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
 
     connect(timer, &QTimer::timeout, this, [=]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < setsToUse.size(); ++i, ++currentIndex) {
-            auto *cardDisplayWidget =
-                new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
-                                                      selectedCard, setsToUse[currentIndex], currentZone);
+            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
+                                                                            cardSizeWidget->getSlider(), selectedCard, setsToUse[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
         }
