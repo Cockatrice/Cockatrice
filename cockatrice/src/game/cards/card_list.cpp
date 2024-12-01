@@ -69,13 +69,25 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
     switch (option) {
         case NoSort:
             return [](CardItem *) { return ""; };
-        case SortByName:
-            return [](CardItem *c) { return c->getName(); };
-        case SortByType:
+        case SortByMainType:
             return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getMainCardType() : ""; };
         case SortByManaValue:
             // getCmc returns the int as a string. We pad with 0's so that string comp also works on it
             return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getCmc().rightJustified(4, '0') : ""; };
+        case SortByName:
+            return [](CardItem *c) { return c->getName(); };
+        case SortByType:
+            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getCardType() : ""; };
+        case SortByManaCost:
+            return [](CardItem *c) {
+                auto info = c->getInfo();
+                if (!info)
+                    return QString("");
+
+                // calculation copied from CardDatabaseModel.
+                // we pad the cmc and also append the mana cost to the end so same cmc cards still have a sort order
+                return QString("%1%2").arg(info->getCmc(), 4, QChar('0')).arg(info->getManaCost());
+            };
     }
 
     // this line should never be reached
