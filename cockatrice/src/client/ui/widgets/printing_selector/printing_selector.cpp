@@ -3,6 +3,7 @@
 #include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_set_comparator.h"
 #include "printing_selector_card_display_widget.h"
+#include "printing_selector_card_selection_widget.h"
 
 #include <QComboBox>
 #include <QDebug>
@@ -77,18 +78,7 @@ PrintingSelector::PrintingSelector(QWidget *parent,
 
     layout->addWidget(cardSizeWidget);
 
-    cardSelectionBar = new QWidget(this);
-    cardSelectionBarLayout = new QHBoxLayout(cardSelectionBar);
-    previousCardButton = new QPushButton(cardSelectionBar);
-    previousCardButton->setText(tr("Previous Card"));
-    connect(previousCardButton, &QPushButton::clicked, this, &PrintingSelector::selectPreviousCard);
-    nextCardButton = new QPushButton(cardSelectionBar);
-    nextCardButton->setText(tr("Next Card"));
-    connect(nextCardButton, &QPushButton::clicked, this, &PrintingSelector::selectNextCard);
-
-    cardSelectionBarLayout->addWidget(previousCardButton);
-    cardSelectionBarLayout->addWidget(nextCardButton);
-
+    cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);
     layout->addWidget(cardSelectionBar);
 
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {

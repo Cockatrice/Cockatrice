@@ -15,6 +15,7 @@
 
 #define BATCH_SIZE 10
 
+class PrintingSelectorCardSelectionWidget;
 class TabDeckEditor;
 class PrintingSelector : public QWidget
 {
@@ -54,10 +55,7 @@ private:
     QHBoxLayout *cardSizeLayout;
     QLabel *cardSizeLabel;
     QSlider *cardSizeSlider;
-    QWidget *cardSelectionBar;
-    QHBoxLayout *cardSelectionBarLayout;
-    QPushButton *previousCardButton;
-    QPushButton *nextCardButton;
+    PrintingSelectorCardSelectionWidget *cardSelectionBar;
     TabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
