@@ -17,6 +17,7 @@
 #define BATCH_SIZE 10
 
 class PrintingSelectorCardSelectionWidget;
+class PrintingSelectorCardSortingWidget;
 class TabDeckEditor;
 class PrintingSelector : public QWidget
 {
@@ -26,29 +27,16 @@ public:
     PrintingSelector(QWidget *parent, TabDeckEditor *deckEditor, DeckListModel *deckModel, QTreeView *deckView);
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     CardInfoPerSet getSetForUUID(const QString &uuid);
-    QList<CardInfoPerSet> prependPrintingsInDeck(const QList<CardInfoPerSet> &sets);
-    QList<CardInfoPerSet> sortSets();
-    QList<CardInfoPerSet> filterSets(const QList<CardInfoPerSet> &sets) const;
     void getAllSetsForCurrentCard();
 
 public slots:
     void updateDisplay();
     void selectPreviousCard();
     void selectNextCard();
-    void updateSortOrder();
 
 private:
     QVBoxLayout *layout;
-    QHBoxLayout *sortToolBar;
-    static const QString SORT_OPTIONS_ALPHABETICAL;
-    static const QString SORT_OPTIONS_PREFERENCE;
-    static const QString SORT_OPTIONS_RELEASE_DATE;
-    static const QString SORT_OPTIONS_CONTAINED_IN_DECK;
-    static const QString SORT_OPTIONS_POTENTIAL_CARDS;
-    static const QStringList SORT_OPTIONS;
-    QComboBox *sortOptionsSelector;
-    bool descendingSort;
-    QPushButton *toggleSortOrder;
+    PrintingSelectorCardSortingWidget *sortToolBar;
     QLineEdit *searchBar;
     QTimer *searchDebounceTimer;
     FlowWidget *flowWidget;
