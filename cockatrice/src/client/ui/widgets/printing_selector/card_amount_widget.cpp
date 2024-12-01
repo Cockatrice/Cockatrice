@@ -153,6 +153,10 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
 {
     int count = 0;
 
+    if (setInfoForCard.getProperty("uuid").isEmpty()) {
+        return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
+    }
+
     if (!deckModel) {
         return -1;
     }
