@@ -170,6 +170,10 @@ CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
 
 QList<CardInfoPerSet> PrintingSelector::prependPrintingsInDeck(const QList<CardInfoPerSet> &sets)
 {
+    if (!selectedCard) {
+        return {};
+    }
+
     CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
     QList<QPair<CardInfoPerSet, int>> countList;
 
