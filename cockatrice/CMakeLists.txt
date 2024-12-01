@@ -100,7 +100,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/printing_selector/printing_selector.cpp
     src/client/ui/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
-        src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/client/ui/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/client/network/release_channel.cpp
     src/server/remote/remote_client.cpp
