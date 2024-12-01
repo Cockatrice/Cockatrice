@@ -67,7 +67,7 @@ public:
     int getMaxPlayersFilterMin() const;
     int getMaxPlayersFilterMax() const;
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    const QTime &getMaxGameAge() const;
+    QTime getMaxGameAge() const;
     const QMap<QTime, QString> gameAgeMap;
     bool getShowOnlyIfSpectatorsCanWatch() const;
     bool getShowSpectatorPasswordProtected() const;

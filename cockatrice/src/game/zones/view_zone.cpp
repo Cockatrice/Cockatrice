@@ -16,6 +16,13 @@
 #include <QPainter>
 #include <QtMath>
 
+/**
+ * @param _p the player that the cards are revealed to.
+ * @param _origZone the zone the cards were revealed from.
+ * @param _revealZone if false, the cards will be face down.
+ * @param _writeableRevealZone whether the player can interact with the revealed cards.
+ * @param parent the parent QGraphicsWidget containing the reveal zone
+ */
 ZoneViewZone::ZoneViewZone(Player *_p,
                            CardZone *_origZone,
                            int _numberCards,
@@ -24,7 +31,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
                            QGraphicsItem *parent)
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
-      writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
+      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -105,85 +112,127 @@ void ZoneViewZone::reorganizeCards()
         for (int i = 0; i < cardCount; ++i)
             cards[i]->setId(i);
 
-    int cols = qFloor(qSqrt((double)cardCount / 2));
-    if (cols > 7)
-        cols = 7;
-    int rows = qCeil((double)cardCount / cols);
-    if (rows < 1)
-        rows = 1;
-    if (minRows == 0)
-        minRows = rows;
-    else if (rows < minRows) {
-        rows = minRows;
-        cols = qCeil((double)cardCount / minRows);
-    }
-    if (cols < 2)
-        cols = 2;
-
-    qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
-
     CardList cardsToDisplay(cards);
-    if (sortByName || sortByType)
-        cardsToDisplay.sort((sortByName ? CardList::SortByName : 0) | (sortByType ? CardList::SortByType : 0));
 
-    int typeColumn = 0;
-    int longestRow = 0;
-    if (pileView && sortByType) { // we need sort by type enabled for the feature to work
-        int typeRow = 0;
-        QString lastCardType;
-        for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cardsToDisplay.at(i);
-            QString cardType = c->getInfo() ? c->getInfo()->getMainCardType() : "";
+    // sort cards
+    QList<CardList::SortOption> sortOptions;
+    if (groupBy != CardList::NoSort) {
+        sortOptions << groupBy;
+    }
 
-            if (i) { // if not the first card
-                if (cardType == lastCardType)
-                    typeRow++; // add below current card
-                else {         // if no match then move card to next column
-                    typeColumn++;
-                    typeRow = 0;
-                }
-            }
+    if (sortBy != CardList::NoSort) {
+        sortOptions << sortBy;
 
-            lastCardType = cardType;
-            qreal x = 7 + (typeColumn * CARD_WIDTH);
-            qreal y = typeRow * CARD_HEIGHT / 3;
-            c->setPos(x + 5, y + 5);
-            c->setRealZValue(i);
-            longestRow = qMax(typeRow, longestRow);
-        }
-    } else {
-        for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cardsToDisplay.at(i);
-            qreal x = 7 + ((i / rows) * CARD_WIDTH);
-            qreal y = (i % rows) * CARD_HEIGHT / 3;
-            c->setPos(x + 5, y + 5);
-            c->setRealZValue(i);
+        // implicitly sort by name at the end so that cards with the same name appear together
+        if (sortBy != CardList::SortByName) {
+            sortOptions << CardList::SortByName;
         }
     }
 
+    cardsToDisplay.sortBy(sortOptions);
+
+    // position cards
+    GridSize gridSize;
+    if (pileView) {
+        gridSize = positionCardsForDisplay(cardsToDisplay, groupBy);
+    } else {
+        gridSize = positionCardsForDisplay(cardsToDisplay);
+    }
+
+    // determine bounding rect
     qreal aleft = 0;
     qreal atop = 0;
-    qreal awidth = (pileView && sortByType) ? qMax(typeColumn + 1, 3) * CARD_WIDTH + (CARD_WIDTH / 2)
-                                            : qMax(cols, 1) * CARD_WIDTH + (CARD_WIDTH / 2);
-    qreal aheight = (pileView && sortByType) ? (longestRow * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3
-                                             : (rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
+    qreal awidth = gridSize.cols * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
+    qreal aheight = (gridSize.rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
     optimumRect = QRectF(aleft, atop, awidth, aheight);
 
     updateGeometry();
     emit optimumRectChanged();
 }
 
-void ZoneViewZone::setSortByName(int _sortByName)
+/**
+ * @brief Sets the position of each card to the proper position for the view
+ *
+ * @param cards The cards to reposition. Will modify the cards in the list.
+ * @param pileOption Property used to group cards for the piles. Expects `cards` to be sorted by that property. Pass in
+ * NoSort to not make piles.
+ *
+ * @returns The number of rows and columns to display
+ */
+ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption)
 {
-    sortByName = _sortByName;
+    int cardCount = cards.size();
+
+    if (pileOption != CardList::NoSort) {
+        int row = 0;
+        int col = 0;
+        int longestRow = 0;
+
+        QString lastColumnProp;
+
+        const auto extractor = CardList::getExtractorFor(pileOption);
+
+        for (int i = 0; i < cardCount; i++) {
+            CardItem *c = cards.at(i);
+            QString columnProp = extractor(c);
+
+            if (i) { // if not the first card
+                if (columnProp == lastColumnProp)
+                    row++; // add below current card
+                else {     // if no match then move card to next column
+                    col++;
+                    row = 0;
+                }
+            }
+
+            lastColumnProp = columnProp;
+            qreal x = col * CARD_WIDTH;
+            qreal y = row * CARD_HEIGHT / 3;
+            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
+            c->setRealZValue(i);
+            longestRow = qMax(row, longestRow);
+        }
+
+        // +1 because the row/col variables used in the calculations are 0-indexed but
+        // GridSize expects the actual row/col count
+        return GridSize{longestRow + 1, qMax(col + 1, 3)};
+
+    } else {
+        int cols = qBound(1, qFloor(qSqrt((double)cardCount / 2)), 7);
+        int rows = qMax(qCeil((double)cardCount / cols), 1);
+        if (minRows == 0) {
+            minRows = rows;
+        } else if (rows < minRows) {
+            rows = minRows;
+            cols = qCeil((double)cardCount / minRows);
+        }
+
+        if (cols < 2)
+            cols = 2;
+
+        qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+
+        for (int i = 0; i < cardCount; i++) {
+            CardItem *c = cards.at(i);
+            qreal x = (i / rows) * CARD_WIDTH;
+            qreal y = (i % rows) * CARD_HEIGHT / 3;
+            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
+            c->setRealZValue(i);
+        }
+
+        return GridSize{rows, qMax(cols, 1)};
+    }
+}
+
+void ZoneViewZone::setGroupBy(CardList::SortOption _groupBy)
+{
+    groupBy = _groupBy;
     reorganizeCards();
 }
 
-void ZoneViewZone::setSortByType(int _sortByType)
+void ZoneViewZone::setSortBy(CardList::SortOption _sortBy)
 {
-    sortByType = _sortByType;
-    if (!sortByType)
-        pileView = false;
+    sortBy = _sortBy;
     reorganizeCards();
 }
 

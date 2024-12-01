@@ -81,8 +81,7 @@ void DlgCreateGame::sharedCtor()
 
     spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators can watch"));
     spectatorsAllowedCheckBox->setChecked(true);
-    connect(spectatorsAllowedCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(spectatorsAllowedChanged(QT_STATE_CHANGED_T)));
+    connect(spectatorsAllowedCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &DlgCreateGame::spectatorsAllowedChanged);
     spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to watch"));
     spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
     spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &hands"));

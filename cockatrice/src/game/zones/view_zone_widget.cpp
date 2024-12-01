@@ -17,6 +17,15 @@
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
 
+/**
+ * @param _player the player the cards were revealed to.
+ * @param _origZone the zone the cards were revealed from.
+ * @param numberCards num of cards to reveal from the zone. Ex: scry the top 3 cards.
+ * Pass in a negative number to reveal the entire zone.
+ * -1 specifically will give the option to shuffle the zone upon closing the window.
+ * @param _revealZone if false, the cards will be face down.
+ * @param _writeableRevealZone whether the player can interact with the revealed cards.
+ */
 ZoneViewWidget::ZoneViewWidget(Player *_player,
                                CardZone *_origZone,
                                int numberCards,
@@ -31,22 +40,27 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     setFlag(ItemIgnoresTransformations);
 
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
-    QGraphicsLinearLayout *hPilebox = 0;
 
+    // If the number is < 0, then it means that we can give the option to make the area sorted
     if (numberCards < 0) {
-        hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
-        QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
+        // top row
+        QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
-        QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
-        sortByNameProxy->setWidget(&sortByNameCheckBox);
-        hFilterbox->addItem(sortByNameProxy);
+        // groupBy options
+        QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
+        groupBySelectorProxy->setWidget(&groupBySelector);
+        groupBySelectorProxy->setZValue(2000000008);
+        hTopRow->addItem(groupBySelectorProxy);
 
-        QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
-        sortByTypeProxy->setWidget(&sortByTypeCheckBox);
-        hFilterbox->addItem(sortByTypeProxy);
+        // sortBy options
+        QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
+        sortBySelectorProxy->setWidget(&sortBySelector);
+        sortBySelectorProxy->setZValue(2000000007);
+        hTopRow->addItem(sortBySelectorProxy);
 
-        vbox->addItem(hFilterbox);
+        vbox->addItem(hTopRow);
 
+        // line
         QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
         QFrame *line = new QFrame;
         line->setFrameShape(QFrame::HLine);
@@ -54,19 +68,24 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         lineProxy->setWidget(line);
         vbox->addItem(lineProxy);
 
+        // bottom row
+        QGraphicsLinearLayout *hBottomRow = new QGraphicsLinearLayout(Qt::Horizontal);
+
+        // pile view options
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
-        hPilebox->addItem(pileViewProxy);
-    }
+        hBottomRow->addItem(pileViewProxy);
 
-    if (_origZone->getIsShufflable() && (numberCards == -1)) {
-        shuffleCheckBox.setChecked(true);
-        QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
-        shuffleProxy->setWidget(&shuffleCheckBox);
-        hPilebox->addItem(shuffleProxy);
-    }
+        // shuffle options
+        if (_origZone->getIsShufflable() && numberCards == -1) {
+            shuffleCheckBox.setChecked(true);
+            QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
+            shuffleProxy->setWidget(&shuffleCheckBox);
+            hBottomRow->addItem(shuffleProxy);
+        }
 
-    vbox->addItem(hPilebox);
+        vbox->addItem(hBottomRow);
+    }
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
     resize(150, 150);
@@ -93,42 +112,71 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
             SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
 
-    // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
-    // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
+    retranslateUi();
+
+    // only wire up sort options after creating ZoneViewZone, since it segfaults otherwise.
     if (numberCards < 0) {
-        connect(&sortByNameCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-                SLOT(processSortByName(QT_STATE_CHANGED_T)));
-        connect(&sortByTypeCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-                SLOT(processSortByType(QT_STATE_CHANGED_T)));
-        connect(&pileViewCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-                SLOT(processSetPileView(QT_STATE_CHANGED_T)));
-        sortByNameCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByName());
-        sortByTypeCheckBox.setChecked(SettingsCache::instance().getZoneViewSortByType());
+        connect(&groupBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+                &ZoneViewWidget::processGroupBy);
+        connect(&sortBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+                &ZoneViewWidget::processSortBy);
+        connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
+        groupBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewGroupByIndex());
+        sortBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewSortByIndex());
         pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
-        if (!SettingsCache::instance().getZoneViewSortByType())
+
+        if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
             pileViewCheckBox.setEnabled(false);
+        }
     }
 
-    retranslateUi();
     setLayout(vbox);
 
     connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
     connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
     zone->initializeCards(cardList);
+
+    // QLabel sizes aren't taken into account until the widget is rendered.
+    // Force refresh after 1ms to fix glitchy rendering with long QLabels.
+    auto *lastResizeBeforeVisibleTimer = new QTimer(this);
+    connect(lastResizeBeforeVisibleTimer, &QTimer::timeout, this, [=] {
+        resizeToZoneContents();
+        disconnect(lastResizeBeforeVisibleTimer);
+        lastResizeBeforeVisibleTimer->deleteLater();
+    });
+    lastResizeBeforeVisibleTimer->setSingleShot(true);
+    lastResizeBeforeVisibleTimer->start(1);
 }
 
-void ZoneViewWidget::processSortByType(QT_STATE_CHANGED_T value)
+void ZoneViewWidget::processGroupBy(int index)
 {
-    pileViewCheckBox.setEnabled(value);
-    SettingsCache::instance().setZoneViewSortByType(value);
-    zone->setPileView(pileViewCheckBox.isChecked());
-    zone->setSortByType(value);
+    auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
+    SettingsCache::instance().setZoneViewGroupByIndex(index);
+    zone->setGroupBy(option);
+
+    // disable pile view checkbox if we're not grouping by anything
+    pileViewCheckBox.setEnabled(option != CardList::NoSort);
+
+    // reset sortBy if it has the same value as groupBy
+    if (option != CardList::NoSort &&
+        option == static_cast<CardList::SortOption>(sortBySelector.currentData().toInt())) {
+        sortBySelector.setCurrentIndex(1); // set to SortByName
+    }
 }
 
-void ZoneViewWidget::processSortByName(QT_STATE_CHANGED_T value)
+void ZoneViewWidget::processSortBy(int index)
 {
-    SettingsCache::instance().setZoneViewSortByName(value);
-    zone->setSortByName(value);
+    auto option = static_cast<CardList::SortOption>(sortBySelector.itemData(index).toInt());
+
+    // set to SortByName instead if it has the same value as groupBy
+    if (option != CardList::NoSort &&
+        option == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
+        sortBySelector.setCurrentIndex(1); // set to SortByName
+        return;
+    }
+
+    SettingsCache::instance().setZoneViewSortByIndex(index);
+    zone->setSortBy(option);
 }
 
 void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
@@ -140,8 +188,30 @@ void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 void ZoneViewWidget::retranslateUi()
 {
     setWindowTitle(zone->getTranslatedName(false, CaseNominative));
-    sortByNameCheckBox.setText(tr("sort by name"));
-    sortByTypeCheckBox.setText(tr("sort by type"));
+
+    { // We can't change the strings after they're put into the QComboBox, so this is our workaround
+        int oldIndex = groupBySelector.currentIndex();
+        groupBySelector.clear();
+        groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
+        groupBySelector.addItem(tr("Group by Type"), CardList::SortByMainType);
+        groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
+        groupBySelector.addItem(tr("Group by Color"), CardList::SortByColorGrouping);
+        groupBySelector.setCurrentIndex(oldIndex);
+    }
+
+    {
+        int oldIndex = sortBySelector.currentIndex();
+        sortBySelector.clear();
+        sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
+        sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
+        sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
+        sortBySelector.addItem(tr("Sort by Mana Cost"), CardList::SortByManaCost);
+        sortBySelector.addItem(tr("Sort by Colors"), CardList::SortByColors);
+        sortBySelector.addItem(tr("Sort by P/T"), CardList::SortByPt);
+        sortBySelector.addItem(tr("Sort by Set"), CardList::SortBySet);
+        sortBySelector.setCurrentIndex(oldIndex);
+    }
+
     shuffleCheckBox.setText(tr("shuffle when closing"));
     pileViewCheckBox.setText(tr("pile view"));
 }

@@ -666,6 +666,7 @@ void MainWindow::retranslateUi()
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
+    aReloadCardDatabase->setText(tr("Reload card database"));
 
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
@@ -714,6 +715,8 @@ void MainWindow::createActions()
     connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
     aAddCustomSet = new QAction(QString(), this);
     connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+    aReloadCardDatabase = new QAction(QString(), this);
+    connect(aReloadCardDatabase, SIGNAL(triggered()), this, SLOT(actReloadCardDatabase()));
 
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
@@ -788,6 +791,8 @@ void MainWindow::createMenus()
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
     dbMenu->addAction(aAddCustomSet);
+    dbMenu->addSeparator();
+    dbMenu->addAction(aReloadCardDatabase);
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
@@ -878,6 +883,7 @@ void MainWindow::startupConfigCheck()
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
+        SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
@@ -1322,6 +1328,11 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
     }
 
     return maxIndex + 1;
+}
+
+void MainWindow::actReloadCardDatabase()
+{
+    const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 }
 
 void MainWindow::actManageSets()

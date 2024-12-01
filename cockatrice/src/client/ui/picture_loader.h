@@ -11,6 +11,12 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QThread;
 
+#define REDIRECT_HEADER_NAME "redirects"
+#define REDIRECT_ORIGINAL_URL "original"
+#define REDIRECT_URL "redirect"
+#define REDIRECT_TIMESTAMP "timestamp"
+#define REDIRECT_CACHE_FILENAME "cache.ini"
+
 class PictureToLoad
 {
 private:
@@ -83,6 +89,9 @@ private:
     QList<PictureToLoad> loadQueue;
     QMutex mutex;
     QNetworkAccessManager *networkManager;
+    QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
+    QString cacheFilePath;                             // Path to persistent storage
+    static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
     QList<PictureToLoad> cardsToDownload;
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
@@ -91,6 +100,12 @@ private:
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
     bool imageIsBlackListed(const QByteArray &);
     QNetworkReply *makeRequest(const QUrl &url);
+    void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
+    QUrl getCachedRedirect(const QUrl &originalUrl) const;
+    void loadRedirectCache();
+    void saveRedirectCache() const;
+    void cleanStaleEntries();
+
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();

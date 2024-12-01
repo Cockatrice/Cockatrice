@@ -3,6 +3,10 @@
 
 #include "card_zone.h"
 
+/**
+ * A CardZone where the cards are in a single pile instead of being laid out.
+ * Usually only top card is accessible by clicking.
+ */
 class PileZone : public CardZone
 {
     Q_OBJECT

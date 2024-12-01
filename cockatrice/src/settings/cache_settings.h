@@ -16,15 +16,20 @@
 
 class ReleaseChannel;
 
-// size should be a multiple of 64
-#define PIXMAPCACHE_SIZE_DEFAULT 2047
+// In MB (Increments of 64)
+#define PIXMAPCACHE_SIZE_DEFAULT 2048
 #define PIXMAPCACHE_SIZE_MIN 64
-#define PIXMAPCACHE_SIZE_MAX 2047
+#define PIXMAPCACHE_SIZE_MAX 4096
 
 // In MB
 constexpr int NETWORK_CACHE_SIZE_DEFAULT = 1024 * 4; // 4 GB
 constexpr int NETWORK_CACHE_SIZE_MIN = 1;            // 1 MB
 constexpr int NETWORK_CACHE_SIZE_MAX = 1024 * 1024;  // 1 TB
+
+// In Days
+#define NETWORK_REDIRECT_CACHE_TTL_DEFAULT 30
+#define NETWORK_REDIRECT_CACHE_TTL_MIN 1
+#define NETWORK_REDIRECT_CACHE_TTL_MAX 90
 
 #define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
@@ -53,6 +58,7 @@ signals:
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void networkCacheSizeChanged(int newSizeInMBs);
+    void redirectCacheTtlChanged(int newTtl);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
@@ -73,8 +79,8 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, themesPath,
-        spoilerDatabasePath, tokenDatabasePath, themeName;
+    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
+        customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
@@ -103,7 +109,8 @@ private:
     QString chatHighlightColor;
     bool chatMentionForeground;
     bool chatHighlightForeground;
-    bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
+    int zoneViewSortByIndex, zoneViewGroupByIndex;
+    bool zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
     bool ignoreUnregisteredUsers;
@@ -116,6 +123,7 @@ private:
     bool useTearOffMenus;
     int pixmapCacheSize;
     int networkCacheSize;
+    int redirectCacheTtl;
     bool scaleCards;
     int verticalCardOverlapPercent;
     bool showMessagePopups;
@@ -182,6 +190,10 @@ public:
     QString getPicsPath() const
     {
         return picsPath;
+    }
+    QString getRedirectCachePath() const
+    {
+        return redirectCachePath;
     }
     QString getCustomPicsPath() const
     {
@@ -316,13 +328,19 @@ public:
     {
         return chatHighlightForeground;
     }
-    bool getZoneViewSortByName() const
+    /**
+     * Currently selected index for the `Group by X` QComboBox
+     */
+    int getZoneViewGroupByIndex() const
     {
-        return zoneViewSortByName;
+        return zoneViewGroupByIndex;
     }
-    bool getZoneViewSortByType() const
+    /**
+     * Currently selected index for the `Sort by X` QComboBox
+     */
+    int getZoneViewSortByIndex() const
     {
-        return zoneViewSortByType;
+        return zoneViewSortByIndex;
     }
     /**
        Returns if the view should be sorted into pile view.
@@ -355,6 +373,10 @@ public:
     int getNetworkCacheSizeInMB() const
     {
         return networkCacheSize;
+    }
+    int getRedirectCacheTtl() const
+    {
+        return redirectCacheTtl;
     }
     bool getScaleCards() const
     {
@@ -548,8 +570,8 @@ public slots:
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
     void setChatHighlightForeground(QT_STATE_CHANGED_T _chatHighlightForeground);
-    void setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName);
-    void setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType);
+    void setZoneViewGroupByIndex(const int _zoneViewGroupByIndex);
+    void setZoneViewSortByIndex(const int _zoneViewSortByIndex);
     void setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView);
     void setSoundEnabled(QT_STATE_CHANGED_T _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
@@ -557,6 +579,7 @@ public slots:
     void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
+    void setNetworkRedirectCacheTtl(const int _redirectCacheTtl);
     void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
     void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups);

@@ -4,6 +4,7 @@
 #include "../../utility/macros.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 
@@ -14,7 +15,6 @@ class ZoneViewZone;
 class Player;
 class CardDatabase;
 class QScrollBar;
-class QCheckBox;
 class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
@@ -31,6 +31,12 @@ public slots:
     }
 };
 
+/**
+ * A QGraphicsWidget that holds a ZoneViewZone.
+ *
+ * Some zone views allow sorting.
+ * This widget will display the sort options when relevant, and forward the values of the options to the ZoneViewZone.
+ */
 class ZoneViewWidget : public QGraphicsWidget
 {
     Q_OBJECT
@@ -41,8 +47,8 @@ private:
     QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
-    QCheckBox sortByNameCheckBox;
-    QCheckBox sortByTypeCheckBox;
+    QComboBox groupBySelector;
+    QComboBox sortBySelector;
     QCheckBox shuffleCheckBox;
     QCheckBox pileViewCheckBox;
 
@@ -52,8 +58,8 @@ private:
 signals:
     void closePressed(ZoneViewWidget *zv);
 private slots:
-    void processSortByType(QT_STATE_CHANGED_T value);
-    void processSortByName(QT_STATE_CHANGED_T value);
+    void processGroupBy(int value);
+    void processSortBy(int value);
     void processSetPileView(QT_STATE_CHANGED_T value);
     void resizeToZoneContents();
     void handleScrollBarChange(int value);

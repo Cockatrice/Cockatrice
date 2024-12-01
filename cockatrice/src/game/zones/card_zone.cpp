@@ -11,6 +11,14 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 
+/**
+ * @param _p the player that the zone belongs to
+ * @param _name internal name of the zone
+ * @param _isShufflable whether it makes sense to shuffle this zone by default after viewing it
+ * @param _contentsKnown whether the cards in the zone are known to the client
+ * @param parent the parent graphics object.
+ * @param _isView whether this zone is a view of another zone. Modifications to a view should modify the original
+ */
 CardZone::CardZone(Player *_p,
                    const QString &_name,
                    bool _hasCardAttr,
@@ -142,7 +150,7 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
-    CardItem *c = cards.findCard(cardId, false);
+    CardItem *c = cards.findCard(cardId);
     if (!c) {
         qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
         return 0;

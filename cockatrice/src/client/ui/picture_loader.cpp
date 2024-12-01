@@ -1,17 +1,14 @@
 #include "picture_loader.h"
 
-#include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../settings/cache_settings.h"
-#include "theme_manager.h"
 
 #include <QApplication>
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QDebug>
-#include <QDir>
 #include <QDirIterator>
-#include <QFile>
+#include <QFileInfo>
 #include <QImageReader>
 #include <QMovie>
 #include <QNetworkAccessManager>
@@ -23,7 +20,6 @@
 #include <QRegularExpression>
 #include <QScreen>
 #include <QSet>
-#include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
 #include <algorithm>
@@ -136,6 +132,8 @@ PictureLoaderWorker::PictureLoaderWorker()
 #endif
     auto cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
+    cache->setMaximumCacheSize(1024L * 1024L *
+                               static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
     // Note: the settings is in MB, but QNetworkDiskCache uses bytes
     connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache,
             [cache](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
@@ -144,6 +142,13 @@ PictureLoaderWorker::PictureLoaderWorker()
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
+
+    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
+    loadRedirectCache();
+    cleanStaleEntries();
+
+    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,
+            &PictureLoaderWorker::saveRedirectCache);
 
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
@@ -447,11 +452,104 @@ bool PictureLoaderWorker::imageIsBlackListed(const QByteArray &picData)
 
 QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
 {
+    // Check if the redirect is cached
+    QUrl cachedRedirect = getCachedRedirect(url);
+    if (!cachedRedirect.isEmpty()) {
+        qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                           << " set: " << cardBeingDownloaded.getSetName() << "]: Using cached redirect for "
+                           << url.toDisplayString() << " to " << cachedRedirect.toDisplayString();
+        return makeRequest(cachedRedirect); // Use the cached redirect
+    }
+
     QNetworkRequest req(url);
+
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
     }
-    return networkManager->get(req);
+
+    QNetworkReply *reply = networkManager->get(req);
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply, url]() {
+        QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+
+        if (redirectTarget.isValid()) {
+            QUrl redirectUrl = redirectTarget.toUrl();
+            if (redirectUrl.isRelative()) {
+                redirectUrl = url.resolved(redirectUrl);
+            }
+
+            cacheRedirect(url, redirectUrl);
+            qDebug().nospace() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                               << " set: " << cardBeingDownloaded.getSetName() << "]: Caching redirect from "
+                               << url.toDisplayString() << " to " << redirectUrl.toDisplayString();
+        }
+
+        reply->deleteLater();
+    });
+
+    return reply;
+}
+
+void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)
+{
+    redirectCache[originalUrl] = qMakePair(redirectUrl, QDateTime::currentDateTimeUtc());
+    saveRedirectCache();
+}
+
+QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
+{
+    if (redirectCache.contains(originalUrl)) {
+        return redirectCache[originalUrl].first;
+    }
+    return {};
+}
+
+void PictureLoaderWorker::loadRedirectCache()
+{
+    QSettings settings(cacheFilePath, QSettings::IniFormat);
+
+    redirectCache.clear();
+    int size = settings.beginReadArray(REDIRECT_HEADER_NAME);
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        QUrl originalUrl = settings.value(REDIRECT_ORIGINAL_URL).toUrl();
+        QUrl redirectUrl = settings.value(REDIRECT_URL).toUrl();
+        QDateTime timestamp = settings.value(REDIRECT_TIMESTAMP).toDateTime();
+
+        if (originalUrl.isValid() && redirectUrl.isValid()) {
+            redirectCache[originalUrl] = qMakePair(redirectUrl, timestamp);
+        }
+    }
+    settings.endArray();
+}
+
+void PictureLoaderWorker::saveRedirectCache() const
+{
+    QSettings settings(cacheFilePath, QSettings::IniFormat);
+
+    settings.beginWriteArray(REDIRECT_HEADER_NAME, static_cast<int>(redirectCache.size()));
+    int index = 0;
+    for (auto it = redirectCache.cbegin(); it != redirectCache.cend(); ++it) {
+        settings.setArrayIndex(index++);
+        settings.setValue(REDIRECT_ORIGINAL_URL, it.key());
+        settings.setValue(REDIRECT_URL, it.value().first);
+        settings.setValue(REDIRECT_TIMESTAMP, it.value().second);
+    }
+    settings.endArray();
+}
+
+void PictureLoaderWorker::cleanStaleEntries()
+{
+    QDateTime now = QDateTime::currentDateTimeUtc();
+
+    auto it = redirectCache.begin();
+    while (it != redirectCache.end()) {
+        if (it.value().second.addDays(SettingsCache::instance().getRedirectCacheTtl()) < now) {
+            it = redirectCache.erase(it); // Remove stale entry
+        } else {
+            ++it;
+        }
+    }
 }
 
 void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)

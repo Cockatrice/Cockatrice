@@ -80,8 +80,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
         autoConnectCheckBox->setEnabled(false);
     }
 
-    connect(savePasswordCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(passwordSaved(QT_STATE_CHANGED_T)));
+    connect(savePasswordCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &DlgConnect::passwordSaved);
 
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));

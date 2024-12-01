@@ -22,6 +22,7 @@ class Response;
 class FilterTreeModel;
 class FilterBuilder;
 class QGroupBox;
+class QMessageBox;
 class QHBoxLayout;
 class QVBoxLayout;
 class QPushButton;
@@ -100,6 +101,19 @@ private slots:
     void showSearchSyntaxHelp();
 
 private:
+    /**
+     * @brief Which tab to open the new deck in
+     */
+    enum DeckOpenLocation
+    {
+        CANCELLED,
+        SAME_TAB,
+        NEW_TAB
+    };
+
+    DeckOpenLocation confirmOpen(const bool openInSameTabIfBlank = true);
+    QMessageBox *createSaveConfirmationWindow();
+
     bool isBlankNewDeck() const;
     CardInfoPtr currentCardInfo() const;
     void addCardHelper(QString zoneName);

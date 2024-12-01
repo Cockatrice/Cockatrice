@@ -2,56 +2,28 @@
 
 #include "settings_manager.h"
 
+const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
+    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!",
+    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image",
+    "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
+    "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
+
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
     : SettingsManager(settingPath + "downloads.ini", parent)
 {
-    downloadURLs = getValue("urls", "downloads").value<QStringList>();
 }
 
-void DownloadSettings::setDownloadUrlAt(int index, const QString &url)
+void DownloadSettings::setDownloadUrls(const QStringList &downloadURLs)
 {
-    downloadURLs.insert(index, url);
     setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
 }
 
-/**
- * If reset or first run, this method contains the default URLs we will populate
- */
 QStringList DownloadSettings::getAllURLs()
 {
-    // First run, these will be empty
-    if (downloadURLs.count() == 0) {
-        populateDefaultURLs();
-    }
-
-    return downloadURLs;
+    return getValue("urls", "downloads").toStringList();
 }
 
-void DownloadSettings::populateDefaultURLs()
+void DownloadSettings::resetToDefaultURLs()
 {
-    downloadURLs.clear();
-    downloadURLs.append("https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!");
-    downloadURLs.append("https://api.scryfall.com/cards/multiverse/!set:muid!?format=image");
-    downloadURLs.append("https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card");
-    downloadURLs.append("https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card");
-    setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
-}
-
-QString DownloadSettings::getDownloadUrlAt(int index)
-{
-    if (0 <= index && index < downloadURLs.size()) {
-        return downloadURLs[index];
-    }
-
-    return "";
-}
-
-int DownloadSettings::getCount()
-{
-    return downloadURLs.size();
-}
-
-void DownloadSettings::clear()
-{
-    downloadURLs.clear();
+    setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls", "downloads");
 }

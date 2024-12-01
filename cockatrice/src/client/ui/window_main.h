@@ -98,6 +98,7 @@ private slots:
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();
     void actAddCustomSet();
+    void actReloadCardDatabase();
 
     void actManageSets();
     void actEditTokens();
@@ -125,7 +126,7 @@ private:
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
         *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets,
-        *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aShow;
+        *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase, *aShow;
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
     RemoteClient *client;

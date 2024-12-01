@@ -188,10 +188,10 @@ void SettingsCache::setChatMentionColor(const QString & /* _chatMentionColor */)
 void SettingsCache::setChatHighlightColor(const QString & /* _chatHighlightColor */)
 {
 }
-void SettingsCache::setZoneViewSortByName(QT_STATE_CHANGED_T /* _zoneViewSortByName */)
+void SettingsCache::setZoneViewGroupByIndex(int /* _zoneViewGroupByIndex */)
 {
 }
-void SettingsCache::setZoneViewSortByType(QT_STATE_CHANGED_T /* _zoneViewSortByType */)
+void SettingsCache::setZoneViewSortByIndex(int /* _zoneViewSortByIndex */)
 {
 }
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T /* _zoneViewPileView */)
@@ -222,6 +222,9 @@ void SettingsCache::setPixmapCacheSize(const int /* _pixmapCacheSize */)
 {
 }
 void SettingsCache::setNetworkCacheSizeInMB(const int /* _networkCacheSize */)
+{
+}
+void SettingsCache::setNetworkRedirectCacheTtl(const int /* _redirectCacheTtl */)
 {
 }
 void SettingsCache::setClientID(const QString & /* _clientID */)

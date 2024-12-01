@@ -221,6 +221,7 @@ SettingsCache::SettingsCache()
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
 
     networkCacheSize = settings->value("personal/networkCacheSize", NETWORK_CACHE_SIZE_DEFAULT).toInt();
+    redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
 
@@ -251,8 +252,8 @@ SettingsCache::SettingsCache()
     chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
     chatHighlightColor = settings->value("chat/highlightcolor", "A6120D").toString();
 
-    zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
-    zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
+    zoneViewGroupByIndex = settings->value("zoneview/groupby", 1).toInt();
+    zoneViewSortByIndex = settings->value("zoneview/sortby", 1).toInt();
     zoneViewPileView = settings->value("zoneview/pileview", true).toBool();
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
@@ -581,16 +582,16 @@ void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor)
     settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
 
-void SettingsCache::setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName)
+void SettingsCache::setZoneViewGroupByIndex(int _zoneViewGroupByIndex)
 {
-    zoneViewSortByName = static_cast<bool>(_zoneViewSortByName);
-    settings->setValue("zoneview/sortbyname", zoneViewSortByName);
+    zoneViewGroupByIndex = _zoneViewGroupByIndex;
+    settings->setValue("zoneview/groupby", zoneViewGroupByIndex);
 }
 
-void SettingsCache::setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType)
+void SettingsCache::setZoneViewSortByIndex(int _zoneViewSortByIndex)
 {
-    zoneViewSortByType = static_cast<bool>(_zoneViewSortByType);
-    settings->setValue("zoneview/sortbytype", zoneViewSortByType);
+    zoneViewSortByIndex = _zoneViewSortByIndex;
+    settings->setValue("zoneview/sortby", zoneViewSortByIndex);
 }
 
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView)
@@ -655,6 +656,13 @@ void SettingsCache::setNetworkCacheSizeInMB(const int _networkCacheSize)
     networkCacheSize = _networkCacheSize;
     settings->setValue("personal/networkCacheSize", networkCacheSize);
     emit networkCacheSizeChanged(networkCacheSize);
+}
+
+void SettingsCache::setNetworkRedirectCacheTtl(const int _redirectCacheTtl)
+{
+    redirectCacheTtl = _redirectCacheTtl;
+    settings->setValue("personal/redirectCacheSize", redirectCacheTtl);
+    emit redirectCacheTtlChanged(redirectCacheTtl);
 }
 
 void SettingsCache::setClientID(const QString &_clientID)
@@ -1030,6 +1038,7 @@ void SettingsCache::loadPaths()
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
+    redirectCachePath = getSafeConfigPath("paths/redirects", getCachePath() + "/redirects/");
     // this has never been exposed as an user-configurable setting
     if (picsPath.endsWith("/")) {
         customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");

@@ -19,7 +19,7 @@ function(get_commit_id)
       PARENT_SCOPE
   )
   set(PROJECT_VERSION_LABEL
-      "custom(${GIT_COM_ID})"
+      "custom-${GIT_COM_ID}"
       PARENT_SCOPE
   )
 endfunction()

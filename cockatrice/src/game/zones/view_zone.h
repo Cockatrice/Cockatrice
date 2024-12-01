@@ -10,18 +10,38 @@ class Response;
 class ServerInfo_Card;
 class QGraphicsSceneWheelEvent;
 
+/**
+ * A CardZone that is a view into another CardZone.
+ * If this zone is writable, then modifications to this zone will be reflected in the underlying zone.
+ *
+ * Most interactions with StackZones are handled through a zone view.
+ * For example, viewing the deck/graveyard/exile is handled through a view.
+ *
+ * Handles both limited reveals (eg. look at top X cards) and full zone reveals (eg. searching the deck).
+ */
 class ZoneViewZone : public SelectZone, public QGraphicsLayoutItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsLayoutItem)
 private:
+    static constexpr int HORIZONTAL_PADDING = 12;
+    static constexpr int VERTICAL_PADDING = 5;
+
     QRectF bRect, optimumRect;
     int minRows, numberCards;
     void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
     CardZone *origZone;
     bool revealZone, writeableRevealZone;
-    bool sortByName, sortByType;
+    CardList::SortOption groupBy, sortBy;
     bool pileView;
+
+    struct GridSize
+    {
+        int rows;
+        int cols;
+    };
+
+    GridSize positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption = CardList::NoSort);
 
 public:
     ZoneViewZone(Player *_p,
@@ -55,8 +75,8 @@ public:
     }
     void setWriteableRevealZone(bool _writeableRevealZone);
 public slots:
-    void setSortByName(int _sortByName);
-    void setSortByType(int _sortByType);
+    void setGroupBy(CardList::SortOption _groupBy);
+    void setSortBy(CardList::SortOption _sortBy);
     void setPileView(int _pileView);
 private slots:
     void zoneDumpReceived(const Response &r);
