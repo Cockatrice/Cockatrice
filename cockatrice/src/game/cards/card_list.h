@@ -14,9 +14,21 @@ public:
     enum SortOption
     {
         NoSort,
+
+        // Options that are used by groupBy
+        // Should partition all cards into a reasonable number of buckets
+        SortByMainType,
+        SortByManaValue,
+        SortByColorGrouping,
+
+        // Options that are used by sortBy
+        // We don't care about buckets; we want as many distinct values as possible.
         SortByName,
         SortByType,
-        SortByManaValue
+        SortByManaCost,
+        SortByColors,
+        SortByPt,
+        SortBySet
     };
     CardList(bool _contentsKnown);
     CardItem *findCard(const int cardId) const;

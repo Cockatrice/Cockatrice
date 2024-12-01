@@ -193,8 +193,9 @@ void ZoneViewWidget::retranslateUi()
         int oldIndex = groupBySelector.currentIndex();
         groupBySelector.clear();
         groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
-        groupBySelector.addItem(tr("Group by Type"), CardList::SortByType);
+        groupBySelector.addItem(tr("Group by Type"), CardList::SortByMainType);
         groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
+        groupBySelector.addItem(tr("Group by Color"), CardList::SortByColorGrouping);
         groupBySelector.setCurrentIndex(oldIndex);
     }
 
@@ -204,7 +205,10 @@ void ZoneViewWidget::retranslateUi()
         sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
         sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
         sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
-        sortBySelector.addItem(tr("Sort by Mana Value"), CardList::SortByManaValue);
+        sortBySelector.addItem(tr("Sort by Mana Cost"), CardList::SortByManaCost);
+        sortBySelector.addItem(tr("Sort by Colors"), CardList::SortByColors);
+        sortBySelector.addItem(tr("Sort by P/T"), CardList::SortByPt);
+        sortBySelector.addItem(tr("Sort by Set"), CardList::SortBySet);
         sortBySelector.setCurrentIndex(oldIndex);
     }
 
