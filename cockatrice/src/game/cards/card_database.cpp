@@ -266,8 +266,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                  _sets, _cipt, _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
-    for (const auto &x : _sets) {
-        for (const CardInfoPerSet &set : x) {
+    for (const auto &cardInfoPerSetList : _sets) {
+        for (const CardInfoPerSet &set : cardInfoPerSetList) {
             set.getPtr()->append(ptr);
             break;
         }
@@ -300,8 +300,8 @@ void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;
     // update the cached list of set names
-    for (const auto &x : sets) {
-        for (const auto &set : x) {
+    for (const auto &cardInfoPerSetList : sets) {
+        for (const auto &set : cardInfoPerSetList) {
             if (set.getPtr()->getEnabled()) {
                 setList << set.getPtr()->getShortName();
             }
@@ -402,8 +402,8 @@ void CardDatabase::addCard(CardInfoPtr card)
     // if card already exists just add the new set property
     if (cards.contains(card->getName())) {
         CardInfoPtr sameCard = cards[card->getName()];
-        for (const auto &x : card->getSets()) {
-            for (const CardInfoPerSet &set : x) {
+        for (const auto &cardInfoPerSetList : card->getSets()) {
+            for (const CardInfoPerSet &set : cardInfoPerSetList) {
                 sameCard->addToSet(set.getPtr(), set);
             }
         }
@@ -464,8 +464,8 @@ CardInfoPtr CardDatabase::getCardByNameAndProviderId(const QString &cardName, co
         return info;
     }
 
-    for (const auto &x : info->getSets()) {
-        for (const auto &set : x) {
+    for (const auto &cardInfoPerSetList : info->getSets()) {
+        for (const auto &set : cardInfoPerSetList) {
             if (set.getProperty("uuid") == providerId) {
                 CardInfoPtr cardFromSpecificSet = info->clone();
                 cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(info->getName()) +
@@ -640,8 +640,8 @@ CardInfoPerSet CardDatabase::getPreferredSetForCard(const QString &cardName) con
     CardInfoPerSet preferredCard;
     SetPriorityComparator comparator;
 
-    for (const auto &x : setMap) {
-        for (auto &cardInfoForSet : x) {
+    for (const auto &cardInfoPerSetList : setMap) {
+        for (auto &cardInfoForSet : cardInfoPerSetList) {
             CardSetPtr currentSet = cardInfoForSet.getPtr();
             if (!preferredSet || comparator(currentSet, preferredSet)) {
                 preferredSet = currentSet;
@@ -669,8 +669,8 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, cons
         return CardInfoPerSet(nullptr);
     }
 
-    for (const auto &x : setMap) {
-        for (auto &cardInfoForSet : x) {
+    for (const auto &cardInfoPerSetList : setMap) {
+        for (auto &cardInfoForSet : cardInfoPerSetList) {
             if (cardInfoForSet.getProperty("uuid") == providerId) {
                 return cardInfoForSet;
             }
@@ -714,8 +714,8 @@ CardInfoPerSet CardDatabase::getSetInfoForCard(const CardInfoPtr &_card)
         return CardInfoPerSet(nullptr);
     }
 
-    for (const auto &x : setMap) {
-        for (auto &cardInfoForSet : x) {
+    for (const auto &cardInfoPerSetList : setMap) {
+        for (const auto &cardInfoForSet : cardInfoPerSetList) {
             if (QLatin1String("card_") + _card->getName() + QString("_") + cardInfoForSet.getProperty("uuid") ==
                 _card->getPixmapCacheKey()) {
                 return cardInfoForSet;

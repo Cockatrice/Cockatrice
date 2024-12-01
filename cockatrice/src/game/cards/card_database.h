@@ -307,19 +307,6 @@ public:
         if (!sets.contains(setName))
             return "";
 
-        /*
-        for (const auto &x : card->getSets()) {
-            for (const auto &set : x) {
-                if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
-                    card->getPixmapCacheKey()) {
-                    long long setIndex = sortedSets.indexOf(set.getPtr());
-                    CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
-                    sortedSets.prepend(setForCardProviderID);
-                    }
-            }
-        }
-        */
-
         for (const auto &set : sets[setName]) {
             if (QLatin1String("card_") + this->getName() + QString("_") + QString(set.getProperty("uuid")) ==
                 this->getPixmapCacheKey()) {
