@@ -30,8 +30,8 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
 
     const QString combinedSetName =
         QString(setInfoForCard.getPtr()->getLongName() + " (" + setInfoForCard.getPtr()->getShortName() + ")");
-    setNameAndCollectorsNumberDisplayWidget =
-        new SetNameAndCollectorsNumberDisplayWidget(this, combinedSetName, setInfoForCard.getProperty("num"));
+    setNameAndCollectorsNumberDisplayWidget = new SetNameAndCollectorsNumberDisplayWidget(
+        this, combinedSetName, setInfoForCard.getProperty("num"), cardSizeSlider);
 
     layout->addWidget(overlayWidget, 0, Qt::AlignHCenter);
     layout->addWidget(setNameAndCollectorsNumberDisplayWidget, 1, Qt::AlignHCenter | Qt::AlignBottom);
