@@ -7067,7 +7067,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Replays</source>
-        <translation type="unfinished"/>
+        <translation>Replays</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="143"/>
@@ -7753,12 +7753,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="593"/>
         <source>Play/Pause</source>
-        <translation type="unfinished"/>
+        <translation>Play/Pause</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="596"/>
         <source>Toggle Fast Forward</source>
-        <translation type="unfinished"/>
+        <translation>Toggle Fast Forward</translation>
     </message>
 </context>
 </TS>
