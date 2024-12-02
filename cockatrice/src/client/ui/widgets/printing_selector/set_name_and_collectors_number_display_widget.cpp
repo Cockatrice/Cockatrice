@@ -1,8 +1,11 @@
 #include "set_name_and_collectors_number_display_widget.h"
 
+#include <QSlider>
+
 SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget(QWidget *parent,
                                                                                  const QString &_setName,
-                                                                                 const QString &_collectorsNumber)
+                                                                                 const QString &_collectorsNumber,
+                                                                                 QSlider *_cardSizeSlider)
     : QWidget(parent)
 {
     layout = new QVBoxLayout(this);
@@ -19,8 +22,39 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
     collectorsNumber->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     collectorsNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
+    cardSizeSlider = _cardSizeSlider;
+
+    connect(cardSizeSlider, &QSlider::valueChanged, this, &SetNameAndCollectorsNumberDisplayWidget::adjustFontSize);
+
     layout->addWidget(setName);
     layout->addWidget(collectorsNumber);
+}
+
+
+void SetNameAndCollectorsNumberDisplayWidget::adjustFontSize(int scalePercentage)
+{
+    // Define the base font size and the range
+    const int minFontSize = 8;  // Minimum font size
+    const int maxFontSize = 32; // Maximum font size
+    const int basePercentage = 100; // Scale at 100%
+
+    // Calculate the new font size
+    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
+
+    // Clamp the font size to the defined range
+    newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
+
+    // Update the fonts for both labels
+    QFont setNameFont = setName->font();
+    setNameFont.setPointSize(newFontSize);
+    setName->setFont(setNameFont);
+
+    QFont collectorsNumberFont = collectorsNumber->font();
+    collectorsNumberFont.setPointSize(newFontSize);
+    collectorsNumber->setFont(collectorsNumberFont);
+
+    // Optionally trigger a resize to accommodate new font size
+    adjustSize();
 }
 
 void SetNameAndCollectorsNumberDisplayWidget::resizeEvent(QResizeEvent *event)
