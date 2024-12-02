@@ -7,6 +7,7 @@
 #include <utility>
 
 // many users prefer not to see these sets with non english arts
+// they will given priority PriorityLowest
 const QStringList nonEnglishSets = {"4BB", "FBB", "PS11", "PSAL", "REN", "RIN"};
 const QMap<QString, CardSet::Priority> setTypePriorities{
     {"core", CardSet::PriorityPrimary},
