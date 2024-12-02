@@ -49,7 +49,8 @@ public:
         LongNameCol,
         ShortNameCol,
         SetTypeCol,
-        ReleaseDateCol
+        ReleaseDateCol,
+        PriorityCol
     };
     enum Role
     {
@@ -80,6 +81,7 @@ public:
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
+    void restoreOriginalOrder();
 };
 
 class SetsDisplayModel : public QSortFilterProxyModel

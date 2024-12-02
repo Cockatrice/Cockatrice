@@ -102,6 +102,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
     view->setColumnHidden(SetsModel::IsKnownCol, true);
+    view->setColumnHidden(SetsModel::PriorityCol, true);
     view->setRootIsDecorated(false);
 
     connect(view->header(), SIGNAL(sectionClicked(int)), this, SLOT(actSort(int)));
@@ -254,7 +255,7 @@ void WndSets::actRestore()
 void WndSets::actRestoreOriginalOrder()
 {
     view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
-    model->sort(model->ReleaseDateCol, Qt::DescendingOrder);
+    model->restoreOriginalOrder();
     sortWarning->setVisible(false);
 }
 

@@ -23,8 +23,9 @@ const char *CardDatabase::TOKENS_SETNAME = "TK";
 CardSet::CardSet(const QString &_shortName,
                  const QString &_longName,
                  const QString &_setType,
-                 const QDate &_releaseDate)
-    : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType)
+                 const QDate &_releaseDate,
+                 const CardSet::Priority _priority)
+    : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType), priority(_priority)
 {
     loadSetOptions();
 }
@@ -32,9 +33,10 @@ CardSet::CardSet(const QString &_shortName,
 CardSetPtr CardSet::newInstance(const QString &_shortName,
                                 const QString &_longName,
                                 const QString &_setType,
-                                const QDate &_releaseDate)
+                                const QDate &_releaseDate,
+                                const Priority _priority)
 {
-    CardSetPtr ptr(new CardSet(_shortName, _longName, _setType, _releaseDate));
+    CardSetPtr ptr(new CardSet(_shortName, _longName, _setType, _releaseDate, _priority));
     // ptr->setSmartPointer(ptr);
     return ptr;
 }
@@ -195,23 +197,29 @@ void SetList::markAllAsKnown()
 
 void SetList::guessSortKeys()
 {
-    // sort by release date DESC; invalid dates to the bottom.
-    QDate distantFuture(2050, 1, 1);
-    int aHundredYears = 36500;
+    defaultSort();
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
         if (set.isNull()) {
             qDebug() << "guessSortKeys set is null";
             continue;
         }
-
-        QDate date = set->getReleaseDate();
-        if (date.isNull()) {
-            set->setSortKey(static_cast<unsigned int>(aHundredYears));
-        } else {
-            set->setSortKey(static_cast<unsigned int>(date.daysTo(distantFuture)));
-        }
+        set->setSortKey(i);
     }
+}
+
+void SetList::defaultSort()
+{
+    std::sort(begin(), end(), [](const CardSetPtr &a, const CardSetPtr &b) {
+        // Sort by priority, then by release date, then by short name
+        if (a->getPriority() != b->getPriority()) {
+            return a->getPriority() < b->getPriority(); // lowest first
+        } else if (a->getReleaseDate() != b->getReleaseDate()) {
+            return a->getReleaseDate() > b->getReleaseDate(); // most recent first
+        } else {
+            return a->getShortName() < b->getShortName(); // alphabetically
+        }
+    });
 }
 
 CardInfoPerSet::CardInfoPerSet(const CardSetPtr &_set) : set(_set)

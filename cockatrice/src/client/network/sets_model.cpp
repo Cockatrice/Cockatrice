@@ -195,6 +195,13 @@ void SetsModel::swapRows(int oldRow, int newRow)
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
 
+void SetsModel::restoreOriginalOrder()
+{
+    int numRows = rowCount();
+    sets.defaultSort();
+    emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
+}
+
 void SetsModel::sort(int column, Qt::SortOrder order)
 {
     QMultiMap<QString, CardSetPtr> setMap;
