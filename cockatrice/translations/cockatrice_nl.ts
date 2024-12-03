@@ -5061,7 +5061,8 @@ Controleer uw snelkoppelingsinstellingen!</translation>
         <location filename="src/settings/shortcuts_settings.cpp" line="48"/>
         <source>The following shortcuts have been set to default:
 </source>
-        <translation>De volgende snelkoppelingen zijn op de standaardinstelling ingesteld:</translation>
+        <translation>De volgende snelkoppelingen zijn op de standaardinstelling ingesteld:
+</translation>
     </message>
 </context>
 <context>
@@ -6411,7 +6412,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="101"/>
         <source>%1&apos;s games</source>
-        <translation>%s&apos;s spellen</translation>
+        <translation>%1&apos;s spellen</translation>
     </message>
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="157"/>
