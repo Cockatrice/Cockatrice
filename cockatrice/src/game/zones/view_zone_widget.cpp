@@ -253,7 +253,8 @@ void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
 void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
 {
     qreal totalZoneHeight = zone->getOptimumRect().height();
-    scrollBar->setMaximum(totalZoneHeight - newZoneHeight);
+    qreal newMax = qMax(totalZoneHeight - newZoneHeight, 0.0);
+    scrollBar->setMaximum(newMax);
 }
 
 /**
@@ -266,6 +267,20 @@ static qreal calcMaxInitialHeight()
     return cardsHeight + 5; // +5 padding to make the cutoff look nicer
 }
 
+/**
+ * @brief Handles edge cases in determining the next default zone height. We want the height to snap when the number of
+ * rows changes, but not if the player has already expanded the window.
+ */
+static qreal determineNewZoneHeight(qreal oldZoneHeight)
+{
+    // don't snap if window is taller than max initial height
+    if (oldZoneHeight > calcMaxInitialHeight()) {
+        return oldZoneHeight;
+    }
+
+    return calcMaxInitialHeight();
+}
+
 void ZoneViewWidget::resizeToZoneContents()
 {
     QRectF zoneRect = zone->getOptimumRect();
@@ -275,12 +290,15 @@ void ZoneViewWidget::resizeToZoneContents()
                        zoneRect.width() + scrollBar->width() + 10);
 
     QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
-    setMaximumSize(maxSize);
 
-    qreal initialZoneHeight = qMin(zoneRect.height(), calcMaxInitialHeight());
-    QSizeF initialSize(width, initialZoneHeight + extraHeight + 10);
+    qreal currentZoneHeight = rect().height() - extraHeight - 10;
+    qreal newZoneHeight = determineNewZoneHeight(currentZoneHeight);
+
+    QSizeF initialSize(width, newZoneHeight + extraHeight + 10);
+
+    setMaximumSize(maxSize);
     resize(initialSize);
-    resizeScrollbar(initialZoneHeight);
+    resizeScrollbar(newZoneHeight);
 
     zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
 
