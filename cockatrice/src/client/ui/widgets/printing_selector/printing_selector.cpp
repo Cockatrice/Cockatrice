@@ -5,6 +5,7 @@
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
+#include "printing_selector_view_options_toolbar_widget.h"
 
 #include <QScrollBar>
 
@@ -18,6 +19,9 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     layout = new QVBoxLayout();
     setLayout(layout);
     widgetLoadingBufferTimer = new QTimer(this);
+
+    viewOptionsToolbar = new PrintingSelectorViewOptionsToolbarWidget(this, this);
+    layout->addWidget(viewOptionsToolbar);
 
     sortToolBar = new PrintingSelectorCardSortingWidget(this);
     layout->addWidget(sortToolBar);

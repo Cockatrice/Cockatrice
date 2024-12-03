@@ -17,6 +17,7 @@
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
+class PrintingSelectorViewOptionsToolbarWidget;
 class TabDeckEditor;
 class PrintingSelector : public QWidget
 {
@@ -35,6 +36,7 @@ public slots:
 
 private:
     QVBoxLayout *layout;
+    PrintingSelectorViewOptionsToolbarWidget *viewOptionsToolbar;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
     FlowWidget *flowWidget;
