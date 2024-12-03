@@ -4,6 +4,8 @@
 #include "printing_selector.h"
 
 #include <QWidget>
+#include <QComboBox>
+#include <QPushButton>
 
 class PrintingSelectorCardSortingWidget : public QWidget
 {

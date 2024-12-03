@@ -6,9 +6,6 @@
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 
-#include <QComboBox>
-#include <QDebug>
-#include <QHBoxLayout>
 #include <QScrollBar>
 
 PrintingSelector::PrintingSelector(QWidget *parent,
