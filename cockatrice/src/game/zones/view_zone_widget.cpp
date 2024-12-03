@@ -101,7 +101,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     scrollBar->setMinimum(0);
     scrollBar->setSingleStep(20);
     scrollBar->setPageStep(200);
-    connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(handleScrollBarChange(int)));
+    connect(scrollBar, &QScrollBar::valueChanged, this, &ZoneViewWidget::handleScrollBarChange);
     scrollBarProxy = new ScrollableGraphicsProxyWidget;
     scrollBarProxy->setWidget(scrollBar);
     zoneHBox->addItem(scrollBarProxy);
