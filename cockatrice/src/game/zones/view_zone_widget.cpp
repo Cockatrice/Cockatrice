@@ -249,16 +249,19 @@ void ZoneViewWidget::resizeToZoneContents()
 {
     QRectF zoneRect = zone->getOptimumRect();
     qreal totalZoneHeight = zoneRect.height();
-    if (zoneRect.height() > 500)
-        zoneRect.setHeight(500);
-    QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
-                        zoneRect.width() + scrollBar->width() + 10),
-                   zoneRect.height() + extraHeight + 10);
-    setMaximumSize(newSize);
-    resize(newSize);
+
+    qreal width = qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
+                       zoneRect.width() + scrollBar->width() + 10);
+
+    QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
+    setMaximumSize(maxSize);
+
+    qreal initialZoneHeight = qMin(zoneRect.height(), 500.0);
+    QSizeF initialSize(width, initialZoneHeight + extraHeight + 10);
+    resize(initialSize);
 
     zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
-    scrollBar->setMaximum(totalZoneHeight - zoneRect.height());
+    scrollBar->setMaximum(totalZoneHeight - initialZoneHeight);
 
     if (layout())
         layout()->invalidate();
