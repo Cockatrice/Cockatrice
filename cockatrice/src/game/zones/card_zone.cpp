@@ -130,8 +130,13 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
         event->ignore();
 }
 
-void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
+    if (!card) {
+        qDebug() << "CardZone::addCard() card is null(???)";
+        return;
+    }
+
     for (auto *view : views) {
         if ((x <= view->getCards().size()) || (view->getNumberCards() == -1)) {
             view->addCard(new CardItem(player, nullptr, card->getName(), card->getProviderId(), card->getId()),
@@ -153,7 +158,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
     CardItem *c = cards.findCard(cardId);
     if (!c) {
         qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
-        return 0;
+        return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
     // so we need to give the card an id and a name as it comes out.
@@ -179,7 +184,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
             position = 0;
     }
     if (position >= cards.size())
-        return 0;
+        return nullptr;
 
     CardItem *c = cards.takeAt(position);
 
@@ -196,6 +201,11 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 
 void CardZone::removeCard(CardItem *card)
 {
+    if (!card) {
+        qDebug() << "CardZone::removeCard: card is null(???)";
+        return;
+    }
+
     cards.removeOne(card);
     reorganizeCards();
     emit cardCountChanged();
