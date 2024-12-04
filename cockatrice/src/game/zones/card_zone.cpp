@@ -133,7 +133,7 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
     if (!card) {
-        qDebug() << "CardZone::addCard() card is null(???)";
+        qDebug() << "CardZone::addCard() card is null, this shouldn't normally happen";
         return;
     }
 
@@ -202,7 +202,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 void CardZone::removeCard(CardItem *card)
 {
     if (!card) {
-        qDebug() << "CardZone::removeCard: card is null(???)";
+        qDebug() << "CardZone::removeCard: card is null, this shouldn't normally happen";
         return;
     }
 
