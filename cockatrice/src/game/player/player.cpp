@@ -3442,7 +3442,7 @@ void Player::actPlay()
     }
 }
 
-void Player::actHide() const
+void Player::actHide()
 {
     auto *card = game->getActiveCard();
     if (card) {

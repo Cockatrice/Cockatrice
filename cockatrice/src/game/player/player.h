@@ -222,7 +222,7 @@ private slots:
     void actFlowT();
     void actSetAnnotation();
     void actPlay();
-    void actHide() const;
+    void actHide();
     void actPlayFacedown();
     void actReveal(QAction *action);
     void refreshShortcuts();
