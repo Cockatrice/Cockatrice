@@ -302,6 +302,8 @@ void GeneralSettingsPage::retranslateUi()
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
     SettingsCache &settings = SettingsCache::instance();
+
+    // Theme settings
     QString themeName = SettingsCache::instance().getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
@@ -322,6 +324,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
 
+    // Card rendering
     displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
     connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
 
@@ -342,6 +345,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
 
+    // Hand layout
     horizontalHandCheckBox.setChecked(settings.getHorizontalHand());
     connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setHorizontalHand);
 
@@ -355,6 +359,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
 
+    // table grid layout
     invertVerticalCoordinateCheckBox.setChecked(settings.getInvertVerticalCoordinate());
     connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setInvertVerticalCoordinate);
@@ -381,6 +386,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
 
+    // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(cardsGroupBox);
