@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     ui.show();
     qDebug("main(): ui.show() finished");
 
-    // If enabled, force shortcuts to be shown in right-click menus regardless of system defaults
+    // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
