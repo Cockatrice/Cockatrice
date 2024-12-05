@@ -509,7 +509,7 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
 void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
 {
     showShortcuts = static_cast<bool>(_showShortcuts);
-    settings->setValue("menu/ShowShortcuts", showShortcuts);
+    settings->setValue("menu/showshortcuts", showShortcuts);
 }
 
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
