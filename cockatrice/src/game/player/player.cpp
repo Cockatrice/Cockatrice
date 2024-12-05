@@ -1693,7 +1693,7 @@ void Player::actCreatePredefinedToken()
 
 void Player::actCreateRelatedCard()
 {
-    CardItem *sourceCard = game->getActiveCard();
+    const CardItem *sourceCard = game->getActiveCard();
     if (!sourceCard) {
         return;
     }
@@ -1714,7 +1714,7 @@ void Player::actCreateRelatedCard()
 
 void Player::actCreateAllRelatedCards()
 {
-    CardItem *sourceCard = game->getActiveCard();
+    const CardItem *sourceCard = game->getActiveCard();
     if (!sourceCard) {
         return;
     }
@@ -3247,11 +3247,10 @@ void Player::actSetPT()
 
 void Player::actDrawArrow()
 {
-    if (!game->getActiveCard()) {
-        return;
+    auto *card = game->getActiveCard();
+    if (card) {
+        card->drawArrow(Qt::red);
     }
-
-    game->getActiveCard()->drawArrow(Qt::red);
 }
 
 void Player::actIncP()
@@ -3436,30 +3435,27 @@ void Player::actCardCounterTrigger()
 
 void Player::actPlay()
 {
-    if (!game->getActiveCard()) {
-        return;
+    auto *card = game->getActiveCard();
+    if (card) {
+        const bool cipt = card->getInfo() ? card->getInfo()->getCipt() : false;
+        playCard(card, false, cipt);
     }
-
-    bool cipt = game->getActiveCard()->getInfo() ? game->getActiveCard()->getInfo()->getCipt() : false;
-    playCard(game->getActiveCard(), false, cipt);
 }
 
 void Player::actHide()
 {
-    if (!game->getActiveCard()) {
-        return;
+    auto *card = game->getActiveCard();
+    if (card) {
+        card->getZone()->removeCard(card);
     }
-
-    game->getActiveCard()->getZone()->removeCard(game->getActiveCard());
 }
 
 void Player::actPlayFacedown()
 {
-    if (!game->getActiveCard()) {
-        return;
+    auto *card = game->getActiveCard();
+    if (card) {
+        playCard(card, true, false);
     }
-
-    playCard(game->getActiveCard(), true, false);
 }
 
 void Player::actReveal(QAction *action)
