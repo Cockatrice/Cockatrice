@@ -97,6 +97,7 @@ private:
     int startingHandSize;
     bool annotateTokens;
     QByteArray tabGameSplitterSizes;
+    bool showShortcuts;
     bool displayCardNames;
     bool horizontalHand;
     bool invertVerticalCoordinate;
@@ -287,6 +288,10 @@ public:
     QByteArray getTabGameSplitterSizes() const
     {
         return tabGameSplitterSizes;
+    }
+    bool getShowShortcuts() const
+    {
+        return showShortcuts;
     }
     bool getDisplayCardNames() const
     {
@@ -560,6 +565,7 @@ public slots:
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
+    void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);

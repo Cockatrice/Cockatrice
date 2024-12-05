@@ -90,6 +90,7 @@ private:
     QPushButton openThemeButton;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
+    QCheckBox showShortcutsCheckBox;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
     QLabel verticalCardOverlapPercentLabel;
@@ -98,6 +99,7 @@ private:
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *themeGroupBox;
+    QGroupBox *menuGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
