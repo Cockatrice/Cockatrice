@@ -302,6 +302,8 @@ void GeneralSettingsPage::retranslateUi()
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
     SettingsCache &settings = SettingsCache::instance();
+
+    // Theme settings
     QString themeName = SettingsCache::instance().getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
@@ -322,6 +324,17 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
 
+    // Menu settings
+    showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
+    connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
+
+    auto *menuGrid = new QGridLayout;
+    menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
+
+    menuGroupBox = new QGroupBox;
+    menuGroupBox->setLayout(menuGrid);
+
+    // Card rendering
     displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
     connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
 
@@ -342,6 +355,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
 
+    // Hand layout
     horizontalHandCheckBox.setChecked(settings.getHorizontalHand());
     connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setHorizontalHand);
 
@@ -355,6 +369,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
 
+    // table grid layout
     invertVerticalCoordinateCheckBox.setChecked(settings.getInvertVerticalCoordinate());
     connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setInvertVerticalCoordinate);
@@ -381,8 +396,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
 
+    // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
+    mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(handGroupBox);
     mainLayout->addWidget(tableGroupBox);
@@ -411,11 +428,20 @@ void AppearanceSettingsPage::openThemeLocation()
     }
 }
 
+void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
+{
+    SettingsCache::instance().setShowShortcuts(value);
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
+}
+
 void AppearanceSettingsPage::retranslateUi()
 {
     themeGroupBox->setTitle(tr("Theme settings"));
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
+
+    menuGroupBox->setTitle(tr("Menu settings"));
+    showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
