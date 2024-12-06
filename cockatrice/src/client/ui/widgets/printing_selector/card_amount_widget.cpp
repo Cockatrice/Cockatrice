@@ -91,6 +91,12 @@ void CardAmountWidget::addPrinting(const QString &zone)
     recursiveExpand(newCardIndex);
     QModelIndex find_card = deckModel->findCard(rootCard->getName(), zone);
     if (find_card.isValid() && find_card != newCardIndex) {
+        auto amount = deckModel->data(find_card, Qt::DisplayRole);
+        if (amount.toInt() > 1) {
+            for (int i = 0; i < amount.toInt() - 1; i++) {
+                deckModel->addCard(rootCard->getName(), setInfoForCard, zone);
+            }
+        }
         deckModel->removeRow(find_card.row(), find_card.parent());
     };
     newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"));
