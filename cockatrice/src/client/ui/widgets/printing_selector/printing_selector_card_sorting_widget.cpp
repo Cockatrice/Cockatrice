@@ -1,5 +1,6 @@
 #include "printing_selector_card_sorting_widget.h"
 
+#include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_set_comparator.h"
 
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
@@ -18,7 +19,9 @@ PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSel
 
     sortOptionsSelector = new QComboBox(this);
     sortOptionsSelector->addItems(SORT_OPTIONS);
-    sortOptionsSelector->setCurrentIndex(2);
+    sortOptionsSelector->setCurrentIndex(SettingsCache::instance().getPrintingSelectorSortOrder());
+    connect(sortOptionsSelector, &QComboBox::currentTextChanged, this,
+            &PrintingSelectorCardSortingWidget::updateSortSetting);
     connect(sortOptionsSelector, &QComboBox::currentTextChanged, parent, &PrintingSelector::updateDisplay);
     sortToolBar->addWidget(sortOptionsSelector);
 
@@ -38,6 +41,11 @@ void PrintingSelectorCardSortingWidget::updateSortOrder()
     }
     descendingSort = !descendingSort;
     parent->updateDisplay();
+}
+
+void PrintingSelectorCardSortingWidget::updateSortSetting()
+{
+    SettingsCache::instance().setPrintingSelectorSortOrder(sortOptionsSelector->currentIndex());
 }
 
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSetMap cardInfoPerSets)

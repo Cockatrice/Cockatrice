@@ -19,6 +19,7 @@ public:
 
 public slots:
     void updateSortOrder();
+    void updateSortSetting();
 
 private:
     PrintingSelector *parent;
