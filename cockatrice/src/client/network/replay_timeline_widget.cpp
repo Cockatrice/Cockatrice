@@ -9,7 +9,7 @@ ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentTime(0), currentEvent(0)
 {
     replayTimer = new QTimer(this);
-    connect(replayTimer, SIGNAL(timeout()), this, SLOT(replayTimerTimeout()));
+    connect(replayTimer, &QTimer::timeout, this, &ReplayTimelineWidget::replayTimerTimeout);
 
     rewindBufferingTimer = new QTimer(this);
     rewindBufferingTimer->setSingleShot(true);

@@ -38,7 +38,7 @@ void ReleaseChannel::checkForUpdates()
     QString releaseChannelUrl = getReleaseChannelUrl();
     qDebug() << "Searching for updates on the channel: " << releaseChannelUrl;
     response = netMan->get(QNetworkRequest(releaseChannelUrl));
-    connect(response, SIGNAL(finished()), this, SLOT(releaseListFinished()));
+    connect(response, &QNetworkReply::finished, this, &ReleaseChannel::releaseListFinished);
 }
 
 // Different release channel checking functions for different operating systems
@@ -158,7 +158,7 @@ void StableReleaseChannel::releaseListFinished()
     QString url = QString(STABLETAG_URL) + tagName;
     qDebug() << "Searching for commit hash corresponding to stable channel tag: " << tagName;
     response = netMan->get(QNetworkRequest(url));
-    connect(response, SIGNAL(finished()), this, SLOT(tagListFinished()));
+    connect(response, &QNetworkReply::finished, this, &StableReleaseChannel::tagListFinished);
 }
 
 void StableReleaseChannel::tagListFinished()
@@ -260,7 +260,7 @@ void BetaReleaseChannel::releaseListFinished()
 
     qDebug() << "Searching for a corresponding file on the beta channel: " << betaBuildDownloadUrl;
     response = netMan->get(QNetworkRequest(betaBuildDownloadUrl));
-    connect(response, SIGNAL(finished()), this, SLOT(fileListFinished()));
+    connect(response, &QNetworkReply::finished, this, &BetaReleaseChannel::fileListFinished);
 }
 
 void BetaReleaseChannel::fileListFinished()
