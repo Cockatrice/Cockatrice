@@ -103,6 +103,7 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool openDeckInNewTab;
+    int rewindBufferingMs;
     bool chatMention;
     bool chatMentionCompleter;
     QString chatMentionColor;
@@ -311,6 +312,10 @@ public:
     bool getOpenDeckInNewTab() const
     {
         return openDeckInNewTab;
+    }
+    int getRewindBufferingMs() const
+    {
+        return rewindBufferingMs;
     }
     bool getChatMention() const
     {
@@ -566,6 +571,7 @@ public slots:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(QT_STATE_CHANGED_T _tapAnimation);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
+    void setRewindBufferingMs(int _rewindBufferingMs);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);

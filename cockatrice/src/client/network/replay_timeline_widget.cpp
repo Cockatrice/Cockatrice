@@ -106,18 +106,11 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
         // The rewind only happens once the timer runs out.
         // If another backwards skip happens, the timer will just get reset instead of rewinding.
         rewindBufferingTimer->stop();
-        rewindBufferingTimer->start(calcRewindBufferingTimeout());
+        rewindBufferingTimer->start(SettingsCache::instance().getRewindBufferingMs());
     } else {
         // otherwise, process the rewind immediately
         processRewind();
     }
-}
-
-/// The timeout scales based on the current event number, up to a limit
-int ReplayTimelineWidget::calcRewindBufferingTimeout() const
-{
-    int extraTime = currentEvent / 100;
-    return std::min(BASE_REWIND_BUFFERING_TIMEOUT_MS + extraTime, MAX_REWIND_BUFFERING_TIMEOUT_MS);
 }
 
 void ReplayTimelineWidget::processRewind()

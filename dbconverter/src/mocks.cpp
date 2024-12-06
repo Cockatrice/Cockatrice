@@ -166,6 +166,9 @@ void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T /* _tapAnimation */)
 void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T /* _openDeckInNewTab */)
 {
 }
+void SettingsCache::setRewindBufferingMs(int /* _rewindBufferingMs */)
+{
+}
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T /* _chatMention */)
 {
 }

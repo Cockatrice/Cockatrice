@@ -125,10 +125,13 @@ private:
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
+    QLabel rewindBufferingMsLabel;
+    QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
     QGroupBox *deckEditorGroupBox;
+    QGroupBox *replayGroupBox;
 
 public:
     UserInterfaceSettingsPage();
