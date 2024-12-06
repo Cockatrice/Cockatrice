@@ -4,10 +4,10 @@
 #include "printing_selector.h"
 #include "printing_selector_view_options_widget.h"
 
+#include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QPushButton>
 
 class PrintingSelectorViewOptionsToolbarWidget : public QWidget
 {

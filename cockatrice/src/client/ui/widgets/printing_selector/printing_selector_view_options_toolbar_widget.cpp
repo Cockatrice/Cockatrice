@@ -4,9 +4,8 @@
 #include <QLabel>
 #include <QPushButton>
 
-PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidget(
-    QWidget *_parent,
-    PrintingSelector *_printingSelector)
+PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidget(QWidget *_parent,
+                                                                                   PrintingSelector *_printingSelector)
     : QWidget(_parent), printingSelector(_printingSelector)
 {
     layout = new QVBoxLayout();
@@ -94,7 +93,7 @@ QSize PrintingSelectorViewOptionsToolbarWidget::minimumSizeHint() const
     return stackedWidget->currentWidget()->minimumSizeHint();
 }
 
-PrintingSelectorViewOptionsWidget* PrintingSelectorViewOptionsToolbarWidget::getViewOptionsWidget() const
+PrintingSelectorViewOptionsWidget *PrintingSelectorViewOptionsToolbarWidget::getViewOptionsWidget() const
 {
     return viewOptions;
 }
