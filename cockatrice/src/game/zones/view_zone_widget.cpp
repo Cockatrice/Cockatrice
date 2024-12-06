@@ -101,7 +101,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     scrollBar->setMinimum(0);
     scrollBar->setSingleStep(20);
     scrollBar->setPageStep(200);
-    connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(handleScrollBarChange(int)));
+    connect(scrollBar, &QScrollBar::valueChanged, this, &ZoneViewWidget::handleScrollBarChange);
     scrollBarProxy = new ScrollableGraphicsProxyWidget;
     scrollBarProxy->setWidget(scrollBar);
     zoneHBox->addItem(scrollBarProxy);
@@ -245,20 +245,35 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
         setPos(scenePos);
 }
 
+void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
+{
+    if (!zone)
+        return;
+
+    // We need to manually resize the scroll bar whenever the window gets resized
+    qreal totalZoneHeight = zone->getOptimumRect().height();
+    qreal newWindowHeight = event->newSize().height();
+    qreal newZoneHeight = newWindowHeight - extraHeight - 10;
+
+    scrollBar->setMaximum(totalZoneHeight - newZoneHeight);
+}
+
 void ZoneViewWidget::resizeToZoneContents()
 {
     QRectF zoneRect = zone->getOptimumRect();
     qreal totalZoneHeight = zoneRect.height();
-    if (zoneRect.height() > 500)
-        zoneRect.setHeight(500);
-    QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
-                        zoneRect.width() + scrollBar->width() + 10),
-                   zoneRect.height() + extraHeight + 10);
-    setMaximumSize(newSize);
-    resize(newSize);
+
+    qreal width = qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
+                       zoneRect.width() + scrollBar->width() + 10);
+
+    QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
+    setMaximumSize(maxSize);
+
+    qreal initialZoneHeight = qMin(zoneRect.height(), 500.0);
+    QSizeF initialSize(width, initialZoneHeight + extraHeight + 10);
+    resize(initialSize);
 
     zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
-    scrollBar->setMaximum(totalZoneHeight - zoneRect.height());
 
     if (layout())
         layout()->invalidate();

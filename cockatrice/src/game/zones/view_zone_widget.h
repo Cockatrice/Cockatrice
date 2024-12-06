@@ -65,6 +65,7 @@ private slots:
     void handleScrollBarChange(int value);
     void zoneDeleted();
     void moveEvent(QGraphicsSceneMoveEvent * /* event */);
+    void resizeEvent(QGraphicsSceneResizeEvent * /* event */);
 
 public:
     ZoneViewWidget(Player *_player,
