@@ -4,10 +4,10 @@ PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(Printin
 {
     cardSelectionBarLayout = new QHBoxLayout(this);
     previousCardButton = new QPushButton(this);
-    previousCardButton->setText(tr("Previous Card"));
+    previousCardButton->setText(tr("Previous Card in Deck"));
 
     nextCardButton = new QPushButton(this);
-    nextCardButton->setText(tr("Next Card"));
+    nextCardButton->setText(tr("Next Card in Deck"));
 
     connectSignals();
 
