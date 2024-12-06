@@ -167,7 +167,7 @@ void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED
 void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T /* _bumpSetsWithCardsInDeckToTop */)
 {
 }
-void setPrintingSelectorSortOrder(int /* _printingSelectorSortOrder */)
+void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrder */)
 {
 }
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
