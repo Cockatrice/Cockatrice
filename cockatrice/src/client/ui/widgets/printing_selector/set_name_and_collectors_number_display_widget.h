@@ -10,7 +10,10 @@ class SetNameAndCollectorsNumberDisplayWidget : public QWidget
 {
     Q_OBJECT
 public:
-    SetNameAndCollectorsNumberDisplayWidget(QWidget *parent, const QString &setName, const QString &collectorsNumber, QSlider *cardSizeSlider);
+    SetNameAndCollectorsNumberDisplayWidget(QWidget *parent,
+                                            const QString &setName,
+                                            const QString &collectorsNumber,
+                                            QSlider *cardSizeSlider);
     void resizeEvent(QResizeEvent *event) override;
 
 public slots:

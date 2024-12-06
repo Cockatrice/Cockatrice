@@ -30,12 +30,11 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
     layout->addWidget(collectorsNumber);
 }
 
-
 void SetNameAndCollectorsNumberDisplayWidget::adjustFontSize(int scalePercentage)
 {
     // Define the base font size and the range
-    const int minFontSize = 8;  // Minimum font size
-    const int maxFontSize = 32; // Maximum font size
+    const int minFontSize = 8;      // Minimum font size
+    const int maxFontSize = 32;     // Maximum font size
     const int basePercentage = 100; // Scale at 100%
 
     // Calculate the new font size
