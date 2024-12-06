@@ -25,4 +25,6 @@ message Command_CreateToken {
 
     // What to do with the target card. Ignored if there is no target card.
     optional TargetMode target_mode = 11;
+
+    optional string card_provider_id = 12;
 }

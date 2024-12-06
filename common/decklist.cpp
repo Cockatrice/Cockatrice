@@ -156,12 +156,17 @@ AbstractDecklistNode *InnerDecklistNode::findChild(const QString &_name)
     return nullptr;
 }
 
-AbstractDecklistNode *InnerDecklistNode::findCardChildByNameAndProviderId(const QString &_name,
-                                                                          const QString &_providerId)
+AbstractDecklistNode *InnerDecklistNode::findCardChildByNameProviderIdAndNumber(const QString &_name,
+                                                                                const QString &_providerId,
+                                                                                const QString &_cardNumber)
 {
-    for (int i = 0; i < size(); i++) {
-        if (at(i) != nullptr && at(i)->getName() == _name && at(i)->getCardProviderId() == _providerId) {
-            return at(i);
+    for (const auto &i : *this) {
+        if (i != nullptr && i->getName() == _name) {
+            if (i->getCardCollectorNumber() == _cardNumber) {
+                if (i->getCardProviderId() == _providerId) {
+                    return i;
+                }
+            }
         }
     }
     return nullptr;
@@ -319,13 +324,13 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
     xml->writeAttribute("number", QString::number(getNumber()));
     xml->writeAttribute("name", getName());
 
-    if (getCardSetShortName().isEmpty()) {
+    if (!getCardSetShortName().isEmpty()) {
         xml->writeAttribute("setShortName", getCardSetShortName());
     }
-    if (getCardCollectorNumber().isEmpty()) {
+    if (!getCardCollectorNumber().isEmpty()) {
         xml->writeAttribute("collectorNumber", getCardCollectorNumber());
     }
-    if (getCardProviderId().isEmpty()) {
+    if (!getCardProviderId().isEmpty()) {
         xml->writeAttribute("uuid", getCardProviderId());
     }
 }

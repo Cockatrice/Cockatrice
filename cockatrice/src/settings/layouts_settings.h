@@ -15,6 +15,7 @@ public:
     void setDeckEditorGeometry(const QByteArray &value);
     void setDeckEditorCardSize(const QSize &value);
     void setDeckEditorDeckSize(const QSize &value);
+    void setDeckEditorPrintingSelectorSize(const QSize &value);
     void setDeckEditorFilterSize(const QSize &value);
     void setDeckEditorDbHeaderState(const QByteArray &value);
     void setSetsDialogHeaderState(const QByteArray &value);
@@ -34,9 +35,10 @@ public:
 
     const QByteArray getDeckEditorLayoutState();
     const QByteArray getDeckEditorGeometry();
-    const QSize getDeckEditorCardSize();
-    const QSize getDeckEditorDeckSize();
-    const QSize getDeckEditorFilterSize();
+    QSize getDeckEditorCardSize();
+    QSize getDeckEditorDeckSize();
+    QSize getDeckEditorPrintingSelectorSize();
+    QSize getDeckEditorFilterSize();
     const QByteArray getDeckEditorDbHeaderState();
     const QByteArray getSetsDialogHeaderState();
 
@@ -57,7 +59,7 @@ signals:
 public slots:
 
 private:
-    explicit LayoutsSettings(QString settingPath, QObject *parent = nullptr);
+    explicit LayoutsSettings(const QString &settingPath, QObject *parent = nullptr);
     LayoutsSettings(const LayoutsSettings & /*other*/);
 };
 

@@ -240,6 +240,10 @@ SettingsCache::SettingsCache()
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
 
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
+    overrideAllCardArtWithPersonalPreference =
+        settings->value("cards/overrideallcardartwithpersonalpreference", false).toBool();
+    bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
+    printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -510,6 +514,27 @@ void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
     displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
+}
+
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt)
+{
+    overrideAllCardArtWithPersonalPreference = static_cast<bool>(_overrideAllCardArt);
+    settings->setValue("cards/overrideallcardartwithpersonalpreference", overrideAllCardArtWithPersonalPreference);
+    emit overrideAllCardArtWithPersonalPreferenceChanged();
+}
+
+void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop)
+{
+    bumpSetsWithCardsInDeckToTop = static_cast<bool>(_bumpSetsWithCardsInDeckToTop);
+    settings->setValue("cards/bumpsetswithcardsindecktotop", bumpSetsWithCardsInDeckToTop);
+    emit bumpSetsWithCardsInDeckToTopChanged();
+}
+
+void SettingsCache::setPrintingSelectorSortOrder(int _printingSelectorSortOrder)
+{
+    printingSelectorSortOrder = _printingSelectorSortOrder;
+    settings->setValue("cards/printingselectorsortorder", printingSelectorSortOrder);
+    emit printingSelectorSortOrderChanged();
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

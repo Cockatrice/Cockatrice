@@ -181,7 +181,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                 attrName = "picurl";
                             setInfo.setProperty(attrName, attr.value().toString());
                         }
-                        _sets.insert(setName, setInfo);
+                        _sets[setName].append(setInfo);
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
@@ -284,14 +284,16 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeEndElement();
 
     // sets
-    for (CardInfoPerSet set : info->getSets()) {
-        xml.writeStartElement("set");
-        for (QString propName : set.getProperties()) {
-            xml.writeAttribute(propName, set.getProperty(propName));
-        }
+    for (const auto &cardInfoPerSetList : info->getSets()) {
+        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+            xml.writeStartElement("set");
+            for (const QString &propName : set.getProperties()) {
+                xml.writeAttribute(propName, set.getProperty(propName));
+            }
 
-        xml.writeCharacters(set.getPtr()->getShortName());
-        xml.writeEndElement();
+            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeEndElement();
+        }
     }
 
     // related cards
