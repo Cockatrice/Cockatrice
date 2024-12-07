@@ -5,6 +5,7 @@
 #include "../../client/ui/theme_manager.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_create_token.h"
+#include "../../dialogs/dlg_move_top_cards_until.h"
 #include "../../dialogs/dlg_roll_dice.h"
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
@@ -1330,16 +1331,19 @@ void Player::actMoveTopCardsToExile()
 
 void Player::actMoveTopCardsUntil()
 {
-    moveTopCardTimer->stop();
-    movingCardsUntil = false;
+    stopMoveTopCardsUntil();
+
     QString expr = previousMovingCardsUntilExpr;
+    int numberOfHits = previousMovingCardsUntilNumberOfHits;
     for (;;) {
-        bool ok;
-        expr = QInputDialog::getText(game, "Put top cards on stack until", "Card name (or search expressions)", {},
-                                     expr, &ok);
-        if (!ok) {
+        DlgMoveTopCardsUntil dlg(game, expr, numberOfHits);
+        if (!dlg.exec()) {
             return;
         }
+
+        expr = dlg.getExpr();
+        numberOfHits = dlg.getNumberOfHits();
+
         movingCardsUntilFilter = FilterString(expr);
         if (movingCardsUntilFilter.valid()) {
             break;
@@ -1351,9 +1355,11 @@ void Player::actMoveTopCardsUntil()
         }
     }
     previousMovingCardsUntilExpr = expr;
+    previousMovingCardsUntilNumberOfHits = numberOfHits;
     if (zones.value("deck")->getCards().empty()) {
-        movingCardsUntil = false;
+        stopMoveTopCardsUntil();
     } else {
+        movingCardsUntilCounter = numberOfHits;
         movingCardsUntil = true;
         actMoveTopCardToPlay();
     }
@@ -1362,11 +1368,28 @@ void Player::actMoveTopCardsUntil()
 void Player::moveOneCardUntil(const CardInfoPtr card)
 {
     moveTopCardTimer->stop();
-    if (zones.value("deck")->getCards().empty() || card.isNull() || movingCardsUntilFilter.check(card)) {
-        movingCardsUntil = false;
+    if (zones.value("deck")->getCards().empty() || card.isNull()) {
+        stopMoveTopCardsUntil();
+    } else if (movingCardsUntilFilter.check(card)) {
+        --movingCardsUntilCounter;
+        if (movingCardsUntilCounter > 0) {
+            moveTopCardTimer->start();
+        } else {
+            stopMoveTopCardsUntil();
+        }
     } else {
         moveTopCardTimer->start();
     }
+}
+
+/**
+ * @brief Immediately stops any ongoing `play top card to stack until...` process, resetting all variables involved.
+ */
+void Player::stopMoveTopCardsUntil()
+{
+    moveTopCardTimer->stop();
+    movingCardsUntilCounter = 0;
+    movingCardsUntil = false;
 }
 
 void Player::actMoveTopCardToBottom()
