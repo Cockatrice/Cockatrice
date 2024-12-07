@@ -5,6 +5,7 @@
 #include "../../client/ui/theme_manager.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_create_token.h"
+#include "../../dialogs/dlg_move_top_cards_until.h"
 #include "../../dialogs/dlg_roll_dice.h"
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
@@ -1333,13 +1334,16 @@ void Player::actMoveTopCardsUntil()
     moveTopCardTimer->stop();
     movingCardsUntil = false;
     QString expr = previousMovingCardsUntilExpr;
+    uint numberOfHits = 1;
     for (;;) {
-        bool ok;
-        expr = QInputDialog::getText(game, "Put top cards on stack until", "Card name (or search expressions)", {},
-                                     expr, &ok);
-        if (!ok) {
+        DlgMoveTopCardsUntil dlg(game, expr, numberOfHits);
+        if (!dlg.exec()) {
             return;
         }
+
+        expr = dlg.getExpr();
+        numberOfHits = dlg.getNumberOfHits();
+
         movingCardsUntilFilter = FilterString(expr);
         if (movingCardsUntilFilter.valid()) {
             break;
