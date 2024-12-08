@@ -3488,7 +3488,7 @@ void Player::actPlay()
     }
 
     for (auto &card : selectedCards) {
-        if (card) {
+        if (card && !isUnwritableRevealZone(card->getZone())) {
             const bool cipt = card->getInfo() ? card->getInfo()->getCipt() : false;
             playCard(card, false, cipt);
         }
@@ -3514,7 +3514,7 @@ void Player::actPlayFacedown()
     }
 
     for (auto &card : selectedCards) {
-        if (card) {
+        if (card && !isUnwritableRevealZone(card->getZone())) {
             playCard(card, true, false);
         }
     }
