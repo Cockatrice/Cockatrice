@@ -192,7 +192,7 @@ void ZoneViewWidget::retranslateUi()
     { // We can't change the strings after they're put into the QComboBox, so this is our workaround
         int oldIndex = groupBySelector.currentIndex();
         groupBySelector.clear();
-        groupBySelector.addItem(tr("Group by ---"), CardList::NoSort);
+        groupBySelector.addItem(tr("Ungrouped"), CardList::NoSort);
         groupBySelector.addItem(tr("Group by Type"), CardList::SortByMainType);
         groupBySelector.addItem(tr("Group by Mana Value"), CardList::SortByManaValue);
         groupBySelector.addItem(tr("Group by Color"), CardList::SortByColorGrouping);
@@ -202,7 +202,7 @@ void ZoneViewWidget::retranslateUi()
     {
         int oldIndex = sortBySelector.currentIndex();
         sortBySelector.clear();
-        sortBySelector.addItem(tr("Sort by ---"), CardList::NoSort);
+        sortBySelector.addItem(tr("Unsorted"), CardList::NoSort);
         sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
         sortBySelector.addItem(tr("Sort by Type"), CardList::SortByType);
         sortBySelector.addItem(tr("Sort by Mana Cost"), CardList::SortByManaCost);
