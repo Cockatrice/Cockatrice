@@ -3444,9 +3444,16 @@ void Player::actPlay()
 
 void Player::actHide()
 {
-    auto *card = game->getActiveCard();
-    if (card) {
-        card->getZone()->removeCard(card);
+    QList<CardItem *> selectedCards;
+    for (const auto &item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        selectedCards.append(card);
+    }
+
+    for (auto &card : selectedCards) {
+        if (card) {
+            card->getZone()->removeCard(card);
+        }
     }
 }
 
