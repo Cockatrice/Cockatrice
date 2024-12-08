@@ -559,7 +559,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     deckEditorGroupBox->setTitle(tr("Deck editor settings"));
     openDeckInNewTabCheckBox.setText(tr("Always open deck in new tab"));
     replayGroupBox->setTitle(tr("Replay settings"));
-    rewindBufferingMsLabel.setText(tr("Amount of time to buffer a backwards skip from keyboard shortcut by:"));
+    rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(tr(" ms"));
 }
 
