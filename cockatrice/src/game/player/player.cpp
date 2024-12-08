@@ -3481,10 +3481,17 @@ static bool isUnwritableRevealZone(CardZone *zone)
 
 void Player::actPlay()
 {
-    auto *card = game->getActiveCard();
-    if (card) {
-        const bool cipt = card->getInfo() ? card->getInfo()->getCipt() : false;
-        playCard(card, false, cipt);
+    QList<CardItem *> selectedCards;
+    for (const auto &item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        selectedCards.append(card);
+    }
+
+    for (auto &card : selectedCards) {
+        if (card) {
+            const bool cipt = card->getInfo() ? card->getInfo()->getCipt() : false;
+            playCard(card, false, cipt);
+        }
     }
 }
 
@@ -3500,9 +3507,16 @@ void Player::actHide()
 
 void Player::actPlayFacedown()
 {
-    auto *card = game->getActiveCard();
-    if (card) {
-        playCard(card, true, false);
+    QList<CardItem *> selectedCards;
+    for (const auto &item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        selectedCards.append(card);
+    }
+
+    for (auto &card : selectedCards) {
+        if (card) {
+            playCard(card, true, false);
+        }
     }
 }
 
