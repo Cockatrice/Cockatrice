@@ -245,7 +245,7 @@ SettingsCache::SettingsCache()
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
-    rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toBool();
+    rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
