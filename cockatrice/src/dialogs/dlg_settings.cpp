@@ -508,12 +508,26 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
 
+    // replay settings
+    rewindBufferingMsBox.setRange(0, 9999);
+    rewindBufferingMsBox.setValue(SettingsCache::instance().getRewindBufferingMs());
+    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setRewindBufferingMs);
+
+    auto *replayGrid = new QGridLayout;
+    replayGrid->addWidget(&rewindBufferingMsLabel, 0, 0, 1, 1);
+    replayGrid->addWidget(&rewindBufferingMsBox, 0, 1, 1, 1);
+
+    replayGroupBox = new QGroupBox;
+    replayGroupBox->setLayout(replayGrid);
+
     // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(notificationsGroupBox);
     mainLayout->addWidget(animationGroupBox);
     mainLayout->addWidget(deckEditorGroupBox);
+    mainLayout->addWidget(replayGroupBox);
     mainLayout->addStretch();
 
     setLayout(mainLayout);
@@ -544,6 +558,9 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor settings"));
     openDeckInNewTabCheckBox.setText(tr("Always open deck in new tab"));
+    replayGroupBox->setTitle(tr("Replay settings"));
+    rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
+    rewindBufferingMsBox.setSuffix(tr(" ms"));
 }
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()

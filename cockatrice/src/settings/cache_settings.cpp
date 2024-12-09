@@ -245,6 +245,7 @@ SettingsCache::SettingsCache()
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
+    rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
@@ -543,6 +544,12 @@ void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab)
 {
     openDeckInNewTab = static_cast<bool>(_openDeckInNewTab);
     settings->setValue("editor/openDeckInNewTab", openDeckInNewTab);
+}
+
+void SettingsCache::setRewindBufferingMs(int _rewindBufferingMs)
+{
+    rewindBufferingMs = _rewindBufferingMs;
+    settings->setValue("replay/rewindBufferingMs", rewindBufferingMs);
 }
 
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)
