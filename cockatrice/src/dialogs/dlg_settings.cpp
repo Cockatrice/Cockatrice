@@ -511,7 +511,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     // replay settings
     rewindBufferingMsBox.setValue(SettingsCache::instance().getRewindBufferingMs());
     rewindBufferingMsBox.setRange(0, 9999);
-    connect(&rewindBufferingMsBox, &QSpinBox::valueChanged, &SettingsCache::instance(),
+    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setRewindBufferingMs);
 
     auto *replayGrid = new QGridLayout;
