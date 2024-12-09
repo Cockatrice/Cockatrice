@@ -509,8 +509,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGroupBox->setLayout(deckEditorGrid);
 
     // replay settings
-    rewindBufferingMsBox.setValue(SettingsCache::instance().getRewindBufferingMs());
     rewindBufferingMsBox.setRange(0, 9999);
+    rewindBufferingMsBox.setValue(SettingsCache::instance().getRewindBufferingMs());
     connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setRewindBufferingMs);
 
