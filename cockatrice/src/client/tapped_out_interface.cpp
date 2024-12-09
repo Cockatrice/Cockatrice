@@ -14,7 +14,7 @@ TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *par
     : QObject(parent), cardDatabase(_cardDatabase)
 {
     manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryFinished(QNetworkReply *)));
+    connect(manager, &QNetworkAccessManager::finished, this, &TappedOutInterface::queryFinished);
 }
 
 void TappedOutInterface::queryFinished(QNetworkReply *reply)
