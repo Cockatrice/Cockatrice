@@ -17,6 +17,8 @@ class DlgMoveTopCardsUntil : public QDialog
     QSpinBox *numberOfHitsEdit;
     QDialogButtonBox *buttonBox;
 
+    void validateAndAccept();
+
 public:
     explicit DlgMoveTopCardsUntil(QWidget *parent = nullptr, QString expr = QString(), uint numberOfHits = 1);
     [[nodiscard]] QString getExpr() const;

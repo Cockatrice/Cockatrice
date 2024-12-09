@@ -1,10 +1,12 @@
 #include "dlg_move_top_cards_until.h"
 
+#include "../game/filters/filter_string.h"
 #include "trice_limits.h"
 
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QSpinBox>
 #include <QString>
 #include <QVBoxLayout>
@@ -30,7 +32,7 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint 
     grid->addWidget(numberOfHitsEdit, 0, 1);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgMoveTopCardsUntil::validateAndAccept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     auto *mainLayout = new QVBoxLayout;
@@ -41,6 +43,16 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint 
 
     setLayout(mainLayout);
     setWindowTitle(tr("Put top cards on stack until..."));
+}
+
+void DlgMoveTopCardsUntil::validateAndAccept()
+{
+    auto movingCardsUntilFilter = FilterString(exprEdit->text());
+    if (movingCardsUntilFilter.valid()) {
+        accept();
+    } else {
+        QMessageBox::warning(this, tr("Invalid filter"), movingCardsUntilFilter.error(), QMessageBox::Ok);
+    }
 }
 
 QString DlgMoveTopCardsUntil::getExpr() const

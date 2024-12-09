@@ -1333,33 +1333,19 @@ void Player::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    QString expr = previousMovingCardsUntilExpr;
-    int numberOfHits = previousMovingCardsUntilNumberOfHits;
-    for (;;) {
-        DlgMoveTopCardsUntil dlg(game, expr, numberOfHits);
-        if (!dlg.exec()) {
-            return;
-        }
-
-        expr = dlg.getExpr();
-        numberOfHits = dlg.getNumberOfHits();
-
-        movingCardsUntilFilter = FilterString(expr);
-        if (movingCardsUntilFilter.valid()) {
-            break;
-        } else {
-            auto button = QMessageBox::warning(game, "Invalid filter", movingCardsUntilFilter.error());
-            if (button != QMessageBox::Ok) {
-                return;
-            }
-        }
+    DlgMoveTopCardsUntil dlg(game, previousMovingCardsUntilExpr, previousMovingCardsUntilNumberOfHits);
+    if (!dlg.exec()) {
+        return;
     }
-    previousMovingCardsUntilExpr = expr;
-    previousMovingCardsUntilNumberOfHits = numberOfHits;
+
+    previousMovingCardsUntilExpr = dlg.getExpr();
+    previousMovingCardsUntilNumberOfHits = dlg.getNumberOfHits();
+
     if (zones.value("deck")->getCards().empty()) {
         stopMoveTopCardsUntil();
     } else {
-        movingCardsUntilCounter = numberOfHits;
+        movingCardsUntilFilter = FilterString(previousMovingCardsUntilExpr);
+        movingCardsUntilCounter = previousMovingCardsUntilNumberOfHits;
         movingCardsUntil = true;
         actMoveTopCardToPlay();
     }
