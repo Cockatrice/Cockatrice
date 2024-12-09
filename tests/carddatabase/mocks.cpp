@@ -152,6 +152,9 @@ void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T /* _annotateTokens */)
 void SettingsCache::setTabGameSplitterSizes(const QByteArray & /* _tabGameSplitterSizes */)
 {
 }
+void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T /* _showShortcuts */)
+{
+}
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T /* _displayCardNames */)
 {
 }

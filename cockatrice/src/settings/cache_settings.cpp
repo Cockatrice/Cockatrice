@@ -239,6 +239,7 @@ SettingsCache::SettingsCache()
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
 
+    showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
@@ -504,6 +505,12 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
 {
     tabGameSplitterSizes = _tabGameSplitterSizes;
     settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
+}
+
+void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
+{
+    showShortcuts = static_cast<bool>(_showShortcuts);
+    settings->setValue("menu/showshortcuts", showShortcuts);
 }
 
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
