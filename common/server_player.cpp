@@ -162,7 +162,7 @@ int Server_Player::newArrowId() const
     return id + 1;
 }
 
-void Server_Player::setupZones()
+void Server_Player::setupZones(const QStringList &gameTypes)
 {
     // This may need to be customized according to the game rules.
     // ------------------------------------------------------------------
@@ -178,7 +178,11 @@ void Server_Player::setupZones()
     addZone(new Server_CardZone(this, "grave", false, ServerInfo_Zone::PublicZone));
     addZone(new Server_CardZone(this, "rfg", false, ServerInfo_Zone::PublicZone));
 
-    addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
+    if (gameTypes.contains(QString("Commander"))) {
+        addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 40));
+    } else {
+        addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
+    }
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
     addCounter(new Server_Counter(2, "u", makeColor(150, 150, 255), 20, 0));
     addCounter(new Server_Counter(3, "b", makeColor(150, 150, 150), 20, 0));
@@ -903,7 +907,7 @@ Server_Player::cmdUnconcede(const Command_Unconcede & /*cmd*/, ResponseContainer
     ges.enqueueGameEvent(event, playerId);
     ges.setGameEventContext(Context_Unconcede());
 
-    setupZones();
+    setupZones(game->getRoom()->getGameTypes());
 
     game->sendGameStateToPlayers();
 
