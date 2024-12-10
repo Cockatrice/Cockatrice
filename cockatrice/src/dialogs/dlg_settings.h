@@ -126,6 +126,8 @@ private:
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
+    QLabel cardViewInitialHeightLabel;
+    QSpinBox cardViewInitialHeightBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel rewindBufferingMsLabel;
