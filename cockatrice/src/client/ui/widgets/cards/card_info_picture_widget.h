@@ -29,6 +29,7 @@ public slots:
 
 signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
+    void cardScaleFactorChanged(int _scale);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

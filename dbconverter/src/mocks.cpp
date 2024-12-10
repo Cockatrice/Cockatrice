@@ -154,6 +154,15 @@ void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T /* _showShortcuts */)
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T /* _displayCardNames */)
 {
 }
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T /* _displayCardNames */)
+{
+}
+void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T /* _bumpSetsWithCardsInDeckToTop */)
+{
+}
+void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrder */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }

@@ -221,7 +221,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     if (attrs.hasAttribute("rarity")) {
                         setInfo.setProperty("rarity", attrs.value("rarity").toString());
                     }
-                    _sets.insert(setName, setInfo);
+                    _sets[setName].append(setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
                     CardRelation::AttachType attach = CardRelation::DoesNotAttach;
@@ -331,24 +331,26 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
 
     // sets
     const CardInfoPerSetMap sets = info->getSets();
-    for (CardInfoPerSet set : sets) {
-        xml.writeStartElement("set");
-        xml.writeAttribute("rarity", set.getProperty("rarity"));
-        xml.writeAttribute("muId", set.getProperty("muid"));
-        xml.writeAttribute("uuId", set.getProperty("uuid"));
+    for (const auto &cardInfoPerSetList : sets) {
+        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+            xml.writeStartElement("set");
+            xml.writeAttribute("rarity", set.getProperty("rarity"));
+            xml.writeAttribute("muId", set.getProperty("muid"));
+            xml.writeAttribute("uuId", set.getProperty("uuid"));
 
-        tmpString = set.getProperty("num");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("num", tmpString);
+            tmpString = set.getProperty("num");
+            if (!tmpString.isEmpty()) {
+                xml.writeAttribute("num", tmpString);
+            }
+
+            tmpString = set.getProperty("picurl");
+            if (!tmpString.isEmpty()) {
+                xml.writeAttribute("picURL", tmpString);
+            }
+
+            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeEndElement();
         }
-
-        tmpString = set.getProperty("picurl");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("picURL", tmpString);
-        }
-
-        xml.writeCharacters(set.getPtr()->getShortName());
-        xml.writeEndElement();
     }
 
     // related cards

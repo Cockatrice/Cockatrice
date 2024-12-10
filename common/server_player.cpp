@@ -391,6 +391,7 @@ static Event_CreateToken makeCreateTokenEvent(Server_CardZone *zone, Server_Card
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
     event.set_card_name(card->getName().toStdString());
+    event.set_card_provider_id(card->getProviderId().toStdString());
     event.set_color(card->getColor().toStdString());
     event.set_pt(card->getPT().toStdString());
     event.set_annotation(card->getAnnotation().toStdString());
@@ -1400,7 +1401,8 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         }
     }
 
-    QString cardName = nameFromStdString(cmd.card_name());
+    const QString cardName = nameFromStdString(cmd.card_name());
+    const QString cardProviderId = nameFromStdString(cmd.card_provider_id());
     if (zone->hasCoords()) {
         xCoord = zone->getFreeGridColumn(xCoord, yCoord, cardName, false);
     }
@@ -1411,7 +1413,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         yCoord = 0;
     }
 
-    auto *card = new Server_Card(cardName, QString(), newCardId(), xCoord, yCoord);
+    auto *card = new Server_Card(cardName, cardProviderId, newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
     card->setPT(nameFromStdString(cmd.pt()));
     card->setColor(nameFromStdString(cmd.color()));
