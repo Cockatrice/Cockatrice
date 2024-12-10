@@ -3457,13 +3457,8 @@ void Player::actPlay()
 
 void Player::actHide()
 {
-    QList<CardItem *> selectedCards;
     for (const auto &item : scene()->selectedItems()) {
         auto *card = static_cast<CardItem *>(item);
-        selectedCards.append(card);
-    }
-
-    for (auto &card : selectedCards) {
         if (card && isUnwritableRevealZone(card->getZone())) {
             card->getZone()->removeCard(card);
         }
