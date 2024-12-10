@@ -35,7 +35,9 @@ private:
     QList<int> histogram;
     int maxBinValue, maxTime;
     qreal timeScaleFactor;
-    int currentTime;
+    int currentVisualTime;    // time currently displayed by the timeline
+    int currentProcessedTime; // time that events are currently processed up to. Could differ from visual time due to
+                              // rewind buffering
     int currentEvent;
 
     void skipToTime(int newTime, bool doRewindBuffering);
