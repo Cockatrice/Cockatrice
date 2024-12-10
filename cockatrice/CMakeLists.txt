@@ -48,6 +48,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_load_deck_from_clipboard.cpp
     src/dialogs/dlg_load_remote_deck.cpp
     src/dialogs/dlg_manage_sets.cpp
+    src/dialogs/dlg_move_top_cards_until.cpp
     src/dialogs/dlg_register.cpp
     src/dialogs/dlg_roll_dice.cpp
     src/dialogs/dlg_settings.cpp
