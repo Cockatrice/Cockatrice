@@ -346,11 +346,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
             SLOT(setStackCardOverlapPercent(int)));
 
+    cardViewInitialHeightBox.setRange(0, 9999);
+    cardViewInitialHeightBox.setValue(SettingsCache::instance().getCardViewInitialHeight());
+    connect(&cardViewInitialHeightBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setCardViewInitialHeight);
+
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
     cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 2, 0, 1, 1);
     cardsGrid->addWidget(&verticalCardOverlapPercentBox, 2, 1, 1, 1);
+    cardsGrid->addWidget(&cardViewInitialHeightLabel, 3, 0);
+    cardsGrid->addWidget(&cardViewInitialHeightBox, 3, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -448,6 +455,7 @@ void AppearanceSettingsPage::retranslateUi()
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
+    cardViewInitialHeightLabel.setText(tr("Card view window maximum initial height:"));
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
@@ -495,18 +503,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
 
-    cardViewInitialHeightBox.setRange(0, 9999);
-    cardViewInitialHeightBox.setValue(SettingsCache::instance().getCardViewInitialHeight());
-    connect(&cardViewInitialHeightBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setCardViewInitialHeight);
-
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&playToStackCheckBox, 1, 0);
     generalGrid->addWidget(&annotateTokensCheckBox, 2, 0);
     generalGrid->addWidget(&useTearOffMenusCheckBox, 3, 0);
-    generalGrid->addWidget(&cardViewInitialHeightLabel, 4, 0);
-    generalGrid->addWidget(&cardViewInitialHeightBox, 4, 1);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -583,7 +584,6 @@ void UserInterfaceSettingsPage::retranslateUi()
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
-    cardViewInitialHeightLabel.setText(tr("Card view window maximum initial height:"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));

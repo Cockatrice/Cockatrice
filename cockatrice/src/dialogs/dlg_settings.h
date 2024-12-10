@@ -96,6 +96,8 @@ private:
     QCheckBox cardScalingCheckBox;
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
+    QLabel cardViewInitialHeightLabel;
+    QSpinBox cardViewInitialHeightBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
@@ -126,8 +128,6 @@ private:
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
-    QLabel cardViewInitialHeightLabel;
-    QSpinBox cardViewInitialHeightBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel rewindBufferingMsLabel;
