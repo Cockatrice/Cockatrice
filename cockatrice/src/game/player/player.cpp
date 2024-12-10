@@ -3434,12 +3434,13 @@ void Player::actCardCounterTrigger()
 }
 
 /**
- * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window)
+ * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
+ * is nullptr.
  */
 static bool isUnwritableRevealZone(CardZone *zone)
 {
     if (zone && zone->getIsView()) {
-        auto *view = dynamic_cast<ZoneViewZone *>(zone);
+        auto *view = static_cast<ZoneViewZone *>(zone);
         return view->getRevealZone() && !view->getWriteableRevealZone();
     }
     return false;
