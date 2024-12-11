@@ -6,7 +6,8 @@
 #include <QTimer>
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
-    : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentTime(0), currentEvent(0)
+    : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentVisualTime(0), currentProcessedTime(0),
+      currentEvent(0)
 {
     replayTimer = new QTimer(this);
     connect(replayTimer, SIGNAL(timeout()), this, SLOT(replayTimerTimeout()));
@@ -58,7 +59,7 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     painter.fillPath(path, Qt::black);
 
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
-    quint64 w = (quint64)(width() - 1) * (quint64)currentTime / maxTime;
+    quint64 w = (quint64)(width() - 1) * (quint64)currentVisualTime / maxTime;
     painter.fillRect(0, 0, static_cast<int>(w), height() - 1, barColor);
 }
 
@@ -85,8 +86,8 @@ void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindBuffering)
 
     newTime -= newTime % TIMER_INTERVAL_MS; // Time should always be a multiple of the interval
 
-    const bool isBackwardsSkip = newTime < currentTime;
-    currentTime = newTime;
+    const bool isBackwardsSkip = newTime < currentProcessedTime;
+    currentVisualTime = newTime;
 
     if (isBackwardsSkip) {
         handleBackwardsSkip(doRewindBuffering);
@@ -136,23 +137,25 @@ QSize ReplayTimelineWidget::minimumSizeHint() const
 
 void ReplayTimelineWidget::replayTimerTimeout()
 {
-    currentTime += TIMER_INTERVAL_MS;
+    currentVisualTime += TIMER_INTERVAL_MS;
 
     processNewEvents(NORMAL_PLAYBACK);
 
-    if (!(currentTime % 1000))
+    if (!(currentVisualTime % 1000))
         update();
 }
 
 /// Processes all unprocessed events up to the current time.
 void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 {
-    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
+    currentProcessedTime = currentVisualTime;
+
+    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentProcessedTime)) {
         Player::EventProcessingOptions options;
 
         // backwards skip => always skip reveal windows
         // forwards skip => skip reveal windows that don't happen within a big skip of the target
-        if (playbackMode == BACKWARD_SKIP || currentTime - replayTimeline[currentEvent] > BIG_SKIP_MS)
+        if (playbackMode == BACKWARD_SKIP || currentProcessedTime - replayTimeline[currentEvent] > BIG_SKIP_MS)
             options |= Player::EventProcessingOption::SKIP_REVEAL_WINDOW;
 
         // backwards skip => always skip tap animation
@@ -186,5 +189,5 @@ void ReplayTimelineWidget::stopReplay()
 
 void ReplayTimelineWidget::skipByAmount(int amount)
 {
-    skipToTime(currentTime + amount, true);
+    skipToTime(currentVisualTime + amount, amount < 0);
 }
