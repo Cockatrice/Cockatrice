@@ -88,7 +88,6 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     }
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
-    resize(150, 150);
 
     QGraphicsLinearLayout *zoneHBox = new QGraphicsLinearLayout(Qt::Horizontal);
 
@@ -247,9 +246,6 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
 
 void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
 {
-    if (!zone)
-        return;
-
     // We need to manually resize the scroll bar whenever the window gets resized
     qreal totalZoneHeight = zone->getOptimumRect().height();
     qreal newWindowHeight = event->newSize().height();
