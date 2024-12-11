@@ -254,6 +254,16 @@ void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
     scrollBar->setMaximum(totalZoneHeight - newZoneHeight);
 }
 
+/**
+ * Calculates the max initial height from the settings.
+ * The max initial height setting is given as number of rows, so we need to map it to a height.
+ **/
+static qreal calcMaxInitialHeight()
+{
+    const qreal cardsHeight = (SettingsCache::instance().getCardViewInitialRowsMax() + 1) * CARD_HEIGHT * 0.33;
+    return cardsHeight + 2; // +2 padding to make the cutoff look nicer
+}
+
 void ZoneViewWidget::resizeToZoneContents()
 {
     QRectF zoneRect = zone->getOptimumRect();
@@ -265,8 +275,7 @@ void ZoneViewWidget::resizeToZoneContents()
     QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
     setMaximumSize(maxSize);
 
-    qreal initialZoneHeight =
-        qMin(zoneRect.height(), static_cast<qreal>(SettingsCache::instance().getCardViewInitialHeight()));
+    qreal initialZoneHeight = qMin(zoneRect.height(), calcMaxInitialHeight());
     QSizeF initialSize(width, initialZoneHeight + extraHeight + 10);
     resize(initialSize);
 

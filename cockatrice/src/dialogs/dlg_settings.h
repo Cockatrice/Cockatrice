@@ -96,8 +96,8 @@ private:
     QCheckBox cardScalingCheckBox;
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
-    QLabel cardViewInitialHeightLabel;
-    QSpinBox cardViewInitialHeightBox;
+    QLabel cardViewInitialRowsMaxLabel;
+    QSpinBox cardViewInitialRowsMaxBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;

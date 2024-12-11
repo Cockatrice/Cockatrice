@@ -238,7 +238,7 @@ SettingsCache::SettingsCache()
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
-    cardViewInitialHeight = settings->value("interface/cardViewInitialHeight", 500).toInt();
+    cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -301,10 +301,10 @@ void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)
     emit useTearOffMenusChanged(useTearOffMenus);
 }
 
-void SettingsCache::setCardViewInitialHeight(int _cardViewInitialHeight)
+void SettingsCache::setCardViewInitialRowsMax(int _cardViewInitialRowsMax)
 {
-    cardViewInitialHeight = _cardViewInitialHeight;
-    settings->setValue("interface/cardViewInitialHeight", cardViewInitialHeight);
+    cardViewInitialRowsMax = _cardViewInitialRowsMax;
+    settings->setValue("interface/cardViewInitialRowsMax", cardViewInitialRowsMax);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
