@@ -267,7 +267,10 @@ private:
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
     QString previousMovingCardsUntilExpr = {};
+    int previousMovingCardsUntilNumberOfHits = 1;
     FilterString movingCardsUntilFilter;
+    int movingCardsUntilCounter = 0;
+    void stopMoveTopCardsUntil();
 
     bool shortcutsActive;
     int defaultNumberTopCards = 1;
