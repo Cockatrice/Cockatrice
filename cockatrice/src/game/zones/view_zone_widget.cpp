@@ -265,7 +265,8 @@ void ZoneViewWidget::resizeToZoneContents()
     QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
     setMaximumSize(maxSize);
 
-    qreal initialZoneHeight = qMin(zoneRect.height(), 500.0);
+    qreal initialZoneHeight =
+        qMin(zoneRect.height(), static_cast<qreal>(SettingsCache::instance().getCardViewInitialHeight()));
     QSizeF initialSize(width, initialZoneHeight + extraHeight + 10);
     resize(initialSize);
 
