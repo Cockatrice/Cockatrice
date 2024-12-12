@@ -365,7 +365,7 @@ FilterString::FilterString(const QString &expr)
     };
 
     if (!search.parse(ba.data(), result)) {
-        qDebug() << "Filter string error" << _error;
+        qDebug() << "Filter string error for" << expr << ";" << _error;
         result = [](CardData) -> bool { return false; };
     }
 }
