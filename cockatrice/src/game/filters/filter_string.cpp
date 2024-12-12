@@ -361,11 +361,11 @@ FilterString::FilterString(const QString &expr)
     }
 
     search.log = [&](size_t ln, size_t col, const std::string &msg) {
-        _error = QString("%1:%2: %3").arg(ln).arg(col).arg(QString::fromStdString(msg));
+        _error = QString("line %1, col %2: %3").arg(ln).arg(col).arg(QString::fromStdString(msg));
     };
 
     if (!search.parse(ba.data(), result)) {
-        qDebug().nospace() << "FilterString error for " << expr << "; " << _error;
+        qDebug().nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
         result = [](CardData) -> bool { return false; };
     }
 }
