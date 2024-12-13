@@ -455,7 +455,7 @@ void AppearanceSettingsPage::retranslateUi()
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
-    cardViewInitialRowsMaxLabel.setText(tr("Card view window maximum initial height:"));
+    cardViewInitialRowsMaxLabel.setText(tr("Maximum initial height for card view window:"));
     cardViewInitialRowsMaxBox.setSuffix(tr(" rows"));
 
     handGroupBox->setTitle(tr("Hand layout"));
