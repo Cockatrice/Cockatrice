@@ -3442,6 +3442,19 @@ void Player::actCardCounterTrigger()
     sendGameCommand(prepareGameCommand(commandList));
 }
 
+/**
+ * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
+ * is nullptr.
+ */
+static bool isUnwritableRevealZone(CardZone *zone)
+{
+    if (zone && zone->getIsView()) {
+        auto *view = static_cast<ZoneViewZone *>(zone);
+        return view && view->getRevealZone() && !view->getWriteableRevealZone();
+    }
+    return false;
+}
+
 void Player::actPlay()
 {
     auto *card = game->getActiveCard();
@@ -3453,9 +3466,11 @@ void Player::actPlay()
 
 void Player::actHide()
 {
-    auto *card = game->getActiveCard();
-    if (card) {
-        card->getZone()->removeCard(card);
+    for (const auto &item : scene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+        if (card && isUnwritableRevealZone(card->getZone())) {
+            card->getZone()->removeCard(card);
+        }
     }
 }
 
