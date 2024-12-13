@@ -360,7 +360,7 @@ FilterString::FilterString(const QString &expr)
         return;
     }
 
-    search.log = [&](size_t ln, size_t col, const std::string &msg) {
+    search.log = [&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
     };
 
