@@ -26,7 +26,7 @@ class FilterString
 public:
     FilterString();
     explicit FilterString(const QString &exp);
-    bool check(const CardData &card)
+    bool check(const CardData &card) const
     {
         return result(card);
     }

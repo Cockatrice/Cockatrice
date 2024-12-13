@@ -6,7 +6,8 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QSpinBox>
-#include <QString>
+
+class FilterString;
 
 class DlgMoveTopCardsUntil : public QDialog
 {
@@ -18,6 +19,7 @@ class DlgMoveTopCardsUntil : public QDialog
     QDialogButtonBox *buttonBox;
 
     void validateAndAccept();
+    bool validateMatchExists(const FilterString &filterString);
 
 public:
     explicit DlgMoveTopCardsUntil(QWidget *parent = nullptr, QString expr = QString(), uint numberOfHits = 1);
