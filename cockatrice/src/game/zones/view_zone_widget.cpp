@@ -260,8 +260,7 @@ void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
  **/
 static qreal calcMaxInitialHeight()
 {
-    const qreal cardsHeight = (SettingsCache::instance().getCardViewInitialRowsMax() + 1) * CARD_HEIGHT * 0.33;
-    return cardsHeight + 2; // +2 padding to make the cutoff look nicer
+    return (SettingsCache::instance().getCardViewInitialRowsMax() + 1) * CARD_HEIGHT / 3;
 }
 
 void ZoneViewWidget::resizeToZoneContents()
