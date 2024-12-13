@@ -3441,7 +3441,7 @@ static bool isUnwritableRevealZone(CardZone *zone)
 {
     if (zone && zone->getIsView()) {
         auto *view = static_cast<ZoneViewZone *>(zone);
-        return view->getRevealZone() && !view->getWriteableRevealZone();
+        return view && view->getRevealZone() && !view->getWriteableRevealZone();
     }
     return false;
 }
