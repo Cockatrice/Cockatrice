@@ -360,12 +360,12 @@ FilterString::FilterString(const QString &expr)
         return;
     }
 
-    search.log = [&](size_t ln, size_t col, const std::string &msg) {
-        _error = QString("%1:%2: %3").arg(ln).arg(col).arg(QString::fromStdString(msg));
+    search.log = [&](size_t /*ln*/, size_t col, const std::string &msg) {
+        _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
     };
 
     if (!search.parse(ba.data(), result)) {
-        qDebug() << "Filter string error" << _error;
+        qDebug().nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
         result = [](CardData) -> bool { return false; };
     }
 }
