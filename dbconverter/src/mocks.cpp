@@ -55,6 +55,9 @@ SettingsCache::SettingsCache()
 void SettingsCache::setUseTearOffMenus(bool /* _useTearOffMenus */)
 {
 }
+void SettingsCache::setCardViewInitialRowsMax(int /* _cardViewInitialRowsMax */)
+{
+}
 void SettingsCache::setKnownMissingFeatures(const QString & /* _knownMissingFeatures */)
 {
 }

@@ -346,11 +346,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
             SLOT(setStackCardOverlapPercent(int)));
 
+    cardViewInitialRowsMaxBox.setRange(1, 999);
+    cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().getCardViewInitialRowsMax());
+    connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setCardViewInitialRowsMax);
+
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
     cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 2, 0, 1, 1);
     cardsGrid->addWidget(&verticalCardOverlapPercentBox, 2, 1, 1, 1);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 3, 0);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 3, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -448,6 +455,8 @@ void AppearanceSettingsPage::retranslateUi()
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
+    cardViewInitialRowsMaxLabel.setText(tr("Maximum initial height for card view window:"));
+    cardViewInitialRowsMaxBox.setSuffix(tr(" rows"));
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
