@@ -81,9 +81,9 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Rings of the Wild")
 endif()
 
-# Use c++17 for all targets
+# Use c++20 for all targets
 set(CMAKE_CXX_STANDARD
-    17
+    20
     CACHE STRING "C++ ISO Standard"
 )
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -140,8 +140,8 @@ endif()
 
 # Define proper compilation flags
 if(MSVC)
-  # Visual Studio: Disable Warning C4251, C++17 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++17 /permissive- /W4 /MP /EHsc")
+  # Visual Studio: Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc")
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL, Debug Symbols
@@ -158,7 +158,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
   endif()
 
   set(ADDITIONAL_DEBUG_FLAGS
