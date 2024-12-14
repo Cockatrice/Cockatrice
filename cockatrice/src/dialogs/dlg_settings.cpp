@@ -346,7 +346,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
             SLOT(setStackCardOverlapPercent(int)));
 
-    cardViewInitialRowsMaxBox.setRange(0, 9999);
+    cardViewInitialRowsMaxBox.setRange(1, 9999);
     cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().getCardViewInitialRowsMax());
     connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setCardViewInitialRowsMax);
