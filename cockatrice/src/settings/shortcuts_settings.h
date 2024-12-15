@@ -411,7 +411,7 @@ private:
         {"Player/aNextTurn", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Next Turn"),
                                          parseSequenceString("Ctrl+Return;Ctrl+Enter"),
                                          ShortcutGroup::Game_Phases)},
-        {"Player/aHide", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hide Card (in Reveal Window)"),
+        {"Player/aHide", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hide Card in Reveal Window"),
                                      parseSequenceString("Alt+H"),
                                      ShortcutGroup::Playing_Area)},
         {"Player/aTap", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Tap / Untap Card"),
