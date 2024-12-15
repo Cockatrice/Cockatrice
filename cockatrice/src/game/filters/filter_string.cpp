@@ -70,8 +70,8 @@ static void setupParserRules()
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](const CardData& x) {
-            for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-                if (!std::any_cast<Filter>(sv[i])(x))
+            for (const auto & i : sv) {
+                if (!std::any_cast<Filter>(i)(x))
                     return false;
             }
             return true;
@@ -79,8 +79,8 @@ static void setupParserRules()
     };
     search["ComplexQueryPart"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](const CardData& x) {
-            for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-                if (std::any_cast<Filter>(sv[i])(x))
+            for (const auto & i : sv) {
+                if (std::any_cast<Filter>(i)(x))
                     return true;
             }
             return false;
@@ -203,15 +203,15 @@ static void setupParserRules()
     };
     search["CompactStringSet"] = [](const peg::SemanticValues &sv) -> QStringList {
         QStringList result;
-        for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-            result.append(std::any_cast<QString>(sv[i]));
+        for (const auto & i : sv) {
+            result.append(std::any_cast<QString>(i));
         }
         return result;
     };
     search["StringList"] = [](const peg::SemanticValues &sv) -> QStringList {
         QStringList result;
-        for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-            result.append(std::any_cast<QString>(sv[i]));
+        for (const auto & i : sv) {
+            result.append(std::any_cast<QString>(i));
         }
         return result;
     };
@@ -265,13 +265,13 @@ static void setupParserRules()
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         QString parts;
-        for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-            parts += std::any_cast<char>(sv[i]);
+        for (const auto & i : sv) {
+            parts += std::any_cast<char>(i);
         }
-        bool idenity = sv.tokens[0][0] != 'i';
+        bool identity = sv.tokens[0][0] != 'i';
         if (sv.tokens[1][0] == ':') {
             return [=](const CardData& x) {
-                QString match = idenity ? x->getColors() : x->getProperty("coloridentity");
+                QString match = identity ? x->getColors() : x->getProperty("coloridentity");
                 if (parts.contains("m") && match.length() < 2) {
                     return false;
                 } else if (parts == "m") {
@@ -289,7 +289,7 @@ static void setupParserRules()
             };
         } else {
             return [=](const CardData& x) {
-                QString match = idenity ? x->getColors() : x->getProperty("colorIdentity");
+                QString match = identity ? x->getColors() : x->getProperty("colorIdentity");
                 if (parts.contains("m") && match.length() < 2)
                     return false;
 
@@ -329,11 +329,11 @@ static void setupParserRules()
         QString field = std::any_cast<QString>(sv[0]);
         if (sv.choice() == 0) {
             StringMatcher matcher = std::any_cast<StringMatcher>(sv[1]);
-            return [=](const CardData& x) -> bool { return x->hasProperty(field) ? matcher(x->getProperty(field)) : false; };
+            return [=](const CardData& x) -> bool { return x->hasProperty(field) && matcher(x->getProperty(field)); };
         } else {
             NumberMatcher matcher = std::any_cast<NumberMatcher>(sv[1]);
             return [=](const CardData& x) -> bool {
-                return x->hasProperty(field) ? matcher(x->getProperty(field).toInt()) : false;
+                return x->hasProperty(field) && matcher(x->getProperty(field).toInt());
             };
         }
     };
