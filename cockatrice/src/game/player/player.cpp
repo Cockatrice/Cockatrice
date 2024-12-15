@@ -3026,12 +3026,23 @@ void Player::cardMenuAction()
             }
         }
     } else {
+        CardZone *zone = cardList[0]->getZone();
+        if (!zone) {
+            return;
+        }
+
+        Player *startPlayer = zone->getPlayer();
+        if (!startPlayer) {
+            return;
+        }
+
+        int startPlayerId = startPlayer->getId();
+        QString startZone = zone->getName();
+
         ListOfCardsToMove idList;
         for (const auto &i : cardList) {
             idList.add_card()->set_card_id(i->getId());
         }
-        int startPlayerId = cardList[0]->getZone()->getPlayer()->getId();
-        QString startZone = cardList[0]->getZone()->getName();
 
         switch (static_cast<CardMenuActionType>(a->data().toInt())) {
             case cmMoveToTopLibrary: {
