@@ -16,6 +16,7 @@ public:
                                       TabDeckEditor *deckEditor,
                                       DeckListModel *deckModel,
                                       QTreeView *deckView,
+                                      QSlider *cardSizeSlider,
                                       CardInfoPtr rootCard,
                                       CardInfoPerSet setInfoForCard);
     int getMainboardAmount();
@@ -31,6 +32,7 @@ private:
     TabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
+    QSlider *cardSizeSlider;
     CardInfoPtr rootCard;
     CardInfoPerSet setInfoForCard;
     QLabel *zoneLabelMainboard;

@@ -22,6 +22,7 @@ public:
                               TabDeckEditor *deckEditor,
                               DeckListModel *deckModel,
                               QTreeView *deckView,
+                              QSlider *cardSizeSlider,
                               CardInfoPtr &rootCard,
                               CardInfoPerSet &setInfoForCard,
                               QString zoneName);
@@ -40,6 +41,7 @@ private:
     TabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
+    QSlider *cardSizeSlider;
     CardInfoPtr rootCard;
     CardInfoPerSet setInfoForCard;
     QString zoneName;
@@ -60,6 +62,7 @@ private slots:
     void addPrintingSideboard();
     void removePrintingMainboard();
     void removePrintingSideboard();
+    void adjustFontSize(int scalePercentage);
 };
 
 #endif // CARD_AMOUNT_WIDGET_H

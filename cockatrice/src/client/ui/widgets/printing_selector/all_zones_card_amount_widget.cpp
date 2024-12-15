@@ -1,43 +1,29 @@
 #include "all_zones_card_amount_widget.h"
 
+#include "../general/display/shadow_background_label.h"
+
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    TabDeckEditor *deckEditor,
                                                    DeckListModel *deckModel,
                                                    QTreeView *deckView,
+                                                   QSlider *cardSizeSlider,
                                                    CardInfoPtr rootCard,
                                                    CardInfoPerSet setInfoForCard)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), rootCard(rootCard),
-      setInfoForCard(setInfoForCard)
+    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
+      rootCard(rootCard), setInfoForCard(setInfoForCard)
 {
     layout = new QVBoxLayout(this);
-    layout->setAlignment(Qt::AlignCenter);
+    layout->setAlignment(Qt::AlignHCenter);
     setLayout(layout);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setContentsMargins(5, 5, 5, 5); // Padding around the text
 
-    zoneLabelMainboard = new QLabel(tr("Mainboard"), this);
-    zoneLabelMainboard->setStyleSheet(R"(
-    QLabel {
-        background-color: rgba(0, 0, 0, 128); /* Semi-transparent black */
-        color: white; /* Text color */
-        font-size: 16px;
-        border-radius: 5px; /* Rounded corners */
-        padding: 5px; /* Padding around text */
-    }
-    )");
+    zoneLabelMainboard = new ShadowBackgroundLabel(this, tr("Mainboard"));
     buttonBoxMainboard =
-        new CardAmountWidget(this, deckEditor, deckModel, deckView, rootCard, setInfoForCard, DECK_ZONE_MAIN);
-    zoneLabelSideboard = new QLabel(tr("Sideboard"), this);
-    zoneLabelSideboard->setStyleSheet(R"(
-    QLabel {
-        background-color: rgba(0, 0, 0, 128); /* Semi-transparent black */
-        color: white; /* Text color */
-        font-size: 16px;
-        border-radius: 5px; /* Rounded corners */
-        padding: 5px; /* Padding around text */
-    }
-    )");
+        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, setInfoForCard, DECK_ZONE_MAIN);
+    zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
     buttonBoxSideboard =
-        new CardAmountWidget(this, deckEditor, deckModel, deckView, rootCard, setInfoForCard, DECK_ZONE_SIDE);
+        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, setInfoForCard, DECK_ZONE_SIDE);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);

@@ -1,49 +1,29 @@
 #include "card_amount_widget.h"
 
+#include "../general/display/dynamic_font_size_push_button.h"
+
 CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    TabDeckEditor *deckEditor,
                                    DeckListModel *deckModel,
                                    QTreeView *deckView,
+                                   QSlider *cardSizeSlider,
                                    CardInfoPtr &rootCard,
                                    CardInfoPerSet &setInfoForCard,
                                    QString zoneName)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), rootCard(rootCard),
-      setInfoForCard(setInfoForCard), zoneName(zoneName), hovered(false)
+    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
+      rootCard(rootCard), setInfoForCard(setInfoForCard), zoneName(zoneName), hovered(false)
 {
     layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(10);
     this->setLayout(layout);
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    incrementButton = new QPushButton(this);
+    incrementButton = new DynamicFontSizePushButton(this);
+    incrementButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     incrementButton->setText("+");
-    decrementButton = new QPushButton(this);
+    decrementButton = new DynamicFontSizePushButton(this);
     decrementButton->setText("-");
-
-    incrementButton->setFixedSize(30, 30);
-    decrementButton->setFixedSize(30, 30);
-
-    // Apply styles for gradient buttons
-    QString buttonStyle = R"(
-        QPushButton {
-            background: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,
-                stop:0 rgba(64, 64, 64, 255), stop:1 rgba(32, 32, 32, 255));
-            border: none;
-            color: white;
-            font-size: 16px;
-        }
-        QPushButton:hover {
-            background: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,
-                stop:0 rgba(96, 96, 96, 255), stop:1 rgba(48, 48, 48, 255));
-        }
-        QPushButton:pressed {
-            background: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1,
-                stop:0 rgba(128, 128, 128, 255), stop:1 rgba(64, 64, 64, 255));
-        }
-    )";
-    incrementButton->setStyleSheet(buttonStyle);
-    decrementButton->setStyleSheet(buttonStyle);
 
     // Set up connections
     if (zoneName == DECK_ZONE_MAIN) {
@@ -55,7 +35,6 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     }
 
     cardCountInZone = new QLabel(QString::number(countCardsInZone(zoneName)), this);
-    cardCountInZone->setStyleSheet("color: white; font-size: 16px;");
     cardCountInZone->setAlignment(Qt::AlignCenter);
 
     layout->addWidget(decrementButton);
@@ -65,6 +44,10 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     // React to model changes
     connect(deckModel, &DeckListModel::dataChanged, this, &CardAmountWidget::updateCardCount);
     connect(deckModel, &QAbstractItemModel::rowsRemoved, this, &CardAmountWidget::updateCardCount);
+
+    // Connect slider for dynamic font size adjustment
+    connect(cardSizeSlider, &QSlider::valueChanged, this, &CardAmountWidget::adjustFontSize);
+    adjustFontSize(cardSizeSlider->value());
 }
 
 void CardAmountWidget::paintEvent(QPaintEvent *event)
@@ -80,9 +63,35 @@ void CardAmountWidget::paintEvent(QPaintEvent *event)
     QWidget::paintEvent(event);
 }
 
+void CardAmountWidget::adjustFontSize(int scalePercentage)
+{
+    qDebug() << scalePercentage;
+    const int minFontSize = 8;      // Minimum font size
+    const int maxFontSize = 24;     // Maximum font size
+    const int basePercentage = 100; // Scale at 100%
+
+    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
+    newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
+
+    qDebug() << newFontSize;
+
+    // Update the font for card count label
+    QFont cardCountFont = cardCountInZone->font();
+    cardCountFont.setPointSize(newFontSize);
+    cardCountInZone->setFont(cardCountFont);
+
+    incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
+    decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
+
+    // Repaint the widget (if necessary)
+    repaint();
+}
+
 void CardAmountWidget::updateCardCount()
 {
     cardCountInZone->setText(QString::number(countCardsInZone(zoneName)));
+    layout->invalidate();
+    layout->activate();
 }
 
 void CardAmountWidget::addPrinting(const QString &zone)
@@ -153,7 +162,7 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
     QModelIndex idx;
-    idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"));
+    idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"), setInfoForCard.getProperty("num"));
     offsetCountAtIndex(idx, -1);
 }
 

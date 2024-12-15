@@ -34,7 +34,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
 
     // Add AllZonesCardAmountWidget
     allZonesCardAmountWidget =
-        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, setCard, setInfoForCard);
+        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, setCard, setInfoForCard);
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
     // Set initial visibility based on amounts
