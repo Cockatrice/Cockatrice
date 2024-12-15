@@ -450,7 +450,7 @@ private:
         {"Player/aSetAnnotation", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Set Annotation..."),
                                               parseSequenceString("Alt+N"),
                                               ShortcutGroup::Playing_Area)},
-        {"Player/aSelectAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All in Zone"),
+        {"Player/aSelectAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Zone"),
                                           parseSequenceString("Ctrl+A"),
                                           ShortcutGroup::Playing_Area)},
         {"Player/aMoveToBottomLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),
