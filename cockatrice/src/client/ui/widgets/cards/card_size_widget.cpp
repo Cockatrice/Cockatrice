@@ -8,7 +8,7 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget) : parent
     cardSizeLabel = new QLabel(tr("Card Size"), this);
     cardSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     cardSizeSlider = new QSlider(Qt::Horizontal, this);
-    cardSizeSlider->setRange(25, 250);
+    cardSizeSlider->setRange(50, 250);
     cardSizeSlider->setValue(100);
 
     cardSizeLayout->addWidget(cardSizeLabel);

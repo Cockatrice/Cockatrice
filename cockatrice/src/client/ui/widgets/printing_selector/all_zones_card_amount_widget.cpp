@@ -31,7 +31,30 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     layout->addWidget(zoneLabelSideboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxSideboard, 0, Qt::AlignHCenter | Qt::AlignTop);
 
+    connect(cardSizeSlider, &QSlider::valueChanged, this, &AllZonesCardAmountWidget::adjustFontSize);
+    adjustFontSize(cardSizeSlider->value());
+
     setMouseTracking(true);
+}
+
+void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
+{
+    qDebug() << scalePercentage;
+    const int minFontSize = 8;      // Minimum font size
+    const int maxFontSize = 32;     // Maximum font size
+    const int basePercentage = 100; // Scale at 100%
+
+    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
+    newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
+
+    // Update the font labels
+    QFont zoneLabelFont = zoneLabelMainboard->font();
+    zoneLabelFont.setPointSize(newFontSize);
+    zoneLabelMainboard->setFont(zoneLabelFont);
+    zoneLabelSideboard->setFont(zoneLabelFont);
+
+    // Repaint the widget (if necessary)
+    repaint();
 }
 
 int AllZonesCardAmountWidget::getMainboardAmount()

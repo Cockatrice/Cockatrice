@@ -27,6 +27,9 @@ public:
     void enterEvent(QEvent *event) override;
 #endif
 
+public slots:
+    void adjustFontSize(int scalePercentage);
+
 private:
     QVBoxLayout *layout;
     TabDeckEditor *deckEditor;
