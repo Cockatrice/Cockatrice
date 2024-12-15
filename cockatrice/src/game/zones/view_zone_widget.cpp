@@ -138,7 +138,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     // QLabel sizes aren't taken into account until the widget is rendered.
     // Force refresh after 1ms to fix glitchy rendering with long QLabels.
     auto *lastResizeBeforeVisibleTimer = new QTimer(this);
-    connect(lastResizeBeforeVisibleTimer, &QTimer::timeout, this, [=] {
+    connect(lastResizeBeforeVisibleTimer, &QTimer::timeout, this, [=, this] {
         resizeToZoneContents();
         disconnect(lastResizeBeforeVisibleTimer);
         lastResizeBeforeVisibleTimer->deleteLater();
