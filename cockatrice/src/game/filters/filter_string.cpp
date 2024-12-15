@@ -65,13 +65,13 @@ std::once_flag init;
 
 static void setupParserRules()
 {
-    auto passthru = [](const peg::SemanticValues &sv) -> Filter { return !sv.empty() ? sv[0].get<Filter>() : nullptr; };
+    auto passthru = [](const peg::SemanticValues &sv) -> Filter { return !sv.empty() ? std::any_cast<Filter>(sv[0]) : nullptr; };
 
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](CardData x) {
             for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-                if (!sv[i].get<Filter>()(x))
+                if (!std::any_cast<Filter>(sv[i])(x))
                     return false;
             }
             return true;
@@ -80,7 +80,7 @@ static void setupParserRules()
     search["ComplexQueryPart"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](CardData x) {
             for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-                if (sv[i].get<Filter>()(x))
+                if (std::any_cast<Filter>(sv[i])(x))
                     return true;
             }
             return false;
@@ -89,15 +89,15 @@ static void setupParserRules()
     search["SomewhatComplexQueryPart"] = passthru;
     search["QueryPart"] = passthru;
     search["NotQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        Filter dependent = sv[0].get<Filter>();
+        Filter dependent = std::any_cast<Filter>(sv[0]);
         return [=](CardData x) -> bool { return !dependent(x); };
     };
     search["TypeQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        StringMatcher matcher = sv[0].get<StringMatcher>();
+        StringMatcher matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](CardData x) -> bool { return matcher(x->getCardType()); };
     };
     search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        StringMatcher matcher = sv[0].get<StringMatcher>();
+        StringMatcher matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](CardData x) -> bool {
             for (const auto &set : x->getSets().keys()) {
                 if (matcher(set))
@@ -107,29 +107,27 @@ static void setupParserRules()
         };
     };
     search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        StringMatcher matcher = sv[0].get<StringMatcher>();
-        return [=](const CardData &x) -> bool {
-            for (const auto &cardInfoPerSetList : x->getSets().values()) {
-                for (const auto &set : cardInfoPerSetList) {
-                    if (matcher(set.getProperty("rarity")))
-                        return true;
-                }
+        StringMatcher matcher = std::any_cast<StringMatcher>(sv[0]);
+        return [=](CardData x) -> bool {
+            for (const auto &set : x->getSets().values()) {
+                if (matcher(set.getProperty("rarity")))
+                    return true;
             }
             return false;
         };
     };
     search["FormatQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         if (sv.choice() == 0) {
-            QString format = sv[0].get<QString>();
+            QString format = std::any_cast<QString>(sv[0]);
             return [=](CardData x) -> bool { return x->getProperty(QString("format-%1").arg(format)) == "legal"; };
         } else {
-            QString format = sv[1].get<QString>();
-            QString legality = sv[0].get<QString>();
+            QString format = std::any_cast<QString>(sv[1]);
+            QString legality = std::any_cast<QString>(sv[0]);
             return [=](CardData x) -> bool { return x->getProperty(QString("format-%1").arg(format)) == legality; };
         }
     };
     search["Legality"] = [](const peg::SemanticValues &sv) -> QString {
-        switch (tolower(sv.str()[0])) {
+        switch (tolower(std::string(sv.sv())[0])) {
             case 'l':
                 return "legal";
             case 'b':
@@ -142,8 +140,8 @@ static void setupParserRules()
     };
 
     search["Format"] = [](const peg::SemanticValues &sv) -> QString {
-        if (sv.length() == 1) {
-            switch (tolower(sv.str()[0])) {
+        if (sv.size() == 1) {
+            switch (tolower(std::string(sv.sv())[0])) {
                 case 'm':
                     return "modern";
                 case 's':
@@ -160,15 +158,15 @@ static void setupParserRules()
                     return "";
             }
         } else {
-            return QString::fromStdString(sv.str()).toLower();
+            return QString::fromStdString(std::string(sv.sv())).toLower();
         }
     };
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         if (sv.choice() == 0) {
-            auto target = sv[0].get<QString>();
+            auto target = std::any_cast<QString>(sv[0]);
             return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
         } else {
-            auto target = sv[0].get<QStringList>();
+            auto target = std::any_cast<QStringList>(sv[0]);
             return [=](const QString &s) {
                 for (const QString &str : target) {
                     if (s.split(" ").contains(str, Qt::CaseInsensitive)) {
@@ -182,14 +180,14 @@ static void setupParserRules()
 
     search["String"] = [](const peg::SemanticValues &sv) -> QString {
         if (sv.choice() == 0) {
-            return QString::fromStdString(sv.str());
+            return QString::fromStdString(std::string(sv.sv()));
         } else {
-            return QString::fromStdString(sv.token(0));
+            return QString::fromStdString(std::string(sv.token(0)));
         }
     };
     search["FlexStringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         if (sv.choice() != 1) {
-            auto target = sv[0].get<QStringList>();
+            auto target = std::any_cast<QStringList>(sv[0]);
             return [=](const QString &s) {
                 for (const QString &str : target) {
                     if (s.split(" ").contains(str, Qt::CaseInsensitive)) {
@@ -199,24 +197,31 @@ static void setupParserRules()
                 return false;
             };
         } else {
-            auto target = sv[0].get<QString>();
+            auto target = std::any_cast<QString>(sv[0]);
             return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
         }
     };
-    search["CompactStringSet"] = search["StringList"] = [](const peg::SemanticValues &sv) -> QStringList {
+    search["CompactStringSet"] = [](const peg::SemanticValues &sv) -> QStringList {
         QStringList result;
         for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-            result.append(sv[i].get<QString>());
+            result.append(std::any_cast<QString>(sv[i]));
+        }
+        return result;
+    };
+    search["StringList"] = [](const peg::SemanticValues &sv) -> QStringList {
+        QStringList result;
+        for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
+            result.append(std::any_cast<QString>(sv[i]));
         }
         return result;
     };
     search["StringListString"] = [](const peg::SemanticValues &sv) -> QString {
-        return QString::fromStdString(sv.str());
+        return QString::fromStdString(std::string(sv.sv()));
     };
 
     search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
-        auto arg = sv[1].get<int>();
-        auto op = sv[0].get<QString>();
+        auto arg = std::any_cast<int>(sv[1]);
+        auto op = std::any_cast<QString>(sv[0]);
 
         if (op == ">")
             return [=](int s) { return s > arg; };
@@ -236,15 +241,15 @@ static void setupParserRules()
     };
 
     search["NumericValue"] = [](const peg::SemanticValues &sv) -> int {
-        return QString::fromStdString(sv.str()).toInt();
+        return QString::fromStdString(std::string(sv.sv())).toInt();
     };
 
     search["NumericOperator"] = [](const peg::SemanticValues &sv) -> QString {
-        return QString::fromStdString(sv.str());
+        return QString::fromStdString(std::string(sv.sv()));
     };
 
     search["RegexString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
-        auto target = sv[0].get<QString>();
+        auto target = std::any_cast<QString>(sv[0]);
         return [=](const QString &s) {
             auto sanitizedTarget = QString(target);
             sanitizedTarget.replace("\\\"", "\"");
@@ -254,17 +259,17 @@ static void setupParserRules()
     };
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        StringMatcher matcher = sv[0].get<StringMatcher>();
+        StringMatcher matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](CardData x) { return matcher(x->getText()); };
     };
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         QString parts;
         for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
-            parts += sv[i].get<char>();
+            parts += std::any_cast<char>(sv[i]);
         }
-        bool idenity = sv.tokens[0].first[0] != 'i';
-        if (sv.tokens[1].first[0] == ':') {
+        bool idenity = sv.tokens[0][0] != 'i';
+        if (sv.tokens[1][0] == ':') {
             return [=](CardData x) {
                 QString match = idenity ? x->getColors() : x->getProperty("coloridentity");
                 if (parts.contains("m") && match.length() < 2) {
@@ -306,40 +311,40 @@ static void setupParserRules()
     };
 
     search["CMCQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        NumberMatcher matcher = sv[0].get<NumberMatcher>();
+        NumberMatcher matcher = std::any_cast<NumberMatcher>(sv[0]);
         return [=](CardData x) -> bool { return matcher(x->getProperty("cmc").toInt()); };
     };
     search["PowerQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        NumberMatcher matcher = sv[0].get<NumberMatcher>();
+        NumberMatcher matcher = std::any_cast<NumberMatcher>(sv[0]);
         return [=](CardData x) -> bool { return matcher(x->getPowTough().split("/")[0].toInt()); };
     };
     search["ToughnessQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        NumberMatcher matcher = sv[0].get<NumberMatcher>();
+        NumberMatcher matcher = std::any_cast<NumberMatcher>(sv[0]);
         return [=](CardData x) -> bool {
             auto parts = x->getPowTough().split("/");
             return matcher(parts.length() == 2 ? parts[1].toInt() : 0);
         };
     };
     search["FieldQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        QString field = sv[0].get<QString>();
+        QString field = std::any_cast<QString>(sv[0]);
         if (sv.choice() == 0) {
-            StringMatcher matcher = sv[1].get<StringMatcher>();
+            StringMatcher matcher = std::any_cast<StringMatcher>(sv[1]);
             return [=](CardData x) -> bool { return x->hasProperty(field) ? matcher(x->getProperty(field)) : false; };
         } else {
-            NumberMatcher matcher = sv[1].get<NumberMatcher>();
+            NumberMatcher matcher = std::any_cast<NumberMatcher>(sv[1]);
             return [=](CardData x) -> bool {
                 return x->hasProperty(field) ? matcher(x->getProperty(field).toInt()) : false;
             };
         }
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        StringMatcher matcher = sv[0].get<StringMatcher>();
+        StringMatcher matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](CardData x) { return matcher(x->getName()); };
     };
 
     search["Color"] = [](const peg::SemanticValues &sv) -> char { return "WUBRGU"[sv.choice()]; };
     search["ColorEx"] = [](const peg::SemanticValues &sv) -> char {
-        return sv.choice() == 0 ? sv[0].get<char>() : *sv.c_str();
+        return sv.choice() == 0 ? std::any_cast<char>(sv[0]) : *std::string(sv.sv()).c_str();
     };
 }
 
@@ -362,9 +367,9 @@ FilterString::FilterString(const QString &expr)
         return;
     }
 
-    search.log = [&](size_t /*ln*/, size_t col, const std::string &msg) {
+    search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
-    };
+    });
 
     if (!search.parse(ba.data(), result)) {
         qDebug().nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
