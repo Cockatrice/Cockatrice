@@ -253,7 +253,7 @@ void UserInfoBox::actPassword()
         connect(pend,
                 // we need qoverload here in order to select the right version of this function
                 QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
-                this, [=](const Response &response, const CommandContainer &, const QVariant &) {
+                this, [=, this](const Response &response, const CommandContainer &, const QVariant &) {
                     if (response.response_code() == Response::RespOk) {
                         changePassword(oldPassword, newPassword);
                     } else {
