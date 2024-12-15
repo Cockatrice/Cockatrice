@@ -539,7 +539,7 @@ private:
                                                 parseSequenceString(""),
                                                 ShortcutGroup::Move_bottom)},
         {"Player/aDrawArrow", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Draw Arrow..."),
-                                          parseSequenceString(""),
+                                          parseSequenceString("Alt+A"),
                                           ShortcutGroup::Gameplay)},
         {"Player/aRemoveLocalArrows", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Remove Local Arrows"),
                                                   parseSequenceString("Ctrl+R"),
