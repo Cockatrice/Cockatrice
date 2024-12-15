@@ -552,7 +552,7 @@ private:
         {"Player/aShuffle", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Shuffle Library"),
                                         parseSequenceString("Ctrl+S"),
                                         ShortcutGroup::Gameplay)},
-        {"Player/aSelectAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Zone"),
+        {"Player/aSelectAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All in Zone"),
                                           parseSequenceString("Ctrl+A"),
                                           ShortcutGroup::Gameplay)},
         {"Player/aMulligan", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Mulligan"),

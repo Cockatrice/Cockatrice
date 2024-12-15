@@ -839,7 +839,7 @@ void Player::retranslateUi()
         sayMenu->setTitle(tr("S&ay"));
     }
 
-    aSelectAll->setText(tr("&Select All Cards in Zone"));
+    aSelectAll->setText(tr("&Select All in Zone"));
 
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
