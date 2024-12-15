@@ -896,6 +896,7 @@ void Player::setShortcutsActive()
     shortcutsActive = true;
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
+    aHide->setShortcuts(shortcuts.getShortcut("Player/aHide"));
     aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
     aTap->setShortcuts(shortcuts.getShortcut("Player/aTap"));
     aDoesntUntap->setShortcuts(shortcuts.getShortcut("Player/aDoesntUntap"));
