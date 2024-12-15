@@ -839,7 +839,7 @@ void Player::retranslateUi()
         sayMenu->setTitle(tr("S&ay"));
     }
 
-    aSelectAll->setText(tr("Select All"));
+    aSelectAll->setText(tr("&Select All"));
 
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
