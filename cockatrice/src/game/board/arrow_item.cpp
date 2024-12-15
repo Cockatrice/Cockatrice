@@ -318,8 +318,14 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
         CardZone *targetZone = targetCard->getZone();
 
+        // move card onto table first if attaching from some other zone
+        if (startZone->getName() != "table") {
+            auto info = startCard->getInfo();
+            player->playCardToTable(startCard, false, info ? info->getCipt() : false);
+        }
+
         Command_AttachCard cmd;
-        cmd.set_start_zone(startZone->getName().toStdString());
+        cmd.set_start_zone("table");
         cmd.set_card_id(startCard->getId());
         cmd.set_target_player_id(targetZone->getPlayer()->getId());
         cmd.set_target_zone(targetZone->getName().toStdString());

@@ -2666,6 +2666,46 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
     sendGameCommand(cmd);
 }
 
+/**
+ * Like {@link Player::playCard}, but forces the card to be played to the table zone.
+ * Cards with tablerow 3 (the stack) will be played to tablerow 1 (the noncreatures row).
+ */
+void Player::playCardToTable(CardItem *card, bool faceDown, bool tapped)
+{
+    if (card == nullptr) {
+        return;
+    }
+
+    Command_MoveCard cmd;
+    cmd.set_start_player_id(card->getZone()->getPlayer()->getId());
+    cmd.set_start_zone(card->getZone()->getName().toStdString());
+    cmd.set_target_player_id(getId());
+    CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
+    cardToMove->set_card_id(card->getId());
+
+    CardInfoPtr info = card->getInfo();
+    if (!info) {
+        return;
+    }
+
+    int tableRow = faceDown ? 2 : info->getTableRow();
+    // default instant/sorcery cards to the noncreatures row
+    if (tableRow > 2) {
+        tableRow = 1;
+    }
+
+    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+    cardToMove->set_face_down(faceDown);
+    if (!faceDown) {
+        cardToMove->set_pt(info->getPowTough().toStdString());
+    }
+    cardToMove->set_tapped(faceDown ? false : tapped);
+    cmd.set_target_zone("table");
+    cmd.set_x(gridPoint.x());
+    cmd.set_y(gridPoint.y());
+    sendGameCommand(cmd);
+}
+
 void Player::addCard(CardItem *card)
 {
     emit newCardAdded(card);
