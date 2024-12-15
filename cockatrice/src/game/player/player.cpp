@@ -3562,6 +3562,7 @@ void Player::updateCardMenu(const CardItem *card)
 
     if (revealedCard) {
         cardMenu->addAction(aHide);
+        cardMenu->addSeparator();
         cardMenu->addAction(aSelectAll);
         addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
