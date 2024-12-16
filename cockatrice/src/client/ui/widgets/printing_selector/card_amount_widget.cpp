@@ -58,6 +58,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
         adjustFontSize(this->cardSizeSlider->value());
         incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
         decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
+        updateCardCount();
     });
 }
 
