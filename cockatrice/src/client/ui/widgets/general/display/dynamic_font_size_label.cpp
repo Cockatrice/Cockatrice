@@ -57,6 +57,10 @@ float DynamicFontSizeLabel::getWidgetMaximumFontSize(QWidget *widget, QString te
         return currentSize;
     }
 
+    if (currentSize < 0) {
+        return 1;
+    }
+
     /* Only stop when step is small enough and new size is smaller than QWidget */
     while(step>FONT_PRECISION || (currentHeight > widgetHeight) || (currentWidth > widgetWidth)){
         /* Keep last tested value */
