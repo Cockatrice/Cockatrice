@@ -2,18 +2,18 @@
 #define DYNAMICFONTSIZEPUSHBUTTON_H
 
 #include <QObject>
-#include <QWidget>
 #include <QPushButton>
+#include <QWidget>
 
 class DynamicFontSizePushButton : public QPushButton
 {
 public:
-    explicit DynamicFontSizePushButton(QWidget* parent = NULL);
+    explicit DynamicFontSizePushButton(QWidget *parent = NULL);
 
     /* This method overwrite stylesheet */
     void setTextColor(QColor color);
     QColor getTextColor();
-    void setTextAndColor(const QString &text, QColor color=QColor::Invalid);
+    void setTextAndColor(const QString &text, QColor color = QColor::Invalid);
 
     // QWidget interface
     QSize minimumSizeHint() const;
@@ -24,7 +24,6 @@ protected:
 
 private:
     QColor textColor;
-
 };
 
 #endif // DYNAMICFONTSIZEPUSHBUTTON_H

@@ -1,14 +1,12 @@
 #include "dynamic_font_size_push_button.h"
 
-#include <QDebug>
 #include "dynamic_font_size_label.h"
 
+#include <QDebug>
 #include <QPainter>
 
-DynamicFontSizePushButton::DynamicFontSizePushButton(QWidget* parent)
-    : QPushButton(parent)
+DynamicFontSizePushButton::DynamicFontSizePushButton(QWidget *parent) : QPushButton(parent)
 {
-
 }
 
 void DynamicFontSizePushButton::paintEvent(QPaintEvent *event)
@@ -38,8 +36,8 @@ void DynamicFontSizePushButton::paintEvent(QPaintEvent *event)
         gradient.setColorAt(1, QColor(48, 48, 48));
     } else {
         // Normal state
-        gradient.setColorAt(0, QColor(64, 64, 64));   // start color
-        gradient.setColorAt(1, QColor(32, 32, 32));   // end color
+        gradient.setColorAt(0, QColor(64, 64, 64)); // start color
+        gradient.setColorAt(1, QColor(32, 32, 32)); // end color
     }
     painter.setBrush(gradient);
     painter.setPen(Qt::NoPen); // No border

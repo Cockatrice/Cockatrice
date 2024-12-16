@@ -1,16 +1,19 @@
 #ifndef DYNAMICFONTSIZELABEL_H
 #define DYNAMICFONTSIZELABEL_H
 
-#include <QLabel>
 #include <QColor>
+#include <QLabel>
 
-class DynamicFontSizeLabel : public QLabel {
+class DynamicFontSizeLabel : public QLabel
+{
     Q_OBJECT
 
 public:
-    explicit DynamicFontSizeLabel(QWidget* parent = NULL, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit DynamicFontSizeLabel(QWidget *parent = NULL, Qt::WindowFlags f = Qt::WindowFlags());
 
-    ~DynamicFontSizeLabel() {}
+    ~DynamicFontSizeLabel()
+    {
+    }
 
     static float getWidgetMaximumFontSize(QWidget *widget, QString text);
 
@@ -18,13 +21,12 @@ public:
     void setTextColor(QColor color);
     QColor getTextColor();
     void setTextAndColor(const QString &text, QColor color = QColor::Invalid);
-    signals:
-        void clicked();
+signals:
+    void clicked();
 
 protected:
-    void mousePressEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent *event);
     QColor textColor;
-
 
     // QWidget interface
 protected:

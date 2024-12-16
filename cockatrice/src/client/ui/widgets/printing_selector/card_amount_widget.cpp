@@ -116,7 +116,8 @@ void CardAmountWidget::addPrinting(const QString &zone)
         }
         deckModel->removeRow(find_card.row(), find_card.parent());
     };
-    newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"), setInfoForCard.getProperty("num"));
+    newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
+                                       setInfoForCard.getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
 }
@@ -170,7 +171,8 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
     QModelIndex idx;
-    idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"), setInfoForCard.getProperty("num"));
+    idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
+                              setInfoForCard.getProperty("num"));
     offsetCountAtIndex(idx, -1);
 }
 

@@ -3,7 +3,8 @@
 
 #include <QLabel>
 
-class ShadowBackgroundLabel : public QLabel {
+class ShadowBackgroundLabel : public QLabel
+{
     Q_OBJECT
 
 public:

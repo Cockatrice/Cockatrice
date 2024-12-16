@@ -21,11 +21,11 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     setContentsMargins(5, 5, 5, 5); // Padding around the text
 
     zoneLabelMainboard = new ShadowBackgroundLabel(this, tr("Mainboard"));
-    buttonBoxMainboard =
-        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, setInfoForCard, DECK_ZONE_MAIN);
+    buttonBoxMainboard = new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard,
+                                              setInfoForCard, DECK_ZONE_MAIN);
     zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
-    buttonBoxSideboard =
-        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, setInfoForCard, DECK_ZONE_SIDE);
+    buttonBoxSideboard = new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard,
+                                              setInfoForCard, DECK_ZONE_SIDE);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);
@@ -35,9 +35,7 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
 
     connect(cardSizeSlider, &QSlider::valueChanged, this, &AllZonesCardAmountWidget::adjustFontSize);
 
-    QTimer::singleShot(10, this, [this]() {
-        adjustFontSize(this->cardSizeSlider->value());
-    });
+    QTimer::singleShot(10, this, [this]() { adjustFontSize(this->cardSizeSlider->value()); });
 
     setMouseTracking(true);
 }

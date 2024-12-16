@@ -1,9 +1,9 @@
 #include "shadow_background_label.h"
-#include <QPainter>
-#include <QPaintEvent>
 
-ShadowBackgroundLabel::ShadowBackgroundLabel(QWidget *parent, const QString &text)
-    : QLabel(parent)
+#include <QPaintEvent>
+#include <QPainter>
+
+ShadowBackgroundLabel::ShadowBackgroundLabel(QWidget *parent, const QString &text) : QLabel(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground); // Allows transparency
     setText("<font color='white'>" + text + "</font>");
@@ -24,7 +24,7 @@ void ShadowBackgroundLabel::paintEvent(QPaintEvent *event)
     // Semi-transparent background
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(QColor(0, 0, 0, 128)); // Semi-transparent black
-    painter.setPen(Qt::NoPen); // No border
+    painter.setPen(Qt::NoPen);              // No border
 
     // Compute the painting rectangle accounting for margins
     QRect adjustedRect = this->rect();

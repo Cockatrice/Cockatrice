@@ -2,7 +2,8 @@
 
 #include "../../../../settings/cache_settings.h"
 
-CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defaultValue) : parent(parent), flowWidget(flowWidget)
+CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defaultValue)
+    : parent(parent), flowWidget(flowWidget)
 {
     cardSizeLayout = new QHBoxLayout(this);
     setLayout(cardSizeLayout);
