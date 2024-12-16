@@ -307,31 +307,41 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
+void ArrowAttachItem::attachCards(CardItem *startCard, const CardItem *targetCard)
+{
+    // do nothing if target is already attached to another card
+    if (targetCard->getAttachedTo()) {
+        return;
+    }
+
+    CardZone *startZone = startCard->getZone();
+    CardZone *targetZone = targetCard->getZone();
+
+    // move card onto table first if attaching from some other zone
+    if (startZone->getName() != "table") {
+        auto info = startCard->getInfo();
+        player->playCardToTable(startCard, false, info ? info->getCipt() : false);
+    }
+
+    Command_AttachCard cmd;
+    cmd.set_start_zone("table");
+    cmd.set_card_id(startCard->getId());
+    cmd.set_target_player_id(targetZone->getPlayer()->getId());
+    cmd.set_target_zone(targetZone->getName().toStdString());
+    cmd.set_target_card_id(targetCard->getId());
+
+    player->sendGameCommand(cmd);
+}
+
 void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem)
         return;
 
     if (targetItem && (targetItem != startItem)) {
-        CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
-        CardZone *startZone = startCard->getZone();
-        CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
-        CardZone *targetZone = targetCard->getZone();
-
-        // move card onto table first if attaching from some other zone
-        if (startZone->getName() != "table") {
-            auto info = startCard->getInfo();
-            player->playCardToTable(startCard, false, info ? info->getCipt() : false);
-        }
-
-        Command_AttachCard cmd;
-        cmd.set_start_zone("table");
-        cmd.set_card_id(startCard->getId());
-        cmd.set_target_player_id(targetZone->getPlayer()->getId());
-        cmd.set_target_zone(targetZone->getName().toStdString());
-        cmd.set_target_card_id(targetCard->getId());
-
-        player->sendGameCommand(cmd);
+        auto startCard = qgraphicsitem_cast<CardItem *>(startItem);
+        auto targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
+        attachCards(startCard, targetCard);
     }
 
     delArrow();

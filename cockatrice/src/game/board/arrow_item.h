@@ -88,6 +88,8 @@ class ArrowAttachItem : public ArrowItem
 private:
     QList<ArrowAttachItem *> childArrows;
 
+    void attachCards(CardItem *startCard, const CardItem *targetCard);
+
 public:
     ArrowAttachItem(ArrowTarget *_startItem);
     void addChildArrow(ArrowAttachItem *childArrow);
