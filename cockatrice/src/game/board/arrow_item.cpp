@@ -341,7 +341,9 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (targetItem && (targetItem != startItem)) {
         auto startCard = qgraphicsitem_cast<CardItem *>(startItem);
         auto targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
-        attachCards(startCard, targetCard);
+        if (startCard && targetCard) {
+            attachCards(startCard, targetCard);
+        }
     }
 
     delArrow();
