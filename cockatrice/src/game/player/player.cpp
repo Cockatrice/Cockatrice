@@ -3487,6 +3487,9 @@ void Player::actPlay()
         selectedCards.append(card);
     }
 
+    std::sort(selectedCards.begin(), selectedCards.end(),
+              [](const auto &card1, const auto &card2) { return card1->getId() > card2->getId(); });
+
     for (auto &card : selectedCards) {
         if (card && !isUnwritableRevealZone(card->getZone())) {
             const bool cipt = card->getInfo() ? card->getInfo()->getCipt() : false;
