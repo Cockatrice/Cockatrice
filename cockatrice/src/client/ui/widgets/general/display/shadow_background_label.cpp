@@ -6,7 +6,7 @@ ShadowBackgroundLabel::ShadowBackgroundLabel(QWidget *parent, const QString &tex
     : QLabel(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground); // Allows transparency
-    setText(text);
+    setText("<font color='white'>" + text + "</font>");
     setAlignment(Qt::AlignCenter);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }

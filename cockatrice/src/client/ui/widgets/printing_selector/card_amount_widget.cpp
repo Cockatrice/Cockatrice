@@ -100,7 +100,7 @@ void CardAmountWidget::adjustFontSize(int scalePercentage)
 
 void CardAmountWidget::updateCardCount()
 {
-    cardCountInZone->setText(QString::number(countCardsInZone(zoneName)));
+    cardCountInZone->setText("<font color='white'>" + QString::number(countCardsInZone(zoneName)) + "</font>");
     layout->invalidate();
     layout->activate();
 }
