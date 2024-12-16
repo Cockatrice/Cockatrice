@@ -3635,6 +3635,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
                 // Card is on the stack
+                cardMenu->addAction(aAttach);
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
@@ -3649,11 +3650,16 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aSelectAll);
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
+
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
+
+                cardMenu->addSeparator();
+                cardMenu->addAction(aAttach);
+                cardMenu->addAction(aDrawArrow);
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
@@ -3667,8 +3673,13 @@ void Player::updateCardMenu(const CardItem *card)
                 connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
 
                 cardMenu->addMenu(moveMenu);
+
+                cardMenu->addSeparator();
+                cardMenu->addAction(aAttach);
+                cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
+
                 addRelatedCardView(card, cardMenu);
             }
         } else {
