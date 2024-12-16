@@ -33,7 +33,7 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
-    cardSizeWidget = new CardSizeWidget(this);
+    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
     layout->addWidget(cardSizeWidget);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);

@@ -1,6 +1,8 @@
 #include "card_size_widget.h"
 
-CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget) : parent(parent), flowWidget(flowWidget)
+#include "../../../../settings/cache_settings.h"
+
+CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defaultValue) : parent(parent), flowWidget(flowWidget)
 {
     cardSizeLayout = new QHBoxLayout(this);
     setLayout(cardSizeLayout);
@@ -9,7 +11,7 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget) : parent
     cardSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     cardSizeSlider = new QSlider(Qt::Horizontal, this);
     cardSizeSlider->setRange(50, 250);
-    cardSizeSlider->setValue(100);
+    cardSizeSlider->setValue(defaultValue);
 
     cardSizeLayout->addWidget(cardSizeLabel);
     cardSizeLayout->addWidget(cardSizeSlider);
@@ -17,6 +19,13 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget) : parent
     if (flowWidget != nullptr) {
         connect(cardSizeSlider, &QSlider::valueChanged, flowWidget, &FlowWidget::setMinimumSizeToMaxSizeHint);
     }
+
+    connect(cardSizeSlider, &QSlider::valueChanged, this, &CardSizeWidget::updateCardSizeSetting);
+}
+
+void CardSizeWidget::updateCardSizeSetting(int newValue)
+{
+    SettingsCache::instance().setPrintingSelectorCardSize(newValue);
 }
 
 QSlider *CardSizeWidget::getSlider() const

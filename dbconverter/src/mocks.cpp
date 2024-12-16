@@ -166,6 +166,9 @@ void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T /* _bumpS
 void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrder */)
 {
 }
+void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }

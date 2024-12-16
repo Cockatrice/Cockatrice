@@ -51,6 +51,7 @@ signals:
     void overrideAllCardArtWithPersonalPreferenceChanged();
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
+    void printingSelectorCardSizeChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -105,6 +106,7 @@ private:
     bool overrideAllCardArtWithPersonalPreference;
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
+    int printingSelectorCardSize;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -316,6 +318,10 @@ public:
     int getPrintingSelectorSortOrder() const
     {
         return printingSelectorSortOrder;
+    }
+    int getPrintingSelectorCardSize() const
+    {
+        return printingSelectorCardSize;
     }
     bool getHorizontalHand() const
     {
@@ -599,6 +605,7 @@ public slots:
     void setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt);
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
+    void setPrintingSelectorCardSize(int _printingSelectorCardSize);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
