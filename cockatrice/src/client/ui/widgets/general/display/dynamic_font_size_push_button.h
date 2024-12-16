@@ -13,7 +13,6 @@ public:
     /* This method overwrite stylesheet */
     void setTextColor(QColor color);
     QColor getTextColor();
-
     void setTextAndColor(const QString &text, QColor color=QColor::Invalid);
 
     // QWidget interface

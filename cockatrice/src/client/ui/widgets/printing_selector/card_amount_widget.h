@@ -6,6 +6,7 @@
 #include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
 #include "../../../tabs/tab_deck_editor.h"
+#include "../general/display/dynamic_font_size_push_button.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -46,8 +47,8 @@ private:
     CardInfoPerSet setInfoForCard;
     QString zoneName;
     QHBoxLayout *layout;
-    QPushButton *incrementButton;
-    QPushButton *decrementButton;
+    DynamicFontSizePushButton *incrementButton;
+    DynamicFontSizePushButton *decrementButton;
     QLabel *cardCountInZone;
 
     bool hovered;

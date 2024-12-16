@@ -23,9 +23,9 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     layout->setAlignment(Qt::AlignHCenter);
 
     incrementButton = new DynamicFontSizePushButton(this);
-    incrementButton->setText("+");
+    incrementButton->setTextAndColor("+", Qt::white);
     decrementButton = new DynamicFontSizePushButton(this);
-    decrementButton->setText("-");
+    decrementButton->setTextAndColor("-", Qt::white);
 
     incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
     decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
