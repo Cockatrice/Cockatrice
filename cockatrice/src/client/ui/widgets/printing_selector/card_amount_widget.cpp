@@ -2,6 +2,8 @@
 
 #include "../general/display/dynamic_font_size_push_button.h"
 
+#include <QTimer>
+
 CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    TabDeckEditor *deckEditor,
                                    DeckListModel *deckModel,
@@ -18,12 +20,15 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     layout->setSpacing(10);
     this->setLayout(layout);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    layout->setAlignment(Qt::AlignHCenter);
 
     incrementButton = new DynamicFontSizePushButton(this);
-    incrementButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     incrementButton->setText("+");
     decrementButton = new DynamicFontSizePushButton(this);
     decrementButton->setText("-");
+
+    incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
+    decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
 
     // Set up connections
     if (zoneName == DECK_ZONE_MAIN) {
@@ -48,6 +53,12 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     // Connect slider for dynamic font size adjustment
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardAmountWidget::adjustFontSize);
     adjustFontSize(cardSizeSlider->value());
+
+    // Resize after a little delay since, initially, the parent widget has no size.
+    QTimer::singleShot(50, this, [this]() {
+        incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
+        decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
+    });
 }
 
 void CardAmountWidget::paintEvent(QPaintEvent *event)
