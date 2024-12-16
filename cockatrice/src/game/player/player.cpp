@@ -3714,9 +3714,13 @@ void Player::updateCardMenu(const CardItem *card)
 
                 cardMenu->addMenu(moveMenu);
 
-                cardMenu->addSeparator();
-                cardMenu->addAction(aAttach);
-                cardMenu->addAction(aDrawArrow);
+                // actions that are really wonky when done from deck or sideboard
+                if (card->getZone()->getName() == "hand") {
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aAttach);
+                    cardMenu->addAction(aDrawArrow);
+                }
+
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
 
