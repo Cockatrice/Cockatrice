@@ -513,6 +513,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToExile, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
 
+    aSelectAll = new QAction(this);
+    connect(aSelectAll, SIGNAL(triggered()), this, SLOT(actSelectAll()));
+
     aPlay = new QAction(this);
     connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
     aHide = new QAction(this);
@@ -836,6 +839,8 @@ void Player::retranslateUi()
         sayMenu->setTitle(tr("S&ay"));
     }
 
+    aSelectAll->setText(tr("&Select All"));
+
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
@@ -922,6 +927,8 @@ void Player::setShortcutsActive()
     aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
     aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
+
+    aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
 
     QList<QKeySequence> addCCShortCuts;
     addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCRed"));
@@ -1535,6 +1542,22 @@ void Player::actMoveBottomCardToTop()
     cmd.set_y(0);
 
     sendGameCommand(cmd);
+}
+
+void Player::actSelectAll()
+{
+    const CardItem *card = game->getActiveCard();
+    if (!card) {
+        return;
+    }
+
+    if (const auto *zone = card->getZone()) {
+        for (auto &cardItem : zone->getCards()) {
+            if (cardItem) {
+                cardItem->setSelected(true);
+            }
+        }
+    }
 }
 
 void Player::actDrawBottomCard()
@@ -3540,6 +3563,8 @@ void Player::updateCardMenu(const CardItem *card)
 
     if (revealedCard) {
         cardMenu->addAction(aHide);
+        cardMenu->addSeparator();
+        cardMenu->addAction(aSelectAll);
         addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
         if (moveMenu->isEmpty()) {
@@ -3596,6 +3621,8 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aSelectAll);
 
                 for (int i = 0; i < aAddCounter.size(); ++i) {
                     cardMenu->addSeparator();
@@ -3612,16 +3639,21 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aSelectAll);
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
             } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
                 // Card is in the graveyard or exile
+                cardMenu->addAction(aSelectAll);
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aSelectAll);
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
@@ -3635,6 +3667,8 @@ void Player::updateCardMenu(const CardItem *card)
                 connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
 
                 cardMenu->addMenu(moveMenu);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aSelectAll);
                 addRelatedCardView(card, cardMenu);
             }
         } else {
@@ -3648,6 +3682,8 @@ void Player::updateCardMenu(const CardItem *card)
             addRelatedCardActions(card, cardMenu);
             cardMenu->addSeparator();
             cardMenu->addAction(aClone);
+            cardMenu->addSeparator();
+            cardMenu->addAction(aSelectAll);
         }
     }
 }
