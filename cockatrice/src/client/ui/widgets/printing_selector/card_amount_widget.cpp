@@ -76,15 +76,12 @@ void CardAmountWidget::paintEvent(QPaintEvent *event)
 
 void CardAmountWidget::adjustFontSize(int scalePercentage)
 {
-    qDebug() << scalePercentage;
     const int minFontSize = 8;      // Minimum font size
     const int maxFontSize = 32;     // Maximum font size
     const int basePercentage = 100; // Scale at 100%
 
     int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
     newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
-
-    qDebug() << newFontSize;
 
     // Update the font for card count label
     QFont cardCountFont = cardCountInZone->font();

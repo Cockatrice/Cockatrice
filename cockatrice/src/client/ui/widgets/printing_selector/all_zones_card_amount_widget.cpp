@@ -39,7 +39,6 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
 
 void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
 {
-    qDebug() << scalePercentage;
     const int minFontSize = 8;      // Minimum font size
     const int maxFontSize = 32;     // Maximum font size
     const int basePercentage = 100; // Scale at 100%
