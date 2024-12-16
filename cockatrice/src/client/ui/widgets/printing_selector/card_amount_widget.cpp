@@ -119,7 +119,7 @@ void CardAmountWidget::addPrinting(const QString &zone)
         }
         deckModel->removeRow(find_card.row(), find_card.parent());
     };
-    newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"));
+    newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"), setInfoForCard.getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
 }
