@@ -25,7 +25,7 @@ PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidg
     connect(collapseButton, &QPushButton::clicked, this, &PrintingSelectorViewOptionsToolbarWidget::collapse);
     expandedLayout->addWidget(collapseButton, 0, Qt::AlignLeft);
 
-    viewOptions = new PrintingSelectorViewOptionsWidget(expandedWidget);
+    viewOptions = new PrintingSelectorViewOptionsWidget(expandedWidget, printingSelector);
     expandedLayout->addWidget(viewOptions);
 
     expandedWidget->setLayout(expandedLayout);

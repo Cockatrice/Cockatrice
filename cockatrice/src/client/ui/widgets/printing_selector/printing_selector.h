@@ -33,6 +33,10 @@ public slots:
     void updateDisplay();
     void selectPreviousCard();
     void selectNextCard();
+    void toggleVisibilitySortOptions(bool _state);
+    void toggleVisibilitySearchBar(bool _state);
+    void toggleVisibilityCardSizeSlider(bool _state);
+    void toggleVisibilityNavigationButtons(bool _state);
 
 private:
     QVBoxLayout *layout;

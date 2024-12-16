@@ -24,19 +24,22 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     layout->addWidget(viewOptionsToolbar);
 
     sortToolBar = new PrintingSelectorCardSortingWidget(this);
+    sortToolBar->setVisible(SettingsCache::instance().getPrintingSelectorSortOptionsVisible());
     layout->addWidget(sortToolBar);
 
-    // Add the search bar
     searchBar = new PrintingSelectorCardSearchWidget(this);
+    searchBar->setVisible(SettingsCache::instance().getPrintingSelectorSearchBarVisible());
     layout->addWidget(searchBar);
 
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
+    cardSizeWidget->setVisible(SettingsCache::instance().getPrintingSelectorCardSizeSliderVisible());
     layout->addWidget(cardSizeWidget);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);
+    cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
     layout->addWidget(cardSelectionBar);
 
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
@@ -165,4 +168,24 @@ void PrintingSelector::getAllSetsForCurrentCard()
     });
     currentIndex = 0;
     widgetLoadingBufferTimer->start(0); // Process as soon as possible
+}
+
+void PrintingSelector::toggleVisibilitySortOptions(bool _state)
+{
+    sortToolBar->setVisible(_state);
+}
+
+void PrintingSelector::toggleVisibilitySearchBar(bool _state)
+{
+    searchBar->setVisible(_state);
+}
+
+void PrintingSelector::toggleVisibilityCardSizeSlider(bool _state)
+{
+    cardSizeWidget->setVisible(_state);
+}
+
+void PrintingSelector::toggleVisibilityNavigationButtons(bool _state)
+{
+    cardSelectionBar->setVisible(_state);
 }

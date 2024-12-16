@@ -52,6 +52,10 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
+    void printingSelectorSortOptionsVisibleChanged();
+    void printingSelectorSearchBarVisibleChanged();
+    void printingSelectorCardSizeSliderVisibleChanged();
+    void printingSelectorNavigationButtonsVisibleChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -107,6 +111,10 @@ private:
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
     int printingSelectorCardSize;
+    bool printingSelectorSortOptionsVisible;
+    bool printingSelectorSearchBarVisible;
+    bool printingSelectorCardSizeSliderVisible;
+    bool printingSelectorNavigationButtonsVisible;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -322,6 +330,22 @@ public:
     int getPrintingSelectorCardSize() const
     {
         return printingSelectorCardSize;
+    }
+    bool getPrintingSelectorSortOptionsVisible() const
+    {
+        return printingSelectorSortOptionsVisible;
+    }
+    bool getPrintingSelectorSearchBarVisible() const
+    {
+        return printingSelectorSearchBarVisible;
+    }
+    bool getPrintingSelectorCardSizeSliderVisible() const
+    {
+        return printingSelectorCardSizeSliderVisible;
+    }
+    bool getPrintingSelectorNavigationButtonsVisible() const
+    {
+        return printingSelectorNavigationButtonsVisible;
     }
     bool getHorizontalHand() const
     {
@@ -606,6 +630,10 @@ public slots:
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
+    void setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T _sortOptionsVisible);
+    void setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible);
+    void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
+    void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
