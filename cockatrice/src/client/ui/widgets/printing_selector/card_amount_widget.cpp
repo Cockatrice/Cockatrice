@@ -52,10 +52,10 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
 
     // Connect slider for dynamic font size adjustment
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardAmountWidget::adjustFontSize);
-    adjustFontSize(cardSizeSlider->value());
 
     // Resize after a little delay since, initially, the parent widget has no size.
-    QTimer::singleShot(50, this, [this]() {
+    QTimer::singleShot(10, this, [this]() {
+        adjustFontSize(this->cardSizeSlider->value());
         incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
         decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
     });

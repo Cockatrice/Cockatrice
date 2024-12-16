@@ -2,6 +2,8 @@
 
 #include "../general/display/shadow_background_label.h"
 
+#include <QTimer>
+
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    TabDeckEditor *deckEditor,
                                                    DeckListModel *deckModel,
@@ -32,7 +34,10 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     layout->addWidget(buttonBoxSideboard, 0, Qt::AlignHCenter | Qt::AlignTop);
 
     connect(cardSizeSlider, &QSlider::valueChanged, this, &AllZonesCardAmountWidget::adjustFontSize);
-    adjustFontSize(cardSizeSlider->value());
+
+    QTimer::singleShot(10, this, [this]() {
+        adjustFontSize(this->cardSizeSlider->value());
+    });
 
     setMouseTracking(true);
 }
