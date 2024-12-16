@@ -3479,7 +3479,7 @@ static bool isUnwritableRevealZone(CardZone *zone)
     return false;
 }
 
-void Player::actPlay()
+void Player::playSelectedCards(const bool faceDown)
 {
     QList<CardItem *> selectedCards;
     for (const auto &item : scene()->selectedItems()) {
@@ -3487,15 +3487,28 @@ void Player::actPlay()
         selectedCards.append(card);
     }
 
+    // CardIds will get shuffled downwards when cards leave the deck.
+    // We need to iterate through the cards in reverse order so cardIds don't get changed out from under us as we play
+    // out the cards one-by-one.
     std::sort(selectedCards.begin(), selectedCards.end(),
               [](const auto &card1, const auto &card2) { return card1->getId() > card2->getId(); });
 
     for (auto &card : selectedCards) {
         if (card && !isUnwritableRevealZone(card->getZone())) {
-            const bool cipt = card->getInfo() ? card->getInfo()->getCipt() : false;
-            playCard(card, false, cipt);
+            const bool cipt = !faceDown && card->getInfo() ? card->getInfo()->getCipt() : false;
+            playCard(card, faceDown, cipt);
         }
     }
+}
+
+void Player::actPlay()
+{
+    playSelectedCards(false);
+}
+
+void Player::actPlayFacedown()
+{
+    playSelectedCards(true);
 }
 
 void Player::actHide()
@@ -3504,21 +3517,6 @@ void Player::actHide()
         auto *card = static_cast<CardItem *>(item);
         if (card && isUnwritableRevealZone(card->getZone())) {
             card->getZone()->removeCard(card);
-        }
-    }
-}
-
-void Player::actPlayFacedown()
-{
-    QList<CardItem *> selectedCards;
-    for (const auto &item : scene()->selectedItems()) {
-        auto *card = static_cast<CardItem *>(item);
-        selectedCards.append(card);
-    }
-
-    for (auto &card : selectedCards) {
-        if (card && !isUnwritableRevealZone(card->getZone())) {
-            playCard(card, true, false);
         }
     }
 }
