@@ -1341,19 +1341,19 @@ void Player::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    DlgMoveTopCardsUntil dlg(game, previousMovingCardsUntilExpr, previousMovingCardsUntilNumberOfHits);
+    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExpr, movingCardsUntilNumberOfHits);
     if (!dlg.exec()) {
         return;
     }
 
-    previousMovingCardsUntilExpr = dlg.getExpr();
-    previousMovingCardsUntilNumberOfHits = dlg.getNumberOfHits();
+    movingCardsUntilExpr = dlg.getExpr();
+    movingCardsUntilNumberOfHits = dlg.getNumberOfHits();
 
     if (zones.value("deck")->getCards().empty()) {
         stopMoveTopCardsUntil();
     } else {
-        movingCardsUntilFilter = FilterString(previousMovingCardsUntilExpr);
-        movingCardsUntilCounter = previousMovingCardsUntilNumberOfHits;
+        movingCardsUntilFilter = FilterString(movingCardsUntilExpr);
+        movingCardsUntilCounter = movingCardsUntilNumberOfHits;
         movingCardsUntil = true;
         actMoveTopCardToPlay();
     }
