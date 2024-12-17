@@ -63,7 +63,7 @@ private slots:
     void processGroupBy(int value);
     void processSortBy(int value);
     void processSetPileView(QT_STATE_CHANGED_T value);
-    void resizeToZoneContents();
+    void resizeToZoneContents(bool forceInitialHeight = false);
     void handleScrollBarChange(int value);
     void zoneDeleted();
     void moveEvent(QGraphicsSceneMoveEvent * /* event */) override;
@@ -90,6 +90,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
     void initStyleOption(QStyleOption *option) const override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif

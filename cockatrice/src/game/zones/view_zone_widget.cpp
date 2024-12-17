@@ -282,7 +282,7 @@ static qreal determineNewZoneHeight(qreal oldZoneHeight)
     return calcMaxInitialHeight();
 }
 
-void ZoneViewWidget::resizeToZoneContents()
+void ZoneViewWidget::resizeToZoneContents(bool forceInitialHeight)
 {
     QRectF zoneRect = zone->getOptimumRect();
     qreal totalZoneHeight = zoneRect.height();
@@ -293,7 +293,7 @@ void ZoneViewWidget::resizeToZoneContents()
     QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
 
     qreal currentZoneHeight = rect().height() - extraHeight - 10;
-    qreal newZoneHeight = determineNewZoneHeight(currentZoneHeight);
+    qreal newZoneHeight = forceInitialHeight ? calcMaxInitialHeight() : determineNewZoneHeight(currentZoneHeight);
 
     QSizeF initialSize(width, newZoneHeight + extraHeight + 10);
 
@@ -334,4 +334,17 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar)
         titleBar->icon = QPixmap("theme:cockatrice");
+}
+
+void ZoneViewWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->pos().y() <= 0) {
+        // expand window to full height and width if not currently at full height and width
+        // otherwise shrink window to initial max height
+        if (size().height() < maximumHeight() || size().width() < maximumWidth()) {
+            resize(maximumSize());
+        } else {
+            resizeToZoneContents(true);
+        }
+    }
 }
