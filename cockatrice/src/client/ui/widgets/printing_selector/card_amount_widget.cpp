@@ -1,5 +1,7 @@
 #include "card_amount_widget.h"
+
 #include "../general/display/dynamic_font_size_push_button.h"
+
 #include <QTimer>
 
 /**

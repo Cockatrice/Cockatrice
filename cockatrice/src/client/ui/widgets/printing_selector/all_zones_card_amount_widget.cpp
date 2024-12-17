@@ -1,5 +1,7 @@
 #include "all_zones_card_amount_widget.h"
+
 #include "../general/display/shadow_background_label.h"
+
 #include <QTimer>
 
 /**

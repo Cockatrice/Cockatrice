@@ -1,4 +1,5 @@
 #include "printing_selector_card_sorting_widget.h"
+
 #include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_set_comparator.h"
 
