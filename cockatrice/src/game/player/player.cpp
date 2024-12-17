@@ -1003,6 +1003,7 @@ void Player::setShortcutsActive()
          */
         game->addAction(aClone);
         game->addAction(aDrawArrow);
+        game->addAction(aSelectAll);
     }
 }
 
