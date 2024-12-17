@@ -385,14 +385,43 @@ void CardItem::playCard(bool faceDown)
         tz->toggleTapped();
     else {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            if (faceDown) {
-                zone->getPlayer()->actPlayFacedown();
-            } else {
-                zone->getPlayer()->actPlay();
-            }
+            faceDown ? zone->getPlayer()->actPlayFacedown() : zone->getPlayer()->actPlay();
         } else {
             zone->getPlayer()->playCard(this, faceDown, info ? info->getCipt() : false);
         }
+    }
+}
+
+/**
+ * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
+ * is nullptr.
+ */
+static bool isUnwritableRevealZone(CardZone *zone)
+{
+    if (zone && zone->getIsView()) {
+        if (auto *view = static_cast<ZoneViewZone *>(zone)) {
+            return view->getRevealZone() && !view->getWriteableRevealZone();
+        }
+    }
+    return false;
+}
+
+/**
+ * This method is called when a "click to play" is done on the card.
+ * This is either triggered by a single click or double click, depending on the settings.
+ *
+ * @param shiftHeld if the shift key was held during the click
+ */
+void CardItem::handleClickedToPlay(bool shiftHeld)
+{
+    if (isUnwritableRevealZone(zone)) {
+        if (SettingsCache::instance().getClickPlaysAllSelected()) {
+            zone->getPlayer()->actHide();
+        } else {
+            zone->removeCard(this);
+        }
+    } else {
+        playCard(shiftHeld);
     }
 }
 
@@ -405,21 +434,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
                (!SettingsCache::instance().getDoubleClickToPlay())) {
-        bool hideCard = false;
-        if (zone && zone->getIsView()) {
-            auto *view = static_cast<ZoneViewZone *>(zone);
-            if (view->getRevealZone() && !view->getWriteableRevealZone())
-                hideCard = true;
-        }
-        if (zone && hideCard) {
-            if (SettingsCache::instance().getClickPlaysAllSelected()) {
-                zone->getPlayer()->actHide();
-            } else {
-                zone->removeCard(this);
-            }
-        } else {
-            playCard(event->modifiers().testFlag(Qt::ShiftModifier));
-        }
+        handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
 
     if (owner != nullptr) { // cards without owner will be deleted
@@ -430,16 +445,9 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if ((event->modifiers() != Qt::AltModifier) && (SettingsCache::instance().getDoubleClickToPlay()) &&
-        (event->buttons() == Qt::LeftButton)) {
-        if (revealedCard) {
-            if (SettingsCache::instance().getClickPlaysAllSelected()) {
-                zone->getPlayer()->actHide();
-            } else {
-                zone->removeCard(this);
-            }
-        } else
-            playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+    if ((event->modifiers() != Qt::AltModifier) && (event->buttons() == Qt::LeftButton) &&
+        (SettingsCache::instance().getDoubleClickToPlay())) {
+        handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();
 }
