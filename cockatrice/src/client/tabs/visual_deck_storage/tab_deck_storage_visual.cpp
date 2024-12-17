@@ -17,6 +17,7 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QDirIterator>
 #include <QFileSystemModel>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -83,68 +84,18 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
         allFiles << it.next(); // Add each file path to the list
     }
 
-    auto deck_loader = new DeckLoader();
     foreach (const QString &file, allFiles) {
         qDebug() << file;
+        auto deck_loader = new DeckLoader();
         deck_loader->loadFromFile(file, DeckLoader::CockatriceFormat);
         deck_list_model->setDeckList(new DeckLoader(*deck_loader));
 
-        InnerDecklistNode *listRoot = deck_list_model->getDeckList()->getRoot();
-
-        bool shouldExitOuterLoop = false; // Flag to indicate if we should exit the outer loop
-        for (int i = 0; i < listRoot->size(); i++) {
-            InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-
-            for (int j = 0; j < currentZone->size(); j++) {
-                DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-                if (!currentCard)
-                    continue;
-
-                for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
-                    if (info) {
-                        if (info->getCardType().contains("Legendary Creature")) {
-                            //qDebug() << currentCard->getName();
-                            //qDebug() << info->getCmc();
-                            //qDebug() << info->getProperties();
-                            //qDebug() << info->getCardType();
-
-                            CardInfoPerSetMap setMap = info->getSets();
-                            OverlapWidget *printings_group_widget =
-                                new OverlapWidget(this, 80, 0, 0, Qt::Orientation::Vertical);
-                            for (auto set : setMap) {
-                                // qDebug() << set.getPtr()->getLongName();
-                                CardInfoPtr set_info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                                    currentCard->getName(), set.getProperty("uuid"));
-                                CardInfoPictureWithTextOverlayWidget * display = new CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
-                                display->setCard(set_info);
-                                display->setOverlayText(deck_loader->getName());
-                                display->setFontSize(24);
-                                printings_group_widget->addWidget(display);
-                            }
-                            flow_widget->addWidget(printings_group_widget);
-
-                            //db->getPreferredPrintingForCard(info->getName());
-
-                            //PictureLoader::getCardBackPixmap();
-
-                            shouldExitOuterLoop = true; // Set the flag to exit the outer loop
-                            break; // Break the innermost loop
-                        }
-                    } else {
-                        //qDebug() << "Card not found in database!";
-                    }
-
-                    // emit newCardAdded(newCard);
-                }
-                if (shouldExitOuterLoop) {
-                    break; // Break the middle loop if flag is set
-                }
-            }
-            if (shouldExitOuterLoop) {
-                break; // Break the outer loop if flag is set
-            }
-        }
+        CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
+        qDebug() << "Banner card is: " << deck_loader->getBannerCard();
+        display->setCard(CardDatabaseManager::getInstance()->getCard(deck_loader->getBannerCard()));
+        display->setOverlayText(deck_loader->getName());
+        display->setFontSize(24);
+        flow_widget->addWidget(display);
     }
 
     return QStringList("lol");
@@ -181,6 +132,4 @@ void TabDeckStorageVisual::actDeleteLocalDeck()
 void TabDeckStorageVisual::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug() << "Card update process finished with exit code:" << exitCode << "and exit status:" << exitStatus;
-
-    // You can add any additional logic you need here.
 }

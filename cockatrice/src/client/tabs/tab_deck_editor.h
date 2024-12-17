@@ -22,6 +22,7 @@ class DeckLoader;
 class Response;
 class FilterTreeModel;
 class FilterBuilder;
+class QComboBox;
 class QGroupBox;
 class QMessageBox;
 class QHBoxLayout;
@@ -35,6 +36,8 @@ class TabDeckEditor : public Tab
 private slots:
     void updateName(const QString &name);
     void updateComments();
+    void updateBannerCardComboBox();
+    void setBannerCard();
     void updateHash();
     void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
     void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
@@ -129,6 +132,8 @@ private:
     LineEditUnfocusable *nameEdit;
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
+    QLabel *bannerCardLabel;
+    QComboBox *bannerCardComboBox;
     QLabel *hashLabel1;
     LineEditUnfocusable *hashLabel;
     FilterTreeModel *filterModel;

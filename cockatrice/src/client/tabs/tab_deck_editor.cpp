@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QComboBox>
 #include <QDesktopServices>
 #include <QDir>
 #include <QDockWidget>
@@ -94,6 +95,15 @@ void TabDeckEditor::createDeckDock()
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
+    bannerCardLabel = new QLabel();
+    bannerCardLabel->setObjectName("bannerCardLabel");
+    bannerCardLabel->setText(tr("Banner Card"));
+    bannerCardComboBox = new QComboBox(this);
+    connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
+        // Delay the update to avoid race conditions
+        QTimer::singleShot(100, this, &TabDeckEditor::updateBannerCardComboBox);
+    });
+    connect(bannerCardComboBox, &QComboBox::currentIndexChanged, this, &TabDeckEditor::setBannerCard);
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
@@ -120,6 +130,9 @@ void TabDeckEditor::createDeckDock()
 
     upperLayout->addWidget(commentsLabel, 1, 0);
     upperLayout->addWidget(commentsEdit, 1, 1);
+
+    upperLayout->addWidget(bannerCardLabel, 2, 0);
+    upperLayout->addWidget(bannerCardComboBox, 2, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -794,6 +807,68 @@ void TabDeckEditor::updateComments()
     setSaveStatus(true);
 }
 
+void TabDeckEditor::updateBannerCardComboBox()
+{
+    // Store the current text of the combo box
+    QString currentText = bannerCardComboBox->currentText();
+
+    // Block signals temporarily
+    bool wasBlocked = bannerCardComboBox->blockSignals(true);
+
+    // Clear the existing items in the combo box
+    bannerCardComboBox->clear();
+
+    // Prepare the new items with deduplication
+    QSet<QString> bannerCardSet;
+    InnerDecklistNode *listRoot = deckModel->getDeckList()->getRoot();
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        for (int j = 0; j < currentZone->size(); j++) {
+            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            if (!currentCard)
+                continue;
+
+            for (int k = 0; k < currentCard->getNumber(); ++k) {
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+                if (info) {
+                    bannerCardSet.insert(currentCard->getName());
+                }
+            }
+        }
+    }
+
+    // Convert the QSet to a sorted QStringList
+    QStringList bannerCardChoices = QStringList(bannerCardSet.begin(), bannerCardSet.end());
+    bannerCardChoices.sort(Qt::CaseInsensitive);
+
+    // Populate the combo box with new items
+    bannerCardComboBox->addItems(bannerCardChoices);
+
+    // Try to restore the previous selection by finding the currentText
+    int restoredIndex = bannerCardComboBox->findText(currentText);
+    if (restoredIndex != -1) {
+        bannerCardComboBox->setCurrentIndex(restoredIndex);
+    } else {
+        // Add a placeholder "-" and set it as the current selection
+        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard());
+        if (bannerIndex != -1) {
+            bannerCardComboBox->setCurrentIndex(bannerIndex);
+        } else {
+            bannerCardComboBox->insertItem(0, "-");
+            bannerCardComboBox->setCurrentIndex(0);
+        }
+    }
+
+    // Restore the previous signal blocking state
+    bannerCardComboBox->blockSignals(wasBlocked);
+}
+
+void TabDeckEditor::setBannerCard()
+{
+    qDebug() << "Banner card was set to: " << bannerCardComboBox->currentText();
+    deckModel->getDeckList()->setBannerCard(bannerCardComboBox->currentText());
+}
+
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
 {
     cardInfo->setCard(_card);
@@ -968,6 +1043,11 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
         }
     } else {
         delete l;
+    updateBannerCardComboBox();
+    if (!l->getBannerCard().isEmpty()) {
+        qDebug() << "Found banner card:" << l->getBannerCard();
+        bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard()));
+    }
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     setSaveStatus(true);
