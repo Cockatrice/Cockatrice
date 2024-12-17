@@ -139,6 +139,9 @@ void SettingsCache::setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T /* _b
 void SettingsCache::setDoubleClickToPlay(QT_STATE_CHANGED_T /* _doubleClickToPlay */)
 {
 }
+void SettingsCache::setClickPlaysAllSelected(QT_STATE_CHANGED_T /* _clickPlaysAllSelected */)
+{
+}
 void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T /* _playToStack */)
 {
 }

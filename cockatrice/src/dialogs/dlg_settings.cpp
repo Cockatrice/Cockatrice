@@ -492,6 +492,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setDoubleClickToPlay);
 
+    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().getClickPlaysAllSelected());
+    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setClickPlaysAllSelected);
+
     playToStackCheckBox.setChecked(SettingsCache::instance().getPlayToStack());
     connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPlayToStack);
@@ -506,9 +510,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
-    generalGrid->addWidget(&playToStackCheckBox, 1, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 2, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 3, 0);
+    generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
+    generalGrid->addWidget(&playToStackCheckBox, 2, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 3, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 4, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -582,6 +587,7 @@ void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
+    clickPlaysAllSelectedCheckBox.setText(tr("&Clicking plays all selected cards (instead of just the clicked card)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
