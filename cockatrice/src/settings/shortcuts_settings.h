@@ -6,6 +6,7 @@
 #include <QKeySequence>
 #include <QObject>
 #include <QSettings>
+#include "../common/card_zones.h"
 
 class ShortcutGroup
 {
@@ -466,7 +467,7 @@ private:
                                                 parseSequenceString("Ctrl+Del"),
                                                 ShortcutGroup::Move_selected)},
         {"Player/aMoveToHand",
-         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::Move_selected)},
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", ZONE_HAND), parseSequenceString(""), ShortcutGroup::Move_selected)},
         {"Player/aMoveToTopLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top of Library"),
                                                  parseSequenceString(""),
                                                  ShortcutGroup::Move_selected)},
@@ -477,7 +478,7 @@ private:
                                      parseSequenceString(""),
                                      ShortcutGroup::Move_selected)},
         {"Player/aViewHand",
-         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::View)},
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", ZONE_HAND), parseSequenceString(""), ShortcutGroup::View)},
         {"Player/aViewGraveyard",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard"), parseSequenceString("F4"), ShortcutGroup::View)},
         {"Player/aViewLibrary",
@@ -493,7 +494,7 @@ private:
         {"Player/aCloseMostRecentZoneView", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Close Recent View"),
                                                         parseSequenceString("Esc"),
                                                         ShortcutGroup::View)},
-        {"Player/aMoveTopToPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Stack"),
+        {"Player/aMoveTopToPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", ZONE_STACK),
                                               parseSequenceString("Ctrl+Y"),
                                               ShortcutGroup::Move_top)},
         {"Player/aMoveTopToPlayFaceDown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield, Face Down"),
@@ -517,7 +518,7 @@ private:
                                                     parseSequenceString(""),
                                                     ShortcutGroup::Move_top)},
         {"Player/aMoveBottomToPlay",
-         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Stack"), parseSequenceString(""), ShortcutGroup::Move_bottom)},
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", ZONE_STACK), parseSequenceString(""), ShortcutGroup::Move_bottom)},
         {"Player/aMoveBottomToPlayFaceDown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield, Face Down"),
                                                          parseSequenceString(""),
                                                          ShortcutGroup::Move_bottom)},

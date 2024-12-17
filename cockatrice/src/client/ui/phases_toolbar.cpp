@@ -1,5 +1,7 @@
 #include "phases_toolbar.h"
 
+#include "../common/card_zones.h"
+
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_next_turn.pb.h"
 #include "pb/command_set_active_phase.pb.h"
@@ -259,7 +261,7 @@ void PhasesToolbar::actNextTurn()
 void PhasesToolbar::actUntapAll()
 {
     Command_SetCardAttr cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZONE_TABLE);
     cmd.set_attribute(AttrTapped);
     cmd.set_attr_value("0");
 

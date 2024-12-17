@@ -68,9 +68,9 @@ void CardZone::clearContents()
 QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
 {
     QString ownerName = player->getName();
-    if (name == "hand")
+    if (name == ZONE_HAND)
         return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
-    else if (name == "deck")
+    else if (name == ZONE_DECK)
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their library", "look at zone")
@@ -86,11 +86,11 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
             default:
                 return (theirOwn ? tr("their library", "nominative") : tr("%1's library", "nominative").arg(ownerName));
         }
-    else if (name == "grave")
+    else if (name == ZONE_GRAVEYARD)
         return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
-    else if (name == "rfg")
+    else if (name == ZONE_EXILE)
         return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
-    else if (name == "sb")
+    else if (name == ZONE_SIDEBOARD)
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their sideboard", "look at zone")

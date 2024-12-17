@@ -12,7 +12,7 @@
 #include <QSet>
 
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
-    : SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
+    : SelectZone(_p, ZONE_STACK, false, false, true, parent), zoneHeight(_zoneHeight)
 {
     connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
     updateBg();

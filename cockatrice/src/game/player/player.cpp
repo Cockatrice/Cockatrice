@@ -129,7 +129,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
-    auto *_deck = new PileZone(this, "deck", true, false, playerArea);
+    auto *_deck = new PileZone(this, ZONE_DECK, true, false, playerArea);
     QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
                            10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
     _deck->setPos(base);
@@ -140,13 +140,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     handCounter->setPos(base + QPointF(0, h + 10));
     qreal h2 = handCounter->boundingRect().height();
 
-    PileZone *grave = new PileZone(this, "grave", false, true, playerArea);
+    PileZone *grave = new PileZone(this, ZONE_GRAVEYARD, false, true, playerArea);
     grave->setPos(base + QPointF(0, h + h2 + 10));
 
-    PileZone *rfg = new PileZone(this, "rfg", false, true, playerArea);
+    PileZone *rfg = new PileZone(this, ZONE_EXILE, false, true, playerArea);
     rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
-    PileZone *sb = new PileZone(this, "sb", false, false, playerArea);
+    PileZone *sb = new PileZone(this, ZONE_SIDEBOARD, false, false, playerArea);
     sb->setVisible(false);
 
     table = new TableZone(this, this);
@@ -168,13 +168,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     if (local || judge) {
         aMoveHandToTopLibrary = new QAction(this);
-        aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveHandToTopLibrary->setData(QList<QVariant>() << ZONE_DECK << 0);
         aMoveHandToBottomLibrary = new QAction(this);
-        aMoveHandToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveHandToBottomLibrary->setData(QList<QVariant>() << ZONE_DECK << -1);
         aMoveHandToGrave = new QAction(this);
-        aMoveHandToGrave->setData(QList<QVariant>() << "grave" << 0);
+        aMoveHandToGrave->setData(QList<QVariant>() << ZONE_GRAVEYARD << 0);
         aMoveHandToRfg = new QAction(this);
-        aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
+        aMoveHandToRfg->setData(QList<QVariant>() << ZONE_EXILE << 0);
 
         connect(aMoveHandToTopLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
         connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
@@ -182,13 +182,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveHandToRfg, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
 
         aMoveGraveToTopLibrary = new QAction(this);
-        aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveGraveToTopLibrary->setData(QList<QVariant>() << ZONE_DECK << 0);
         aMoveGraveToBottomLibrary = new QAction(this);
-        aMoveGraveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveGraveToBottomLibrary->setData(QList<QVariant>() << ZONE_DECK << -1);
         aMoveGraveToHand = new QAction(this);
-        aMoveGraveToHand->setData(QList<QVariant>() << "hand" << 0);
+        aMoveGraveToHand->setData(QList<QVariant>() << ZONE_HAND << 0);
         aMoveGraveToRfg = new QAction(this);
-        aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
+        aMoveGraveToRfg->setData(QList<QVariant>() << ZONE_EXILE << 0);
 
         connect(aMoveGraveToTopLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
         connect(aMoveGraveToBottomLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
@@ -196,13 +196,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveGraveToRfg, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
 
         aMoveRfgToTopLibrary = new QAction(this);
-        aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveRfgToTopLibrary->setData(QList<QVariant>() << ZONE_DECK << 0);
         aMoveRfgToBottomLibrary = new QAction(this);
-        aMoveRfgToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveRfgToBottomLibrary->setData(QList<QVariant>() << ZONE_DECK << -1);
         aMoveRfgToHand = new QAction(this);
-        aMoveRfgToHand->setData(QList<QVariant>() << "hand" << 0);
+        aMoveRfgToHand->setData(QList<QVariant>() << ZONE_HAND << 0);
         aMoveRfgToGrave = new QAction(this);
-        aMoveRfgToGrave->setData(QList<QVariant>() << "grave" << 0);
+        aMoveRfgToGrave->setData(QList<QVariant>() << ZONE_GRAVEYARD << 0);
 
         connect(aMoveRfgToTopLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
         connect(aMoveRfgToBottomLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
@@ -649,25 +649,25 @@ void Player::playerListActionTriggered()
     }
 
     if (menu == mRevealLibrary || menu == mLendLibrary) {
-        cmd.set_zone_name("deck");
+        cmd.set_zone_name(ZONE_DECK);
         cmd.set_grant_write_access(menu == mLendLibrary);
     } else if (menu == mRevealTopCard) {
-        int deckSize = zones.value("deck")->getCards().size();
+        int deckSize = zones.value(ZONE_DECK)->getCards().size();
         bool ok;
         int number = QInputDialog::getInt(game, tr("Reveal top cards of library"),
                                           tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1,
                                           deckSize, 1, &ok);
         if (ok) {
-            cmd.set_zone_name("deck");
+            cmd.set_zone_name(ZONE_DECK);
             cmd.set_top_cards(number);
             // backward compatibility: servers before #1051 only permits to reveal the first card
             cmd.add_card_id(0);
         }
 
     } else if (menu == mRevealHand) {
-        cmd.set_zone_name("hand");
+        cmd.set_zone_name(ZONE_HAND);
     } else if (menu == mRevealRandomHandCard) {
-        cmd.set_zone_name("hand");
+        cmd.set_zone_name(ZONE_HAND);
         cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
     } else {
         return;
@@ -1094,31 +1094,31 @@ void Player::setDeck(const DeckLoader &_deck)
 
 void Player::actViewLibrary()
 {
-    static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", -1);
+    static_cast<GameScene *>(scene())->toggleZoneView(this, ZONE_DECK, -1);
 }
 
 void Player::actViewHand()
 {
-    static_cast<GameScene *>(scene())->toggleZoneView(this, "hand", -1);
+    static_cast<GameScene *>(scene())->toggleZoneView(this, ZONE_HAND, -1);
 }
 
 void Player::actViewTopCards()
 {
-    int deckSize = zones.value("deck")->getCards().size();
+    int deckSize = zones.value(ZONE_DECK)->getCards().size();
     bool ok;
     int number =
         QInputDialog::getInt(game, tr("View top cards of library"), tr("Number of cards: (max. %1)").arg(deckSize),
                              defaultNumberTopCards, 1, deckSize, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
-        static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
+        static_cast<GameScene *>(scene())->toggleZoneView(this, ZONE_DECK, number);
     }
 }
 
 void Player::actAlwaysRevealTopCard()
 {
     Command_ChangeZoneProperties cmd;
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZONE_DECK);
     cmd.set_always_reveal_top_card(aAlwaysRevealTopCard->isChecked());
 
     sendGameCommand(cmd);
@@ -1127,7 +1127,7 @@ void Player::actAlwaysRevealTopCard()
 void Player::actAlwaysLookAtTopCard()
 {
     Command_ChangeZoneProperties cmd;
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZONE_DECK);
     cmd.set_always_look_at_top_card(aAlwaysLookAtTopCard->isChecked());
 
     sendGameCommand(cmd);
@@ -1140,7 +1140,7 @@ void Player::actOpenDeckInDeckEditor()
 
 void Player::actViewGraveyard()
 {
-    dynamic_cast<GameScene *>(scene())->toggleZoneView(this, "grave", -1);
+    dynamic_cast<GameScene *>(scene())->toggleZoneView(this, ZONE_GRAVEYARD, -1);
 }
 
 void Player::actRevealRandomGraveyardCard()
@@ -1151,19 +1151,19 @@ void Player::actRevealRandomGraveyardCard()
     if (otherPlayerId != -1) {
         cmd.set_player_id(otherPlayerId);
     }
-    cmd.set_zone_name("grave");
+    cmd.set_zone_name(ZONE_GRAVEYARD);
     cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
     sendGameCommand(cmd);
 }
 
 void Player::actViewRfg()
 {
-    static_cast<GameScene *>(scene())->toggleZoneView(this, "rfg", -1);
+    static_cast<GameScene *>(scene())->toggleZoneView(this, ZONE_EXILE, -1);
 }
 
 void Player::actViewSideboard()
 {
-    static_cast<GameScene *>(scene())->toggleZoneView(this, "sb", -1);
+    static_cast<GameScene *>(scene())->toggleZoneView(this, ZONE_SIDEBOARD, -1);
 }
 
 void Player::actShuffle()
@@ -1181,8 +1181,8 @@ void Player::actDrawCard()
 void Player::actMulligan()
 {
     int startSize = SettingsCache::instance().getStartingHandSize();
-    int handSize = zones.value("hand")->getCards().size();
-    int deckSize = zones.value("deck")->getCards().size() + handSize; // hand is shuffled back into the deck
+    int handSize = zones.value(ZONE_HAND)->getCards().size();
+    int deckSize = zones.value(ZONE_DECK)->getCards().size() + handSize; // hand is shuffled back into the deck
     bool ok;
     int number = QInputDialog::getInt(game, tr("Draw hand"),
                                       tr("Number of cards: (max. %1)").arg(deckSize) + '\n' +
@@ -1208,7 +1208,7 @@ void Player::actMulligan()
 
 void Player::actDrawCards()
 {
-    int deckSize = zones.value("deck")->getCards().size();
+    int deckSize = zones.value(ZONE_DECK)->getCards().size();
     bool ok;
     int number = QInputDialog::getInt(game, tr("Draw cards"), tr("Number of cards: (max. %1)").arg(deckSize),
                                       defaultNumberTopCards, 1, deckSize, 1, &ok);
@@ -1227,7 +1227,7 @@ void Player::actUndoDraw()
 
 void Player::cmdSetTopCard(Command_MoveCard &cmd)
 {
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(0);
     cmd.set_target_player_id(getId());
@@ -1235,9 +1235,9 @@ void Player::cmdSetTopCard(Command_MoveCard &cmd)
 
 void Player::cmdSetBottomCard(Command_MoveCard &cmd)
 {
-    CardZone *zone = zones.value("deck");
+    CardZone *zone = zones.value(ZONE_DECK);
     int lastCard = zone->getCards().size() - 1;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(lastCard);
     cmd.set_target_player_id(getId());
@@ -1245,13 +1245,13 @@ void Player::cmdSetBottomCard(Command_MoveCard &cmd)
 
 void Player::actMoveTopCardToGrave()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("grave");
+    cmd.set_target_zone(ZONE_GRAVEYARD);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1260,13 +1260,13 @@ void Player::actMoveTopCardToGrave()
 
 void Player::actMoveTopCardToExile()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(ZONE_EXILE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1275,7 +1275,7 @@ void Player::actMoveTopCardToExile()
 
 void Player::actMoveTopCardsToGrave()
 {
-    const int maxCards = zones.value("deck")->getCards().size();
+    const int maxCards = zones.value(ZONE_DECK)->getCards().size();
     if (maxCards == 0) {
         return;
     }
@@ -1292,9 +1292,9 @@ void Player::actMoveTopCardsToGrave()
     defaultNumberTopCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("grave");
+    cmd.set_target_zone(ZONE_GRAVEYARD);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1307,7 +1307,7 @@ void Player::actMoveTopCardsToGrave()
 
 void Player::actMoveTopCardsToExile()
 {
-    const int maxCards = zones.value("deck")->getCards().size();
+    const int maxCards = zones.value(ZONE_DECK)->getCards().size();
     if (maxCards == 0) {
         return;
     }
@@ -1324,9 +1324,9 @@ void Player::actMoveTopCardsToExile()
     defaultNumberTopCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(ZONE_EXILE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1349,7 +1349,7 @@ void Player::actMoveTopCardsUntil()
     previousMovingCardsUntilExpr = dlg.getExpr();
     previousMovingCardsUntilNumberOfHits = dlg.getNumberOfHits();
 
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         stopMoveTopCardsUntil();
     } else {
         movingCardsUntilFilter = FilterString(previousMovingCardsUntilExpr);
@@ -1362,7 +1362,7 @@ void Player::actMoveTopCardsUntil()
 void Player::moveOneCardUntil(const CardInfoPtr card)
 {
     moveTopCardTimer->stop();
-    if (zones.value("deck")->getCards().empty() || card.isNull()) {
+    if (zones.value(ZONE_DECK)->getCards().empty() || card.isNull()) {
         stopMoveTopCardsUntil();
     } else if (movingCardsUntilFilter.check(card)) {
         --movingCardsUntilCounter;
@@ -1388,13 +1388,13 @@ void Player::stopMoveTopCardsUntil()
 
 void Player::actMoveTopCardToBottom()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("deck");
+    cmd.set_target_zone(ZONE_DECK);
     cmd.set_x(-1); // bottom of deck
     cmd.set_y(0);
 
@@ -1403,13 +1403,13 @@ void Player::actMoveTopCardToBottom()
 
 void Player::actMoveTopCardToPlay()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("stack");
+    cmd.set_target_zone(ZONE_STACK);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -1418,17 +1418,17 @@ void Player::actMoveTopCardToPlay()
 
 void Player::actMoveTopCardToPlayFaceDown()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(0);
     cardToMove->set_face_down(true);
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("table");
+    cmd.set_target_zone(ZONE_TABLE);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -1437,13 +1437,13 @@ void Player::actMoveTopCardToPlayFaceDown()
 
 void Player::actMoveBottomCardToGrave()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("grave");
+    cmd.set_target_zone(ZONE_GRAVEYARD);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1452,13 +1452,13 @@ void Player::actMoveBottomCardToGrave()
 
 void Player::actMoveBottomCardToExile()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(ZONE_EXILE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1467,7 +1467,7 @@ void Player::actMoveBottomCardToExile()
 
 void Player::actMoveBottomCardsToGrave()
 {
-    const int maxCards = zones.value("deck")->getCards().size();
+    const int maxCards = zones.value(ZONE_DECK)->getCards().size();
     if (maxCards == 0) {
         return;
     }
@@ -1484,9 +1484,9 @@ void Player::actMoveBottomCardsToGrave()
     defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("grave");
+    cmd.set_target_zone(ZONE_GRAVEYARD);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1499,7 +1499,7 @@ void Player::actMoveBottomCardsToGrave()
 
 void Player::actMoveBottomCardsToExile()
 {
-    const int maxCards = zones.value("deck")->getCards().size();
+    const int maxCards = zones.value(ZONE_DECK)->getCards().size();
     if (maxCards == 0) {
         return;
     }
@@ -1516,9 +1516,9 @@ void Player::actMoveBottomCardsToExile()
     defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(ZONE_EXILE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1531,13 +1531,13 @@ void Player::actMoveBottomCardsToExile()
 
 void Player::actMoveBottomCardToTop()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("deck");
+    cmd.set_target_zone(ZONE_DECK);
     cmd.set_x(0); // top of deck
     cmd.set_y(0);
 
@@ -1562,13 +1562,13 @@ void Player::actSelectAll()
 
 void Player::actDrawBottomCard()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("hand");
+    cmd.set_target_zone(ZONE_HAND);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1577,7 +1577,7 @@ void Player::actDrawBottomCard()
 
 void Player::actDrawBottomCards()
 {
-    const int maxCards = zones.value("deck")->getCards().size();
+    const int maxCards = zones.value(ZONE_DECK)->getCards().size();
     if (maxCards == 0) {
         return;
     }
@@ -1593,9 +1593,9 @@ void Player::actDrawBottomCards()
     defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("hand");
+    cmd.set_target_zone(ZONE_HAND);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -1608,13 +1608,13 @@ void Player::actDrawBottomCards()
 
 void Player::actMoveBottomCardToPlay()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("stack");
+    cmd.set_target_zone(ZONE_STACK);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -1623,21 +1623,21 @@ void Player::actMoveBottomCardToPlay()
 
 void Player::actMoveBottomCardToPlayFaceDown()
 {
-    if (zones.value("deck")->getCards().empty()) {
+    if (zones.value(ZONE_DECK)->getCards().empty()) {
         return;
     }
 
-    CardZone *zone = zones.value("deck");
+    CardZone *zone = zones.value(ZONE_DECK);
     int lastCard = zone->getCards().size() - 1;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZONE_DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(lastCard);
     cardToMove->set_face_down(true);
 
     cmd.set_target_player_id(getId());
-    cmd.set_target_zone("table");
+    cmd.set_target_zone(ZONE_TABLE);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -1647,7 +1647,7 @@ void Player::actMoveBottomCardToPlayFaceDown()
 void Player::actUntapAll()
 {
     Command_SetCardAttr cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZONE_TABLE);
     cmd.set_attribute(AttrTapped);
     cmd.set_attr_value("0");
 
@@ -1699,7 +1699,7 @@ void Player::actCreateAnotherToken()
     }
 
     Command_CreateToken cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZONE_TABLE);
     cmd.set_card_name(lastTokenName.toStdString());
     cmd.set_color(lastTokenColor.toStdString());
     cmd.set_pt(lastTokenPT.toStdString());
@@ -1871,7 +1871,7 @@ void Player::createCard(const CardItem *sourceCard,
 
     // create the token for the related card
     Command_CreateToken cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZONE_TABLE);
     cmd.set_card_name(cardInfo->getName().toStdString());
     switch (cardInfo->getColors().size()) {
         case 0:
@@ -2267,7 +2267,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     }
     updateCardMenu(card);
 
-    if (movingCardsUntil && startZoneString == "deck" && targetZone->getName() == "stack") {
+    if (movingCardsUntil && startZoneString == ZONE_DECK && targetZone->getName() == ZONE_STACK) {
         moveOneCardUntil(card->getInfo());
     }
 }
@@ -2358,8 +2358,8 @@ void Player::eventAttachCard(const Event_AttachCard &event)
 
 void Player::eventDrawCards(const Event_DrawCards &event)
 {
-    CardZone *_deck = zones.value("deck");
-    CardZone *_hand = zones.value("hand");
+    CardZone *_deck = zones.value(ZONE_DECK);
+    CardZone *_hand = zones.value(ZONE_HAND);
 
     const int listSize = event.cards_size();
     if (listSize) {
@@ -2641,13 +2641,13 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
     int tableRow = info->getTableRow();
     bool playToStack = SettingsCache::instance().getPlayToStack();
     QString currentZone = card->getZone()->getName();
-    if (currentZone == "stack" && tableRow == 3) {
-        cmd.set_target_zone("grave");
+    if (currentZone == ZONE_STACK && tableRow == 3) {
+        cmd.set_target_zone(ZONE_GRAVEYARD);
         cmd.set_x(0);
         cmd.set_y(0);
     } else if (!faceDown &&
-               ((!playToStack && tableRow == 3) || ((playToStack && tableRow != 0) && currentZone != "stack"))) {
-        cmd.set_target_zone("stack");
+               ((!playToStack && tableRow == 3) || ((playToStack && tableRow != 0) && currentZone != ZONE_STACK))) {
+        cmd.set_target_zone(ZONE_STACK);
         cmd.set_x(-1);
         cmd.set_y(0);
     } else {
@@ -2659,7 +2659,7 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
         }
         cardToMove->set_tapped(faceDown ? false : tapped);
         if (tableRow != 3)
-            cmd.set_target_zone("table");
+            cmd.set_target_zone(ZONE_TABLE);
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
     }
@@ -2893,7 +2893,7 @@ bool Player::clearCardsToDelete()
 
 void Player::actMoveCardXCardsFromTop()
 {
-    int deckSize = zones.value("deck")->getCards().size() + 1; // add the card to move to the deck
+    int deckSize = zones.value(ZONE_DECK)->getCards().size() + 1; // add the card to move to the deck
     bool ok;
     int number =
         QInputDialog::getInt(game, tr("Place card X cards from top of library"),
@@ -2931,7 +2931,7 @@ void Player::actMoveCardXCardsFromTop()
     cmd->set_start_zone(startZone.toStdString());
     cmd->mutable_cards_to_move()->CopyFrom(idList);
     cmd->set_target_player_id(getId());
-    cmd->set_target_zone("deck");
+    cmd->set_target_zone(ZONE_DECK);
     cmd->set_x(number);
     cmd->set_y(0);
     commandList.append(cmd);
@@ -3001,7 +3001,7 @@ void Player::cardMenuAction()
                 }
                 case cmClone: {
                     auto *cmd = new Command_CreateToken;
-                    cmd->set_zone("table");
+                    cmd->set_zone(ZONE_TABLE);
                     cmd->set_card_name(card->getName().toStdString());
                     cmd->set_color(card->getColor().toStdString());
                     cmd->set_pt(card->getPT().toStdString());
@@ -3031,13 +3031,13 @@ void Player::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(getId());
-                cmd->set_target_zone("deck");
+                cmd->set_target_zone(ZONE_DECK);
                 cmd->set_x(0);
                 cmd->set_y(0);
 
                 if (idList.card_size() > 1) {
                     auto *scmd = new Command_Shuffle;
-                    scmd->set_zone_name("deck");
+                    scmd->set_zone_name(ZONE_DECK);
                     scmd->set_start(0);
                     scmd->set_end(idList.card_size());
                     // Server process events backwards, so...
@@ -3053,13 +3053,13 @@ void Player::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(getId());
-                cmd->set_target_zone("deck");
+                cmd->set_target_zone(ZONE_DECK);
                 cmd->set_x(-1);
                 cmd->set_y(0);
 
                 if (idList.card_size() > 1) {
                     auto *scmd = new Command_Shuffle;
-                    scmd->set_zone_name("deck");
+                    scmd->set_zone_name(ZONE_DECK);
                     scmd->set_start(-idList.card_size());
                     scmd->set_end(-1);
                     // Server process events backwards, so...
@@ -3075,7 +3075,7 @@ void Player::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(getId());
-                cmd->set_target_zone("hand");
+                cmd->set_target_zone(ZONE_HAND);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
@@ -3087,7 +3087,7 @@ void Player::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(getId());
-                cmd->set_target_zone("grave");
+                cmd->set_target_zone(ZONE_GRAVEYARD);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
@@ -3099,7 +3099,7 @@ void Player::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(getId());
-                cmd->set_target_zone("rfg");
+                cmd->set_target_zone(ZONE_EXILE);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
@@ -3580,7 +3580,7 @@ void Player::updateCardMenu(const CardItem *card)
         }
 
         if (card->getZone()) {
-            if (card->getZone()->getName() == "table") {
+            if (card->getZone()->getName() == ZONE_TABLE) {
                 // Card is on the battlefield
 
                 if (ptMenu->isEmpty()) {
@@ -3633,7 +3633,7 @@ void Player::updateCardMenu(const CardItem *card)
                     cardMenu->addAction(aSetCounter[i]);
                 }
                 cardMenu->addSeparator();
-            } else if (card->getZone()->getName() == "stack") {
+            } else if (card->getZone()->getName() == ZONE_STACK) {
                 // Card is on the stack
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
@@ -3644,7 +3644,7 @@ void Player::updateCardMenu(const CardItem *card)
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
-            } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
+            } else if (card->getZone()->getName() == ZONE_EXILE || card->getZone()->getName() == ZONE_GRAVEYARD) {
                 // Card is in the graveyard or exile
                 cardMenu->addAction(aSelectAll);
                 cardMenu->addAction(aPlay);
@@ -3675,7 +3675,7 @@ void Player::updateCardMenu(const CardItem *card)
             cardMenu->addMenu(moveMenu);
         }
     } else {
-        if (card->getZone() && card->getZone()->getName() != "hand") {
+        if (card->getZone() && card->getZone()->getName() != ZONE_HAND) {
             cardMenu->addAction(aDrawArrow);
             cardMenu->addSeparator();
             addRelatedCardView(card, cardMenu);

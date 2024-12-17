@@ -9,6 +9,7 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
+#include "../common/card_zones.h"
 
 DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent)
     : QObject(parent), cardDatabase(_cardDatabase)
@@ -50,7 +51,7 @@ void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
 
     QUrl params;
     QUrlQuery urlQuery;
-    urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
+    urlQuery.addQueryItem(ZONE_DECK, deckWithoutTokens.writeToString_Plain());
     urlQuery.addQueryItem("decktitle", deck->getName());
     params.setQuery(urlQuery);
     data->append(params.query(QUrl::EncodeReserved).toUtf8());

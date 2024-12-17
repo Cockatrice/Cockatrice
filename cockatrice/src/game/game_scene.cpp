@@ -155,9 +155,9 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
     zoneViews.append(item);
     connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
-    if (zoneName == "grave") {
+    if (zoneName == ZONE_GRAVEYARD) {
         item->setPos(360, 100);
-    } else if (zoneName == "rfg") {
+    } else if (zoneName == ZONE_EXILE) {
         item->setPos(380, 120);
     } else {
         item->setPos(340, 80);

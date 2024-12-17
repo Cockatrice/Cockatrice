@@ -237,15 +237,15 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             PlayerTarget *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
             cmd.set_target_player_id(targetPlayer->getOwner()->getId());
         }
-        if (startZone->getName().compare("hand") == 0) {
+        if (startZone->getName().compare(ZONE_HAND) == 0) {
             startCard->playCard(false);
             CardInfoPtr ci = startCard->getInfo();
             if (ci && (((!SettingsCache::instance().getPlayToStack() && ci->getTableRow() == 3) ||
                         ((SettingsCache::instance().getPlayToStack() && ci->getTableRow() != 0) &&
-                         startCard->getZone()->getName().toStdString() != "stack"))))
-                cmd.set_start_zone("stack");
+                         startCard->getZone()->getName().toStdString() != ZONE_STACK))))
+                cmd.set_start_zone(ZONE_STACK);
             else
-                cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? "stack" : "table");
+                cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? ZONE_STACK : ZONE_TABLE);
         }
         player->sendGameCommand(cmd);
     }

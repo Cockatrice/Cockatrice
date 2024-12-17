@@ -14,43 +14,43 @@
 
 const QString &MessageLogWidget::tableConstant() const
 {
-    static const QString constant("table");
+    static const QString constant(ZONE_TABLE);
     return constant;
 }
 
 const QString &MessageLogWidget::graveyardConstant() const
 {
-    static const QString constant("grave");
+    static const QString constant(ZONE_GRAVEYARD);
     return constant;
 }
 
 const QString &MessageLogWidget::exileConstant() const
 {
-    static const QString constant("rfg");
+    static const QString constant(ZONE_EXILE);
     return constant;
 }
 
 const QString &MessageLogWidget::handConstant() const
 {
-    static const QString constant("hand");
+    static const QString constant(ZONE_HAND);
     return constant;
 }
 
 const QString &MessageLogWidget::deckConstant() const
 {
-    static const QString constant("deck");
+    static const QString constant(ZONE_DECK);
     return constant;
 }
 
 const QString &MessageLogWidget::sideboardConstant() const
 {
-    static const QString constant("sb");
+    static const QString constant(ZONE_SIDEBOARD);
     return constant;
 }
 
 const QString &MessageLogWidget::stackConstant() const
 {
-    static const QString constant("stack");
+    static const QString constant(ZONE_STACK);
     return constant;
 }
 

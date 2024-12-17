@@ -20,7 +20,7 @@ const QColor TableZone::GRADIENT_COLOR = QColor(255, 255, 255, 150);
 const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-    : SelectZone(_p, "table", true, false, true, parent), active(false)
+    : SelectZone(_p, ZONE_TABLE, true, false, true, parent), active(false)
 {
     connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
     connect(&SettingsCache::instance(), SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
@@ -218,7 +218,7 @@ void TableZone::toggleTapped()
 
     auto isCardOnTable = [](const QGraphicsItem *item) {
         if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
-            return card->getZone()->getName() == "table";
+            return card->getZone()->getName() == ZONE_TABLE;
         }
         return false;
     };

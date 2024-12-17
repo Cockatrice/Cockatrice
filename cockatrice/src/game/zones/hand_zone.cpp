@@ -10,7 +10,7 @@
 #include <QPainter>
 
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
-    : SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
+    : SelectZone(_p, ZONE_HAND, false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
 {
     connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
     updateBg();
