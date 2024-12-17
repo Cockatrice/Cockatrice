@@ -1,9 +1,21 @@
 #include "all_zones_card_amount_widget.h"
-
 #include "../general/display/shadow_background_label.h"
-
 #include <QTimer>
 
+/**
+ * @brief Constructor for the AllZonesCardAmountWidget class.
+ *
+ * Initializes the widget with its layout and sets up the connections and necessary
+ * UI elements for managing card counts in both the mainboard and sideboard zones.
+ *
+ * @param parent The parent widget.
+ * @param deckEditor Pointer to the TabDeckEditor.
+ * @param deckModel Pointer to the DeckListModel.
+ * @param deckView Pointer to the QTreeView for the deck display.
+ * @param cardSizeSlider Pointer to the QSlider used for dynamic font resizing.
+ * @param rootCard The root card for the widget.
+ * @param setInfoForCard The set information for the card.
+ */
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    TabDeckEditor *deckEditor,
                                                    DeckListModel *deckModel,
@@ -40,6 +52,14 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     setMouseTracking(true);
 }
 
+/**
+ * @brief Adjusts the font size of the zone labels based on the slider value.
+ *
+ * This method calculates the new font size as a percentage of the original font size
+ * based on the slider value and applies it to the zone label text.
+ *
+ * @param scalePercentage The scale percentage from the slider.
+ */
 void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
 {
     const int minFontSize = 8;      // Minimum font size
@@ -59,16 +79,34 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
     repaint();
 }
 
+/**
+ * @brief Gets the card count in the mainboard zone.
+ *
+ * @return The number of cards in the mainboard.
+ */
 int AllZonesCardAmountWidget::getMainboardAmount()
 {
     return buttonBoxMainboard->countCardsInZone(DECK_ZONE_MAIN);
 }
 
+/**
+ * @brief Gets the card count in the sideboard zone.
+ *
+ * @return The number of cards in the sideboard.
+ */
 int AllZonesCardAmountWidget::getSideboardAmount()
 {
     return buttonBoxSideboard->countCardsInZone(DECK_ZONE_SIDE);
 }
 
+/**
+ * @brief Handles the event when the mouse enters the widget.
+ *
+ * This method is triggered when the mouse enters the widget's area, allowing for updates
+ * or interactions such as UI feedback or layout changes.
+ *
+ * @param event The event information for the mouse entry.
+ */
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void AllZonesCardAmountWidget::enterEvent(QEnterEvent *event)
 #else

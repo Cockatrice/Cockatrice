@@ -9,6 +9,19 @@
 
 #include <QScrollBar>
 
+/**
+ * @brief Constructs a PrintingSelector widget to display and manage card printings.
+ *
+ * This constructor initializes the PrintingSelector widget, setting up various child widgets
+ * such as sorting tools, search bar, card size options, and navigation controls. It also connects
+ * signals and slots to update the display when the deck model changes, and loads available printings
+ * for the selected card.
+ *
+ * @param parent The parent widget for the PrintingSelector.
+ * @param deckEditor The TabDeckEditor instance used for managing the deck.
+ * @param deckModel The DeckListModel instance that provides data for the deck's contents.
+ * @param deckView The QTreeView instance used to display the deck and its contents.
+ */
 PrintingSelector::PrintingSelector(QWidget *parent,
                                    TabDeckEditor *deckEditor,
                                    DeckListModel *deckModel,
@@ -20,6 +33,7 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     setLayout(layout);
     widgetLoadingBufferTimer = new QTimer(this);
 
+    // Initialize toolbar and widgets
     viewOptionsToolbar = new PrintingSelectorViewOptionsToolbarWidget(this, this);
     layout->addWidget(viewOptionsToolbar);
 
@@ -42,12 +56,16 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
     layout->addWidget(cardSelectionBar);
 
+    // Connect deck model data change signal to update display
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
-        // We have to delay this or else we hit a race condition where the data isn't actually updated yet.
+        // Delay the update to avoid race conditions
         QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
     });
 }
 
+/**
+ * @brief Updates the display by clearing the layout and loading new sets for the current card.
+ */
 void PrintingSelector::updateDisplay()
 {
     widgetLoadingBufferTimer->stop();
@@ -60,6 +78,12 @@ void PrintingSelector::updateDisplay()
     getAllSetsForCurrentCard();
 }
 
+/**
+ * @brief Sets the current card for the selector and updates the display.
+ *
+ * @param newCard The new card to set.
+ * @param _currentZone The current zone the card is in.
+ */
 void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_currentZone)
 {
     if (newCard.isNull()) {
@@ -75,16 +99,27 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_curre
     flowWidget->repaint();
 }
 
+/**
+ * @brief Selects the previous card in the list.
+ */
 void PrintingSelector::selectPreviousCard()
 {
     selectCard(-1);
 }
 
+/**
+ * @brief Selects the next card in the list.
+ */
 void PrintingSelector::selectNextCard()
 {
     selectCard(1);
 }
 
+/**
+ * @brief Selects a card based on the change direction.
+ *
+ * @param changeBy The direction to change, -1 for previous, 1 for next.
+ */
 void PrintingSelector::selectCard(int changeBy)
 {
     if (changeBy == 0) {
@@ -116,6 +151,12 @@ void PrintingSelector::selectCard(int changeBy)
     }
 }
 
+/**
+ * @brief Retrieves the card set for a specific UUID.
+ *
+ * @param uuid The UUID of the set to retrieve.
+ * @return The CardInfoPerSet associated with the UUID.
+ */
 CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
 {
     CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
@@ -131,6 +172,9 @@ CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
     return CardInfoPerSet();
 }
 
+/**
+ * @brief Loads and displays all sets for the current selected card.
+ */
 void PrintingSelector::getAllSetsForCurrentCard()
 {
     if (selectedCard.isNull()) {
@@ -170,21 +214,41 @@ void PrintingSelector::getAllSetsForCurrentCard()
     widgetLoadingBufferTimer->start(0); // Process as soon as possible
 }
 
+/**
+ * @brief Toggles the visibility of the sorting options toolbar.
+ *
+ * @param _state The visibility state to set.
+ */
 void PrintingSelector::toggleVisibilitySortOptions(bool _state)
 {
     sortToolBar->setVisible(_state);
 }
 
+/**
+ * @brief Toggles the visibility of the search bar.
+ *
+ * @param _state The visibility state to set.
+ */
 void PrintingSelector::toggleVisibilitySearchBar(bool _state)
 {
     searchBar->setVisible(_state);
 }
 
+/**
+ * @brief Toggles the visibility of the card size slider.
+ *
+ * @param _state The visibility state to set.
+ */
 void PrintingSelector::toggleVisibilityCardSizeSlider(bool _state)
 {
     cardSizeWidget->setVisible(_state);
 }
 
+/**
+ * @brief Toggles the visibility of the navigation buttons.
+ *
+ * @param _state The visibility state to set.
+ */
 void PrintingSelector::toggleVisibilityNavigationButtons(bool _state)
 {
     cardSelectionBar->setVisible(_state);

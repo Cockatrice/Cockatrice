@@ -7,6 +7,21 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
+/**
+ * @brief Constructs a PrintingSelectorCardOverlayWidget for displaying a card overlay.
+ *
+ * This widget is responsible for showing the card's image and providing interactive features such
+ * as a context menu and the ability to adjust the card's scale. It includes the card's image as well
+ * as a widget that displays the card amounts in different zones (mainboard, sideboard, etc.).
+ *
+ * @param parent The parent widget for this overlay.
+ * @param deckEditor The TabDeckEditor instance for deck management.
+ * @param deckModel The DeckListModel instance providing deck data.
+ * @param deckView The QTreeView instance displaying the deck.
+ * @param cardSizeSlider The slider controlling the size of the card.
+ * @param rootCard The root card object that contains information about the card.
+ * @param setInfoForCard The set-specific information for the card being displayed.
+ */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                                      TabDeckEditor *deckEditor,
                                                                      DeckListModel *deckModel,
@@ -53,6 +68,14 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     connect(cardSizeSlider, &QSlider::valueChanged, cardInfoPicture, &CardInfoPictureWidget::setScaleFactor);
 }
 
+/**
+ * @brief Handles the mouse press event for right-clicks to show the context menu.
+ *
+ * If the right mouse button is pressed, a custom context menu will appear. For other mouse buttons,
+ * the event is passed to the base class for default handling.
+ *
+ * @param event The mouse event triggered by the user.
+ */
 void PrintingSelectorCardOverlayWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
@@ -62,6 +85,14 @@ void PrintingSelectorCardOverlayWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief Resizes the overlay widget to match the card's size.
+ *
+ * This method ensures that the amount widget matches the card's size when the overlay widget is resized.
+ * It also resizes the card info picture widget to match the new size.
+ *
+ * @param event The resize event triggered when the widget is resized.
+ */
 void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
 {
     // Ensure the amount widget matches the parent size
@@ -72,6 +103,14 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
     resize(cardInfoPicture->size());
 }
 
+/**
+ * @brief Handles the mouse enter event when the cursor enters the overlay widget area.
+ *
+ * When the cursor enters the widget, the card information is updated, and the card amount widget
+ * is displayed if the amounts are zero for both the mainboard and sideboard.
+ *
+ * @param event The event triggered when the mouse enters the widget.
+ */
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
 #else
@@ -91,6 +130,14 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
     allZonesCardAmountWidget->setVisible(true);
 }
 
+/**
+ * @brief Handles the mouse leave event when the cursor leaves the overlay widget area.
+ *
+ * When the cursor leaves the widget, the card amount widget is hidden if both the mainboard and sideboard
+ * amounts are zero.
+ *
+ * @param event The event triggered when the mouse leaves the widget.
+ */
 void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
@@ -105,6 +152,15 @@ void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
     allZonesCardAmountWidget->setVisible(false);
 }
 
+/**
+ * @brief Creates and shows a custom context menu when the right mouse button is clicked.
+ *
+ * The context menu includes an option to show related cards, which displays a submenu with actions
+ * for each related card. When an action is triggered, the card information is updated, and the
+ * printing selector is shown.
+ *
+ * @param point The position of the mouse when the right-click occurred.
+ */
 void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 {
     QMenu menu;

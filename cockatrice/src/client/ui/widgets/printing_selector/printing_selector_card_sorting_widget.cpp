@@ -1,18 +1,13 @@
 #include "printing_selector_card_sorting_widget.h"
-
 #include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_set_comparator.h"
 
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_RELEASE_DATE = tr("Release Date");
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_CONTAINED_IN_DECK = tr("Contained in Deck");
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_POTENTIAL_CARDS = tr("Potential Cards in Deck");
-
-const QStringList PrintingSelectorCardSortingWidget::SORT_OPTIONS = {
-    SORT_OPTIONS_ALPHABETICAL, SORT_OPTIONS_PREFERENCE, SORT_OPTIONS_RELEASE_DATE, SORT_OPTIONS_CONTAINED_IN_DECK,
-    SORT_OPTIONS_POTENTIAL_CARDS};
-
+/**
+ * @brief A widget for sorting and filtering card sets in the Printing Selector.
+ *
+ * This widget allows users to choose sorting options for the card sets, such as alphabetical order, release date, or
+ * user-defined preferences. It also allows users to toggle the sorting order between ascending and descending.
+ */
 PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSelector *parent) : parent(parent)
 {
     sortToolBar = new QHBoxLayout(this);
@@ -32,6 +27,11 @@ PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSel
     sortToolBar->addWidget(toggleSortOrder);
 }
 
+/**
+ * @brief Updates the sorting order (ascending or descending).
+ *
+ * This function toggles the sort order between ascending and descending and updates the display.
+ */
 void PrintingSelectorCardSortingWidget::updateSortOrder()
 {
     if (descendingSort) {
@@ -43,11 +43,29 @@ void PrintingSelectorCardSortingWidget::updateSortOrder()
     parent->updateDisplay();
 }
 
+/**
+ * @brief Updates the sorting setting in the application settings.
+ *
+ * This function saves the selected sorting option (from the combobox) to the application settings.
+ */
 void PrintingSelectorCardSortingWidget::updateSortSetting()
 {
     SettingsCache::instance().setPrintingSelectorSortOrder(sortOptionsSelector->currentIndex());
 }
 
+/**
+ * @brief Sorts a list of card sets based on the selected sorting option.
+ *
+ * This function sorts the card sets according to the selected sorting option in the combobox. The options include:
+ * - Alphabetical
+ * - Preference
+ * - Release Date
+ * - Contained in Deck
+ * - Potential Cards in Deck
+ *
+ * @param cardInfoPerSets The list of card sets to be sorted.
+ * @return A sorted list of card sets.
+ */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSetMap cardInfoPerSets)
 {
     QList<CardSetPtr> sortedSets;
@@ -90,6 +108,17 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSet
     return sortedCardInfoPerSets;
 }
 
+/**
+ * @brief Filters a list of card sets based on the search text.
+ *
+ * This function filters the given list of card sets by comparing their long and short names with the provided search
+ * text. If the search text matches either the long or short name of a card set, that set is included in the filtered
+ * list.
+ *
+ * @param sets The list of card sets to be filtered.
+ * @param searchText The search text used to filter the card sets.
+ * @return A filtered list of card sets.
+ */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<CardInfoPerSet> &sets,
                                                                     const QString searchText) const
 {
@@ -111,6 +140,17 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
     return filteredSets;
 }
 
+/**
+ * @brief Prepend card printings that are contained in the deck to the list of card sets.
+ *
+ * This function adjusts the list of card sets by moving the printings that are already contained in the deck to the
+ * beginning of the list, sorted by the count of cards in the deck.
+ *
+ * @param sets The original list of card sets.
+ * @param selectedCard The currently selected card.
+ * @param deckModel The model representing the deck.
+ * @return A list of card sets with the printings contained in the deck prepended.
+ */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
                                                                                 CardInfoPtr selectedCard,
                                                                                 DeckListModel *deckModel)

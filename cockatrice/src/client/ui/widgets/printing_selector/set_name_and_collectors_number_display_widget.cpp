@@ -2,34 +2,56 @@
 
 #include <QSlider>
 
+/**
+ * @class SetNameAndCollectorsNumberDisplayWidget
+ * @brief A widget to display the set name and collectors number with adjustable font size.
+ *
+ * This widget displays the set name and collectors number on two separate labels. The font size is resized dynamically
+ * when the card size is changed.
+ */
 SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget(QWidget *parent,
                                                                                  const QString &_setName,
                                                                                  const QString &_collectorsNumber,
                                                                                  QSlider *_cardSizeSlider)
     : QWidget(parent)
 {
+    // Set up the layout for the widget
     layout = new QVBoxLayout(this);
     setLayout(layout);
+
+    // Set the widget's size policy and minimum size
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     setMinimumSize(QWidget::sizeHint());
 
+    // Create and configure the set name label
     setName = new QLabel(_setName);
     setName->setWordWrap(true);
     setName->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     setName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
+    // Create and configure the collectors number label
     collectorsNumber = new QLabel(_collectorsNumber);
     collectorsNumber->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     collectorsNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
+    // Store the card size slider and connect its signal to the font size adjustment slot
     cardSizeSlider = _cardSizeSlider;
-
     connect(cardSizeSlider, &QSlider::valueChanged, this, &SetNameAndCollectorsNumberDisplayWidget::adjustFontSize);
 
+    // Add labels to the layout
     layout->addWidget(setName);
     layout->addWidget(collectorsNumber);
 }
 
+/**
+ * @brief Adjusts the font size of the labels based on the slider value.
+ *
+ * This method adjusts the font size of the set name and collectors number labels
+ * according to the scale percentage provided by the slider. The font size is clamped
+ * to a range between the defined minimum and maximum font sizes.
+ *
+ * @param scalePercentage The scale percentage from the slider.
+ */
 void SetNameAndCollectorsNumberDisplayWidget::adjustFontSize(int scalePercentage)
 {
     // Define the base font size and the range
@@ -56,6 +78,14 @@ void SetNameAndCollectorsNumberDisplayWidget::adjustFontSize(int scalePercentage
     adjustSize();
 }
 
+/**
+ * @brief Handles resize events to adjust the height of the set name label.
+ *
+ * This method calculates the height required to display the set name label with word wrapping.
+ * It adjusts the minimum height of the set name label to fit the text.
+ *
+ * @param event The resize event.
+ */
 void SetNameAndCollectorsNumberDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event); // Ensure the parent class handles the event first
