@@ -214,15 +214,12 @@ void TableZone::reorganizeCards()
 void TableZone::toggleTapped()
 {
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
-    bool tapAll = false;
-    for (int i = 0; i < selectedItems.size(); i++)
-        if (!qgraphicsitem_cast<CardItem *>(selectedItems[i])->getTapped()) {
-            tapAll = true;
-            break;
-        }
+    bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
+        return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
+    });
     QList<const ::google::protobuf::Message *> cmdList;
-    for (int i = 0; i < selectedItems.size(); i++) {
-        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
+    for (const auto &selectedItem : selectedItems) {
+        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
         if (temp->getTapped() != tapAll) {
             Command_SetCardAttr *cmd = new Command_SetCardAttr;
             cmd->set_zone(name.toStdString());
