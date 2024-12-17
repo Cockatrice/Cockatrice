@@ -333,3 +333,16 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
     if (titleBar)
         titleBar->icon = QPixmap("theme:cockatrice");
 }
+
+void ZoneViewWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->pos().y() <= 0) {
+        // expand window to full height and width if not currently at full height and width
+        // otherwise shrink window to initial max height
+        if (size().height() < maximumHeight() || size().width() < maximumWidth()) {
+            resize(maximumSize());
+        } else {
+            resizeToZoneContents();
+        }
+    }
+}

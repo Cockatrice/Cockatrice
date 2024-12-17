@@ -89,6 +89,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
     void initStyleOption(QStyleOption *option) const override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif
