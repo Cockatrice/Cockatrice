@@ -26,34 +26,36 @@ PrintingSelectorViewOptionsWidget::PrintingSelectorViewOptionsWidget(QWidget *pa
     sortCheckBox = new QCheckBox(flowWidget);
     sortCheckBox->setText(tr("Display Sorting Options"));
     sortCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorSortOptionsVisible());
-    connect(sortCheckBox, &QCheckBox::stateChanged, printingSelector, &PrintingSelector::toggleVisibilitySortOptions);
-    connect(sortCheckBox, &QCheckBox::stateChanged, &SettingsCache::instance(),
+    connect(sortCheckBox, &QCheckBox::QT_STATE_CHANGED, printingSelector,
+            &PrintingSelector::toggleVisibilitySortOptions);
+    connect(sortCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPrintingSelectorSortOptionsVisible);
 
     // Create the checkbox for search bar visibility
     searchCheckBox = new QCheckBox(flowWidget);
     searchCheckBox->setText(tr("Display Search Bar"));
     searchCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorSearchBarVisible());
-    connect(searchCheckBox, &QCheckBox::stateChanged, printingSelector, &PrintingSelector::toggleVisibilitySearchBar);
-    connect(searchCheckBox, &QCheckBox::stateChanged, &SettingsCache::instance(),
+    connect(searchCheckBox, &QCheckBox::QT_STATE_CHANGED, printingSelector,
+            &PrintingSelector::toggleVisibilitySearchBar);
+    connect(searchCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPrintingSelectorSearchBarVisible);
 
     // Create the checkbox for card size slider visibility
     cardSizeCheckBox = new QCheckBox(flowWidget);
     cardSizeCheckBox->setText(tr("Display Card Size Slider"));
     cardSizeCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorCardSizeSliderVisible());
-    connect(cardSizeCheckBox, &QCheckBox::stateChanged, printingSelector,
+    connect(cardSizeCheckBox, &QCheckBox::QT_STATE_CHANGED, printingSelector,
             &PrintingSelector::toggleVisibilityCardSizeSlider);
-    connect(cardSizeCheckBox, &QCheckBox::stateChanged, &SettingsCache::instance(),
+    connect(cardSizeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPrintingSelectorCardSizeSliderVisible);
 
     // Create the checkbox for navigation buttons visibility
     navigationCheckBox = new QCheckBox(flowWidget);
     navigationCheckBox->setText(tr("Display Navigation Buttons"));
     navigationCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
-    connect(navigationCheckBox, &QCheckBox::stateChanged, printingSelector,
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, printingSelector,
             &PrintingSelector::toggleVisibilityNavigationButtons);
-    connect(navigationCheckBox, &QCheckBox::stateChanged, &SettingsCache::instance(),
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPrintingSelectorNavigationButtonsVisible);
 
     // Add checkboxes to the flow widget
