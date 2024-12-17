@@ -14,7 +14,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint _numberOfHits) : QDialog(parent)
+DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint _numberOfHits, bool autoPlay)
+    : QDialog(parent)
 {
     exprLabel = new QLabel(tr("Card name (or search expressions):"));
 
@@ -33,6 +34,9 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint 
     grid->addWidget(numberOfHitsLabel, 0, 0);
     grid->addWidget(numberOfHitsEdit, 0, 1);
 
+    autoPlayCheckBox = new QCheckBox(tr("Auto play hits"));
+    autoPlayCheckBox->setChecked(autoPlay);
+
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgMoveTopCardsUntil::validateAndAccept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -41,6 +45,7 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint 
     mainLayout->addWidget(exprLabel);
     mainLayout->addWidget(exprEdit);
     mainLayout->addItem(grid);
+    mainLayout->addWidget(autoPlayCheckBox);
     mainLayout->addWidget(buttonBox);
 
     setLayout(mainLayout);
@@ -108,4 +113,9 @@ QString DlgMoveTopCardsUntil::getExpr() const
 uint DlgMoveTopCardsUntil::getNumberOfHits() const
 {
     return numberOfHitsEdit->text().toUInt();
+}
+
+bool DlgMoveTopCardsUntil::isAutoPlay() const
+{
+    return autoPlayCheckBox->isChecked();
 }

@@ -270,6 +270,7 @@ private:
     QTimer *moveTopCardTimer;
     QString movingCardsUntilExpr = {};
     int movingCardsUntilNumberOfHits = 1;
+    bool movingCardsUntilAutoPlay = false;
     FilterString movingCardsUntilFilter;
     int movingCardsUntilCounter = 0;
     void stopMoveTopCardsUntil();
@@ -319,7 +320,7 @@ private:
                     CardRelation::AttachType attach = CardRelation::DoesNotAttach,
                     bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
-    void moveOneCardUntil(const CardInfoPtr card);
+    void moveOneCardUntil(CardItem *card);
     void addPlayerToList(QMenu *playerList, Player *player);
     static void removePlayerFromList(QMenu *playerList, Player *player);
 

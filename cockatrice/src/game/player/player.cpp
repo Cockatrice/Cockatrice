@@ -74,6 +74,7 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QtConcurrent>
 
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
@@ -1341,13 +1342,14 @@ void Player::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExpr, movingCardsUntilNumberOfHits);
+    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExpr, movingCardsUntilNumberOfHits, movingCardsUntilAutoPlay);
     if (!dlg.exec()) {
         return;
     }
 
     movingCardsUntilExpr = dlg.getExpr();
     movingCardsUntilNumberOfHits = dlg.getNumberOfHits();
+    movingCardsUntilAutoPlay = dlg.isAutoPlay();
 
     if (zones.value("deck")->getCards().empty()) {
         stopMoveTopCardsUntil();
@@ -1359,12 +1361,24 @@ void Player::actMoveTopCardsUntil()
     }
 }
 
-void Player::moveOneCardUntil(const CardInfoPtr card)
+void Player::moveOneCardUntil(CardItem *card)
 {
     moveTopCardTimer->stop();
-    if (zones.value("deck")->getCards().empty() || card.isNull()) {
+
+    const bool isMatch = movingCardsUntilFilter.check(card->getInfo());
+
+    if (isMatch && movingCardsUntilAutoPlay) {
+        // Directly calling playCard will deadlock, since we are already in the middle of processing an event.
+        // Use QTimer::singleShot to queue up the playCard on the event loop.
+        QTimer::singleShot(0, this, [card, this] {
+            bool cipt = card && card->getInfo() && card->getInfo()->getCipt();
+            playCard(card, false, cipt);
+        });
+    }
+
+    if (zones.value("deck")->getCards().empty() || !card) {
         stopMoveTopCardsUntil();
-    } else if (movingCardsUntilFilter.check(card)) {
+    } else if (isMatch) {
         --movingCardsUntilCounter;
         if (movingCardsUntilCounter > 0) {
             moveTopCardTimer->start();
@@ -2268,7 +2282,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     updateCardMenu(card);
 
     if (movingCardsUntil && startZoneString == "deck" && targetZone->getName() == "stack") {
-        moveOneCardUntil(card->getInfo());
+        moveOneCardUntil(card);
     }
 }
 
