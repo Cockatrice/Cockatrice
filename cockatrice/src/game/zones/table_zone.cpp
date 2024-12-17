@@ -213,7 +213,18 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    QList<QGraphicsItem *> selectedItemsRaw = scene()->selectedItems();
+    QList<QGraphicsItem *> selectedItems;
+
+    auto isCardOnTable = [](const QGraphicsItem *item) {
+        if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
+            return card->getZone()->getName() == "table";
+        }
+        return false;
+    };
+
+    std::copy_if(selectedItemsRaw.begin(), selectedItemsRaw.end(), std::back_inserter(selectedItems), isCardOnTable);
+
     bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
         return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
     });
