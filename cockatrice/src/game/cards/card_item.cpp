@@ -383,8 +383,17 @@ void CardItem::playCard(bool faceDown)
     TableZone *tz = qobject_cast<TableZone *>(zone);
     if (tz)
         tz->toggleTapped();
-    else
-        zone->getPlayer()->playCard(this, faceDown, info ? info->getCipt() : false);
+    else {
+        if (SettingsCache::instance().getClickPlaysAllSelected()) {
+            if (faceDown) {
+                zone->getPlayer()->actPlayFacedown();
+            } else {
+                zone->getPlayer()->actPlay();
+            }
+        } else {
+            zone->getPlayer()->playCard(this, faceDown, info ? info->getCipt() : false);
+        }
+    }
 }
 
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -403,7 +412,11 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 hideCard = true;
         }
         if (zone && hideCard) {
-            zone->removeCard(this);
+            if (SettingsCache::instance().getClickPlaysAllSelected()) {
+                zone->getPlayer()->actHide();
+            } else {
+                zone->removeCard(this);
+            }
         } else {
             playCard(event->modifiers().testFlag(Qt::ShiftModifier));
         }
@@ -419,9 +432,13 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->modifiers() != Qt::AltModifier) && (SettingsCache::instance().getDoubleClickToPlay()) &&
         (event->buttons() == Qt::LeftButton)) {
-        if (revealedCard)
-            zone->removeCard(this);
-        else
+        if (revealedCard) {
+            if (SettingsCache::instance().getClickPlaysAllSelected()) {
+                zone->getPlayer()->actHide();
+            } else {
+                zone->removeCard(this);
+            }
+        } else
             playCard(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();
