@@ -3,6 +3,16 @@
 #include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_set_comparator.h"
 
+const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
+const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");
+const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_RELEASE_DATE = tr("Release Date");
+const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_CONTAINED_IN_DECK = tr("Contained in Deck");
+const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_POTENTIAL_CARDS = tr("Potential Cards in Deck");
+
+const QStringList PrintingSelectorCardSortingWidget::SORT_OPTIONS = {
+    SORT_OPTIONS_ALPHABETICAL, SORT_OPTIONS_PREFERENCE, SORT_OPTIONS_RELEASE_DATE, SORT_OPTIONS_CONTAINED_IN_DECK,
+    SORT_OPTIONS_POTENTIAL_CARDS};
+
 /**
  * @brief A widget for sorting and filtering card sets in the Printing Selector.
  *
