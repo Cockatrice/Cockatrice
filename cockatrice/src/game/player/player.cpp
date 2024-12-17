@@ -3494,7 +3494,7 @@ void Player::playSelectedCards(const bool faceDown)
               [](const auto &card1, const auto &card2) { return card1->getId() > card2->getId(); });
 
     for (auto &card : selectedCards) {
-        if (card && !isUnwritableRevealZone(card->getZone())) {
+        if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != "table") {
             const bool cipt = !faceDown && card->getInfo() ? card->getInfo()->getCipt() : false;
             playCard(card, faceDown, cipt);
         }
