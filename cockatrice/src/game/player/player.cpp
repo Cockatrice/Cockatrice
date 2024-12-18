@@ -3653,6 +3653,7 @@ void Player::updateCardMenu(const CardItem *card)
 
     if (revealedCard) {
         cardMenu->addAction(aHide);
+        cardMenu->addAction(aClone);
         cardMenu->addSeparator();
         cardMenu->addAction(aSelectAll);
         addRelatedCardView(card, cardMenu);
@@ -3762,6 +3763,8 @@ void Player::updateCardMenu(const CardItem *card)
                 initContextualPlayersMenu(revealMenu);
                 connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
 
+                cardMenu->addSeparator();
+                cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
                 // actions that are really wonky when done from deck or sideboard
