@@ -1332,7 +1332,10 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
 
 void MainWindow::actReloadCardDatabase()
 {
-    const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+    const auto reloadOk1 = QtConcurrent::run([] {
+        CardDatabaseManager::getInstance()->loadCardDatabases();
+        SettingsCache::instance().downloads().sync();
+    });
 }
 
 void MainWindow::actManageSets()
