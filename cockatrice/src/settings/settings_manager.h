@@ -12,6 +12,7 @@ class SettingsManager : public QObject
 public:
     explicit SettingsManager(QString settingPath, QObject *parent = nullptr);
     QVariant getValue(QString name, QString group = "", QString subGroup = "");
+    void sync();
 
 signals:
 

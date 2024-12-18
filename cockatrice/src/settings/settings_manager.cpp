@@ -69,3 +69,11 @@ QVariant SettingsManager::getValue(QString name, QString group, QString subGroup
 
     return value;
 }
+
+/**
+ * Calls sync on the underlying QSettings object
+ */
+void SettingsManager::sync()
+{
+    settings.sync();
+}
