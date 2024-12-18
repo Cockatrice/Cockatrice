@@ -995,6 +995,16 @@ void Player::setShortcutsActive()
     aMoveBottomCardToTop->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToTop"));
     aPlayFacedown->setShortcut(shortcuts.getSingleShortcut("Player/aPlayFacedown"));
     aPlay->setShortcut(shortcuts.getSingleShortcut("Player/aPlay"));
+
+    if (!game->getIsLocalGame()) {
+        /* Attach all card menu actions that also work on the opponent's cards to the TabGame object so that those
+         * shortcuts will be active regardless of whether your card menu currently exists.
+         * Added as a workaround to get the clone keyboard shortcut to work on opponent's cards.
+         */
+        game->addAction(aClone);
+        game->addAction(aDrawArrow);
+        game->addAction(aSelectAll);
+    }
 }
 
 void Player::setShortcutsInactive()
@@ -3057,12 +3067,23 @@ void Player::cardMenuAction()
             }
         }
     } else {
+        CardZone *zone = cardList[0]->getZone();
+        if (!zone) {
+            return;
+        }
+
+        Player *startPlayer = zone->getPlayer();
+        if (!startPlayer) {
+            return;
+        }
+
+        int startPlayerId = startPlayer->getId();
+        QString startZone = zone->getName();
+
         ListOfCardsToMove idList;
         for (const auto &i : cardList) {
             idList.add_card()->set_card_id(i->getId());
         }
-        int startPlayerId = cardList[0]->getZone()->getPlayer()->getId();
-        QString startZone = cardList[0]->getZone()->getName();
 
         switch (static_cast<CardMenuActionType>(a->data().toInt())) {
             case cmMoveToTopLibrary: {
