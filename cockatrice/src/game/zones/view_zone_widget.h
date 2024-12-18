@@ -55,6 +55,8 @@ private:
     bool canBeShuffled;
     int extraHeight;
     Player *player;
+
+    void resizeScrollbar(qreal newZoneHeight);
 signals:
     void closePressed(ZoneViewWidget *zv);
 private slots:
