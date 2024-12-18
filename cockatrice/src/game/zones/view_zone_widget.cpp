@@ -247,10 +247,12 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
 void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
 {
     // We need to manually resize the scroll bar whenever the window gets resized
-    qreal totalZoneHeight = zone->getOptimumRect().height();
-    qreal newWindowHeight = event->newSize().height();
-    qreal newZoneHeight = newWindowHeight - extraHeight - 10;
+    resizeScrollbar(event->newSize().height() - extraHeight - 10);
+}
 
+void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
+{
+    qreal totalZoneHeight = zone->getOptimumRect().height();
     scrollBar->setMaximum(totalZoneHeight - newZoneHeight);
 }
 
@@ -278,6 +280,7 @@ void ZoneViewWidget::resizeToZoneContents()
     qreal initialZoneHeight = qMin(zoneRect.height(), calcMaxInitialHeight());
     QSizeF initialSize(width, initialZoneHeight + extraHeight + 10);
     resize(initialSize);
+    resizeScrollbar(initialZoneHeight);
 
     zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
 
