@@ -64,14 +64,6 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
 
     // Connect slider for dynamic font size adjustment
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardAmountWidget::adjustFontSize);
-
-    // Resize after a little delay to ensure parent size is available
-    QTimer::singleShot(10, this, [this]() {
-        adjustFontSize(this->cardSizeSlider->value());
-        incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
-        decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
-        updateCardCount();
-    });
 }
 
 /**
@@ -90,6 +82,22 @@ void CardAmountWidget::paintEvent(QPaintEvent *event)
     painter.drawRect(rect());
 
     QWidget::paintEvent(event);
+}
+
+void CardAmountWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    adjustFontSize(this->cardSizeSlider->value());
+    updateCardCount();
+
+    if (parentWidget()) {
+        int width = parentWidget()->size().width();
+        int height = parentWidget()->size().height();
+
+        incrementButton->setFixedSize(width / 3, height / 9);
+        decrementButton->setFixedSize(width / 3, height / 9);
+    }
 }
 
 /**

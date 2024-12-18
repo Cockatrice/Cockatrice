@@ -35,6 +35,7 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void showEvent(QShowEvent *event) override;
     void hideElements();
     void showElements();
 
