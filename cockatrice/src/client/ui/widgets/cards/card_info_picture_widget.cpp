@@ -175,8 +175,6 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
                            transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-
-
 /**
  * @brief Provides the recommended size for the widget based on the scale factor.
  * @return The recommended widget size.
