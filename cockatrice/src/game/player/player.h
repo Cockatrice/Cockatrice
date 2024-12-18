@@ -162,6 +162,11 @@ public slots:
     void actDrawCards();
     void actUndoDraw();
     void actMulligan();
+
+    void actPlay();
+    void actPlayFacedown();
+    void actHide();
+
     void actMoveTopCardToPlay();
     void actMoveTopCardToPlayFaceDown();
     void actMoveTopCardToGrave();
@@ -223,9 +228,6 @@ private slots:
     void actFlowP();
     void actFlowT();
     void actSetAnnotation();
-    void actPlay();
-    void actHide();
-    void actPlayFacedown();
     void actReveal(QAction *action);
     void refreshShortcuts();
 
@@ -322,6 +324,8 @@ private:
     void moveOneCardUntil(const CardInfoPtr card);
     void addPlayerToList(QMenu *playerList, Player *player);
     static void removePlayerFromList(QMenu *playerList, Player *player);
+
+    void playSelectedCards(bool faceDown = false);
 
     QRectF bRect;
 

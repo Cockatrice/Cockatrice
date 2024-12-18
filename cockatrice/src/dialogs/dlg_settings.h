@@ -125,6 +125,7 @@ private:
     QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox buddyConnectNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
+    QCheckBox clickPlaysAllSelectedCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;

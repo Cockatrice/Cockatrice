@@ -232,6 +232,7 @@ SettingsCache::SettingsCache()
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+    clickPlaysAllSelected = settings->value("interface/clickPlaysAllSelected", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
@@ -488,6 +489,12 @@ void SettingsCache::setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay)
 {
     doubleClickToPlay = static_cast<bool>(_doubleClickToPlay);
     settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
+}
+
+void SettingsCache::setClickPlaysAllSelected(QT_STATE_CHANGED_T _clickPlaysAllSelected)
+{
+    clickPlaysAllSelected = static_cast<bool>(_clickPlaysAllSelected);
+    settings->setValue("interface/clickPlaysAllSelected", clickPlaysAllSelected);
 }
 
 void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T _playToStack)

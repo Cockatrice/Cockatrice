@@ -37,6 +37,7 @@ private:
     QMenu *cardMenu, *ptMenu, *moveMenu;
 
     void prepareDelete();
+    void handleClickedToPlay(bool shiftHeld);
 public slots:
     void deleteLater();
 

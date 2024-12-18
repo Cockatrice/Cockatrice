@@ -93,6 +93,7 @@ private:
     bool spectatorNotificationsEnabled;
     bool buddyConnectNotificationsEnabled;
     bool doubleClickToPlay;
+    bool clickPlaysAllSelected;
     bool playToStack;
     int startingHandSize;
     bool annotateTokens;
@@ -274,6 +275,10 @@ public:
     bool getDoubleClickToPlay() const
     {
         return doubleClickToPlay;
+    }
+    bool getClickPlaysAllSelected() const
+    {
+        return clickPlaysAllSelected;
     }
     bool getPlayToStack() const
     {
@@ -572,6 +577,7 @@ public slots:
     void setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T _spectatorNotificationsEnabled);
     void setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T _buddyConnectNotificationsEnabled);
     void setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay);
+    void setClickPlaysAllSelected(QT_STATE_CHANGED_T _clickPlaysAllSelected);
     void setPlayToStack(QT_STATE_CHANGED_T _playToStack);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
