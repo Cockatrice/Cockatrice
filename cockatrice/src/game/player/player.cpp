@@ -1365,7 +1365,7 @@ void Player::moveOneCardUntil(CardItem *card)
 {
     moveTopCardTimer->stop();
 
-    const bool isMatch = movingCardsUntilFilter.check(card->getInfo());
+    const bool isMatch = card && movingCardsUntilFilter.check(card->getInfo());
 
     if (isMatch && movingCardsUntilAutoPlay) {
         // Directly calling playCard will deadlock, since we are already in the middle of processing an event.
