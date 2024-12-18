@@ -673,12 +673,12 @@ void TabDeckEditor::retranslateUi()
     deckMenu->setTitle(tr("&Deck Editor"));
 
     cardInfoDock->setWindowTitle(tr("Card Info"));
-    deckDock->setWindowTitle(tr(ZONE_DECK));
+    deckDock->setWindowTitle(tr("Deck"));
     filterDock->setWindowTitle(tr("Filters"));
 
     viewMenu->setTitle(tr("&View"));
     cardInfoDockMenu->setTitle(tr("Card Info"));
-    deckDockMenu->setTitle(tr(ZONE_DECK));
+    deckDockMenu->setTitle(tr("Deck"));
     filterDockMenu->setTitle(tr("Filters"));
 
     aCardInfoDockVisible->setText(tr("Visible"));
