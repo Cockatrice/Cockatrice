@@ -163,6 +163,7 @@ private:
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
     bool createGameAsSpectator;
+    int defaultStartingLifeTotal;
     int keepalive;
     int timeout;
     void translateLegacySettings();
@@ -515,6 +516,10 @@ public:
     {
         return spectatorsCanSeeEverything;
     }
+    int getDefaultStartingLifeTotal() const
+    {
+        return defaultStartingLifeTotal;
+    }
     bool getCreateGameAsSpectator() const
     {
         return createGameAsSpectator;
@@ -679,6 +684,7 @@ public slots:
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
+    void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);

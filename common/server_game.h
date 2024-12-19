@@ -66,6 +66,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsSeeEverything;
+    int startingLifeTotal;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -105,6 +106,7 @@ public:
                 bool _spectatorsNeedPassword,
                 bool _spectatorsCanTalk,
                 bool _spectatorsSeeEverything,
+                int startingLifeTotal,
                 Server_Room *parent);
     ~Server_Game();
     Server_Room *getRoom() const
@@ -161,6 +163,10 @@ public:
     bool getSpectatorsSeeEverything() const
     {
         return spectatorsSeeEverything;
+    }
+    int getStartingLifeTotal() const
+    {
+        return startingLifeTotal;
     }
     Response::ResponseCode
     checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);

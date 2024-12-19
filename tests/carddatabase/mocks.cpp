@@ -304,6 +304,9 @@ void SettingsCache::setSpectatorsCanSeeEverything(const bool /* _spectatorsCanSe
 void SettingsCache::setCreateGameAsSpectator(const bool /* _createGameAsSpectator */)
 {
 }
+void SettingsCache::setDefaultStartingLifeTotal(const int /* _startingLifeTotal */)
+{
+}
 void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings */)
 {
 }
