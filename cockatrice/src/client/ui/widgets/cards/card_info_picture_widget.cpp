@@ -149,15 +149,29 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
         loadPixmap();
     }
 
-    const QSize scaledSize = resizedPixmap.size().scaled(size(), Qt::KeepAspectRatio);
-    const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
+    QPixmap transformedPixmap = resizedPixmap; // Default pixmap
+    if (info && info->getLandscapeOrientation()) {
+        // Rotate pixmap 90 degrees to the left
+        QTransform transform;
+        transform.rotate(90);
+        transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
+    }
+
+    // Adjust scaling after rotation
+    const QSize availableSize = size(); // Size of the widget
+    const QSize pixmapSize = transformedPixmap.size();
+    const QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
+
+    const QPoint topLeft{(availableSize.width() - scaledSize.width()) / 2,
+                         (availableSize.height() - scaledSize.height()) / 2};
     const qreal radius = 0.05 * scaledSize.width();
 
     QStylePainter painter(this);
     QPainterPath shape;
     shape.addRoundedRect(QRect(topLeft, scaledSize), radius, radius);
     painter.setClipPath(shape);
-    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter, resizedPixmap);
+    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter,
+                           transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 /**
