@@ -821,7 +821,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     Server_Game *game = new Server_Game(
         copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
         cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
-        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+        cmd.spectators_can_talk(), cmd.spectators_see_everything(), cmd.starting_life_total(), room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
