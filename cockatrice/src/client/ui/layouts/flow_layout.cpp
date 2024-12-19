@@ -1,5 +1,5 @@
 /**
- * @file flowLayout.cpp
+ * @file flow_layout.cpp
  * @brief Implementation of the FlowLayout class, a custom layout for dynamically organizing widgets
  * in rows within the constraints of available width or parent scroll areas.
  */
