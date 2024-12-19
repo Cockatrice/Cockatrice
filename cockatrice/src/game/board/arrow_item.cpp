@@ -19,8 +19,8 @@
 #include <QtMath>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
-    : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color),
-      fullColor(true)
+    : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), targetLocked(false),
+      color(_color), fullColor(true)
 {
     qDebug() << "ArrowItem constructor: startItem=" << static_cast<QGraphicsItem *>(startItem);
     setZValue(2000000005);
@@ -167,7 +167,7 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     // This ensures that if a mouse move event happens after a call to delArrow(),
     // the event will be discarded as it would create some stray pointers.
-    if (!startItem)
+    if (targetLocked || !startItem)
         return;
 
     QPointF endPos = event->scenePos();
@@ -268,7 +268,7 @@ void ArrowAttachItem::addChildArrow(ArrowAttachItem *childArrow)
 
 void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!startItem)
+    if (targetLocked || !startItem)
         return;
 
     QPointF endPos = event->scenePos();
@@ -336,6 +336,12 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem)
         return;
+
+    // Attaching could move startItem under the current cursor position, causing all children to retarget to it right
+    // before they are processed. Prevent that.
+    for (ArrowAttachItem *child : childArrows) {
+        child->setTargetLocked(true);
+    }
 
     if (targetItem && (targetItem != startItem)) {
         auto startCard = qgraphicsitem_cast<CardItem *>(startItem);
