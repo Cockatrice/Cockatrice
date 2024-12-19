@@ -309,8 +309,8 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void ArrowAttachItem::attachCards(CardItem *startCard, const CardItem *targetCard)
 {
-    // do nothing if target is already attached to another card
-    if (targetCard->getAttachedTo()) {
+    // do nothing if target is already attached to another card or is not in play
+    if (targetCard->getAttachedTo() || targetCard->getZone()->getName() != "table") {
         return;
     }
 
