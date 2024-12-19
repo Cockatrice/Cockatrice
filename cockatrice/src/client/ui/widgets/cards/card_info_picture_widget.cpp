@@ -150,8 +150,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     }
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
-    if (info && (info->getProperty("layout") == "split" || info->getProperty("layout") == "planar" ||
-                 info->getProperty("maintype") == "Battle")) {
+    if (info && info->getLandscapeOrientation()) {
         // Rotate pixmap 90 degrees to the left
         QTransform transform;
         transform.rotate(90);
