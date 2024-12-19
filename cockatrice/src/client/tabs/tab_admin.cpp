@@ -29,8 +29,8 @@ ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
     minutesEdit->setMaximum(999);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &ShutdownDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &ShutdownDialog::reject);
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(reasonLabel, 0, 0);
@@ -57,11 +57,11 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     : Tab(_tabSupervisor, parent), locked(true), client(_client), fullAdmin(_fullAdmin)
 {
     updateServerMessageButton = new QPushButton;
-    connect(updateServerMessageButton, SIGNAL(clicked()), this, SLOT(actUpdateServerMessage()));
+    connect(updateServerMessageButton, &QPushButton::clicked, this, &TabAdmin::actUpdateServerMessage);
     shutdownServerButton = new QPushButton;
-    connect(shutdownServerButton, SIGNAL(clicked()), this, SLOT(actShutdownServer()));
+    connect(shutdownServerButton, &QPushButton::clicked, this, &TabAdmin::actShutdownServer);
     reloadConfigButton = new QPushButton;
-    connect(reloadConfigButton, SIGNAL(clicked()), this, SLOT(actReloadConfig()));
+    connect(reloadConfigButton, &QPushButton::clicked, this, &TabAdmin::actReloadConfig);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(updateServerMessageButton);
@@ -74,10 +74,10 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     adminGroupBox->setEnabled(false);
 
     unlockButton = new QPushButton;
-    connect(unlockButton, SIGNAL(clicked()), this, SLOT(actUnlock()));
+    connect(unlockButton, &QPushButton::clicked, this, &TabAdmin::actUnlock);
     lockButton = new QPushButton;
     lockButton->setEnabled(false);
-    connect(lockButton, SIGNAL(clicked()), this, SLOT(actLock()));
+    connect(lockButton, &QPushButton::clicked, this, &TabAdmin::actLock);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(adminGroupBox);
