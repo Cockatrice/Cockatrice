@@ -450,9 +450,13 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
         if (!card) {
             return Response::RespNameNotFound;
         }
-        if (card->getParentCard()) {
+
+        // do not allow attached cards to move around on the table
+        if (card->getParentCard() && targetzone->getName() == "table") {
             continue;
         }
+
+        // do not allow cards with attachments to stack with other cards
         if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
             continue;
         }
