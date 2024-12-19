@@ -387,7 +387,7 @@ void CardItem::playCard(bool faceDown)
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
             faceDown ? zone->getPlayer()->actPlayFacedown() : zone->getPlayer()->actPlay();
         } else {
-            zone->getPlayer()->playCard(this, faceDown, info ? info->getCipt() : false);
+            zone->getPlayer()->playCard(this, faceDown);
         }
     }
 }
