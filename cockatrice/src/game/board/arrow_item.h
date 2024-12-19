@@ -21,6 +21,7 @@ protected:
     Player *player;
     int id;
     ArrowTarget *startItem, *targetItem;
+    bool targetLocked;
     QColor color;
     bool fullColor;
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -63,6 +64,10 @@ public:
     ArrowTarget *getTargetItem() const
     {
         return targetItem;
+    }
+    void setTargetLocked(bool _targetLocked)
+    {
+        targetLocked = _targetLocked;
     }
     void delArrow();
 };
