@@ -32,20 +32,28 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
     : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
-        for (const auto &set : card->getSets()) {
-            sortedSets << set.getPtr();
+        for (const auto &cardInfoPerSetList : card->getSets()) {
+            for (const auto &set : cardInfoPerSetList) {
+                sortedSets << set.getPtr();
+            }
         }
         if (sortedSets.empty()) {
             sortedSets << CardSet::newInstance("", "", "", QDate());
         }
         std::sort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
-        // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-        for (const auto &set : card->getSets()) {
-            if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
-                card->getPixmapCacheKey()) {
-                long long setIndex = sortedSets.indexOf(set.getPtr());
-                CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
-                sortedSets.prepend(setForCardProviderID);
+
+        // If the user hasn't disabled arts other than their personal preference...
+        if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+            // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
+            for (const auto &cardInfoPerSetList : card->getSets()) {
+                for (const auto &set : cardInfoPerSetList) {
+                    if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                        card->getPixmapCacheKey()) {
+                        long long setIndex = sortedSets.indexOf(set.getPtr());
+                        CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+                        sortedSets.prepend(setForCardProviderID);
+                    }
+                }
             }
         }
         // The first time called, nextSet will also populate the Urls for the first set.
@@ -708,6 +716,26 @@ PictureLoader::~PictureLoader()
 }
 
 void PictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
+{
+    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
+    if (!QPixmapCache::find(backCacheKey, &pixmap)) {
+        qDebug() << "PictureLoader: cache fail for" << backCacheKey;
+        pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QPixmapCache::insert(backCacheKey, pixmap);
+    }
+}
+
+void PictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize size)
+{
+    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
+    if (!QPixmapCache::find(backCacheKey, &pixmap)) {
+        qDebug() << "PictureLoader: cache fail for" << backCacheKey;
+        pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QPixmapCache::insert(backCacheKey, pixmap);
+    }
+}
+
+void PictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size)
 {
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {

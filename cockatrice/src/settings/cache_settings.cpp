@@ -243,6 +243,17 @@ SettingsCache::SettingsCache()
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
+    overrideAllCardArtWithPersonalPreference =
+        settings->value("cards/overrideallcardartwithpersonalpreference", false).toBool();
+    bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
+    printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
+    printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
+    printingSelectorSortOptionsVisible = settings->value("cards/printingselectorsortoptionsvisible", true).toBool();
+    printingSelectorSearchBarVisible = settings->value("cards/printingselectorcardsearchbarvisible", true).toBool();
+    printingSelectorCardSizeSliderVisible =
+        settings->value("cards/printingselectorcardsizeslidervisible", true).toBool();
+    printingSelectorNavigationButtonsVisible =
+        settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -532,6 +543,62 @@ void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
     displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
+}
+
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt)
+{
+    overrideAllCardArtWithPersonalPreference = static_cast<bool>(_overrideAllCardArt);
+    settings->setValue("cards/overrideallcardartwithpersonalpreference", overrideAllCardArtWithPersonalPreference);
+    emit overrideAllCardArtWithPersonalPreferenceChanged();
+}
+
+void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop)
+{
+    bumpSetsWithCardsInDeckToTop = static_cast<bool>(_bumpSetsWithCardsInDeckToTop);
+    settings->setValue("cards/bumpsetswithcardsindecktotop", bumpSetsWithCardsInDeckToTop);
+    emit bumpSetsWithCardsInDeckToTopChanged();
+}
+
+void SettingsCache::setPrintingSelectorSortOrder(int _printingSelectorSortOrder)
+{
+    printingSelectorSortOrder = _printingSelectorSortOrder;
+    settings->setValue("cards/printingselectorsortorder", printingSelectorSortOrder);
+    emit printingSelectorSortOrderChanged();
+}
+
+void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
+{
+    printingSelectorCardSize = _printingSelectorCardSize;
+    settings->setValue("cards/printingselectorcardsize", printingSelectorCardSize);
+    emit printingSelectorCardSizeChanged();
+}
+
+void SettingsCache::setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T _sortOptionsVisible)
+{
+    printingSelectorSortOptionsVisible = _sortOptionsVisible;
+    settings->setValue("cards/printingselectorsortoptionsvisible", printingSelectorSortOptionsVisible);
+    emit printingSelectorSortOptionsVisibleChanged();
+}
+
+void SettingsCache::setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible)
+{
+    printingSelectorSearchBarVisible = _searchBarVisible;
+    settings->setValue("cards/printingselectorsearchbarvisible", printingSelectorSearchBarVisible);
+    emit printingSelectorSearchBarVisibleChanged();
+}
+
+void SettingsCache::setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible)
+{
+    printingSelectorCardSizeSliderVisible = _cardSizeSliderVisible;
+    settings->setValue("cards/printingselectorcardsizeslidervisible", printingSelectorCardSizeSliderVisible);
+    emit printingSelectorCardSizeSliderVisibleChanged();
+}
+
+void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)
+{
+    printingSelectorNavigationButtonsVisible = _navigationButtonsVisible;
+    settings->setValue("cards/printingselectornavigationbuttonsvisible", printingSelectorNavigationButtonsVisible);
+    emit printingSelectorNavigationButtonsVisibleChanged();
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

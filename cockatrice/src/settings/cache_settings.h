@@ -48,6 +48,14 @@ signals:
     void themeChanged();
     void picDownloadChanged();
     void displayCardNamesChanged();
+    void overrideAllCardArtWithPersonalPreferenceChanged();
+    void bumpSetsWithCardsInDeckToTopChanged();
+    void printingSelectorSortOrderChanged();
+    void printingSelectorCardSizeChanged();
+    void printingSelectorSortOptionsVisibleChanged();
+    void printingSelectorSearchBarVisibleChanged();
+    void printingSelectorCardSizeSliderVisibleChanged();
+    void printingSelectorNavigationButtonsVisibleChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -100,6 +108,14 @@ private:
     QByteArray tabGameSplitterSizes;
     bool showShortcuts;
     bool displayCardNames;
+    bool overrideAllCardArtWithPersonalPreference;
+    bool bumpSetsWithCardsInDeckToTop;
+    int printingSelectorSortOrder;
+    int printingSelectorCardSize;
+    bool printingSelectorSortOptionsVisible;
+    bool printingSelectorSearchBarVisible;
+    bool printingSelectorCardSizeSliderVisible;
+    bool printingSelectorNavigationButtonsVisible;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -303,6 +319,38 @@ public:
     bool getDisplayCardNames() const
     {
         return displayCardNames;
+    }
+    bool getOverrideAllCardArtWithPersonalPreference() const
+    {
+        return overrideAllCardArtWithPersonalPreference;
+    }
+    bool getBumpSetsWithCardsInDeckToTop() const
+    {
+        return bumpSetsWithCardsInDeckToTop;
+    }
+    int getPrintingSelectorSortOrder() const
+    {
+        return printingSelectorSortOrder;
+    }
+    int getPrintingSelectorCardSize() const
+    {
+        return printingSelectorCardSize;
+    }
+    bool getPrintingSelectorSortOptionsVisible() const
+    {
+        return printingSelectorSortOptionsVisible;
+    }
+    bool getPrintingSelectorSearchBarVisible() const
+    {
+        return printingSelectorSearchBarVisible;
+    }
+    bool getPrintingSelectorCardSizeSliderVisible() const
+    {
+        return printingSelectorCardSizeSliderVisible;
+    }
+    bool getPrintingSelectorNavigationButtonsVisible() const
+    {
+        return printingSelectorNavigationButtonsVisible;
     }
     bool getHorizontalHand() const
     {
@@ -584,6 +632,14 @@ public slots:
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
+    void setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt);
+    void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
+    void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
+    void setPrintingSelectorCardSize(int _printingSelectorCardSize);
+    void setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T _sortOptionsVisible);
+    void setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible);
+    void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
+    void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

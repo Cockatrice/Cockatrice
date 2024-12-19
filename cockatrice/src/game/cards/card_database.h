@@ -23,7 +23,7 @@ class ICardDatabaseParser;
 typedef QMap<QString, QString> QStringMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
-typedef QMap<QString, CardInfoPerSet> CardInfoPerSetMap;
+typedef QMap<QString, QList<CardInfoPerSet>> CardInfoPerSetMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
@@ -306,15 +306,15 @@ public:
     {
         if (!sets.contains(setName))
             return "";
-        return sets[setName].getProperty(propertyName);
-    }
-    void setSetProperty(const QString &setName, const QString &_name, const QString &_value)
-    {
-        if (!sets.contains(setName))
-            return;
 
-        sets[setName].setProperty(_name, _value);
-        emit cardInfoChanged(smartThis);
+        for (const auto &set : sets[setName]) {
+            if (QLatin1String("card_") + this->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                this->getPixmapCacheKey()) {
+                return set.getProperty(propertyName);
+            }
+        }
+
+        return sets[setName][0].getProperty(propertyName);
     }
 
     // related cards
@@ -450,22 +450,23 @@ public:
     ~CardDatabase() override;
     void clear();
     void removeCard(CardInfoPtr card);
-    CardInfoPtr getCard(const QString &cardName) const;
-    QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
-    CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
-    CardInfoPerSet getPreferredSetForCard(const QString &cardName);
-    CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
+    [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
+    [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
+    [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
+    [[nodiscard]] CardInfoPerSet getPreferredSetForCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
     QString getPreferredPrintingProviderIdForCard(const QString &cardName);
-    CardInfoPtr guessCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr guessCard(const QString &cardName) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
      * function, so you don't need to simplify it beforehand.
      */
-    CardInfoPtr getCardBySimpleName(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
     CardSetPtr getSet(const QString &setName);
     bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
+    static CardInfoPerSet getSetInfoForCard(const CardInfoPtr &_card);
     QList<CardInfoPtr> getCardList() const
     {
         return cards.values();

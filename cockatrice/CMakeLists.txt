@@ -24,6 +24,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_info_picture_widget.cpp
     src/client/ui/widgets/cards/card_info_text_widget.cpp
     src/client/ui/widgets/cards/card_info_display_widget.cpp
+    src/client/ui/widgets/cards/card_size_widget.cpp
     src/game/cards/card_item.cpp
     src/game/cards/card_list.cpp
     src/game/zones/card_zone.cpp
@@ -80,6 +81,9 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
+    src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
+    src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
+    src/client/ui/widgets/general/display/shadow_background_label.cpp
     src/main.cpp
     src/server/message_log_widget.cpp
     src/client/ui/layouts/overlap_layout.cpp
@@ -94,6 +98,17 @@ set(cockatrice_SOURCES
     src/game/player/player.cpp
     src/game/player/player_list_widget.cpp
     src/game/player/player_target.cpp
+    src/client/ui/widgets/printing_selector/all_zones_card_amount_widget.cpp
+    src/client/ui/widgets/printing_selector/card_amount_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_card_display_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_card_search_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_view_options_toolbar_widget.cpp
+    src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp
+    src/client/ui/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/client/network/release_channel.cpp
     src/server/remote/remote_client.cpp
     src/server/remote/remote_decklist_tree_widget.cpp

@@ -164,6 +164,30 @@ void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T /* _showShortcuts */)
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T /* _displayCardNames */)
 {
 }
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T /* _overrideAllCardArt */)
+{
+}
+void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T /* _bumpSetsWithCardsInDeckToTop */)
+{
+}
+void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrder */)
+{
+}
+void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
+{
+}
+void SettingsCache::setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T /* _sortOptionsVisible */)
+{
+}
+void SettingsCache::setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T /* _searchBarVisible */)
+{
+}
+void SettingsCache::setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T /* _cardSizeSliderVisible */)
+{
+}
+void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }

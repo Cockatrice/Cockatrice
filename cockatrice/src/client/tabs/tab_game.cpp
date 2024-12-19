@@ -1807,9 +1807,9 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
 }
 
-void TabGame::viewCardInfo(const QString &cardName)
+void TabGame::viewCardInfo(const QString &cardName, const QString &providerId) const
 {
-    cardInfoFrameWidget->setCard(cardName);
+    cardInfoFrameWidget->setCard(cardName, providerId);
 }
 
 void TabGame::createCardInfoDock(bool bReplay)

@@ -3,7 +3,8 @@
 #include "game/cards/card_database_parser/cockatrice_xml_4.h"
 #include "qt-json/json.h"
 
-#include <QtWidgets>
+#include <QDebug>
+#include <QRegularExpression>
 #include <algorithm>
 #include <climits>
 
@@ -42,7 +43,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         return false;
     }
 
-    QListIterator<QVariant> it(setsMap.values());
+    QListIterator it(setsMap.values());
     QVariantMap map;
 
     QString shortName;
@@ -176,7 +177,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
     CardInfoPerSetMap setsInfo;
-    setsInfo.insert(setInfo.getPtr()->getShortName(), setInfo);
+    setsInfo[setInfo.getPtr()->getShortName()].append(setInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, tableRow, upsideDown);
 
@@ -193,9 +194,7 @@ QString OracleImporter::getStringPropertyFromMap(const QVariantMap &card, const 
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
 
-int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
-                                       const QList<QVariant> &cardsList,
-                                       bool skipSpecialCards)
+int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList)
 {
     // mtgjson name => xml name
     static const QMap<QString, QString> cardProperties{
@@ -213,22 +212,16 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, maintype, faceName;
-    static const bool isToken = false;
+    QString layout, name, text, colors, colorIdentity, faceName;
+    static constexpr bool isToken = false;
+    static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
-    static const QList<QString> specialNumChars = {"★", "s", "†"};
-    QMap<QString, QVariant> specialPromoCards;
     QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
-
-        // skip alternatives
-        if (getStringPropertyFromMap(card, "isAlternative") == "true") {
-            continue;
-        }
 
         /* Currently used layouts are:
          * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
@@ -251,7 +244,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // card properties
         properties.clear();
-        QMapIterator<QString, QString> it(cardProperties);
+        QMapIterator it(cardProperties);
         while (it.hasNext()) {
             it.next();
             QString mtgjsonProperty = it.key();
@@ -263,7 +256,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // per-set properties
         setInfo = CardInfoPerSet(currentSet);
-        QMapIterator<QString, QString> it2(setInfoProperties);
+        QMapIterator it2(setInfoProperties);
         while (it2.hasNext()) {
             it2.next();
             QString mtgjsonProperty = it2.key();
@@ -274,7 +267,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         }
 
         // Identifiers
-        QMapIterator<QString, QString> it3(identifierProperties);
+        QMapIterator it3(identifierProperties);
         while (it3.hasNext()) {
             it3.next();
             auto mtgjsonProperty = it3.key();
@@ -285,43 +278,16 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             }
         }
 
-        QString numComponent{};
-        if (skipSpecialCards) {
-            QString numProperty = setInfo.getProperty("num");
-            // skip promo cards if it's not the only print, cards with two faces are different cards
-            if (allNameProps.contains(faceName)) {
-                // check for alternative versions
-                if (layout != "normal")
-                    continue;
+        QString numComponent;
+        const QString numProperty = setInfo.getProperty("num");
+        const QChar lastChar = numProperty.at(numProperty.size() - 1);
 
-                // alternative versions have a letter in the end of num like abc
-                // note this will also catch p and s, those will get removed later anyway
-                QChar lastChar = numProperty.at(numProperty.size() - 1);
-                if (!lastChar.isLetter())
-                    continue;
-
-                numComponent = " (" + QString(lastChar) + ")";
-                faceName += numComponent; // add to facename to make it unique
-            }
-            if (getStringPropertyFromMap(card, "isPromo") == "true") {
-                specialPromoCards.insert(faceName, cardVar);
-                continue;
-            }
-            bool skip = false;
-            // skip cards containing special stuff in the collectors number like promo cards
-            for (const QString &specialChar : specialNumChars) {
-                if (numProperty.contains(specialChar)) {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip) {
-                specialPromoCards.insert(faceName, cardVar);
-                continue;
-            } else {
-                allNameProps.append(faceName);
-            }
+        // Un-Sets do some wonky stuff. Split up these cards as individual entries.
+        if (setsWithCardsWithSameNameButDifferentText.contains(currentSet->getShortName()) &&
+            allNameProps.contains(faceName) && layout == "normal" && lastChar.isLetter()) {
+            numComponent = " (" + QString(lastChar).toLower() + ")";
         }
+        allNameProps.append(faceName);
 
         // special handling properties
         colors = card.value("colors").toStringList().join("");
@@ -463,18 +429,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         numCards++;
     }
 
-    // only add the unique promo cards that didn't already exist in the set
-    if (skipSpecialCards) {
-        QList<QVariant> nonDuplicatePromos;
-        for (auto cardIter = specialPromoCards.constBegin(); cardIter != specialPromoCards.constEnd(); ++cardIter) {
-            if (!allNameProps.contains(cardIter.key())) {
-                nonDuplicatePromos.append(cardIter.value());
-            }
-        }
-        if (!nonDuplicatePromos.isEmpty()) {
-            numCards += importCardsFromSet(currentSet, nonDuplicatePromos, false);
-        }
-    }
     return numCards;
 }
 
