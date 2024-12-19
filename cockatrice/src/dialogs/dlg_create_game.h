@@ -35,10 +35,10 @@ private:
     QMap<int, QString> gameTypes;
     QMap<int, QRadioButton *> gameTypeCheckBoxes;
 
-    QGroupBox *generalGroupBox, *spectatorsGroupBox;
-    QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
+    QGroupBox *generalGroupBox, *spectatorsGroupBox, *gameSetupOptionsGroupBox;
+    QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel, *startingLifeTotalLabel;
     QLineEdit *descriptionEdit, *passwordEdit;
-    QSpinBox *maxPlayersEdit;
+    QSpinBox *maxPlayersEdit, *startingLifeTotalEdit;
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
         *spectatorsSeeEverythingCheckBox, *createGameAsSpectatorCheckBox;

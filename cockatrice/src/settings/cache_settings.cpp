@@ -301,6 +301,7 @@ SettingsCache::SettingsCache()
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     createGameAsSpectator = settings->value("game/creategameasspectator", false).toBool();
+    defaultStartingLifeTotal = settings->value("game/defaultstartinglifetotal", 20).toInt();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
@@ -1088,6 +1089,12 @@ void SettingsCache::setCreateGameAsSpectator(const bool _createGameAsSpectator)
     createGameAsSpectator = _createGameAsSpectator;
     settings->setValue("game/creategameasspectator", createGameAsSpectator);
 }
+
+void SettingsCache::setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal)
+{
+    defaultStartingLifeTotal = _defaultStartingLifeTotal;
+    settings->setValue("game/defaultstartinglifetotal", defaultStartingLifeTotal);
+};
 
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {
