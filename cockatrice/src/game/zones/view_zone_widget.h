@@ -66,8 +66,8 @@ private slots:
     void resizeToZoneContents();
     void handleScrollBarChange(int value);
     void zoneDeleted();
-    void moveEvent(QGraphicsSceneMoveEvent * /* event */);
-    void resizeEvent(QGraphicsSceneResizeEvent * /* event */);
+    void moveEvent(QGraphicsSceneMoveEvent * /* event */) override;
+    void resizeEvent(QGraphicsSceneResizeEvent * /* event */) override;
 
 public:
     ZoneViewWidget(Player *_player,
@@ -87,8 +87,9 @@ public:
     void retranslateUi();
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    void initStyleOption(QStyleOption *option) const;
+    void closeEvent(QCloseEvent *event) override;
+    void initStyleOption(QStyleOption *option) const override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif
