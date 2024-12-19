@@ -281,7 +281,7 @@ static qreal determineNewZoneHeight(qreal oldZoneHeight)
     return calcMaxInitialHeight();
 }
 
-void ZoneViewWidget::resizeToZoneContents()
+void ZoneViewWidget::resizeToZoneContents(bool forceInitialHeight)
 {
     QRectF zoneRect = zone->getOptimumRect();
     qreal totalZoneHeight = zoneRect.height();
@@ -292,7 +292,7 @@ void ZoneViewWidget::resizeToZoneContents()
     QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
 
     qreal currentZoneHeight = rect().height() - extraHeight - 10;
-    qreal newZoneHeight = determineNewZoneHeight(currentZoneHeight);
+    qreal newZoneHeight = forceInitialHeight ? calcMaxInitialHeight() : determineNewZoneHeight(currentZoneHeight);
 
     QSizeF initialSize(width, newZoneHeight + extraHeight + 10);
 
@@ -342,7 +342,7 @@ void ZoneViewWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         if (size().height() < maximumHeight() || size().width() < maximumWidth()) {
             resize(maximumSize());
         } else {
-            resizeToZoneContents();
+            resizeToZoneContents(true);
         }
     }
 }
