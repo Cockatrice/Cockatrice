@@ -33,10 +33,11 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
                                                                      CardInfoPtr _rootCard,
-                                                                     const CardInfoPerSet& _setInfoForCard,
+                                                                     const CardInfoPerSet &_setInfoForCard,
                                                                      QString &_currentZone)
-    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView), cardSizeSlider(_cardSizeSlider),
-      rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard), currentZone(_currentZone)
+    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
+      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard),
+      currentZone(_currentZone)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);

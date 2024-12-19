@@ -30,8 +30,8 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
                                                                      QSlider *_cardSizeSlider,
                                                                      CardInfoPtr _rootCard,
                                                                      const CardInfoPerSet &_setInfoForCard)
-    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView), cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)),
-      setInfoForCard(_setInfoForCard)
+    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
+      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard)
 {
     // Set up the main layout
     auto *mainLayout = new QVBoxLayout(this);

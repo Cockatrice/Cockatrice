@@ -26,7 +26,7 @@ public:
                               QSlider *cardSizeSlider,
                               CardInfoPtr &rootCard,
                               CardInfoPerSet &setInfoForCard,
-                              const QString& zoneName);
+                              const QString &zoneName);
     int countCardsInZone(const QString &deckZone);
 
 public slots:

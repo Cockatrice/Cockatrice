@@ -21,7 +21,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    QSlider *cardSizeSlider,
                                    CardInfoPtr &rootCard,
                                    CardInfoPerSet &setInfoForCard,
-                                   const QString& zoneName)
+                                   const QString &zoneName)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
       rootCard(rootCard), setInfoForCard(setInfoForCard), zoneName(zoneName), hovered(false)
 {
@@ -234,7 +234,7 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
     QModelIndex idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
-                              setInfoForCard.getProperty("num"));
+                                          setInfoForCard.getProperty("num"));
     offsetCountAtIndex(idx, -1);
 }
 

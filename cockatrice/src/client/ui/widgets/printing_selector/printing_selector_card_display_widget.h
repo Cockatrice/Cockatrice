@@ -29,7 +29,7 @@ public:
                                       QTreeView *_deckView,
                                       QSlider *_cardSizeSlider,
                                       CardInfoPtr _rootCard,
-                                      const CardInfoPerSet& _setInfoForCard,
+                                      const CardInfoPerSet &_setInfoForCard,
                                       QString &_currentZone);
 
 public slots:

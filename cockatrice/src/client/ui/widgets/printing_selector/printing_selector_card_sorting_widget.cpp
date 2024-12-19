@@ -7,8 +7,8 @@ const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr(
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_RELEASE_DATE = tr("Release Date");
 
-const QStringList PrintingSelectorCardSortingWidget::SORT_OPTIONS = {
-    SORT_OPTIONS_ALPHABETICAL, SORT_OPTIONS_PREFERENCE, SORT_OPTIONS_RELEASE_DATE};
+const QStringList PrintingSelectorCardSortingWidget::SORT_OPTIONS = {SORT_OPTIONS_ALPHABETICAL, SORT_OPTIONS_PREFERENCE,
+                                                                     SORT_OPTIONS_RELEASE_DATE};
 
 /**
  * @brief A widget for sorting and filtering card sets in the Printing Selector.
@@ -128,7 +128,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSet
  * @return A filtered list of card sets.
  */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<CardInfoPerSet> &sets,
-                                                                    const QString& searchText)
+                                                                    const QString &searchText)
 {
     if (searchText.isEmpty()) {
         return sets;
@@ -160,7 +160,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
  * @return A list of card sets with the printings contained in the deck prepended.
  */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
-                                                                                const CardInfoPtr& selectedCard,
+                                                                                const CardInfoPtr &selectedCard,
                                                                                 DeckListModel *deckModel)
 {
     if (!selectedCard) {
