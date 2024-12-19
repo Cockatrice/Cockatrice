@@ -202,17 +202,17 @@ private:
     bool upsideDownArt;
 
 public:
-    explicit CardInfo(const QString &_name = QString(),
-                      const QString &_text = QString(),
-                      bool _isToken = false,
-                      QVariantHash _properties = QVariantHash(),
-                      const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
-                      const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
-                      CardInfoPerSetMap _sets = CardInfoPerSetMap(),
-                      bool _cipt = false,
-                      bool _landscapeOrientation = false,
-                      int _tableRow = 0,
-                      bool _upsideDownArt = false);
+    explicit CardInfo(const QString &_name,
+                      const QString &_text,
+                      bool _isToken,
+                      QVariantHash _properties,
+                      const QList<CardRelation *> &_relatedCards,
+                      const QList<CardRelation *> &_reverseRelatedCards,
+                      CardInfoPerSetMap _sets,
+                      bool _cipt,
+                      bool _landscapeOrientation,
+                      int _tableRow,
+                      bool _upsideDownArt);
     CardInfo(const CardInfo &other)
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), pixmapCacheKey(other.pixmapCacheKey),
           text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
@@ -223,17 +223,19 @@ public:
     }
     ~CardInfo() override;
 
-    static CardInfoPtr newInstance(const QString &_name = QString(),
-                                   const QString &_text = QString(),
-                                   bool _isToken = false,
-                                   QVariantHash _properties = QVariantHash(),
-                                   const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
-                                   const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
-                                   CardInfoPerSetMap _sets = CardInfoPerSetMap(),
-                                   bool _cipt = false,
-                                   bool _landscapeOrientation = false,
-                                   int _tableRow = 0,
-                                   bool _upsideDownArt = false);
+    static CardInfoPtr newInstance(const QString &_name);
+
+    static CardInfoPtr newInstance(const QString &_name,
+                                   const QString &_text,
+                                   bool _isToken,
+                                   QVariantHash _properties,
+                                   const QList<CardRelation *> &_relatedCards,
+                                   const QList<CardRelation *> &_reverseRelatedCards,
+                                   CardInfoPerSetMap _sets,
+                                   bool _cipt,
+                                   bool _landscapeOrientation,
+                                   int _tableRow,
+                                   bool _upsideDownArt);
 
     CardInfoPtr clone() const
     {

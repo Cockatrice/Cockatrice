@@ -252,6 +252,12 @@ CardInfo::~CardInfo()
     PictureLoader::clearPixmapCache(smartThis);
 }
 
+CardInfoPtr CardInfo::newInstance(const QString &_name)
+{
+    return newInstance(_name, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
+                       CardInfoPerSetMap(), false, false, 0, false);
+}
+
 CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,

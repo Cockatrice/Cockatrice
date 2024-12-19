@@ -140,6 +140,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             auto _sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
+            bool landscapeOrientation = false;
             bool isToken = false;
             bool upsideDown = false;
 
@@ -165,6 +166,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
                 } else if (xmlName == "cipt") {
                     cipt = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                } else if (xmlName == "landscapeOrientation") {
+                    landscapeOrientation = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                 } else if (xmlName == "upsidedown") {
                     upsideDown = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                     // sets
@@ -233,8 +236,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, cipt, tableRow, upsideDown);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
+                                      landscapeOrientation, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
