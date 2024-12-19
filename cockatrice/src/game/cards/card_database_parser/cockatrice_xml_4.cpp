@@ -353,6 +353,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     if (info->getCipt()) {
         xml.writeTextElement("cipt", "1");
     }
+    if (info->getLandscapeOrientation()) {
+        xml.writeTextElement("landscapeOrientation", "1");
+    }
     if (info->getUpsideDownArt()) {
         xml.writeTextElement("upsidedown", "1");
     }

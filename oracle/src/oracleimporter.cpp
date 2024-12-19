@@ -156,6 +156,10 @@ CardInfoPtr OracleImporter::addCard(QString name,
                                  ") enters( the battlefield)? tapped(?! unless)");
     bool cipt = ciptRegex.match(text).hasMatch();
 
+    bool landscapeOrientation = properties.value("maintype").toString() == "Battle" ||
+                                properties.value("layout").toString() == "split" ||
+                                properties.value("layout").toString() == "planar";
+
     // table row
     int tableRow = 1;
     QString mainCardType = properties.value("maintype").toString();
@@ -179,7 +183,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     CardInfoPerSetMap setsInfo;
     setsInfo[setInfo.getPtr()->getShortName()].append(setInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
-                                                setsInfo, cipt, tableRow, upsideDown);
+                                                setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);
 
     if (name.isEmpty()) {
         qDebug() << "warning: an empty card was added to set" << setInfo.getPtr()->getShortName();

@@ -234,11 +234,12 @@ CardInfo::CardInfo(const QString &_name,
                    const QList<CardRelation *> &_reverseRelatedCards,
                    CardInfoPerSetMap _sets,
                    bool _cipt,
+                   bool _landscapeOrientation,
                    int _tableRow,
                    bool _upsideDownArt)
     : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), sets(std::move(_sets)), cipt(_cipt), tableRow(_tableRow),
-      upsideDownArt(_upsideDownArt)
+      reverseRelatedCards(_reverseRelatedCards), sets(std::move(_sets)), cipt(_cipt),
+      landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
@@ -259,11 +260,12 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QList<CardRelation *> &_reverseRelatedCards,
                                   CardInfoPerSetMap _sets,
                                   bool _cipt,
+                                  bool _landscapeOrientation,
                                   int _tableRow,
                                   bool _upsideDownArt)
 {
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_properties), _relatedCards, _reverseRelatedCards,
-                                 _sets, _cipt, _tableRow, _upsideDownArt));
+                                 _sets, _cipt, _landscapeOrientation, _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
     for (const auto &cardInfoPerSetList : _sets) {

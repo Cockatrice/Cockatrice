@@ -158,6 +158,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             auto _sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
+            bool landscapeOrientation = false;
             bool isToken = false;
             bool upsideDown = false;
 
@@ -194,6 +195,8 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
                 } else if (xmlName == "cipt") {
                     cipt = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                } else if (xmlName == "landscapeOrientation") {
+                    landscapeOrientation = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                 } else if (xmlName == "upsidedown") {
                     upsideDown = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                     // sets
@@ -267,8 +270,9 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             }
 
             properties.insert("colors", colors);
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, cipt, tableRow, upsideDown);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
+                                      landscapeOrientation, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -404,6 +408,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
     if (info->getCipt()) {
         xml.writeTextElement("cipt", "1");
+    }
+    if (info->getLandscapeOrientation()) {
+        xml.writeTextElement("landscapeOrientation", "1");
     }
     if (info->getUpsideDownArt()) {
         xml.writeTextElement("upsidedown", "1");
