@@ -1,7 +1,5 @@
 #include "card_amount_widget.h"
 
-#include "../general/display/dynamic_font_size_push_button.h"
-
 #include <QTimer>
 
 /**
@@ -23,7 +21,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    QSlider *cardSizeSlider,
                                    CardInfoPtr &rootCard,
                                    CardInfoPerSet &setInfoForCard,
-                                   QString zoneName)
+                                   const QString& zoneName)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
       rootCard(rootCard), setInfoForCard(setInfoForCard), zoneName(zoneName), hovered(false)
 {
@@ -111,7 +109,7 @@ void CardAmountWidget::adjustFontSize(int scalePercentage)
     const int maxFontSize = 32;     ///< Maximum font size
     const int basePercentage = 100; ///< Scale at 100%
 
-    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
+    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / 225;
     newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
 
     // Update the font for card count label
@@ -148,13 +146,11 @@ void CardAmountWidget::addPrinting(const QString &zone)
     QModelIndex find_card = deckModel->findCard(rootCard->getName(), zone);
     if (find_card.isValid() && find_card != newCardIndex) {
         auto amount = deckModel->data(find_card, Qt::DisplayRole);
-        if (amount.toInt() > 1) {
-            for (int i = 0; i < amount.toInt() - 1; i++) {
-                deckModel->addCard(rootCard->getName(), setInfoForCard, zone);
-            }
+        for (int i = 0; i < amount.toInt() - 1; i++) {
+            deckModel->addCard(rootCard->getName(), setInfoForCard, zone);
         }
         deckModel->removeRow(find_card.row(), find_card.parent());
-    };
+    }
     newCardIndex = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
                                        setInfoForCard.getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);
@@ -237,8 +233,7 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
-    QModelIndex idx;
-    idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
+    QModelIndex idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
                               setInfoForCard.getProperty("num"));
     offsetCountAtIndex(idx, -1);
 }
@@ -251,8 +246,6 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
  */
 int CardAmountWidget::countCardsInZone(const QString &deckZone)
 {
-    int count = 0;
-
     if (setInfoForCard.getProperty("uuid").isEmpty()) {
         return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
     }
@@ -270,6 +263,8 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
     if (!listRoot) {
         return -1;
     }
+
+    int count = 0;
 
     for (auto *i : *listRoot) {
         auto *countCurrentZone = dynamic_cast<InnerDecklistNode *>(i);

@@ -1,7 +1,5 @@
 #include "printing_selector_card_display_widget.h"
 
-#include "../../../../deck/deck_loader.h"
-#include "../../../../game/cards/card_database_manager.h"
 #include "card_amount_widget.h"
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
@@ -9,6 +7,7 @@
 #include <QGraphicsEffect>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <utility>
 
 /**
  * @brief Constructs a PrintingSelectorCardDisplayWidget to display card information.
@@ -29,15 +28,15 @@
  * @param currentZone The current zone in which the card is located.
  */
 PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                                                     TabDeckEditor *deckEditor,
-                                                                     DeckListModel *deckModel,
-                                                                     QTreeView *deckView,
-                                                                     QSlider *cardSizeSlider,
-                                                                     CardInfoPtr rootCard,
-                                                                     CardInfoPerSet setInfoForCard,
-                                                                     QString &currentZone)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
-      rootCard(rootCard), setInfoForCard(setInfoForCard), currentZone(currentZone)
+                                                                     TabDeckEditor *_deckEditor,
+                                                                     DeckListModel *_deckModel,
+                                                                     QTreeView *_deckView,
+                                                                     QSlider *_cardSizeSlider,
+                                                                     CardInfoPtr _rootCard,
+                                                                     const CardInfoPerSet& _setInfoForCard,
+                                                                     QString &_currentZone)
+    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView), cardSizeSlider(_cardSizeSlider),
+      rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard), currentZone(_currentZone)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);

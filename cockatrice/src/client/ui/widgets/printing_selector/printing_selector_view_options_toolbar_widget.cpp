@@ -23,7 +23,7 @@ PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidg
 
     // Set up the expanded widget with its layout
     expandedWidget = new QWidget(this);
-    QVBoxLayout *expandedLayout = new QVBoxLayout(expandedWidget);
+    auto *expandedLayout = new QVBoxLayout(expandedWidget);
     expandedLayout->setContentsMargins(0, 0, 0, 0);
     expandedLayout->setSpacing(0);
 
@@ -43,7 +43,7 @@ PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidg
 
     // Set up the collapsed widget with its layout
     collapsedWidget = new QWidget(this);
-    QHBoxLayout *collapsedLayout = new QHBoxLayout(collapsedWidget);
+    auto *collapsedLayout = new QHBoxLayout(collapsedWidget);
     collapsedLayout->setContentsMargins(5, 0, 5, 0);
     collapsedLayout->setSpacing(0);
 
@@ -56,7 +56,7 @@ PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidg
     collapsedLayout->addWidget(expandButton);
 
     // Label for collapsed state
-    QLabel *collapsedLabel = new QLabel(tr("Display Options"), this);
+    auto *collapsedLabel = new QLabel(tr("Display Options"), this);
     collapsedLayout->addWidget(collapsedLabel);
 
     collapsedWidget->setLayout(collapsedLayout);

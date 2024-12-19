@@ -1,9 +1,6 @@
 #ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 
-#ifndef CARDOVERLAYWIDGET_H
-#define CARDOVERLAYWIDGET_H
-
 #include "../../../../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_view.h"
@@ -19,12 +16,12 @@ class PrintingSelectorCardOverlayWidget : public QWidget
 
 public:
     explicit PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                               TabDeckEditor *deckEditor,
-                                               DeckListModel *deckModel,
-                                               QTreeView *deckView,
-                                               QSlider *cardSizeSlider,
-                                               CardInfoPtr rootCard,
-                                               CardInfoPerSet setInfoForCard);
+                                               TabDeckEditor *_deckEditor,
+                                               DeckListModel *_deckModel,
+                                               QTreeView *_deckView,
+                                               QSlider *_cardSizeSlider,
+                                               CardInfoPtr _rootCard,
+                                               const CardInfoPerSet &_setInfoForCard);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -48,7 +45,5 @@ private:
     CardInfoPtr setCard;
     CardInfoPerSet setInfoForCard;
 };
-
-#endif // CARDOVERLAYWIDGET_H
 
 #endif // PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H

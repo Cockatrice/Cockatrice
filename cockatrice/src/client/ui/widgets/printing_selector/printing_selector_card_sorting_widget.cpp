@@ -6,12 +6,9 @@
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_RELEASE_DATE = tr("Release Date");
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_CONTAINED_IN_DECK = tr("Contained in Deck");
-const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_POTENTIAL_CARDS = tr("Potential Cards in Deck");
 
 const QStringList PrintingSelectorCardSortingWidget::SORT_OPTIONS = {
-    SORT_OPTIONS_ALPHABETICAL, SORT_OPTIONS_PREFERENCE, SORT_OPTIONS_RELEASE_DATE, SORT_OPTIONS_CONTAINED_IN_DECK,
-    SORT_OPTIONS_POTENTIAL_CARDS};
+    SORT_OPTIONS_ALPHABETICAL, SORT_OPTIONS_PREFERENCE, SORT_OPTIONS_RELEASE_DATE};
 
 /**
  * @brief A widget for sorting and filtering card sets in the Printing Selector.
@@ -131,7 +128,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSet
  * @return A filtered list of card sets.
  */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<CardInfoPerSet> &sets,
-                                                                    const QString searchText) const
+                                                                    const QString& searchText)
 {
     if (searchText.isEmpty()) {
         return sets;
@@ -163,7 +160,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
  * @return A list of card sets with the printings contained in the deck prepended.
  */
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
-                                                                                CardInfoPtr selectedCard,
+                                                                                const CardInfoPtr& selectedCard,
                                                                                 DeckListModel *deckModel)
 {
     if (!selectedCard) {

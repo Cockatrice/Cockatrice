@@ -60,7 +60,7 @@ void SetNameAndCollectorsNumberDisplayWidget::adjustFontSize(int scalePercentage
     const int basePercentage = 100; // Scale at 100%
 
     // Calculate the new font size
-    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
+    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / 225;
 
     // Clamp the font size to the defined range
     newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);

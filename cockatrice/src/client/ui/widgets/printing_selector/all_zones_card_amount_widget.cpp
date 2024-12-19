@@ -68,7 +68,7 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
     const int maxFontSize = 32;     // Maximum font size
     const int basePercentage = 100; // Scale at 100%
 
-    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / (250 - 25);
+    int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / 225;
     newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
 
     // Update the font labels

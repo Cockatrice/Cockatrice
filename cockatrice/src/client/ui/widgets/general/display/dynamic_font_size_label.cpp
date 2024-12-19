@@ -30,7 +30,7 @@ void DynamicFontSizeLabel::paintEvent(QPaintEvent *event)
     // LOG(true, "Paint delay" << ((float)timer.nsecsElapsed())/1000000.0 << " mS");
 }
 
-float DynamicFontSizeLabel::getWidgetMaximumFontSize(QWidget *widget, QString text)
+float DynamicFontSizeLabel::getWidgetMaximumFontSize(QWidget *widget, const QString& text)
 {
     QFont font = widget->font();
     const QRect widgetRect = widget->contentsRect();

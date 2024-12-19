@@ -14,9 +14,9 @@ class CardSizeWidget : public QWidget
 
 public:
     explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr, int defaultValue = 100);
-    QSlider *getSlider() const;
+    [[nodiscard]] QSlider *getSlider() const;
 public slots:
-    void updateCardSizeSetting(int newValue);
+    static void updateCardSizeSetting(int newValue);
 
 private:
     QWidget *parent;

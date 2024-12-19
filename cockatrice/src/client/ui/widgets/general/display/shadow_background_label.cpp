@@ -43,7 +43,7 @@ void ShadowBackgroundLabel::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    // Enable anti-aliasing for smoother edges.
+    // Enable antialiasing for smoother edges.
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     // Set semi-transparent black brush and disable border pen.

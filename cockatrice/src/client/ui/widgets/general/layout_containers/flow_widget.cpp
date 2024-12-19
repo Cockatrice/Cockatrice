@@ -5,7 +5,6 @@
 
 #include "flow_widget.h"
 
-#include "../../../layouts/flow_layout.h"
 #include "../../../layouts/horizontal_flow_layout.h"
 #include "../../../layouts/vertical_flow_layout.h"
 
@@ -29,21 +28,21 @@ FlowWidget::FlowWidget(QWidget *parent,
     // Main Widget and Layout
     this->setMinimumSize(0, 0);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    main_layout = new QHBoxLayout();
-    this->setLayout(main_layout);
+    mainLayout = new QHBoxLayout();
+    this->setLayout(mainLayout);
 
     // Flow Layout inside the scroll area
     container = new QWidget();
 
     if (horizontalPolicy != Qt::ScrollBarAlwaysOff && verticalPolicy == Qt::ScrollBarAlwaysOff) {
-        flow_layout = new HorizontalFlowLayout(container);
+        flowLayout = new HorizontalFlowLayout(container);
     } else if (horizontalPolicy == Qt::ScrollBarAlwaysOff && verticalPolicy != Qt::ScrollBarAlwaysOff) {
-        flow_layout = new VerticalFlowLayout(container);
+        flowLayout = new VerticalFlowLayout(container);
     } else {
-        flow_layout = new FlowLayout(container, 0, 0, 0);
+        flowLayout = new FlowLayout(container, 0, 0, 0);
     }
 
-    container->setLayout(flow_layout);
+    container->setLayout(flowLayout);
     // The container should expand as much as possible, trusting the scrollArea to constrain it.
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setMinimumSize(0, 0);
@@ -60,10 +59,10 @@ FlowWidget::FlowWidget(QWidget *parent,
 
     // Use the FlowLayout container directly if we disable the ScrollArea
     if (horizontalPolicy == Qt::ScrollBarAlwaysOff && verticalPolicy == Qt::ScrollBarAlwaysOff) {
-        main_layout->addWidget(container);
+        mainLayout->addWidget(container);
     } else {
         scrollArea->setWidget(container);
-        main_layout->addWidget(scrollArea);
+        mainLayout->addWidget(scrollArea);
     }
 }
 
@@ -85,7 +84,7 @@ void FlowWidget::addWidget(QWidget *widget_to_add) const
     }
 
     // Add the widget to the flow layout
-    this->flow_layout->addWidget(widget_to_add);
+    flowLayout->addWidget(widget_to_add);
 }
 
 /**
@@ -95,23 +94,23 @@ void FlowWidget::addWidget(QWidget *widget_to_add) const
  */
 void FlowWidget::clearLayout()
 {
-    if (flow_layout != nullptr) {
+    if (flowLayout != nullptr) {
         QLayoutItem *item;
-        while ((item = flow_layout->takeAt(0)) != nullptr) {
+        while ((item = flowLayout->takeAt(0)) != nullptr) {
             item->widget()->deleteLater(); // Delete the widget
             delete item;                   // Delete the layout item
         }
     } else {
         if (scrollArea->horizontalScrollBarPolicy() != Qt::ScrollBarAlwaysOff &&
             scrollArea->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOff) {
-            flow_layout = new HorizontalFlowLayout(container);
+            flowLayout = new HorizontalFlowLayout(container);
         } else if (scrollArea->horizontalScrollBarPolicy() == Qt::ScrollBarAlwaysOff &&
                    scrollArea->verticalScrollBarPolicy() != Qt::ScrollBarAlwaysOff) {
-            flow_layout = new VerticalFlowLayout(container);
+            flowLayout = new VerticalFlowLayout(container);
         } else {
-            flow_layout = new FlowLayout(container, 0, 0, 0);
+            flowLayout = new FlowLayout(container, 0, 0, 0);
         }
-        this->container->setLayout(flow_layout);
+        container->setLayout(flowLayout);
     }
 }
 
@@ -127,16 +126,14 @@ void FlowWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 
     // Trigger the layout to recalculate
-    if (flow_layout != nullptr) {
-        flow_layout->invalidate(); // Marks the layout as dirty and requires recalculation
-        flow_layout->activate();   // Recalculate the layout based on the new size
+    if (flowLayout != nullptr) {
+        flowLayout->invalidate(); // Marks the layout as dirty and requires recalculation
+        flowLayout->activate();   // Recalculate the layout based on the new size
     }
 
     // Ensure the scroll area and its content adjust correctly
-    if (scrollArea != nullptr) {
-        if (scrollArea->widget() != nullptr) {
-            scrollArea->widget()->adjustSize();
-        }
+    if (scrollArea != nullptr && scrollArea->widget() != nullptr) {
+        scrollArea->widget()->adjustSize();
     }
 }
 
@@ -148,11 +145,9 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
     QSize maxSize(0, 0); // Initialize to a zero size
 
     // Iterate over all widgets in the flow layout to find the maximum sizeHint
-    for (int i = 0; i < flow_layout->count(); ++i) {
-        QLayoutItem *item = flow_layout->itemAt(i);
-        if (item) {
-            QWidget *widget = item->widget();
-            if (widget) {
+    for (int i = 0; i < flowLayout->count(); ++i) {
+        if (QLayoutItem *item = flowLayout->itemAt(i)) {
+            if (QWidget *widget = item->widget()) {
                 // Update the max size based on the sizeHint of each widget
                 QSize widgetSizeHint = widget->sizeHint();
                 maxSize.setWidth(qMax(maxSize.width(), widgetSizeHint.width()));
@@ -162,11 +157,9 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
     }
 
     // Set the minimum size for all widgets to the max sizeHint
-    for (int i = 0; i < flow_layout->count(); ++i) {
-        QLayoutItem *item = flow_layout->itemAt(i);
-        if (item) {
-            QWidget *widget = item->widget();
-            if (widget) {
+    for (int i = 0; i < flowLayout->count(); ++i) {
+        if (QLayoutItem *item = flowLayout->itemAt(i)) {
+            if (QWidget *widget = item->widget()) {
                 widget->setMinimumSize(maxSize);
             }
         }
@@ -175,10 +168,10 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
 
 QLayoutItem *FlowWidget::itemAt(int index) const
 {
-    return flow_layout->itemAt(index);
+    return flowLayout->itemAt(index);
 }
 
 int FlowWidget::count() const
 {
-    return flow_layout->count();
+    return flowLayout->count();
 }

@@ -316,14 +316,6 @@ public:
 
         return sets[setName][0].getProperty(propertyName);
     }
-    void setSetProperty(const QString &, const QString &, const QString &)
-    {
-        // if (!sets.contains(setName))
-        //     return;
-        //
-        // sets[setName].setProperty(_name, _value);
-        // emit cardInfoChanged(smartThis);
-    }
 
     // related cards
     const QList<CardRelation *> &getRelatedCards() const

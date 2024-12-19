@@ -26,7 +26,7 @@ public:
                               QSlider *cardSizeSlider,
                               CardInfoPtr &rootCard,
                               CardInfoPerSet &setInfoForCard,
-                              QString zoneName);
+                              const QString& zoneName);
     int countCardsInZone(const QString &deckZone);
 
 public slots:
@@ -36,8 +36,6 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void showEvent(QShowEvent *event) override;
-    void hideElements();
-    void showElements();
 
 private:
     TabDeckEditor *deckEditor;
@@ -53,7 +51,6 @@ private:
     QLabel *cardCountInZone;
 
     bool hovered;
-    QPropertyAnimation *fadeAnimation;
 
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(const QString &zoneName);

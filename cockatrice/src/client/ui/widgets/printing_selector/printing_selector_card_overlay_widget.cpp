@@ -6,6 +6,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <utility>
 
 /**
  * @brief Constructs a PrintingSelectorCardOverlayWidget for displaying a card overlay.
@@ -23,14 +24,14 @@
  * @param setInfoForCard The set-specific information for the card being displayed.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                                                     TabDeckEditor *deckEditor,
-                                                                     DeckListModel *deckModel,
-                                                                     QTreeView *deckView,
-                                                                     QSlider *cardSizeSlider,
-                                                                     CardInfoPtr rootCard,
-                                                                     CardInfoPerSet setInfoForCard)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), rootCard(rootCard),
-      setInfoForCard(setInfoForCard)
+                                                                     TabDeckEditor *_deckEditor,
+                                                                     DeckListModel *_deckModel,
+                                                                     QTreeView *_deckView,
+                                                                     QSlider *_cardSizeSlider,
+                                                                     CardInfoPtr _rootCard,
+                                                                     const CardInfoPerSet &_setInfoForCard)
+    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView), cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)),
+      setInfoForCard(_setInfoForCard)
 {
     // Set up the main layout
     auto *mainLayout = new QVBoxLayout(this);

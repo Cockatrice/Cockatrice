@@ -24,20 +24,19 @@ class PrintingSelectorCardDisplayWidget : public QWidget
 
 public:
     PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                      TabDeckEditor *deckEditor,
-                                      DeckListModel *deckModel,
-                                      QTreeView *deckView,
-                                      QSlider *cardSizeSlider,
-                                      CardInfoPtr rootCard,
-                                      CardInfoPerSet setInfoForCard,
-                                      QString &currentZone);
+                                      TabDeckEditor *_deckEditor,
+                                      DeckListModel *_deckModel,
+                                      QTreeView *_deckView,
+                                      QSlider *_cardSizeSlider,
+                                      CardInfoPtr _rootCard,
+                                      const CardInfoPerSet& _setInfoForCard,
+                                      QString &_currentZone);
 
 public slots:
     void clampSetNameToPicture();
 
 private:
     QVBoxLayout *layout;
-    AllZonesCardAmountWidget *allZonesCardAmountWidget;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
     TabDeckEditor *deckEditor;
     DeckListModel *deckModel;
@@ -47,7 +46,6 @@ private:
     CardInfoPtr setCard;
     CardInfoPerSet setInfoForCard;
     QString currentZone;
-    CardInfoPictureWidget *cardInfoPicture;
     PrintingSelectorCardOverlayWidget *overlayWidget;
 };
 

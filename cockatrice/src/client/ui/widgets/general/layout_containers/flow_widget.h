@@ -26,8 +26,8 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
-    QHBoxLayout *main_layout;
-    FlowLayout *flow_layout;
+    QHBoxLayout *mainLayout;
+    FlowLayout *flowLayout;
     QWidget *container;
 };
 

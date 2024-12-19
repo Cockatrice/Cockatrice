@@ -120,18 +120,18 @@ void PrintingSelector::selectNextCard()
  *
  * @param changeBy The direction to change, -1 for previous, 1 for next.
  */
-void PrintingSelector::selectCard(int changeBy)
+void PrintingSelector::selectCard(const int changeBy)
 {
     if (changeBy == 0) {
         return;
     }
 
     // Get the current index of the selected item
-    auto currentIndex = deckView->currentIndex();
+    auto deckViewCurrentIndex = deckView->currentIndex();
 
-    auto nextIndex = currentIndex.siblingAtRow(currentIndex.row() + changeBy);
+    auto nextIndex = deckViewCurrentIndex.siblingAtRow(deckViewCurrentIndex.row() + changeBy);
     if (!nextIndex.isValid()) {
-        nextIndex = currentIndex;
+        nextIndex = deckViewCurrentIndex;
 
         // Increment to the next valid index, skipping header rows
         AbstractDecklistNode *node;
@@ -149,27 +149,6 @@ void PrintingSelector::selectCard(int changeBy)
         deckView->setCurrentIndex(nextIndex);
         deckView->setFocus(Qt::FocusReason::MouseFocusReason);
     }
-}
-
-/**
- * @brief Retrieves the card set for a specific UUID.
- *
- * @param uuid The UUID of the set to retrieve.
- * @return The CardInfoPerSet associated with the UUID.
- */
-CardInfoPerSet PrintingSelector::getSetForUUID(const QString &uuid)
-{
-    CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
-
-    for (const auto &cardInfoPerSetList : cardInfoPerSets) {
-        for (const auto &cardInfoPerSet : cardInfoPerSetList) {
-            if (cardInfoPerSet.getProperty("uuid") == uuid) {
-                return cardInfoPerSet;
-            }
-        }
-    }
-
-    return CardInfoPerSet();
 }
 
 /**
