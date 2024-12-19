@@ -223,6 +223,8 @@ public:
     }
     ~CardInfo() override;
 
+    static CardInfoPtr newInstance(const QString &_name);
+
     static CardInfoPtr newInstance(const QString &_name,
                                    const QString &_text,
                                    bool _isToken,
