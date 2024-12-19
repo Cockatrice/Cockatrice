@@ -613,7 +613,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor settings"));
-    openDeckInNewTabCheckBox.setText(tr("Always open deck in new tab"));
+    openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(tr(" ms"));
