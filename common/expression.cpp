@@ -51,9 +51,9 @@ double Expression::eval(const peg::Ast &ast)
 {
     const auto &nodes = ast.nodes;
     if (ast.name == "NUMBER") {
-        return stod(ast.token);
+        return stod(std::string(ast.token));
     } else if (ast.name == "FUNCTION") {
-        QString name = QString::fromStdString(nodes[0]->token);
+        QString name = QString::fromStdString(std::string(nodes[0]->token));
         if (!fns.contains(name))
             return 0;
         return fns[name](eval(*nodes[1]));

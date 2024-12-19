@@ -1391,6 +1391,6 @@ void TabDeckEditor::showSearchSyntaxHelp()
     browser->document()->setDefaultStyleSheet(sheet);
 
     browser->setHtml(text);
-    connect(browser, &QTextBrowser::anchorClicked, [=](const QUrl &link) { searchEdit->setText(link.fragment()); });
+    connect(browser, &QTextBrowser::anchorClicked, [this](const QUrl &link) { searchEdit->setText(link.fragment()); });
     browser->show();
 }
