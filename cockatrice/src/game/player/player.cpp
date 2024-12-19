@@ -1380,10 +1380,7 @@ void Player::moveOneCardUntil(CardItem *card)
     if (isMatch && movingCardsUntilAutoPlay) {
         // Directly calling playCard will deadlock, since we are already in the middle of processing an event.
         // Use QTimer::singleShot to queue up the playCard on the event loop.
-        QTimer::singleShot(0, this, [card, this] {
-            bool cipt = card && card->getInfo() && card->getInfo()->getCipt();
-            playCard(card, false, cipt);
-        });
+        QTimer::singleShot(0, this, [card, this] { playCard(card, false); });
     }
 
     if (zones.value("deck")->getCards().empty() || !card) {
@@ -2648,7 +2645,7 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
     }
 }
 
-void Player::playCard(CardItem *card, bool faceDown, bool tapped)
+void Player::playCard(CardItem *card, bool faceDown)
 {
     if (card == nullptr) {
         return;
@@ -2685,7 +2682,7 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
         if (!faceDown) {
             cardToMove->set_pt(info->getPowTough().toStdString());
         }
-        cardToMove->set_tapped(faceDown ? false : tapped);
+        cardToMove->set_tapped(!faceDown && info->getCipt());
         if (tableRow != 3)
             cmd.set_target_zone("table");
         cmd.set_x(gridPoint.x());
@@ -2698,7 +2695,7 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
  * Like {@link Player::playCard}, but forces the card to be played to the table zone.
  * Cards with tablerow 3 (the stack) will be played to tablerow 1 (the noncreatures row).
  */
-void Player::playCardToTable(CardItem *card, bool faceDown, bool tapped)
+void Player::playCardToTable(CardItem *card, bool faceDown)
 {
     if (card == nullptr) {
         return;
@@ -2727,7 +2724,7 @@ void Player::playCardToTable(CardItem *card, bool faceDown, bool tapped)
     if (!faceDown) {
         cardToMove->set_pt(info->getPowTough().toStdString());
     }
-    cardToMove->set_tapped(faceDown ? false : tapped);
+    cardToMove->set_tapped(!faceDown && info->getCipt());
     cmd.set_target_zone("table");
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
@@ -3574,8 +3571,7 @@ void Player::playSelectedCards(const bool faceDown)
 
     for (auto &card : selectedCards) {
         if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != "table") {
-            const bool cipt = !faceDown && card->getInfo() ? card->getInfo()->getCipt() : false;
-            playCard(card, faceDown, cipt);
+            playCard(card, faceDown);
         }
     }
 }

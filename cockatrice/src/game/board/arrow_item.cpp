@@ -319,8 +319,7 @@ void ArrowAttachItem::attachCards(CardItem *startCard, const CardItem *targetCar
 
     // move card onto table first if attaching from some other zone
     if (startZone->getName() != "table") {
-        auto info = startCard->getInfo();
-        player->playCardToTable(startCard, false, info ? info->getCipt() : false);
+        player->playCardToTable(startCard, false);
     }
 
     Command_AttachCard cmd;

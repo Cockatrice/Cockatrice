@@ -394,8 +394,8 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void playCard(CardItem *c, bool faceDown, bool tapped);
-    void playCardToTable(CardItem *c, bool faceDown, bool tapped);
+    void playCard(CardItem *c, bool faceDown);
+    void playCardToTable(CardItem *c, bool faceDown);
     void addCard(CardItem *c);
     void deleteCard(CardItem *c);
     void addZone(CardZone *z);
