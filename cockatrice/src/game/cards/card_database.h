@@ -197,6 +197,7 @@ private:
     QString setsNames;
     // positioning properties; used by UI
     bool cipt;
+    bool landscapeOrientation;
     int tableRow;
     bool upsideDownArt;
 
@@ -209,14 +210,15 @@ public:
                       const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
                       CardInfoPerSetMap _sets = CardInfoPerSetMap(),
                       bool _cipt = false,
+                      bool _landscapeOrientation = false,
                       int _tableRow = 0,
                       bool _upsideDownArt = false);
     CardInfo(const CardInfo &other)
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), pixmapCacheKey(other.pixmapCacheKey),
           text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
-          sets(other.sets), setsNames(other.setsNames), cipt(other.cipt), tableRow(other.tableRow),
-          upsideDownArt(other.upsideDownArt)
+          sets(other.sets), setsNames(other.setsNames), cipt(other.cipt),
+          landscapeOrientation(other.landscapeOrientation), tableRow(other.tableRow), upsideDownArt(other.upsideDownArt)
     {
     }
     ~CardInfo() override;
@@ -229,6 +231,7 @@ public:
                                    const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
                                    CardInfoPerSetMap _sets = CardInfoPerSetMap(),
                                    bool _cipt = false,
+                                   bool _landscapeOrientation = false,
                                    int _tableRow = 0,
                                    bool _upsideDownArt = false);
 
@@ -347,6 +350,10 @@ public:
     bool getCipt() const
     {
         return cipt;
+    }
+    bool getLandscapeOrientation() const
+    {
+        return landscapeOrientation;
     }
     int getTableRow() const
     {
