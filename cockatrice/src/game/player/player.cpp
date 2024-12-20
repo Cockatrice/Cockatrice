@@ -516,6 +516,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     aSelectAll = new QAction(this);
     connect(aSelectAll, SIGNAL(triggered()), this, SLOT(actSelectAll()));
+    aSelectColumn = new QAction(this);
+    connect(aSelectColumn, SIGNAL(triggered()), this, SLOT(actSelectColumn()));
 
     aPlay = new QAction(this);
     connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
@@ -841,6 +843,7 @@ void Player::retranslateUi()
     }
 
     aSelectAll->setText(tr("&Select All"));
+    aSelectColumn->setText(tr("S&elect Column"));
 
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
@@ -930,6 +933,7 @@ void Player::setShortcutsActive()
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
 
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
+    aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
 
     QList<QKeySequence> addCCShortCuts;
     addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCRed"));
@@ -1565,6 +1569,27 @@ void Player::actMoveBottomCardToTop()
     sendGameCommand(cmd);
 }
 
+/**
+ * Selects all cards in the given zone.
+ *
+ * @param zone The zone to select from
+ * @param filter A predicate to filter which cards are selected. Defaults to always returning true.
+ */
+static void selectCardsInZone(
+    const CardZone *zone,
+    std::function<bool(const CardItem *)> filter = [](const CardItem *) { return true; })
+{
+    if (!zone) {
+        return;
+    }
+
+    for (auto &cardItem : zone->getCards()) {
+        if (cardItem && filter(cardItem)) {
+            cardItem->setSelected(true);
+        }
+    }
+}
+
 void Player::actSelectAll()
 {
     const CardItem *card = game->getActiveCard();
@@ -1572,13 +1597,18 @@ void Player::actSelectAll()
         return;
     }
 
-    if (const auto *zone = card->getZone()) {
-        for (auto &cardItem : zone->getCards()) {
-            if (cardItem) {
-                cardItem->setSelected(true);
-            }
-        }
+    selectCardsInZone(card->getZone());
+}
+
+void Player::actSelectColumn()
+{
+    const CardItem *card = game->getActiveCard();
+    if (!card) {
+        return;
     }
+
+    auto isSameColumn = [card](const CardItem *cardItem) { return cardItem->x() == card->x(); };
+    selectCardsInZone(card->getZone(), isSameColumn);
 }
 
 void Player::actDrawBottomCard()
@@ -3656,6 +3686,7 @@ void Player::updateCardMenu(const CardItem *card)
         cardMenu->addAction(aClone);
         cardMenu->addSeparator();
         cardMenu->addAction(aSelectAll);
+        cardMenu->addAction(aSelectColumn);
         addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
         if (moveMenu->isEmpty()) {
@@ -3747,6 +3778,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addMenu(moveMenu);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
+                cardMenu->addAction(aSelectColumn);
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aAttach);
@@ -3776,6 +3808,9 @@ void Player::updateCardMenu(const CardItem *card)
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
+                if (card->getZone()->getIsView()) {
+                    cardMenu->addAction(aSelectColumn);
+                }
 
                 addRelatedCardView(card, cardMenu);
             }

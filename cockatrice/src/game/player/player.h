@@ -186,6 +186,7 @@ public slots:
     void actMoveBottomCardToTop();
 
     void actSelectAll();
+    void actSelectColumn();
 
     void actViewLibrary();
     void actViewHand();
@@ -266,7 +267,7 @@ private:
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary, *aSelectAll;
+        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectColumn;
 
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
