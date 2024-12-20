@@ -457,7 +457,7 @@ private:
                                           parseSequenceString("Ctrl+A"),
                                           ShortcutGroup::Playing_Area)},
         {"Player/aSelectColumn", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Column"),
-                                             parseSequenceString("Ctrl+C"),
+                                             parseSequenceString("Ctrl+Shift+C"),
                                              ShortcutGroup::Playing_Area)},
         {"Player/aMoveToBottomLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),
                                                     parseSequenceString("Ctrl+B"),
