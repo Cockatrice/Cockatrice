@@ -26,7 +26,9 @@ OracleQuery <- 'o' [:] RegexString
 CMCQuery <- ('cmc'/'mv') ws? NumericExpression
 PowerQuery <- [Pp] 'ow' 'er'? ws? NumericExpression
 ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
-RarityQuery <- [rR] ':' RegexString
+
+RarityQuery <- [rR] ':' Rarity
+Rarity <- [Cc] 'ommon'? / [Uu] 'ncommon'? / [Rr] 'are'? / [Mm] 'ythic'? / [Ss] 'pecial'? / [a-zA-Z] [a-z]*
 
 FormatQuery <- 'f' ':' Format / Legality ':' Format
 Format <- [a-zA-Z] [a-z]*
@@ -101,15 +103,37 @@ static void setupParserRules()
             return std::any_of(sets.begin(), sets.end(), matchesSet);
         };
     };
+    search["Rarity"] = [](const peg::SemanticValues &sv) -> QString {
+        switch (tolower(std::string(sv.sv())[0])) {
+            case 'c':
+                return "common";
+            case 'u':
+                return "uncommon";
+            case 'r':
+                return "rare";
+            case 'm':
+                return "mythic";
+            case 's':
+                return "special";
+            default:
+                return QString::fromStdString(std::string(sv.sv()));
+        }
+    };
     search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        auto matcher = std::any_cast<StringMatcher>(sv[0]);
+        const auto rarity = std::any_cast<QString>(sv[0]);
         return [=](const CardData &x) -> bool {
-            QList<CardInfoPerSet> infos = x->getSets().values();
+            QList<CardInfoPerSet> infos;
+            for (const auto &setsValue : x->getSets().values()) {
+                for (const auto &cardInfoPerSet : setsValue) {
+                    infos.append(cardInfoPerSet);
+                }
+            }
 
-            auto matchesRarity = [&matcher](const CardInfoPerSet &info) { return matcher(info.getProperty("rarity")); };
+            auto matchesRarity = [&rarity](const CardInfoPerSet &info) { return rarity == info.getProperty("rarity"); };
             return std::any_of(infos.begin(), infos.end(), matchesRarity);
         };
     };
+
     search["FormatQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         if (sv.choice() == 0) {
             const auto format = std::any_cast<QString>(sv[0]);
