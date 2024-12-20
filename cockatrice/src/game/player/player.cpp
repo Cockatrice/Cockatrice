@@ -516,6 +516,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     aSelectAll = new QAction(this);
     connect(aSelectAll, SIGNAL(triggered()), this, SLOT(actSelectAll()));
+    aSelectRow = new QAction(this);
+    connect(aSelectRow, SIGNAL(triggered()), this, SLOT(actSelectRow()));
     aSelectColumn = new QAction(this);
     connect(aSelectColumn, SIGNAL(triggered()), this, SLOT(actSelectColumn()));
 
@@ -843,6 +845,7 @@ void Player::retranslateUi()
     }
 
     aSelectAll->setText(tr("&Select All"));
+    aSelectRow->setText(tr("S&elect Row"));
     aSelectColumn->setText(tr("S&elect Column"));
 
     aPlay->setText(tr("&Play"));
@@ -933,6 +936,7 @@ void Player::setShortcutsActive()
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
 
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
+    aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
     aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
 
     QList<QKeySequence> addCCShortCuts;
@@ -1602,6 +1606,19 @@ void Player::actSelectAll()
     }
 
     selectCardsInZone(card->getZone());
+}
+
+void Player::actSelectRow()
+{
+    const CardItem *card = game->getActiveCard();
+    if (!card) {
+        return;
+    }
+
+    auto isSameRow = [card](const CardItem *cardItem) {
+        return qAbs(card->scenePos().y() - cardItem->scenePos().y()) < 50;
+    };
+    selectCardsInZone(card->getZone(), isSameRow);
 }
 
 void Player::actSelectColumn()
@@ -3750,6 +3767,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addMenu(moveMenu);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
+                cardMenu->addAction(aSelectRow);
 
                 for (int i = 0; i < aAddCounter.size(); ++i) {
                     cardMenu->addSeparator();
