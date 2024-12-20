@@ -1009,6 +1009,10 @@ void Player::setShortcutsActive()
         game->addAction(aClone);
         game->addAction(aDrawArrow);
         game->addAction(aSelectAll);
+
+        // unattach action is only active in card menu if the active card is attached.
+        // make unattach shortcut always active so that it consistently works when multiple cards are selected.
+        game->addAction(aUnattach);
     }
 }
 
@@ -3491,13 +3495,14 @@ void Player::actAttach()
 
 void Player::actUnattach()
 {
-    if (!game->getActiveCard()) {
-        return;
-    }
-
     QList<const ::google::protobuf::Message *> commandList;
     for (QGraphicsItem *item : scene()->selectedItems()) {
         auto *card = static_cast<CardItem *>(item);
+
+        if (!card->getAttachedTo()) {
+            continue;
+        }
+
         auto *cmd = new Command_AttachCard;
         cmd->set_start_zone(card->getZone()->getName().toStdString());
         cmd->set_card_id(card->getId());
