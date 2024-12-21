@@ -141,6 +141,7 @@ void CardInfoPictureWidget::loadPixmap()
 void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
+
     if (width() == 0 || height() == 0) {
         return;
     }
@@ -159,19 +160,19 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     // Adjust scaling after rotation
     const QSize availableSize = size(); // Size of the widget
-    const QSize pixmapSize = transformedPixmap.size();
-    const QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
+    const QSize scaledSize = transformedPixmap.size().scaled(availableSize, Qt::KeepAspectRatio);
 
-    const QPoint topLeft{(availableSize.width() - scaledSize.width()) / 2,
-                         (availableSize.height() - scaledSize.height()) / 2};
+    const QRect targetRect{(availableSize.width() - scaledSize.width()) / 2,
+                           (availableSize.height() - scaledSize.height()) / 2, scaledSize.width(), scaledSize.height()};
+
     const qreal radius = 0.05 * scaledSize.width();
 
+    // Draw the pixmap with rounded corners
     QStylePainter painter(this);
     QPainterPath shape;
-    shape.addRoundedRect(QRect(topLeft, scaledSize), radius, radius);
+    shape.addRoundedRect(targetRect, radius, radius);
     painter.setClipPath(shape);
-    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter,
-                           transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    painter.drawPixmap(targetRect, transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 /**
