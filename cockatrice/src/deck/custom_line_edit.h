@@ -4,6 +4,7 @@
 
 #include <QLineEdit>
 
+class QTreeView;
 class QKeyEvent;
 class QWidget;
 class QString;
@@ -23,6 +24,24 @@ private:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
+};
+
+class SearchLineEdit : public LineEditUnfocusable
+{
+private:
+    QTreeView *treeView;
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
+public:
+    SearchLineEdit() : LineEditUnfocusable(), treeView(nullptr)
+    {
+    }
+    void setTreeView(QTreeView *_treeView)
+    {
+        treeView = _treeView;
+    }
 };
 
 #endif
