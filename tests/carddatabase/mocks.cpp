@@ -200,6 +200,9 @@ void SettingsCache::setMinPlayersForMultiColumnLayout(int /* _minPlayersForMulti
 void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T /* _tapAnimation */)
 {
 }
+void SettingsCache::setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T /* _autoRotateSidewaysLayoutCards */)
+{
+}
 void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T /* _openDeckInNewTab */)
 {
 }

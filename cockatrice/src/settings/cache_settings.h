@@ -120,6 +120,7 @@ private:
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
+    bool autoRotateSidewaysLayoutCards;
     bool openDeckInNewTab;
     int rewindBufferingMs;
     bool chatMention;
@@ -368,6 +369,10 @@ public:
     bool getTapAnimation() const
     {
         return tapAnimation;
+    }
+    bool getAutoRotateSidewaysLayoutCards() const
+    {
+        return autoRotateSidewaysLayoutCards;
     }
     bool getOpenDeckInNewTab() const
     {
@@ -649,6 +654,7 @@ public slots:
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(QT_STATE_CHANGED_T _tapAnimation);
+    void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);

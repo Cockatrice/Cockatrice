@@ -1,6 +1,7 @@
 #include "card_info_picture_widget.h"
 
 #include "../../../../game/cards/card_item.h"
+#include "../../../../settings/cache_settings.h"
 #include "../../picture_loader.h"
 
 #include <QMouseEvent>
@@ -151,11 +152,13 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     }
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
-    if (info && info->getLandscapeOrientation()) {
-        // Rotate pixmap 90 degrees to the left
-        QTransform transform;
-        transform.rotate(90);
-        transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
+    if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
+        if (info && info->getLandscapeOrientation()) {
+            // Rotate pixmap 90 degrees to the left
+            QTransform transform;
+            transform.rotate(90);
+            transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
+        }
     }
 
     // Adjust scaling after rotation
