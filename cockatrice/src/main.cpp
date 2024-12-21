@@ -61,6 +61,28 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
     Logger::getInstance().log(type, ctx, message);
 }
 
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#include <DbgHelp.h>
+#pragma comment(lib, "DbgHelp.lib")  // Link the DbgHelp library
+
+LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPointers) {
+    HANDLE hDumpFile = CreateFile(L"CockatriceCrashDump.dmp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (hDumpFile != INVALID_HANDLE_VALUE) {
+        MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
+        dumpInfo.ExceptionPointers = pExceptionPointers;
+        dumpInfo.ThreadId = GetCurrentThreadId();
+        dumpInfo.ClientPointers = TRUE;
+
+        MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &dumpInfo, NULL, NULL);
+        CloseHandle(hDumpFile);
+    }
+
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+#endif
+
 void installNewTranslator()
 {
     QString lang = SettingsCache::instance().getLang();
@@ -93,10 +115,10 @@ void installNewTranslator()
 QString const generateClientID()
 {
     QString macList;
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-        if (interface.hardwareAddress() != "")
-            if (interface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
-                macList += interface.hardwareAddress() + ".";
+    foreach (QNetworkInterface networkInterface, QNetworkInterface::allInterfaces()) {
+        if (networkInterface.hardwareAddress() != "")
+            if (networkInterface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
+                macList += networkInterface.hardwareAddress() + ".";
     }
     QString strClientID = QCryptographicHash::hash(macList.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
     return strClientID;
@@ -104,6 +126,10 @@ QString const generateClientID()
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_WIN
+    SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
+#endif
+
     QApplication app(argc, argv);
 
     QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
