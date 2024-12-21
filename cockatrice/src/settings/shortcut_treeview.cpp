@@ -38,7 +38,7 @@ ShortcutTreeView::ShortcutTreeView(QWidget *parent) : QTreeView(parent)
     setSelectionMode(SingleSelection);
     setSelectionBehavior(SelectRows);
 
-    expandRecursively(QModelIndex());
+    expandAll();
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &ShortcutTreeView::refreshShortcuts);
@@ -128,5 +128,5 @@ void ShortcutTreeView::currentChanged(const QModelIndex &current, const QModelIn
 void ShortcutTreeView::updateSearchString(const QString &searchString)
 {
     proxyModel->setFilterFixedString(searchString);
-    expandRecursively(QModelIndex());
+    expandAll();
 }
