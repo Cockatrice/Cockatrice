@@ -146,6 +146,8 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL, Debug Symbols
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd /Zi")
+
+  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   # linux/gcc, bsd/gcc, windows/mingw
   include(CheckCXXCompilerFlag)
