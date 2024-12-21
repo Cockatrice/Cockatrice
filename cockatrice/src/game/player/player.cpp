@@ -1005,15 +1005,9 @@ void Player::setShortcutsActive()
     aPlayFacedown->setShortcut(shortcuts.getSingleShortcut("Player/aPlayFacedown"));
     aPlay->setShortcut(shortcuts.getSingleShortcut("Player/aPlay"));
 
+    // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
+    // when there are more than 1 player.
     if (!game->getIsLocalGame()) {
-        /* Attach all card menu actions that also work on the opponent's cards to the TabGame object so that those
-         * shortcuts will be active regardless of whether your card menu currently exists.
-         * Added as a workaround to get the clone keyboard shortcut to work on opponent's cards.
-         */
-        game->addAction(aClone);
-        game->addAction(aDrawArrow);
-        game->addAction(aSelectAll);
-
         // unattach action is only active in card menu if the active card is attached.
         // make unattach shortcut always active so that it consistently works when multiple cards are selected.
         game->addAction(aUnattach);
