@@ -1,7 +1,6 @@
 #ifndef SHORTCUT_TREEVIEW_H
 #define SHORTCUT_TREEVIEW_H
 
-#include <QDebug>
 #include <QModelIndex>
 #include <QStandardItemModel>
 #include <QTreeView>

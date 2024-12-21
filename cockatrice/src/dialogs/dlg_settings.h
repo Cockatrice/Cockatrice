@@ -9,9 +9,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
-#include <QSortFilterProxyModel>
 #include <QSpinBox>
-#include <QtGui/qstandarditemmodel.h>
 
 class ShortcutTreeView;
 class SearchLineEdit;
@@ -27,8 +25,6 @@ class QListWidgetItem;
 class QRadioButton;
 class QSlider;
 class QStackedWidget;
-class QTreeWidget;
-class QTreeWidgetItem;
 class QVBoxLayout;
 class SequenceEdit;
 
