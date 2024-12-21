@@ -21,8 +21,10 @@ struct EmptyType;
 typedef AstBase<EmptyType> Ast;
 } // namespace peg
 
-class FilterString
+class FilterString : QObject
 {
+    Q_OBJECT
+
 public:
     FilterString();
     explicit FilterString(const QString &exp);
@@ -42,6 +44,8 @@ public:
     }
 
 private:
+    void logger(size_t ln, size_t col, const std::string &msg);
+
     QString _error;
     Filter result;
 };
