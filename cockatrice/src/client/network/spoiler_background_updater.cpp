@@ -45,10 +45,10 @@ void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
 
     if (saveResults) {
         // This will write out to the file (used for spoiler.xml)
-        connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
+        connect(reply, &QNetworkReply::finished, this, &SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile);
     } else {
         // This will check the status (used to see if we're in spoiler season or not)
-        connect(reply, SIGNAL(finished()), this, SLOT(actCheckIfSpoilerSeasonEnabled()));
+        connect(reply, &QNetworkReply::finished, this, &SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled);
     }
 }
 
