@@ -29,24 +29,6 @@ class QVBoxLayout;
 class QPushButton;
 class QDockWidget;
 
-class SearchLineEdit : public LineEditUnfocusable
-{
-private:
-    QTreeView *treeView;
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
-
-public:
-    SearchLineEdit() : LineEditUnfocusable(), treeView(nullptr)
-    {
-    }
-    void setTreeView(QTreeView *_treeView)
-    {
-        treeView = _treeView;
-    }
-};
-
 class TabDeckEditor : public Tab
 {
     Q_OBJECT

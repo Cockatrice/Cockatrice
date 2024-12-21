@@ -50,22 +50,6 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-void SearchLineEdit::keyPressEvent(QKeyEvent *event)
-{
-    // List of key events that must be handled by the card list instead of the search box
-    static const QVector<Qt::Key> forwardToTreeView = {Qt::Key_Up, Qt::Key_Down, Qt::Key_PageDown, Qt::Key_PageUp};
-    // forward only if the search text is empty
-    static const QVector<Qt::Key> forwardWhenEmpty = {Qt::Key_Home, Qt::Key_End};
-    Qt::Key key = static_cast<Qt::Key>(event->key());
-    if (treeView) {
-        if (forwardToTreeView.contains(key))
-            QCoreApplication::sendEvent(treeView, event);
-        if (text().isEmpty() && forwardWhenEmpty.contains(key))
-            QCoreApplication::sendEvent(treeView, event);
-    }
-    LineEditUnfocusable::keyPressEvent(event);
-}
-
 void TabDeckEditor::createDeckDock()
 {
     deckModel = new DeckListModel(this);
