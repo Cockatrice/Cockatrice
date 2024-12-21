@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
     app.setOrganizationName("Cockatrice");
     app.setApplicationName("Dbconverter");
+    app.setApplicationDisplayName("Dbconverter");
     app.setApplicationVersion(VERSION_STRING);
 
     QCommandLineParser parser;
