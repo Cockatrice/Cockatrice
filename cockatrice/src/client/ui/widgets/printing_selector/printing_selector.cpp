@@ -175,7 +175,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
     // Defer widget creation
     currentIndex = 0;
 
-    connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=]() mutable {
+    connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < setsToUse.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
                                                                             cardSizeWidget->getSlider(), selectedCard,
