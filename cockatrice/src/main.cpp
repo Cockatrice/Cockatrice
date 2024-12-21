@@ -71,11 +71,8 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
 
 LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *pExceptionPointers)
 {
-    const auto fileNameString = "cockatrice.crash." + std::to_string(std::time(0)) + ".dmp";
-    const auto fileNameWString = std::wstring(fileNameString.begin(), fileNameString.end());
-
     HANDLE hDumpFile =
-        CreateFile(fileNameWString.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        CreateFile(_T("cockatrice.crash.dmp"), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hDumpFile != INVALID_HANDLE_VALUE) {
         MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
