@@ -62,12 +62,20 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
 }
 
 #ifdef Q_OS_WIN
+// clang-format off
 #include <Windows.h>
 #include <DbgHelp.h>
-#pragma comment(lib, "DbgHelp.lib")  // Link the DbgHelp library
+#include <tchar.h>
+#pragma comment(lib, "DbgHelp.lib") // Link the DbgHelp library
+// clang-format on
 
-LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPointers) {
-    HANDLE hDumpFile = CreateFile(L"CockatriceCrashDump.dmp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *pExceptionPointers)
+{
+    const auto fileNameString = "cockatrice.crash." + std::to_string(std::time(0)) + ".dmp";
+    const auto fileNameWString = std::wstring(fileNameString.begin(), fileNameString.end());
+
+    HANDLE hDumpFile =
+        CreateFile(fileNameWString.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hDumpFile != INVALID_HANDLE_VALUE) {
         MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
@@ -75,7 +83,8 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPoi
         dumpInfo.ThreadId = GetCurrentThreadId();
         dumpInfo.ClientPointers = TRUE;
 
-        MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &dumpInfo, NULL, NULL);
+        MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &dumpInfo,
+                          NULL, NULL);
         CloseHandle(hDumpFile);
     }
 
