@@ -338,6 +338,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
     connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
 
+    autoRotateSidewaysLayoutCardsCheckBox.setChecked(settings.getAutoRotateSidewaysLayoutCards());
+    connect(&autoRotateSidewaysLayoutCardsCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setAutoRotateSidewaysLayoutCards);
+
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(settings.getOverrideAllCardArtWithPersonalPreference());
     connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setOverrideAllCardArtWithPersonalPreference);
@@ -361,13 +365,14 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
-    cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
-    cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 2, 0, 1, 2);
-    cardsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 3, 0, 1, 2);
-    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 4, 0, 1, 1);
-    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 4, 1, 1, 1);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 5, 0);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 5, 1);
+    cardsGrid->addWidget(&autoRotateSidewaysLayoutCardsCheckBox, 1, 0, 1, 2);
+    cardsGrid->addWidget(&cardScalingCheckBox, 2, 0, 1, 2);
+    cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 3, 0, 1, 2);
+    cardsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 4, 0, 1, 2);
+    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 5, 0, 1, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 5, 1, 1, 1);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 6, 0);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 6, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -462,6 +467,7 @@ void AppearanceSettingsPage::retranslateUi()
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
+    autoRotateSidewaysLayoutCardsCheckBox.setText(tr("Auto-Rotate cards with sideways layout"));
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(
         tr("Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client "
            "restart]"));

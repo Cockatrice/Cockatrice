@@ -258,6 +258,8 @@ SettingsCache::SettingsCache()
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
+    autoRotateSidewaysLayoutCards = settings->value("cards/autorotatesidewayslayoutcards", true).toBool();
+
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
     rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
     chatMention = settings->value("chat/mention", true).toBool();
@@ -627,6 +629,12 @@ void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T _tapAnimation)
 {
     tapAnimation = static_cast<bool>(_tapAnimation);
     settings->setValue("cards/tapanimation", tapAnimation);
+}
+
+void SettingsCache::setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards)
+{
+    autoRotateSidewaysLayoutCards = static_cast<bool>(_autoRotateSidewaysLayoutCards);
+    settings->setValue("cards/autorotatesidewayslayoutcards", autoRotateSidewaysLayoutCards);
 }
 
 void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab)

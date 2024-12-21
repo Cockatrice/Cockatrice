@@ -1,6 +1,7 @@
 #include "card_info_picture_widget.h"
 
 #include "../../../../game/cards/card_item.h"
+#include "../../../../settings/cache_settings.h"
 #include "../../picture_loader.h"
 
 #include <QMouseEvent>
@@ -141,6 +142,7 @@ void CardInfoPictureWidget::loadPixmap()
 void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
+
     if (width() == 0 || height() == 0) {
         return;
     }
@@ -150,28 +152,30 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     }
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
-    if (info && info->getLandscapeOrientation()) {
-        // Rotate pixmap 90 degrees to the left
-        QTransform transform;
-        transform.rotate(90);
-        transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
+    if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
+        if (info && info->getLandscapeOrientation()) {
+            // Rotate pixmap 90 degrees to the left
+            QTransform transform;
+            transform.rotate(90);
+            transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
+        }
     }
 
     // Adjust scaling after rotation
     const QSize availableSize = size(); // Size of the widget
-    const QSize pixmapSize = transformedPixmap.size();
-    const QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
+    const QSize scaledSize = transformedPixmap.size().scaled(availableSize, Qt::KeepAspectRatio);
 
-    const QPoint topLeft{(availableSize.width() - scaledSize.width()) / 2,
-                         (availableSize.height() - scaledSize.height()) / 2};
+    const QRect targetRect{(availableSize.width() - scaledSize.width()) / 2,
+                           (availableSize.height() - scaledSize.height()) / 2, scaledSize.width(), scaledSize.height()};
+
     const qreal radius = 0.05 * scaledSize.width();
 
+    // Draw the pixmap with rounded corners
     QStylePainter painter(this);
     QPainterPath shape;
-    shape.addRoundedRect(QRect(topLeft, scaledSize), radius, radius);
+    shape.addRoundedRect(targetRect, radius, radius);
     painter.setClipPath(shape);
-    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter,
-                           transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    painter.drawPixmap(targetRect, transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 /**
