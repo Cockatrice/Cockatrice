@@ -24,6 +24,7 @@
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QScreen>
 #include <QToolBar>
 #include <QTreeView>
@@ -110,7 +111,6 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
 
 void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
-    qDebug() << event;
     DeckLoader deckLoader;
     if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat))
         return;

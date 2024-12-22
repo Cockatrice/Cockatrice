@@ -27,8 +27,13 @@ signals:
 public slots:
     void setFilePath(const QString &filePath);
 
+private:
+    QTimer *singleClickTimer;
+    QMouseEvent *lastMouseEvent = nullptr; // Store the last mouse event
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 };
 
 #endif // DECK_PREVIEW_CARD_PICTURE_WIDGET_H

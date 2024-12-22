@@ -1,6 +1,8 @@
 #include "deck_preview_card_picture_widget.h"
 
+#include <QApplication>
 #include <QFontMetrics>
+#include <QMouseEvent>
 #include <QPainterPath>
 #include <QStylePainter>
 #include <QTextOption>
@@ -24,11 +26,25 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
                                                            const Qt::Alignment alignment)
     : CardInfoPictureWithTextOverlayWidget(parent, hoverToZoomEnabled, textColor, outlineColor, fontSize, alignment)
 {
+    singleClickTimer = new QTimer(this);
+    singleClickTimer->setSingleShot(true);
+    connect(singleClickTimer, &QTimer::timeout, this, [this]() { qDebug() << "Clicked some stuff"; });
 }
 
 void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)
 {
-    emit imageClicked(event, this);
+    if (event->button() == Qt::LeftButton) {
+        lastMouseEvent = event;
+        singleClickTimer->start(QApplication::doubleClickInterval());
+    }
+}
+
+void DeckPreviewCardPictureWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        singleClickTimer->stop(); // Prevent single-click logic
+        emit imageClicked(lastMouseEvent, this);
+    }
 }
 
 void DeckPreviewCardPictureWidget::setFilePath(const QString &_filePath)
