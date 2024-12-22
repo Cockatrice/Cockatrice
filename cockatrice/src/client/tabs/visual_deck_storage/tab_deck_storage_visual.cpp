@@ -33,7 +33,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     deck_list_model = new DeckListModel(this);
     deck_list_model->setObjectName("visualDeckModel");
 
-    flow_widget = new FlowWidget(this, Qt::ScrollBarAlwaysOff,Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    flow_widget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     this->setCentralWidget(flow_widget);
 
     // Start adding our Widgets to our FlowLayout...
@@ -90,7 +90,7 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
         deck_loader->loadFromFile(file, DeckLoader::CockatriceFormat);
         deck_list_model->setDeckList(new DeckLoader(*deck_loader));
 
-        CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
+        auto *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
         qDebug() << "Banner card is: " << deck_loader->getBannerCard();
         display->setCard(CardDatabaseManager::getInstance()->getCard(deck_loader->getBannerCard()));
         display->setOverlayText(deck_loader->getName().isEmpty() ? QFileInfo(deck_loader->getLastFileName()).fileName()

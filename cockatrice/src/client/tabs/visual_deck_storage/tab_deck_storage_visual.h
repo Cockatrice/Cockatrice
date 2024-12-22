@@ -4,8 +4,8 @@
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_view.h"
 #include "../../ui/layouts/flow_layout.h"
-#include "../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../../ui/layouts/overlap_layout.h"
+#include "../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../tab.h"
 
 #include <QProcess>
@@ -38,8 +38,8 @@ private:
     QString getTargetPath() const;
     QStringList getBannerCardsForDecks();
 private slots:
-        void actOpenLocalDeck();
-        void actDeleteLocalDeck();
+    void actOpenLocalDeck();
+    void actDeleteLocalDeck();
 
 public:
     TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client);
@@ -48,11 +48,10 @@ public:
     {
         return tr("Deck storage");
     }
-    public slots:
-        void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    signals:
-        void openDeckEditor(const DeckLoader *deckLoader);
+public slots:
+    void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
+signals:
+    void openDeckEditor(const DeckLoader *deckLoader);
 };
-
 
 #endif
