@@ -111,6 +111,7 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
 
 void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
+    (void)event;
     DeckLoader deckLoader;
     if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat))
         return;
