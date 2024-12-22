@@ -178,7 +178,7 @@ bool SequenceEdit::validateShortcut(const QKeySequence &sequence)
     if (!shortcutsSettings.isValid(shortcutName, sequenceString)) {
         auto overlaps = shortcutsSettings.findOverlaps(shortcutName, sequenceString);
         QToolTip::showText(lineEdit->mapToGlobal(QPoint()),
-                           tr("Shortcut already in use by:") + " " + overlaps.join(','));
+                           tr("Shortcut already in use by:") + " " + overlaps.join(", "));
         return true;
     }
 
