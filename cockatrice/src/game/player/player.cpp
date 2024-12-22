@@ -3970,7 +3970,9 @@ void Player::setCardMenu(QMenu *menu)
 {
     if (aCardMenu != nullptr) {
         aCardMenu->setEnabled(menu != nullptr);
-        aCardMenu->setMenu(menu);
+        if (menu) {
+            aCardMenu->setMenu(menu);
+        }
     }
 }
 
