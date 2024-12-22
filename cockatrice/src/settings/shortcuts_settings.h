@@ -2,9 +2,7 @@
 #define SHORTCUTSSETTINGS_H
 
 #include <QApplication>
-#include <QHash>
 #include <QKeySequence>
-#include <QObject>
 #include <QSettings>
 
 class ShortcutGroup
@@ -80,18 +78,18 @@ public:
 class ShortcutKey : public QList<QKeySequence>
 {
 public:
-    ShortcutKey(const QString &_name = QString(),
-                QList<QKeySequence> _sequence = QList<QKeySequence>(),
-                ShortcutGroup::Groups _group = ShortcutGroup::Main_Window);
-    void setSequence(QList<QKeySequence> _sequence)
+    explicit ShortcutKey(const QString &_name = QString(),
+                         QList _sequence = QList(),
+                         ShortcutGroup::Groups _group = ShortcutGroup::Main_Window);
+    void setSequence(const QList &_sequence)
     {
-        QList<QKeySequence>::operator=(_sequence);
+        QList::operator=(_sequence);
     };
-    const QString getName() const
+    QString getName() const
     {
         return QApplication::translate("shortcutsTab", name.toUtf8().data());
     };
-    const QString getGroupName() const
+    QString getGroupName() const
     {
         return ShortcutGroup::getGroupName(group);
     };
@@ -105,13 +103,14 @@ class ShortcutsSettings : public QObject
 {
     Q_OBJECT
 public:
-    ShortcutsSettings(const QString &settingsFilePath, QObject *parent = nullptr);
+    explicit ShortcutsSettings(const QString &settingsFilePath, QObject *parent = nullptr);
 
     ShortcutKey getDefaultShortcut(const QString &name) const;
     ShortcutKey getShortcut(const QString &name) const;
     QKeySequence getSingleShortcut(const QString &name) const;
     QString getDefaultShortcutString(const QString &name) const;
     QString getShortcutString(const QString &name) const;
+    QString getShortcutFriendlyName(const QString &shortcutName) const;
     QList<QString> getAllShortcutKeys() const
     {
         return shortCuts.keys();
@@ -119,10 +118,11 @@ public:
 
     void setShortcuts(const QString &name, const QList<QKeySequence> &Sequence);
     void setShortcuts(const QString &name, const QKeySequence &Sequence);
-    void setShortcuts(const QString &name, const QString &Sequences);
+    void setShortcuts(const QString &name, const QString &sequences);
 
-    bool isKeyAllowed(const QString &name, const QString &Sequences) const;
-    bool isValid(const QString &name, const QString &Sequences) const;
+    bool isKeyAllowed(const QString &name, const QString &sequences) const;
+    bool isValid(const QString &name, const QString &sequences) const;
+    QStringList findOverlaps(const QString &name, const QString &sequences) const;
 
     void resetAllShortcuts();
     void clearAllShortcuts();
