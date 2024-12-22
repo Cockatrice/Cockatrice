@@ -9,17 +9,17 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="201"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>Bu sihirbaz Cockatrice tarafından kullanılacak setlerin, kartların ve tokenlerin listesini içe aktaracaktır.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="203"/>
         <source>Interface language:</source>
-        <translation type="unfinished"/>
+        <translation>Arayüz dili:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="204"/>
         <source>Version:</source>
-        <translation type="unfinished"/>
+        <translation>Sürüm:</translation>
     </message>
 </context>
 <context>
@@ -32,12 +32,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="260"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Lütfen set ve kart listesi için uyumlu bir kaynak belirtin. İndirilecek bir URL adresi belirtebilir veya bilgisayarınızdaki mevcut bir dosyayı kullanabilirsiniz.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="264"/>
         <source>Download URL:</source>
-        <translation>İndirme URL:</translation>
+        <translation>İndirme Bağlantısı:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="265"/>
@@ -47,7 +47,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="266"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Varsayılan URL&apos;yi geri yükle</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="267"/>
@@ -57,12 +57,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="277"/>
         <source>Load sets file</source>
-        <translation type="unfinished"/>
+        <translation>Set dosyasını yükle</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="287"/>
         <source>Sets JSON file (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Setler JSON dosyası (%1)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="317"/>
@@ -78,7 +78,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="317"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Paylaşılan bağlantı geçerli değil.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="321"/>
@@ -108,17 +108,17 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="447"/>
         <source>Parsing file</source>
-        <translation type="unfinished"/>
+        <translation>Dosya ayrıştırılıyor</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="469"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Xz çıkarma işlemi başarısız oldu.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="476"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
-        <translation type="unfinished"/>
+        <translation>Maalesef, Oracle&apos;ın bu sürümü xz sıkıştırılmış dosyaları desteklemiyor.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="496"/>
@@ -128,32 +128,32 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="501"/>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation type="unfinished"/>
+        <translation>Zip çıkarma işlemi başarısız oldu: Zip arşivi tam olarak bir dosya içermiyor.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="509"/>
         <source>Zip extraction failed: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Zip çıkarma işlemi başarısız oldu: %1.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="517"/>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation type="unfinished"/>
+        <translation>Maalesef, Oracle&apos;ın bu sürümü zip dosyalarını desteklemiyor.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="540"/>
         <source>Failed to interpret downloaded data.</source>
-        <translation type="unfinished"/>
+        <translation>İndirilen veriler işlenemedi.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="553"/>
         <source>Do you want to download the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Bunun yerine sıkıştırılmamış dosyayı indirmek ister misiniz?</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="575"/>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation type="unfinished"/>
+        <translation>Dosya başarıyla alındı, ancak herhangi bir set verisi içermiyor.</translation>
     </message>
 </context>
 <context>
@@ -161,32 +161,32 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="749"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler veritabanını kaydet</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="754"/>
         <source>XML; spoiler database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; spoiler veritabanı (*.xml)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="759"/>
         <source>Spoilers import</source>
-        <translation type="unfinished"/>
+        <translation>Spoilers içe aktar</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="760"/>
         <source>Please specify a compatible source for spoiler data.</source>
-        <translation type="unfinished"/>
+        <translation>Lütfen spoiler verileri için uyumlu bir kaynak belirtin.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="762"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>İndirme Bağlantısı:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="763"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Varsayılan bağlantıyı geri yükle</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="764"/>
