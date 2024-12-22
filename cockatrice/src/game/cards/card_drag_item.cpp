@@ -95,18 +95,24 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     QList<CardDragItem *> dragItemList;
     CardZone *startZone = static_cast<CardItem *>(item)->getZone();
-    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone)) && !occupied) {
-        dragItemList.append(this);
+    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone))) {
+        if (!occupied) {
+            dragItemList.append(this);
+        }
+
         for (int i = 0; i < childDrags.size(); i++) {
             CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
-            if (!(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone)) && !c->occupied)
+            if (!occupied && !(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone)) &&
+                !c->occupied) {
                 dragItemList.append(c);
+            }
             sc->removeItem(c);
         }
     }
 
-    if (currentZone)
+    if (currentZone) {
         currentZone->handleDropEvent(dragItemList, startZone, (sp - currentZone->scenePos()).toPoint());
+    }
 
     event->accept();
 }
