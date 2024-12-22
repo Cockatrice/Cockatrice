@@ -426,14 +426,10 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         initSayMenu();
     }
 
-    if (local || judge) {
-        aCardMenu = new QAction(this);
-        aCardMenu->setEnabled(false);
-        playerMenu->addSeparator();
-        playerMenu->addAction(aCardMenu);
-    } else {
-        aCardMenu = nullptr;
-    }
+    aCardMenu = new QAction(this);
+    aCardMenu->setEnabled(false);
+    playerMenu->addSeparator();
+    playerMenu->addAction(aCardMenu);
 
     if (local || judge) {
 
@@ -833,12 +829,12 @@ void Player::retranslateUi()
             counterIterator.next().value()->retranslateUi();
         }
 
-        aCardMenu->setText(tr("Selec&ted cards"));
-
         for (auto &allPlayersAction : allPlayersActions) {
             allPlayersAction->setText(tr("&All players"));
         }
     }
+
+    aCardMenu->setText(tr("Selec&ted cards"));
 
     if (local) {
         sayMenu->setTitle(tr("S&ay"));
