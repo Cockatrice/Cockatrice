@@ -31,7 +31,11 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
     nameEdit->setMaxLength(MAX_NAME_LENGTH);
-    nameEdit->selectAll();
+    QTimer::singleShot(100, this, [=, this]() {
+        nameEdit->selectAll();
+        nameEdit->setFocus();
+    });
+
     connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     nameLabel->setBuddy(nameEdit);
 
