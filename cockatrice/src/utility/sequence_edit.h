@@ -36,6 +36,7 @@ private:
 
     void processKey(QKeyEvent *e);
     int translateModifiers(Qt::KeyboardModifiers state, const QString &text);
+    bool validateShortcut(const QKeySequence &sequence);
     void finishShortcut();
     void updateSettings();
 };

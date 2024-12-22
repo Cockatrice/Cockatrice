@@ -114,6 +114,17 @@ QString ShortcutsSettings::getShortcutString(const QString &name) const
     return stringifySequence(getShortcut(name));
 }
 
+QString ShortcutsSettings::getShortcutFriendlyName(const QString &shortcutName) const
+{
+    for (auto it = defaultShortCuts.cbegin(); it != defaultShortCuts.cend(); ++it) {
+        if (shortcutName == it.key()) {
+            return it.value().getName();
+        }
+    }
+
+    return {};
+}
+
 QString ShortcutsSettings::stringifySequence(const QList<QKeySequence> &Sequence) const
 {
     QStringList stringSequence;
@@ -150,9 +161,9 @@ void ShortcutsSettings::setShortcuts(const QString &name, const QKeySequence &Se
     setShortcuts(name, QList<QKeySequence>{Sequence});
 }
 
-void ShortcutsSettings::setShortcuts(const QString &name, const QString &Sequences)
+void ShortcutsSettings::setShortcuts(const QString &name, const QString &sequences)
 {
-    setShortcuts(name, parseSequenceString(Sequences));
+    setShortcuts(name, parseSequenceString(sequences));
 }
 
 void ShortcutsSettings::resetAllShortcuts()
@@ -177,33 +188,45 @@ void ShortcutsSettings::clearAllShortcuts()
     emit shortCutChanged();
 }
 
-bool ShortcutsSettings::isKeyAllowed(const QString &name, const QString &Sequences) const
+bool ShortcutsSettings::isKeyAllowed(const QString &name, const QString &sequences) const
 {
     // if the shortcut is not to be used in deck-editor then it doesn't matter
     if (name.startsWith("Player") || name.startsWith("Replays")) {
         return true;
     }
-    QString checkSequence = Sequences.split(sep).last();
+    QString checkSequence = sequences.split(sep).last();
     QStringList forbiddenKeys{"Del",        "Backspace", "Down",  "Up",         "Left",       "Right",
                               "Return",     "Enter",     "Menu",  "Ctrl+Alt+-", "Ctrl+Alt+=", "Ctrl+Alt+[",
                               "Ctrl+Alt+]", "Tab",       "Space", "Shift+S",    "Shift+Left", "Shift+Right"};
     return !forbiddenKeys.contains(checkSequence);
 }
 
-bool ShortcutsSettings::isValid(const QString &name, const QString &Sequences) const
+/**
+ *  Checks that the shortcut doesn't overlap with an existing shortcut
+ *
+ * @param name The name of the shortcut
+ * @param sequences The shortcut key sequence
+ * @return Whether the shortcut is valid.
+ */
+bool ShortcutsSettings::isValid(const QString &name, const QString &sequences) const
 {
-    QString checkSequence = Sequences.split(sep).last();
+    return findOverlaps(name, sequences).isEmpty();
+}
+
+QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &sequences) const
+{
+    QString checkSequence = sequences.split(sep).last();
     QString checkKey = name.left(name.indexOf("/"));
 
-    QList<QString> allKeys = shortCuts.keys();
-    for (const auto &key : allKeys) {
+    QStringList overlaps;
+    for (const auto &key : shortCuts.keys()) {
         if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow")) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
-            QStringList stringSequences = storedSequence.split(sep);
-            if (stringSequences.contains(checkSequence)) {
-                return false;
+            if (storedSequence.split(sep).contains(checkSequence)) {
+                overlaps.append(getShortcutFriendlyName(key));
             }
         }
     }
-    return true;
+
+    return overlaps;
 }
