@@ -26,6 +26,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QComboBox>
+#include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
 #include <QDockWidget>
