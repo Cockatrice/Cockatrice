@@ -42,7 +42,6 @@ void SequenceEdit::setShortcutName(const QString &_shortcutName)
         lineEdit->setText("");
         // Correct as in-line translation
         lineEdit->setPlaceholderText(tr("Choose an action from the table"));
-
     } else {
         clearButton->setEnabled(true);
         defaultButton->setEnabled(true);
