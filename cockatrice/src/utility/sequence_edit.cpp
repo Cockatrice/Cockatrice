@@ -40,13 +40,12 @@ void SequenceEdit::setShortcutName(const QString &_shortcutName)
         defaultButton->setEnabled(false);
         lineEdit->setEnabled(false);
         lineEdit->setText("");
-        lineEdit->setPlaceholderText(tr("Choose an action from the table"));
+
     } else {
         clearButton->setEnabled(true);
         defaultButton->setEnabled(true);
         lineEdit->setEnabled(true);
         lineEdit->setText(SettingsCache::instance().shortcuts().getShortcutString(shortcutName));
-        lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
     }
 }
 
@@ -215,4 +214,7 @@ void SequenceEdit::retranslateUi()
     clearButton->setText(tr("Clear"));
     defaultButton->setText(tr("Restore default"));
     setShortcutName(shortcutName);
+
+    lineEdit->setPlaceholderText(tr("Choose an action from the table"));
+    lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
 }

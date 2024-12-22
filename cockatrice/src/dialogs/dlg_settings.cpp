@@ -61,11 +61,11 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     // updates
     SettingsCache &settings = SettingsCache::instance();
-    QList<ReleaseChannel *> channels = settings.getUpdateReleaseChannels();
-    foreach (ReleaseChannel *chan, channels) {
-        updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
-    }
-    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
+    //    QList<ReleaseChannel *> channels = settings.getUpdateReleaseChannels();
+    //    for (ReleaseChannel *chan : channels) {
+    //        updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
+    //    }
+    //    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
 
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
     newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
@@ -137,7 +137,7 @@ GeneralSettingsPage::GeneralSettingsPage()
         customCardDatabasePathButton->setVisible(false);
         tokenDatabasePathButton->setVisible(false);
     } else {
-        resetAllPathsButton = new QPushButton(tr("Reset all paths"));
+        resetAllPathsButton = new QPushButton;
         connect(resetAllPathsButton, SIGNAL(clicked()), this, SLOT(resetAllPathsClicked()));
         allPathsResetLabel = new QLabel(tr("All paths have been reset"));
         allPathsResetLabel->setVisible(false);
@@ -297,6 +297,15 @@ void GeneralSettingsPage::retranslateUi()
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
+    resetAllPathsButton->setText(tr("Reset all paths"));
+
+    const auto &settings = SettingsCache::instance();
+    QList<ReleaseChannel *> channels = settings.getUpdateReleaseChannels();
+    updateReleaseChannelBox.clear();
+    for (ReleaseChannel *chan : channels) {
+        updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
+    }
+    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -647,7 +656,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     mpSpoilerPathButton = new QPushButton("...");
     connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
 
-    updateNowButton = new QPushButton(tr("Update Spoilers"));
+    updateNowButton = new QPushButton;
     updateNowButton->setFixedWidth(150);
     connect(updateNowButton, SIGNAL(clicked()), this, SLOT(updateSpoilers()));
 
@@ -664,17 +673,16 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
 
-    auto aAdd = new QAction(this);
+    aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    aAdd->setToolTip(tr("Add New URL"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAddURL()));
-    auto aEdit = new QAction(this);
+
+    aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    aEdit->setToolTip(tr("Edit URL"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEditURL()));
-    auto aRemove = new QAction(this);
+
+    aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    aRemove->setToolTip(tr("Remove URL"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemoveURL()));
 
     auto *urlToolBar = new QToolBar;
@@ -706,7 +714,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkRedirectCacheTtlEdit.setMaximum(NETWORK_REDIRECT_CACHE_TTL_MAX);
     networkRedirectCacheTtlEdit.setSingleStep(1);
     networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
-    networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));
 
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
@@ -939,6 +946,11 @@ void DeckEditorSettingsPage::retranslateUi()
     networkRedirectCacheTtlEdit.setToolTip(tr("How long cached redirects for urls are valid for."));
     pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
+    updateNowButton->setText(tr("Update Spoilers"));
+    aAdd->setToolTip(tr("Add New URL"));
+    aEdit->setToolTip(tr("Edit URL"));
+    aRemove->setToolTip(tr("Remove URL"));
+    networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -985,7 +997,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&roomHistory, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(), &SettingsCache::setRoomHistory);
 
     customAlertString = new QLineEdit();
-    customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
     customAlertString->setText(SettingsCache::instance().getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), &SettingsCache::instance(),
             SLOT(setHighlightWords(QString)));
@@ -1026,15 +1037,14 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    aAdd->setToolTip(tr("Add New Message"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
+
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    aEdit->setToolTip(tr("Edit Message"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
+
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    aRemove->setToolTip(tr("Remove Message"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     auto *messageToolBar = new QToolBar;
@@ -1179,6 +1189,10 @@ void MessagesSettingsPage::retranslateUi()
     hexLabel.setText(tr("(Color is hexadecimal)"));
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
+    customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
+    aAdd->setToolTip(tr("Add New Message"));
+    aEdit->setToolTip(tr("Edit Message"));
+    aRemove->setToolTip(tr("Remove Message"));
 }
 
 SoundSettingsPage::SoundSettingsPage()
@@ -1260,7 +1274,6 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     // search bar
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
-    searchEdit->setPlaceholderText(tr("Search by shortcut name"));
     searchEdit->setClearButtonEnabled(true);
 
     setFocusProxy(searchEdit);
@@ -1369,6 +1382,7 @@ void ShortcutSettingsPage::retranslateUi()
     faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
     btnResetAll->setText(tr("Restore all default shortcuts"));
     btnClearAll->setText(tr("Clear all shortcuts"));
+    searchEdit->setPlaceholderText(tr("Search by shortcut name"));
 }
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)

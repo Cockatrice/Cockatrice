@@ -176,6 +176,7 @@ private:
     QLabel urlLinkLabel;
     QCheckBox picDownloadCheckBox;
     QListWidget *urlList;
+    QAction *aAdd, *aEdit, *aRemove;
     QCheckBox mcDownloadSpoilersCheckBox;
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
