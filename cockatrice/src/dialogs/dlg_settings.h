@@ -11,6 +11,10 @@
 #include <QPushButton>
 #include <QSpinBox>
 
+class ShortcutTreeView;
+class SearchLineEdit;
+class QTreeView;
+class QStandardItemModel;
 class CardDatabase;
 class QCloseEvent;
 class QGridLayout;
@@ -21,8 +25,6 @@ class QListWidgetItem;
 class QRadioButton;
 class QSlider;
 class QStackedWidget;
-class QTreeWidget;
-class QTreeWidgetItem;
 class QVBoxLayout;
 class SequenceEdit;
 
@@ -268,7 +270,8 @@ public:
     void retranslateUi() override;
 
 private:
-    QTreeWidget *shortcutsTable;
+    SearchLineEdit *searchEdit;
+    ShortcutTreeView *shortcutsTable;
     QVBoxLayout *mainLayout;
     QHBoxLayout *buttonsLayout;
     QGroupBox *editShortcutGroupBox;
@@ -285,10 +288,8 @@ private:
 
 private slots:
     void resetShortcuts();
-    void refreshShortcuts();
-    void createShortcuts();
     void clearShortcuts();
-    void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    void currentItemChanged(const QString &key);
 };
 
 class DlgSettings : public QDialog
