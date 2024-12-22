@@ -1739,12 +1739,12 @@ La tua email verrà utilizzata per verificare il tuo account.</translation>
     <message>
         <location filename="src/dialogs/dlg_roll_dice.cpp" line="20"/>
         <source>Number of dice:</source>
-        <translation type="unfinished"/>
+        <translation>Numero di dadi:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_roll_dice.cpp" line="41"/>
         <source>Roll Dice</source>
-        <translation type="unfinished"/>
+        <translation>Lancia dado</translation>
     </message>
 </context>
 <context>
@@ -7070,7 +7070,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Replays</source>
-        <translation type="unfinished"/>
+        <translation>Replay</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="143"/>
