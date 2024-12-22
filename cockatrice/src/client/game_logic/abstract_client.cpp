@@ -52,7 +52,7 @@ AbstractClient::AbstractClient(QObject *parent)
     FeatureSet features;
     features.initalizeFeatureList(clientFeatures);
 
-    connect(this, SIGNAL(sigQueuePendingCommand(PendingCommand *)), this, SLOT(queuePendingCommand(PendingCommand *)));
+    connect(this, &AbstractClient::sigQueuePendingCommand, this, &AbstractClient::queuePendingCommand);
 }
 
 AbstractClient::~AbstractClient()

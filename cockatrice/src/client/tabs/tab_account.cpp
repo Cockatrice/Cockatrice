@@ -30,29 +30,22 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     userInfoBox = new UserInfoBox(client, true);
     userInfoBox->updateInfo(userInfo);
 
-    connect(allUsersList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
-    connect(buddyList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
-    connect(ignoreList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
+    connect(allUsersList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
+    connect(buddyList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
+    connect(ignoreList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
 
-    connect(client, SIGNAL(userJoinedEventReceived(const Event_UserJoined &)), this,
-            SLOT(processUserJoinedEvent(const Event_UserJoined &)));
-    connect(client, SIGNAL(userLeftEventReceived(const Event_UserLeft &)), this,
-            SLOT(processUserLeftEvent(const Event_UserLeft &)));
-    connect(client, SIGNAL(buddyListReceived(const QList<ServerInfo_User> &)), this,
-            SLOT(buddyListReceived(const QList<ServerInfo_User> &)));
-    connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this,
-            SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
-    connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this,
-            SLOT(processAddToListEvent(const Event_AddToList &)));
-    connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this,
-            SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
+    connect(client, &AbstractClient::userJoinedEventReceived, this, &TabUserLists::processUserJoinedEvent);
+    connect(client, &AbstractClient::userLeftEventReceived, this, &TabUserLists::processUserLeftEvent);
+    connect(client, &AbstractClient::buddyListReceived, this, &TabUserLists::buddyListReceived);
+    connect(client, &AbstractClient::ignoreListReceived, this, &TabUserLists::ignoreListReceived);
+    connect(client, &AbstractClient::addToListEventReceived, this, &TabUserLists::processAddToListEvent);
+    connect(client, &AbstractClient::removeFromListEventReceived, this, &TabUserLists::processRemoveFromListEvent);
 
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(processListUsersResponse(const Response &)));
+    connect(pend,
+            static_cast<void (PendingCommand::*)(const Response &, const CommandContainer &, const QVariant &)>(
+                &PendingCommand::finished),
+            this, &TabUserLists::processListUsersResponse);
     client->sendCommand(pend);
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -63,9 +56,9 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     addBuddyEdit = new LineEditUnfocusable;
     addBuddyEdit->setMaxLength(MAX_NAME_LENGTH);
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
-    connect(addBuddyEdit, SIGNAL(returnPressed()), this, SLOT(addToBuddyList()));
+    connect(addBuddyEdit, &LineEditUnfocusable::returnPressed, this, &TabUserLists::addToBuddyList);
     QPushButton *addBuddyButton = new QPushButton("Add");
-    connect(addBuddyButton, SIGNAL(clicked()), this, SLOT(addToBuddyList()));
+    connect(addBuddyButton, &QPushButton::clicked, this, &TabUserLists::addToBuddyList);
     addToBuddyList->addWidget(addBuddyEdit);
     addToBuddyList->addWidget(addBuddyButton);
 
@@ -73,9 +66,9 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     addIgnoreEdit = new LineEditUnfocusable;
     addIgnoreEdit->setMaxLength(MAX_NAME_LENGTH);
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
-    connect(addIgnoreEdit, SIGNAL(returnPressed()), this, SLOT(addToIgnoreList()));
+    connect(addIgnoreEdit, &LineEditUnfocusable::returnPressed, this, &TabUserLists::addToIgnoreList);
     QPushButton *addIgnoreButton = new QPushButton("Add");
-    connect(addIgnoreButton, SIGNAL(clicked()), this, SLOT(addToIgnoreList()));
+    connect(addIgnoreButton, &QPushButton::clicked, this, &TabUserLists::addToIgnoreList);
     addToIgnoreList->addWidget(addIgnoreEdit);
     addToIgnoreList->addWidget(addIgnoreButton);
 
