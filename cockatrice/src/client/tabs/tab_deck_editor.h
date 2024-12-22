@@ -37,7 +37,7 @@ private slots:
     void updateName(const QString &name);
     void updateComments();
     void updateBannerCardComboBox();
-    void setBannerCard();
+    void setBannerCard(int);
     void updateHash();
     void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
     void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
