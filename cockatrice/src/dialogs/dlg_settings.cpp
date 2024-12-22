@@ -61,12 +61,6 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     // updates
     SettingsCache &settings = SettingsCache::instance();
-    //    QList<ReleaseChannel *> channels = settings.getUpdateReleaseChannels();
-    //    for (ReleaseChannel *chan : channels) {
-    //        updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
-    //    }
-    //    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
-
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
     newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
 
