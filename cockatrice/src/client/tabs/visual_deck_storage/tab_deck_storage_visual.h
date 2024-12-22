@@ -5,6 +5,8 @@
 #include "../../../deck/deck_view.h"
 #include "../../ui/layouts/flow_layout.h"
 #include "../../ui/layouts/overlap_layout.h"
+#include "../../ui/widgets/cards/card_info_picture_with_text_overlay_widget.h"
+#include "../../ui/widgets/cards/deck_preview_card_picture_widget.h"
 #include "../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../tab.h"
 
@@ -38,7 +40,7 @@ private:
     QString getTargetPath() const;
     QStringList getBannerCardsForDecks();
 private slots:
-    void actOpenLocalDeck();
+    void actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void actDeleteLocalDeck();
 
 public:

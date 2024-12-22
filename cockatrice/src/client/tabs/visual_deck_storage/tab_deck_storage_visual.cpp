@@ -11,8 +11,10 @@
 #include "../../ui/picture_loader.h"
 #include "../../ui/widgets/cards/card_info_picture_widget.h"
 #include "../../ui/widgets/cards/card_info_picture_with_text_overlay_widget.h"
+#include "../../ui/widgets/cards/deck_preview_card_picture_widget.h"
 #include "../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../../ui/widgets/general/layout_containers/overlap_widget.h"
+#include "../tab_supervisor.h"
 #include "pb/command_deck_del.pb.h"
 
 #include <QAction>
@@ -55,6 +57,8 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
 
+    connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addDeckEditorTab);
+
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aDeleteLocalDeck);
     retranslateUi();
@@ -90,27 +94,25 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
         deck_loader->loadFromFile(file, DeckLoader::CockatriceFormat);
         deck_list_model->setDeckList(new DeckLoader(*deck_loader));
 
-        auto *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
+        auto *display = new DeckPreviewCardPictureWidget(flow_widget, true);
         qDebug() << "Banner card is: " << deck_loader->getBannerCard();
         display->setCard(CardDatabaseManager::getInstance()->getCard(deck_loader->getBannerCard()));
         display->setOverlayText(deck_loader->getName().isEmpty() ? QFileInfo(deck_loader->getLastFileName()).fileName()
                                                                  : deck_loader->getName());
         display->setFontSize(24);
+        display->setFilePath(deck_loader->getLastFileName());
+        connect(display, &DeckPreviewCardPictureWidget::imageClicked, this, &TabDeckStorageVisual::actOpenLocalDeck);
         flow_widget->addWidget(display);
     }
 
     return QStringList("lol");
 }
 
-void TabDeckStorageVisual::actOpenLocalDeck()
+void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
-        return;
-    QString filePath = localDirModel->filePath(curLeft);
-
+    qDebug() << event;
     DeckLoader deckLoader;
-    if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
+    if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat))
         return;
 
     emit openDeckEditor(&deckLoader);

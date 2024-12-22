@@ -7,7 +7,7 @@
 #include <QSize>
 #include <QTextOption>
 
-class CardInfoPictureWithTextOverlayWidget final : public CardInfoPictureWidget
+class CardInfoPictureWithTextOverlayWidget : public CardInfoPictureWidget
 {
     Q_OBJECT
 
