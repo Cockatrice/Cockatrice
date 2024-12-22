@@ -93,7 +93,8 @@ QStringList TabDeckStorageVisual::getBannerCardsForDecks()
         CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
         qDebug() << "Banner card is: " << deck_loader->getBannerCard();
         display->setCard(CardDatabaseManager::getInstance()->getCard(deck_loader->getBannerCard()));
-        display->setOverlayText(deck_loader->getName());
+        display->setOverlayText(deck_loader->getName().isEmpty() ? QFileInfo(deck_loader->getLastFileName()).fileName()
+                                                                 : deck_loader->getName());
         display->setFontSize(24);
         flow_widget->addWidget(display);
     }
