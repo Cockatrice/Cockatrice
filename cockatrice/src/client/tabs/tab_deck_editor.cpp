@@ -103,7 +103,8 @@ void TabDeckEditor::createDeckDock()
         // Delay the update to avoid race conditions
         QTimer::singleShot(100, this, &TabDeckEditor::updateBannerCardComboBox);
     });
-    connect(bannerCardComboBox, &QComboBox::currentIndexChanged, this, &TabDeckEditor::setBannerCard);
+    connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &TabDeckEditor::setBannerCard);
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
