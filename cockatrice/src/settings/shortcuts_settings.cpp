@@ -227,6 +227,5 @@ QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &
         }
     }
 
-    qDebug() << "TRACK" << overlaps;
     return overlaps;
 }
