@@ -355,12 +355,30 @@ void TabDeckStorage::newFolderFinished(const Response &response, const CommandCo
 
 void TabDeckStorage::actDeleteRemoteDeck()
 {
-    PendingCommand *pend;
-    RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
-    if (!curRight)
+    auto curRights = serverDirView->getCurrentSelection();
+
+    if (curRights.isEmpty()) {
         return;
-    RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
-    if (dir) {
+    }
+
+    if (QMessageBox::warning(this, tr("Delete remote decks"), tr("Are you sure you want to delete the selected decks?"),
+                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+
+    for (const auto &curRight : curRights) {
+        deleteRemoteDeck(curRight);
+    }
+}
+
+void TabDeckStorage::deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *curRight)
+{
+    if (!curRight) {
+        return;
+    }
+
+    PendingCommand *pend;
+    if (const auto *dir = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(curRight)) {
         QString targetPath = dir->getPath();
         if (targetPath.isEmpty())
             return;
@@ -368,22 +386,13 @@ void TabDeckStorage::actDeleteRemoteDeck()
             qCritical() << "target path to delete is too long" << targetPath;
             return;
         }
-        if (QMessageBox::warning(this, tr("Delete remote folder"),
-                                 tr("Are you sure you want to delete \"%1\"?").arg(targetPath),
-                                 QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-            return;
         Command_DeckDelDir cmd;
         cmd.set_path(targetPath.toStdString());
         pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(deleteFolderFinished(Response, CommandContainer)));
     } else {
-        RemoteDeckList_TreeModel::FileNode *deckNode = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
-        if (QMessageBox::warning(this, tr("Delete remote deck"),
-                                 tr("Are you sure you want to delete \"%1\"?").arg(deckNode->getName()),
-                                 QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-            return;
-
+        const auto *deckNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(curRight);
         Command_DeckDel cmd;
         cmd.set_deck_id(deckNode->getId());
         pend = client->prepareSessionCommand(cmd);
