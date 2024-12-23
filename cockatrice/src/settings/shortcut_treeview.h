@@ -2,10 +2,23 @@
 #define SHORTCUT_TREEVIEW_H
 
 #include <QModelIndex>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>
 
-class QSortFilterProxyModel;
+/**
+ * Custom implementation of QSortFilterProxyModel that also searches in the parent's string when filtering
+ */
+class ShortcutFilterProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    explicit ShortcutFilterProxyModel(QObject *parent = nullptr);
+
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+};
+
 class ShortcutTreeView : public QTreeView
 {
     Q_OBJECT
@@ -21,7 +34,7 @@ public slots:
 
 private:
     QStandardItemModel *shortcutsModel;
-    QSortFilterProxyModel *proxyModel;
+    ShortcutFilterProxyModel *proxyModel;
     void populateShortcutsModel();
 
 private slots:
