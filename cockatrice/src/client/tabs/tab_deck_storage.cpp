@@ -164,16 +164,29 @@ void TabDeckStorage::actOpenLocalDeck()
 
 void TabDeckStorage::actUpload()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    if (curLefts.isEmpty()) {
         return;
+    }
+
     QString targetPath = getTargetPath();
     if (targetPath.length() > MAX_NAME_LENGTH) {
         qCritical() << "target path to upload to is too long" << targetPath;
         return;
     }
 
-    QString filePath = localDirModel->filePath(curLeft);
+    for (const auto &curLeft : curLefts) {
+        if (localDirModel->isDir(curLeft)) {
+            continue;
+        }
+
+        QString filePath = localDirModel->filePath(curLeft);
+        uploadDeck(filePath, targetPath);
+    }
+}
+
+void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPath)
+{
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 

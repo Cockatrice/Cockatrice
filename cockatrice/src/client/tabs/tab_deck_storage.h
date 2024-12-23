@@ -28,6 +28,9 @@ private:
 
     QAction *aOpenLocalDeck, *aUpload, *aDeleteLocalDeck, *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
     QString getTargetPath() const;
+
+    void uploadDeck(const QString &filePath, const QString &targetPath);
+
 private slots:
     void actOpenLocalDeck();
 
