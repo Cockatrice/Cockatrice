@@ -190,14 +190,14 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 
 void TabReplays::actDownload()
 {
-    QString folderPath;
+    QString dirPath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (!curLeft.isValid())
-        folderPath = localDirModel->rootPath();
+        dirPath = localDirModel->rootPath();
     else {
         while (!localDirModel->isDir(curLeft))
             curLeft = curLeft.parent();
-        folderPath = localDirModel->filePath(curLeft);
+        dirPath = localDirModel->filePath(curLeft);
     }
 
     const auto curRights = serverDirView->getSelectedReplays();
@@ -210,7 +210,7 @@ void TabReplays::actDownload()
     }
 
     for (const auto curRight : curRights) {
-        const QString filePath = folderPath + QString("/replay_%1.cor").arg(curRight->replay_id());
+        const QString filePath = dirPath + QString("/replay_%1.cor").arg(curRight->replay_id());
 
         Command_ReplayDownload cmd;
         cmd.set_replay_id(curRight->replay_id());
