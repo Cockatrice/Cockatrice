@@ -648,6 +648,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             isFoil = true;
             cardName.chop(3); // Remove the "*F*" from the card name
         }
+        Q_UNUSED(isFoil);
 
         // Attempt to match the hyphen-separated format (PLST-2094)
         match = reHyphenFormat.match(cardName);
