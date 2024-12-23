@@ -244,16 +244,22 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
 
 void TabDeckStorage::actDeleteLocalDeck()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
-        return;
+    const QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
 
-    if (QMessageBox::warning(this, tr("Delete local file"),
-                             tr("Are you sure you want to delete \"%1\"?").arg(localDirModel->fileName(curLeft)),
+    auto isDir = [&](const auto &curLeft) { return localDirModel->isDir(curLeft); };
+    if (curLefts.isEmpty() || std::all_of(curLefts.begin(), curLefts.end(), isDir)) {
+        return;
+    }
+
+    if (QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete the selected files?"),
                              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
-    localDirModel->remove(curLeft);
+    for (const auto &curLeft : curLefts) {
+        if (!localDirModel->isDir(curLeft)) {
+            localDirModel->remove(curLeft);
+        }
+    }
 }
 
 void TabDeckStorage::actOpenRemoteDeck()
