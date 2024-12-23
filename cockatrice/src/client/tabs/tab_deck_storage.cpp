@@ -242,18 +242,19 @@ void TabDeckStorage::actDeleteLocalDeck()
 
 void TabDeckStorage::actOpenRemoteDeck()
 {
-    RemoteDeckList_TreeModel::FileNode *curRight =
-        dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getCurrentItem());
-    if (!curRight)
-        return;
+    for (const auto &curRight : serverDirView->getCurrentSelection()) {
+        RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
+        if (!node)
+            return;
 
-    Command_DeckDownload cmd;
-    cmd.set_deck_id(curRight->getId());
+        Command_DeckDownload cmd;
+        cmd.set_deck_id(node->getId());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(openRemoteDeckFinished(Response, CommandContainer)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(openRemoteDeckFinished(Response, CommandContainer)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer)
