@@ -3,6 +3,7 @@
 
 #include "../../client/tearoff_menu.h"
 #include "../../game/player/player.h"
+#include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
@@ -89,6 +90,7 @@ private:
     QPushButton *loadLocalButton, *loadRemoteButton, *forceStartGameButton;
     ToggleButton *readyStartButton, *sideboardLockButton;
     DeckView *deckView;
+    VisualDeckStorageWidget *visualDeckStorageWidget;
     TabGame *parentGame;
     int playerId;
 private slots:

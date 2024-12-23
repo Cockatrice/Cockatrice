@@ -1,19 +1,6 @@
 #include "tab_deck_storage_visual.h"
 
-#include "../../../deck/deck_list_model.h"
-#include "../../../deck/deck_loader.h"
-#include "../../../deck/deck_view.h"
-#include "../../../game/cards/card_database_manager.h"
 #include "../../../game/cards/card_database_model.h"
-#include "../../../main.h"
-#include "../../../settings/cache_settings.h"
-#include "../../dbconverter/src/mocks.h"
-#include "../../ui/picture_loader.h"
-#include "../../ui/widgets/cards/card_info_picture_widget.h"
-#include "../../ui/widgets/cards/card_info_picture_with_text_overlay_widget.h"
-#include "../../ui/widgets/cards/deck_preview_card_picture_widget.h"
-#include "../../ui/widgets/general/layout_containers/flow_widget.h"
-#include "../../ui/widgets/general/layout_containers/overlap_widget.h"
 #include "../tab_supervisor.h"
 #include "pb/command_deck_del.pb.h"
 
@@ -36,17 +23,15 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     deck_list_model = new DeckListModel(this);
     deck_list_model->setObjectName("visualDeckModel");
 
-    flow_widget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-    this->setCentralWidget(flow_widget);
-
-    // Start adding our Widgets to our FlowLayout...
-
-    getBannerCardsForDecks();
+    QWidget *container = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(container);
+    container->setLayout(layout);
+    this->setCentralWidget(container);
 
     leftToolBar = new QToolBar;
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *leftToolBarLayout = new QHBoxLayout;
+    QHBoxLayout *leftToolBarLayout = new QHBoxLayout(this);
     leftToolBarLayout->addStretch();
     leftToolBarLayout->addWidget(leftToolBar);
     leftToolBarLayout->addStretch();
@@ -62,6 +47,12 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
 
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aDeleteLocalDeck);
+
+    visualDeckStorageWidget = new VisualDeckStorageWidget(this);
+
+    layout->addWidget(leftToolBar);
+    layout->addWidget(visualDeckStorageWidget);
+
     retranslateUi();
 }
 
@@ -77,37 +68,7 @@ QString TabDeckStorageVisual::getTargetPath() const
     return {};
 }
 
-QStringList TabDeckStorageVisual::getBannerCardsForDecks()
-{
-    QStringList allFiles;
 
-    // QDirIterator with QDir::Files and QDir::NoSymLinks ensures only files are listed (no directories or symlinks)
-    QDirIterator it(SettingsCache::instance().getDeckPath(), QDir::Files | QDir::NoSymLinks,
-                    QDirIterator::Subdirectories);
-
-    while (it.hasNext()) {
-        allFiles << it.next(); // Add each file path to the list
-    }
-
-    foreach (const QString &file, allFiles) {
-        qDebug() << file;
-        auto deck_loader = new DeckLoader();
-        deck_loader->loadFromFile(file, DeckLoader::CockatriceFormat);
-        deck_list_model->setDeckList(new DeckLoader(*deck_loader));
-
-        auto *display = new DeckPreviewCardPictureWidget(flow_widget, true);
-        qDebug() << "Banner card is: " << deck_loader->getBannerCard();
-        display->setCard(CardDatabaseManager::getInstance()->getCard(deck_loader->getBannerCard()));
-        display->setOverlayText(deck_loader->getName().isEmpty() ? QFileInfo(deck_loader->getLastFileName()).fileName()
-                                                                 : deck_loader->getName());
-        display->setFontSize(24);
-        display->setFilePath(deck_loader->getLastFileName());
-        connect(display, &DeckPreviewCardPictureWidget::imageClicked, this, &TabDeckStorageVisual::actOpenLocalDeck);
-        flow_widget->addWidget(display);
-    }
-
-    return QStringList("lol");
-}
 
 void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
