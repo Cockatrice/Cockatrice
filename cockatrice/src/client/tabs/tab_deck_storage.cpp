@@ -274,30 +274,32 @@ void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandCont
 
 void TabDeckStorage::actDownload()
 {
-    QString filePath;
+    QString dirPath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (!curLeft.isValid())
-        filePath = localDirModel->rootPath();
+        dirPath = localDirModel->rootPath();
     else {
         while (!localDirModel->isDir(curLeft))
             curLeft = curLeft.parent();
-        filePath = localDirModel->filePath(curLeft);
+        dirPath = localDirModel->filePath(curLeft);
     }
 
-    RemoteDeckList_TreeModel::FileNode *curRight =
-        dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getCurrentItem());
-    if (!curRight)
-        return;
-    filePath += QString("/deck_%1.cod").arg(curRight->getId());
+    for (const auto &curRight : serverDirView->getCurrentSelection()) {
+        RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
+        if (!node)
+            return;
 
-    Command_DeckDownload cmd;
-    cmd.set_deck_id(curRight->getId());
+        QString filePath = dirPath + QString("/deck_%1.cod").arg(node->getId());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(filePath);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(downloadFinished(Response, CommandContainer, QVariant)));
-    client->sendCommand(pend);
+        Command_DeckDownload cmd;
+        cmd.set_deck_id(node->getId());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(filePath);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabDeckStorage::downloadFinished(const Response &r,
