@@ -530,13 +530,19 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reDeckComment("^((main)?deck(list)?|mainboard)\\b",
                                            QRegularExpression::CaseInsensitiveOption);
 
-    // simplified matches
+    // Regex for advanced card parsing
     const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
-    const QRegularExpression reBrace(R"( ?[\[\{][^\]\}]*[\]\}] ?)"); // not nested
-    const QRegularExpression reRoundBrace(R"(^\([^\)]*\) ?)");       // () are only matched at start of string
-    const QRegularExpression reDigitBrace(R"( ?\(\d*\) ?)");         // () are matched if containing digits
-                                                             // () are matched if containing setcode then a number
+    const QRegularExpression reSplitCard(R"( ?\/\/ ?)");
+    const QRegularExpression reBrace(R"( ?[\[\{][^\]\}]*[\]\}] ?)");
+    const QRegularExpression reRoundBrace(R"(^\([^\)]*\) ?)");
+    const QRegularExpression reDigitBrace(R"( ?\(\d*\) ?)");
     const QRegularExpression reBraceDigit(R"( ?\([\dA-Z]+\) *\d+$)");
+    const QRegularExpression reDoubleFacedMarker(R"( ?\(Transform\) ?)");
+
+    // Regex for extracting set code and collector number with attached symbols
+    const QRegularExpression reHyphenFormat(R"(\((\w{3,})\)\s+(\w{3,})-(\d+[^\w\s]*))");
+    const QRegularExpression reRegularFormat(R"(\((\w{3,})\)\s+(\d+[^\w\s]*))");
+
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
                                                          {QRegularExpression("æ"), QString("ae")},
@@ -547,11 +553,11 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     auto inputs = in.readAll().trimmed().split('\n');
     auto max_line = inputs.size();
 
-    // start at the first empty line before the first cardline
+    // Start at the first empty line before the first card line
     auto deckStart = inputs.indexOf(reCardLine);
-    if (deckStart == -1) { // there are no cards?
+    if (deckStart == -1) {
         if (inputs.indexOf(reComment) == -1) {
-            return false; // input is empty
+            return false; // Input is empty
         }
         deckStart = max_line;
     } else {
@@ -561,7 +567,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         }
     }
 
-    // find sideboard position, if marks are used this won't be needed
+    // Find sideboard position
     int sBStart = -1;
     if (inputs.indexOf(reSBMark, deckStart) == -1) {
         sBStart = inputs.indexOf(reSBComment, deckStart);
@@ -572,7 +578,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             }
             auto nextCard = inputs.indexOf(reCardLine, sBStart + 1);
             if (inputs.indexOf(reEmpty, nextCard + 1) != -1) {
-                sBStart = max_line; // if there is another empty line all cards are mainboard
+                sBStart = max_line;
             }
         }
     }
@@ -580,7 +586,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     int index = 0;
     QRegularExpressionMatch match;
 
-    // parse name and comments
+    // Parse name and comments
     while (index < deckStart) {
         const auto &current = inputs.at(index++);
         if (!current.contains(reEmpty)) {
@@ -596,29 +602,28 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             comments += match.captured() + '\n';
         }
     }
-    comments.chop(1); // remove last newline
+    comments.chop(1);
 
-    // discard empty lines
+    // Discard empty lines
     while (index < max_line && inputs.at(index).contains(reEmpty)) {
         ++index;
     }
 
-    // discard line if it starts with deck or mainboard, all cards until the sideboard starts are in the mainboard
+    // Discard lines that indicate sections like "mainboard"
     if (inputs.at(index).contains(reDeckComment)) {
         ++index;
     }
 
-    // parse decklist
+    // Parse decklist
     for (; index < max_line; ++index) {
-
-        // check if line is a card
         match = reCardLine.match(inputs.at(index));
         if (!match.hasMatch())
             continue;
-        QString cardName = match.captured().simplified();
 
-        // check if card should be sideboard
+        QString cardName = match.captured().simplified();
         bool sideboard = false;
+
+        // Sideboard detection
         if (sBStart < 0) {
             match = reSBMark.match(cardName);
             if (match.hasMatch()) {
@@ -626,12 +631,39 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
                 cardName = match.captured(1);
             }
         } else {
-            if (index == sBStart) // skip sideboard line itself
+            if (index == sBStart)
                 continue;
             sideboard = index > sBStart;
         }
 
-        // check if a specific amount is mentioned
+        // Extract set code, collector number, and foil
+        QString setCode;
+        QString collectorNumber;
+        bool isFoil = false;
+
+        // Check for foil status at the end of the card name
+        if (cardName.endsWith("*F*", Qt::CaseInsensitive)) {
+            isFoil = true;
+            cardName.chop(3); // Remove the "*F*" from the card name
+        }
+
+        // Attempt to match the hyphen-separated format
+        match = reHyphenFormat.match(cardName);
+        if (match.hasMatch()) {
+            setCode = match.captured(2).toUpper();
+            collectorNumber = match.captured(3);
+            cardName = cardName.left(match.capturedStart()).trimmed();
+        } else {
+            // Attempt to match the regular format
+            match = reRegularFormat.match(cardName);
+            if (match.hasMatch()) {
+                setCode = match.captured(1).toUpper();
+                collectorNumber = match.captured(2);
+                cardName = cardName.left(match.capturedStart()).trimmed();
+            }
+        }
+
+        // Check for amount
         int amount = 1;
         match = reMultiplier.match(cardName);
         if (match.hasMatch()) {
@@ -639,25 +671,34 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             cardName = match.captured(2);
         }
 
-        // remove stuff inbetween braces
-        cardName.remove(reBrace);
-        cardName.remove(reRoundBrace); // I'll be entirely honest here, these are split to accommodate just three cards
-        cardName.remove(reDigitBrace); // from un-sets that have a word in between round braces at the end
-        cardName.remove(reBraceDigit); // very specific format with the set code in () and collectors number after
+        // Handle advanced card types
+        if (cardName.contains(reSplitCard)) {
+            cardName = cardName.split(reSplitCard).join(" // ");
+        }
 
-        // replace common differences in cardnames
+        if (cardName.contains(reDoubleFacedMarker)) {
+            QStringList faces = cardName.split(reDoubleFacedMarker);
+            cardName = faces.first().trimmed();
+        }
+
+        // Remove unnecessary characters
+        cardName.remove(reBrace);
+        cardName.remove(reRoundBrace);
+        cardName.remove(reDigitBrace);
+        cardName.remove(reBraceDigit);
+
+        // Normalize names
         for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
             cardName.replace(diff.key(), diff.value());
         }
 
-        // get cardname, this function does nothing if the name is not found
+        // Resolve complete card name
         cardName = getCompleteCardName(cardName);
 
-        // get zone name based on if it's in sideboard
+        // Determine the zone (mainboard/sideboard)
         QString zoneName = getCardZoneFromName(cardName, sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
 
-        // make new entry in decklist
-        new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName));
+        new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName), setCode, collectorNumber);
     }
 
     updateDeckHash();
