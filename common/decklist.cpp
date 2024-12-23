@@ -533,10 +533,11 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     // Regex for advanced card parsing
     const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
     const QRegularExpression reSplitCard(R"( ?\/\/ ?)");
-    const QRegularExpression reBrace(R"( ?[\[\{][^\]\}]*[\]\}] ?)");
-    const QRegularExpression reRoundBrace(R"(^\([^\)]*\) ?)");
-    const QRegularExpression reDigitBrace(R"( ?\(\d*\) ?)");
-    const QRegularExpression reBraceDigit(R"( ?\([\dA-Z]+\) *\d+$)");
+    const QRegularExpression reBrace(R"( ?[\[\{][^\]\}]*[\]\}] ?)"); // not nested
+    const QRegularExpression reRoundBrace(R"(^\([^\)]*\) ?)");       // () are only matched at start of string
+    const QRegularExpression reDigitBrace(R"( ?\(\d*\) ?)");         // () are matched if containing digits
+    const QRegularExpression reBraceDigit(
+        R"( ?\([\dA-Z]+\) *\d+$)"); // () are matched if containing setcode then a number
     const QRegularExpression reDoubleFacedMarker(R"( ?\(Transform\) ?)");
 
     // Regex for extracting set code and collector number with attached symbols
@@ -567,7 +568,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         }
     }
 
-    // Find sideboard position
+    // find sideboard position, if marks are used this won't be needed
     int sBStart = -1;
     if (inputs.indexOf(reSBMark, deckStart) == -1) {
         sBStart = inputs.indexOf(reSBComment, deckStart);
@@ -609,13 +610,14 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         ++index;
     }
 
-    // Discard lines that indicate sections like "mainboard"
+    // Discard line if it starts with deck or mainboard, all cards until the sideboard starts are in the mainboard
     if (inputs.at(index).contains(reDeckComment)) {
         ++index;
     }
 
     // Parse decklist
     for (; index < max_line; ++index) {
+        // check if line is a card
         match = reCardLine.match(inputs.at(index));
         if (!match.hasMatch())
             continue;
@@ -647,14 +649,14 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             cardName.chop(3); // Remove the "*F*" from the card name
         }
 
-        // Attempt to match the hyphen-separated format
+        // Attempt to match the hyphen-separated format (PLST-2094)
         match = reHyphenFormat.match(cardName);
         if (match.hasMatch()) {
             setCode = match.captured(2).toUpper();
             collectorNumber = match.captured(3);
             cardName = cardName.left(match.capturedStart()).trimmed();
         } else {
-            // Attempt to match the regular format
+            // Attempt to match the regular format (PLST) 2094
             match = reRegularFormat.match(cardName);
             if (match.hasMatch()) {
                 setCode = match.captured(1).toUpper();
@@ -663,7 +665,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             }
         }
 
-        // Check for amount
+        // check if a specific amount is mentioned
         int amount = 1;
         match = reMultiplier.match(cardName);
         if (match.hasMatch()) {
@@ -683,21 +685,22 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
         // Remove unnecessary characters
         cardName.remove(reBrace);
-        cardName.remove(reRoundBrace);
-        cardName.remove(reDigitBrace);
-        cardName.remove(reBraceDigit);
+        cardName.remove(reRoundBrace); // I'll be entirely honest here, these are split to accommodate just three cards
+        cardName.remove(reDigitBrace); // from un-sets that have a word in between round braces at the end
+        cardName.remove(reBraceDigit); // very specific format with the set code in () and collectors number after
 
         // Normalize names
         for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
             cardName.replace(diff.key(), diff.value());
         }
 
-        // Resolve complete card name
+        // Resolve complete card name, this function does nothing if the name is not found
         cardName = getCompleteCardName(cardName);
 
         // Determine the zone (mainboard/sideboard)
         QString zoneName = getCardZoneFromName(cardName, sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
 
+        // make new entry in decklist
         new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName), setCode, collectorNumber);
     }
 
