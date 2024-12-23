@@ -24,7 +24,7 @@ private:
     QNetworkAccessManager *manager;
 
     CardDatabase &cardDatabase;
-    void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
+    void copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:
     void queryFinished(QNetworkReply *reply);
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);

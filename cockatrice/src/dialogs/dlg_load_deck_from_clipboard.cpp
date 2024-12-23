@@ -65,6 +65,7 @@ void DlgLoadDeckFromClipboard::actOK()
         }
     } else if (deckLoader->loadFromStream_Plain(stream)) {
         deckList = deckLoader;
+        deckList->resolveSetNameAndNumberToProviderID();
         accept();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));

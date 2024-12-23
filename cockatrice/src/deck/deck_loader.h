@@ -47,6 +47,8 @@ public:
     bool saveToFile(const QString &fileName, FileFormat fmt);
     QString exportDeckToDecklist();
 
+    void resolveSetNameAndNumberToProviderID();
+
     // overload
     bool saveToStream_Plain(QTextStream &out, bool addComments = true);
 
