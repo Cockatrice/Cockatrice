@@ -150,16 +150,18 @@ QString TabDeckStorage::getTargetPath() const
 
 void TabDeckStorage::actOpenLocalDeck()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
-        return;
-    QString filePath = localDirModel->filePath(curLeft);
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    for (const auto &curLeft : curLefts) {
+        if (localDirModel->isDir(curLeft))
+            return;
+        QString filePath = localDirModel->filePath(curLeft);
 
-    DeckLoader deckLoader;
-    if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
-        return;
+        DeckLoader deckLoader;
+        if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
+            return;
 
-    emit openDeckEditor(&deckLoader);
+        emit openDeckEditor(&deckLoader);
+    }
 }
 
 void TabDeckStorage::actUpload()
