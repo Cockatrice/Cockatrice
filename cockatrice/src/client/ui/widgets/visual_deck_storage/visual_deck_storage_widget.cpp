@@ -49,7 +49,10 @@ QStringList VisualDeckStorageWidget::getBannerCardsForDecks()
 
         auto *display = new DeckPreviewCardPictureWidget(flowWidget, true);
         qDebug() << "Banner card is: " << deckLoader->getBannerCard();
-        display->setCard(CardDatabaseManager::getInstance()->getCard(deckLoader->getBannerCard()));
+        auto bannerCard = deckLoader->getBannerCard().isEmpty()
+                              ? CardInfoPtr()
+                              : CardDatabaseManager::getInstance()->getCard(deckLoader->getBannerCard());
+        display->setCard(bannerCard);
         display->setOverlayText(deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName()
                                                                 : deckLoader->getName());
         display->setFontSize(24);

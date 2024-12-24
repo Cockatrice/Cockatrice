@@ -47,8 +47,8 @@ private:
     DeckListModel *deck_list_model;
     QAction *aOpenLocalDeck, *aDeleteLocalDeck;
     QString getTargetPath() const;
-    private slots:
-        void actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+private slots:
+    void actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void actDeleteLocalDeck();
 };
 
