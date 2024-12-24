@@ -272,8 +272,7 @@ void TabDeckStorage::actDeleteLocalDeck()
 {
     const QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
 
-    auto isDir = [&](const auto &curLeft) { return localDirModel->isDir(curLeft); };
-    if (curLefts.isEmpty() || std::all_of(curLefts.begin(), curLefts.end(), isDir)) {
+    if (curLefts.isEmpty()) {
         return;
     }
 
@@ -282,7 +281,7 @@ void TabDeckStorage::actDeleteLocalDeck()
         return;
 
     for (const auto &curLeft : curLefts) {
-        if (!localDirModel->isDir(curLeft)) {
+        if (curLeft.isValid()) {
             localDirModel->remove(curLeft);
         }
     }
