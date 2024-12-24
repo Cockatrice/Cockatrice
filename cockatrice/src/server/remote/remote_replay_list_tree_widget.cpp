@@ -306,14 +306,41 @@ RemoteReplayList_TreeWidget::RemoteReplayList_TreeWidget(AbstractClient *_client
     setSortingEnabled(true);
     proxyModel->sort(0, Qt::AscendingOrder);
     header()->setSortIndicator(0, Qt::AscendingOrder);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
-ServerInfo_Replay const *RemoteReplayList_TreeWidget::getCurrentReplay() const
+/**
+ * Gets all currently selected replays.
+ * Any selection that isn't a replay file (e.g. a folder) will appear as a nullptr in the list.
+ * Make sure to check the list for nullptr before using it.
+ *
+ * @return A List of pointers to the selected replays, as well as nullptr for any selection that isn't a replay.
+ */
+QList<ServerInfo_Replay const *> RemoteReplayList_TreeWidget::getSelectedReplays() const
 {
-    return treeModel->getReplay(proxyModel->mapToSource(selectionModel()->currentIndex()));
+    const auto selection = selectionModel()->selectedRows();
+    auto replays = QList<ServerInfo_Replay const *>();
+    for (const auto &row : selection) {
+        replays << treeModel->getReplay(proxyModel->mapToSource(row));
+    }
+
+    return replays;
 }
 
-ServerInfo_ReplayMatch const *RemoteReplayList_TreeWidget::getCurrentReplayMatch() const
+/**
+ * Gets all currently selected replayMatches.
+ *
+ * @return A Set of pointers to the selected replayMatches.
+ */
+QSet<ServerInfo_ReplayMatch const *> RemoteReplayList_TreeWidget::getSelectedReplayMatches() const
 {
-    return treeModel->getReplayMatch(proxyModel->mapToSource(selectionModel()->currentIndex()));
+    const auto selection = selectionModel()->selectedRows();
+    auto replayMatches = QSet<ServerInfo_ReplayMatch const *>();
+    for (const auto &row : selection) {
+        if (const auto replayMatch = treeModel->getReplayMatch(proxyModel->mapToSource(row))) {
+            replayMatches << replayMatch;
+        }
+    }
+
+    return replayMatches;
 }

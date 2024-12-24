@@ -4,7 +4,22 @@
 #include "shortcuts_settings.h"
 
 #include <QHeaderView>
-#include <QSortFilterProxyModel>
+
+ShortcutFilterProxyModel::ShortcutFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent)
+{
+}
+
+/**
+ * @return True if this row or its parent matches the search string
+ */
+bool ShortcutFilterProxyModel::filterAcceptsRow(const int sourceRow, const QModelIndex &sourceParent) const
+{
+    QModelIndex nameIndex = sourceModel()->index(sourceRow, filterKeyColumn(), sourceParent);
+    QModelIndex parentIndex = sourceModel()->index(sourceParent.row(), filterKeyColumn(), sourceParent.parent());
+
+    return sourceModel()->data(nameIndex).toString().contains(filterRegularExpression()) ||
+           sourceModel()->data(parentIndex).toString().contains(filterRegularExpression());
+}
 
 ShortcutTreeView::ShortcutTreeView(QWidget *parent) : QTreeView(parent)
 {
@@ -14,7 +29,7 @@ ShortcutTreeView::ShortcutTreeView(QWidget *parent) : QTreeView(parent)
     populateShortcutsModel();
 
     // filter proxy
-    proxyModel = new QSortFilterProxyModel(this);
+    proxyModel = new ShortcutFilterProxyModel(this);
     proxyModel->setRecursiveFilteringEnabled(true);
     proxyModel->setSourceModel(shortcutsModel);
     proxyModel->setDynamicSortFilter(true);
