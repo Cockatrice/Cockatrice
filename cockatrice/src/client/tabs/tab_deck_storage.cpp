@@ -176,14 +176,8 @@ void TabDeckStorage::actUpload()
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 
-    QString deckString;
     DeckLoader deck;
-    bool error = !deck.loadFromFile(filePath, DeckLoader::CockatriceFormat);
-    if (!error) {
-        deckString = deck.writeToString_Native();
-        error = deckString.length() > MAX_FILE_LENGTH;
-    }
-    if (error) {
+    if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat)) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
     }
@@ -200,6 +194,12 @@ void TabDeckStorage::actUpload()
         deck.setName(deckName);
     } else {
         deck.setName(deck.getName().left(MAX_NAME_LENGTH));
+    }
+
+    QString deckString = deck.writeToString_Native();
+    if (deckString.length() > MAX_FILE_LENGTH) {
+        QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
+        return;
     }
 
     Command_DeckUpload cmd;
