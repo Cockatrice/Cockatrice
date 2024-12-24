@@ -135,7 +135,7 @@ private:
     QWidget *filterBox;
 
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu,
-        *analyzeDeckMenu, *saveDeckToClipboardMenu, *openRecentsMenu;
+        *analyzeDeckMenu, *saveDeckToClipboardMenu, *loadRecentDeckMenu;
     QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
         *aSaveDeckToClipboard, *aSaveDeckToClipboardRaw, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats,
         *aAnalyzeDeckTappedout, *aClose;

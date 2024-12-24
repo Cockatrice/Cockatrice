@@ -292,7 +292,7 @@ void TabDeckEditor::createMenus()
     aLoadDeck = new QAction(QString(), this);
     connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
 
-    openRecentsMenu = new QMenu(this);
+    loadRecentDeckMenu = new QMenu(this);
     connect(&SettingsCache::instance().recents(), &RecentsSettings::recentlyOpenedDeckPathsChanged, this,
             &TabDeckEditor::updateRecentlyOpened);
 
@@ -351,7 +351,7 @@ void TabDeckEditor::createMenus()
     deckMenu = new QMenu(this);
     deckMenu->addAction(aNewDeck);
     deckMenu->addAction(aLoadDeck);
-    deckMenu->addMenu(openRecentsMenu);
+    deckMenu->addMenu(loadRecentDeckMenu);
     deckMenu->addAction(aSaveDeck);
     deckMenu->addAction(aSaveDeckAs);
     deckMenu->addSeparator();
@@ -715,8 +715,8 @@ void TabDeckEditor::retranslateUi()
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
-    openRecentsMenu->setTitle(tr("Open Recent..."));
-    aClearRecents->setText(tr("Clear Items..."));
+    loadRecentDeckMenu->setTitle(tr("Load recent deck..."));
+    aClearRecents->setText(tr("Clear items..."));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
@@ -866,15 +866,15 @@ void TabDeckEditor::updateHash()
 
 void TabDeckEditor::updateRecentlyOpened()
 {
-    openRecentsMenu->clear();
+    loadRecentDeckMenu->clear();
     for (const auto &deckPath : SettingsCache::instance().recents().getRecentlyOpenedDeckPaths()) {
         QAction *aRecentlyOpenedDeck = new QAction(deckPath, this);
-        openRecentsMenu->addAction(aRecentlyOpenedDeck);
+        loadRecentDeckMenu->addAction(aRecentlyOpenedDeck);
         connect(aRecentlyOpenedDeck, &QAction::triggered, this,
                 [=, this] { actOpenRecent(aRecentlyOpenedDeck->text()); });
     }
-    openRecentsMenu->addSeparator();
-    openRecentsMenu->addAction(aClearRecents);
+    loadRecentDeckMenu->addSeparator();
+    loadRecentDeckMenu->addAction(aClearRecents);
     aClearRecents->setEnabled(SettingsCache::instance().recents().getRecentlyOpenedDeckPaths().length() > 0);
 }
 
