@@ -68,7 +68,7 @@ void VisualDeckStorageWidget::refreshBannerCards()
             case Alphabetical:
                 return info1.fileName().toLower() < info2.fileName().toLower();
             case ByLastModified:
-                return info1.lastModified() < info2.lastModified();
+                return info1.lastModified() > info2.lastModified();
         }
 
         return false; // Default case
