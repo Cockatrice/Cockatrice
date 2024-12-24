@@ -292,6 +292,15 @@ void TabDeckEditor::createMenus()
     aLoadDeck = new QAction(QString(), this);
     connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
 
+    openRecentsMenu = new QMenu(this);
+    connect(&SettingsCache::instance().recents(), &RecentsSettings::recentlyOpenedDeckPathsChanged, this,
+            &TabDeckEditor::updateRecentlyOpened);
+
+    aClearRecents = new QAction(QString(), this);
+    connect(aClearRecents, &QAction::triggered, this, &TabDeckEditor::actClearRecents);
+
+    updateRecentlyOpened();
+
     aSaveDeck = new QAction(QString(), this);
     connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
 
@@ -342,6 +351,7 @@ void TabDeckEditor::createMenus()
     deckMenu = new QMenu(this);
     deckMenu->addAction(aNewDeck);
     deckMenu->addAction(aLoadDeck);
+    deckMenu->addMenu(openRecentsMenu);
     deckMenu->addAction(aSaveDeck);
     deckMenu->addAction(aSaveDeckAs);
     deckMenu->addSeparator();
@@ -705,6 +715,8 @@ void TabDeckEditor::retranslateUi()
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
+    openRecentsMenu->setTitle(tr("Open Recent..."));
+    aClearRecents->setText(tr("Clear Items..."));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
@@ -852,6 +864,20 @@ void TabDeckEditor::updateHash()
     hashLabel->setText(deckModel->getDeckList()->getDeckHash());
 }
 
+void TabDeckEditor::updateRecentlyOpened()
+{
+    openRecentsMenu->clear();
+    for (const auto &deckPath : SettingsCache::instance().recents().getRecentlyOpenedDeckPaths()) {
+        QAction *aRecentlyOpenedDeck = new QAction(deckPath, this);
+        openRecentsMenu->addAction(aRecentlyOpenedDeck);
+        connect(aRecentlyOpenedDeck, &QAction::triggered, this,
+                [=, this] { actOpenRecent(aRecentlyOpenedDeck->text()); });
+    }
+    openRecentsMenu->addSeparator();
+    openRecentsMenu->addAction(aClearRecents);
+    aClearRecents->setEnabled(SettingsCache::instance().recents().getRecentlyOpenedDeckPaths().length() > 0);
+}
+
 bool TabDeckEditor::confirmClose()
 {
     if (modified) {
@@ -907,7 +933,30 @@ void TabDeckEditor::actLoadDeck()
         return;
 
     QString fileName = dialog.selectedFiles().at(0);
+    openDeckFromFile(fileName, deckOpenLocation);
+}
+
+void TabDeckEditor::actOpenRecent(const QString &fileName)
+{
+    auto deckOpenLocation = confirmOpen();
+
+    if (deckOpenLocation == CANCELLED) {
+        return;
+    }
+
+    openDeckFromFile(fileName, deckOpenLocation);
+}
+
+/**
+ * Actually opens the deck from file
+ * @param fileName The path of the deck to open
+ * @param deckOpenLocation Which tab to open the deck
+ */
+void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
+{
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+
+    SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
 
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt)) {
@@ -920,6 +969,11 @@ void TabDeckEditor::actLoadDeck()
     } else
         delete l;
     setSaveStatus(true);
+}
+
+void TabDeckEditor::actClearRecents()
+{
+    SettingsCache::instance().recents().clearRecentlyOpenedDeckPaths();
 }
 
 void TabDeckEditor::saveDeckRemoteFinished(const Response &response)

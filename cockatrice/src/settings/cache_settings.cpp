@@ -178,6 +178,7 @@ SettingsCache::SettingsCache()
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
     downloadSettings = new DownloadSettings(settingsPath, this);
+    recentsSettings = new RecentsSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();

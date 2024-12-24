@@ -28,6 +28,7 @@ set(oracle_SOURCES
     ../cockatrice/src/settings/servers_settings.cpp
     ../cockatrice/src/settings/settings_manager.cpp
     ../cockatrice/src/settings/message_settings.cpp
+    ../cockatrice/src/settings/recents_settings.cpp
     ../cockatrice/src/settings/game_filters_settings.cpp
     ../cockatrice/src/settings/layouts_settings.cpp
     ../cockatrice/src/settings/download_settings.cpp

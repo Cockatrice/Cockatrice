@@ -122,6 +122,7 @@ set(cockatrice_SOURCES
     src/settings/game_filters_settings.cpp
     src/settings/layouts_settings.cpp
     src/settings/message_settings.cpp
+    src/settings/recents_settings.cpp
     src/settings/servers_settings.cpp
     src/settings/settings_manager.cpp
     src/settings/cache_settings.cpp
