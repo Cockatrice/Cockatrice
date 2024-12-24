@@ -814,6 +814,14 @@ void CardDatabase::notifyEnabledSetsChanged()
     emit cardDatabaseEnabledSetsChanged();
 }
 
+bool CardDatabase::saveCardsToFile()
+{
+    QString fileName = SettingsCache::instance().getCustomCardDatabasePath() + "/cards.xml";
+
+    availableParsers.first()->saveToFile(sets, cards, fileName);
+    return true;
+}
+
 bool CardDatabase::saveCustomTokensToFile()
 {
     QString fileName =

@@ -33,7 +33,7 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
                                                                      CardInfoPtr _rootCard,
-                                                                     const CardInfoPerSet &_setInfoForCard,
+                                                                     CardInfoPerSet *_setInfoForCard,
                                                                      QString &_currentZone)
     : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
       cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard),
@@ -49,9 +49,9 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
 
     // Create the widget to display the set name and collector's number
     const QString combinedSetName =
-        QString(setInfoForCard.getPtr()->getLongName() + " (" + setInfoForCard.getPtr()->getShortName() + ")");
+        QString(setInfoForCard->getPtr()->getLongName() + " (" + setInfoForCard->getPtr()->getShortName() + ")");
     setNameAndCollectorsNumberDisplayWidget = new SetNameAndCollectorsNumberDisplayWidget(
-        this, combinedSetName, setInfoForCard.getProperty("num"), cardSizeSlider);
+        this, combinedSetName, setInfoForCard->getProperty("num"), cardSizeSlider);
 
     // Add the widgets to the layout
     layout->addWidget(overlayWidget, 0, Qt::AlignHCenter);

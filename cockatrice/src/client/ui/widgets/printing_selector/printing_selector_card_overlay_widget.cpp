@@ -29,7 +29,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
                                                                      CardInfoPtr _rootCard,
-                                                                     const CardInfoPerSet &_setInfoForCard)
+                                                                     CardInfoPerSet *_setInfoForCard)
     : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
       cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard)
 {
@@ -44,7 +44,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture->setMinimumSize(0, 0);
     cardInfoPicture->setScaleFactor(cardSizeSlider->value());
     setCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(rootCard->getName(),
-                                                                             setInfoForCard.getProperty("uuid"));
+                                                                             setInfoForCard->getProperty("uuid"));
     cardInfoPicture->setCard(setCard);
     mainLayout->addWidget(cardInfoPicture);
 
@@ -165,6 +165,24 @@ void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
 void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 {
     QMenu menu;
+
+    auto *preferenceMenu = new QMenu(tr("Preference"));
+    menu.addMenu(preferenceMenu);
+    bool isPreferred = setInfoForCard->getProperty("preferred").toInt();
+    if (isPreferred) {
+        QAction *setUnpreferred = preferenceMenu->addAction("Set as not preferred");
+        connect(setUnpreferred, &QAction::triggered, deckEditor, [this]() {
+            this->setInfoForCard->setProperty("preferred", nullptr);
+            CardDatabaseManager::getInstance()->saveCardsToFile();
+        });
+    } else {
+        QAction *setPreferred = preferenceMenu->addAction("Set as preferred");
+        connect(setPreferred, &QAction::triggered, deckEditor, [this]() {
+            this->setInfoForCard->setProperty("preferred", "1");
+            CardDatabaseManager::getInstance()->saveCardsToFile();
+        });
+    }
+
     // filling out the related cards submenu
     auto *relatedMenu = new QMenu(tr("Show Related cards"));
     menu.addMenu(relatedMenu);
