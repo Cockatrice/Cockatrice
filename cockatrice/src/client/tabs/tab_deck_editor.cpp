@@ -956,10 +956,9 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
 {
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
-
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt)) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
         } else {
