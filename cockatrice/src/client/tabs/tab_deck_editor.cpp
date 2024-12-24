@@ -966,8 +966,10 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
             setSaveStatus(false);
             setDeck(l);
         }
-    } else
+    } else {
         delete l;
+        QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
+    }
     setSaveStatus(true);
 }
 
