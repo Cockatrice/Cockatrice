@@ -51,7 +51,6 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
             &TabDeckStorageVisual::actOpenLocalDeck);
-    connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addDeckEditorTab);
 
     layout->addWidget(leftToolBar);
     layout->addWidget(visualDeckStorageWidget);
