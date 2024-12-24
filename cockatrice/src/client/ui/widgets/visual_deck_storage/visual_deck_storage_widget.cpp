@@ -4,12 +4,11 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 
-#include <QDirIterator>
 #include <QComboBox>
+#include <QDirIterator>
 #include <QVBoxLayout>
 
-VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent)
-    : QWidget(parent), sortOrder(Alphabetical)
+VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), sortOrder(Alphabetical)
 {
     deckListModel = new DeckListModel(this);
     deckListModel->setObjectName("visualDeckModel");

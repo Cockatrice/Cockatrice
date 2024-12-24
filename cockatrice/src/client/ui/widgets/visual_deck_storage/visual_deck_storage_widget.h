@@ -15,16 +15,17 @@ public:
     explicit VisualDeckStorageWidget(QWidget *parent);
     void retranslateUi();
 
-    public slots:
-        void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+public slots:
+    void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
-    signals:
-        void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+signals:
+    void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
 private:
-    enum SortOrder {
+    enum SortOrder
+    {
         Alphabetical,
         ByLastModified
     };
@@ -34,7 +35,7 @@ private:
     DeckListModel *deckListModel;
     QMap<QString, DeckViewCardContainer *> cardContainers;
 
-    SortOrder sortOrder; // Current sorting option
+    SortOrder sortOrder;       // Current sorting option
     void refreshBannerCards(); // Refresh the display of cards based on the current sorting option
 };
 
