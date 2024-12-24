@@ -3,7 +3,6 @@
 #include "../../../../deck/deck_loader.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
-#include "../../../ui/widgets/cards/deck_preview_card_picture_widget.h"
 
 #include <QDirIterator>
 
@@ -18,9 +17,16 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->addWidget(flowWidget);
 
     getBannerCardsForDecks();
+}
 
-    // TODO: Move this to class that uses this widget (The tab one, in this instance, distinct from the game one)
-    // connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addDeckEditorTab);
+void VisualDeckStorageWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
+{
+    emit imageClicked(event, instance);
+}
+
+void VisualDeckStorageWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
+{
+    emit imageDoubleClicked(event, instance);
 }
 
 QStringList VisualDeckStorageWidget::getBannerCardsForDecks()
@@ -49,8 +55,10 @@ QStringList VisualDeckStorageWidget::getBannerCardsForDecks()
         display->setFontSize(24);
         display->setFilePath(deckLoader->getLastFileName());
 
-        // TODO: Connect these to the parent.
-        // connect(display, &DeckPreviewCardPictureWidget::imageClicked, this, &TabDeckStorageVisual::actOpenLocalDeck);
+        connect(display, &DeckPreviewCardPictureWidget::imageClicked, this,
+                &VisualDeckStorageWidget::imageClickedEvent);
+        connect(display, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
+                &VisualDeckStorageWidget::imageDoubleClickedEvent);
         flowWidget->addWidget(display);
     }
 

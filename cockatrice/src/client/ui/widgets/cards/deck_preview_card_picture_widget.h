@@ -23,6 +23,7 @@ public:
 
 signals:
     void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void imageDoubleClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
 public slots:
     void setFilePath(const QString &filePath);

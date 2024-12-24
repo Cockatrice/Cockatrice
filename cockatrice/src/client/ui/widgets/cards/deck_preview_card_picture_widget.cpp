@@ -28,7 +28,7 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
 {
     singleClickTimer = new QTimer(this);
     singleClickTimer->setSingleShot(true);
-    connect(singleClickTimer, &QTimer::timeout, this, [this]() { qDebug() << "Clicked some stuff"; });
+    connect(singleClickTimer, &QTimer::timeout, this, [this]() { emit imageClicked(lastMouseEvent, this); });
 }
 
 void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)
@@ -43,7 +43,7 @@ void DeckPreviewCardPictureWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         singleClickTimer->stop(); // Prevent single-click logic
-        emit imageClicked(lastMouseEvent, this);
+        emit imageDoubleClicked(lastMouseEvent, this);
     }
 }
 
