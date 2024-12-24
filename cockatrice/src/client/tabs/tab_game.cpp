@@ -141,6 +141,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     deckView = new DeckView;
     connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
+    deckView->setVisible(false);
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
@@ -148,6 +149,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
+    deckViewLayout->addWidget(deckView);
     deckViewLayout->addWidget(visualDeckStorageWidget);
     deckViewLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(deckViewLayout);
@@ -320,15 +322,17 @@ void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckP
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
             SLOT(deckSelectFinished(const Response &)));
     parentGame->sendGameCommand(pend, playerId);
-    deckViewLayout->removeWidget(visualDeckStorageWidget);
-    deckViewLayout->addWidget(deckView);
+    visualDeckStorageWidget->setVisible(false);
+    deckView->setVisible(true);
+    deckViewLayout->update();
     unloadDeckButton->setEnabled(true);
 }
 
 void DeckViewContainer::unloadDeck()
 {
-    deckViewLayout->removeWidget(deckView);
-    deckViewLayout->addWidget(visualDeckStorageWidget);
+    deckView->setVisible(false);
+    visualDeckStorageWidget->setVisible(true);
+    deckViewLayout->update();
     unloadDeckButton->setEnabled(false);
 }
 
