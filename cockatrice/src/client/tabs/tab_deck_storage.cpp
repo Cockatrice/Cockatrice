@@ -41,6 +41,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     localDirView->setColumnHidden(1, true);
     localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
     localDirView->setSortingEnabled(true);
+    localDirView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
@@ -149,30 +150,45 @@ QString TabDeckStorage::getTargetPath() const
 
 void TabDeckStorage::actOpenLocalDeck()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
-        return;
-    QString filePath = localDirModel->filePath(curLeft);
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    for (const auto &curLeft : curLefts) {
+        if (localDirModel->isDir(curLeft))
+            return;
+        QString filePath = localDirModel->filePath(curLeft);
 
-    DeckLoader deckLoader;
-    if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
-        return;
+        DeckLoader deckLoader;
+        if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
+            return;
 
-    emit openDeckEditor(&deckLoader);
+        emit openDeckEditor(&deckLoader);
+    }
 }
 
 void TabDeckStorage::actUpload()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    if (curLefts.isEmpty()) {
         return;
+    }
+
     QString targetPath = getTargetPath();
     if (targetPath.length() > MAX_NAME_LENGTH) {
         qCritical() << "target path to upload to is too long" << targetPath;
         return;
     }
 
-    QString filePath = localDirModel->filePath(curLeft);
+    for (const auto &curLeft : curLefts) {
+        if (localDirModel->isDir(curLeft)) {
+            continue;
+        }
+
+        QString filePath = localDirModel->filePath(curLeft);
+        uploadDeck(filePath, targetPath);
+    }
+}
+
+void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPath)
+{
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 
@@ -228,16 +244,22 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
 
 void TabDeckStorage::actDeleteLocalDeck()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
-        return;
+    const QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
 
-    if (QMessageBox::warning(this, tr("Delete local file"),
-                             tr("Are you sure you want to delete \"%1\"?").arg(localDirModel->fileName(curLeft)),
+    auto isDir = [&](const auto &curLeft) { return localDirModel->isDir(curLeft); };
+    if (curLefts.isEmpty() || std::all_of(curLefts.begin(), curLefts.end(), isDir)) {
+        return;
+    }
+
+    if (QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete the selected files?"),
                              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
-    localDirModel->remove(curLeft);
+    for (const auto &curLeft : curLefts) {
+        if (!localDirModel->isDir(curLeft)) {
+            localDirModel->remove(curLeft);
+        }
+    }
 }
 
 void TabDeckStorage::actOpenRemoteDeck()
