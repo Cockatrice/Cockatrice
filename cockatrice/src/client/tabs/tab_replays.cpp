@@ -78,9 +78,13 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
     connect(localDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenLocalReplay()));
+    aNewLocalFolder = new QAction(this);
+    aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
+    connect(aNewLocalFolder, &QAction::triggered, this, &TabReplays::actNewLocalFolder);
     aDeleteLocalReplay = new QAction(this);
     aDeleteLocalReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
+
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
@@ -96,6 +100,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
 
     leftToolBar->addAction(aOpenLocalReplay);
+    leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalReplay);
     rightToolBar->addAction(aOpenRemoteReplay);
     rightToolBar->addAction(aDownload);
@@ -118,6 +123,7 @@ void TabReplays::retranslateUi()
     rightGroupBox->setTitle(tr("Server replay storage"));
 
     aOpenLocalReplay->setText(tr("Watch replay"));
+    aNewLocalFolder->setText(tr("New folder"));
     aDeleteLocalReplay->setText(tr("Delete"));
     aOpenRemoteReplay->setText(tr("Watch replay"));
     aDownload->setText(tr("Download replay"));
@@ -144,6 +150,26 @@ void TabReplays::actOpenLocalReplay()
 
         emit openReplay(replay);
     }
+}
+
+void TabReplays::actNewLocalFolder()
+{
+    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
+
+    QModelIndex dirIndex;
+    if (curLeft.isValid() && !localDirModel->isDir(curLeft)) {
+        dirIndex = curLeft.parent();
+    } else {
+        dirIndex = curLeft;
+    }
+
+    bool ok;
+    QString folderName =
+        QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"), QLineEdit::Normal, "", &ok);
+    if (!ok || folderName.isEmpty())
+        return;
+
+    localDirModel->mkdir(dirIndex, folderName);
 }
 
 void TabReplays::actDeleteLocalReplay()
