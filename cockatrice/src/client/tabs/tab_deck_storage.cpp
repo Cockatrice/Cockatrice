@@ -85,9 +85,13 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     aUpload = new QAction(this);
     aUpload->setIcon(QPixmap("theme:icons/arrow_right_green"));
     connect(aUpload, SIGNAL(triggered()), this, SLOT(actUpload()));
+    aNewLocalFolder = new QAction(this);
+    aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
+    connect(aNewLocalFolder, &QAction::triggered, this, &TabDeckStorage::actNewLocalFolder);
     aDeleteLocalDeck = new QAction(this);
     aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
+
     aOpenRemoteDeck = new QAction(this);
     aOpenRemoteDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenRemoteDeck, SIGNAL(triggered()), this, SLOT(actOpenRemoteDeck()));
@@ -103,6 +107,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
 
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aUpload);
+    leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalDeck);
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
@@ -125,6 +130,7 @@ void TabDeckStorage::retranslateUi()
     aUpload->setText(tr("Upload deck"));
     aOpenRemoteDeck->setText(tr("Open in deck editor"));
     aDownload->setText(tr("Download deck"));
+    aNewLocalFolder->setText(tr("New folder"));
     aNewFolder->setText(tr("New folder"));
     aDeleteLocalDeck->setText(tr("Delete"));
     aDeleteRemoteDeck->setText(tr("Delete"));
@@ -242,12 +248,31 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
     serverDirView->addFileToTree(resp.new_file(), serverDirView->getNodeByPath(QString::fromStdString(cmd.path())));
 }
 
+void TabDeckStorage::actNewLocalFolder()
+{
+    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
+
+    QModelIndex dirIndex;
+    if (curLeft.isValid() && !localDirModel->isDir(curLeft)) {
+        dirIndex = curLeft.parent();
+    } else {
+        dirIndex = curLeft;
+    }
+
+    bool ok;
+    QString folderName =
+        QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"), QLineEdit::Normal, "", &ok);
+    if (!ok || folderName.isEmpty())
+        return;
+
+    localDirModel->mkdir(dirIndex, folderName);
+}
+
 void TabDeckStorage::actDeleteLocalDeck()
 {
     const QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
 
-    auto isDir = [&](const auto &curLeft) { return localDirModel->isDir(curLeft); };
-    if (curLefts.isEmpty() || std::all_of(curLefts.begin(), curLefts.end(), isDir)) {
+    if (curLefts.isEmpty()) {
         return;
     }
 
@@ -256,7 +281,7 @@ void TabDeckStorage::actDeleteLocalDeck()
         return;
 
     for (const auto &curLeft : curLefts) {
-        if (!localDirModel->isDir(curLeft)) {
+        if (curLeft.isValid()) {
             localDirModel->remove(curLeft);
         }
     }
