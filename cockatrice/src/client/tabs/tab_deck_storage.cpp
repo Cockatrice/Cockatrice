@@ -264,18 +264,19 @@ void TabDeckStorage::actDeleteLocalDeck()
 
 void TabDeckStorage::actOpenRemoteDeck()
 {
-    RemoteDeckList_TreeModel::FileNode *curRight =
-        dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getCurrentItem());
-    if (!curRight)
-        return;
+    for (const auto &curRight : serverDirView->getCurrentSelection()) {
+        RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
+        if (!node)
+            return;
 
-    Command_DeckDownload cmd;
-    cmd.set_deck_id(curRight->getId());
+        Command_DeckDownload cmd;
+        cmd.set_deck_id(node->getId());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(openRemoteDeckFinished(Response, CommandContainer)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(openRemoteDeckFinished(Response, CommandContainer)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer)
@@ -295,30 +296,32 @@ void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandCont
 
 void TabDeckStorage::actDownload()
 {
-    QString filePath;
+    QString dirPath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (!curLeft.isValid())
-        filePath = localDirModel->rootPath();
+        dirPath = localDirModel->rootPath();
     else {
         while (!localDirModel->isDir(curLeft))
             curLeft = curLeft.parent();
-        filePath = localDirModel->filePath(curLeft);
+        dirPath = localDirModel->filePath(curLeft);
     }
 
-    RemoteDeckList_TreeModel::FileNode *curRight =
-        dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getCurrentItem());
-    if (!curRight)
-        return;
-    filePath += QString("/deck_%1.cod").arg(curRight->getId());
+    for (const auto &curRight : serverDirView->getCurrentSelection()) {
+        RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
+        if (!node)
+            return;
 
-    Command_DeckDownload cmd;
-    cmd.set_deck_id(curRight->getId());
+        QString filePath = dirPath + QString("/deck_%1.cod").arg(node->getId());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(filePath);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(downloadFinished(Response, CommandContainer, QVariant)));
-    client->sendCommand(pend);
+        Command_DeckDownload cmd;
+        cmd.set_deck_id(node->getId());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(filePath);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabDeckStorage::downloadFinished(const Response &r,
@@ -374,12 +377,30 @@ void TabDeckStorage::newFolderFinished(const Response &response, const CommandCo
 
 void TabDeckStorage::actDeleteRemoteDeck()
 {
-    PendingCommand *pend;
-    RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
-    if (!curRight)
+    auto curRights = serverDirView->getCurrentSelection();
+
+    if (curRights.isEmpty()) {
         return;
-    RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
-    if (dir) {
+    }
+
+    if (QMessageBox::warning(this, tr("Delete remote decks"), tr("Are you sure you want to delete the selected decks?"),
+                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+
+    for (const auto &curRight : curRights) {
+        deleteRemoteDeck(curRight);
+    }
+}
+
+void TabDeckStorage::deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *curRight)
+{
+    if (!curRight) {
+        return;
+    }
+
+    PendingCommand *pend;
+    if (const auto *dir = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(curRight)) {
         QString targetPath = dir->getPath();
         if (targetPath.isEmpty())
             return;
@@ -387,22 +408,13 @@ void TabDeckStorage::actDeleteRemoteDeck()
             qCritical() << "target path to delete is too long" << targetPath;
             return;
         }
-        if (QMessageBox::warning(this, tr("Delete remote folder"),
-                                 tr("Are you sure you want to delete \"%1\"?").arg(targetPath),
-                                 QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-            return;
         Command_DeckDelDir cmd;
         cmd.set_path(targetPath.toStdString());
         pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(deleteFolderFinished(Response, CommandContainer)));
     } else {
-        RemoteDeckList_TreeModel::FileNode *deckNode = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
-        if (QMessageBox::warning(this, tr("Delete remote deck"),
-                                 tr("Are you sure you want to delete \"%1\"?").arg(deckNode->getName()),
-                                 QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-            return;
-
+        const auto *deckNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(curRight);
         Command_DeckDel cmd;
         cmd.set_deck_id(deckNode->getId());
         pend = client->prepareSessionCommand(cmd);

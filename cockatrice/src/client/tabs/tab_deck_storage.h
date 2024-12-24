@@ -1,6 +1,7 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
+#include "../../server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
 class AbstractClient;
@@ -10,7 +11,6 @@ class QToolBar;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
-class RemoteDeckList_TreeWidget;
 class CommandContainer;
 class Response;
 class DeckLoader;
@@ -30,6 +30,7 @@ private:
     QString getTargetPath() const;
 
     void uploadDeck(const QString &filePath, const QString &targetPath);
+    void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
 
 private slots:
     void actOpenLocalDeck();

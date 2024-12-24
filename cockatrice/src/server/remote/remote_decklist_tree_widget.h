@@ -118,6 +118,7 @@ public:
     RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
     RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
     RemoteDeckList_TreeModel::Node *getCurrentItem() const;
+    QList<RemoteDeckList_TreeModel::Node *> getCurrentSelection() const;
     RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;
     RemoteDeckList_TreeModel::FileNode *getNodeById(int id) const;
     void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, RemoteDeckList_TreeModel::DirectoryNode *parent);

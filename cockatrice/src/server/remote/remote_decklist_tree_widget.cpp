@@ -300,6 +300,7 @@ RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QW
 
     header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     setUniformRowHeights(true);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
     setSortingEnabled(true);
     proxyModel->sort(0, Qt::AscendingOrder);
     header()->setSortIndicator(0, Qt::AscendingOrder);
@@ -313,6 +314,15 @@ RemoteDeckList_TreeModel::Node *RemoteDeckList_TreeWidget::getNode(const QModelI
 RemoteDeckList_TreeModel::Node *RemoteDeckList_TreeWidget::getCurrentItem() const
 {
     return getNode(selectionModel()->currentIndex());
+}
+
+QList<RemoteDeckList_TreeModel::Node *> RemoteDeckList_TreeWidget::getCurrentSelection() const
+{
+    auto list = QList<RemoteDeckList_TreeModel::Node *>();
+    for (const auto &row : selectionModel()->selectedRows()) {
+        list << getNode(row);
+    }
+    return list;
 }
 
 RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeWidget::getNodeByPath(const QString &path) const
