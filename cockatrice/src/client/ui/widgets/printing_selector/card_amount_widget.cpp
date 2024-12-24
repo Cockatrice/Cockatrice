@@ -155,6 +155,7 @@ void CardAmountWidget::addPrinting(const QString &zone)
                                        setInfoForCard.getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
+    deckEditor->setModified(true);
 }
 
 /**
@@ -236,6 +237,7 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
     QModelIndex idx = deckModel->findCard(rootCard->getName(), zone, setInfoForCard.getProperty("uuid"),
                                           setInfoForCard.getProperty("num"));
     offsetCountAtIndex(idx, -1);
+    deckEditor->setModified(true);
 }
 
 /**
