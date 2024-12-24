@@ -18,7 +18,7 @@ public:
                                       QTreeView *deckView,
                                       QSlider *cardSizeSlider,
                                       CardInfoPtr rootCard,
-                                      CardInfoPerSet setInfoForCard);
+                                      CardInfoPerSet *setInfoForCard);
     int getMainboardAmount();
     int getSideboardAmount();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -37,7 +37,7 @@ private:
     QTreeView *deckView;
     QSlider *cardSizeSlider;
     CardInfoPtr rootCard;
-    CardInfoPerSet setInfoForCard;
+    CardInfoPerSet *setInfoForCard;
     QLabel *zoneLabelMainboard;
     CardAmountWidget *buttonBoxMainboard;
     QLabel *zoneLabelSideboard;

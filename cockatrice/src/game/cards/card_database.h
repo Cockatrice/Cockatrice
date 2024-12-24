@@ -491,6 +491,7 @@ public:
     void enableAllUnknownSets();
     void markAllSetsAsKnown();
     void notifyEnabledSetsChanged();
+    bool saveCardsToFile();
 
 public slots:
     LoadStatus loadCardDatabases();

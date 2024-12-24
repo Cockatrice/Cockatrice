@@ -25,7 +25,7 @@ public:
                               QTreeView *deckView,
                               QSlider *cardSizeSlider,
                               CardInfoPtr &rootCard,
-                              CardInfoPerSet &setInfoForCard,
+                              CardInfoPerSet *setInfoForCard,
                               const QString &zoneName);
     int countCardsInZone(const QString &deckZone);
 
@@ -43,7 +43,7 @@ private:
     QTreeView *deckView;
     QSlider *cardSizeSlider;
     CardInfoPtr rootCard;
-    CardInfoPerSet setInfoForCard;
+    CardInfoPerSet *setInfoForCard;
     QString zoneName;
     QHBoxLayout *layout;
     DynamicFontSizePushButton *incrementButton;

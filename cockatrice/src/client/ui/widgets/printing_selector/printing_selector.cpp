@@ -179,7 +179,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         for (int i = 0; i < BATCH_SIZE && currentIndex < setsToUse.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
                                                                             cardSizeWidget->getSlider(), selectedCard,
-                                                                            setsToUse[currentIndex], currentZone);
+                                                                            &setsToUse[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
         }
