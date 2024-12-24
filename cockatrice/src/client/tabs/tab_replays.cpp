@@ -168,17 +168,21 @@ void TabReplays::actDeleteLocalReplay()
 
 void TabReplays::actOpenRemoteReplay()
 {
-    ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
-    if (!curRight)
-        return;
+    auto const curRights = serverDirView->getSelectedReplays();
 
-    Command_ReplayDownload cmd;
-    cmd.set_replay_id(curRight->replay_id());
+    for (const auto curRight : curRights) {
+        if (!curRight) {
+            continue;
+        }
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(openRemoteReplayFinished(const Response &)));
-    client->sendCommand(pend);
+        Command_ReplayDownload cmd;
+        cmd.set_replay_id(curRight->replay_id());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(openRemoteReplayFinished(const Response &)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::openRemoteReplayFinished(const Response &r)
@@ -195,34 +199,37 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 
 void TabReplays::actDownload()
 {
-    QString filePath;
+    QString dirPath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (!curLeft.isValid())
-        filePath = localDirModel->rootPath();
+        dirPath = localDirModel->rootPath();
     else {
         while (!localDirModel->isDir(curLeft))
             curLeft = curLeft.parent();
-        filePath = localDirModel->filePath(curLeft);
+        dirPath = localDirModel->filePath(curLeft);
     }
 
-    ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
+    const auto curRights = serverDirView->getSelectedReplays();
 
-    if (!curRight) {
+    const auto isNull = [](const auto *replay) { return !replay; };
+    if (std::any_of(curRights.begin(), curRights.end(), isNull)) {
         QMessageBox::information(this, tr("Downloading Replays"),
                                  tr("Folder download is not yet supported. Please download replays individually."));
         return;
     }
 
-    filePath += QString("/replay_%1.cor").arg(curRight->replay_id());
+    for (const auto curRight : curRights) {
+        const QString filePath = dirPath + QString("/replay_%1.cor").arg(curRight->replay_id());
 
-    Command_ReplayDownload cmd;
-    cmd.set_replay_id(curRight->replay_id());
+        Command_ReplayDownload cmd;
+        cmd.set_replay_id(curRight->replay_id());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(filePath);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(downloadFinished(Response, CommandContainer, QVariant)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(filePath);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::downloadFinished(const Response &r,
@@ -244,18 +251,22 @@ void TabReplays::downloadFinished(const Response &r,
 
 void TabReplays::actKeepRemoteReplay()
 {
-    ServerInfo_ReplayMatch const *curRight = serverDirView->getCurrentReplayMatch();
-    if (!curRight)
+    const auto curRights = serverDirView->getSelectedReplayMatches();
+
+    if (curRights.isEmpty()) {
         return;
+    }
 
-    Command_ReplayModifyMatch cmd;
-    cmd.set_game_id(curRight->game_id());
-    cmd.set_do_not_hide(!curRight->do_not_hide());
+    for (const auto curRight : curRights) {
+        Command_ReplayModifyMatch cmd;
+        cmd.set_game_id(curRight->game_id());
+        cmd.set_do_not_hide(!curRight->do_not_hide());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(keepRemoteReplayFinished(Response, CommandContainer)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(keepRemoteReplayFinished(Response, CommandContainer)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
@@ -274,21 +285,27 @@ void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContai
 
 void TabReplays::actDeleteRemoteReplay()
 {
-    ServerInfo_ReplayMatch const *curRight = serverDirView->getCurrentReplayMatch();
-    if (!curRight)
+    const auto curRights = serverDirView->getSelectedReplayMatches();
+
+    if (curRights.isEmpty()) {
         return;
+    }
+
     if (QMessageBox::warning(this, tr("Delete remote replay"),
-                             tr("Are you sure you want to delete the replay of game %1?").arg(curRight->game_id()),
-                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+                             tr("Are you sure you want to delete the selected replays?"),
+                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
+    }
 
-    Command_ReplayDeleteMatch cmd;
-    cmd.set_game_id(curRight->game_id());
+    for (const auto curRight : curRights) {
+        Command_ReplayDeleteMatch cmd;
+        cmd.set_game_id(curRight->game_id());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(deleteRemoteReplayFinished(Response, CommandContainer)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(deleteRemoteReplayFinished(Response, CommandContainer)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
