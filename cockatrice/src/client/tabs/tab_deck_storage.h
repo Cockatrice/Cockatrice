@@ -26,7 +26,8 @@ private:
     RemoteDeckList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
 
-    QAction *aOpenLocalDeck, *aUpload, *aDeleteLocalDeck, *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aOpenLocalDeck, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
+    QAction *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
     QString getTargetPath() const;
 
     void uploadDeck(const QString &filePath, const QString &targetPath);
@@ -37,6 +38,7 @@ private slots:
     void actUpload();
     void uploadFinished(const Response &r, const CommandContainer &commandContainer);
 
+    void actNewLocalFolder();
     void actDeleteLocalDeck();
 
     void actOpenRemoteDeck();
