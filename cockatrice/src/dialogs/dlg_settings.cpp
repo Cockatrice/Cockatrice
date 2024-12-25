@@ -941,11 +941,8 @@ void DeckEditorSettingsPage::retranslateUi()
     pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
     updateNowButton->setText(tr("Update Spoilers"));
-    aAdd->setToolTip(tr("Add New URL"));
     aAdd->setText(tr("Add New URL"));
-    aEdit->setToolTip(tr("Edit URL"));
     aEdit->setText(tr("Edit URL"));
-    aRemove->setToolTip(tr("Remove URL"));
     aRemove->setText(tr("Remove URL"));
     networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));
 }
