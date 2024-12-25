@@ -716,7 +716,7 @@ void TabDeckEditor::retranslateUi()
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
     loadRecentDeckMenu->setTitle(tr("Load recent deck..."));
-    aClearRecents->setText(tr("Clear items..."));
+    aClearRecents->setText(tr("Clear"));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
