@@ -97,6 +97,7 @@ public:
     void refreshTree();
     ServerInfo_Replay const *getReplay(const QModelIndex &index) const;
     ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &index) const;
+    ServerInfo_ReplayMatch const *getEnclosingReplayMatch(const QModelIndex &index) const;
     void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
     void updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo);
     void removeMatchInfo(int gameId);
