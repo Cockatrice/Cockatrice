@@ -221,6 +221,18 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getReplayMatch(const Q
         return nullptr;
 
     auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
+    if (!node)
+        return nullptr;
+
+    return &node->getMatchInfo();
+}
+
+ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatch(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return nullptr;
+
+    auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
     if (!node) {
         auto *_node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
         if (!_node)
@@ -319,6 +331,15 @@ ServerInfo_Replay const *RemoteReplayList_TreeWidget::getReplay(const QModelInde
 }
 
 /**
+ * Gets the replay match at the given index
+ * @return The replay match. Returns nullptr if there is no replay match at the index.
+ */
+ServerInfo_ReplayMatch const *RemoteReplayList_TreeWidget::getReplayMatch(const QModelIndex &ind) const
+{
+    return treeModel->getReplayMatch(proxyModel->mapToSource(ind));
+}
+
+/**
  * Gets all currently selected replays.
  * Any selection that isn't a replay file (e.g. a folder) will appear as a nullptr in the list.
  * Make sure to check the list for nullptr before using it.
@@ -338,6 +359,7 @@ QList<ServerInfo_Replay const *> RemoteReplayList_TreeWidget::getSelectedReplays
 
 /**
  * Gets all currently selected replayMatches.
+ * If a non-folder node is selected, it will return the parent folder of that node.
  *
  * @return A Set of pointers to the selected replayMatches.
  */
@@ -346,7 +368,7 @@ QSet<ServerInfo_ReplayMatch const *> RemoteReplayList_TreeWidget::getSelectedRep
     const auto selection = selectionModel()->selectedRows();
     auto replayMatches = QSet<ServerInfo_ReplayMatch const *>();
     for (const auto &row : selection) {
-        if (const auto replayMatch = treeModel->getReplayMatch(proxyModel->mapToSource(row))) {
+        if (const auto replayMatch = treeModel->getEnclosingReplayMatch(proxyModel->mapToSource(row))) {
             replayMatches << replayMatch;
         }
     }

@@ -97,6 +97,7 @@ public:
     void refreshTree();
     ServerInfo_Replay const *getReplay(const QModelIndex &index) const;
     ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &index) const;
+    ServerInfo_ReplayMatch const *getEnclosingReplayMatch(const QModelIndex &index) const;
     void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo);
     void updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo);
     void removeMatchInfo(int gameId);
@@ -111,6 +112,7 @@ private:
 public:
     RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
     ServerInfo_Replay const *getReplay(const QModelIndex &ind) const;
+    ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &ind) const;
     QList<ServerInfo_Replay const *> getSelectedReplays() const;
     QSet<ServerInfo_ReplayMatch const *> getSelectedReplayMatches() const;
     void refreshTree();

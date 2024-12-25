@@ -27,6 +27,9 @@ private:
 
     QAction *aOpenLocalReplay, *aNewLocalFolder, *aDeleteLocalReplay;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
+
+    void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
+
 private slots:
     void actLocalDoubleClick(const QModelIndex &curLeft);
     void actOpenLocalReplay();
