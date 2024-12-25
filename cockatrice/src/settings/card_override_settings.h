@@ -11,9 +11,11 @@ class CardOverrideSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    void setCardPreferenceOverride(QString cardName, QString providerId, bool enabled);
+    void setCardPreferenceOverride(const QString &cardName, const QString &providerId);
 
-    QString getCardPreferenceOverride(QString cardName);
+    void deleteCardPreferenceOverride(const QString &cardName);
+
+    QString getCardPreferenceOverride(const QString &cardName);
 
 private:
     explicit CardOverrideSettings(QString settingPath, QObject *parent = nullptr);

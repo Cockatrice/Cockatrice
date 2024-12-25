@@ -177,14 +177,13 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
         QAction *setPreferred = preferenceMenu->addAction(tr("Set as preferred printing"));
         connect(setPreferred, &QAction::triggered, this, [this, cardProviderId]() {
-            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(rootCard->getName(), cardProviderId,
-                                                                                true);
+            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(rootCard->getName(), cardProviderId);
             emit cardPreferenceChanged();
         });
     } else {
         QAction *setUnpreferred = preferenceMenu->addAction(tr("Unset as preferred printing"));
-        connect(setUnpreferred, &QAction::triggered, this, [this]() {
-            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(rootCard->getName(), "", false);
+        connect(setUnpreferred, &QAction::triggered, this, [this, cardProviderId]() {
+            SettingsCache::instance().cardOverrides().deleteCardPreferenceOverride(rootCard->getName());
             emit cardPreferenceChanged();
         });
     }

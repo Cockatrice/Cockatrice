@@ -5,16 +5,17 @@ CardOverrideSettings::CardOverrideSettings(QString settingPath, QObject *parent)
 {
 }
 
-void CardOverrideSettings::setCardPreferenceOverride(QString cardName, QString providerId, bool enabled)
+void CardOverrideSettings::setCardPreferenceOverride(const QString &cardName, const QString &providerId)
 {
-    if (enabled) {
-        setValue(providerId, cardName, "cards");
-    } else {
-        deleteValue(providerId, cardName, "cards");
-    }
+    setValue(providerId, cardName, "cards");
 }
 
-QString CardOverrideSettings::getCardPreferenceOverride(QString cardName)
+void CardOverrideSettings::deleteCardPreferenceOverride(const QString &cardName)
+{
+    deleteValue(cardName, "cards");
+}
+
+QString CardOverrideSettings::getCardPreferenceOverride(const QString &cardName)
 {
     return getValue(cardName, "cards").toString();
 }
