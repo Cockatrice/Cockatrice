@@ -178,8 +178,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         for (int i = 0; i < setsToUse.size(); ++i) {
             const auto &card = setsToUse[i];
             if (card.getProperty("uuid") == cardProviderId) {
-                setsToUse.prepend(card);
-                setsToUse.removeAt(i + 1);
+                setsToUse.move(i, 0);
                 break;
             }
         }
