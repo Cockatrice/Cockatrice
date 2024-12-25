@@ -239,30 +239,36 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 
 void TabReplays::actDownload()
 {
-    QString dirPath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (!curLeft.isValid())
-        dirPath = localDirModel->rootPath();
-    else {
-        while (!localDirModel->isDir(curLeft))
-            curLeft = curLeft.parent();
-        dirPath = localDirModel->filePath(curLeft);
+    while (!localDirModel->isDir(curLeft)) {
+        curLeft = curLeft.parent();
     }
 
-    const auto curRights = serverDirView->getSelectedReplays();
-
-    const auto isNull = [](const auto *replay) { return !replay; };
-    if (std::any_of(curRights.begin(), curRights.end(), isNull)) {
-        QMessageBox::information(this, tr("Downloading Replays"),
-                                 tr("Folder download is not yet supported. Please download replays individually."));
-        return;
+    for (const auto curRight : serverDirView->selectionModel()->selectedRows()) {
+        downloadNodeAtIndex(curLeft, curRight);
     }
+}
 
-    for (const auto curRight : curRights) {
-        const QString filePath = dirPath + QString("/replay_%1.cor").arg(curRight->replay_id());
+void TabReplays::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight)
+{
+    if (const auto replayMatch = serverDirView->getReplayMatch(curRight)) {
+        // node at index is a folder
+        const QString name =
+            QString::number(replayMatch->game_id()) + "_" + QString::fromStdString(replayMatch->game_name());
+
+        const auto newDirIndex = localDirModel->mkdir(curLeft, name);
+
+        int rows = serverDirView->model()->rowCount(curRight);
+        for (int i = 0; i < rows; i++) {
+            const auto childIndex = serverDirView->model()->index(i, 0, curRight);
+            downloadNodeAtIndex(newDirIndex, childIndex);
+        }
+    } else if (const auto replay = serverDirView->getReplay(curRight)) {
+        // node at index is a replay
+        const QString filePath = localDirModel->filePath(curLeft) + QString("/replay_%1.cor").arg(replay->replay_id());
 
         Command_ReplayDownload cmd;
-        cmd.set_replay_id(curRight->replay_id());
+        cmd.set_replay_id(replay->replay_id());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(filePath);
@@ -270,6 +276,7 @@ void TabReplays::actDownload()
                 SLOT(downloadFinished(Response, CommandContainer, QVariant)));
         client->sendCommand(pend);
     }
+    // node at index was invalid
 }
 
 void TabReplays::downloadFinished(const Response &r,
