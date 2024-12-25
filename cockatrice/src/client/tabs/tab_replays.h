@@ -28,10 +28,12 @@ private:
     QAction *aOpenLocalReplay, *aNewLocalFolder, *aDeleteLocalReplay;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
 private slots:
+    void actLocalDoubleClick(const QModelIndex &curLeft);
     void actOpenLocalReplay();
     void actNewLocalFolder();
     void actDeleteLocalReplay();
 
+    void actRemoteDoubleClick(const QModelIndex &curLeft);
     void actOpenRemoteReplay();
     void openRemoteReplayFinished(const Response &r);
 
