@@ -131,6 +131,13 @@ void TabReplays::retranslateUi()
     aDeleteRemoteReplay->setText(tr("Delete"));
 }
 
+void TabReplays::actLocalDoubleClick(const QModelIndex &curLeft)
+{
+    if (!localDirModel->isDir(curLeft)) {
+        actOpenLocalReplay();
+    }
+}
+
 void TabReplays::actOpenLocalReplay()
 {
     QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
@@ -189,6 +196,13 @@ void TabReplays::actDeleteLocalReplay()
         if (curLeft.isValid()) {
             localDirModel->remove(curLeft);
         }
+    }
+}
+
+void TabReplays::actRemoteDoubleClick(const QModelIndex &curRight)
+{
+    if (serverDirView->getReplay(curRight)) {
+        actOpenRemoteReplay();
     }
 }
 
