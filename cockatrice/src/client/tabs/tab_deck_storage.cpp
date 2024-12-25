@@ -45,6 +45,8 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
+    connect(localDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actLocalDoubleClick);
+
     leftToolBar = new QToolBar;
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
@@ -68,6 +70,8 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     rightToolBarLayout->addStretch();
 
     serverDirView = new RemoteDeckList_TreeWidget(client);
+
+    connect(serverDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actRemoteDoubleClick);
 
     QVBoxLayout *rightVbox = new QVBoxLayout;
     rightVbox->addWidget(serverDirView);
@@ -151,6 +155,13 @@ QString TabDeckStorage::getTargetPath() const
         }
     } else {
         return dir->getPath();
+    }
+}
+
+void TabDeckStorage::actLocalDoubleClick(const QModelIndex &curLeft)
+{
+    if (!localDirModel->isDir(curLeft)) {
+        actOpenLocalDeck();
     }
 }
 
@@ -286,6 +297,13 @@ void TabDeckStorage::actDeleteLocalDeck()
         if (curLeft.isValid()) {
             localDirModel->remove(curLeft);
         }
+    }
+}
+
+void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)
+{
+    if (dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getNode(curRight))) {
+        actOpenRemoteDeck();
     }
 }
 
