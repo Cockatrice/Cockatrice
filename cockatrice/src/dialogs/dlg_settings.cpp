@@ -728,9 +728,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(urlListLayout, 1, 0, 1, 2);
-    lpGeneralGrid->addLayout(networkCacheLayout, 2, 0, 1, 2);
-    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 0, 1, 2);
-    lpGeneralGrid->addLayout(networkRedirectCacheLayout, 4, 0, 1, 2);
+    lpGeneralGrid->addLayout(networkCacheLayout, 2, 1);
+    lpGeneralGrid->addLayout(networkRedirectCacheLayout, 3, 0);
+    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 1);
     lpGeneralGrid->addWidget(&urlLinkLabel, 5, 0);
     lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 5, 1);
 
