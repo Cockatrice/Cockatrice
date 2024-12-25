@@ -7,6 +7,7 @@
 #include "game_filters_settings.h"
 #include "layouts_settings.h"
 #include "message_settings.h"
+#include "recents_settings.h"
 #include "servers_settings.h"
 #include "shortcuts_settings.h"
 
@@ -82,6 +83,7 @@ private:
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
     DownloadSettings *downloadSettings;
+    RecentsSettings *recentsSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -597,6 +599,10 @@ public:
     DownloadSettings &downloads() const
     {
         return *downloadSettings;
+    }
+    RecentsSettings &recents() const
+    {
+        return *recentsSettings;
     }
     bool getIsPortableBuild() const
     {

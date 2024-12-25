@@ -43,9 +43,12 @@ private slots:
     void updateSearch(const QString &search);
     void databaseCustomMenu(QPoint point);
     void decklistCustomMenu(QPoint point);
+    void updateRecentlyOpened();
 
     void actNewDeck();
     void actLoadDeck();
+    void actOpenRecent(const QString &fileName);
+    void actClearRecents();
     bool actSaveDeck();
     bool actSaveDeckAs();
     void actLoadDeckFromClipboard();
@@ -106,6 +109,7 @@ private:
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
+    void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
@@ -131,10 +135,10 @@ private:
     QWidget *filterBox;
 
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu,
-        *analyzeDeckMenu, *saveDeckToClipboardMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard,
-        *aSaveDeckToClipboardRaw, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout,
-        *aClose;
+        *analyzeDeckMenu, *saveDeckToClipboardMenu, *loadRecentDeckMenu;
+    QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
+        *aSaveDeckToClipboard, *aSaveDeckToClipboardRaw, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats,
+        *aAnalyzeDeckTappedout, *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;

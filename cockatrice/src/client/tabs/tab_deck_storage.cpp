@@ -166,6 +166,8 @@ void TabDeckStorage::actOpenLocalDeck()
         if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
             return;
 
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(filePath);
+
         emit openDeckEditor(&deckLoader);
     }
 }
