@@ -1187,9 +1187,9 @@ void MessagesSettingsPage::retranslateUi()
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
-    aAdd->setToolTip(tr("Add New Message"));
-    aEdit->setToolTip(tr("Edit Message"));
-    aRemove->setToolTip(tr("Remove Message"));
+    aAdd->setText(tr("Add New Message"));
+    aEdit->setText(tr("Edit Message"));
+    aRemove->setText(tr("Remove Message"));
 }
 
 SoundSettingsPage::SoundSettingsPage()
