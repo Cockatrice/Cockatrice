@@ -34,6 +34,7 @@ private:
     void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
 
 private slots:
+    void actLocalDoubleClick(const QModelIndex &curLeft);
     void actOpenLocalDeck();
 
     void actUpload();
@@ -42,6 +43,7 @@ private slots:
     void actNewLocalFolder();
     void actDeleteLocalDeck();
 
+    void actRemoteDoubleClick(const QModelIndex &curRight);
     void actOpenRemoteDeck();
     void openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer);
 
