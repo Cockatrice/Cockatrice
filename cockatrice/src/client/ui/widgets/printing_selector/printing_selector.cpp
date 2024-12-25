@@ -172,6 +172,19 @@ void PrintingSelector::getAllSetsForCurrentCard()
         setsToUse = filteredSets;
     }
 
+    const auto &cardProviderId =
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(selectedCard->getName());
+    if (!cardProviderId.isEmpty()) {
+        for (int i = 0; i < setsToUse.size(); ++i) {
+            const auto &card = setsToUse[i];
+            if (card.getProperty("uuid") == cardProviderId) {
+                setsToUse.prepend(card);
+                setsToUse.removeAt(i + 1);
+                break;
+            }
+        }
+    }
+
     // Defer widget creation
     currentIndex = 0;
 
@@ -182,6 +195,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
                                                                             setsToUse[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
+            connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,
+                    &PrintingSelector::updateDisplay);
         }
 
         // Stop timer when done

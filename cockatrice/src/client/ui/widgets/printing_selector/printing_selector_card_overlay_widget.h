@@ -34,6 +34,9 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void customMenu(QPoint point);
 
+signals:
+    void cardPreferenceChanged();
+
 private:
     CardInfoPictureWidget *cardInfoPicture;
     AllZonesCardAmountWidget *allZonesCardAmountWidget;

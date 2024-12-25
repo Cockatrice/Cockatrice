@@ -46,6 +46,8 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     // Create the overlay widget for the card display
     overlayWidget = new PrintingSelectorCardOverlayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
                                                           rootCard, setInfoForCard);
+    connect(overlayWidget, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
+            [this]() { emit cardPreferenceChanged(); });
 
     // Create the widget to display the set name and collector's number
     const QString combinedSetName =

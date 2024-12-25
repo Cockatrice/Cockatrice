@@ -35,6 +35,9 @@ public:
 public slots:
     void clampSetNameToPicture();
 
+signals:
+    void cardPreferenceChanged();
+
 private:
     QVBoxLayout *layout;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
