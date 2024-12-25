@@ -112,6 +112,7 @@ private:
 public:
     RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
     ServerInfo_Replay const *getReplay(const QModelIndex &ind) const;
+    ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &ind) const;
     QList<ServerInfo_Replay const *> getSelectedReplays() const;
     QSet<ServerInfo_ReplayMatch const *> getSelectedReplayMatches() const;
     void refreshTree();

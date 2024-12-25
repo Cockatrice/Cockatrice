@@ -331,6 +331,15 @@ ServerInfo_Replay const *RemoteReplayList_TreeWidget::getReplay(const QModelInde
 }
 
 /**
+ * Gets the replay match at the given index
+ * @return The replay match. Returns nullptr if there is no replay match at the index.
+ */
+ServerInfo_ReplayMatch const *RemoteReplayList_TreeWidget::getReplayMatch(const QModelIndex &ind) const
+{
+    return treeModel->getReplayMatch(proxyModel->mapToSource(ind));
+}
+
+/**
  * Gets all currently selected replays.
  * Any selection that isn't a replay file (e.g. a folder) will appear as a nullptr in the list.
  * Make sure to check the list for nullptr before using it.
