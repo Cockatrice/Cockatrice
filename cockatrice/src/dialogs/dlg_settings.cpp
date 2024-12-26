@@ -941,11 +941,8 @@ void DeckEditorSettingsPage::retranslateUi()
     pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
     updateNowButton->setText(tr("Update Spoilers"));
-    aAdd->setToolTip(tr("Add New URL"));
     aAdd->setText(tr("Add New URL"));
-    aEdit->setToolTip(tr("Edit URL"));
     aEdit->setText(tr("Edit URL"));
-    aRemove->setToolTip(tr("Remove URL"));
     aRemove->setText(tr("Remove URL"));
     networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));
 }
@@ -1187,9 +1184,9 @@ void MessagesSettingsPage::retranslateUi()
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
-    aAdd->setToolTip(tr("Add New Message"));
-    aEdit->setToolTip(tr("Edit Message"));
-    aRemove->setToolTip(tr("Remove Message"));
+    aAdd->setText(tr("Add New Message"));
+    aEdit->setText(tr("Edit Message"));
+    aRemove->setText(tr("Remove Message"));
 }
 
 SoundSettingsPage::SoundSettingsPage()
