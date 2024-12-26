@@ -78,6 +78,9 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
     connect(localDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenLocalReplay()));
+    aRenameLocal = new QAction(this);
+    aRenameLocal->setIcon(QPixmap("theme:icons/pencil"));
+    connect(aRenameLocal, &QAction::triggered, this, &TabReplays::actRenameLocal);
     aNewLocalFolder = new QAction(this);
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewLocalFolder, &QAction::triggered, this, &TabReplays::actNewLocalFolder);
@@ -100,6 +103,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
 
     leftToolBar->addAction(aOpenLocalReplay);
+    leftToolBar->addAction(aRenameLocal);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalReplay);
     rightToolBar->addAction(aOpenRemoteReplay);
@@ -156,6 +160,36 @@ void TabReplays::actOpenLocalReplay()
         replay->ParseFromArray(_data.data(), _data.size());
 
         emit openReplay(replay);
+    }
+}
+
+void TabReplays::actRenameLocal()
+{
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    for (const auto &curLeft : curLefts) {
+        const QFileInfo info = localDirModel->fileInfo(curLeft);
+
+        const QString oldName = info.baseName();
+        const QString title = info.isDir() ? tr("Rename local folder") : tr("Rename local file");
+
+        bool ok;
+        QString newName = QInputDialog::getText(this, title, tr("New name:"), QLineEdit::Normal, oldName, &ok);
+        if (!ok) { // terminate all remaining selections if user cancels
+            return;
+        }
+        if (newName.isEmpty() || oldName == newName) {
+            continue;
+        }
+
+        QString newFileName = newName;
+        if (!info.suffix().isEmpty()) {
+            newFileName += "." + info.suffix();
+        }
+        const QString newFilePath = QFileInfo(info.dir(), newFileName).filePath();
+
+        if (!QFile::rename(info.filePath(), newFilePath)) {
+            QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
+        }
     }
 }
 

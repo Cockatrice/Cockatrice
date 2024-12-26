@@ -25,13 +25,14 @@ private:
     RemoteReplayList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
 
-    QAction *aOpenLocalReplay, *aNewLocalFolder, *aDeleteLocalReplay;
+    QAction *aOpenLocalReplay, *aRenameLocal, *aNewLocalFolder, *aDeleteLocalReplay;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
 
     void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
 
 private slots:
     void actLocalDoubleClick(const QModelIndex &curLeft);
+    void actRenameLocal();
     void actOpenLocalReplay();
     void actNewLocalFolder();
     void actDeleteLocalReplay();
