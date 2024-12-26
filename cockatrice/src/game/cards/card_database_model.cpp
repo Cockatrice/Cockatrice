@@ -145,9 +145,9 @@ void CardDatabaseModel::cardRemoved(CardInfoPtr card)
 
     beginRemoveRows(QModelIndex(), row, row);
     disconnect(card.data(), nullptr, this, nullptr);
+    cardListSet.remove(card);
     card.clear();
     cardList.removeAt(row);
-    cardListSet.insert(card);
     endRemoveRows();
 }
 
