@@ -11,6 +11,7 @@ class SelectZone : public CardZone
     Q_OBJECT
 private:
     QPointF selectionOrigin;
+    QSet<CardItem *> cardsInSelectionRect;
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

@@ -62,7 +62,17 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             if (card->getAttachedTo() && card->getAttachedTo()->getZone() != this) {
                 continue;
             }
-            card->setSelected(selectionRect.intersects(card->mapRectToParent(card->boundingRect())));
+
+            bool inRect = selectionRect.intersects(card->mapRectToParent(card->boundingRect()));
+            if (inRect && !cardsInSelectionRect.contains(card)) {
+                // selection has just expanded to cover the card
+                cardsInSelectionRect.insert(card);
+                card->setSelected(!card->isSelected());
+            } else if (!inRect && cardsInSelectionRect.contains(card)) {
+                // selection has just shrunk to no longer cover the card
+                cardsInSelectionRect.remove(card);
+                card->setSelected(!card->isSelected());
+            }
         }
         static_cast<GameScene *>(scene())->resizeRubberBand(
             deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
@@ -85,6 +95,7 @@ void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void SelectZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     selectionOrigin = QPoint();
+    cardsInSelectionRect.clear();
     static_cast<GameScene *>(scene())->stopRubberBand();
     event->accept();
 }
