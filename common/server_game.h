@@ -82,11 +82,11 @@ private:
                                      bool withUserInfo);
     void storeGameInformation();
 signals:
-    void sigStartGameIfReady();
+    void sigStartGameIfReady(bool override);
     void gameInfoChanged(ServerInfo_Game gameInfo);
 private slots:
     void pingClockTimeout();
-    void doStartGameIfReady();
+    void doStartGameIfReady(bool forceStartGame = false);
 
 public:
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -180,7 +180,7 @@ public:
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
     void unattachCards(GameEventStorage &ges, Server_Player *player);
     bool kickPlayer(int playerId);
-    void startGameIfReady();
+    void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();
     int getActivePlayer() const
     {

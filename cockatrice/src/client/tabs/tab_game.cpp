@@ -106,11 +106,14 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     loadRemoteButton = new QPushButton;
     readyStartButton = new ToggleButton;
     readyStartButton->setEnabled(false);
+    forceStartGameButton = new QPushButton;
+    forceStartGameButton->setEnabled(parent->isHost());
     sideboardLockButton = new ToggleButton;
     sideboardLockButton->setEnabled(false);
 
     connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
     connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
+    connect(forceStartGameButton, &QPushButton::clicked, this, &DeckViewContainer::forceStart);
     connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
     connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
 
@@ -125,6 +128,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addWidget(loadRemoteButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
+    if (forceStartGameButton->isEnabled()) {
+        buttonHBox->addWidget(forceStartGameButton);
+    }
     buttonHBox->setContentsMargins(0, 0, 0, 0);
     buttonHBox->addStretch();
     deckView = new DeckView;
@@ -147,6 +153,7 @@ void DeckViewContainer::retranslateUi()
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
     readyStartButton->setText(tr("Ready to start"));
+    forceStartGameButton->setText(tr("Force start"));
     updateSideboardLockButtonText();
 }
 
@@ -155,6 +162,7 @@ void DeckViewContainer::setButtonsVisible(bool _visible)
     loadLocalButton->setVisible(_visible);
     loadRemoteButton->setVisible(_visible);
     readyStartButton->setVisible(_visible);
+    forceStartGameButton->setVisible(_visible);
     sideboardLockButton->setVisible(_visible);
 }
 
@@ -335,6 +343,14 @@ void DeckViewContainer::readyStart()
 {
     Command_ReadyStart cmd;
     cmd.set_ready(!readyStartButton->getState());
+    parentGame->sendGameCommand(cmd, playerId);
+}
+
+void DeckViewContainer::forceStart()
+{
+    Command_ReadyStart cmd;
+    cmd.set_force_start(true);
+    cmd.set_ready(true);
     parentGame->sendGameCommand(cmd, playerId);
 }
 
