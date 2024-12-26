@@ -3711,7 +3711,9 @@ void Player::updateCardMenu(const CardItem *card)
         cardMenu->addAction(aSelectColumn);
         addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
-        if (moveMenu->isEmpty()) {
+        bool canModifyCard = judge || card->getOwner() == this;
+
+        if (moveMenu->isEmpty() && canModifyCard) {
             moveMenu->addAction(aMoveToTopLibrary);
             moveMenu->addAction(aMoveToXfromTopOfLibrary);
             moveMenu->addAction(aMoveToBottomLibrary);
@@ -3726,6 +3728,20 @@ void Player::updateCardMenu(const CardItem *card)
         if (card->getZone()) {
             if (card->getZone()->getName() == "table") {
                 // Card is on the battlefield
+
+                if (!canModifyCard) {
+                    addRelatedCardView(card, cardMenu);
+                    addRelatedCardActions(card, cardMenu);
+
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aDrawArrow);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aClone);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aSelectAll);
+                    cardMenu->addAction(aSelectRow);
+                    return;
+                }
 
                 if (ptMenu->isEmpty()) {
                     ptMenu->addAction(aIncP);
@@ -3780,32 +3796,48 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
                 // Card is on the stack
-                cardMenu->addAction(aAttach);
-                cardMenu->addAction(aDrawArrow);
-                cardMenu->addSeparator();
-                cardMenu->addAction(aClone);
-                cardMenu->addMenu(moveMenu);
-                cardMenu->addSeparator();
-                cardMenu->addAction(aSelectAll);
+                if (canModifyCard) {
+                    cardMenu->addAction(aAttach);
+                    cardMenu->addAction(aDrawArrow);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aClone);
+                    cardMenu->addMenu(moveMenu);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aSelectAll);
+                } else {
+                    cardMenu->addAction(aDrawArrow);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aClone);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aSelectAll);
+                }
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
             } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
                 // Card is in the graveyard or exile
-                cardMenu->addAction(aSelectAll);
-                cardMenu->addAction(aPlay);
-                cardMenu->addAction(aPlayFacedown);
+                if (canModifyCard) {
+                    cardMenu->addAction(aPlay);
+                    cardMenu->addAction(aPlayFacedown);
 
-                cardMenu->addSeparator();
-                cardMenu->addAction(aClone);
-                cardMenu->addMenu(moveMenu);
-                cardMenu->addSeparator();
-                cardMenu->addAction(aSelectAll);
-                cardMenu->addAction(aSelectColumn);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aClone);
+                    cardMenu->addMenu(moveMenu);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aSelectAll);
+                    cardMenu->addAction(aSelectColumn);
 
-                cardMenu->addSeparator();
-                cardMenu->addAction(aAttach);
-                cardMenu->addAction(aDrawArrow);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aAttach);
+                    cardMenu->addAction(aDrawArrow);
+                } else {
+                    cardMenu->addAction(aClone);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aSelectAll);
+                    cardMenu->addAction(aSelectColumn);
+                    cardMenu->addSeparator();
+                    cardMenu->addAction(aDrawArrow);
+                }
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
