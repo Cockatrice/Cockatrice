@@ -170,12 +170,12 @@ void TabDeckStorage::actOpenLocalDeck()
     QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
     for (const auto &curLeft : curLefts) {
         if (localDirModel->isDir(curLeft))
-            return;
+            continue;
         QString filePath = localDirModel->filePath(curLeft);
 
         DeckLoader deckLoader;
         if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
-            return;
+            continue;
 
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(filePath);
 
@@ -312,7 +312,7 @@ void TabDeckStorage::actOpenRemoteDeck()
     for (const auto &curRight : serverDirView->getCurrentSelection()) {
         RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
         if (!node)
-            return;
+            continue;
 
         Command_DeckDownload cmd;
         cmd.set_deck_id(node->getId());
@@ -354,7 +354,7 @@ void TabDeckStorage::actDownload()
     for (const auto &curRight : serverDirView->getCurrentSelection()) {
         RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
         if (!node)
-            return;
+            continue;
 
         QString filePath = dirPath + QString("/deck_%1.cod").arg(node->getId());
 
