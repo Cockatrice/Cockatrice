@@ -5,4 +5,5 @@ message Command_ReadyStart {
         optional Command_ReadyStart ext = 1016;
     }
     optional bool ready = 1;
+    optional bool force_start = 2;
 }

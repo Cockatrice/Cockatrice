@@ -944,7 +944,7 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    if (readyStart == cmd.ready()) {
+    if (readyStart == cmd.ready() && !cmd.force_start()) {
         return Response::RespContextError;
     }
 
@@ -955,8 +955,13 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
     ges.enqueueGameEvent(event, playerId);
     ges.setGameEventContext(Context_ReadyStart());
 
-    if (cmd.ready()) {
-        game->startGameIfReady();
+    if (cmd.force_start()) {
+        if (game->getHostId() != playerId) {
+            return Response::RespFunctionNotAllowed;
+        }
+        game->startGameIfReady(true);
+    } else if (cmd.ready()) {
+        game->startGameIfReady(false);
     }
 
     return Response::RespOk;
