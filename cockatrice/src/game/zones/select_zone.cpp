@@ -58,11 +58,11 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             pos.setY(br.height());
 
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
-        for (int i = 0; i < cards.size(); ++i) {
-            if (cards[i]->getAttachedTo())
-                if (cards[i]->getAttachedTo()->getZone() != this)
-                    continue;
-            cards[i]->setSelected(selectionRect.intersects(cards[i]->mapRectToParent(cards[i]->boundingRect())));
+        for (auto card : cards) {
+            if (card->getAttachedTo() && card->getAttachedTo()->getZone() != this) {
+                continue;
+            }
+            card->setSelected(selectionRect.intersects(card->mapRectToParent(card->boundingRect())));
         }
         static_cast<GameScene *>(scene())->resizeRubberBand(
             deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
