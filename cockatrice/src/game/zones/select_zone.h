@@ -3,6 +3,8 @@
 
 #include "card_zone.h"
 
+#include <QSet>
+
 /**
  * A CardZone where the cards are laid out, with each card directly interactable by clicking.
  */
