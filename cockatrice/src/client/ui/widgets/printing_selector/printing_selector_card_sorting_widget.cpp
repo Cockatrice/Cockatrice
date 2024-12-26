@@ -149,7 +149,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
 }
 
 QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPinnedPrintings(const QList<CardInfoPerSet> &sets,
-                                                                                  const QString &cardName)
+                                                                                const QString &cardName)
 {
     auto setsToUse = sets;
     const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);

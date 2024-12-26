@@ -16,8 +16,8 @@ public:
     QList<CardInfoPerSet> filterSets(const QList<CardInfoPerSet> &sets, const QString &searchText);
     QList<CardInfoPerSet> prependPinnedPrintings(const QList<CardInfoPerSet> &sets, const QString &cardName);
     QList<CardInfoPerSet> prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
-                                                        const CardInfoPtr &selectedCard,
-                                                        DeckListModel *deckModel);
+                                                 const CardInfoPtr &selectedCard,
+                                                 DeckListModel *deckModel);
 
 public slots:
     void updateSortOrder();
