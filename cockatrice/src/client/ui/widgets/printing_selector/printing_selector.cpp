@@ -171,7 +171,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
     } else {
         setsToUse = filteredSets;
     }
-    setsToUse = sortToolBar->prependSelectedPrintings(setsToUse, selectedCard->getName());
+    setsToUse = sortToolBar->prependPinnedPrintings(setsToUse, selectedCard->getName());
 
     // Defer widget creation
     currentIndex = 0;

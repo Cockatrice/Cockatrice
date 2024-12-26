@@ -14,7 +14,7 @@ public:
     explicit PrintingSelectorCardSortingWidget(PrintingSelector *parent);
     QList<CardInfoPerSet> sortSets(const CardInfoPerSetMap &cardInfoPerSets);
     QList<CardInfoPerSet> filterSets(const QList<CardInfoPerSet> &sets, const QString &searchText);
-    QList<CardInfoPerSet> prependSelectedPrintings(const QList<CardInfoPerSet> &sets, const QString &cardName);
+    QList<CardInfoPerSet> prependPinnedPrintings(const QList<CardInfoPerSet> &sets, const QString &cardName);
     QList<CardInfoPerSet> prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
                                                         const CardInfoPtr &selectedCard,
                                                         DeckListModel *deckModel);

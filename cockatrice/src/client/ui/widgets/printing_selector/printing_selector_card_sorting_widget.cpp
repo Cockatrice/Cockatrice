@@ -148,7 +148,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
     return filteredSets;
 }
 
-QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependSelectedPrintings(const QList<CardInfoPerSet> &sets,
+QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPinnedPrintings(const QList<CardInfoPerSet> &sets,
                                                                                   const QString &cardName)
 {
     auto setsToUse = sets;
