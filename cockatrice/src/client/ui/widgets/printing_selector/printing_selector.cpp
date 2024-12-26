@@ -171,18 +171,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
     } else {
         setsToUse = filteredSets;
     }
-
-    const auto &cardProviderId =
-        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(selectedCard->getName());
-    if (!cardProviderId.isEmpty()) {
-        for (int i = 0; i < setsToUse.size(); ++i) {
-            const auto &card = setsToUse[i];
-            if (card.getProperty("uuid") == cardProviderId) {
-                setsToUse.move(i, 0);
-                break;
-            }
-        }
-    }
+    setsToUse = sortToolBar->prependSelectedPrintings(setsToUse, selectedCard->getName());
 
     // Defer widget creation
     currentIndex = 0;

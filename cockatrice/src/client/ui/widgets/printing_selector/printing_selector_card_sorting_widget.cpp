@@ -74,7 +74,7 @@ void PrintingSelectorCardSortingWidget::updateSortSetting()
  * @param cardInfoPerSets The list of card sets to be sorted.
  * @return A sorted list of card sets.
  */
-QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(CardInfoPerSetMap cardInfoPerSets)
+QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(const CardInfoPerSetMap &cardInfoPerSets)
 {
     QList<CardSetPtr> sortedSets;
 
@@ -146,6 +146,24 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
     }
 
     return filteredSets;
+}
+
+QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependSelectedPrintings(const QList<CardInfoPerSet> &sets,
+                                                                                  const QString &cardName)
+{
+    auto setsToUse = sets;
+    const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
+    if (!cardProviderId.isEmpty()) {
+        for (int i = 0; i < setsToUse.size(); ++i) {
+            const auto &card = setsToUse[i];
+            if (card.getProperty("uuid") == cardProviderId) {
+                setsToUse.move(i, 0);
+                break;
+            }
+        }
+    }
+
+    return setsToUse;
 }
 
 /**
