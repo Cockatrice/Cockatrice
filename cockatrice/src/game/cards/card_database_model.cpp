@@ -110,15 +110,17 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
 void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
 {
     // remove all the cards no more present in at least one enabled set
-    foreach (CardInfoPtr card, cardList) {
-        if (!checkCardHasAtLeastOneEnabledSet(card))
+    for (const CardInfoPtr &card : cardList) {
+        if (!checkCardHasAtLeastOneEnabledSet(card)) {
             cardRemoved(card);
+        }
     }
 
     // re-check all the card currently not shown, maybe their part of a newly-enabled set
-    foreach (CardInfoPtr card, db->getCardList()) {
-        if (!cardList.contains(card))
+    for (const CardInfoPtr &card : db->getCardList()) {
+        if (!cardListSet.contains(card)) {
             cardAdded(card);
+        }
     }
 }
 
@@ -128,6 +130,7 @@ void CardDatabaseModel::cardAdded(CardInfoPtr card)
         // add the card if it's present in at least one enabled set
         beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
         cardList.append(card);
+        cardListSet.insert(card);
         connect(card.data(), SIGNAL(cardInfoChanged(CardInfoPtr)), this, SLOT(cardInfoChanged(CardInfoPtr)));
         endInsertRows();
     }
@@ -144,6 +147,7 @@ void CardDatabaseModel::cardRemoved(CardInfoPtr card)
     disconnect(card.data(), nullptr, this, nullptr);
     card.clear();
     cardList.removeAt(row);
+    cardListSet.insert(card);
     endRemoveRows();
 }
 
