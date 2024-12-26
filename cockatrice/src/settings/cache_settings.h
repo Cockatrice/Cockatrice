@@ -3,6 +3,7 @@
 
 #include "../utility/macros.h"
 #include "card_database_settings.h"
+#include "card_override_settings.h"
 #include "download_settings.h"
 #include "game_filters_settings.h"
 #include "layouts_settings.h"
@@ -84,6 +85,7 @@ private:
     LayoutsSettings *layoutsSettings;
     DownloadSettings *downloadSettings;
     RecentsSettings *recentsSettings;
+    CardOverrideSettings *cardOverrideSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -603,6 +605,10 @@ public:
     RecentsSettings &recents() const
     {
         return *recentsSettings;
+    }
+    CardOverrideSettings &cardOverrides() const
+    {
+        return *cardOverrideSettings;
     }
     bool getIsPortableBuild() const
     {

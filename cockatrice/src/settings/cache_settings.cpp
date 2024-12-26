@@ -1,6 +1,7 @@
 #include "cache_settings.h"
 
 #include "../client/network/release_channel.h"
+#include "card_override_settings.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -179,6 +180,7 @@ SettingsCache::SettingsCache()
     layoutsSettings = new LayoutsSettings(settingsPath, this);
     downloadSettings = new DownloadSettings(settingsPath, this);
     recentsSettings = new RecentsSettings(settingsPath, this);
+    cardOverrideSettings = new CardOverrideSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();

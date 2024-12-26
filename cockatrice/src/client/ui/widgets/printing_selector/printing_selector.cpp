@@ -171,6 +171,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
     } else {
         setsToUse = filteredSets;
     }
+    setsToUse = sortToolBar->prependPinnedPrintings(setsToUse, selectedCard->getName());
 
     // Defer widget creation
     currentIndex = 0;
@@ -182,6 +183,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
                                                                             setsToUse[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
+            connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,
+                    &PrintingSelector::updateDisplay);
         }
 
         // Stop timer when done

@@ -1,6 +1,7 @@
 #include "printing_selector_card_overlay_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../settings/cache_settings.h"
 #include "printing_selector_card_display_widget.h"
 
 #include <QMenu>
@@ -165,6 +166,28 @@ void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
 void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 {
     QMenu menu;
+
+    auto *preferenceMenu = new QMenu(tr("Preference"));
+    menu.addMenu(preferenceMenu);
+
+    const auto &preferredProviderId =
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard->getName());
+    const auto &cardProviderId = setInfoForCard.getProperty("uuid");
+
+    if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
+        auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));
+        connect(pinAction, &QAction::triggered, this, [this, cardProviderId]() {
+            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(rootCard->getName(), cardProviderId);
+            emit cardPreferenceChanged();
+        });
+    } else {
+        auto *unpinAction = preferenceMenu->addAction(tr("Unpin Printing"));
+        connect(unpinAction, &QAction::triggered, this, [this, cardProviderId]() {
+            SettingsCache::instance().cardOverrides().deleteCardPreferenceOverride(rootCard->getName());
+            emit cardPreferenceChanged();
+        });
+    }
+
     // filling out the related cards submenu
     auto *relatedMenu = new QMenu(tr("Show Related cards"));
     menu.addMenu(relatedMenu);
