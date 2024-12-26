@@ -83,7 +83,9 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        scene()->clearSelection();
+        if (!event->modifiers().testFlag(Qt::ControlModifier)) {
+            scene()->clearSelection();
+        }
 
         selectionOrigin = event->pos();
         static_cast<GameScene *>(scene())->startRubberBand(event->scenePos());
