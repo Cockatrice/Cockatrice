@@ -3,6 +3,8 @@
 
 #include "card_zone.h"
 
+#include <QSet>
+
 /**
  * A CardZone where the cards are laid out, with each card directly interactable by clicking.
  */
@@ -11,6 +13,7 @@ class SelectZone : public CardZone
     Q_OBJECT
 private:
     QPointF selectionOrigin;
+    QSet<CardItem *> cardsInSelectionRect;
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
