@@ -17,7 +17,7 @@ public:
 
 private:
     QHBoxLayout *layout;
-    FlowWidget *flowWidget;
+    QGridLayout *gridLayout;
     PrintingSelector *printingSelector;
     QCheckBox *sortCheckBox;
     QCheckBox *searchCheckBox;
