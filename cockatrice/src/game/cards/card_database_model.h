@@ -46,6 +46,7 @@ public:
 
 private:
     QList<CardInfoPtr> cardList;
+    QSet<CardInfoPtr> cardListSet; // Supports faster lookups in cardDatabaseEnabledSetsChanged()
     CardDatabase *db;
     bool showOnlyCardsFromEnabledSets;
 
