@@ -82,6 +82,7 @@
 #include "trice_limits.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <algorithm>
 
 struct MoveCardStruct
@@ -644,6 +645,17 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                   AttrPT, ptString);
             }
 
+            // If card is transferring to a different player, leave an annotation of who actually "owns" the card
+            const auto &priorAnnotation = card->getAnnotation();
+            if (startzone->getPlayer() != targetzone->getPlayer() && !priorAnnotation.contains("Owner:")) {
+                const auto &ownerAnnotation =
+                    "Owner: " + QString::fromStdString(startzone->getPlayer()->getUserInfo()->name());
+                const auto &newAnnotation =
+                    priorAnnotation.isEmpty() ? ownerAnnotation : ownerAnnotation + "\n\n" + priorAnnotation;
+                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
+                                  AttrAnnotation, newAnnotation, card);
+            }
+
             if (originalPosition == 0) {
                 revealTopStart = true;
             }
@@ -694,7 +706,8 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges,
                                                         const QString &zoneName,
                                                         int cardId,
                                                         CardAttribute attribute,
-                                                        const QString &attrValue)
+                                                        const QString &attrValue,
+                                                        Server_Card *unzonedCard)
 {
     Server_CardZone *zone = getZones().value(zoneName);
     if (!zone) {
@@ -714,7 +727,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges,
             }
         }
     } else {
-        Server_Card *card = zone->getCard(cardId);
+        Server_Card *card = unzonedCard == nullptr ? zone->getCard(cardId) : unzonedCard;
         if (!card) {
             return Response::RespNameNotFound;
         }

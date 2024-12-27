@@ -186,7 +186,8 @@ public:
                                              const QString &zone,
                                              int cardId,
                                              CardAttribute attribute,
-                                             const QString &attrValue);
+                                             const QString &attrValue,
+                                             Server_Card *unzonedCard = nullptr);
 
     Response::ResponseCode cmdLeaveGame(const Command_LeaveGame &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode
