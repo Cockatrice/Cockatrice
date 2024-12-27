@@ -30,7 +30,7 @@ ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &ShutdownDialog::accept);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &ShutdownDialog::reject);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &ShutdownDialog::reject);
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(reasonLabel, 0, 0);
@@ -117,7 +117,7 @@ void TabAdmin::actShutdownServer()
         cmd.set_reason(dlg.getReason().toStdString());
         cmd.set_minutes(dlg.getMinutes());
 
-        client->sendCommand(client->prepareAdminCommand(cmd));
+        client->sendCommand(AbstractClient::prepareAdminCommand(cmd));
     }
 }
 
