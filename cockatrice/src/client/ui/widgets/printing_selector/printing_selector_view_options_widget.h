@@ -16,7 +16,6 @@ public:
     explicit PrintingSelectorViewOptionsWidget(QWidget *parent, PrintingSelector *_printingSelector);
 
 private:
-    QHBoxLayout *layout;
     QGridLayout *gridLayout;
     PrintingSelector *printingSelector;
     QCheckBox *sortCheckBox;

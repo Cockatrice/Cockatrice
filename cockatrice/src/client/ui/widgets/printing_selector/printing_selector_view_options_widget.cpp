@@ -15,12 +15,9 @@ PrintingSelectorViewOptionsWidget::PrintingSelectorViewOptionsWidget(QWidget *pa
                                                                      PrintingSelector *_printingSelector)
     : QWidget(parent), printingSelector(_printingSelector)
 {
-    // Set up the layout for the widget
-    layout = new QHBoxLayout(this);
-    setLayout(layout);
-
     // Create the grid to hold the checkboxes
     gridLayout = new QGridLayout(this);
+    setLayout(gridLayout);
 
     // Create the checkbox for sorting options visibility
     sortCheckBox = new QCheckBox(this);
@@ -63,7 +60,4 @@ PrintingSelectorViewOptionsWidget::PrintingSelectorViewOptionsWidget(QWidget *pa
     gridLayout->addWidget(searchCheckBox, 0, 1);
     gridLayout->addWidget(cardSizeCheckBox, 1, 0);
     gridLayout->addWidget(navigationCheckBox, 1, 1);
-
-    // Add grid to the main layout
-    layout->addLayout(gridLayout);
 }
