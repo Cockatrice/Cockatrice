@@ -799,42 +799,47 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>DeckViewContainer</name>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="147"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="153"/>
         <source>Load deck...</source>
         <translation>Load deck...</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="148"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="154"/>
         <source>Load remote deck...</source>
         <translation>Load remote deck...</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="149"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="155"/>
         <source>Ready to start</source>
         <translation>Ready to start</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="164"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="156"/>
+        <source>Force start</source>
+        <translation>Force start</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_game.cpp" line="172"/>
         <source>Sideboard unlocked</source>
         <translation>Sideboard unlocked</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="166"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="174"/>
         <source>Sideboard locked</source>
         <translation>Sideboard locked</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="283"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="291"/>
         <source>Load deck</source>
         <translation>Load deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="300"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="308"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="300"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="308"/>
         <source>The selected file could not be loaded.</source>
         <translation>The selected file could not be loaded.</translation>
     </message>
@@ -4221,624 +4226,624 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="src/game/player/player.cpp" line="662"/>
+        <location filename="src/game/player/player.cpp" line="658"/>
         <source>Reveal top cards of library</source>
         <translation>Reveal top cards of library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="663"/>
-        <location filename="src/game/player/player.cpp" line="1133"/>
-        <location filename="src/game/player/player.cpp" line="1211"/>
-        <location filename="src/game/player/player.cpp" line="1236"/>
-        <location filename="src/game/player/player.cpp" line="1308"/>
-        <location filename="src/game/player/player.cpp" line="1340"/>
-        <location filename="src/game/player/player.cpp" line="1510"/>
-        <location filename="src/game/player/player.cpp" line="1542"/>
-        <location filename="src/game/player/player.cpp" line="1658"/>
+        <location filename="src/game/player/player.cpp" line="659"/>
+        <location filename="src/game/player/player.cpp" line="1123"/>
+        <location filename="src/game/player/player.cpp" line="1201"/>
+        <location filename="src/game/player/player.cpp" line="1226"/>
+        <location filename="src/game/player/player.cpp" line="1298"/>
+        <location filename="src/game/player/player.cpp" line="1330"/>
+        <location filename="src/game/player/player.cpp" line="1500"/>
+        <location filename="src/game/player/player.cpp" line="1532"/>
+        <location filename="src/game/player/player.cpp" line="1648"/>
         <source>Number of cards: (max. %1)</source>
         <translation>Number of cards: (max. %1)</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="754"/>
+        <location filename="src/game/player/player.cpp" line="750"/>
         <source>&amp;View graveyard</source>
         <translation>&amp;View graveyard</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="755"/>
+        <location filename="src/game/player/player.cpp" line="751"/>
         <source>&amp;View exile</source>
         <translation>&amp;View exile</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="757"/>
+        <location filename="src/game/player/player.cpp" line="753"/>
         <source>Player &quot;%1&quot;</source>
         <translation>Player &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="758"/>
-        <location filename="src/game/player/player.cpp" line="765"/>
-        <location filename="src/game/player/player.cpp" line="778"/>
-        <location filename="src/game/player/player.cpp" line="897"/>
+        <location filename="src/game/player/player.cpp" line="754"/>
+        <location filename="src/game/player/player.cpp" line="761"/>
+        <location filename="src/game/player/player.cpp" line="774"/>
+        <location filename="src/game/player/player.cpp" line="893"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Graveyard</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="759"/>
-        <location filename="src/game/player/player.cpp" line="766"/>
-        <location filename="src/game/player/player.cpp" line="772"/>
-        <location filename="src/game/player/player.cpp" line="898"/>
+        <location filename="src/game/player/player.cpp" line="755"/>
+        <location filename="src/game/player/player.cpp" line="762"/>
+        <location filename="src/game/player/player.cpp" line="768"/>
+        <location filename="src/game/player/player.cpp" line="894"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exile</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="762"/>
+        <location filename="src/game/player/player.cpp" line="758"/>
         <source>&amp;Move hand to...</source>
         <translation>&amp;Move hand to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="763"/>
-        <location filename="src/game/player/player.cpp" line="769"/>
-        <location filename="src/game/player/player.cpp" line="775"/>
+        <location filename="src/game/player/player.cpp" line="759"/>
+        <location filename="src/game/player/player.cpp" line="765"/>
+        <location filename="src/game/player/player.cpp" line="771"/>
         <source>&amp;Top of library</source>
         <translation>&amp;Top of library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="764"/>
-        <location filename="src/game/player/player.cpp" line="770"/>
-        <location filename="src/game/player/player.cpp" line="776"/>
+        <location filename="src/game/player/player.cpp" line="760"/>
+        <location filename="src/game/player/player.cpp" line="766"/>
+        <location filename="src/game/player/player.cpp" line="772"/>
         <source>&amp;Bottom of library</source>
         <translation>&amp;Bottom of library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="768"/>
+        <location filename="src/game/player/player.cpp" line="764"/>
         <source>&amp;Move graveyard to...</source>
         <translation>&amp;Move graveyard to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="771"/>
-        <location filename="src/game/player/player.cpp" line="777"/>
-        <location filename="src/game/player/player.cpp" line="817"/>
-        <location filename="src/game/player/player.cpp" line="896"/>
+        <location filename="src/game/player/player.cpp" line="767"/>
+        <location filename="src/game/player/player.cpp" line="773"/>
+        <location filename="src/game/player/player.cpp" line="813"/>
+        <location filename="src/game/player/player.cpp" line="892"/>
         <source>&amp;Hand</source>
         <translation>&amp;Hand</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="774"/>
+        <location filename="src/game/player/player.cpp" line="770"/>
         <source>&amp;Move exile to...</source>
         <translation>&amp;Move exile to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="780"/>
+        <location filename="src/game/player/player.cpp" line="776"/>
         <source>&amp;View library</source>
         <translation>&amp;View library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="781"/>
+        <location filename="src/game/player/player.cpp" line="777"/>
         <source>&amp;View hand</source>
         <translation>&amp;View hand</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="782"/>
+        <location filename="src/game/player/player.cpp" line="778"/>
         <source>View &amp;top cards of library...</source>
         <translation>View &amp;top cards of library...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="783"/>
+        <location filename="src/game/player/player.cpp" line="779"/>
         <source>Reveal &amp;library to...</source>
         <translation>Reveal &amp;library to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="788"/>
+        <location filename="src/game/player/player.cpp" line="784"/>
         <source>&amp;Always reveal top card</source>
         <translation>&amp;Always reveal top card</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="791"/>
+        <location filename="src/game/player/player.cpp" line="787"/>
         <source>&amp;View sideboard</source>
         <translation>&amp;View sideboard</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="792"/>
+        <location filename="src/game/player/player.cpp" line="788"/>
         <source>&amp;Draw card</source>
         <translation>&amp;Draw card</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="793"/>
+        <location filename="src/game/player/player.cpp" line="789"/>
         <source>D&amp;raw cards...</source>
         <translation>D&amp;raw cards...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="794"/>
+        <location filename="src/game/player/player.cpp" line="790"/>
         <source>&amp;Undo last draw</source>
         <translation>&amp;Undo last draw</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="795"/>
+        <location filename="src/game/player/player.cpp" line="791"/>
         <source>Take &amp;mulligan</source>
         <translation>Take &amp;mulligan</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="796"/>
+        <location filename="src/game/player/player.cpp" line="792"/>
         <source>&amp;Shuffle</source>
         <translation>&amp;Shuffle</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="799"/>
+        <location filename="src/game/player/player.cpp" line="795"/>
         <source>Play top card &amp;face down</source>
         <translation>Play top card &amp;face down</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="801"/>
+        <location filename="src/game/player/player.cpp" line="797"/>
         <source>Move top card to grave&amp;yard</source>
         <translation>Move top card to grave&amp;yard</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="802"/>
+        <location filename="src/game/player/player.cpp" line="798"/>
         <source>Move top card to e&amp;xile</source>
         <translation>Move top card to e&amp;xile</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="803"/>
+        <location filename="src/game/player/player.cpp" line="799"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Move top cards to &amp;graveyard...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="804"/>
+        <location filename="src/game/player/player.cpp" line="800"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>Move top cards to &amp;exile...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="800"/>
+        <location filename="src/game/player/player.cpp" line="796"/>
         <source>Put top card on &amp;bottom</source>
         <translation>Put top card on &amp;bottom</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="784"/>
+        <location filename="src/game/player/player.cpp" line="780"/>
         <source>Lend library to...</source>
         <translation>Lend library to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="805"/>
+        <location filename="src/game/player/player.cpp" line="801"/>
         <source>Put top cards on stack &amp;until...</source>
         <oldsource>Take top cards &amp;until...</oldsource>
         <translation>Put top cards on stack &amp;until...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="818"/>
+        <location filename="src/game/player/player.cpp" line="814"/>
         <source>&amp;Reveal hand to...</source>
         <translation>&amp;Reveal hand to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="819"/>
+        <location filename="src/game/player/player.cpp" line="815"/>
         <source>Reveal r&amp;andom card to...</source>
         <translation>Reveal r&amp;andom card to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="820"/>
+        <location filename="src/game/player/player.cpp" line="816"/>
         <source>Reveal random card to...</source>
         <translation>Reveal random card to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="821"/>
+        <location filename="src/game/player/player.cpp" line="817"/>
         <source>&amp;Sideboard</source>
         <translation>&amp;Sideboard</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="822"/>
+        <location filename="src/game/player/player.cpp" line="818"/>
         <source>&amp;Library</source>
         <translation>&amp;Library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="823"/>
+        <location filename="src/game/player/player.cpp" line="819"/>
         <source>&amp;Counters</source>
         <translation>&amp;Counters</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="825"/>
+        <location filename="src/game/player/player.cpp" line="821"/>
         <source>&amp;Untap all permanents</source>
         <translation>&amp;Untap all permanents</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="826"/>
+        <location filename="src/game/player/player.cpp" line="822"/>
         <source>R&amp;oll die...</source>
         <translation>R&amp;oll die...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="827"/>
+        <location filename="src/game/player/player.cpp" line="823"/>
         <source>&amp;Create token...</source>
         <translation>&amp;Create token...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="828"/>
+        <location filename="src/game/player/player.cpp" line="824"/>
         <source>C&amp;reate another token</source>
         <translation>C&amp;reate another token</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="829"/>
+        <location filename="src/game/player/player.cpp" line="825"/>
         <source>Cr&amp;eate predefined token</source>
         <translation>Cr&amp;eate predefined token</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="839"/>
-        <location filename="src/game/player/player.cpp" line="1084"/>
+        <location filename="src/game/player/player.cpp" line="833"/>
+        <location filename="src/game/player/player.cpp" line="1074"/>
         <source>&amp;All players</source>
         <translation>&amp;All players</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="844"/>
+        <location filename="src/game/player/player.cpp" line="840"/>
         <source>S&amp;ay</source>
         <translation>S&amp;ay</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="847"/>
+        <location filename="src/game/player/player.cpp" line="843"/>
         <source>&amp;Select All</source>
         <translation>&amp;Select All</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="848"/>
+        <location filename="src/game/player/player.cpp" line="844"/>
         <source>S&amp;elect Row</source>
         <translation>S&amp;elect Row</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="849"/>
+        <location filename="src/game/player/player.cpp" line="845"/>
         <source>S&amp;elect Column</source>
         <translation>S&amp;elect Column</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="851"/>
+        <location filename="src/game/player/player.cpp" line="847"/>
         <source>&amp;Play</source>
         <translation>&amp;Play</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="852"/>
+        <location filename="src/game/player/player.cpp" line="848"/>
         <source>&amp;Hide</source>
         <translation>&amp;Hide</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="853"/>
+        <location filename="src/game/player/player.cpp" line="849"/>
         <source>Play &amp;Face Down</source>
         <translation>Play &amp;Face Down</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="855"/>
+        <location filename="src/game/player/player.cpp" line="851"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
         <translation>&amp;Tap / Untap</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="856"/>
+        <location filename="src/game/player/player.cpp" line="852"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>Toggle &amp;normal untapping</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="858"/>
+        <location filename="src/game/player/player.cpp" line="854"/>
         <source>T&amp;urn Over</source>
         <extracomment>Turn face up/face down</extracomment>
         <translation>T&amp;urn Over</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="861"/>
+        <location filename="src/game/player/player.cpp" line="857"/>
         <source>&amp;Peek at card face</source>
         <translation>&amp;Peek at card face</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="862"/>
+        <location filename="src/game/player/player.cpp" line="858"/>
         <source>&amp;Clone</source>
         <translation>&amp;Clone</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="863"/>
+        <location filename="src/game/player/player.cpp" line="859"/>
         <source>Attac&amp;h to card...</source>
         <translation>Attac&amp;h to card...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="864"/>
+        <location filename="src/game/player/player.cpp" line="860"/>
         <source>Unattac&amp;h</source>
         <translation>Unattac&amp;h</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="865"/>
+        <location filename="src/game/player/player.cpp" line="861"/>
         <source>&amp;Draw arrow...</source>
         <translation>&amp;Draw arrow...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="866"/>
+        <location filename="src/game/player/player.cpp" line="862"/>
         <source>&amp;Increase power</source>
         <translation>&amp;Increase power</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="867"/>
+        <location filename="src/game/player/player.cpp" line="863"/>
         <source>&amp;Decrease power</source>
         <translation>&amp;Decrease power</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="868"/>
+        <location filename="src/game/player/player.cpp" line="864"/>
         <source>I&amp;ncrease toughness</source>
         <translation>I&amp;ncrease toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="869"/>
+        <location filename="src/game/player/player.cpp" line="865"/>
         <source>D&amp;ecrease toughness</source>
         <translation>D&amp;ecrease toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="870"/>
+        <location filename="src/game/player/player.cpp" line="866"/>
         <source>In&amp;crease power and toughness</source>
         <translation>In&amp;crease power and toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="871"/>
+        <location filename="src/game/player/player.cpp" line="867"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>Dec&amp;rease power and toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="872"/>
+        <location filename="src/game/player/player.cpp" line="868"/>
         <source>Increase power and decrease toughness</source>
         <translation>Increase power and decrease toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="873"/>
+        <location filename="src/game/player/player.cpp" line="869"/>
         <source>Decrease power and increase toughness</source>
         <translation>Decrease power and increase toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="874"/>
+        <location filename="src/game/player/player.cpp" line="870"/>
         <source>Set &amp;power and toughness...</source>
         <translation>Set &amp;power and toughness...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="875"/>
+        <location filename="src/game/player/player.cpp" line="871"/>
         <source>Reset p&amp;ower and toughness</source>
         <translation>Reset p&amp;ower and toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="876"/>
+        <location filename="src/game/player/player.cpp" line="872"/>
         <source>&amp;Set annotation...</source>
         <translation>&amp;Set annotation...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="879"/>
+        <location filename="src/game/player/player.cpp" line="875"/>
         <source>Red</source>
         <translation>Red</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="880"/>
+        <location filename="src/game/player/player.cpp" line="876"/>
         <source>Yellow</source>
         <translation>Yellow</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="881"/>
+        <location filename="src/game/player/player.cpp" line="877"/>
         <source>Green</source>
         <translation>Green</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="884"/>
+        <location filename="src/game/player/player.cpp" line="880"/>
         <source>&amp;Add counter (%1)</source>
         <translation>&amp;Add counter (%1)</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="887"/>
+        <location filename="src/game/player/player.cpp" line="883"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>&amp;Remove counter (%1)</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="890"/>
+        <location filename="src/game/player/player.cpp" line="886"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>&amp;Set counters (%1)...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="893"/>
+        <location filename="src/game/player/player.cpp" line="889"/>
         <source>&amp;Top of library in random order</source>
         <translation>&amp;Top of library in random order</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="894"/>
+        <location filename="src/game/player/player.cpp" line="890"/>
         <source>X cards from the top of library...</source>
         <translation>X cards from the top of library...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="895"/>
+        <location filename="src/game/player/player.cpp" line="891"/>
         <source>&amp;Bottom of library in random order</source>
         <translation>&amp;Bottom of library in random order</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1133"/>
+        <location filename="src/game/player/player.cpp" line="1123"/>
         <source>View top cards of library</source>
         <translation>View top cards of library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3016"/>
+        <location filename="src/game/player/player.cpp" line="3006"/>
         <source>Which position should this card be placed:</source>
         <translation>Which position should this card be placed:</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3016"/>
+        <location filename="src/game/player/player.cpp" line="3006"/>
         <source>(max. %1)</source>
         <translation>(max. %1)</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1210"/>
+        <location filename="src/game/player/player.cpp" line="1200"/>
         <source>Draw hand</source>
         <translation>Draw hand</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1212"/>
+        <location filename="src/game/player/player.cpp" line="1202"/>
         <source>0 and lower are in comparison to current hand size</source>
         <translation>0 and lower are in comparison to current hand size</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1236"/>
+        <location filename="src/game/player/player.cpp" line="1226"/>
         <source>Draw cards</source>
         <translation>Draw cards</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1911"/>
-        <location filename="src/game/player/player.cpp" line="3574"/>
+        <location filename="src/game/player/player.cpp" line="1901"/>
+        <location filename="src/game/player/player.cpp" line="3564"/>
         <source>Number:</source>
         <translation>Number:</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1308"/>
+        <location filename="src/game/player/player.cpp" line="1298"/>
         <source>Move top cards to grave</source>
         <translation>Move top cards to grave</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="785"/>
+        <location filename="src/game/player/player.cpp" line="781"/>
         <source>Reveal &amp;top cards to...</source>
         <translation>Reveal &amp;top cards to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="786"/>
+        <location filename="src/game/player/player.cpp" line="782"/>
         <source>&amp;Top of library...</source>
         <translation>&amp;Top of library...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="787"/>
+        <location filename="src/game/player/player.cpp" line="783"/>
         <source>&amp;Bottom of library...</source>
         <translation>&amp;Bottom of library...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="789"/>
+        <location filename="src/game/player/player.cpp" line="785"/>
         <source>&amp;Always look at top card</source>
         <translation>&amp;Always look at top card</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="790"/>
+        <location filename="src/game/player/player.cpp" line="786"/>
         <source>&amp;Open deck in deck editor</source>
         <translation>&amp;Open deck in deck editor</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="798"/>
+        <location filename="src/game/player/player.cpp" line="794"/>
         <source>&amp;Play top card</source>
         <translation>&amp;Play top card</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="807"/>
+        <location filename="src/game/player/player.cpp" line="803"/>
         <source>&amp;Draw bottom card</source>
         <translation>&amp;Draw bottom card</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="808"/>
+        <location filename="src/game/player/player.cpp" line="804"/>
         <source>D&amp;raw bottom cards...</source>
         <translation>D&amp;raw bottom cards...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="809"/>
+        <location filename="src/game/player/player.cpp" line="805"/>
         <source>&amp;Play bottom card</source>
         <translation>&amp;Play bottom card</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="810"/>
+        <location filename="src/game/player/player.cpp" line="806"/>
         <source>Play bottom card &amp;face down</source>
         <translation>Play bottom card &amp;face down</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="811"/>
+        <location filename="src/game/player/player.cpp" line="807"/>
         <source>Move bottom card to grave&amp;yard</source>
         <translation>Move bottom card to grave&amp;yard</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="812"/>
+        <location filename="src/game/player/player.cpp" line="808"/>
         <source>Move bottom card to e&amp;xile</source>
         <translation>Move bottom card to e&amp;xile</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="813"/>
+        <location filename="src/game/player/player.cpp" line="809"/>
         <source>Move bottom cards to &amp;graveyard...</source>
         <translation>Move bottom cards to &amp;graveyard...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="814"/>
+        <location filename="src/game/player/player.cpp" line="810"/>
         <source>Move bottom cards to &amp;exile...</source>
         <translation>Move bottom cards to &amp;exile...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="815"/>
+        <location filename="src/game/player/player.cpp" line="811"/>
         <source>Put bottom card on &amp;top</source>
         <translation>Put bottom card on &amp;top</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="836"/>
+        <location filename="src/game/player/player.cpp" line="837"/>
         <source>Selec&amp;ted cards</source>
         <translation>Selec&amp;ted cards</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1340"/>
+        <location filename="src/game/player/player.cpp" line="1330"/>
         <source>Move top cards to exile</source>
         <translation>Move top cards to exile</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1510"/>
+        <location filename="src/game/player/player.cpp" line="1500"/>
         <source>Move bottom cards to grave</source>
         <translation>Move bottom cards to grave</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1542"/>
+        <location filename="src/game/player/player.cpp" line="1532"/>
         <source>Move bottom cards to exile</source>
         <translation>Move bottom cards to exile</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1658"/>
+        <location filename="src/game/player/player.cpp" line="1648"/>
         <source>Draw bottom cards</source>
         <translation>Draw bottom cards</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1763"/>
-        <location filename="src/game/player/player.cpp" line="4059"/>
+        <location filename="src/game/player/player.cpp" line="1753"/>
+        <location filename="src/game/player/player.cpp" line="4084"/>
         <source>C&amp;reate another %1 token</source>
         <translation>C&amp;reate another %1 token</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="1911"/>
+        <location filename="src/game/player/player.cpp" line="1901"/>
         <source>Create tokens</source>
         <translation>Create tokens</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3015"/>
+        <location filename="src/game/player/player.cpp" line="3005"/>
         <source>Place card X cards from top of library</source>
         <translation>Place card X cards from top of library</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3361"/>
+        <location filename="src/game/player/player.cpp" line="3351"/>
         <source>Change power/toughness</source>
         <translation>Change power/toughness</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3361"/>
+        <location filename="src/game/player/player.cpp" line="3351"/>
         <source>Change stats to:</source>
         <translation>Change stats to:</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3480"/>
+        <location filename="src/game/player/player.cpp" line="3470"/>
         <source>Set annotation</source>
         <translation>Set annotation</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3481"/>
+        <location filename="src/game/player/player.cpp" line="3471"/>
         <source>Please enter the new annotation:</source>
         <translation>Please enter the new annotation:</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3574"/>
+        <location filename="src/game/player/player.cpp" line="3564"/>
         <source>Set counters</source>
         <translation>Set counters</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3817"/>
+        <location filename="src/game/player/player.cpp" line="3839"/>
         <source>Re&amp;veal to...</source>
         <translation>Re&amp;veal to...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3884"/>
+        <location filename="src/game/player/player.cpp" line="3909"/>
         <source>View related cards</source>
         <translation>View related cards</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3932"/>
+        <location filename="src/game/player/player.cpp" line="3957"/>
         <source>Token: </source>
         <translation>Token: </translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3949"/>
+        <location filename="src/game/player/player.cpp" line="3974"/>
         <source>All tokens</source>
         <translation>All tokens</translation>
     </message>
@@ -4846,7 +4851,22 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>PrintingSelectorCardOverlayWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="169"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="170"/>
+        <source>Preference</source>
+        <translation>Preference</translation>
+    </message>
+    <message>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="178"/>
+        <source>Pin Printing</source>
+        <translation>Pin Printing</translation>
+    </message>
+    <message>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="184"/>
+        <source>Unpin Printing</source>
+        <translation>Unpin Printing</translation>
+    </message>
+    <message>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="192"/>
         <source>Show Related cards</source>
         <translation>Show Related cards</translation>
     </message>
@@ -4912,22 +4932,22 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>PrintingSelectorViewOptionsWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="27"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="24"/>
         <source>Display Sorting Options</source>
         <translation>Display Sorting Options</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="36"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="33"/>
         <source>Display Search Bar</source>
         <translation>Display Search Bar</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="45"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="42"/>
         <source>Display Card Size Slider</source>
         <translation>Display Card Size Slider</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="54"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_view_options_widget.cpp" line="51"/>
         <source>Display Navigation Buttons</source>
         <translation>Display Navigation Buttons</translation>
     </message>
@@ -5309,12 +5329,12 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>ShortcutTreeView</name>
     <message>
-        <location filename="src/settings/shortcut_treeview.cpp" line="78"/>
+        <location filename="src/settings/shortcut_treeview.cpp" line="93"/>
         <source>Action</source>
         <translation>Action</translation>
     </message>
     <message>
-        <location filename="src/settings/shortcut_treeview.cpp" line="79"/>
+        <location filename="src/settings/shortcut_treeview.cpp" line="94"/>
         <source>Shortcut</source>
         <translation>Shortcut</translation>
     </message>
@@ -5500,278 +5520,294 @@ Please check your shortcut settings!</translation>
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="410"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="420"/>
         <source>Search by card name (or search expressions)</source>
         <oldsource>Search by card name</oldsource>
         <translation>Search by card name (or search expressions)</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="503"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="513"/>
         <source>Add to Deck</source>
         <translation>Add to Deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="504"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="514"/>
         <source>Add to Sideboard</source>
         <translation>Add to Sideboard</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="505"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="533"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="515"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="543"/>
         <source>Select Printing</source>
         <translation>Select Printing</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="512"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="522"/>
         <source>Show Related cards</source>
         <translation>Show Related cards</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="699"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="709"/>
         <source>&amp;Clear all filters</source>
         <translation>&amp;Clear all filters</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="700"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="710"/>
         <source>Delete selected</source>
         <translation>Delete selected</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="702"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="712"/>
         <source>Deck &amp;name:</source>
         <translation>Deck &amp;name:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="703"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="713"/>
         <source>&amp;Comments:</source>
         <translation>&amp;Comments:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="704"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="714"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="706"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="716"/>
         <source>&amp;New deck</source>
         <translation>&amp;New deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="707"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="717"/>
         <source>&amp;Load deck...</source>
         <translation>&amp;Load deck...</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="708"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="718"/>
+        <source>Load recent deck...</source>
+        <translation>Load recent deck...</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="719"/>
+        <source>Clear</source>
+        <translation>Clear</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="720"/>
         <source>&amp;Save deck</source>
         <translation>&amp;Save deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="709"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="721"/>
         <source>Save deck &amp;as...</source>
         <translation>Save deck &amp;as...</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="710"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="722"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation>Load deck from cl&amp;ipboard...</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="712"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="724"/>
         <source>Save deck to clipboard</source>
         <translation>Save deck to clipboard</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="713"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="725"/>
         <source>Annotated</source>
         <translation>Annotated</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="714"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="726"/>
         <source>Not Annotated</source>
         <translation>Not Annotated</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="716"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="728"/>
         <source>&amp;Print deck...</source>
         <translation>&amp;Print deck...</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="718"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="730"/>
         <source>&amp;Send deck to online service</source>
         <translation>&amp;Send deck to online service</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="719"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="731"/>
         <source>Create decklist (decklist.org)</source>
         <translation>Create decklist (decklist.org)</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="720"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="732"/>
         <source>Analyze deck (deckstats.net)</source>
         <translation>Analyze deck (deckstats.net)</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="721"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="733"/>
         <source>Analyze deck (tappedout.net)</source>
         <translation>Analyze deck (tappedout.net)</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="723"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="735"/>
         <source>&amp;Close</source>
         <translation>&amp;Close</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="725"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="737"/>
         <source>Add card to &amp;maindeck</source>
         <translation>Add card to &amp;maindeck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="726"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="738"/>
         <source>Add card to &amp;sideboard</source>
         <translation>Add card to &amp;sideboard</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="728"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="740"/>
         <source>&amp;Remove row</source>
         <translation>&amp;Remove row</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="730"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="742"/>
         <source>&amp;Increment number</source>
         <translation>&amp;Increment number</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="732"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="744"/>
         <source>&amp;Decrement number</source>
         <translation>&amp;Decrement number</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="734"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="746"/>
         <source>&amp;Deck Editor</source>
         <translation>&amp;Deck Editor</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="736"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="742"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="748"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="754"/>
         <source>Card Info</source>
         <translation>Card Info</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="737"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="743"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="749"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="755"/>
         <source>Deck</source>
         <translation>Deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="738"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="744"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="750"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="756"/>
         <source>Filters</source>
         <translation>Filters</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="739"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="751"/>
         <source>Printing Selector</source>
         <translation>Printing Selector</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="741"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="753"/>
         <source>&amp;View</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="745"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="757"/>
         <source>Printing</source>
         <translation>Printing</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="747"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="750"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="753"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="756"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="759"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="762"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="765"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="768"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="748"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="751"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="754"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="757"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="760"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="763"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="766"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="769"/>
         <source>Floating</source>
         <translation>Floating</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="759"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="771"/>
         <source>Reset layout</source>
         <translation>Reset layout</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="764"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="776"/>
         <source>Deck: %1</source>
         <translation>Deck: %1</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1130"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="970"/>
+        <source>Could not open deck at %1</source>
+        <translation>Could not open deck at %1</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1185"/>
         <source>Open in new tab</source>
         <translation>Open in new tab</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1159"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1214"/>
         <source>Are you sure?</source>
         <translation>Are you sure?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1160"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1215"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>The decklist has been modified.
 Do you want to save the changes?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="903"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="929"/>
         <source>Load deck</source>
         <translation>Load deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="928"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="939"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="960"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="981"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1050"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1062"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="970"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="983"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="994"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1015"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1036"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1105"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1117"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="928"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="983"/>
         <source>The deck could not be saved.</source>
         <translation>The deck could not be saved.</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="939"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="994"/>
         <source>Could not save remote deck</source>
         <translation>Could not save remote deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="961"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="982"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1016"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1037"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>The deck could not be saved.
 Please check that the directory is writable and try again.</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="967"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1022"/>
         <source>Save deck</source>
         <translation>Save deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1050"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1105"/>
         <source>There are no cards in your deck to be exported</source>
         <translation>There are no cards in your deck to be exported</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1062"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1117"/>
         <source>No deck was selected to be saved.</source>
         <translation>No deck was selected to be saved.</translation>
     </message>
@@ -5779,316 +5815,319 @@ Please check that the directory is writable and try again.</translation>
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.h" line="57"/>
+        <location filename="src/client/tabs/tab_deck_storage.h" line="65"/>
         <source>Deck storage</source>
         <translation>Deck storage</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="120"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="130"/>
         <source>Local file system</source>
         <translation>Local file system</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="121"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="131"/>
         <source>Server deck storage</source>
         <translation>Server deck storage</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="123"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="125"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="133"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="135"/>
         <source>Open in deck editor</source>
         <translation>Open in deck editor</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="124"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="134"/>
         <source>Upload deck</source>
         <translation>Upload deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="126"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="136"/>
         <source>Download deck</source>
         <translation>Download deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="127"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="324"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="137"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="138"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="277"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="394"/>
         <source>New folder</source>
         <translation>New folder</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="128"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="129"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="139"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="140"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="187"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="219"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="216"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="236"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="254"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="187"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="216"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="236"/>
         <source>Invalid deck file</source>
         <translation>Invalid deck file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="194"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="223"/>
         <source>Enter deck name</source>
         <translation>Enter deck name</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="194"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="223"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>This decklist does not have a name.
 Please enter a name:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="199"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="228"/>
         <source>Unnamed deck</source>
         <translation>Unnamed deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="219"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="254"/>
         <source>Failed to upload deck to server</source>
         <translation>Failed to upload deck to server</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="235"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="292"/>
         <source>Delete local file</source>
         <translation>Delete local file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="236"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="369"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="380"/>
-        <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>Are you sure you want to delete &quot;%1&quot;?</translation>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="292"/>
+        <source>Are you sure you want to delete the selected files?</source>
+        <translation>Are you sure you want to delete the selected files?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="324"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="431"/>
+        <source>Delete remote decks</source>
+        <translation>Delete remote decks</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="431"/>
+        <source>Are you sure you want to delete the selected decks?</source>
+        <translation>Are you sure you want to delete the selected decks?</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="277"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="394"/>
         <source>Name of new folder:</source>
         <translation>Name of new folder:</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="368"/>
-        <source>Delete remote folder</source>
-        <translation>Delete remote folder</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="379"/>
-        <source>Delete remote deck</source>
-        <translation>Delete remote deck</translation>
     </message>
 </context>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="517"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="525"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="1416"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="533"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="541"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1432"/>
         <source>Replay</source>
         <translation>Replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="517"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="525"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="533"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="541"/>
         <source>Game</source>
         <translation>Game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="519"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="582"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="535"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="598"/>
         <source>Player List</source>
         <translation>Player List</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="528"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="580"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="544"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="596"/>
         <source>Card Info</source>
         <translation>Card Info</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="529"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="581"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="545"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="597"/>
         <source>Messages</source>
         <translation>Messages</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="531"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="594"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="547"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="610"/>
         <source>Replay Timeline</source>
         <translation>Replay Timeline</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="536"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="552"/>
         <source>&amp;Phases</source>
         <translation>&amp;Phases</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="539"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="555"/>
         <source>&amp;Game</source>
         <translation>&amp;Game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="541"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="557"/>
         <source>Next &amp;phase</source>
         <translation>Next &amp;phase</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="544"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="560"/>
         <source>Next phase with &amp;action</source>
         <translation>Next phase with &amp;action</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="547"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="563"/>
         <source>Next &amp;turn</source>
         <translation>Next &amp;turn</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="550"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="566"/>
         <source>Reverse turn order</source>
         <translation>Reverse turn order</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="553"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="569"/>
         <source>&amp;Remove all local arrows</source>
         <translation>&amp;Remove all local arrows</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="556"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="572"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation>Rotate View Cl&amp;ockwise</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="559"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="575"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation>Rotate View Co&amp;unterclockwise</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="562"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="578"/>
         <source>Game &amp;information</source>
         <translation>Game &amp;information</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="564"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="580"/>
         <source>&amp;Concede</source>
         <translation>&amp;Concede</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="567"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="583"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Leave game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="570"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="586"/>
         <source>C&amp;lose replay</source>
         <translation>C&amp;lose replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="573"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="589"/>
         <source>&amp;Focus Chat</source>
         <translation>&amp;Focus Chat</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="576"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="592"/>
         <source>&amp;Say:</source>
         <translation>&amp;Say:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="579"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="595"/>
         <source>&amp;View</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="584"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="587"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="590"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="595"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="600"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="603"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="606"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="611"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="585"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="588"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="591"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="596"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="601"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="604"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="607"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="612"/>
         <source>Floating</source>
         <translation>Floating</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="599"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="615"/>
         <source>Reset layout</source>
         <translation>Reset layout</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="691"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="707"/>
         <source>Concede</source>
         <translation>Concede</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="691"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="707"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>Are you sure you want to concede this game?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="697"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="713"/>
         <source>Unconcede</source>
         <translation>Unconcede</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="698"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="714"/>
         <source>You have already conceded.  Do you want to return to this game?</source>
         <translation>You have already conceded.  Do you want to return to this game?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="710"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="726"/>
         <source>Leave game</source>
         <translation>Leave game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="710"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="726"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>Are you sure you want to leave this game?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="990"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1006"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>You are flooding the game. Please wait a couple of seconds.</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1235"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1251"/>
         <source>A player has joined game #%1</source>
         <translation>A player has joined game #%1</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1236"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1252"/>
         <source>%1 has joined the game</source>
         <translation>%1 has joined the game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1247"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1263"/>
         <source>kicked by game host or moderator</source>
         <translation>kicked by game host or moderator</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1250"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1266"/>
         <source>player left the game</source>
         <translation>player left the game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1253"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1269"/>
         <source>player disconnected from server</source>
         <translation>player disconnected from server</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1257"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1273"/>
         <source>reason unknown</source>
         <translation>reason unknown</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1294"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1310"/>
         <source>You have been kicked out of the game.</source>
         <translation>You have been kicked out of the game.</translation>
     </message>
@@ -6293,71 +6332,97 @@ The more information you put in, the more specific your results will be.</transl
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="src/client/tabs/tab_replays.h" line="55"/>
+        <location filename="src/client/tabs/tab_replays.h" line="62"/>
         <source>Game replays</source>
         <translation>Game replays</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="116"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="126"/>
         <source>Local file system</source>
         <translation>Local file system</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="117"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="127"/>
         <source>Server replay storage</source>
         <translation>Server replay storage</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="119"/>
-        <location filename="src/client/tabs/tab_replays.cpp" line="121"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="129"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="132"/>
         <source>Watch replay</source>
         <translation>Watch replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="120"/>
-        <location filename="src/client/tabs/tab_replays.cpp" line="124"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="130"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="209"/>
+        <source>New folder</source>
+        <translation>New folder</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="131"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="135"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="122"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="133"/>
         <source>Download replay</source>
         <translation>Download replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="123"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="134"/>
         <source>Toggle expiration lock</source>
         <translation>Toggle expiration lock</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="152"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="173"/>
+        <source>Rename local folder</source>
+        <translation>Rename local folder</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="173"/>
+        <source>Rename local file</source>
+        <translation>Rename local file</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="176"/>
+        <source>New name:</source>
+        <translation>New name:</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="191"/>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="191"/>
+        <source>Rename failed</source>
+        <translation>Rename failed</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="209"/>
+        <source>Name of new folder:</source>
+        <translation>Name of new folder:</translation>
+    </message>
+    <message>
+        <location filename="src/client/tabs/tab_replays.cpp" line="224"/>
         <source>Delete local file</source>
         <translation>Delete local file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="153"/>
-        <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>Are you sure you want to delete &quot;%1&quot;?</translation>
+        <location filename="src/client/tabs/tab_replays.cpp" line="224"/>
+        <source>Are you sure you want to delete the selected files?</source>
+        <translation>Are you sure you want to delete the selected files?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="202"/>
-        <source>Downloading Replays</source>
-        <translation>Downloading Replays</translation>
+        <location filename="src/client/tabs/tab_replays.cpp" line="376"/>
+        <source>Are you sure you want to delete the selected replays?</source>
+        <translation>Are you sure you want to delete the selected replays?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="203"/>
-        <source>Folder download is not yet supported. Please download replays individually.</source>
-        <translation>Folder download is not yet supported. Please download replays individually.</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="271"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="375"/>
         <source>Delete remote replay</source>
         <translation>Delete remote replay</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="272"/>
-        <source>Are you sure you want to delete the replay of game %1?</source>
-        <translation>Are you sure you want to delete the replay of game %1?</translation>
     </message>
 </context>
 <context>
@@ -7325,7 +7390,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>i18n</name>
     <message>
-        <location filename="src/settings/cache_settings.cpp" line="170"/>
+        <location filename="src/settings/cache_settings.cpp" line="171"/>
         <source>English</source>
         <translation>English</translation>
     </message>
