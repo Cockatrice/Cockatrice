@@ -1,19 +1,20 @@
 #include "tab_admin.h"
 
+#include "../../server/pending_command.h"
 #include "../game_logic/abstract_client.h"
 #include "pb/admin_commands.pb.h"
+#include "pb/event_replay_added.pb.h"
+#include "pb/moderator_commands.pb.h"
 #include "trice_limits.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QVBoxLayout>
 
 ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 {
@@ -63,10 +64,23 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     reloadConfigButton = new QPushButton;
     connect(reloadConfigButton, &QPushButton::clicked, this, &TabAdmin::actReloadConfig);
 
+    grantReplayAccessButton = new QPushButton;
+    grantReplayAccessButton->setEnabled(false);
+    connect(grantReplayAccessButton, &QPushButton::clicked, this, &TabAdmin::actGrantReplayAccess);
+    replayIdToGrant = new QLineEdit;
+    replayIdToGrant->setMaximumWidth(500);
+    replayIdToGrant->setValidator(new QIntValidator(0, INT_MAX, this));
+    connect(replayIdToGrant, &QLineEdit::textChanged, this,
+            [=, this]() { grantReplayAccessButton->setEnabled(!replayIdToGrant->text().isEmpty()); });
+    auto *grandReplayAccessLayout = new QGridLayout(this);
+    grandReplayAccessLayout->addWidget(replayIdToGrant, 0, 0);
+    grandReplayAccessLayout->addWidget(grantReplayAccessButton, 0, 1);
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(updateServerMessageButton);
     vbox->addWidget(shutdownServerButton);
     vbox->addWidget(reloadConfigButton);
+    vbox->addLayout(grandReplayAccessLayout);
     vbox->addStretch();
 
     adminGroupBox = new QGroupBox;
@@ -100,6 +114,9 @@ void TabAdmin::retranslateUi()
     reloadConfigButton->setText(tr("&Reload configuration"));
     adminGroupBox->setTitle(tr("Server administration functions"));
 
+    replayIdToGrant->setPlaceholderText(tr("Replay ID"));
+    grantReplayAccessButton->setText(tr("Grant Replay Access"));
+
     unlockButton->setText(tr("&Unlock functions"));
     lockButton->setText(tr("&Lock functions"));
 }
@@ -125,6 +142,41 @@ void TabAdmin::actReloadConfig()
 {
     Command_ReloadConfig cmd;
     client->sendCommand(client->prepareAdminCommand(cmd));
+}
+
+void TabAdmin::actGrantReplayAccess()
+{
+    if (!replayIdToGrant) {
+        return;
+    }
+
+    Command_GrantReplayAccess cmd;
+    cmd.set_replay_id(replayIdToGrant->text().toUInt());
+    cmd.set_moderator_name(client->getUserName().toStdString());
+
+    auto *pend = client->prepareModeratorCommand(cmd);
+    connect(pend,
+            QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
+            this, &TabAdmin::grantReplayAccessProcessResponse);
+    client->sendCommand(pend);
+}
+
+void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
+{
+    auto *event = new Event_ReplayAdded();
+
+    switch (response.response_code()) {
+        case Response::RespOk:
+            client->replayAddedEventReceived(*event);
+            QMessageBox::information(this, tr("Success"), tr("Replay access granted"));
+            break;
+        case Response::RespContextError:
+            QMessageBox::critical(this, tr("Error"), tr("Unable to grant replay access. Replay ID invalid"));
+            break;
+        default:
+            QMessageBox::critical(this, tr("Error"), tr("Unable to grant replay access: Internal error"));
+            break;
+    }
 }
 
 void TabAdmin::actUnlock()

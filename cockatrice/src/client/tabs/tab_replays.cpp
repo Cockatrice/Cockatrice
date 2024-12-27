@@ -401,5 +401,11 @@ void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandCont
 
 void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)
 {
-    serverDirView->addMatchInfo(event.match_info());
+    if (event.has_match_info()) {
+        // 99.9% of events will have match info (Normal Workflow)
+        serverDirView->addMatchInfo(event.match_info());
+    } else {
+        // When a Moderator force adds a replay, we need to refresh their view
+        serverDirView->refreshTree();
+    }
 }
