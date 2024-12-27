@@ -11,6 +11,7 @@
 PrintingSelectorCardSearchWidget::PrintingSelectorCardSearchWidget(PrintingSelector *parent) : parent(parent)
 {
     layout = new QHBoxLayout(this);
+    layout->setContentsMargins(9, 0, 9, 0);
     setLayout(layout);
 
     searchBar = new QLineEdit(this);

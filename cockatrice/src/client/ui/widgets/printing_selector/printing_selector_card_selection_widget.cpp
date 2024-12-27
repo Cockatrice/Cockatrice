@@ -11,6 +11,7 @@
 PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(PrintingSelector *parent) : parent(parent)
 {
     cardSelectionBarLayout = new QHBoxLayout(this);
+    cardSelectionBarLayout->setContentsMargins(9, 0, 9, 0);
 
     previousCardButton = new QPushButton(this);
     previousCardButton->setText(tr("Previous Card in Deck"));
