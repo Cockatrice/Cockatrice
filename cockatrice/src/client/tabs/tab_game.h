@@ -177,6 +177,8 @@ private:
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
+    bool isMainPlayerConceded() const;
+
     void startGame(bool resuming);
     void stopGame();
     void closeGame();

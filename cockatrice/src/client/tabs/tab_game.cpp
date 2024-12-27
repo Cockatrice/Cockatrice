@@ -536,6 +536,12 @@ void TabGame::updatePlayerListDockTitle()
                                    (playerListDock->isWindow() ? tabText : QString()));
 }
 
+bool TabGame::isMainPlayerConceded() const
+{
+    Player *player = players.value(localPlayerId, nullptr);
+    return player && player->getConceded();
+}
+
 void TabGame::retranslateUi()
 {
     QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
@@ -577,7 +583,11 @@ void TabGame::retranslateUi()
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
-        aConcede->setText(tr("&Concede"));
+        if (isMainPlayerConceded()) {
+            aConcede->setText(tr("Un&concede"));
+        } else {
+            aConcede->setText(tr("&Concede"));
+        }
     }
     if (aLeaveGame) {
         aLeaveGame->setText(tr("&Leave game"));
@@ -873,6 +883,9 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
             }
         }
     }
+
+    // update menu text when player concedes so that "concede" gets updated to "unconcede"
+    connect(newPlayer, &Player::playerCountChanged, this, &TabGame::retranslateUi);
 
     emit playerAdded(newPlayer);
     return newPlayer;
