@@ -3858,6 +3858,9 @@ void Player::updateCardMenu(const CardItem *card)
                 }
 
                 addRelatedCardView(card, cardMenu);
+                if (card->getZone()->getName() == "hand") {
+                    addRelatedCardActions(card, cardMenu);
+                }
             }
         } else {
             cardMenu->addMenu(moveMenu);
