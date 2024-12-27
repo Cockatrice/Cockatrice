@@ -13,6 +13,7 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defa
     : parent(parent), flowWidget(flowWidget)
 {
     cardSizeLayout = new QHBoxLayout(this);
+    cardSizeLayout->setContentsMargins(9, 0, 9, 0);
     setLayout(cardSizeLayout);
 
     cardSizeLabel = new QLabel(tr("Card Size"), this);

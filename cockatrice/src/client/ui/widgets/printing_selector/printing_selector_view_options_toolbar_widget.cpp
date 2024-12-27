@@ -17,7 +17,7 @@ PrintingSelectorViewOptionsToolbarWidget::PrintingSelectorViewOptionsToolbarWidg
 {
     // Set up layout for the widget
     layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(9, 0, 9, 0);
     layout->setSpacing(0);
     setLayout(layout);
 
