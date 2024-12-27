@@ -7,6 +7,7 @@ message ModeratorCommand {
         WARN_HISTORY = 1003;
         WARN_LIST = 1004;
         VIEWLOG_HISTORY = 1005;
+        GRANT_REPLAY_ACCESS = 1006;
     }
     extensions 100 to max;
 }
@@ -70,4 +71,12 @@ message Command_ViewLogHistory {
     repeated string log_location = 6;    // destination of message (ex: main room, game room, private chat)
     required uint32 date_range = 7;      // the length of time (in minutes) to look back for
     optional uint32 maximum_results = 8; // the maximum number of query results
+}
+
+message Command_GrantReplayAccess {
+    extend ModeratorCommand {
+        optional Command_GrantReplayAccess ext = 1006;
+    }
+    optional uint32 replay_id = 1;
+    optional string moderator_name = 2;
 }

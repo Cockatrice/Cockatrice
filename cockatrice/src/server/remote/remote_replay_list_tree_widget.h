@@ -115,7 +115,10 @@ public:
     ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &ind) const;
     QList<ServerInfo_Replay const *> getSelectedReplays() const;
     QSet<ServerInfo_ReplayMatch const *> getSelectedReplayMatches() const;
-    void refreshTree();
+    void refreshTree()
+    {
+        treeModel->refreshTree();
+    }
     void addMatchInfo(const ServerInfo_ReplayMatch &matchInfo)
     {
         treeModel->addMatchInfo(matchInfo);

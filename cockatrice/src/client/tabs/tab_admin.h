@@ -1,6 +1,8 @@
 #ifndef TAB_ADMIN_H
 #define TAB_ADMIN_H
 
+#include "pb/commands.pb.h"
+#include "pb/response.pb.h"
 #include "tab.h"
 
 #include <QDialog>
@@ -32,15 +34,18 @@ private:
     bool locked;
     AbstractClient *client;
     bool fullAdmin;
-    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton;
+    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton;
     QGroupBox *adminGroupBox;
     QPushButton *unlockButton, *lockButton;
+    QLineEdit *replayIdToGrant;
 signals:
     void adminLockChanged(bool lock);
 private slots:
     void actUpdateServerMessage();
     void actShutdownServer();
     void actReloadConfig();
+    void actGrantReplayAccess();
+    void grantReplayAccessProcessResponse(const Response &resp, const CommandContainer &, const QVariant &);
 
     void actUnlock();
     void actLock();

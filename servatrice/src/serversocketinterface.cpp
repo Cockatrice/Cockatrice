@@ -224,6 +224,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetWarnList(cmd.GetExtension(Command_GetWarnList::ext), rc);
         case ModeratorCommand::VIEWLOG_HISTORY:
             return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc);
+        case ModeratorCommand::GRANT_REPLAY_ACCESS:
+            return cmdGrantReplayAccess(cmd.GetExtension(Command_GrantReplayAccess::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1651,6 +1653,52 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
                 return Response::RespInternalError;
             }
         }
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGrantReplayAccess(const Command_GrantReplayAccess &cmd,
+                                                                           ResponseContainer & /*rc*/)
+{
+    // Determine if the replay actually exists already
+    auto *replayExistsQuery =
+        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
+    replayExistsQuery->bindValue(":idgame", cmd.replay_id());
+    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!replayExistsQuery->next()) {
+        return Response::RespInternalError;
+    }
+
+    const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
+    if (!replayExists) {
+        return Response::RespContextError;
+    }
+
+    // Determine the Moderator's User ID (As it's not apart of client, only username is)
+    auto *getModeratorUserIdQuery = sqlInterface->prepareQuery("select id from {prefix}_users WHERE name = :name");
+    getModeratorUserIdQuery->bindValue(":name", QString::fromStdString(cmd.moderator_name()));
+    if (!sqlInterface->execSqlQuery(getModeratorUserIdQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!getModeratorUserIdQuery->next()) {
+        return Response::RespInternalError;
+    }
+
+    const auto &moderator_id = getModeratorUserIdQuery->value(0).toString();
+
+    // Grant the Moderator access to the replay
+    auto *grantReplayAccessQuery =
+        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
+                                   "values(:idgame, :idplayer, :replayname, 0)");
+    grantReplayAccessQuery->bindValue(":idgame", cmd.replay_id());
+    grantReplayAccessQuery->bindValue(":idplayer", moderator_id);
+    grantReplayAccessQuery->bindValue(":replayname", "Moderator Access Replay Grant");
+
+    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
+        return Response::RespInternalError;
     }
 
     return Response::RespOk;
