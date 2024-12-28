@@ -41,13 +41,26 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
-    leftToolBar = new QToolBar;
+    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    QToolBar *dummyToolBar = new QToolBar(this);
+    QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    dummyToolBar->setSizePolicy(sizePolicy);
+    dummyToolBar->setVisible(false);
+
+    leftToolBar = new QToolBar(this);
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *leftToolBarLayout = new QHBoxLayout;
-    leftToolBarLayout->addStretch();
-    leftToolBarLayout->addWidget(leftToolBar);
-    leftToolBarLayout->addStretch();
+
+    QToolBar *leftRightmostToolBar = new QToolBar(this);
+    leftRightmostToolBar->setOrientation(Qt::Horizontal);
+    leftRightmostToolBar->setIconSize(QSize(32, 32));
+
+    QGridLayout *leftToolBarLayout = new QGridLayout;
+    leftToolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    leftToolBarLayout->addWidget(leftToolBar, 0, 1, Qt::AlignHCenter);
+    leftToolBarLayout->addWidget(leftRightmostToolBar, 0, 2, Qt::AlignRight);
 
     QVBoxLayout *leftVbox = new QVBoxLayout;
     leftVbox->addWidget(localDirView);
@@ -111,7 +124,9 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     leftToolBar->addAction(aRenameLocal);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalReplay);
-    leftToolBar->addAction(aOpenReplaysFolder);
+
+    leftRightmostToolBar->addAction(aOpenReplaysFolder);
+
     rightToolBar->addAction(aOpenRemoteReplay);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aKeep);
