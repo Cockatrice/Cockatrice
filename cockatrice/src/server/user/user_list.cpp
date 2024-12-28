@@ -285,7 +285,7 @@ int BanDialog::getDeleteMessages() const
 }
 
 AdminNotesDialog::AdminNotesDialog(const QString &_userName, const QString &_notes, QWidget *_parent)
-    : userName(_userName), QDialog(_parent)
+    : QDialog(_parent), userName(_userName)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
