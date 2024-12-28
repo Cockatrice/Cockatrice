@@ -41,6 +41,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
+    // Left side layout
     /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
      * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
     QToolBar *dummyToolBar = new QToolBar(this);
@@ -68,6 +69,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     leftGroupBox = new QGroupBox;
     leftGroupBox->setLayout(leftVbox);
 
+    // Right side layout
     rightToolBar = new QToolBar;
     rightToolBar->setOrientation(Qt::Horizontal);
     rightToolBar->setIconSize(QSize(32, 32));
@@ -88,6 +90,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     hbox->addWidget(leftGroupBox);
     hbox->addWidget(rightGroupBox);
 
+    // Left side actions
     aOpenLocalReplay = new QAction(this);
     aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
@@ -106,6 +109,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aOpenReplaysFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
     connect(aOpenReplaysFolder, &QAction::triggered, this, &TabReplays::actOpenReplaysFolder);
 
+    // Right side actions
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
@@ -120,6 +124,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
 
+    // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalReplay);
     leftToolBar->addAction(aRenameLocal);
     leftToolBar->addAction(aNewLocalFolder);
