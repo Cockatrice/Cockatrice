@@ -326,7 +326,8 @@ void TabReplays::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelInd
         const QString name =
             QString::number(replayMatch->game_id()) + "_" + QString::fromStdString(replayMatch->game_name());
 
-        const auto newDirIndex = localDirModel->mkdir(curLeft, name);
+        const auto dirIndex = curLeft.isValid() ? curLeft : localDirModel->index(localDirModel->rootPath());
+        const auto newDirIndex = localDirModel->mkdir(dirIndex, name);
 
         int rows = serverDirView->model()->rowCount(curRight);
         for (int i = 0; i < rows; i++) {
