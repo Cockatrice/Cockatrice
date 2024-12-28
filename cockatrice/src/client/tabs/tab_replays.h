@@ -26,6 +26,7 @@ private:
     QGroupBox *leftGroupBox, *rightGroupBox;
 
     QAction *aOpenLocalReplay, *aRenameLocal, *aNewLocalFolder, *aDeleteLocalReplay;
+    QAction *aOpenReplaysFolder;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
 
     void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
@@ -36,6 +37,8 @@ private slots:
     void actOpenLocalReplay();
     void actNewLocalFolder();
     void actDeleteLocalReplay();
+
+    void actOpenReplaysFolder();
 
     void actRemoteDoubleClick(const QModelIndex &curLeft);
     void actOpenRemoteReplay();

@@ -15,6 +15,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -23,6 +24,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QUrl>
 #include <QVBoxLayout>
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
@@ -40,13 +42,27 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
-    leftToolBar = new QToolBar;
+    // Left side layout
+    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    QToolBar *dummyToolBar = new QToolBar(this);
+    QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    dummyToolBar->setSizePolicy(sizePolicy);
+    dummyToolBar->setVisible(false);
+
+    leftToolBar = new QToolBar(this);
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *leftToolBarLayout = new QHBoxLayout;
-    leftToolBarLayout->addStretch();
-    leftToolBarLayout->addWidget(leftToolBar);
-    leftToolBarLayout->addStretch();
+
+    QToolBar *leftRightmostToolBar = new QToolBar(this);
+    leftRightmostToolBar->setOrientation(Qt::Horizontal);
+    leftRightmostToolBar->setIconSize(QSize(32, 32));
+
+    QGridLayout *leftToolBarLayout = new QGridLayout;
+    leftToolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    leftToolBarLayout->addWidget(leftToolBar, 0, 1, Qt::AlignHCenter);
+    leftToolBarLayout->addWidget(leftRightmostToolBar, 0, 2, Qt::AlignRight);
 
     QVBoxLayout *leftVbox = new QVBoxLayout;
     leftVbox->addWidget(localDirView);
@@ -54,6 +70,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     leftGroupBox = new QGroupBox;
     leftGroupBox->setLayout(leftVbox);
 
+    // Right side layout
     rightToolBar = new QToolBar;
     rightToolBar->setOrientation(Qt::Horizontal);
     rightToolBar->setIconSize(QSize(32, 32));
@@ -70,10 +87,12 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     rightGroupBox = new QGroupBox;
     rightGroupBox->setLayout(rightVbox);
 
+    // combine layouts
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(leftGroupBox);
     hbox->addWidget(rightGroupBox);
 
+    // Left side actions
     aOpenLocalReplay = new QAction(this);
     aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
@@ -88,6 +107,11 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aDeleteLocalReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
 
+    aOpenReplaysFolder = new QAction(this);
+    aOpenReplaysFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
+    connect(aOpenReplaysFolder, &QAction::triggered, this, &TabReplays::actOpenReplaysFolder);
+
+    // Right side actions
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
@@ -102,10 +126,14 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
 
+    // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalReplay);
     leftToolBar->addAction(aRenameLocal);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalReplay);
+
+    leftRightmostToolBar->addAction(aOpenReplaysFolder);
+
     rightToolBar->addAction(aOpenRemoteReplay);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aKeep);
@@ -127,8 +155,10 @@ void TabReplays::retranslateUi()
     rightGroupBox->setTitle(tr("Server replay storage"));
 
     aOpenLocalReplay->setText(tr("Watch replay"));
+    aRenameLocal->setText(tr("Rename"));
     aNewLocalFolder->setText(tr("New folder"));
     aDeleteLocalReplay->setText(tr("Delete"));
+    aOpenReplaysFolder->setText(tr("Open replays folder"));
     aOpenRemoteReplay->setText(tr("Watch replay"));
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
@@ -231,6 +261,12 @@ void TabReplays::actDeleteLocalReplay()
             localDirModel->remove(curLeft);
         }
     }
+}
+
+void TabReplays::actOpenReplaysFolder()
+{
+    QString dir = localDirModel->rootPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void TabReplays::actRemoteDoubleClick(const QModelIndex &curRight)
