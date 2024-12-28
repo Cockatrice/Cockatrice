@@ -21,11 +21,8 @@
 
 #define GIT_SHORT_HASH_LEN 7
 
-int ReleaseChannel::sharedIndex = 0;
-
 ReleaseChannel::ReleaseChannel() : netMan(new QNetworkAccessManager(this)), response(nullptr), lastRelease(nullptr)
 {
-    index = sharedIndex++;
 }
 
 ReleaseChannel::~ReleaseChannel()

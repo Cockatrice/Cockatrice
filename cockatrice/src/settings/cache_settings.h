@@ -290,6 +290,10 @@ public:
     {
         return seenTips;
     }
+    int getUpdateReleaseChannelIndex() const
+    {
+        return updateReleaseChannel;
+    }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
         return releaseChannels.at(qMax(0, updateReleaseChannel));
