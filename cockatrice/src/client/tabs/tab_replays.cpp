@@ -153,6 +153,7 @@ void TabReplays::retranslateUi()
     rightGroupBox->setTitle(tr("Server replay storage"));
 
     aOpenLocalReplay->setText(tr("Watch replay"));
+    aRenameLocal->setText(tr("Rename"));
     aNewLocalFolder->setText(tr("New folder"));
     aDeleteLocalReplay->setText(tr("Delete"));
     aOpenReplaysFolder->setText(tr("Open replays folder"));
