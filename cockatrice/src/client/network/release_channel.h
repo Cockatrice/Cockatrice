@@ -82,9 +82,6 @@ public:
     ~ReleaseChannel() override;
 
 protected:
-    // shared by all instances
-    static int sharedIndex;
-    int index;
     QNetworkAccessManager *netMan;
     QNetworkReply *response;
     Release *lastRelease;
@@ -94,10 +91,6 @@ protected:
     virtual QString getReleaseChannelUrl() const = 0;
 
 public:
-    int getIndex() const
-    {
-        return index;
-    }
     Release *getLastRelease()
     {
         return lastRelease;

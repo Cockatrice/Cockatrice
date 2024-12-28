@@ -325,7 +325,7 @@ void SettingsCache::setNotifyAboutNewVersion(QT_STATE_CHANGED_T /* _notifyaboutn
 void SettingsCache::setDownloadSpoilerStatus(bool /* _spoilerStatus */)
 {
 }
-void SettingsCache::setUpdateReleaseChannel(int /* _updateReleaseChannel */)
+void SettingsCache::setUpdateReleaseChannelIndex(int /* value */)
 {
 }
 void SettingsCache::setMaxFontSize(int /* _max */)

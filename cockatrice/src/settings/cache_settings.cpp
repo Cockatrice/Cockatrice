@@ -1139,9 +1139,9 @@ void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
     emit downloadSpoilerStatusChanged();
 }
 
-void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
+void SettingsCache::setUpdateReleaseChannelIndex(int value)
 {
-    updateReleaseChannel = _updateReleaseChannel;
+    updateReleaseChannel = value;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
 }
 

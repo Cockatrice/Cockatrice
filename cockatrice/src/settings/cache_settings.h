@@ -290,6 +290,10 @@ public:
     {
         return seenTips;
     }
+    int getUpdateReleaseChannelIndex() const
+    {
+        return updateReleaseChannel;
+    }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
         return releaseChannels.at(qMax(0, updateReleaseChannel));
@@ -712,7 +716,7 @@ public slots:
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
-    void setUpdateReleaseChannel(int _updateReleaseChannel);
+    void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
 };
 
