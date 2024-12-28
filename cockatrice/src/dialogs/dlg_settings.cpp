@@ -174,7 +174,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     GeneralSettingsPage::retranslateUi();
 
     // connect the ReleaseChannel combo box only after the entries are inserted in retranslateUi
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings,
+            SLOT(setUpdateReleaseChannelIndex(int)));
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
     setLayout(mainLayout);
