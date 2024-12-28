@@ -34,7 +34,8 @@ private:
     bool locked;
     AbstractClient *client;
     bool fullAdmin;
-    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton, *activateUserButton;
+    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton,
+        *activateUserButton;
     QGroupBox *adminGroupBox;
     QPushButton *unlockButton, *lockButton;
     QLineEdit *replayIdToGrant, *userToActivate;
