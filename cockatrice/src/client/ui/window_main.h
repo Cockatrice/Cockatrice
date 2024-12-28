@@ -30,6 +30,7 @@
 #include <QSystemTrayIcon>
 #include <QtNetwork>
 
+class Release;
 class DlgConnect;
 class DlgViewLog;
 class GameReplay;
@@ -49,6 +50,7 @@ class MainWindow : public QMainWindow
 public slots:
     void actCheckCardUpdates();
     void actCheckServerUpdates();
+    void actCheckClientUpdates();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -94,6 +96,8 @@ private slots:
     void cardDatabaseLoadingFailed();
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
     void cardDatabaseAllNewSetsEnabled();
+
+    void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
 
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();
