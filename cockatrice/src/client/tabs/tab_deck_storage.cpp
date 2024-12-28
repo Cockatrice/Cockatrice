@@ -388,20 +388,34 @@ void TabDeckStorage::actDownload()
 
 void TabDeckStorage::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight)
 {
-    auto node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(serverDirView->getNode(curRight));
-    if (!node)
-        return;
+    auto node = serverDirView->getNode(curRight);
+    if (const auto dirNode = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+        // node at index is a folder
+        const QString name = dirNode->getName();
 
-    const QString filePath = localDirModel->filePath(curLeft) + QString("/deck_%1.cod").arg(node->getId());
+        const auto dirIndex = curLeft.isValid() ? curLeft : localDirModel->index(localDirModel->rootPath());
+        const auto newDirIndex = localDirModel->mkdir(dirIndex, name);
 
-    Command_DeckDownload cmd;
-    cmd.set_deck_id(node->getId());
+        int rows = serverDirView->model()->rowCount(curRight);
+        for (int i = 0; i < rows; i++) {
+            const auto childIndex = serverDirView->model()->index(i, 0, curRight);
+            downloadNodeAtIndex(newDirIndex, childIndex);
+        }
+    } else if (const auto fileNode = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(node)) {
+        // node at index is a deck
+        const QString dirPath = curLeft.isValid() ? localDirModel->filePath(curLeft) : localDirModel->rootPath();
+        const QString filePath = dirPath + QString("/deck_%1.cod").arg(fileNode->getId());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(filePath);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(downloadFinished(Response, CommandContainer, QVariant)));
-    client->sendCommand(pend);
+        Command_DeckDownload cmd;
+        cmd.set_deck_id(fileNode->getId());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(filePath);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        client->sendCommand(pend);
+    }
+    // node at index is invalid
 }
 
 void TabDeckStorage::downloadFinished(const Response &r,
