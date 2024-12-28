@@ -27,6 +27,7 @@ private:
     QGroupBox *leftGroupBox, *rightGroupBox;
 
     QAction *aOpenLocalDeck, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
+    QAction *aOpenDecksFolder;
     QAction *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
     QString getTargetPath() const;
 
@@ -42,6 +43,8 @@ private slots:
 
     void actNewLocalFolder();
     void actDeleteLocalDeck();
+
+    void actOpenDecksFolder();
 
     void actRemoteDoubleClick(const QModelIndex &curRight);
     void actOpenRemoteDeck();

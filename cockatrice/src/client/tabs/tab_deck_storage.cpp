@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -100,6 +101,10 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
 
+    aOpenDecksFolder = new QAction(this);
+    aOpenDecksFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
+    connect(aOpenDecksFolder, &QAction::triggered, this, &TabDeckStorage::actOpenDecksFolder);
+
     // Right side actions
     aOpenRemoteDeck = new QAction(this);
     aOpenRemoteDeck->setIcon(QPixmap("theme:icons/pencil"));
@@ -119,6 +124,9 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     leftToolBar->addAction(aUpload);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalDeck);
+
+    leftToolBar->addAction(aOpenDecksFolder);
+
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aNewFolder);
@@ -144,6 +152,7 @@ void TabDeckStorage::retranslateUi()
     aNewFolder->setText(tr("New folder"));
     aDeleteLocalDeck->setText(tr("Delete"));
     aDeleteRemoteDeck->setText(tr("Delete"));
+    aOpenDecksFolder->setText(tr("Open decks folder"));
 }
 
 QString TabDeckStorage::getTargetPath() const
@@ -304,6 +313,12 @@ void TabDeckStorage::actDeleteLocalDeck()
             localDirModel->remove(curLeft);
         }
     }
+}
+
+void TabDeckStorage::actOpenDecksFolder()
+{
+    QString dir = localDirModel->rootPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)
