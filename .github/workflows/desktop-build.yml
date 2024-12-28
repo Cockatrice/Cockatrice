@@ -217,10 +217,18 @@ jobs:
             core_count: 3
             make_package: 1
 
-          - target: 14
+          - target: 15
             soc: Apple
-            os: macos-14
-            xcode: "15.4"
+            os: macos-15
+            xcode: "16.2"
+            type: Release
+            core_count: 3
+            make_package: 1
+
+          - target: 15
+            soc: Apple
+            os: macos-15
+            xcode: "16.2"
             type: Debug
             core_count: 3
 
