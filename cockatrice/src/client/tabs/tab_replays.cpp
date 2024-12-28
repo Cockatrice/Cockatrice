@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QUrl>
 #include <QVBoxLayout>
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
