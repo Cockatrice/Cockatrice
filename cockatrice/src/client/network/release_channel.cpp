@@ -112,7 +112,7 @@ void StableReleaseChannel::releaseListFinished()
     QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("name") && resultMap.contains("html_url") && resultMap.contains("tag_name") &&
           resultMap.contains("published_at"))) {
-        qWarning() << "Invalid received from the release update server.";
+        qWarning() << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
