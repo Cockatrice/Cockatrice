@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -27,6 +28,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QUrl>
 #include <QVBoxLayout>
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client)
@@ -47,13 +49,27 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
 
     connect(localDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actLocalDoubleClick);
 
-    leftToolBar = new QToolBar;
+    // Left side layout
+    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    QToolBar *dummyToolBar = new QToolBar(this);
+    QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    dummyToolBar->setSizePolicy(sizePolicy);
+    dummyToolBar->setVisible(false);
+
+    leftToolBar = new QToolBar(this);
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *leftToolBarLayout = new QHBoxLayout;
-    leftToolBarLayout->addStretch();
-    leftToolBarLayout->addWidget(leftToolBar);
-    leftToolBarLayout->addStretch();
+
+    QToolBar *leftRightmostToolBar = new QToolBar(this);
+    leftRightmostToolBar->setOrientation(Qt::Horizontal);
+    leftRightmostToolBar->setIconSize(QSize(32, 32));
+
+    QGridLayout *leftToolBarLayout = new QGridLayout;
+    leftToolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    leftToolBarLayout->addWidget(leftToolBar, 0, 1, Qt::AlignHCenter);
+    leftToolBarLayout->addWidget(leftRightmostToolBar, 0, 2, Qt::AlignRight);
 
     QVBoxLayout *leftVbox = new QVBoxLayout;
     leftVbox->addWidget(localDirView);
@@ -61,6 +77,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     leftGroupBox = new QGroupBox;
     leftGroupBox->setLayout(leftVbox);
 
+    // Right side layout
     rightToolBar = new QToolBar;
     rightToolBar->setOrientation(Qt::Horizontal);
     rightToolBar->setIconSize(QSize(32, 32));
@@ -79,10 +96,12 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     rightGroupBox = new QGroupBox;
     rightGroupBox->setLayout(rightVbox);
 
+    // combine layouts
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(leftGroupBox);
     hbox->addWidget(rightGroupBox);
 
+    // Left side actions
     aOpenLocalDeck = new QAction(this);
     aOpenLocalDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenLocalDeck, SIGNAL(triggered()), this, SLOT(actOpenLocalDeck()));
@@ -96,6 +115,11 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
 
+    aOpenDecksFolder = new QAction(this);
+    aOpenDecksFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
+    connect(aOpenDecksFolder, &QAction::triggered, this, &TabDeckStorage::actOpenDecksFolder);
+
+    // Right side actions
     aOpenRemoteDeck = new QAction(this);
     aOpenRemoteDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenRemoteDeck, SIGNAL(triggered()), this, SLOT(actOpenRemoteDeck()));
@@ -109,10 +133,14 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     aDeleteRemoteDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteDeck, SIGNAL(triggered()), this, SLOT(actDeleteRemoteDeck()));
 
+    // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aUpload);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalDeck);
+
+    leftRightmostToolBar->addAction(aOpenDecksFolder);
+
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aNewFolder);
@@ -138,6 +166,7 @@ void TabDeckStorage::retranslateUi()
     aNewFolder->setText(tr("New folder"));
     aDeleteLocalDeck->setText(tr("Delete"));
     aDeleteRemoteDeck->setText(tr("Delete"));
+    aOpenDecksFolder->setText(tr("Open decks folder"));
 }
 
 QString TabDeckStorage::getTargetPath() const
@@ -298,6 +327,12 @@ void TabDeckStorage::actDeleteLocalDeck()
             localDirModel->remove(curLeft);
         }
     }
+}
+
+void TabDeckStorage::actOpenDecksFolder()
+{
+    QString dir = localDirModel->rootPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)
