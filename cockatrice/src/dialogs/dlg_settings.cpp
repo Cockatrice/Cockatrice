@@ -61,6 +61,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     // updates
     SettingsCache &settings = SettingsCache::instance();
+    startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
     newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
 
@@ -68,6 +69,8 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
+    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setCheckUpdatesOnStartup);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
     connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setNotifyAboutNewVersion);
@@ -78,9 +81,10 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&languageBox, 0, 1);
     personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
-    personalGrid->addWidget(&updateNotificationCheckBox, 3, 0, 1, 2);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&showTipsOnStartup, 5, 0, 1, 2);
+    personalGrid->addWidget(&startupUpdateCheckCheckBox, 3, 0, 1, 2);
+    personalGrid->addWidget(&updateNotificationCheckBox, 4, 0, 1, 2);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 5, 0, 1, 2);
+    personalGrid->addWidget(&showTipsOnStartup, 6, 0, 1, 2);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -288,6 +292,7 @@ void GeneralSettingsPage::retranslateUi()
     customCardDatabasePathLabel.setText(tr("Custom database directory:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
+    startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));

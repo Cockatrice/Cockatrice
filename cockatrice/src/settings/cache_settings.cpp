@@ -192,6 +192,7 @@ SettingsCache::SettingsCache()
 
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
+    checkUpdatesOnStartup = settings->value("personal/startupUpdateCheck", true).toBool();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
@@ -1106,6 +1107,12 @@ void SettingsCache::setDefaultStartingLifeTotal(const int _defaultStartingLifeTo
     defaultStartingLifeTotal = _defaultStartingLifeTotal;
     settings->setValue("game/defaultstartinglifetotal", defaultStartingLifeTotal);
 };
+
+void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
+{
+    checkUpdatesOnStartup = static_cast<bool>(value);
+    settings->setValue("personal/startupUpdateCheck", checkUpdatesOnStartup);
+}
 
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {

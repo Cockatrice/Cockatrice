@@ -313,6 +313,9 @@ void SettingsCache::setDefaultStartingLifeTotal(const int /* _startingLifeTotal 
 void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings */)
 {
 }
+void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T /* value */)
+{
+}
 void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T /* _notifyaboutupdate */)
 {
 }

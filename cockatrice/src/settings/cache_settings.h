@@ -93,6 +93,7 @@ private:
     QString lang;
     QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
+    bool checkUpdatesOnStartup;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
@@ -268,6 +269,10 @@ public:
     bool getBuddyConnectNotificationsEnabled() const
     {
         return buddyConnectNotificationsEnabled;
+    }
+    bool getCheckUpdatesOnStartup() const
+    {
+        return checkUpdatesOnStartup;
     }
     bool getNotifyAboutUpdates() const
     {
@@ -704,6 +709,7 @@ public slots:
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
