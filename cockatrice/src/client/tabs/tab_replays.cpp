@@ -15,6 +15,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -88,6 +89,10 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aDeleteLocalReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
 
+    aOpenReplaysFolder = new QAction(this);
+    aOpenReplaysFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
+    connect(aOpenReplaysFolder, &QAction::triggered, this, &TabReplays::actOpenReplaysFolder);
+
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
@@ -106,6 +111,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     leftToolBar->addAction(aRenameLocal);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalReplay);
+    leftToolBar->addAction(aOpenReplaysFolder);
     rightToolBar->addAction(aOpenRemoteReplay);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aKeep);
@@ -129,6 +135,7 @@ void TabReplays::retranslateUi()
     aOpenLocalReplay->setText(tr("Watch replay"));
     aNewLocalFolder->setText(tr("New folder"));
     aDeleteLocalReplay->setText(tr("Delete"));
+    aOpenReplaysFolder->setText(tr("Open replays folder"));
     aOpenRemoteReplay->setText(tr("Watch replay"));
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
@@ -231,6 +238,12 @@ void TabReplays::actDeleteLocalReplay()
             localDirModel->remove(curLeft);
         }
     }
+}
+
+void TabReplays::actOpenReplaysFolder()
+{
+    QString dir = localDirModel->rootPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void TabReplays::actRemoteDoubleClick(const QModelIndex &curRight)
