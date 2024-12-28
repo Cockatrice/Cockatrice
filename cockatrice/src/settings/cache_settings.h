@@ -292,7 +292,7 @@ public:
     }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
-        return releaseChannels.at(updateReleaseChannel);
+        return releaseChannels.at(qMax(0, updateReleaseChannel));
     }
     QList<ReleaseChannel *> getUpdateReleaseChannels() const
     {
