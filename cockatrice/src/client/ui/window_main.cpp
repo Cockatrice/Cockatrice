@@ -41,6 +41,7 @@
 #include "../../utility/logger.h"
 #include "../get_text_with_max.h"
 #include "../network/client_update_checker.h"
+#include "../network/release_channel.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
 #include "pb/event_connection_closed.pb.h"
