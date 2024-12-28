@@ -47,6 +47,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
 
     connect(localDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actLocalDoubleClick);
 
+    // Left side layout
     leftToolBar = new QToolBar;
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
@@ -61,6 +62,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     leftGroupBox = new QGroupBox;
     leftGroupBox->setLayout(leftVbox);
 
+    // Right side layout
     rightToolBar = new QToolBar;
     rightToolBar->setOrientation(Qt::Horizontal);
     rightToolBar->setIconSize(QSize(32, 32));
@@ -79,10 +81,12 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     rightGroupBox = new QGroupBox;
     rightGroupBox->setLayout(rightVbox);
 
+    // combine layouts
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(leftGroupBox);
     hbox->addWidget(rightGroupBox);
 
+    // Left side actions
     aOpenLocalDeck = new QAction(this);
     aOpenLocalDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenLocalDeck, SIGNAL(triggered()), this, SLOT(actOpenLocalDeck()));
@@ -96,6 +100,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
 
+    // Right side actions
     aOpenRemoteDeck = new QAction(this);
     aOpenRemoteDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenRemoteDeck, SIGNAL(triggered()), this, SLOT(actOpenRemoteDeck()));
@@ -109,6 +114,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     aDeleteRemoteDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteDeck, SIGNAL(triggered()), this, SLOT(actDeleteRemoteDeck()));
 
+    // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aUpload);
     leftToolBar->addAction(aNewLocalFolder);
