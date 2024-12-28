@@ -68,7 +68,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
 
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings, SLOT(setUpdateReleaseChannel(int)));
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckUpdatesOnStartup);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
@@ -171,6 +170,13 @@ GeneralSettingsPage::GeneralSettingsPage()
     mainLayout->addWidget(personalGroupBox);
     mainLayout->addWidget(pathsGroupBox);
     mainLayout->addStretch();
+
+    GeneralSettingsPage::retranslateUi();
+
+    // connect the ReleaseChannel combo box only after the entries are inserted in retranslateUi
+    connect(&updateReleaseChannelBox, &QComboBox::currentIndexChanged, &settings,
+            &SettingsCache::setUpdateReleaseChannel);
+    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
 
     setLayout(mainLayout);
 }
@@ -299,12 +305,14 @@ void GeneralSettingsPage::retranslateUi()
     resetAllPathsButton->setText(tr("Reset all paths"));
 
     const auto &settings = SettingsCache::instance();
-    QList<ReleaseChannel *> channels = settings.getUpdateReleaseChannels();
+
+    // We can't change the strings after they're put into the QComboBox, so this is our workaround
+    int oldIndex = updateReleaseChannelBox.currentIndex();
     updateReleaseChannelBox.clear();
-    for (ReleaseChannel *chan : channels) {
+    for (ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
         updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
     }
-    updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannel()->getIndex());
+    updateReleaseChannelBox.setCurrentIndex(oldIndex);
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
