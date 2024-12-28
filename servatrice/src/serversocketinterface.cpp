@@ -1713,9 +1713,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
     auto *getUserTokenQuery = sqlInterface->prepareQuery("select token from {prefix}_users WHERE name = :name");
     getUserTokenQuery->bindValue(":name", QString::fromStdString(cmd.username_to_activate()));
     if (!sqlInterface->execSqlQuery(getUserTokenQuery)) {
+        // Internal server error
         return Response::RespInternalError;
     }
     if (!getUserTokenQuery->next()) {
+        // User doesn't exist
         return Response::RespNameNotFound;
     }
     const auto &token = getUserTokenQuery->value(0).toString();
@@ -1730,7 +1732,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
     cmdActivate.set_user_name(cmd.username_to_activate());
     cmdActivate.set_token(token.toStdString());
 
-    // Send activation request
+    // Send activation request -- Either User exists or User activated
     return cmdActivateAccount(cmdActivate, rc);
 }
 
