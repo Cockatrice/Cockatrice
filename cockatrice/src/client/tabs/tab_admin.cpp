@@ -76,11 +76,23 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     grandReplayAccessLayout->addWidget(replayIdToGrant, 0, 0);
     grandReplayAccessLayout->addWidget(grantReplayAccessButton, 0, 1);
 
+    activateUserButton = new QPushButton;
+    activateUserButton->setEnabled(false);
+    connect(activateUserButton, &QPushButton::clicked, this, &TabAdmin::actForceActivateUser);
+    userToActivate = new QLineEdit;
+    userToActivate->setMaximumWidth(500);
+    connect(userToActivate, &QLineEdit::textChanged, this,
+            [=, this]() { activateUserButton->setEnabled(!userToActivate->text().isEmpty()); });
+    auto *activateUserLayout = new QGridLayout(this);
+    activateUserLayout->addWidget(userToActivate, 0, 0);
+    activateUserLayout->addWidget(activateUserButton, 0, 1);
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(updateServerMessageButton);
     vbox->addWidget(shutdownServerButton);
     vbox->addWidget(reloadConfigButton);
     vbox->addLayout(grandReplayAccessLayout);
+    vbox->addLayout(activateUserLayout);
     vbox->addStretch();
 
     adminGroupBox = new QGroupBox;
@@ -116,6 +128,9 @@ void TabAdmin::retranslateUi()
 
     replayIdToGrant->setPlaceholderText(tr("Replay ID"));
     grantReplayAccessButton->setText(tr("Grant Replay Access"));
+
+    userToActivate->setPlaceholderText(tr("Username to Activate"));
+    activateUserButton->setText(tr("Force Activate User"));
 
     unlockButton->setText(tr("&Unlock functions"));
     lockButton->setText(tr("&Lock functions"));
@@ -161,6 +176,23 @@ void TabAdmin::actGrantReplayAccess()
     client->sendCommand(pend);
 }
 
+void TabAdmin::actForceActivateUser()
+{
+    if (!userToActivate) {
+        return;
+    }
+
+    Command_ForceActivateUser cmd;
+    cmd.set_username_to_activate(userToActivate->text().trimmed().toStdString());
+    cmd.set_moderator_name(client->getUserName().toStdString());
+
+    auto *pend = client->prepareModeratorCommand(cmd);
+    connect(pend,
+            QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
+            this, &TabAdmin::activateUserProcessResponse);
+    client->sendCommand(pend);
+}
+
 void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
 {
     auto *event = new Event_ReplayAdded();
@@ -174,7 +206,25 @@ void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const 
             QMessageBox::critical(this, tr("Error"), tr("Unable to grant replay access. Replay ID invalid"));
             break;
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unable to grant replay access: Internal error"));
+            QMessageBox::critical(this, tr("Error"), tr("Unable to grant replay access. Internal error"));
+            break;
+    }
+}
+
+void TabAdmin::activateUserProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
+{
+    switch (response.response_code()) {
+        case Response::RespActivationAccepted:
+            QMessageBox::information(this, tr("Success"), tr("User successfully activated"));
+            break;
+        case Response::RespNameNotFound:
+            QMessageBox::critical(this, tr("Error"), tr("Unable to activate user. Username invalid"));
+            break;
+        case Response::RespActivationFailed:
+            QMessageBox::critical(this, tr("Error"), tr("Unable to activate user. User already active"));
+            break;
+        default:
+            QMessageBox::critical(this, tr("Error"), tr("Unable to activate user. Internal error"));
             break;
     }
 }

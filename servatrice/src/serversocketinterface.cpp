@@ -226,6 +226,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc);
         case ModeratorCommand::GRANT_REPLAY_ACCESS:
             return cmdGrantReplayAccess(cmd.GetExtension(Command_GrantReplayAccess::ext), rc);
+        case ModeratorCommand::FORCE_ACTIVATE_USER:
+            return cmdForceActivateUser(cmd.GetExtension(Command_ForceActivateUser::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1702,6 +1704,34 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGrantReplayAccess(const
     }
 
     return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const Command_ForceActivateUser &cmd,
+                                                                           ResponseContainer &rc)
+{
+    // Determine if user exists
+    auto *getUserTokenQuery = sqlInterface->prepareQuery("select token from {prefix}_users WHERE name = :name");
+    getUserTokenQuery->bindValue(":name", QString::fromStdString(cmd.username_to_activate()));
+    if (!sqlInterface->execSqlQuery(getUserTokenQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!getUserTokenQuery->next()) {
+        return Response::RespNameNotFound;
+    }
+    const auto &token = getUserTokenQuery->value(0).toString();
+
+    // Add audit log that Moderator activated account on behalf of user
+    const auto &msg = QString("Attempt Force Activation by %1").arg(QString::fromStdString(cmd.moderator_name()));
+    sqlInterface->addAuditRecord(QString::fromStdString(cmd.username_to_activate()), this->getAddress(), "UNKNOWN",
+                                 "ACTIVATE_ACCOUNT", msg, true);
+
+    // Build up activation request
+    Command_Activate cmdActivate;
+    cmdActivate.set_user_name(cmd.username_to_activate());
+    cmdActivate.set_token(token.toStdString());
+
+    // Send activation request
+    return cmdActivateAccount(cmdActivate, rc);
 }
 
 TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
