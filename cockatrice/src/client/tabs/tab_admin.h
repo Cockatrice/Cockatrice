@@ -34,10 +34,11 @@ private:
     bool locked;
     AbstractClient *client;
     bool fullAdmin;
-    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton;
+    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton,
+        *activateUserButton;
     QGroupBox *adminGroupBox;
     QPushButton *unlockButton, *lockButton;
-    QLineEdit *replayIdToGrant;
+    QLineEdit *replayIdToGrant, *userToActivate;
 signals:
     void adminLockChanged(bool lock);
 private slots:
@@ -45,7 +46,9 @@ private slots:
     void actShutdownServer();
     void actReloadConfig();
     void actGrantReplayAccess();
+    void actForceActivateUser();
     void grantReplayAccessProcessResponse(const Response &resp, const CommandContainer &, const QVariant &);
+    void activateUserProcessResponse(const Response &response, const CommandContainer &, const QVariant &);
 
     void actUnlock();
     void actLock();

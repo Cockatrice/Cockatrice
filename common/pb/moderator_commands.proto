@@ -8,6 +8,7 @@ message ModeratorCommand {
         WARN_LIST = 1004;
         VIEWLOG_HISTORY = 1005;
         GRANT_REPLAY_ACCESS = 1006;
+        FORCE_ACTIVATE_USER = 1007;
     }
     extensions 100 to max;
 }
@@ -78,5 +79,13 @@ message Command_GrantReplayAccess {
         optional Command_GrantReplayAccess ext = 1006;
     }
     optional uint32 replay_id = 1;
+    optional string moderator_name = 2;
+}
+
+message Command_ForceActivateUser {
+    extend ModeratorCommand {
+        optional Command_ForceActivateUser ext = 1007;
+    }
+    optional string username_to_activate = 1;
     optional string moderator_name = 2;
 }
