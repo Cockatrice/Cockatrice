@@ -7,8 +7,9 @@
       bash
       curl
       git
+      qtcreator
 
-      # Test
+      # Debug / Test 
       valgrind
       gdb
 
@@ -17,7 +18,9 @@
 
       # Libraries
       openssl
-      libsForQt5.full
       protobuf
+      qt6.qtbase
+      qt6.full
+      qt6.wrapQtAppsHook
     ];
   }
