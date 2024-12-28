@@ -1,5 +1,6 @@
 #include "dlg_update.h"
 
+#include "../client/network/client_update_checker.h"
 #include "../client/network/release_channel.h"
 #include "../client/ui/window_main.h"
 #include "../settings/cache_settings.h"
@@ -71,11 +72,6 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     connect(uDownloader, SIGNAL(progressMade(qint64, qint64)), this, SLOT(downloadProgressMade(qint64, qint64)));
     connect(uDownloader, SIGNAL(error(QString)), this, SLOT(downloadError(QString)));
 
-    ReleaseChannel *channel = SettingsCache::instance().getUpdateReleaseChannel();
-    connect(channel, SIGNAL(finishedCheck(bool, bool, Release *)), this,
-            SLOT(finishedUpdateCheck(bool, bool, Release *)));
-    connect(channel, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
-
     // Check for updates
     beginUpdateCheck();
 }
@@ -110,7 +106,12 @@ void DlgUpdate::beginUpdateCheck()
     progress->setMinimum(0);
     progress->setMaximum(0);
     setLabel(tr("Checking for updates..."));
-    SettingsCache::instance().getUpdateReleaseChannel()->checkForUpdates();
+
+    auto checker = new ClientUpdateChecker(this);
+    connect(checker, SIGNAL(finishedCheck(bool, bool, Release *)), this,
+            SLOT(finishedUpdateCheck(bool, bool, Release *)));
+    connect(checker, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
+    checker->check();
 }
 
 void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release)
