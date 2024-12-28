@@ -376,25 +376,38 @@ void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandCont
 
 void TabDeckStorage::actDownload()
 {
-    QString dirPath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (!curLeft.isValid())
-        dirPath = localDirModel->rootPath();
-    else {
-        while (!localDirModel->isDir(curLeft))
-            curLeft = curLeft.parent();
-        dirPath = localDirModel->filePath(curLeft);
+    while (!localDirModel->isDir(curLeft)) {
+        curLeft = curLeft.parent();
     }
 
-    for (const auto &curRight : serverDirView->getCurrentSelection()) {
-        RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
-        if (!node)
-            continue;
+    for (const auto curRight : serverDirView->selectionModel()->selectedRows()) {
+        downloadNodeAtIndex(curLeft, curRight);
+    }
+}
 
-        QString filePath = dirPath + QString("/deck_%1.cod").arg(node->getId());
+void TabDeckStorage::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight)
+{
+    auto node = serverDirView->getNode(curRight);
+    if (const auto dirNode = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+        // node at index is a folder
+        const QString name = dirNode->getName();
+
+        const auto dirIndex = curLeft.isValid() ? curLeft : localDirModel->index(localDirModel->rootPath());
+        const auto newDirIndex = localDirModel->mkdir(dirIndex, name);
+
+        int rows = serverDirView->model()->rowCount(curRight);
+        for (int i = 0; i < rows; i++) {
+            const auto childIndex = serverDirView->model()->index(i, 0, curRight);
+            downloadNodeAtIndex(newDirIndex, childIndex);
+        }
+    } else if (const auto fileNode = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(node)) {
+        // node at index is a deck
+        const QString dirPath = curLeft.isValid() ? localDirModel->filePath(curLeft) : localDirModel->rootPath();
+        const QString filePath = dirPath + QString("/deck_%1.cod").arg(fileNode->getId());
 
         Command_DeckDownload cmd;
-        cmd.set_deck_id(node->getId());
+        cmd.set_deck_id(fileNode->getId());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(filePath);
@@ -402,6 +415,7 @@ void TabDeckStorage::actDownload()
                 SLOT(downloadFinished(Response, CommandContainer, QVariant)));
         client->sendCommand(pend);
     }
+    // node at index is invalid
 }
 
 void TabDeckStorage::downloadFinished(const Response &r,
