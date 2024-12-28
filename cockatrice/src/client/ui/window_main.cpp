@@ -40,6 +40,8 @@
 #include "../../settings/cache_settings.h"
 #include "../../utility/logger.h"
 #include "../get_text_with_max.h"
+#include "../network/client_update_checker.h"
+#include "../network/release_channel.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
 #include "pb/event_connection_closed.pb.h"
@@ -879,6 +881,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
+        actCheckClientUpdates();
+    }
+
     if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
@@ -1221,6 +1227,21 @@ void MainWindow::actCheckServerUpdates()
     auto hps = new HandlePublicServers(this);
     hps->downloadPublicServers();
     connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, [=]() { hps->deleteLater(); });
+}
+
+void MainWindow::actCheckClientUpdates()
+{
+    auto checker = new ClientUpdateChecker(this);
+    connect(checker, &ClientUpdateChecker::finishedCheck, this, &MainWindow::checkClientUpdatesFinished);
+    checker->check();
+}
+
+void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompatible */, Release * /* release */)
+{
+    if (needToUpdate) {
+        DlgUpdate dlg(this);
+        dlg.exec();
+    }
 }
 
 void MainWindow::refreshShortcuts()

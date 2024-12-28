@@ -65,6 +65,7 @@ private:
     QGroupBox *personalGroupBox;
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
+    QCheckBox startupUpdateCheckCheckBox;
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
