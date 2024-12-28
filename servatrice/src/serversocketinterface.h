@@ -129,6 +129,9 @@ private:
     Response::ResponseCode cmdGrantReplayAccess(const Command_GrantReplayAccess &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdForceActivateUser(const Command_ForceActivateUser &cmd, ResponseContainer &rc);
 
+    Response::ResponseCode cmdGetAdminNotes(const Command_GetAdminNotes &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd, ResponseContainer &rc);
+
     bool addAdminFlagToUser(const QString &user, int flag);
     bool removeAdminFlagFromUser(const QString &user, int flag);
 

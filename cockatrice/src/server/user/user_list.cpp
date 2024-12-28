@@ -284,6 +284,32 @@ int BanDialog::getDeleteMessages() const
     return deleteMessages->isChecked() ? -1 : 0;
 }
 
+AdminNotesDialog::AdminNotesDialog(const QString &_userName, const QString &_notes, QWidget *_parent)
+    : userName(_userName), QDialog(_parent)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+
+    auto *updateButton = new QPushButton(tr("Update Notes"));
+    updateButton->setEnabled(false);
+    connect(updateButton, &QPushButton::clicked, this, &AdminNotesDialog::accept);
+
+    notes = new QPlainTextEdit(_notes);
+    notes->setMinimumWidth(500);
+    connect(notes, &QPlainTextEdit::textChanged, this, [=]() { updateButton->setEnabled(true); });
+
+    auto *vbox = new QVBoxLayout;
+    vbox->addWidget(notes);
+    vbox->addWidget(updateButton);
+
+    setLayout(vbox);
+    setWindowTitle(tr("Admin Notes for %1").arg(_userName));
+}
+
+QString AdminNotesDialog::getNotes() const
+{
+    return notes->toPlainText();
+}
+
 UserListItemDelegate::UserListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {
 }

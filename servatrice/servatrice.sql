@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(29);
+INSERT INTO cockatrice_schema_version VALUES(30);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `active` tinyint(1) NOT NULL,
   `token` binary(16),
   `clientid` varchar(15) NOT NULL,
+  `adminnotes` mediumtext NOT NULL,
   `privlevel` enum("NONE","VIP","DONATOR") NOT NULL,
   `privlevelStartDate` datetime NOT NULL,
   `privlevelEndDate` datetime NOT NULL,
