@@ -9,6 +9,8 @@ message ModeratorCommand {
         VIEWLOG_HISTORY = 1005;
         GRANT_REPLAY_ACCESS = 1006;
         FORCE_ACTIVATE_USER = 1007;
+        GET_ADMIN_NOTES = 1008;
+        UPDATE_ADMIN_NOTES = 1009;
     }
     extensions 100 to max;
 }
@@ -88,4 +90,19 @@ message Command_ForceActivateUser {
     }
     optional string username_to_activate = 1;
     optional string moderator_name = 2;
+}
+
+message Command_GetAdminNotes {
+    extend ModeratorCommand {
+        optional Command_GetAdminNotes ext = 1008;
+    }
+    optional string user_name = 1;
+}
+
+message Command_UpdateAdminNotes {
+    extend ModeratorCommand {
+        optional Command_UpdateAdminNotes ext = 1009;
+    }
+    optional string user_name = 1;
+    optional string notes = 2;
 }

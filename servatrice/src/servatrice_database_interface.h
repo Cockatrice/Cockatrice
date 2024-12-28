@@ -9,7 +9,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 
-#define DATABASE_SCHEMA_VERSION 29
+#define DATABASE_SCHEMA_VERSION 30
 
 class Servatrice;
 

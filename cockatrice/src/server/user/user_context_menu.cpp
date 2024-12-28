@@ -11,6 +11,7 @@
 #include "pb/commands.pb.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_ban_history.pb.h"
+#include "pb/response_get_admin_notes.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/response_warn_history.pb.h"
@@ -47,6 +48,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aDemoteFromMod = new QAction(QString(), this);
     aPromoteToJudge = new QAction(QString(), this);
     aDemoteFromJudge = new QAction(QString(), this);
+    aGetAdminNotes = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -69,6 +71,7 @@ void UserContextMenu::retranslateUi()
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
     aPromoteToJudge->setText(tr("Promote user to &judge"));
     aDemoteFromJudge->setText(tr("Demote user from judge"));
+    aGetAdminNotes->setText(tr("View admin notes"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -221,6 +224,21 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
                               tr("Failed to collect warning information."));
 }
 
+void UserContextMenu::getAdminNotes_processResponse(const Response &resp)
+{
+    const Response_GetAdminNotes &response = resp.GetExtension(Response_GetAdminNotes::ext);
+
+    if (resp.response_code() != Response::RespOk) {
+        QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to get admin notes."));
+        return;
+    }
+
+    auto *dlg = new AdminNotesDialog(QString::fromStdString(response.user_name()),
+                                     QString::fromStdString(response.notes()), static_cast<QWidget *>(parent()));
+    connect(dlg, &AdminNotesDialog::accepted, this, &UserContextMenu::updateAdminNotes_dialogFinished);
+    dlg->show();
+}
+
 void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
 {
 
@@ -277,6 +295,17 @@ void UserContextMenu::warnUser_dialogFinished()
     if (removeAmount != 0) {
         cmd.set_remove_messages(removeAmount);
     }
+
+    client->sendCommand(client->prepareModeratorCommand(cmd));
+}
+
+void UserContextMenu::updateAdminNotes_dialogFinished()
+{
+    auto *dlg = static_cast<AdminNotesDialog *>(sender());
+
+    Command_UpdateAdminNotes cmd;
+    cmd.set_user_name(dlg->getName().toStdString());
+    cmd.set_notes(dlg->getNotes().toStdString());
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
@@ -347,6 +376,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         menu->addSeparator();
         menu->addAction(aBan);
         menu->addAction(aBanHistory);
+        menu->addSeparator();
+        menu->addAction(aGetAdminNotes);
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
@@ -380,6 +411,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aWarnHistory->setEnabled(anotherUser);
     aBan->setEnabled(anotherUser);
     aBanHistory->setEnabled(anotherUser);
+    aGetAdminNotes->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
     aDemoteFromMod->setEnabled(anotherUser);
 
@@ -478,6 +510,14 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(warnUserHistory_processResponse(Response)));
         client->sendCommand(pend);
+    } else if (actionClicked == aGetAdminNotes) {
+        Command_GetAdminNotes cmd;
+        cmd.set_user_name(userName.toStdString());
+        auto *pend = client->prepareModeratorCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(getAdminNotes_processResponse(Response)));
+        client->sendCommand(pend);
+
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);

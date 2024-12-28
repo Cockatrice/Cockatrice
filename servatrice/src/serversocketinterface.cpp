@@ -46,6 +46,7 @@
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_upload.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"
+#include "pb/response_get_admin_notes.pb.h"
 #include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_replay_download.pb.h"
@@ -228,6 +229,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGrantReplayAccess(cmd.GetExtension(Command_GrantReplayAccess::ext), rc);
         case ModeratorCommand::FORCE_ACTIVATE_USER:
             return cmdForceActivateUser(cmd.GetExtension(Command_ForceActivateUser::ext), rc);
+        case ModeratorCommand::GET_ADMIN_NOTES:
+            return cmdGetAdminNotes(cmd.GetExtension(Command_GetAdminNotes::ext), rc);
+        case ModeratorCommand::UPDATE_ADMIN_NOTES:
+            return cmdUpdateAdminNotes(cmd.GetExtension(Command_UpdateAdminNotes::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1734,6 +1739,48 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
 
     // Send activation request -- Either User exists or User activated
     return cmdActivateAccount(cmdActivate, rc);
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetAdminNotes(const Command_GetAdminNotes &cmd,
+                                                                       ResponseContainer &rc)
+{
+    auto *getAdminNotesQuery = sqlInterface->prepareQuery("select adminnotes from {prefix}_users WHERE name = :name");
+    getAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
+    if (!sqlInterface->execSqlQuery(getAdminNotesQuery)) {
+        // Internal server error
+        return Response::RespInternalError;
+    }
+    if (!getAdminNotesQuery->next()) {
+        // User doesn't exist
+        return Response::RespNameNotFound;
+    }
+    const auto &adminNotes = getAdminNotesQuery->value(0).toString();
+
+    Response_GetAdminNotes *re = new Response_GetAdminNotes;
+    re->set_user_name(cmd.user_name());
+    re->set_notes(adminNotes.toStdString());
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd,
+                                                                          ResponseContainer & /*rc*/)
+{
+    auto *updateAdminNotesQuery =
+        sqlInterface->prepareQuery("update {prefix}_users set adminnotes = :adminnotes where name = :name");
+    updateAdminNotesQuery->bindValue(":adminnotes", QString::fromStdString(cmd.notes()));
+    updateAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
+
+    if (!sqlInterface->execSqlQuery(updateAdminNotesQuery)) {
+        return Response::RespInternalError;
+    }
+
+    if (updateAdminNotesQuery->numRowsAffected() == 0) {
+        return Response::RespNameNotFound;
+    }
+
+    return Response::RespOk;
 }
 
 TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,

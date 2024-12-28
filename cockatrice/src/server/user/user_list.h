@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QGroupBox>
 #include <QStyledItemDelegate>
+#include <QTextEdit>
 #include <QTreeWidgetItem>
 
 class QTreeWidget;
@@ -67,6 +68,23 @@ public:
     QString getReason() const;
     int getDeleteMessages() const;
     void addWarningOption(const QString warning);
+};
+
+class AdminNotesDialog : public QDialog
+{
+    Q_OBJECT
+
+private:
+    QString userName;
+    QPlainTextEdit *notes;
+
+public:
+    explicit AdminNotesDialog(const QString &_userName, const QString &_notes, QWidget *_parent = nullptr);
+    QString getName() const
+    {
+        return userName;
+    }
+    QString getNotes() const;
 };
 
 class UserListItemDelegate : public QStyledItemDelegate
