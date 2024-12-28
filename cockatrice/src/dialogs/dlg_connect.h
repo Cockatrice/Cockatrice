@@ -65,11 +65,11 @@ private slots:
 
 private:
     QGridLayout *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
-    QHBoxLayout *newHolderLayout;
+    QHBoxLayout *newHolderLayout, *forgotPasswordLayout;
     QGroupBox *loginGroupBox, *serverInfoGroupBox, *restrictionsGroupBox;
     QVBoxLayout *mainLayout;
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *serverIssuesLabel,
-        *serverContactLabel, *serverContactLink;
+        *serverContactLabel, *serverContactLink, *forgotPasswordLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;

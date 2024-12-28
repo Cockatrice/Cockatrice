@@ -99,6 +99,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
+    forgotPasswordLabel = new QLabel(tr("Forgot password?"));
+    forgotPasswordLabel->setBuddy(btnForgotPassword);
+
     btnConnect = new QPushButton(tr("&Connect"));
     connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
@@ -130,13 +133,17 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverInfoLayout->addWidget(serverContactLabel, 1, 0);
     serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 3);
 
+    forgotPasswordLayout = new QHBoxLayout;
+    forgotPasswordLayout->addWidget(forgotPasswordLabel, 0, Qt::AlignLeft);
+    forgotPasswordLayout->addWidget(btnForgotPassword, 0, Qt::AlignLeft);
+
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
     loginLayout->addWidget(playernameEdit, 0, 1, 1, 2);
     loginLayout->addWidget(passwordLabel, 1, 0);
-    loginLayout->addWidget(passwordEdit, 1, 1);
-    loginLayout->addWidget(btnForgotPassword, 1, 2);
+    loginLayout->addWidget(passwordEdit, 1, 1, 1, 2);
     loginLayout->addWidget(savePasswordCheckBox, 2, 1);
+    loginLayout->addLayout(forgotPasswordLayout, 3, 1);
 
     loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
