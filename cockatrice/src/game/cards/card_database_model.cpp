@@ -174,6 +174,10 @@ void CardDatabaseDisplayModel::fetchMore(const QModelIndex &index)
     int remainder = sourceModel()->rowCount(index) - loadedRowCount;
     int itemsToFetch = qMin(100, remainder);
 
+    if (itemsToFetch == 0) {
+        return;
+    }
+
     beginInsertRows(QModelIndex(), loadedRowCount, loadedRowCount + itemsToFetch - 1);
 
     loadedRowCount += itemsToFetch;
