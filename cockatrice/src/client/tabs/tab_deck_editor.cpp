@@ -840,7 +840,10 @@ void TabDeckEditor::updateBannerCardComboBox()
     }
 
     // Convert the QSet to a sorted QStringList
-    QStringList bannerCardChoices = QStringList(bannerCardSet.begin(), bannerCardSet.end());
+    QStringList bannerCardChoices;
+    for (const QString &entry : bannerCardSet) {
+        bannerCardChoices.append(entry);
+    }
     bannerCardChoices.sort(Qt::CaseInsensitive);
 
     // Populate the combo box with new items
