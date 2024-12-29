@@ -86,7 +86,7 @@ QString StableReleaseChannel::getManualDownloadUrl() const
 
 QString StableReleaseChannel::getName() const
 {
-    return tr("Stable Releases");
+    return tr("Default");
 }
 
 QString StableReleaseChannel::getReleaseChannelUrl() const
@@ -200,7 +200,7 @@ QString BetaReleaseChannel::getManualDownloadUrl() const
 
 QString BetaReleaseChannel::getName() const
 {
-    return tr("Beta Releases");
+    return tr("Beta");
 }
 
 QString BetaReleaseChannel::getReleaseChannelUrl() const
