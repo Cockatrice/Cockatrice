@@ -122,7 +122,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     resetAllPathsButton = new QPushButton;
 
 
-    bool isPortable = true; // settings.getIsPortableBuild();
+    bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
