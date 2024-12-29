@@ -2,6 +2,7 @@
 #define ORACLEIMPORTER_H
 
 #include <QMap>
+#include <QRegularExpression>
 #include <QVariant>
 #include <game/cards/card_database.h>
 #include <utility>
@@ -122,6 +123,7 @@ class OracleImporter : public CardDatabase
 private:
     const QStringList mainCardTypes = {"Planeswalker", "Creature", "Land",       "Sorcery",
                                        "Instant",      "Artifact", "Enchantment"};
+    static const QRegularExpression formatRegex;
     QList<SetToDownload> allSets;
     QVariantMap setsMap;
     QString dataDir;

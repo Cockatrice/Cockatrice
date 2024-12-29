@@ -16,6 +16,8 @@ SplitCardPart::SplitCardPart(const QString &_name,
 {
 }
 
+const QRegularExpression OracleImporter::formatRegex = QRegularExpression("^format-");
+
 OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : CardDatabase(parent), dataDir(_dataDir)
 {
 }
@@ -118,6 +120,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
     if (cards.contains(name)) {
         CardInfoPtr card = cards.value(name);
         card->addToSet(setInfo.getPtr(), setInfo);
+        if (card->getProperties().filter(formatRegex).empty()) {
+            card->combineLegalities(properties);
+        }
         return card;
     }
 
