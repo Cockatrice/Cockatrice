@@ -1,8 +1,6 @@
 #include "dlg_connect.h"
 
-#include "../server/user/user_info_connection.h"
 #include "../settings/cache_settings.h"
-#include "../utility/macros.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>
@@ -22,7 +20,13 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
-    previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
+
+    btnDeleteServer = new QPushButton(this);
+    btnDeleteServer->setIcon(QPixmap("theme:icons/remove_row"));
+    btnDeleteServer->setToolTip(tr("Delete the currently selected saved server"));
+    btnDeleteServer->setFixedWidth(30);
+
+    connect(btnDeleteServer, &QPushButton::clicked, this, &DlgConnect::actRemoveSavedServer);
 
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(this);
@@ -111,6 +115,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     newHolderLayout = new QHBoxLayout;
     newHolderLayout->addWidget(previousHosts);
+    newHolderLayout->addWidget(btnDeleteServer);
     newHolderLayout->addWidget(btnRefreshServers);
 
     connectionLayout = new QGridLayout;
@@ -255,6 +260,10 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     UserConnection_Information uci;
     QStringList _data = uci.getServerInfo(saveName);
 
+    if (_data.isEmpty()) {
+        _data << "" << "" << "" << "" << "" << "" << "";
+    }
+
     bool savePasswordStatus = (_data.at(5) == "1");
 
     saveEdit->setText(_data.at(0));
@@ -345,21 +354,6 @@ QString DlgConnect::getHost() const
     return hostEdit->text().trimmed();
 }
 
-bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
-{
-    if (event->type() == QEvent::KeyPress) {
-        auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
-
-        if (keyEvent->key() == Qt::Key_Delete) {
-            auto *combobox = reinterpret_cast<QComboBox *>(obj);
-            combobox->removeItem(combobox->currentIndex());
-            return true;
-        }
-    }
-
-    return QObject::eventFilter(obj, event);
-}
-
 void DlgConnect::actForgotPassword()
 {
     ServersSettings &servers = SettingsCache::instance().servers();
@@ -369,4 +363,10 @@ void DlgConnect::actForgotPassword()
 
     emit sigStartForgotPasswordRequest();
     reject();
+}
+
+void DlgConnect::actRemoveSavedServer()
+{
+    SettingsCache::instance().servers().removeServer(hostEdit->text());
+    previousHosts->removeItem(previousHosts->currentIndex());
 }
