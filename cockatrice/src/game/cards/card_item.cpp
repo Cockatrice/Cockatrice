@@ -486,7 +486,9 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
         } else if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(nullptr);
+            if (scene() && scene()->selectedItems().isEmpty()) {
+                owner->setCardMenu(nullptr);
+            }
             owner->getGame()->setActiveCard(nullptr);
         }
     }
