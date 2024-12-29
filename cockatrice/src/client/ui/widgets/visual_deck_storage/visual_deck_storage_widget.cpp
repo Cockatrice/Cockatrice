@@ -35,7 +35,8 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->addWidget(cardSizeWidget);
 
     // Connect sorting change signal to refresh the file list
-    connect(sortComboBox, &QComboBox::currentIndexChanged, this, &VisualDeckStorageWidget::updateSortOrder);
+    connect(sortComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &VisualDeckStorageWidget::updateSortOrder);
 }
 
 void VisualDeckStorageWidget::showEvent(QShowEvent *event)
