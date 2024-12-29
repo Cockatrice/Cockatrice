@@ -192,7 +192,7 @@ QModelIndex RemoteReplayList_TreeModel::parent(const QModelIndex &ind) const
         return QModelIndex();
     else {
         ReplayNode *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(ind.internalPointer()));
-        return createIndex(replayNode->getParent()->indexOf(replayNode), 0, replayNode);
+        return createIndex(replayNode->getParent()->indexOf(replayNode), 0, replayNode->getParent());
     }
 }
 
