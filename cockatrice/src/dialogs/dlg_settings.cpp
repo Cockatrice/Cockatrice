@@ -118,6 +118,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
 
+    resetAllPathsButton = new QPushButton;
+
     bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
@@ -134,7 +136,6 @@ GeneralSettingsPage::GeneralSettingsPage()
         customCardDatabasePathButton->setVisible(false);
         tokenDatabasePathButton->setVisible(false);
     } else {
-        resetAllPathsButton = new QPushButton;
         connect(resetAllPathsButton, SIGNAL(clicked()), this, SLOT(resetAllPathsClicked()));
         allPathsResetLabel = new QLabel(tr("All paths have been reset"));
         allPathsResetLabel->setVisible(false);
