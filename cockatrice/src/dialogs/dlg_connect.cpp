@@ -85,6 +85,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     }
 
     connect(savePasswordCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &DlgConnect::passwordSaved);
+    connect(autoConnectCheckBox, &QCheckBox::QT_STATE_CHANGED, &servers, &ServersSettings::setAutoConnect);
 
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
@@ -345,7 +346,6 @@ void DlgConnect::actOk()
     }
 
     servers.setPrevioushostName(saveEdit->text());
-    servers.setAutoConnect(autoConnectCheckBox->isChecked());
 
     if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
