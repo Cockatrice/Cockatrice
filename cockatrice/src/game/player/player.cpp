@@ -663,8 +663,8 @@ void Player::playerListActionTriggered()
             cmd.set_top_cards(number);
             // backward compatibility: servers before #1051 only permits to reveal the first card
             cmd.add_card_id(0);
+            defaultNumberTopCards = number;
         }
-
     } else if (menu == mRevealHand) {
         cmd.set_zone_name("hand");
     } else if (menu == mRevealRandomHandCard) {
