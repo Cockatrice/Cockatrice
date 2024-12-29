@@ -5,7 +5,7 @@ OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 
 !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
 
-RequestExecutionlevel highest
+RequestExecutionlevel admin
 SetCompressor LZMA
 
 Var NormalDestDir
