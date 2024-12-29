@@ -754,7 +754,7 @@ void TabDeckEditor::retranslateUi()
     cardInfoDockMenu->setTitle(tr("Card Info"));
     deckDockMenu->setTitle(tr("Deck"));
     filterDockMenu->setTitle(tr("Filters"));
-    printingSelectorDockMenu->setTitle(tr("Printing"));
+    printingSelectorDockMenu->setTitle(tr("Printing Selector"));
 
     aCardInfoDockVisible->setText(tr("Visible"));
     aCardInfoDockFloating->setText(tr("Floating"));
