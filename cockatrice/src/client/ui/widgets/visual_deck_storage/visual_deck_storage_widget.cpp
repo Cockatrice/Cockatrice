@@ -18,7 +18,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     setLayout(layout);
 
     // ComboBox for sorting options
-    auto *sortComboBox = new QComboBox(this);
+    sortComboBox = new QComboBox(this);
     sortComboBox->addItem("Sort Alphabetically (Filename)", Alphabetical);
     sortComboBox->addItem("Sort by Last Modified", ByLastModified);
 

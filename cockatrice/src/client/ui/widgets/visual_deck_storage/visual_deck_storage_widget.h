@@ -8,6 +8,7 @@
 #include "../cards/card_size_widget.h"
 #include "visual_deck_storage_search_widget.h"
 
+#include <QComboBox>
 #include <QFileSystemModel>
 
 class VisualDeckStorageSearchWidget;
@@ -41,6 +42,7 @@ private:
     QMap<QString, DeckViewCardContainer *> cardContainers;
 
     SortOrder sortOrder; // Current sorting option
+    QComboBox *sortComboBox;
     VisualDeckStorageSearchWidget *searchWidget;
     CardSizeWidget *cardSizeWidget;
 };
