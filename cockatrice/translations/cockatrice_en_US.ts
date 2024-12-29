@@ -459,7 +459,7 @@ This is only saved for moderators and cannot be seen by the banned person.</tran
 <context>
     <name>CardSizeWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_size_widget.cpp" line="19"/>
+        <location filename="src/client/ui/widgets/cards/card_size_widget.cpp" line="18"/>
         <source>Card Size</source>
         <translation>Card Size</translation>
     </message>
@@ -4874,7 +4874,7 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>PrintingSelectorCardSearchWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_search_widget.cpp" line="18"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_search_widget.cpp" line="17"/>
         <source>Search by set name or set code</source>
         <translation>Search by set name or set code</translation>
     </message>
@@ -4882,12 +4882,12 @@ Cockatrice will now reload the card database.</translation>
 <context>
     <name>PrintingSelectorCardSelectionWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="17"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="16"/>
         <source>Previous Card in Deck</source>
         <translation>Previous Card in Deck</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="20"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="19"/>
         <source>Next Card in Deck</source>
         <translation>Next Card in Deck</translation>
     </message>
@@ -4910,13 +4910,13 @@ Cockatrice will now reload the card database.</translation>
         <translation>Release Date</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp" line="33"/>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp" line="49"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp" line="32"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp" line="48"/>
         <source>Descending</source>
         <translation>Descending</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp" line="47"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_sorting_widget.cpp" line="46"/>
         <source>Ascending</source>
         <translation>Ascending</translation>
     </message>
@@ -5359,17 +5359,17 @@ Please check your shortcut settings!</translation>
 <context>
     <name>ShutdownDialog</name>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="21"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="20"/>
         <source>&amp;Reason for shutdown:</source>
         <translation>&amp;Reason for shutdown:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="25"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="24"/>
         <source>&amp;Time until shutdown (minutes):</source>
         <translation>&amp;Time until shutdown (minutes):</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="44"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="43"/>
         <source>Shut down server</source>
         <translation>Shut down server</translation>
     </message>
@@ -5482,109 +5482,39 @@ Please check your shortcut settings!</translation>
 <context>
     <name>TabAdmin</name>
     <message>
-        <location filename="src/client/tabs/tab_admin.h" line="61"/>
+        <location filename="src/client/tabs/tab_admin.h" line="53"/>
         <source>Administration</source>
         <translation>Administration</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="124"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="98"/>
         <source>Update server &amp;message</source>
         <translation>Update server &amp;message</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="125"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="99"/>
         <source>&amp;Shut down server</source>
         <translation>&amp;Shut down server</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="126"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="100"/>
         <source>&amp;Reload configuration</source>
         <translation>&amp;Reload configuration</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="127"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="101"/>
         <source>Server administration functions</source>
         <translation>Server administration functions</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="129"/>
-        <source>Replay ID</source>
-        <translation>Replay ID</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="130"/>
-        <source>Grant Replay Access</source>
-        <translation>Grant Replay Access</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="132"/>
-        <source>Username to Activate</source>
-        <translation>Username to Activate</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="133"/>
-        <source>Force Activate User</source>
-        <translation>Force Activate User</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="135"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="103"/>
         <source>&amp;Unlock functions</source>
         <translation>&amp;Unlock functions</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="136"/>
+        <location filename="src/client/tabs/tab_admin.cpp" line="104"/>
         <source>&amp;Lock functions</source>
         <translation>&amp;Lock functions</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="203"/>
-        <location filename="src/client/tabs/tab_admin.cpp" line="218"/>
-        <source>Success</source>
-        <translation>Success</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="203"/>
-        <source>Replay access granted</source>
-        <translation>Replay access granted</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="206"/>
-        <location filename="src/client/tabs/tab_admin.cpp" line="209"/>
-        <location filename="src/client/tabs/tab_admin.cpp" line="221"/>
-        <location filename="src/client/tabs/tab_admin.cpp" line="224"/>
-        <location filename="src/client/tabs/tab_admin.cpp" line="227"/>
-        <source>Error</source>
-        <translation>Error</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="206"/>
-        <source>Unable to grant replay access. Replay ID invalid</source>
-        <translation>Unable to grant replay access. Replay ID invalid</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="209"/>
-        <source>Unable to grant replay access. Internal error</source>
-        <translation>Unable to grant replay access. Internal error</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="218"/>
-        <source>User successfully activated</source>
-        <translation>User successfully activated</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="221"/>
-        <source>Unable to activate user. Username invalid</source>
-        <translation>Unable to activate user. Username invalid</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="224"/>
-        <source>Unable to activate user. User already active</source>
-        <translation>Unable to activate user. User already active</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_admin.cpp" line="227"/>
-        <source>Unable to activate user. Internal error</source>
-        <translation>Unable to activate user. Internal error</translation>
     </message>
 </context>
 <context>
@@ -5885,113 +5815,108 @@ Please check that the directory is writable and try again.</translation>
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.h" line="70"/>
+        <location filename="src/client/tabs/tab_deck_storage.h" line="65"/>
         <source>Deck storage</source>
         <translation>Deck storage</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="158"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="130"/>
         <source>Local file system</source>
         <translation>Local file system</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="159"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="131"/>
         <source>Server deck storage</source>
         <translation>Server deck storage</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="161"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="163"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="133"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="135"/>
         <source>Open in deck editor</source>
         <translation>Open in deck editor</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="162"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="134"/>
         <source>Upload deck</source>
         <translation>Upload deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="164"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="136"/>
         <source>Download deck</source>
         <translation>Download deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="165"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="166"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="306"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="443"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="137"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="138"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="277"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="394"/>
         <source>New folder</source>
         <translation>New folder</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="167"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="168"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="139"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="140"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="169"/>
-        <source>Open decks folder</source>
-        <translation>Open decks folder</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="245"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="265"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="283"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="216"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="236"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="254"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="245"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="265"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="216"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="236"/>
         <source>Invalid deck file</source>
         <translation>Invalid deck file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="252"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="223"/>
         <source>Enter deck name</source>
         <translation>Enter deck name</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="252"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="223"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>This decklist does not have a name.
 Please enter a name:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="257"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="228"/>
         <source>Unnamed deck</source>
         <translation>Unnamed deck</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="283"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="254"/>
         <source>Failed to upload deck to server</source>
         <translation>Failed to upload deck to server</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="321"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="292"/>
         <source>Delete local file</source>
         <translation>Delete local file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="321"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="292"/>
         <source>Are you sure you want to delete the selected files?</source>
         <translation>Are you sure you want to delete the selected files?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="480"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="431"/>
         <source>Delete remote decks</source>
         <translation>Delete remote decks</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="480"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="431"/>
         <source>Are you sure you want to delete the selected decks?</source>
         <translation>Are you sure you want to delete the selected decks?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="306"/>
-        <location filename="src/client/tabs/tab_deck_storage.cpp" line="443"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="277"/>
+        <location filename="src/client/tabs/tab_deck_storage.cpp" line="394"/>
         <source>Name of new folder:</source>
         <translation>Name of new folder:</translation>
     </message>
@@ -6000,214 +5925,209 @@ Please enter a name:</translation>
     <name>TabGame</name>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="533"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="547"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="1445"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="541"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1432"/>
         <source>Replay</source>
         <translation>Replay</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="533"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="547"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="541"/>
         <source>Game</source>
         <translation>Game</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="535"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="608"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="598"/>
         <source>Player List</source>
         <translation>Player List</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="550"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="606"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="544"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="596"/>
         <source>Card Info</source>
         <translation>Card Info</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="551"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="607"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="545"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="597"/>
         <source>Messages</source>
         <translation>Messages</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="553"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="620"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="547"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="610"/>
         <source>Replay Timeline</source>
         <translation>Replay Timeline</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="558"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="552"/>
         <source>&amp;Phases</source>
         <translation>&amp;Phases</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="561"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="555"/>
         <source>&amp;Game</source>
         <translation>&amp;Game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="563"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="557"/>
         <source>Next &amp;phase</source>
         <translation>Next &amp;phase</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="566"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="560"/>
         <source>Next phase with &amp;action</source>
         <translation>Next phase with &amp;action</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="569"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="563"/>
         <source>Next &amp;turn</source>
         <translation>Next &amp;turn</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="572"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="566"/>
         <source>Reverse turn order</source>
         <translation>Reverse turn order</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="575"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="569"/>
         <source>&amp;Remove all local arrows</source>
         <translation>&amp;Remove all local arrows</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="578"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="572"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation>Rotate View Cl&amp;ockwise</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="581"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="575"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation>Rotate View Co&amp;unterclockwise</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="584"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="578"/>
         <source>Game &amp;information</source>
         <translation>Game &amp;information</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="587"/>
-        <source>Un&amp;concede</source>
-        <translation>Un&amp;concede</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="589"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="580"/>
         <source>&amp;Concede</source>
         <translation>&amp;Concede</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="593"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="583"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Leave game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="596"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="586"/>
         <source>C&amp;lose replay</source>
         <translation>C&amp;lose replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="599"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="589"/>
         <source>&amp;Focus Chat</source>
         <translation>&amp;Focus Chat</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="602"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="592"/>
         <source>&amp;Say:</source>
         <translation>&amp;Say:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="605"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="595"/>
         <source>&amp;View</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="610"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="613"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="616"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="621"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="600"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="603"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="606"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="611"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="611"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="614"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="617"/>
-        <location filename="src/client/tabs/tab_game.cpp" line="622"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="601"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="604"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="607"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="612"/>
         <source>Floating</source>
         <translation>Floating</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="625"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="615"/>
         <source>Reset layout</source>
         <translation>Reset layout</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="717"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="707"/>
         <source>Concede</source>
         <translation>Concede</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="717"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="707"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>Are you sure you want to concede this game?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="723"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="713"/>
         <source>Unconcede</source>
         <translation>Unconcede</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="724"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="714"/>
         <source>You have already conceded.  Do you want to return to this game?</source>
         <translation>You have already conceded.  Do you want to return to this game?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="736"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="726"/>
         <source>Leave game</source>
         <translation>Leave game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="736"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="726"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>Are you sure you want to leave this game?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1019"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1006"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>You are flooding the game. Please wait a couple of seconds.</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1264"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1251"/>
         <source>A player has joined game #%1</source>
         <translation>A player has joined game #%1</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1265"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1252"/>
         <source>%1 has joined the game</source>
         <translation>%1 has joined the game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1276"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1263"/>
         <source>kicked by game host or moderator</source>
         <translation>kicked by game host or moderator</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1279"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1266"/>
         <source>player left the game</source>
         <translation>player left the game</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1282"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1269"/>
         <source>player disconnected from server</source>
         <translation>player disconnected from server</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1286"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1273"/>
         <source>reason unknown</source>
         <translation>reason unknown</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_game.cpp" line="1323"/>
+        <location filename="src/client/tabs/tab_game.cpp" line="1310"/>
         <source>You have been kicked out of the game.</source>
         <translation>You have been kicked out of the game.</translation>
     </message>
@@ -6412,105 +6332,95 @@ The more information you put in, the more specific your results will be.</transl
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="src/client/tabs/tab_replays.h" line="65"/>
+        <location filename="src/client/tabs/tab_replays.h" line="62"/>
         <source>Game replays</source>
         <translation>Game replays</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="154"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="126"/>
         <source>Local file system</source>
         <translation>Local file system</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="155"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="127"/>
         <source>Server replay storage</source>
         <translation>Server replay storage</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="157"/>
-        <location filename="src/client/tabs/tab_replays.cpp" line="162"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="129"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="132"/>
         <source>Watch replay</source>
         <translation>Watch replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="158"/>
-        <source>Rename</source>
-        <translation>Rename</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="159"/>
-        <location filename="src/client/tabs/tab_replays.cpp" line="239"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="130"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="209"/>
         <source>New folder</source>
         <translation>New folder</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="160"/>
-        <location filename="src/client/tabs/tab_replays.cpp" line="165"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="131"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="135"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="161"/>
-        <source>Open replays folder</source>
-        <translation>Open replays folder</translation>
-    </message>
-    <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="163"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="133"/>
         <source>Download replay</source>
         <translation>Download replay</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="164"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="134"/>
         <source>Toggle expiration lock</source>
         <translation>Toggle expiration lock</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="203"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="173"/>
         <source>Rename local folder</source>
         <translation>Rename local folder</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="203"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="173"/>
         <source>Rename local file</source>
         <translation>Rename local file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="206"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="176"/>
         <source>New name:</source>
         <translation>New name:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="221"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="191"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="221"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="191"/>
         <source>Rename failed</source>
         <translation>Rename failed</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="239"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="209"/>
         <source>Name of new folder:</source>
         <translation>Name of new folder:</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="254"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="224"/>
         <source>Delete local file</source>
         <translation>Delete local file</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="254"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="224"/>
         <source>Are you sure you want to delete the selected files?</source>
         <translation>Are you sure you want to delete the selected files?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="414"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="376"/>
         <source>Are you sure you want to delete the selected replays?</source>
         <translation>Are you sure you want to delete the selected replays?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_replays.cpp" line="413"/>
+        <location filename="src/client/tabs/tab_replays.cpp" line="375"/>
         <source>Delete remote replay</source>
         <translation>Delete remote replay</translation>
     </message>
@@ -7206,6 +7116,11 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="src/dialogs/dlg_settings.cpp" line="627"/>
         <source>Buffer time for backwards skip via shortcut:</source>
         <translation>Buffer time for backwards skip via shortcut:</translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_settings.cpp" line="628"/>
+        <source> ms</source>
+        <translation> ms</translation>
     </message>
 </context>
 <context>
