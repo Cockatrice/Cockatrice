@@ -368,7 +368,6 @@ void DlgConnect::actForgotPassword()
     servers.setFPPlayerName(playernameEdit->text().trimmed());
 
     emit sigStartForgotPasswordRequest();
-    reject();
 }
 
 void DlgConnect::actRemoveSavedServer()
