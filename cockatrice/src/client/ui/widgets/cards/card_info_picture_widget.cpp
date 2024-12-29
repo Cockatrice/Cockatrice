@@ -253,6 +253,9 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
         return cardMenu;
     }
 
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    cardMenu->addMenu(viewRelatedCards);
+
     bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = info->getAllRelatedCards();
     for (const CardRelation *cardRelation : relatedCards) {
@@ -264,20 +267,19 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
     }
 
     if (!atLeastOneGoodRelationFound) {
+        viewRelatedCards->setEnabled(false);
         return cardMenu;
     }
 
-    const auto &currentCardSet = CardDatabase::getSetInfoForCard(info);
-
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
-    cardMenu->addMenu(viewRelatedCards);
-    for (const CardRelation *relatedCard : relatedCards) {
-        QString relatedCardName = relatedCard->getName();
-        // QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        /*connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
-            game->viewCardInfo(relatedCardName, currentCardSet.getProperty("uuid"));
-        });*/
+    for (const auto &relatedCard : relatedCards) {
+        const auto &relatedCardName = relatedCard->getName();
+        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
+            emit cardChanged(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+        });
+        viewRelatedCards->addAction(viewCard);
     }
+
     return cardMenu;
 }
 

@@ -3,6 +3,7 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
+#include "card_info_display_widget.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 
@@ -16,6 +17,8 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPictureWidget();
     pic->setObjectName("pic");
+    connect(pic, &CardInfoPictureWidget::cardChanged, this, qOverload<CardInfoPtr>(&CardInfoFrameWidget::setCard));
+
     text = new CardInfoTextWidget();
     text->setObjectName("text");
     connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));

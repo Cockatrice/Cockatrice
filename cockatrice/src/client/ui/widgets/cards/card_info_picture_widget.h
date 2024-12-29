@@ -31,6 +31,7 @@ public slots:
 signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
     void cardScaleFactorChanged(int _scale);
+    void cardChanged(CardInfoPtr card);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -67,6 +68,9 @@ private:
     QTimer *hoverTimer;
 
     QMenu *createRightClickMenu();
+
+private slots:
+    void actChangeCard(const QString &cardName);
 };
 
 #endif
