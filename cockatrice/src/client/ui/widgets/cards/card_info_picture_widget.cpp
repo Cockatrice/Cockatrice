@@ -235,6 +235,14 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    if (event->button() == Qt::RightButton) {
+        qDebug() << "TRACK clicked!";
+    }
+}
+
 /**
  * @brief Displays the enlarged version of the card's pixmap near the cursor.
  *

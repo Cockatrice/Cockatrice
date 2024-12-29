@@ -41,6 +41,7 @@ protected:
 #endif
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
     void loadPixmap();
     [[nodiscard]] const QPixmap &getResizedPixmap() const
     {
