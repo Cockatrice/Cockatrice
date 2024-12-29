@@ -31,6 +31,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
+    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getVisualDeckStorageCardSize());
+    layout->addWidget(cardSizeWidget);
+
     // Connect sorting change signal to refresh the file list
     connect(sortComboBox, &QComboBox::currentIndexChanged, this, [this, sortComboBox]() {
         sortOrder = static_cast<SortOrder>(sortComboBox->currentData().toInt());
@@ -91,7 +94,7 @@ void VisualDeckStorageWidget::refreshBannerCards()
         deckLoader->loadFromFile(file, DeckLoader::CockatriceFormat);
         deckListModel->setDeckList(new DeckLoader(*deckLoader));
 
-        auto *display = new DeckPreviewCardPictureWidget(flowWidget, true);
+        auto *display = new DeckPreviewCardPictureWidget(flowWidget, false);
         qDebug() << "Banner card is: " << deckLoader->getBannerCard();
         auto bannerCard = deckLoader->getBannerCard().isEmpty()
                               ? CardInfoPtr()
@@ -106,6 +109,8 @@ void VisualDeckStorageWidget::refreshBannerCards()
                 &VisualDeckStorageWidget::imageClickedEvent);
         connect(display, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
                 &VisualDeckStorageWidget::imageDoubleClickedEvent);
+        connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
+        display->setScaleFactor(cardSizeWidget->getSlider()->value());
         flowWidget->addWidget(display);
     }
 }

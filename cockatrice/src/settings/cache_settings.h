@@ -59,6 +59,7 @@ signals:
     void printingSelectorSearchBarVisibleChanged();
     void printingSelectorCardSizeSliderVisibleChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
+    void visualDeckStorageCardSizeChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -123,6 +124,7 @@ private:
     bool printingSelectorSearchBarVisible;
     bool printingSelectorCardSizeSliderVisible;
     bool printingSelectorNavigationButtonsVisible;
+    int visualDeckStorageCardSize;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -368,6 +370,10 @@ public:
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
         return printingSelectorNavigationButtonsVisible;
+    }
+    int getVisualDeckStorageCardSize() const
+    {
+        return visualDeckStorageCardSize;
     }
     bool getHorizontalHand() const
     {
@@ -677,6 +683,7 @@ public slots:
     void setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible);
     void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
+    void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

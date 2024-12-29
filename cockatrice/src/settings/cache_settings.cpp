@@ -259,6 +259,7 @@ SettingsCache::SettingsCache()
         settings->value("cards/printingselectorcardsizeslidervisible", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
+    visualDeckStorageCardSize = settings->value("cards/visualdeckstoragecardsize", 100).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -607,6 +608,13 @@ void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED
     printingSelectorNavigationButtonsVisible = _navigationButtonsVisible;
     settings->setValue("cards/printingselectornavigationbuttonsvisible", printingSelectorNavigationButtonsVisible);
     emit printingSelectorNavigationButtonsVisibleChanged();
+}
+
+void SettingsCache::setVisualDeckStorageCardSize(int _visualDeckStorageCardSize)
+{
+    visualDeckStorageCardSize = _visualDeckStorageCardSize;
+    settings->setValue("cards/visualdeckstoragecardsize", visualDeckStorageCardSize);
+    emit visualDeckStorageCardSizeChanged();
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

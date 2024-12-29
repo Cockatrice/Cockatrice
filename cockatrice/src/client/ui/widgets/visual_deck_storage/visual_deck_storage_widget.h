@@ -6,6 +6,7 @@
 #include "../../../../deck/deck_view.h"
 #include "../../../ui/widgets/cards/deck_preview_card_picture_widget.h"
 #include "../../../ui/widgets/general/layout_containers/flow_widget.h"
+#include "../cards/card_size_widget.h"
 
 #include <QFileSystemModel>
 
@@ -41,6 +42,7 @@ private:
 
     SortOrder sortOrder;       // Current sorting option
     VisualDeckStorageSearchWidget *searchWidget;
+    CardSizeWidget *cardSizeWidget;
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H
