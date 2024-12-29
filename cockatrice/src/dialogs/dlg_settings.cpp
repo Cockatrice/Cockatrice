@@ -302,7 +302,9 @@ void GeneralSettingsPage::retranslateUi()
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
-    resetAllPathsButton->setText(tr("Reset all paths"));
+    if (resetAllPathsButton) {
+        resetAllPathsButton->setText(tr("Reset all paths"));
+    }
 
     const auto &settings = SettingsCache::instance();
 
