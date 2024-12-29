@@ -296,7 +296,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton)
         setCursor(Qt::ClosedHandCursor);
     else if (event->button() == Qt::MiddleButton)
-        emit showCardInfoPopup(event->screenPos(), name);
+        emit showCardInfoPopup(event->screenPos(), name, providerId);
     event->accept();
 }
 

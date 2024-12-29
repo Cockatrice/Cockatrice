@@ -466,7 +466,7 @@ public:
     [[nodiscard]] CardInfoPerSet getPreferredSetForCard(const QString &cardName) const;
     [[nodiscard]] CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
     QString getPreferredPrintingProviderIdForCard(const QString &cardName);
-    [[nodiscard]] CardInfoPtr guessCard(const QString &cardName) const;
+    [[nodiscard]] CardInfoPtr guessCard(const QString &cardName, const QString &providerId = QString()) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this

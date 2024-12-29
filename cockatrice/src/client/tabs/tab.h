@@ -21,11 +21,11 @@ protected:
         tabMenus.append(menu);
     }
 protected slots:
-    void showCardInfoPopup(const QPoint &pos, const QString &cardName);
+    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
     void deleteCardInfoPopup(const QString &cardName);
 
 private:
-    QString currentCardName;
+    QString currentCardName, currentProviderId;
     bool contentsChanged;
     CardInfoDisplayWidget *infoPopup;
     QList<QMenu *> tabMenus;

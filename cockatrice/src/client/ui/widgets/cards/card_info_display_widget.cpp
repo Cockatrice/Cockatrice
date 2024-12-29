@@ -11,7 +11,10 @@
 #include <QVBoxLayout>
 #include <utility>
 
-CardInfoDisplayWidget::CardInfoDisplayWidget(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
+CardInfoDisplayWidget::CardInfoDisplayWidget(const QString &cardName,
+                                             const QString &providerId,
+                                             QWidget *parent,
+                                             Qt::WindowFlags flags)
     : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH), info(nullptr)
 {
     setContentsMargins(3, 3, 3, 3);
@@ -37,7 +40,7 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const QString &cardName, QWidget *p
     pic->setFixedHeight(pixmapHeight);
     setFixedWidth(pixmapWidth + 150);
 
-    setCard(cardName);
+    setCard(cardName, providerId);
 
     // ensure our parent gets a valid size to position us correctly
     resize(width(), sizeHint().height());
@@ -55,9 +58,9 @@ void CardInfoDisplayWidget::setCard(CardInfoPtr card)
     pic->setCard(info);
 }
 
-void CardInfoDisplayWidget::setCard(const QString &cardName)
+void CardInfoDisplayWidget::setCard(const QString &cardName, const QString &providerId)
 {
-    setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->guessCard(cardName, providerId));
     if (info == nullptr) {
         text->setInvalidCardName(cardName);
     }

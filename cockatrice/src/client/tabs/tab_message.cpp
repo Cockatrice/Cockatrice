@@ -26,7 +26,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
       otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
 {
     chatView = new ChatView(tabSupervisor, tabSupervisor, 0, true);
-    connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+    connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
     sayEdit = new LineEditUnfocusable;

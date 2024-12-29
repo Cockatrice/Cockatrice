@@ -12,14 +12,16 @@ Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
     setAttribute(Qt::WA_DeleteOnClose);
 }
 
-void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
+void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId)
 {
     if (infoPopup) {
         infoPopup->deleteLater();
     }
     currentCardName = cardName;
-    infoPopup = new CardInfoDisplayWidget(
-        cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+    currentProviderId = providerId;
+    infoPopup = new CardInfoDisplayWidget(cardName, providerId, nullptr,
+                                          Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint |
+                                              Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     auto screenRect = qApp->primaryScreen()->geometry();

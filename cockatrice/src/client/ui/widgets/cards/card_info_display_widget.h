@@ -22,11 +22,14 @@ private:
     CardInfoTextWidget *text;
 
 public:
-    explicit CardInfoDisplayWidget(const QString &cardName, QWidget *parent = nullptr, Qt::WindowFlags f = {});
+    explicit CardInfoDisplayWidget(const QString &cardName,
+                                   const QString &providerId,
+                                   QWidget *parent = nullptr,
+                                   Qt::WindowFlags f = {});
 
 public slots:
     void setCard(CardInfoPtr card);
-    void setCard(const QString &cardName);
+    void setCard(const QString &cardName, const QString &providerId = QString());
     void setCard(AbstractCardItem *card);
 
 private slots:
