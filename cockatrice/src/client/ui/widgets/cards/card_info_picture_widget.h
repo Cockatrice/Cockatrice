@@ -68,9 +68,6 @@ private:
     QTimer *hoverTimer;
 
     QMenu *createRightClickMenu();
-
-private slots:
-    void actChangeCard(const QString &cardName);
 };
 
 #endif
