@@ -47,8 +47,6 @@ void CardSizeWidget::updateCardSizeSetting(int newValue)
         SettingsCache::instance().setPrintingSelectorCardSize(newValue);
     } else if ((parent = qobject_cast<VisualDeckStorageWidget *>(parentWidget()))) {
         SettingsCache::instance().setVisualDeckStorageCardSize(newValue);
-    } else {
-        qWarning() << "CardSizeWidget has an unexpected parent widget type. Did not set persistent setting.";
     }
 }
 
