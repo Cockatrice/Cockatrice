@@ -7,6 +7,7 @@
 
 #include <QComboBox>
 #include <QDirIterator>
+#include <QMouseEvent>
 #include <QVBoxLayout>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), sortOrder(Alphabetical)
