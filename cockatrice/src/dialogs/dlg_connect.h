@@ -18,13 +18,6 @@ class QPushButton;
 class QRadioButton;
 class QVBoxLayout;
 
-class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
-{
-    Q_OBJECT
-protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
-};
-
 class DlgConnect : public QDialog
 {
     Q_OBJECT
@@ -59,6 +52,7 @@ private slots:
     void previousHostSelected(bool state);
     void newHostSelected(bool state);
     void actForgotPassword();
+    void actRemoveSavedServer();
     void updateDisplayInfo(const QString &saveName);
     void preRebuildComboBoxList();
     void rebuildComboBoxList(int failure = -1);
@@ -74,7 +68,7 @@ private:
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
-    QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers;
+    QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers, *btnDeleteServer;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
     const QString placeHolderText = tr("Downloading...");
