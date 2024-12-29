@@ -1,5 +1,6 @@
 #include "visual_deck_storage_widget.h"
 
+#include "visual_deck_storage_search_widget.h"
 #include "../../../../deck/deck_loader.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
@@ -21,8 +22,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     sortComboBox->addItem("Sort Alphabetically (Filename)", Alphabetical);
     sortComboBox->addItem("Sort by Last Modified", ByLastModified);
 
+    searchWidget = new VisualDeckStorageSearchWidget(this);
+
     // Add combo box to the main layout
     layout->addWidget(sortComboBox);
+    layout->addWidget(searchWidget);
 
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
@@ -32,7 +36,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
         sortOrder = static_cast<SortOrder>(sortComboBox->currentData().toInt());
         refreshBannerCards(); // Refresh the banner cards with the new sort order
     });
+}
 
+void VisualDeckStorageWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
     refreshBannerCards();
 }
 
@@ -73,9 +81,11 @@ void VisualDeckStorageWidget::refreshBannerCards()
         return false; // Default case
     });
 
+    auto filteredFiles = searchWidget->filterFiles(allFiles, searchWidget->getSearchText());
+
     flowWidget->clearLayout(); // Clear existing widgets in the flow layout
 
-    foreach (const QString &file, allFiles) {
+    foreach (const QString &file, filteredFiles) {
         qDebug() << file;
         auto deckLoader = new DeckLoader();
         deckLoader->loadFromFile(file, DeckLoader::CockatriceFormat);
