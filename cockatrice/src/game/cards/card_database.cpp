@@ -304,6 +304,17 @@ void CardInfo::addToSet(const CardSetPtr &_set, const CardInfoPerSet _info)
     refreshCachedSetNames();
 }
 
+void CardInfo::combineLegalities(const QVariantHash &props)
+{
+    QHashIterator<QString, QVariant> it(props);
+    while (it.hasNext()) {
+        it.next();
+        if (it.key().startsWith("format-")) {
+            smartThis->setProperty(it.key(), it.value().toString());
+        }
+    }
+}
+
 void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;

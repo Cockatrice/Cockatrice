@@ -390,6 +390,7 @@ public:
     }
     QString getCorrectedName() const;
     void addToSet(const CardSetPtr &_set, CardInfoPerSet _info = CardInfoPerSet());
+    void combineLegalities(const QVariantHash &props);
     void emitPixmapUpdated()
     {
         emit pixmapUpdated();
