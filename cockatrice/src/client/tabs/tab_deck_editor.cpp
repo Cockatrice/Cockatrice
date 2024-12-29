@@ -1045,11 +1045,11 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
         }
     } else {
         delete l;
-    updateBannerCardComboBox();
-    if (!l->getBannerCard().isEmpty()) {
-        qDebug() << "Found banner card:" << l->getBannerCard();
-        bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard()));
-    }
+        updateBannerCardComboBox();
+        if (!l->getBannerCard().isEmpty()) {
+            qDebug() << "Found banner card:" << l->getBannerCard();
+            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard()));
+        }
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     setSaveStatus(true);

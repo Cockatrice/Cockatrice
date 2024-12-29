@@ -4,7 +4,6 @@
 #include "../printing_selector/printing_selector.h"
 #include "../visual_deck_storage/visual_deck_storage_widget.h"
 
-
 /**
  * @class CardSizeWidget
  * @brief A widget for adjusting card sizes using a slider.
@@ -44,17 +43,14 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defa
 void CardSizeWidget::updateCardSizeSetting(int newValue)
 {
     // Check the type of the parent widget
-    if ((parent = qobject_cast<PrintingSelector*>(parentWidget()))) {
+    if ((parent = qobject_cast<PrintingSelector *>(parentWidget()))) {
         SettingsCache::instance().setPrintingSelectorCardSize(newValue);
-    }
-    else if ((parent = qobject_cast<VisualDeckStorageWidget*>(parentWidget()))) {
+    } else if ((parent = qobject_cast<VisualDeckStorageWidget *>(parentWidget()))) {
         SettingsCache::instance().setVisualDeckStorageCardSize(newValue);
-    }
-    else {
+    } else {
         qWarning() << "CardSizeWidget has an unexpected parent widget type. Did not set persistent setting.";
     }
 }
-
 
 /**
  * @brief Gets the slider widget used for adjusting the card size.
