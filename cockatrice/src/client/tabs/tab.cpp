@@ -19,8 +19,9 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName, const QS
     }
     currentCardName = cardName;
     currentProviderId = providerId;
-    infoPopup = new CardInfoDisplayWidget(
-        cardName, providerId, nullptr, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+    infoPopup = new CardInfoDisplayWidget(cardName, providerId, nullptr,
+                                          Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint |
+                                              Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     auto screenRect = qApp->primaryScreen()->geometry();
