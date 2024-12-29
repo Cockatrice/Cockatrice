@@ -3109,6 +3109,7 @@ void Player::cardMenuAction()
                     auto *cmd = new Command_CreateToken;
                     cmd->set_zone("table");
                     cmd->set_card_name(card->getName().toStdString());
+                    cmd->set_card_provider_id(card->getProviderId().toStdString());
                     cmd->set_color(card->getColor().toStdString());
                     cmd->set_pt(card->getPT().toStdString());
                     cmd->set_annotation(card->getAnnotation().toStdString());
