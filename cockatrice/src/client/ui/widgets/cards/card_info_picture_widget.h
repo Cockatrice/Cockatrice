@@ -8,6 +8,7 @@
 #include <QWidget>
 
 class AbstractCardItem;
+class QMenu;
 
 class CardInfoPictureWidget : public QWidget
 {
@@ -64,6 +65,8 @@ private:
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget;
     int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
+
+    QMenu *createRightClickMenu();
 };
 
 #endif

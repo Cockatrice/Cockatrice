@@ -1,9 +1,11 @@
 #include "card_info_picture_widget.h"
 
+#include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../picture_loader.h"
 
+#include <QMenu>
 #include <QMouseEvent>
 #include <QStylePainter>
 #include <QWidget>
@@ -239,8 +241,44 @@ void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
     if (event->button() == Qt::RightButton) {
-        qDebug() << "TRACK clicked!";
+        createRightClickMenu()->popup(QCursor::pos());
     }
+}
+
+QMenu *CardInfoPictureWidget::createRightClickMenu()
+{
+    auto *cardMenu = new QMenu(this);
+
+    if (!info) {
+        return cardMenu;
+    }
+
+    bool atLeastOneGoodRelationFound = false;
+    QList<CardRelation *> relatedCards = info->getAllRelatedCards();
+    for (const CardRelation *cardRelation : relatedCards) {
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        if (relatedCard != nullptr) {
+            atLeastOneGoodRelationFound = true;
+            break;
+        }
+    }
+
+    if (!atLeastOneGoodRelationFound) {
+        return cardMenu;
+    }
+
+    const auto &currentCardSet = CardDatabase::getSetInfoForCard(info);
+
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    cardMenu->addMenu(viewRelatedCards);
+    for (const CardRelation *relatedCard : relatedCards) {
+        QString relatedCardName = relatedCard->getName();
+        // QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        /*connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
+            game->viewCardInfo(relatedCardName, currentCardSet.getProperty("uuid"));
+        });*/
+    }
+    return cardMenu;
 }
 
 /**
