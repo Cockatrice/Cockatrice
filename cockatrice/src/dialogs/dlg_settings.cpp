@@ -121,7 +121,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     // Required init here to avoid crashing on Portable builds
     resetAllPathsButton = new QPushButton;
 
-
     bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
