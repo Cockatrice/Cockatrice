@@ -1012,6 +1012,7 @@ void TabDeckEditor::actLoadDeck()
 
     QString fileName = dialog.selectedFiles().at(0);
     openDeckFromFile(fileName, deckOpenLocation);
+    updateBannerCardComboBox();
 }
 
 void TabDeckEditor::actOpenRecent(const QString &fileName)
@@ -1037,6 +1038,10 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt)) {
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
+        updateBannerCardComboBox();
+        if (!l->getBannerCard().isEmpty()) {
+            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard()));
+        }
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
         } else {
@@ -1045,11 +1050,6 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
         }
     } else {
         delete l;
-        updateBannerCardComboBox();
-        if (!l->getBannerCard().isEmpty()) {
-            qDebug() << "Found banner card:" << l->getBannerCard();
-            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard()));
-        }
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     setSaveStatus(true);

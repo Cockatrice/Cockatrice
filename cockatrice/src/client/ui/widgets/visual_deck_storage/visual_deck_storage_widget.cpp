@@ -89,13 +89,11 @@ void VisualDeckStorageWidget::refreshBannerCards()
     flowWidget->clearLayout(); // Clear existing widgets in the flow layout
 
     foreach (const QString &file, filteredFiles) {
-        qDebug() << file;
         auto deckLoader = new DeckLoader();
         deckLoader->loadFromFile(file, DeckLoader::CockatriceFormat);
         deckListModel->setDeckList(new DeckLoader(*deckLoader));
 
         auto *display = new DeckPreviewCardPictureWidget(flowWidget, false);
-        qDebug() << "Banner card is: " << deckLoader->getBannerCard();
         auto bannerCard = deckLoader->getBannerCard().isEmpty()
                               ? CardInfoPtr()
                               : CardDatabaseManager::getInstance()->getCard(deckLoader->getBannerCard());
