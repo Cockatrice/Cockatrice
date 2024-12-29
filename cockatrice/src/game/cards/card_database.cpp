@@ -501,13 +501,14 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
     return getCardFromMap(simpleNameCards, CardInfo::simplifyName(cardName));
 }
 
-CardInfoPtr CardDatabase::guessCard(const QString &cardName) const
+CardInfoPtr CardDatabase::guessCard(const QString &cardName, const QString &providerId) const
 {
-    CardInfoPtr temp = getCard(cardName);
+    CardInfoPtr temp = providerId.isEmpty() ? getCard(cardName) : getCardByNameAndProviderId(cardName, providerId);
+
     if (temp == nullptr) { // get card by simple name instead
         temp = getCardBySimpleName(cardName);
         if (temp == nullptr) { // still could not find the card, so simplify the cardName too
-            QString simpleCardName = CardInfo::simplifyName(cardName);
+            const auto &simpleCardName = CardInfo::simplifyName(cardName);
             temp = getCardBySimpleName(simpleCardName);
         }
     }
