@@ -35,7 +35,7 @@ private slots:
     }
 signals:
     void hovered(AbstractCardItem *card);
-    void showCardInfoPopup(QPoint pos, QString cardName, QString providerId);
+    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
     void deleteCardInfoPopup(QString cardName);
     void sigPixmapUpdated();
     void cardShiftClicked(QString cardName);
