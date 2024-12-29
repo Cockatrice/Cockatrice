@@ -24,6 +24,7 @@ public slots:
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void refreshBannerCards(); // Refresh the display of cards based on the current sorting option
     void showEvent(QShowEvent *event) override;
+    void updateSortOrder();
 
 signals:
     void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
