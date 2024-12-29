@@ -56,4 +56,3 @@ QStringList VisualDeckStorageSearchWidget::filterFiles(const QStringList &files,
 
     return filteredFiles;
 }
-
