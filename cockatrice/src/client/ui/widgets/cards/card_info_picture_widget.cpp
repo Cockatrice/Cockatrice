@@ -1,9 +1,11 @@
 #include "card_info_picture_widget.h"
 
+#include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../picture_loader.h"
 
+#include <QMenu>
 #include <QMouseEvent>
 #include <QStylePainter>
 #include <QWidget>
@@ -233,6 +235,52 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
         enlargedPixmapWidget->move(QPoint(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
                                           static_cast<int>(cursorPos.y()) + enlargedPixmapOffset));
     }
+}
+
+void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    if (event->button() == Qt::RightButton) {
+        createRightClickMenu()->popup(QCursor::pos());
+    }
+}
+
+QMenu *CardInfoPictureWidget::createRightClickMenu()
+{
+    auto *cardMenu = new QMenu(this);
+
+    if (!info) {
+        return cardMenu;
+    }
+
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    cardMenu->addMenu(viewRelatedCards);
+
+    bool atLeastOneGoodRelationFound = false;
+    QList<CardRelation *> relatedCards = info->getAllRelatedCards();
+    for (const CardRelation *cardRelation : relatedCards) {
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        if (relatedCard != nullptr) {
+            atLeastOneGoodRelationFound = true;
+            break;
+        }
+    }
+
+    if (!atLeastOneGoodRelationFound) {
+        viewRelatedCards->setEnabled(false);
+        return cardMenu;
+    }
+
+    for (const auto &relatedCard : relatedCards) {
+        const auto &relatedCardName = relatedCard->getName();
+        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
+            emit cardChanged(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+        });
+        viewRelatedCards->addAction(viewCard);
+    }
+
+    return cardMenu;
 }
 
 /**

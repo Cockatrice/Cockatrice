@@ -8,6 +8,7 @@
 #include <QWidget>
 
 class AbstractCardItem;
+class QMenu;
 
 class CardInfoPictureWidget : public QWidget
 {
@@ -30,6 +31,7 @@ public slots:
 signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
     void cardScaleFactorChanged(int _scale);
+    void cardChanged(CardInfoPtr card);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -41,6 +43,7 @@ protected:
 #endif
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
     void loadPixmap();
     [[nodiscard]] const QPixmap &getResizedPixmap() const
     {
@@ -63,6 +66,8 @@ private:
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget;
     int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
+
+    QMenu *createRightClickMenu();
 };
 
 #endif
