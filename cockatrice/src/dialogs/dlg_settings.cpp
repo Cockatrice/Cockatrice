@@ -118,6 +118,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
 
+    // Required init here to avoid crashing on Portable builds
+    resetAllPathsButton = new QPushButton;
+
     bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
@@ -134,7 +137,6 @@ GeneralSettingsPage::GeneralSettingsPage()
         customCardDatabasePathButton->setVisible(false);
         tokenDatabasePathButton->setVisible(false);
     } else {
-        resetAllPathsButton = new QPushButton;
         connect(resetAllPathsButton, SIGNAL(clicked()), this, SLOT(resetAllPathsClicked()));
         allPathsResetLabel = new QLabel(tr("All paths have been reset"));
         allPathsResetLabel->setVisible(false);
@@ -302,9 +304,7 @@ void GeneralSettingsPage::retranslateUi()
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
-    if (resetAllPathsButton) {
-        resetAllPathsButton->setText(tr("Reset all paths"));
-    }
+    resetAllPathsButton->setText(tr("Reset all paths"));
 
     const auto &settings = SettingsCache::instance();
 
