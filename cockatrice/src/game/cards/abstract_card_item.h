@@ -28,11 +28,14 @@ private:
     qreal realZValue;
 private slots:
     void pixmapUpdated();
-    void cardInfoUpdated();
     void callUpdate()
     {
         update();
     }
+
+public slots:
+    void refreshCardInfo();
+
 signals:
     void hovered(AbstractCardItem *card);
     void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);

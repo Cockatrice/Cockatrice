@@ -1,5 +1,6 @@
 #include "card_zone.h"
 
+#include "../cards/card_database_manager.h"
 #include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
@@ -31,6 +32,11 @@ CardZone::CardZone(Player *_p,
 {
     if (!isView)
         player->addZone(this);
+
+    // If we join a game before the card db finishes loading, the cards might have the wrong printings.
+    // Force refresh all cards in the zone when db finishes loading to fix that.
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &CardZone::refreshCardInfos);
 }
 
 CardZone::~CardZone()
@@ -117,6 +123,13 @@ bool CardZone::showContextMenu(const QPoint &screenPos)
         return true;
     }
     return false;
+}
+
+void CardZone::refreshCardInfos()
+{
+    for (const auto &cardItem : cards) {
+        cardItem->refreshCardInfo();
+    }
 }
 
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
