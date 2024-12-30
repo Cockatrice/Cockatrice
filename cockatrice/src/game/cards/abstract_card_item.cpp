@@ -25,7 +25,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
     setCacheMode(DeviceCoordinateCache);
 
     connect(&SettingsCache::instance(), SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
-    cardInfoUpdated();
+    refreshCardInfo();
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -51,7 +51,7 @@ void AbstractCardItem::pixmapUpdated()
     emit sigPixmapUpdated();
 }
 
-void AbstractCardItem::cardInfoUpdated()
+void AbstractCardItem::refreshCardInfo()
 {
     info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(name, providerId);
 
@@ -185,7 +185,7 @@ void AbstractCardItem::setName(const QString &_name)
         disconnect(info.data(), nullptr, this, nullptr);
     name = _name;
 
-    cardInfoUpdated();
+    refreshCardInfo();
 }
 
 void AbstractCardItem::setProviderId(const QString &_providerId)
@@ -200,7 +200,7 @@ void AbstractCardItem::setProviderId(const QString &_providerId)
     }
     providerId = _providerId;
 
-    cardInfoUpdated();
+    refreshCardInfo();
 }
 
 void AbstractCardItem::setHovered(bool _hovered)
