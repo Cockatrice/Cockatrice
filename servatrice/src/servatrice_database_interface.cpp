@@ -103,12 +103,25 @@ bool Servatrice_DatabaseInterface::openDatabase()
 
 bool Servatrice_DatabaseInterface::checkSql()
 {
-    if (!sqlDatabase.isValid())
+    if (!sqlDatabase.isValid()) {
         return false;
+    }
 
     auto query = QSqlQuery(sqlDatabase);
-    if (query.exec("select 1") && query.isActive())
+    if (query.exec("select 1") && query.isActive()) {
         return openDatabase();
+    }
+
+    if (query.lastError().isValid()) {
+        const auto &poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
+        qCritical() << QString("[%1] Error executing query: %2, resetting connection")
+                           .arg(poolStr)
+                           .arg(query.lastError().text());
+
+        sqlDatabase.close();
+        return openDatabase();
+    }
+
     return true;
 }
 
