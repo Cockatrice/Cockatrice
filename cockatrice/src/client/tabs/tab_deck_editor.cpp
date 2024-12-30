@@ -1038,6 +1038,9 @@ bool TabDeckEditor::actSaveDeckAs()
         return false;
     }
     setModified(false);
+
+    SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
+
     return true;
 }
 
