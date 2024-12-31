@@ -281,8 +281,8 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <name>BetaReleaseChannel</name>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="203"/>
-        <source>Beta Releases</source>
-        <translation>Versioni beta</translation>
+        <source>Beta</source>
+        <translation>Beta</translation>
     </message>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="229"/>
@@ -423,19 +423,27 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
 <context>
     <name>CardInfoFrameWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="66"/>
+        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="69"/>
         <source>Image</source>
         <translation>Immagine</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="67"/>
+        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="70"/>
         <source>Description</source>
         <translation>Descrizione</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="68"/>
+        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="71"/>
         <source>Both</source>
         <translation>Entrambi</translation>
+    </message>
+</context>
+<context>
+    <name>CardInfoPictureWidget</name>
+    <message>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="256"/>
+        <source>View related cards</source>
+        <translation>Mostra carte correlate</translation>
     </message>
 </context>
 <context>
@@ -480,121 +488,121 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
 <context>
     <name>CardZone</name>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="72"/>
+        <location filename="src/game/zones/card_zone.cpp" line="78"/>
         <source>their hand</source>
         <comment>nominative</comment>
         <translation>la sua mano</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="72"/>
+        <location filename="src/game/zones/card_zone.cpp" line="78"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
         <translation>Mano di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="76"/>
-        <source>their library</source>
-        <comment>look at zone</comment>
-        <translation>il suo grimorio</translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="77"/>
-        <source>%1&apos;s library</source>
-        <comment>look at zone</comment>
-        <translation>Grimorio di %1</translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="79"/>
-        <source>of their library</source>
-        <comment>top cards of zone,</comment>
-        <translation>del suo grimorio</translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="80"/>
-        <source>of %1&apos;s library</source>
-        <comment>top cards of zone</comment>
-        <translation>del grimorio di %1</translation>
-    </message>
-    <message>
         <location filename="src/game/zones/card_zone.cpp" line="82"/>
         <source>their library</source>
-        <comment>reveal zone</comment>
+        <comment>look at zone</comment>
         <translation>il suo grimorio</translation>
     </message>
     <message>
         <location filename="src/game/zones/card_zone.cpp" line="83"/>
         <source>%1&apos;s library</source>
+        <comment>look at zone</comment>
+        <translation>Grimorio di %1</translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="85"/>
+        <source>of their library</source>
+        <comment>top cards of zone,</comment>
+        <translation>del suo grimorio</translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="86"/>
+        <source>of %1&apos;s library</source>
+        <comment>top cards of zone</comment>
+        <translation>del grimorio di %1</translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="88"/>
+        <source>their library</source>
+        <comment>reveal zone</comment>
+        <translation>il suo grimorio</translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="89"/>
+        <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
         <translation>Grimorio di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="85"/>
+        <location filename="src/game/zones/card_zone.cpp" line="91"/>
         <source>their library</source>
         <comment>shuffle</comment>
         <translation>il suo grimorio</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="85"/>
+        <location filename="src/game/zones/card_zone.cpp" line="91"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
         <translation>Grimorio di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="87"/>
+        <location filename="src/game/zones/card_zone.cpp" line="93"/>
         <source>their library</source>
         <comment>nominative</comment>
         <translation>il suo grimorio</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="87"/>
+        <location filename="src/game/zones/card_zone.cpp" line="93"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
         <translation>Grimorio di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="90"/>
+        <location filename="src/game/zones/card_zone.cpp" line="96"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
         <translation>il suo cimitero</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="90"/>
+        <location filename="src/game/zones/card_zone.cpp" line="96"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
         <translation>Cimitero di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="92"/>
+        <location filename="src/game/zones/card_zone.cpp" line="98"/>
         <source>their exile</source>
         <comment>nominative</comment>
         <translation>la sua zona di esilio</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="92"/>
+        <location filename="src/game/zones/card_zone.cpp" line="98"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
         <translation>Esilio di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="96"/>
+        <location filename="src/game/zones/card_zone.cpp" line="102"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
         <translation>la sua sideboard</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="97"/>
+        <location filename="src/game/zones/card_zone.cpp" line="103"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
         <translation>Sideboard di %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="99"/>
+        <location filename="src/game/zones/card_zone.cpp" line="105"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
         <translation>la sua sideboard</translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="100"/>
+        <location filename="src/game/zones/card_zone.cpp" line="106"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
         <translation>Sideboard di %1</translation>
@@ -4710,7 +4718,7 @@ Il database delle carte verrà ricaricato.</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1901"/>
-        <location filename="src/game/player/player.cpp" line="3564"/>
+        <location filename="src/game/player/player.cpp" line="3565"/>
         <source>Number:</source>
         <translation>Numero:</translation>
     </message>
@@ -4821,7 +4829,7 @@ Il database delle carte verrà ricaricato.</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1753"/>
-        <location filename="src/game/player/player.cpp" line="4084"/>
+        <location filename="src/game/player/player.cpp" line="4085"/>
         <source>C&amp;reate another %1 token</source>
         <translation>C&amp;rea un&apos;altra pedina %1</translation>
     </message>
@@ -4836,47 +4844,47 @@ Il database delle carte verrà ricaricato.</translation>
         <translation>Metti la carta in posizione X dalla cima del grimorio</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3351"/>
+        <location filename="src/game/player/player.cpp" line="3352"/>
         <source>Change power/toughness</source>
         <translation>Cambia forza/costituzione</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3351"/>
+        <location filename="src/game/player/player.cpp" line="3352"/>
         <source>Change stats to:</source>
         <translation>Cambia valori a:</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3470"/>
+        <location filename="src/game/player/player.cpp" line="3471"/>
         <source>Set annotation</source>
         <translation>Imposta nota</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3471"/>
+        <location filename="src/game/player/player.cpp" line="3472"/>
         <source>Please enter the new annotation:</source>
         <translation>Inserisci le nuove note:</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3564"/>
+        <location filename="src/game/player/player.cpp" line="3565"/>
         <source>Set counters</source>
         <translation>Imposta i segnalini</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3839"/>
+        <location filename="src/game/player/player.cpp" line="3840"/>
         <source>Re&amp;veal to...</source>
         <translation>Ri&amp;vela a...</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3909"/>
+        <location filename="src/game/player/player.cpp" line="3910"/>
         <source>View related cards</source>
         <translation>Vedi carte collegate</translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3957"/>
+        <location filename="src/game/player/player.cpp" line="3958"/>
         <source>Token: </source>
         <translation>Pedina: </translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3974"/>
+        <location filename="src/game/player/player.cpp" line="3975"/>
         <source>All tokens</source>
         <translation>Tutte le pedine</translation>
     </message>
@@ -5488,8 +5496,8 @@ Controlla le impostazioni!</translation>
     <name>StableReleaseChannel</name>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="89"/>
-        <source>Stable Releases</source>
-        <translation>Versioni stabili</translation>
+        <source>Default</source>
+        <translation>Predefinito</translation>
     </message>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="105"/>
@@ -5849,17 +5857,17 @@ Controlla le impostazioni!</translation>
         <translation>Impossibile aprire il mazzo a %1</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1185"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1188"/>
         <source>Open in new tab</source>
         <translation>Apri in una nuova scheda</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1214"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1217"/>
         <source>Are you sure?</source>
         <translation>Sei sicuro?</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1215"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1218"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>La lista del mazzo è stata modificata.
@@ -5876,8 +5884,8 @@ Vuoi salvare i cambiamenti?</translation>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="994"/>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="1015"/>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="1036"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1105"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1117"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1108"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1120"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
@@ -5905,12 +5913,12 @@ Controlla se la cartella è valida e prova ancora.</translation>
         <translation>Salva mazzo</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1105"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1108"/>
         <source>There are no cards in your deck to be exported</source>
         <translation>Non ci sono carte da esportare nel tuo mazzo</translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1117"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1120"/>
         <source>No deck was selected to be saved.</source>
         <translation>Nessun mazzo da salvare è stato selezionato.</translation>
     </message>
@@ -8273,7 +8281,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="567"/>
         <source>Mulligan</source>
-        <translation>Mulliga</translation>
+        <translation>Mulligan</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="570"/>
@@ -8318,7 +8326,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="594"/>
         <source>Focus Chat</source>
-        <translation>Focus sulla Chat</translation>
+        <translation>Focalizza Chat</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="597"/>
