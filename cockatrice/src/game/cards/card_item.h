@@ -139,7 +139,7 @@ public:
     {
         return attachedCards;
     }
-    void resetState();
+    void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
 
     QMenu *getCardMenu() const
