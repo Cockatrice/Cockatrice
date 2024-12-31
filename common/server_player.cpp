@@ -576,10 +576,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
             eventOthers.set_start_zone(startzone->getName().toStdString());
             eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
-            if (targetzone->getName() == "stack") {
-                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
-                                  AttrAnnotation, card->getAnnotation(), card);
-            }
             if (startzone != targetzone) {
                 eventOthers.set_target_zone(targetzone->getName().toStdString());
             }
