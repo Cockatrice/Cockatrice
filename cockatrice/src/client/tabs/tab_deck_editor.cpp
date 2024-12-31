@@ -1321,8 +1321,9 @@ void TabDeckEditor::actRemoveCard()
 
 void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
 {
-    if (!idx.isValid() || offset == 0)
+    if (!idx.isValid() || deckModel->hasChildren(idx)) {
         return;
+    }
 
     const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
