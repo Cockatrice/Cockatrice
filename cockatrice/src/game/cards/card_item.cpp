@@ -217,13 +217,15 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     }
 }
 
-void CardItem::resetState()
+void CardItem::resetState(bool keepAnnotations)
 {
     attacking = false;
     facedown = false;
     counters.clear();
     pt.clear();
-    annotation.clear();
+    if (!keepAnnotations) {
+        annotation.clear();
+    }
     attachedTo = 0;
     attachedCards.clear();
     setTapped(false, false);

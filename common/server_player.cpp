@@ -548,7 +548,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
             } else {
                 yCoord = 0;
-                card->resetState();
+                card->resetState(targetzone->getName() == "stack");
             }
 
             targetzone->insertCard(card, newX, yCoord);
