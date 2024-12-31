@@ -64,6 +64,7 @@ void TabDeckEditor::createDeckDock()
     deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     deckView->installEventFilter(&deckViewKeySignals);
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
@@ -1299,14 +1300,23 @@ void TabDeckEditor::actAddCardToSideboard()
 
 void TabDeckEditor::actRemoveCard()
 {
-    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
-        return;
-    deckModel->removeRow(currentIndex.row(), currentIndex.parent());
+    auto selectedRows = deckView->selectionModel()->selectedRows();
+    std::reverse(selectedRows.begin(), selectedRows.end());
 
-    DeckLoader *const deck = deckModel->getDeckList();
-    setSaveStatus(!deck->isEmpty());
-    setModified(true);
+    bool modified = false;
+    for (const auto &index : selectedRows) {
+        if (!index.isValid() || deckModel->hasChildren(index)) {
+            continue;
+        }
+        deckModel->removeRow(index.row(), index.parent());
+        modified = true;
+    }
+
+    if (modified) {
+        DeckLoader *const deck = deckModel->getDeckList();
+        setSaveStatus(!deck->isEmpty());
+        setModified(true);
+    }
 }
 
 void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
@@ -1357,14 +1367,22 @@ void TabDeckEditor::copyDatabaseCellContents()
 
 void TabDeckEditor::actIncrement()
 {
-    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    offsetCountAtIndex(currentIndex, 1);
+    auto selectedRows = deckView->selectionModel()->selectedRows();
+
+    for (const auto &index : selectedRows) {
+        offsetCountAtIndex(index, 1);
+    }
 }
 
 void TabDeckEditor::actDecrement()
 {
-    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    offsetCountAtIndex(currentIndex, -1);
+    auto selectedRows = deckView->selectionModel()->selectedRows();
+    // we need to iterate the rows in reverse order since there may be row deletions
+    std::reverse(selectedRows.begin(), selectedRows.end());
+
+    for (const auto &index : selectedRows) {
+        offsetCountAtIndex(index, -1);
+    }
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
