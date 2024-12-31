@@ -75,7 +75,8 @@ public:
                    int numberCards = 0,
                    bool _revealZone = false,
                    bool _writeableRevealZone = false,
-                   const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
+                   const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>(),
+                   bool _isReversed = false);
     ZoneViewZone *getZone() const
     {
         return zone;

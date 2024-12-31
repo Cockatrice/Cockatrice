@@ -28,10 +28,12 @@ ZoneViewZone::ZoneViewZone(Player *_p,
                            int _numberCards,
                            bool _revealZone,
                            bool _writeableRevealZone,
-                           QGraphicsItem *parent)
+                           QGraphicsItem *parent,
+                           bool _isReversed)
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
-      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
+      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
+      isReversed(_isReversed), firstCardId(-1), latestZoneSize(numberCards), firstResize(true)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -72,6 +74,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         cmd.set_player_id(player->getId());
         cmd.set_zone_name(name.toStdString());
         cmd.set_number_cards(numberCards);
+        cmd.set_is_reversed(isReversed);
 
         PendingCommand *pend = player->prepareGameCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
@@ -99,6 +102,10 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
         auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), revealZone, this);
         cards.insert(i, card);
+
+        if (i == 0) {
+            firstCardId = cardInfo.id();
+        }
     }
     reorganizeCards();
     emit cardCountChanged();
@@ -108,9 +115,23 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 void ZoneViewZone::reorganizeCards()
 {
     int cardCount = cards.size();
-    if (!origZone->contentsKnown())
-        for (int i = 0; i < cardCount; ++i)
-            cards[i]->setId(i);
+    if (!origZone->contentsKnown()) {
+        if (cards.isEmpty()) {
+            return;
+        }
+
+        auto startId = isReversed ? cards.first()->getId() : 0;
+
+        if (isReversed) {
+            if (cards.first()->getId() != firstCardId) {
+                startId -= 1;
+            }
+        }
+
+        for (int i = 0; i < cardCount; ++i) {
+            cards[i]->setId(i + startId);
+        }
+    }
 
     CardList cardsToDisplay(cards);
 
@@ -210,7 +231,7 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         if (cols < 2)
             cols = 2;
 
-        qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+         qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
@@ -248,7 +269,16 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
     if (x < 0 || x >= cards.size()) {
         x = cards.size();
     }
-    cards.insert(x, card);
+
+    if (isReversed) {
+        if (x != 0) {
+            cards.append(card);
+        } else {
+            return;
+        }
+    } else {
+        cards.insert(x, card);
+    }
     card->setParentItem(this);
     card->update();
     reorganizeCards();
@@ -265,6 +295,7 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     cmd.set_target_zone(getName().toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
+    cmd.set_is_reversed(isReversed);
 
     for (int i = 0; i < dragItems.size(); ++i)
         cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
@@ -274,8 +305,17 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
 void ZoneViewZone::removeCard(int position)
 {
-    if (position >= cards.size())
+    if (isReversed) {
+        position -= cards.first()->getId();
+        if (position < 0 || position >= cards.size()) {
+            reorganizeCards();
+            return;
+        }
+    }
+
+    if (position >= cards.size()) {
         return;
+    }
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();

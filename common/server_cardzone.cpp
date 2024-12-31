@@ -128,7 +128,7 @@ int Server_CardZone::removeCard(Server_Card *card)
     return removeCard(card, wasLookedAt);
 }
 
-int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt)
+int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt, bool isReversed)
 {
     int index = cards.indexOf(card);
     wasLookedAt = isCardAtPosLookedAt(index);

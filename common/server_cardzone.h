@@ -59,7 +59,7 @@ public:
         return cards;
     }
     int removeCard(Server_Card *card);
-    int removeCard(Server_Card *card, bool &wasLookedAt);
+    int removeCard(Server_Card *card, bool &wasLookedAt, bool isRevealed = false);
     Server_Card *getCard(int id, int *position = nullptr, bool remove = false);
 
     int getCardsBeingLookedAt() const
