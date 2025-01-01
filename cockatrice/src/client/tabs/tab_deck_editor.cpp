@@ -1252,6 +1252,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
 
     QModelIndex newCardIndex = deckModel->addPreferredPrintingCard(info->getName(), zoneName, false);
     recursiveExpand(newCardIndex);
+    deckView->clearSelection();
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);
     searchEdit->setSelection(0, searchEdit->text().length());
@@ -1338,14 +1339,18 @@ void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
 void TabDeckEditor::decrementCardHelper(QString zoneName)
 {
     const CardInfoPtr info = currentCardInfo();
-    QModelIndex idx;
 
     if (!info)
         return;
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    idx = deckModel->findCard(info->getName(), zoneName);
+    QModelIndex idx = deckModel->findCard(info->getName(), zoneName);
+    if (!idx.isValid()) {
+        return;
+    }
+    deckView->clearSelection();
+    deckView->setCurrentIndex(idx);
     offsetCountAtIndex(idx, -1);
 }
 
