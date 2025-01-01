@@ -1242,6 +1242,23 @@ CardInfoPtr TabDeckEditor::currentCardInfo() const
     return CardDatabaseManager::getInstance()->getCard(cardName);
 }
 
+/**
+ * Gets the index of all the currently selected card nodes in the decklist table.
+ * The list is in reverse order of the visual selection, so that rows can be deleted while iterating over them.
+ *
+ * @return A model index list containing all selected card nodes
+ */
+QModelIndexList TabDeckEditor::getSelectedCardNodes() const
+{
+    auto selectedRows = deckView->selectionModel()->selectedRows();
+
+    const auto notLeafNode = [this](const auto &index) { return deckModel->hasChildren(index); };
+    selectedRows.erase(std::remove_if(selectedRows.begin(), selectedRows.end(), notLeafNode), selectedRows.end());
+
+    std::reverse(selectedRows.begin(), selectedRows.end());
+    return selectedRows;
+}
+
 void TabDeckEditor::addCardHelper(QString zoneName)
 {
     const CardInfoPtr info = currentCardInfo();
@@ -1301,8 +1318,7 @@ void TabDeckEditor::actAddCardToSideboard()
 
 void TabDeckEditor::actRemoveCard()
 {
-    auto selectedRows = deckView->selectionModel()->selectedRows();
-    std::reverse(selectedRows.begin(), selectedRows.end());
+    auto selectedRows = getSelectedCardNodes();
 
     bool modified = false;
     for (const auto &index : selectedRows) {
@@ -1372,7 +1388,7 @@ void TabDeckEditor::copyDatabaseCellContents()
 
 void TabDeckEditor::actIncrement()
 {
-    auto selectedRows = deckView->selectionModel()->selectedRows();
+    auto selectedRows = getSelectedCardNodes();
 
     for (const auto &index : selectedRows) {
         offsetCountAtIndex(index, 1);
@@ -1381,9 +1397,7 @@ void TabDeckEditor::actIncrement()
 
 void TabDeckEditor::actDecrement()
 {
-    auto selectedRows = deckView->selectionModel()->selectedRows();
-    // we need to iterate the rows in reverse order since there may be row deletions
-    std::reverse(selectedRows.begin(), selectedRows.end());
+    auto selectedRows = getSelectedCardNodes();
 
     for (const auto &index : selectedRows) {
         offsetCountAtIndex(index, -1);
