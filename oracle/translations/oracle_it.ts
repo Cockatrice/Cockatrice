@@ -89,7 +89,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/oraclewizard.cpp" line="336"/>
         <source>Please choose a file.</source>
-        <translation>Selezina un file.</translation>
+        <translation>Seleziona un file.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="341"/>
@@ -246,7 +246,7 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="460"/>
+        <location filename="src/oracleimporter.cpp" line="465"/>
         <source>Dummy set containing tokens</source>
         <translation>Set finto contenente i token</translation>
     </message>

@@ -282,7 +282,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <name>BetaReleaseChannel</name>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="203"/>
-        <source>Beta Releases</source>
+        <source>Beta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -424,18 +424,26 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardInfoFrameWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="66"/>
+        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="69"/>
         <source>Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="67"/>
+        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="70"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="68"/>
+        <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="71"/>
         <source>Both</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CardInfoPictureWidget</name>
+    <message>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="256"/>
+        <source>View related cards</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -481,121 +489,121 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardZone</name>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="72"/>
+        <location filename="src/game/zones/card_zone.cpp" line="78"/>
         <source>their hand</source>
         <comment>nominative</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="72"/>
+        <location filename="src/game/zones/card_zone.cpp" line="78"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="76"/>
-        <source>their library</source>
-        <comment>look at zone</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="77"/>
-        <source>%1&apos;s library</source>
-        <comment>look at zone</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="79"/>
-        <source>of their library</source>
-        <comment>top cards of zone,</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="80"/>
-        <source>of %1&apos;s library</source>
-        <comment>top cards of zone</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="src/game/zones/card_zone.cpp" line="82"/>
         <source>their library</source>
-        <comment>reveal zone</comment>
+        <comment>look at zone</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/game/zones/card_zone.cpp" line="83"/>
         <source>%1&apos;s library</source>
+        <comment>look at zone</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="85"/>
+        <source>of their library</source>
+        <comment>top cards of zone,</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="86"/>
+        <source>of %1&apos;s library</source>
+        <comment>top cards of zone</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="88"/>
+        <source>their library</source>
         <comment>reveal zone</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="85"/>
+        <location filename="src/game/zones/card_zone.cpp" line="89"/>
+        <source>%1&apos;s library</source>
+        <comment>reveal zone</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="91"/>
         <source>their library</source>
         <comment>shuffle</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="85"/>
+        <location filename="src/game/zones/card_zone.cpp" line="91"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="87"/>
+        <location filename="src/game/zones/card_zone.cpp" line="93"/>
         <source>their library</source>
         <comment>nominative</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="87"/>
+        <location filename="src/game/zones/card_zone.cpp" line="93"/>
         <source>%1&apos;s library</source>
-        <comment>nominative</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="90"/>
-        <source>their graveyard</source>
-        <comment>nominative</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="90"/>
-        <source>%1&apos;s graveyard</source>
-        <comment>nominative</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="92"/>
-        <source>their exile</source>
-        <comment>nominative</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/game/zones/card_zone.cpp" line="92"/>
-        <source>%1&apos;s exile</source>
         <comment>nominative</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/game/zones/card_zone.cpp" line="96"/>
+        <source>their graveyard</source>
+        <comment>nominative</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="96"/>
+        <source>%1&apos;s graveyard</source>
+        <comment>nominative</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="98"/>
+        <source>their exile</source>
+        <comment>nominative</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="98"/>
+        <source>%1&apos;s exile</source>
+        <comment>nominative</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/game/zones/card_zone.cpp" line="102"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="97"/>
+        <location filename="src/game/zones/card_zone.cpp" line="103"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="99"/>
+        <location filename="src/game/zones/card_zone.cpp" line="105"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/zones/card_zone.cpp" line="100"/>
+        <location filename="src/game/zones/card_zone.cpp" line="106"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
         <translation type="unfinished"></translation>
@@ -4682,7 +4690,7 @@ Cockatrice will now reload the card database.</source>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1901"/>
-        <location filename="src/game/player/player.cpp" line="3564"/>
+        <location filename="src/game/player/player.cpp" line="3565"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4793,7 +4801,7 @@ Cockatrice will now reload the card database.</source>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1753"/>
-        <location filename="src/game/player/player.cpp" line="4084"/>
+        <location filename="src/game/player/player.cpp" line="4085"/>
         <source>C&amp;reate another %1 token</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4808,47 +4816,47 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3351"/>
+        <location filename="src/game/player/player.cpp" line="3352"/>
         <source>Change power/toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3351"/>
+        <location filename="src/game/player/player.cpp" line="3352"/>
         <source>Change stats to:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3470"/>
+        <location filename="src/game/player/player.cpp" line="3471"/>
         <source>Set annotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3471"/>
+        <location filename="src/game/player/player.cpp" line="3472"/>
         <source>Please enter the new annotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3564"/>
+        <location filename="src/game/player/player.cpp" line="3565"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3839"/>
+        <location filename="src/game/player/player.cpp" line="3840"/>
         <source>Re&amp;veal to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3909"/>
+        <location filename="src/game/player/player.cpp" line="3910"/>
         <source>View related cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3957"/>
+        <location filename="src/game/player/player.cpp" line="3958"/>
         <source>Token: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/game/player/player.cpp" line="3974"/>
+        <location filename="src/game/player/player.cpp" line="3975"/>
         <source>All tokens</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5458,7 +5466,7 @@ Please check your shortcut settings!</source>
     <name>StableReleaseChannel</name>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="89"/>
-        <source>Stable Releases</source>
+        <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5819,17 +5827,17 @@ Please check your shortcut settings!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1185"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1188"/>
         <source>Open in new tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1214"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1217"/>
         <source>Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1215"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1218"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation type="unfinished"></translation>
@@ -5845,8 +5853,8 @@ Do you want to save the changes?</source>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="994"/>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="1015"/>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="1036"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1105"/>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1117"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1108"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1120"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5873,12 +5881,12 @@ Please check that the directory is writable and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1105"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1108"/>
         <source>There are no cards in your deck to be exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1117"/>
+        <location filename="src/client/tabs/tab_deck_editor.cpp" line="1120"/>
         <source>No deck was selected to be saved.</source>
         <translation type="unfinished"></translation>
     </message>

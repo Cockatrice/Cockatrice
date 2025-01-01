@@ -103,12 +103,25 @@ bool Servatrice_DatabaseInterface::openDatabase()
 
 bool Servatrice_DatabaseInterface::checkSql()
 {
-    if (!sqlDatabase.isValid())
+    if (!sqlDatabase.isValid()) {
         return false;
+    }
 
     auto query = QSqlQuery(sqlDatabase);
-    if (query.exec("select 1") && query.isActive())
+    if (query.exec("select 1") && query.isActive()) {
         return openDatabase();
+    }
+
+    if (query.lastError().isValid()) {
+        const auto &poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
+        qCritical() << QString("[%1] Error executing query: %2, resetting connection")
+                           .arg(poolStr)
+                           .arg(query.lastError().text());
+
+        sqlDatabase.close();
+        return openDatabase();
+    }
+
     return true;
 }
 
@@ -1196,6 +1209,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
 
     if (!checkSql())
         return results;
+
+    if (user.isEmpty() && ipaddress.isEmpty() && gameid.isEmpty() && gamename.isEmpty()) {
+        // To ensure quick results and minimal lag, require an indexed field
+        return results;
+    }
 
     // BUILD QUERY STRING BASED ON PASSED IN VALUES
     QString queryString = "SELECT * FROM {prefix}_log WHERE `sender_ip` IS NOT NULL";

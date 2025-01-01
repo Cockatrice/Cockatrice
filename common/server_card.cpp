@@ -54,13 +54,15 @@ Server_Card::~Server_Card()
     }
 }
 
-void Server_Card::resetState()
+void Server_Card::resetState(bool keepAnnotations)
 {
     counters.clear();
     setTapped(false);
     setAttacking(false);
     setPT(QString());
-    setAnnotation(QString());
+    if (!keepAnnotations) {
+        setAnnotation(QString());
+    }
     setDoesntUntap(false);
 }
 

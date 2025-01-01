@@ -64,6 +64,7 @@ void TabDeckEditor::createDeckDock()
     deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     deckView->installEventFilter(&deckViewKeySignals);
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
@@ -1038,6 +1039,9 @@ bool TabDeckEditor::actSaveDeckAs()
         return false;
     }
     setModified(false);
+
+    SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
+
     return true;
 }
 
@@ -1238,6 +1242,23 @@ CardInfoPtr TabDeckEditor::currentCardInfo() const
     return CardDatabaseManager::getInstance()->getCard(cardName);
 }
 
+/**
+ * Gets the index of all the currently selected card nodes in the decklist table.
+ * The list is in reverse order of the visual selection, so that rows can be deleted while iterating over them.
+ *
+ * @return A model index list containing all selected card nodes
+ */
+QModelIndexList TabDeckEditor::getSelectedCardNodes() const
+{
+    auto selectedRows = deckView->selectionModel()->selectedRows();
+
+    const auto notLeafNode = [this](const auto &index) { return deckModel->hasChildren(index); };
+    selectedRows.erase(std::remove_if(selectedRows.begin(), selectedRows.end(), notLeafNode), selectedRows.end());
+
+    std::reverse(selectedRows.begin(), selectedRows.end());
+    return selectedRows;
+}
+
 void TabDeckEditor::addCardHelper(QString zoneName)
 {
     const CardInfoPtr info = currentCardInfo();
@@ -1248,6 +1269,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
 
     QModelIndex newCardIndex = deckModel->addPreferredPrintingCard(info->getName(), zoneName, false);
     recursiveExpand(newCardIndex);
+    deckView->clearSelection();
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);
     searchEdit->setSelection(0, searchEdit->text().length());
@@ -1296,25 +1318,41 @@ void TabDeckEditor::actAddCardToSideboard()
 
 void TabDeckEditor::actRemoveCard()
 {
-    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
-        return;
-    deckModel->removeRow(currentIndex.row(), currentIndex.parent());
+    auto selectedRows = getSelectedCardNodes();
 
-    DeckLoader *const deck = deckModel->getDeckList();
-    setSaveStatus(!deck->isEmpty());
-    setModified(true);
+    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
+    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    if (selectedRows.length() == 1) {
+        deckView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
+    bool modified = false;
+    for (const auto &index : selectedRows) {
+        if (!index.isValid() || deckModel->hasChildren(index)) {
+            continue;
+        }
+        deckModel->removeRow(index.row(), index.parent());
+        modified = true;
+    }
+
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    if (modified) {
+        DeckLoader *const deck = deckModel->getDeckList();
+        setSaveStatus(!deck->isEmpty());
+        setModified(true);
+    }
 }
 
 void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
 {
-    if (!idx.isValid() || offset == 0)
+    if (!idx.isValid() || deckModel->hasChildren(idx)) {
         return;
+    }
 
     const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
     const int new_count = count + offset;
-    deckView->setCurrentIndex(numberIndex);
     if (new_count <= 0)
         deckModel->removeRow(idx.row(), idx.parent());
     else
@@ -1325,14 +1363,18 @@ void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
 void TabDeckEditor::decrementCardHelper(QString zoneName)
 {
     const CardInfoPtr info = currentCardInfo();
-    QModelIndex idx;
 
     if (!info)
         return;
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    idx = deckModel->findCard(info->getName(), zoneName);
+    QModelIndex idx = deckModel->findCard(info->getName(), zoneName);
+    if (!idx.isValid()) {
+        return;
+    }
+    deckView->clearSelection();
+    deckView->setCurrentIndex(idx);
     offsetCountAtIndex(idx, -1);
 }
 
@@ -1354,14 +1396,28 @@ void TabDeckEditor::copyDatabaseCellContents()
 
 void TabDeckEditor::actIncrement()
 {
-    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    offsetCountAtIndex(currentIndex, 1);
+    auto selectedRows = getSelectedCardNodes();
+
+    for (const auto &index : selectedRows) {
+        offsetCountAtIndex(index, 1);
+    }
 }
 
 void TabDeckEditor::actDecrement()
 {
-    const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    offsetCountAtIndex(currentIndex, -1);
+    auto selectedRows = getSelectedCardNodes();
+
+    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
+    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    if (selectedRows.length() == 1) {
+        deckView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
+    for (const auto &index : selectedRows) {
+        offsetCountAtIndex(index, -1);
+    }
+
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)

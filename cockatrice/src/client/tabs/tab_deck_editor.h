@@ -111,6 +111,8 @@ private:
     void recursiveExpand(const QModelIndex &index);
     void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 
+    QModelIndexList getSelectedCardNodes() const;
+
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
     DeckListModel *deckModel;

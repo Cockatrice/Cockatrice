@@ -37,7 +37,7 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
         card->setName();
     }
     card->setParentItem(this);
-    card->resetState();
+    card->resetState(true);
     card->setVisible(true);
     card->update();
 }

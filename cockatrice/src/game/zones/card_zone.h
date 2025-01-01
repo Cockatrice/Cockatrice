@@ -43,6 +43,9 @@ public slots:
     void moveAllToZone();
     bool showContextMenu(const QPoint &screenPos);
 
+private slots:
+    void refreshCardInfos();
+
 public:
     enum
     {
