@@ -477,9 +477,9 @@ public:
     CardSetPtr getSet(const QString &setName);
     bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
     static CardInfoPerSet getSetInfoForCard(const CardInfoPtr &_card);
-    QList<CardInfoPtr> getCardList() const
+    const CardNameMap& getCardList() const
     {
-        return cards.values();
+        return cards;
     }
     SetList getSetList() const;
     LoadStatus loadFromFile(const QString &fileName);
