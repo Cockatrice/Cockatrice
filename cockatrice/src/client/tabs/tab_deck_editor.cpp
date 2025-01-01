@@ -1320,6 +1320,12 @@ void TabDeckEditor::actRemoveCard()
 {
     auto selectedRows = getSelectedCardNodes();
 
+    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
+    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    if (selectedRows.length() == 1) {
+        deckView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
     bool modified = false;
     for (const auto &index : selectedRows) {
         if (!index.isValid() || deckModel->hasChildren(index)) {
@@ -1328,6 +1334,8 @@ void TabDeckEditor::actRemoveCard()
         deckModel->removeRow(index.row(), index.parent());
         modified = true;
     }
+
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (modified) {
         DeckLoader *const deck = deckModel->getDeckList();
@@ -1399,9 +1407,17 @@ void TabDeckEditor::actDecrement()
 {
     auto selectedRows = getSelectedCardNodes();
 
+    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
+    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    if (selectedRows.length() == 1) {
+        deckView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
     for (const auto &index : selectedRows) {
         offsetCountAtIndex(index, -1);
     }
+
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
