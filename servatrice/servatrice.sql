@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   KEY `token` (`token`),
   KEY `email` (`email`),
   INDEX `idx_admin` (`admin`),
-  INDEX `idx_active` (`active`)
+  INDEX `idx_active` (`active`),
   INDEX `idx_privlevel` (`privlevel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
