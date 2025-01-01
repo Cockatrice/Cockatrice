@@ -44,7 +44,10 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
-  KEY `email` (`email`)
+  KEY `email` (`email`),
+  INDEX `idx_admin` (`admin`),
+  INDEX `idx_active` (`active`)
+  INDEX `idx_privlevel` (`privlevel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
@@ -190,7 +193,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `clientid` varchar(15) NOT NULL,
   `connection_type` ENUM('tcp', 'websocket'),
   PRIMARY KEY (`id`),
-  KEY `username` (`user_name`)
+  KEY `username` (`user_name`),
+  INDEX `idx_start_time` (`start_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- server moderation
@@ -230,7 +234,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   `target_name` varchar(50) NOT NULL,
   KEY `sender_name` (`sender_name`),
   KEY `sender_ip` (`sender_ip`),
-  KEY `target_type` (`target_type`),
   KEY `target_id` (`target_id`),
   KEY `target_name` (`target_name`),
   FOREIGN KEY(`sender_id`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
@@ -269,7 +272,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_forgot_password` (
   `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
   `emailed` tinyint(1) NOT NULL default 0,
   PRIMARY KEY  (`id`),
-  KEY `user_name` (`name`)
+  KEY `user_name` (`name`),
+  INDEX `idx_emailed` (`emailed`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
