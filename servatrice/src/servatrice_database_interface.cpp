@@ -1210,6 +1210,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     if (!checkSql())
         return results;
 
+    if (user.isEmpty() && ipaddress.isEmpty() && gameid.isEmpty() && gamename.isEmpty()) {
+        // To ensure quick results and minimal lag, require an indexed field
+        return results;
+    }
+
     // BUILD QUERY STRING BASED ON PASSED IN VALUES
     QString queryString = "SELECT * FROM {prefix}_log WHERE `sender_ip` IS NOT NULL";
     if (!user.isEmpty())
