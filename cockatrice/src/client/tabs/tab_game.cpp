@@ -382,6 +382,15 @@ void DeckViewContainer::setReadyStart(bool ready)
     sideboardLockButton->setEnabled(!readyStartButton->getState() && readyStartButton->isEnabled());
 }
 
+/**
+ * Sets the ready start to true, then sends the ready command so the server responds to the update
+ */
+void DeckViewContainer::readyAndUpdate()
+{
+    setReadyStart(true);
+    readyStart();
+}
+
 void DeckViewContainer::setSideboardLocked(bool locked)
 {
     sideboardLockButton->setState(!locked);
