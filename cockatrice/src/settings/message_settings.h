@@ -20,7 +20,7 @@ signals:
 public slots:
 
 private:
-    explicit MessageSettings(QString settingPath, QObject *parent = nullptr);
+    explicit MessageSettings(const QString &settingPath, QObject *parent = nullptr);
     MessageSettings(const MessageSettings & /*other*/);
 };
 

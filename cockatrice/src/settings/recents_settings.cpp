@@ -2,7 +2,7 @@
 
 #define MAX_RECENT_DECK_COUNT 10
 
-RecentsSettings::RecentsSettings(QString settingPath, QObject *parent)
+RecentsSettings::RecentsSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "recents.ini", parent)
 {
 }

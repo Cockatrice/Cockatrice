@@ -18,7 +18,7 @@ public:
     QString getCardPreferenceOverride(const QString &cardName);
 
 private:
-    explicit CardOverrideSettings(QString settingPath, QObject *parent = nullptr);
+    explicit CardOverrideSettings(const QString &settingPath, QObject *parent = nullptr);
     CardOverrideSettings(const CardOverrideSettings & /*other*/);
 };
 
