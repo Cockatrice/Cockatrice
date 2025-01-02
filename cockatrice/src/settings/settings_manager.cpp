@@ -1,6 +1,6 @@
 #include "settings_manager.h"
 
-SettingsManager::SettingsManager(QString settingPath, QObject *parent)
+SettingsManager::SettingsManager(const QString &settingPath, QObject *parent)
     : QObject(parent), settings(settingPath, QSettings::IniFormat)
 {
 }

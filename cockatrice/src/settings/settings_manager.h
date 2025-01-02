@@ -10,7 +10,7 @@ class SettingsManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit SettingsManager(QString settingPath, QObject *parent = nullptr);
+    explicit SettingsManager(const QString &settingPath, QObject *parent = nullptr);
     QVariant getValue(QString name, QString group = "", QString subGroup = "");
     void sync();
 

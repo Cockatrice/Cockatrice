@@ -1,6 +1,6 @@
 #include "card_override_settings.h"
 
-CardOverrideSettings::CardOverrideSettings(QString settingPath, QObject *parent)
+CardOverrideSettings::CardOverrideSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardPreferenceOverrides.ini", parent)
 {
 }

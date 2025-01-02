@@ -46,7 +46,7 @@ signals:
 public slots:
 
 private:
-    explicit GameFiltersSettings(QString settingPath, QObject *parent = nullptr);
+    explicit GameFiltersSettings(const QString &settingPath, QObject *parent = nullptr);
     GameFiltersSettings(const GameFiltersSettings & /*other*/);
 
     QString hashGameType(const QString &gameType) const;

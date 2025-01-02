@@ -1,6 +1,6 @@
 #include "message_settings.h"
 
-MessageSettings::MessageSettings(QString settingPath, QObject *parent)
+MessageSettings::MessageSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "messages.ini", parent)
 {
 }

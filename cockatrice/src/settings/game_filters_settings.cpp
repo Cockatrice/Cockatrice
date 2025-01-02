@@ -3,7 +3,7 @@
 #include <QCryptographicHash>
 #include <QTime>
 
-GameFiltersSettings::GameFiltersSettings(QString settingPath, QObject *parent)
+GameFiltersSettings::GameFiltersSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "gamefilters.ini", parent)
 {
 }

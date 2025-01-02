@@ -1,7 +1,7 @@
 
 #include "mocks.h"
 
-CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent)
+CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardDatabase.ini", parent)
 {
 }

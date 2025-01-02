@@ -8,7 +8,7 @@ class RecentsSettings : public SettingsManager
     Q_OBJECT
     friend class SettingsCache;
 
-    explicit RecentsSettings(QString settingPath, QObject *parent = nullptr);
+    explicit RecentsSettings(const QString &settingPath, QObject *parent = nullptr);
     RecentsSettings(const RecentsSettings & /*other*/);
 
 public:

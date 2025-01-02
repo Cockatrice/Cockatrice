@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <utility>
 
-ServersSettings::ServersSettings(QString settingPath, QObject *parent)
+ServersSettings::ServersSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "servers.ini", parent)
 {
 }

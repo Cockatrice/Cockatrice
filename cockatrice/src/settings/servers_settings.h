@@ -61,7 +61,7 @@ public:
     bool getClearDebugLogStatus(bool abDefaultValue);
 
 private:
-    explicit ServersSettings(QString settingPath, QObject *parent = nullptr);
+    explicit ServersSettings(const QString &settingPath, QObject *parent = nullptr);
     ServersSettings(const ServersSettings & /*other*/);
 };
 
