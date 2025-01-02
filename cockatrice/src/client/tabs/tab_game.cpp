@@ -294,12 +294,16 @@ void DeckViewContainer::loadLocalDeck()
     if (!dialog.exec())
         return;
 
-    QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    loadDeckFromFile(dialog.selectedFiles().at(0));
+}
+
+void DeckViewContainer::loadDeckFromFile(const QString &filePath)
+{
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(filePath);
     QString deckString;
     DeckLoader deck;
 
-    bool error = !deck.loadFromFile(fileName, fmt);
+    bool error = !deck.loadFromFile(filePath, fmt);
     if (!error) {
         deckString = deck.writeToString_Native();
         error = deckString.length() > MAX_FILE_LENGTH;
