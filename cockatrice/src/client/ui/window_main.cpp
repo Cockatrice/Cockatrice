@@ -886,6 +886,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
+        startLocalGame(SettingsCache::instance().debug().getLocalGamePlayerCount());
+    }
+
     if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
         actCheckClientUpdates();
     }
