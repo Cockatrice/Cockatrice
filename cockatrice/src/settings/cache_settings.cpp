@@ -181,6 +181,7 @@ SettingsCache::SettingsCache()
     downloadSettings = new DownloadSettings(settingsPath, this);
     recentsSettings = new RecentsSettings(settingsPath, this);
     cardOverrideSettings = new CardOverrideSettings(settingsPath, this);
+    debugSettings = new DebugSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();

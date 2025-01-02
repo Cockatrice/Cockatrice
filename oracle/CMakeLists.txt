@@ -33,6 +33,7 @@ set(oracle_SOURCES
     ../cockatrice/src/settings/layouts_settings.cpp
     ../cockatrice/src/settings/download_settings.cpp
     ../cockatrice/src/settings/card_override_settings.cpp
+    ../cockatrice/src/settings/debug_settings.cpp
     ../cockatrice/src/client/ui/theme_manager.cpp
     ../cockatrice/src/client/network/release_channel.cpp
     ${VERSION_STRING_CPP}
