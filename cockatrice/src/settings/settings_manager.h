@@ -14,10 +14,6 @@ public:
     QVariant getValue(const QString &name, const QString &group = "", const QString &subGroup = "");
     void sync();
 
-signals:
-
-public slots:
-
 protected:
     QSettings settings;
     void setValue(const QVariant &value, const QString &name, const QString &group = "", const QString &subGroup = "");
