@@ -294,12 +294,16 @@ void DeckViewContainer::loadLocalDeck()
     if (!dialog.exec())
         return;
 
-    QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    loadDeckFromFile(dialog.selectedFiles().at(0));
+}
+
+void DeckViewContainer::loadDeckFromFile(const QString &filePath)
+{
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(filePath);
     QString deckString;
     DeckLoader deck;
 
-    bool error = !deck.loadFromFile(fileName, fmt);
+    bool error = !deck.loadFromFile(filePath, fmt);
     if (!error) {
         deckString = deck.writeToString_Native();
         error = deckString.length() > MAX_FILE_LENGTH;
@@ -376,6 +380,18 @@ void DeckViewContainer::setReadyStart(bool ready)
     readyStartButton->setState(ready);
     deckView->setLocked(ready || !sideboardLockButton->getState());
     sideboardLockButton->setEnabled(!readyStartButton->getState() && readyStartButton->isEnabled());
+}
+
+/**
+ * Sets the ready start to true, then sends the ready command so the server responds to the update
+ */
+void DeckViewContainer::readyAndUpdate()
+{
+    setReadyStart(true);
+
+    Command_ReadyStart cmd;
+    cmd.set_ready(true);
+    parentGame->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::setSideboardLocked(bool locked)
@@ -860,6 +876,15 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
         connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
         deckViewContainers.insert(playerId, deckView);
         deckViewContainerLayout->addWidget(deckView);
+
+        // auto load deck for player if that debug setting is enabled
+        QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getName());
+        if (!deckPath.isEmpty()) {
+            QTimer::singleShot(0, this, [deckView, deckPath] {
+                deckView->loadDeckFromFile(deckPath);
+                deckView->readyAndUpdate();
+            });
+        }
     }
 
     gameMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());

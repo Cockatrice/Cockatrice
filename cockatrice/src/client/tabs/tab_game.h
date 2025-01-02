@@ -110,8 +110,10 @@ public:
     void retranslateUi();
     void setButtonsVisible(bool _visible);
     void setReadyStart(bool ready);
+    void readyAndUpdate();
     void setSideboardLocked(bool locked);
     void setDeck(const DeckLoader &deck);
+    void loadDeckFromFile(const QString &filePath);
 };
 
 class TabGame : public Tab
