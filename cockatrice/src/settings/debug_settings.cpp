@@ -1,6 +1,7 @@
 #include "debug_settings.h"
 
-DebugSettings::DebugSettings(QString settingPath, QObject *parent) : SettingsManager(settingPath + "debug.ini", parent)
+DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
+    : SettingsManager(settingPath + "debug.ini", parent)
 {
 }
 
