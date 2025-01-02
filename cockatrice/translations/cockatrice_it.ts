@@ -339,25 +339,25 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
         <location filename="src/game/filters/filter_card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
-        <translation>AND</translation>
+        <translation>E</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
-        <translation>OR</translation>
+        <translation>O</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
-        <translation>AND NOT</translation>
+        <translation>E NON</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
-        <translation>OR NOT</translation>
+        <translation>O NON</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="23"/>
@@ -614,7 +614,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
         <location filename="src/dialogs/dlg_settings.cpp" line="895"/>
         <location filename="src/dialogs/dlg_settings.cpp" line="958"/>
         <source>Update Spoilers</source>
-        <translation>Aggiorna spoiler</translation>
+        <translation>Aggiorna Spoiler</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="789"/>
