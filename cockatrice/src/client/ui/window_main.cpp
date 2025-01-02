@@ -223,6 +223,11 @@ void MainWindow::actSinglePlayer()
     if (!ok)
         return;
 
+    startLocalGame(numberPlayers);
+}
+
+void MainWindow::startLocalGame(int numberPlayers)
+{
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
     aForgotPassword->setEnabled(false);
