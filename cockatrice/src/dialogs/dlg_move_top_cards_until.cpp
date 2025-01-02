@@ -59,8 +59,8 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint 
  */
 static bool matchExistsInDb(const FilterString &filterString)
 {
-    const auto cardDatabase = CardDatabaseManager::getInstance();
-    const auto allCards = cardDatabase->getCardList();
+    const auto *cardDatabase = CardDatabaseManager::getInstance();
+    const auto &allCards = cardDatabase->getCardList();
 
     const auto it = std::find_if(allCards.begin(), allCards.end(),
                                  [&filterString](const CardInfoPtr &card) { return filterString.check(card); });
