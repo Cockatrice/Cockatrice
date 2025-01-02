@@ -7,5 +7,5 @@ DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
 
 bool DebugSettings::getShowCardId()
 {
-    return getValue("show", "cardId").toBool();
+    return getValue("showCardId", "debug").toBool();
 }
