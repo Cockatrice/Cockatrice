@@ -11,7 +11,7 @@ class SettingsManager : public QObject
     Q_OBJECT
 public:
     explicit SettingsManager(const QString &settingPath, QObject *parent = nullptr);
-    QVariant getValue(QString name, QString group = "", QString subGroup = "");
+    QVariant getValue(const QString &name, const QString &group = "", const QString &subGroup = "");
     void sync();
 
 signals:
@@ -20,8 +20,8 @@ public slots:
 
 protected:
     QSettings settings;
-    void setValue(QVariant value, QString name, QString group = "", QString subGroup = "");
-    void deleteValue(QString name, QString group = "", QString subGroup = "");
+    void setValue(const QVariant &value, const QString &name, const QString &group = "", const QString &subGroup = "");
+    void deleteValue(const QString &name, const QString &group = "", const QString &subGroup = "");
 };
 
 #endif // SETTINGSMANAGER_H
