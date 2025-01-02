@@ -130,6 +130,7 @@ set(cockatrice_SOURCES
     src/settings/shortcuts_settings.cpp
     src/settings/shortcut_treeview.cpp
     src/settings/card_override_settings.cpp
+    src/settings/debug_settings.cpp
     src/client/sound_engine.cpp
     src/client/network/spoiler_background_updater.cpp
     src/game/zones/stack_zone.cpp

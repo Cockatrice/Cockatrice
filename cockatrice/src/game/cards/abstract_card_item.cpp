@@ -141,8 +141,13 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         QString nameStr;
         if (facedown)
             nameStr = "# " + QString::number(id);
-        else
-            nameStr = name;
+        else {
+            QString prefix = "";
+            if (SettingsCache::instance().debug().getShowCardId()) {
+                prefix = "#" + QString::number(id) + " ";
+            }
+            nameStr = prefix + name;
+        }
         painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
                                  translatedSize.height() - 6 * scaleFactor),
                           Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, nameStr);
