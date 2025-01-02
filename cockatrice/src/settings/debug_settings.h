@@ -15,6 +15,8 @@ public:
 
     bool getLocalGameOnStartup();
     int getLocalGamePlayerCount();
+
+    QString getDeckPathForPlayer(const QString &playerName);
 };
 
 #endif // DEBUG_SETTINGS_H

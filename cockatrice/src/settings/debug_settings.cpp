@@ -25,3 +25,8 @@ int DebugSettings::getLocalGamePlayerCount()
 {
     return getValue("playerCount", "localgame").toInt();
 }
+
+QString DebugSettings::getDeckPathForPlayer(const QString &playerName)
+{
+    return getValue(playerName, "localgame", "deck").toString();
+}
