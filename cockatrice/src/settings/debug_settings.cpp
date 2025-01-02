@@ -15,3 +15,13 @@ bool DebugSettings::getShowCardId()
 {
     return getValue("showCardId", "debug").toBool();
 }
+
+bool DebugSettings::getLocalGameOnStartup()
+{
+    return getValue("onStartup", "localgame").toBool();
+}
+
+int DebugSettings::getLocalGamePlayerCount()
+{
+    return getValue("playerCount", "localgame").toInt();
+}

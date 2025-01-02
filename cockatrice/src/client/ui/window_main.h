@@ -126,6 +126,8 @@ private:
     };
     void exitCardDatabaseUpdate();
 
+    void startLocalGame(int numberPlayers);
+
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,

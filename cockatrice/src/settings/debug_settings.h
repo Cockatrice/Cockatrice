@@ -12,6 +12,9 @@ class DebugSettings : public SettingsManager
 
 public:
     bool getShowCardId();
+
+    bool getLocalGameOnStartup();
+    int getLocalGamePlayerCount();
 };
 
 #endif // DEBUG_SETTINGS_H
