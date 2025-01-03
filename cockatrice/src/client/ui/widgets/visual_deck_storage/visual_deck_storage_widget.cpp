@@ -22,6 +22,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     sortComboBox = new QComboBox(this);
     sortComboBox->addItem("Sort Alphabetically (Filename)", Alphabetical);
     sortComboBox->addItem("Sort by Last Modified", ByLastModified);
+    sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
 
     searchWidget = new VisualDeckStorageSearchWidget(this);
 
@@ -43,12 +44,13 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 void VisualDeckStorageWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    refreshBannerCards();
+    updateSortOrder();
 }
 
 void VisualDeckStorageWidget::updateSortOrder()
 {
     sortOrder = static_cast<SortOrder>(sortComboBox->currentData().toInt());
+    SettingsCache::instance().setVisualDeckStorageSortingOrder(sortComboBox->currentData().toInt());
     refreshBannerCards(); // Refresh the banner cards with the new sort order
 }
 

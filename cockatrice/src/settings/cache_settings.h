@@ -124,6 +124,7 @@ private:
     bool printingSelectorSearchBarVisible;
     bool printingSelectorCardSizeSliderVisible;
     bool printingSelectorNavigationButtonsVisible;
+    int visualDeckStorageSortingOrder;
     int visualDeckStorageCardSize;
     bool visualDeckStorageShowOnLoad;
     bool horizontalHand;
@@ -371,6 +372,10 @@ public:
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
         return printingSelectorNavigationButtonsVisible;
+    }
+    int getVisualDeckStorageSortingOrder() const
+    {
+        return visualDeckStorageSortingOrder;
     }
     int getVisualDeckStorageCardSize() const
     {
@@ -688,6 +693,7 @@ public slots:
     void setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible);
     void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
+    void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T _visualDeckStorageShowOnLoad);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
