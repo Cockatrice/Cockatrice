@@ -33,7 +33,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
-      isReversed(_isReversed), firstCardId(-1), latestZoneSize(numberCards), firstResize(true)
+      isReversed(_isReversed), firstCardId(-1)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
