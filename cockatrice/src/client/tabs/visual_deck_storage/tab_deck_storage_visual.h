@@ -29,7 +29,7 @@ public:
     void retranslateUi() override;
     QString getTabText() const override
     {
-        return tr("Deck storage");
+        return tr("Visual Deck storage");
     }
 public slots:
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
