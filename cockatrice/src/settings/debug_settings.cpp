@@ -8,6 +8,11 @@ DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
     // force debug.ini to be created if it doesn't exist yet
     if (!QFile(settingPath + "debug.ini").exists()) {
         setValue(false, "showCardId", "debug");
+
+        setValue(false, "onStartup", "localgame");
+        setValue(1, "playerCount", "localgame");
+        setValue("path/to/deck", "Player 1", "localgame", "deck");
+        setValue("path/to/deck", "Player 2", "localgame", "deck");
     }
 }
 
