@@ -191,6 +191,9 @@ void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED
 void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
 {
 }
+void SettingsCache::setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T /* _visualDeckStorageShowOnLoad */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }

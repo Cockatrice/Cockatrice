@@ -125,6 +125,7 @@ private:
     bool printingSelectorCardSizeSliderVisible;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageCardSize;
+    bool visualDeckStorageShowOnLoad;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -374,6 +375,10 @@ public:
     int getVisualDeckStorageCardSize() const
     {
         return visualDeckStorageCardSize;
+    }
+    bool getVisualDeckStorageShowOnLoad() const
+    {
+        return visualDeckStorageShowOnLoad;
     }
     bool getHorizontalHand() const
     {
@@ -684,6 +689,7 @@ public slots:
     void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
+    void setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T _visualDeckStorageShowOnLoad);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
