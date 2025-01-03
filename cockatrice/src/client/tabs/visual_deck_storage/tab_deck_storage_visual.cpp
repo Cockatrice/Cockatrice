@@ -52,10 +52,15 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
             &TabDeckStorageVisual::actOpenLocalDeck);
 
-    layout->addWidget(leftToolBar);
+    // layout->addWidget(leftToolBar);
     layout->addWidget(visualDeckStorageWidget);
 
     retranslateUi();
+}
+
+void TabDeckStorageVisual::closeRequest()
+{
+    this->close();
 }
 
 void TabDeckStorageVisual::retranslateUi()

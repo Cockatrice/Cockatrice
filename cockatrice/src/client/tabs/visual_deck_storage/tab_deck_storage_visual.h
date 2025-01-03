@@ -25,6 +25,7 @@ class TabDeckStorageVisual final : public Tab
     Q_OBJECT
 public:
     TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+
     void retranslateUi();
     QString getTabText() const
     {
@@ -32,6 +33,7 @@ public:
     }
 public slots:
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void closeRequest() override;
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
 
