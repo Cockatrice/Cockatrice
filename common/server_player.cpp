@@ -482,7 +482,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                         (thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown());
 
         bool sourceBeingLookedAt;
-        int position = startzone->removeCard(card, sourceBeingLookedAt, isReversed);
+        int position = startzone->removeCard(card, sourceBeingLookedAt);
 
         // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
         // reorder their hand). If a just-drawn card leaves the hand then remove cards before it from the list
