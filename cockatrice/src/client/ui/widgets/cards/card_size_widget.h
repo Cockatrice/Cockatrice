@@ -15,11 +15,11 @@ class CardSizeWidget : public QWidget
 public:
     explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr, int defaultValue = 100);
     [[nodiscard]] QSlider *getSlider() const;
+    QWidget *parent;
 public slots:
-    static void updateCardSizeSetting(int newValue);
+    void updateCardSizeSetting(int newValue);
 
 private:
-    QWidget *parent;
     FlowWidget *flowWidget;
     QHBoxLayout *cardSizeLayout;
     QLabel *cardSizeLabel;

@@ -1,6 +1,8 @@
 #include "card_size_widget.h"
 
 #include "../../../../settings/cache_settings.h"
+#include "../printing_selector/printing_selector.h"
+#include "../visual_deck_storage/visual_deck_storage_widget.h"
 
 /**
  * @class CardSizeWidget
@@ -40,7 +42,12 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defa
  */
 void CardSizeWidget::updateCardSizeSetting(int newValue)
 {
-    SettingsCache::instance().setPrintingSelectorCardSize(newValue);
+    // Check the type of the parent widget
+    if ((parent = qobject_cast<PrintingSelector *>(parentWidget()))) {
+        SettingsCache::instance().setPrintingSelectorCardSize(newValue);
+    } else if ((parent = qobject_cast<VisualDeckStorageWidget *>(parentWidget()))) {
+        SettingsCache::instance().setVisualDeckStorageCardSize(newValue);
+    }
 }
 
 /**

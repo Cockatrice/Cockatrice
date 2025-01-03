@@ -250,7 +250,7 @@ class DeckList : public QObject
 {
     Q_OBJECT
 private:
-    QString name, comments;
+    QString name, comments, bannerCard;
     QString deckHash;
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
@@ -279,6 +279,10 @@ public slots:
     {
         comments = _comments;
     }
+    void setBannerCard(const QString &_bannerCard = QString())
+    {
+        bannerCard = _bannerCard;
+    }
 
 public:
     explicit DeckList();
@@ -292,6 +296,10 @@ public:
     QString getComments() const
     {
         return comments;
+    }
+    QString getBannerCard() const
+    {
+        return bannerCard;
     }
     QList<MoveCard_ToZone> getCurrentSideboardPlan();
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);

@@ -96,16 +96,12 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     // Call the base class's paintEvent to draw the card image
     CardInfoPictureWidget::paintEvent(event);
 
-    // Now add the custom text overlay on top of the image
+    // If no overlay text, skip drawing the text
     if (overlayText.isEmpty()) {
         return;
     }
-    QStylePainter painter(this);
 
-    // Set text properties
-    QFont font = painter.font();
-    font.setPointSize(fontSize);
-    painter.setFont(font);
+    QStylePainter painter(this);
 
     // Get the pixmap from the base class using the getter
     const QPixmap &pixmap = getResizedPixmap();
@@ -118,13 +114,34 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
     const QRect pixmapRect(topLeft, scaledSize);
 
-    // Prepare text wrapping
-    const QFontMetrics fontMetrics(font);
-    const int lineHeight = fontMetrics.height();
-    const int textWidth = pixmapRect.width();
-    QString wrappedText;
+    // Calculate the optimal font size
+    QFont font = painter.font();
+    int optimalFontSize = fontSize; // Start with the user-defined font size
+    const QFontMetrics baseMetrics(font);
+    int textWidth = pixmapRect.width();
 
-    // Break the text into multiple lines to fit within the pixmap width
+    // Reduce the font size until the text fits within the pixmap's width
+    do {
+        font.setPointSize(optimalFontSize);
+        QFontMetrics fm(font);
+        int currentWidth = 0;
+        for (const QString &word : overlayText.split(' ')) {
+            currentWidth = std::max(currentWidth, fm.horizontalAdvance(word));
+        }
+
+        if (currentWidth <= textWidth) {
+            break;
+        }
+
+        --optimalFontSize;
+    } while (optimalFontSize > 1);
+
+    // Apply the calculated font size
+    painter.setFont(font);
+
+    // Wrap the text to fit within the pixmap width
+    const QFontMetrics fontMetrics(font);
+    QString wrappedText;
     QString currentLine;
     QStringList words = overlayText.split(' ');
     for (const QString &word : words) {
@@ -141,13 +158,22 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     wrappedText += currentLine;
 
     // Calculate total text block height
-    const int totalTextHeight = static_cast<int>(wrappedText.count('\n')) * lineHeight + lineHeight;
+    int totalTextHeight = wrappedText.count('\n') * fontMetrics.height() + fontMetrics.height();
+
+    // Adjust font size if the total text height exceeds the pixmap height
+    while (totalTextHeight > pixmapRect.height() && optimalFontSize > 1) {
+        --optimalFontSize;
+        font.setPointSize(optimalFontSize);
+        painter.setFont(font);
+        const QFontMetrics newMetrics(font);
+        totalTextHeight = wrappedText.count('\n') * newMetrics.height() + newMetrics.height();
+    }
 
     // Set up the text layout options
     QTextOption textOption;
     textOption.setAlignment(textAlignment);
 
-    // Create a text rectangle centered within the pixmap rect
+    // Create a text rectangle centered vertically within the pixmap rect
     auto textRect = QRect(pixmapRect.left(), pixmapRect.top(), pixmapRect.width(), totalTextHeight);
     textRect.moveTop((pixmapRect.height() - totalTextHeight) / 2 + pixmapRect.top());
 
@@ -169,7 +195,6 @@ void CardInfoPictureWithTextOverlayWidget::drawOutlinedText(QPainter &painter,
                                                             const QString &text,
                                                             const QTextOption &textOption) const
 {
-    // Draw the black outline (outlineColor)
     painter.setPen(outlineColor);
     for (int dx = -1; dx <= 1; ++dx) {
         for (int dy = -1; dy <= 1; ++dy) {
@@ -180,7 +205,7 @@ void CardInfoPictureWithTextOverlayWidget::drawOutlinedText(QPainter &painter,
         }
     }
 
-    // Draw the main text (textColor)
+    // Draw the main text
     painter.setPen(textColor);
     painter.drawText(textRect, text, textOption);
 }
