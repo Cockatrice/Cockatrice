@@ -5,9 +5,9 @@
 DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "debug.ini", parent)
 {
-    // force debug.ini to be created if it doesn't exist yet
+    // Create the default debug.ini if it doesn't exist yet
     if (!QFile(settingPath + "debug.ini").exists()) {
-        setValue(false, "showCardId", "debug");
+        QFile::copy(":/resources/config/debug.ini", settingPath + "debug.ini");
     }
 }
 
