@@ -65,7 +65,6 @@ void TabDeckStorageVisual::closeRequest()
 
 void TabDeckStorageVisual::retranslateUi()
 {
-
     aOpenLocalDeck->setText(tr("Open in deck editor"));
     aDeleteLocalDeck->setText(tr("Delete"));
 }

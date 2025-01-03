@@ -34,6 +34,8 @@ public:
 public slots:
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void closeRequest() override;
+    void actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void actDeleteLocalDeck();
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
 
@@ -49,9 +51,6 @@ private:
     DeckListModel *deck_list_model;
     QAction *aOpenLocalDeck, *aDeleteLocalDeck;
     QString getTargetPath() const;
-private slots:
-    void actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
-    void actDeleteLocalDeck();
 };
 
 #endif

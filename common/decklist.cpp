@@ -368,7 +368,7 @@ DeckList::DeckList()
 
 // TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
-    : QObject(), name(other.name), comments(other.comments), deckHash(other.deckHash)
+    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard), deckHash(other.deckHash)
 {
     root = new InnerDecklistNode(other.getRoot());
 
@@ -425,6 +425,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             comments = xml->readElementText();
         else if (childName == "bannerCard") {
             bannerCard = xml->readElementText();
+            qDebug() << "Deckloader found the banner card " << bannerCard;
         } else if (childName == "zone") {
             InnerDecklistNode *newZone = getZoneObjFromName(xml->attributes().value("name").toString());
             newZone->readElement(xml);

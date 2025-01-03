@@ -1507,10 +1507,14 @@ void TabDeckEditor::actDecrement()
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
 {
+    qDebug() << " ORIGINAL BANNER CARD " << _deck->getBannerCard();
     deckModel->setDeckList(_deck);
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
+    qDebug() << deckModel->getDeckList()->getBannerCard() << " was the banner card";
+    bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard());
+    updateBannerCardComboBox();
     updateHash();
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
     deckView->expandAll();
