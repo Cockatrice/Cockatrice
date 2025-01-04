@@ -179,7 +179,8 @@ public:
                                     int xCoord,
                                     int yCoord,
                                     bool fixFreeSpaces = true,
-                                    bool undoingDraw = false);
+                                    bool undoingDraw = false,
+                                    bool isReversed = false);
     void unattachCard(GameEventStorage &ges, Server_Card *card);
     Response::ResponseCode setCardAttrHelper(GameEventStorage &ges,
                                              int targetPlayerId,

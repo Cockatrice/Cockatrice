@@ -7,4 +7,5 @@ message Command_DumpZone {
     optional sint32 player_id = 1 [default = -1];
     optional string zone_name = 2;
     optional sint32 number_cards = 3;
+    optional bool is_reversed = 4 [default = false];
 }

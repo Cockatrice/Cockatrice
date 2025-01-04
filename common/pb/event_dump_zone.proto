@@ -8,4 +8,5 @@ message Event_DumpZone {
     optional sint32 zone_owner_id = 1;
     optional string zone_name = 2;
     optional sint32 number_cards = 3;
+    optional bool is_reversed = 4 [default = false];
 }
