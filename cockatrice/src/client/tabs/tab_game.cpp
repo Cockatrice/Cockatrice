@@ -765,6 +765,12 @@ void TabGame::actSay()
     if (completer->popup()->isVisible())
         return;
 
+    if (sayEdit->text().startsWith("/card ")) {
+        cardInfoFrameWidget->setCard(sayEdit->text().mid(6));
+        sayEdit->clear();
+        return;
+    }
+
     if (!sayEdit->text().isEmpty()) {
         Command_GameSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
