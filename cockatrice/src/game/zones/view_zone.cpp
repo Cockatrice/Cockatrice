@@ -108,12 +108,12 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         }
     }
     previousOrigSize = origZone->getCards().size();
+    updateCardIds(false);
     reorganizeCards();
     emit cardCountChanged();
 }
 
-// Because of boundingRect(), this function must not be called before the zone was added to a scene.
-void ZoneViewZone::reorganizeCards()
+void ZoneViewZone::updateCardIds(bool /*isRemoval*/)
 {
     int cardCount = cards.size();
     if (!origZone->contentsKnown()) {
@@ -138,7 +138,11 @@ void ZoneViewZone::reorganizeCards()
             cards[i]->setId(i + startId);
         }
     }
+}
 
+// Because of boundingRect(), this function must not be called before the zone was added to a scene.
+void ZoneViewZone::reorganizeCards()
+{
     CardList cardsToDisplay(cards);
 
     // sort cards
@@ -287,6 +291,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
     }
     card->setParentItem(this);
     card->update();
+    updateCardIds(false);
     reorganizeCards();
 }
 
@@ -325,6 +330,7 @@ void ZoneViewZone::removeCard(int position)
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
+    updateCardIds(false);
     reorganizeCards();
 }
 

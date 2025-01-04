@@ -38,6 +38,8 @@ private:
     int firstCardId;
     int previousOrigSize;
 
+    void updateCardIds(bool isRemoval);
+
     struct GridSize
     {
         int rows;
