@@ -121,7 +121,7 @@ void ZoneViewZone::updateCardIds(CardAction action)
 
         if (isReversed) {
             // these get called after this zone's card list updates but before parent zone's card list updates
-            startId = origZone->getCards().size() - cards.size();
+            startId = origZone->getCards().size() - cardCount;
             switch (action) {
                 case INITIALIZE:
                     break;
