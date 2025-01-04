@@ -200,11 +200,11 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
     if (position >= cards.size())
         return nullptr;
 
-    CardItem *c = cards.takeAt(position);
-
     for (auto *view : views) {
         view->removeCard(position);
     }
+
+    CardItem *c = cards.takeAt(position);
 
     c->setId(cardId);
 

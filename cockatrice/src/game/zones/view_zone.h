@@ -36,6 +36,7 @@ private:
     bool pileView;
     bool isReversed;
     int firstCardId;
+    int previousOrigSize;
 
     struct GridSize
     {

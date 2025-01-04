@@ -33,7 +33,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
-      isReversed(_isReversed), firstCardId(-1)
+      isReversed(_isReversed), firstCardId(-1), previousOrigSize(-1)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -107,6 +107,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
             firstCardId = cardInfo.id();
         }
     }
+    previousOrigSize = origZone->getCards().size();
     reorganizeCards();
     emit cardCountChanged();
 }
@@ -125,6 +126,11 @@ void ZoneViewZone::reorganizeCards()
         if (isReversed) {
             if (cards.first()->getId() != firstCardId) {
                 startId -= 1;
+            }
+            if (origZone->getCards().size() != previousOrigSize) {
+                qDebug() << "TRACK origZoneSize changed" << "orig" << origZone->getCards().size() << "prev"
+                         << previousOrigSize;
+                previousOrigSize = origZone->getCards().size();
             }
         }
 
@@ -231,7 +237,7 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         if (cols < 2)
             cols = 2;
 
-         qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+        qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
