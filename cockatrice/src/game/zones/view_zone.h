@@ -38,7 +38,14 @@ private:
     int firstCardId;
     int previousOrigSize;
 
-    void updateCardIds(bool isRemoval);
+    enum CardAction
+    {
+        INITIALIZE,
+        ADD_CARD,
+        REMOVE_CARD
+    };
+
+    void updateCardIds(CardAction action, int index);
 
     struct GridSize
     {

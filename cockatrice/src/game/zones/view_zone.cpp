@@ -108,12 +108,12 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         }
     }
     previousOrigSize = origZone->getCards().size();
-    updateCardIds(false);
+    updateCardIds(INITIALIZE, -1);
     reorganizeCards();
     emit cardCountChanged();
 }
 
-void ZoneViewZone::updateCardIds(bool /*isRemoval*/)
+void ZoneViewZone::updateCardIds(CardAction action, int index)
 {
     int cardCount = cards.size();
     if (!origZone->contentsKnown()) {
@@ -127,11 +127,28 @@ void ZoneViewZone::updateCardIds(bool /*isRemoval*/)
             if (cards.first()->getId() != firstCardId) {
                 startId -= 1;
             }
+
+            qDebug() << "TRACK" << "action" << action << "index" << index << "startId" << startId;
+            switch (action) {
+                case INITIALIZE:
+                    break;
+                case ADD_CARD:
+                    if (index > startId) {
+                        startId += 1;
+                    }
+                    break;
+                case REMOVE_CARD:
+                    startId -= 1;
+                    break;
+            }
+            /*if (cards.first()->getId() != firstCardId) {
+                startId -= 1;
+            }
             if (origZone->getCards().size() != previousOrigSize) {
                 qDebug() << "TRACK origZoneSize changed" << "orig" << origZone->getCards().size() << "prev"
                          << previousOrigSize;
                 previousOrigSize = origZone->getCards().size();
-            }
+            }*/
         }
 
         for (int i = 0; i < cardCount; ++i) {
@@ -291,7 +308,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
     }
     card->setParentItem(this);
     card->update();
-    updateCardIds(false);
+    updateCardIds(ADD_CARD, x);
     reorganizeCards();
 }
 
@@ -314,11 +331,12 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     player->sendGameCommand(cmd);
 }
 
-void ZoneViewZone::removeCard(int position)
+void ZoneViewZone::removeCard(const int position)
 {
     if (isReversed) {
-        position -= cards.first()->getId();
-        if (position < 0 || position >= cards.size()) {
+        int bottomPos = position - cards.first()->getId();
+        if (bottomPos < 0 || bottomPos >= cards.size()) {
+            updateCardIds(REMOVE_CARD, bottomPos);
             reorganizeCards();
             return;
         }
@@ -330,7 +348,7 @@ void ZoneViewZone::removeCard(int position)
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
-    updateCardIds(false);
+    updateCardIds(REMOVE_CARD, position);
     reorganizeCards();
 }
 
