@@ -121,34 +121,26 @@ void ZoneViewZone::updateCardIds(CardAction action, int index)
             return;
         }
 
-        auto startId = isReversed ? cards.first()->getId() : 0;
+        auto startId = 0;
 
         if (isReversed) {
-            if (cards.first()->getId() != firstCardId) {
-                startId -= 1;
-            }
+            startId = origZone->getCards().size() - cards.size();
 
             qDebug() << "TRACK" << "action" << action << "index" << index << "startId" << startId;
+            // these get called after this zone's card list updates but before parent zone's card list updates
             switch (action) {
                 case INITIALIZE:
                     break;
                 case ADD_CARD:
-                    if (index > startId) {
+                    if (index < cards.first()->getId()) {
                         startId += 1;
                     }
+                    startId += 1;
                     break;
                 case REMOVE_CARD:
                     startId -= 1;
                     break;
             }
-            /*if (cards.first()->getId() != firstCardId) {
-                startId -= 1;
-            }
-            if (origZone->getCards().size() != previousOrigSize) {
-                qDebug() << "TRACK origZoneSize changed" << "orig" << origZone->getCards().size() << "prev"
-                         << previousOrigSize;
-                previousOrigSize = origZone->getCards().size();
-            }*/
         }
 
         for (int i = 0; i < cardCount; ++i) {

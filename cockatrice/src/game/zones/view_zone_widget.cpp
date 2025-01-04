@@ -108,7 +108,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     vbox->addItem(zoneHBox);
 
-    zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer, _isReversed);
+    zone =
+        new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer, _isReversed);
     connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
             SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
 

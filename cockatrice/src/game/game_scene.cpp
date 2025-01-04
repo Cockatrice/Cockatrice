@@ -151,7 +151,8 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
         }
     }
 
-    ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
+    ZoneViewWidget *item =
+        new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
     zoneViews.append(item);
     connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
