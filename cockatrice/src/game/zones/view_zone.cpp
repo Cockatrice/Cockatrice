@@ -33,7 +33,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
-      isReversed(_isReversed), firstCardId(-1), previousOrigSize(-1)
+      isReversed(_isReversed)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -102,18 +102,14 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
         auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), revealZone, this);
         cards.insert(i, card);
-
-        if (i == 0) {
-            firstCardId = cardInfo.id();
-        }
     }
-    previousOrigSize = origZone->getCards().size();
-    updateCardIds(INITIALIZE, -1);
+
+    updateCardIds(INITIALIZE);
     reorganizeCards();
     emit cardCountChanged();
 }
 
-void ZoneViewZone::updateCardIds(CardAction action, int index)
+void ZoneViewZone::updateCardIds(CardAction action)
 {
     int cardCount = cards.size();
     if (!origZone->contentsKnown()) {
@@ -124,10 +120,8 @@ void ZoneViewZone::updateCardIds(CardAction action, int index)
         auto startId = 0;
 
         if (isReversed) {
-            startId = origZone->getCards().size() - cards.size();
-
-            qDebug() << "TRACK" << "action" << action << "index" << index << "startId" << startId;
             // these get called after this zone's card list updates but before parent zone's card list updates
+            startId = origZone->getCards().size() - cards.size();
             switch (action) {
                 case INITIALIZE:
                     break;
@@ -290,7 +284,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
         if (x != 0) {
             cards.append(card);
         } else {
-            updateCardIds(ADD_CARD, x);
+            updateCardIds(ADD_CARD);
             reorganizeCards();
             return;
         }
@@ -300,7 +294,8 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
     card->setParentItem(this);
     card->update();
-    updateCardIds(ADD_CARD, x);
+
+    updateCardIds(ADD_CARD);
     reorganizeCards();
 }
 
@@ -326,10 +321,9 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 void ZoneViewZone::removeCard(int position)
 {
     if (isReversed) {
-        int initialPos = position;
         position -= cards.first()->getId();
         if (position < 0 || position >= cards.size()) {
-            updateCardIds(REMOVE_CARD, initialPos);
+            updateCardIds(REMOVE_CARD);
             reorganizeCards();
             return;
         }
@@ -341,7 +335,7 @@ void ZoneViewZone::removeCard(int position)
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
-    updateCardIds(REMOVE_CARD, position);
+    updateCardIds(REMOVE_CARD);
     reorganizeCards();
 }
 
