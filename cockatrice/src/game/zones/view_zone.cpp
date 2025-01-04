@@ -278,20 +278,24 @@ void ZoneViewZone::setPileView(int _pileView)
 
 void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-    // if x is negative set it to add at end
-    if (x < 0 || x >= cards.size()) {
-        x = cards.size();
-    }
-
-    if (isReversed) {
-        if (x != 0) {
-            cards.append(card);
+    if (!isReversed) {
+        // if x is negative set it to add at end
+        if (x < 0) {
+            x = cards.size();
+        }
+        cards.insert(x, card);
+    } else {
+        // map x (which is in origZone indexes) to this viewZone's cardList index
+        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
+        int insertionIndex = x - firstId;
+        if (insertionIndex >= 0) {
+            // card was put into a portion of the deck that's in the view
+            cards.insert(insertionIndex, card);
         } else {
+            // card was put into a portion of the deck that's not in the view
             updateCardIds(ADD_CARD);
             return;
         }
-    } else {
-        cards.insert(x, card);
     }
 
     card->setParentItem(this);
