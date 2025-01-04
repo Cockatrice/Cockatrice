@@ -132,9 +132,6 @@ void ZoneViewZone::updateCardIds(CardAction action, int index)
                 case INITIALIZE:
                     break;
                 case ADD_CARD:
-                    if (index < cards.first()->getId()) {
-                        startId += 1;
-                    }
                     startId += 1;
                     break;
                 case REMOVE_CARD:
@@ -293,11 +290,14 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
         if (x != 0) {
             cards.append(card);
         } else {
+            updateCardIds(ADD_CARD, x);
+            reorganizeCards();
             return;
         }
     } else {
         cards.insert(x, card);
     }
+
     card->setParentItem(this);
     card->update();
     updateCardIds(ADD_CARD, x);
