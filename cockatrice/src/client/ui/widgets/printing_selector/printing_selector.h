@@ -37,6 +37,9 @@ public slots:
     void toggleVisibilityCardSizeSlider(bool _state);
     void toggleVisibilityNavigationButtons(bool _state);
 
+private slots:
+    void printingsInDeckChanged();
+
 private:
     QVBoxLayout *layout;
     PrintingSelectorViewOptionsToolbarWidget *viewOptionsToolbar;

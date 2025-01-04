@@ -57,10 +57,14 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     layout->addWidget(cardSelectionBar);
 
     // Connect deck model data change signal to update display
-    connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
-        // Delay the update to avoid race conditions
-        QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
-    });
+    connect(deckModel, &DeckListModel::rowsInserted, this, &PrintingSelector::printingsInDeckChanged);
+    connect(deckModel, &DeckListModel::rowsRemoved, this, &PrintingSelector::printingsInDeckChanged);
+}
+
+void PrintingSelector::printingsInDeckChanged()
+{
+    // Delay the update to avoid race conditions
+    QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
 }
 
 /**
@@ -89,6 +93,12 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_curre
     if (newCard.isNull()) {
         return;
     }
+
+    // we don't need to redraw the widget if the card is the same
+    if (!selectedCard.isNull() && selectedCard->getName() == newCard->getName()) {
+        return;
+    }
+
     selectedCard = newCard;
     currentZone = _currentZone;
     if (isVisible()) {
