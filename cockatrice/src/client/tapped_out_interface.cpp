@@ -115,7 +115,7 @@ struct CopyMainOrSide
     }
 };
 
-void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard)
+void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     CopyMainOrSide copyMainOrSide(cardDatabase, mainboard, sideboard);
     source.forEachCard(copyMainOrSide);

@@ -176,6 +176,42 @@ QString DeckLoader::exportDeckToDecklist()
     return deckString;
 }
 
+// This struct is here to support the forEachCard function call, defined in decklist.
+// It requires a function to be called for each card, and it will set the providerId.
+struct SetProviderId
+{
+    // Main operator for struct, allowing the foreachcard to work.
+    SetProviderId()
+    {
+    }
+
+    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
+    {
+        Q_UNUSED(node);
+        // Retrieve the providerId based on setName and collectorNumber
+        QString providerId =
+            CardDatabaseManager::getInstance()
+                ->getSpecificSetForCard(card->getName(), card->getCardSetShortName(), card->getCardCollectorNumber())
+                .getProperty("uuid");
+
+        // Set the providerId on the card
+        card->setCardProviderId(providerId);
+    }
+};
+
+/**
+ * This function iterates through each card in the decklist and sets the providerId
+ * on each card based on its set name and collector number.
+ */
+void DeckLoader::resolveSetNameAndNumberToProviderID()
+{
+    // Set up the struct to call.
+    SetProviderId setProviderId;
+
+    // Call the forEachCard method for each card in the deck
+    forEachCard(setProviderId);
+}
+
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 {
     if (fileName.endsWith(".cod", Qt::CaseInsensitive)) {

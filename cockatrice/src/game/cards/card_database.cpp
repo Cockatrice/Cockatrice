@@ -704,6 +704,32 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName, cons
     return CardInfoPerSet(nullptr);
 }
 
+CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName,
+                                                   const QString &setShortName,
+                                                   const QString &collectorNumber) const
+{
+    CardInfoPtr cardInfo = getCard(cardName);
+    if (!cardInfo) {
+        return CardInfoPerSet(nullptr);
+    }
+
+    CardInfoPerSetMap setMap = cardInfo->getSets();
+    if (setMap.empty()) {
+        return CardInfoPerSet(nullptr);
+    }
+
+    for (const auto &cardInfoPerSetList : setMap) {
+        for (auto &cardInfoForSet : cardInfoPerSetList) {
+            if (cardInfoForSet.getPtr()->getShortName() == setShortName &&
+                cardInfoForSet.getProperty("num") == collectorNumber) {
+                return cardInfoForSet;
+            }
+        }
+    }
+
+    return CardInfoPerSet(nullptr);
+}
+
 QString CardDatabase::getPreferredPrintingProviderIdForCard(const QString &cardName)
 {
     CardInfoPerSet preferredSetCardInfo = getPreferredSetForCard(cardName);
