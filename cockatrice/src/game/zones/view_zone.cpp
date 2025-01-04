@@ -288,7 +288,6 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
             cards.append(card);
         } else {
             updateCardIds(ADD_CARD);
-            reorganizeCards();
             return;
         }
     } else {
@@ -327,7 +326,6 @@ void ZoneViewZone::removeCard(int position)
         position -= cards.first()->getId();
         if (position < 0 || position >= cards.size()) {
             updateCardIds(REMOVE_CARD);
-            reorganizeCards();
             return;
         }
     }
