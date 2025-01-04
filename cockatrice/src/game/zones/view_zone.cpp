@@ -111,32 +111,35 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 
 void ZoneViewZone::updateCardIds(CardAction action)
 {
+    if (origZone->contentsKnown()) {
+        return;
+    }
+
+    if (cards.isEmpty()) {
+        return;
+    }
+
     int cardCount = cards.size();
-    if (!origZone->contentsKnown()) {
-        if (cards.isEmpty()) {
-            return;
-        }
 
-        auto startId = 0;
+    auto startId = 0;
 
-        if (isReversed) {
-            // these get called after this zone's card list updates but before parent zone's card list updates
-            startId = origZone->getCards().size() - cardCount;
-            switch (action) {
-                case INITIALIZE:
-                    break;
-                case ADD_CARD:
-                    startId += 1;
-                    break;
-                case REMOVE_CARD:
-                    startId -= 1;
-                    break;
-            }
+    if (isReversed) {
+        // the card has not been added to origZone's cardList at this point
+        startId = origZone->getCards().size() - cardCount;
+        switch (action) {
+            case INITIALIZE:
+                break;
+            case ADD_CARD:
+                startId += 1;
+                break;
+            case REMOVE_CARD:
+                startId -= 1;
+                break;
         }
+    }
 
-        for (int i = 0; i < cardCount; ++i) {
-            cards[i]->setId(i + startId);
-        }
+    for (int i = 0; i < cardCount; ++i) {
+        cards[i]->setId(i + startId);
     }
 }
 
