@@ -33,7 +33,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
-      isReversed(_isReversed), firstCardId(-1)
+      isReversed(_isReversed)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
@@ -102,17 +102,14 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
         auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), revealZone, this);
         cards.insert(i, card);
-
-        if (i == 0) {
-            firstCardId = cardInfo.id();
-        }
     }
+
+    updateCardIds(INITIALIZE);
     reorganizeCards();
     emit cardCountChanged();
 }
 
-// Because of boundingRect(), this function must not be called before the zone was added to a scene.
-void ZoneViewZone::reorganizeCards()
+void ZoneViewZone::updateCardIds(CardAction action)
 {
     int cardCount = cards.size();
     if (!origZone->contentsKnown()) {
@@ -120,11 +117,20 @@ void ZoneViewZone::reorganizeCards()
             return;
         }
 
-        auto startId = isReversed ? cards.first()->getId() : 0;
+        auto startId = 0;
 
         if (isReversed) {
-            if (cards.first()->getId() != firstCardId) {
-                startId -= 1;
+            // these get called after this zone's card list updates but before parent zone's card list updates
+            startId = origZone->getCards().size() - cards.size();
+            switch (action) {
+                case INITIALIZE:
+                    break;
+                case ADD_CARD:
+                    startId += 1;
+                    break;
+                case REMOVE_CARD:
+                    startId -= 1;
+                    break;
             }
         }
 
@@ -132,7 +138,11 @@ void ZoneViewZone::reorganizeCards()
             cards[i]->setId(i + startId);
         }
     }
+}
 
+// Because of boundingRect(), this function must not be called before the zone was added to a scene.
+void ZoneViewZone::reorganizeCards()
+{
     CardList cardsToDisplay(cards);
 
     // sort cards
@@ -231,7 +241,7 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         if (cols < 2)
             cols = 2;
 
-         qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+        qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
@@ -274,13 +284,18 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
         if (x != 0) {
             cards.append(card);
         } else {
+            updateCardIds(ADD_CARD);
+            reorganizeCards();
             return;
         }
     } else {
         cards.insert(x, card);
     }
+
     card->setParentItem(this);
     card->update();
+
+    updateCardIds(ADD_CARD);
     reorganizeCards();
 }
 
@@ -308,6 +323,7 @@ void ZoneViewZone::removeCard(int position)
     if (isReversed) {
         position -= cards.first()->getId();
         if (position < 0 || position >= cards.size()) {
+            updateCardIds(REMOVE_CARD);
             reorganizeCards();
             return;
         }
@@ -319,6 +335,7 @@ void ZoneViewZone::removeCard(int position)
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
+    updateCardIds(REMOVE_CARD);
     reorganizeCards();
 }
 

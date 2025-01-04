@@ -35,7 +35,15 @@ private:
     CardList::SortOption groupBy, sortBy;
     bool pileView;
     bool isReversed;
-    int firstCardId;
+
+    enum CardAction
+    {
+        INITIALIZE,
+        ADD_CARD,
+        REMOVE_CARD
+    };
+
+    void updateCardIds(CardAction action);
 
     struct GridSize
     {
