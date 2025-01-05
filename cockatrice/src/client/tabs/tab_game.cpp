@@ -289,10 +289,18 @@ void TabGame::refreshShortcuts()
 void DeckViewContainer::loadLocalDeck()
 {
     QFileDialog dialog(this, tr("Load deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
+
+    QString startingDir = SettingsCache::instance().recents().getLatestDeckDirPath();
+    if (startingDir.isEmpty()) {
+        startingDir = SettingsCache::instance().getDeckPath();
+    }
+
+    dialog.setDirectory(startingDir);
     dialog.setNameFilters(DeckLoader::fileNameFilters);
     if (!dialog.exec())
         return;
+
+    SettingsCache::instance().recents().setLatestDeckDirPath(dialog.directory().absolutePath());
 
     loadDeckFromFile(dialog.selectedFiles().at(0));
 }

@@ -928,10 +928,18 @@ void TabDeckEditor::actLoadDeck()
     }
 
     QFileDialog dialog(this, tr("Load deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
+
+    QString startingDir = SettingsCache::instance().recents().getLatestDeckDirPath();
+    if (startingDir.isEmpty()) {
+        startingDir = SettingsCache::instance().getDeckPath();
+    }
+
+    dialog.setDirectory(startingDir);
     dialog.setNameFilters(DeckLoader::fileNameFilters);
     if (!dialog.exec())
         return;
+
+    SettingsCache::instance().recents().setLatestDeckDirPath(dialog.directory().absolutePath());
 
     QString fileName = dialog.selectedFiles().at(0);
     openDeckFromFile(fileName, deckOpenLocation);
