@@ -290,6 +290,11 @@ void MainWindow::actDeckEditor()
     tabSupervisor->addDeckEditorTab(nullptr);
 }
 
+void MainWindow::actVisualDeckStorage()
+{
+    tabSupervisor->addVisualDeckStorageTab();
+}
+
 void MainWindow::actFullScreen(bool checked)
 {
     if (checked)
@@ -660,6 +665,7 @@ void MainWindow::retranslateUi()
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
+    aVisualDeckStorage->setText(tr("&Visual Deck storage"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
@@ -707,6 +713,8 @@ void MainWindow::createActions()
     connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
     aDeckEditor = new QAction(this);
     connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+    aVisualDeckStorage = new QAction(this);
+    connect(aVisualDeckStorage, SIGNAL(triggered()), this, SLOT(actVisualDeckStorage()));
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
@@ -794,6 +802,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aDeckEditor);
+    cockatriceMenu->addAction(aVisualDeckStorage);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
@@ -881,6 +890,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
+
+    if (SettingsCache::instance().getVisualDeckStorageShowOnLoad()) {
+        connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFinished()), tabSupervisor,
+                SLOT(addVisualDeckStorageTab()));
+    }
     connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFailed()), this,
             SLOT(cardDatabaseLoadingFailed()));
     connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this,

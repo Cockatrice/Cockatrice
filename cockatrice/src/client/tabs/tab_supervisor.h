@@ -3,6 +3,7 @@
 
 #include "../../deck/deck_loader.h"
 #include "../../server/chat_view/user_list_proxy.h"
+#include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
 #include <QCommonStyle>
@@ -130,6 +131,7 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabDeckStorageVisual *addVisualDeckStorageTab();
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:

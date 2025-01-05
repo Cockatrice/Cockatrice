@@ -3,6 +3,7 @@
 
 #include "../../client/tearoff_menu.h"
 #include "../../game/player/player.h"
+#include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
@@ -86,14 +87,18 @@ class DeckViewContainer : public QWidget
 {
     Q_OBJECT
 private:
-    QPushButton *loadLocalButton, *loadRemoteButton, *forceStartGameButton;
+    QVBoxLayout *deckViewLayout;
+    QPushButton *loadLocalButton, *loadRemoteButton, *unloadDeckButton, *forceStartGameButton;
     ToggleButton *readyStartButton, *sideboardLockButton;
     DeckView *deckView;
+    VisualDeckStorageWidget *visualDeckStorageWidget;
     TabGame *parentGame;
     int playerId;
 private slots:
+    void replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void loadLocalDeck();
     void loadRemoteDeck();
+    void unloadDeck();
     void readyStart();
     void forceStart();
     void deckSelectFinished(const Response &r);

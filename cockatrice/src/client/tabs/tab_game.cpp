@@ -105,6 +105,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
+    unloadDeckButton = new QPushButton;
+    unloadDeckButton->setEnabled(false);
     readyStartButton = new ToggleButton;
     readyStartButton->setEnabled(false);
     forceStartGameButton = new QPushButton;
@@ -114,6 +116,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
     connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
+    connect(unloadDeckButton, &QPushButton::clicked, this, &DeckViewContainer::unloadDeck);
     connect(forceStartGameButton, &QPushButton::clicked, this, &DeckViewContainer::forceStart);
     connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
     connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
@@ -127,6 +130,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
     buttonHBox->addWidget(loadRemoteButton);
+    buttonHBox->addWidget(unloadDeckButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
     if (forceStartGameButton->isEnabled()) {
@@ -134,13 +138,20 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     }
     buttonHBox->setContentsMargins(0, 0, 0, 0);
     buttonHBox->addStretch();
+
     deckView = new DeckView;
     connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
+    deckView->setVisible(false);
 
-    auto *deckViewLayout = new QVBoxLayout;
+    visualDeckStorageWidget = new VisualDeckStorageWidget(this);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
+            &DeckViewContainer::replaceDeckStorageWithDeckView);
+
+    deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->addWidget(deckView);
+    deckViewLayout->addWidget(visualDeckStorageWidget);
     deckViewLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(deckViewLayout);
 
@@ -153,6 +164,7 @@ void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
+    unloadDeckButton->setText(tr("Unload deck..."));
     readyStartButton->setText(tr("Ready to start"));
     forceStartGameButton->setText(tr("Force start"));
     updateSideboardLockButtonText();
@@ -285,6 +297,44 @@ void TabGame::refreshShortcuts()
     if (replayFastForwardButton) {
         replayFastForwardButton->setShortcut(shortcuts.getSingleShortcut("Replays/fastForwardButton"));
     }
+}
+
+void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
+{
+    Q_UNUSED(event);
+    QString fileName = instance->filePath;
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    QString deckString;
+    DeckLoader deck;
+
+    bool error = !deck.loadFromFile(fileName, fmt);
+    if (!error) {
+        deckString = deck.writeToString_Native();
+        error = deckString.length() > MAX_FILE_LENGTH;
+    }
+    if (error) {
+        QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
+        return;
+    }
+
+    Command_DeckSelect cmd;
+    cmd.set_deck(deckString.toStdString());
+    PendingCommand *pend = parentGame->prepareGameCommand(cmd);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(deckSelectFinished(const Response &)));
+    parentGame->sendGameCommand(pend, playerId);
+    visualDeckStorageWidget->setVisible(false);
+    deckView->setVisible(true);
+    deckViewLayout->update();
+    unloadDeckButton->setEnabled(true);
+}
+
+void DeckViewContainer::unloadDeck()
+{
+    deckView->setVisible(false);
+    visualDeckStorageWidget->setVisible(true);
+    deckViewLayout->update();
+    unloadDeckButton->setEnabled(false);
 }
 
 void DeckViewContainer::loadLocalDeck()

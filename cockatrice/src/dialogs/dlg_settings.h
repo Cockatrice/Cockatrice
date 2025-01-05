@@ -95,6 +95,7 @@ private:
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
+    QCheckBox showVisualDeckStorageOnLoadCheckBox;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;

@@ -24,6 +24,7 @@
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
+#include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -500,6 +501,15 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     deckEditorTabs.append(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabDeckStorageVisual *TabSupervisor::addVisualDeckStorageTab()
+{
+    TabDeckStorageVisual *tab = new TabDeckStorageVisual(this, client);
+    int tabIndex = myAddTab(tab);
+    addCloseButtonToTab(tab, tabIndex);
     setCurrentWidget(tab);
     return tab;
 }
