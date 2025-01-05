@@ -150,7 +150,12 @@ void ShortcutTreeView::currentChanged(const QModelIndex &current, const QModelIn
  */
 void ShortcutTreeView::updateSearchString(const QString &searchString)
 {
-    QStringList searchWords = searchString.split(" ", Qt::SkipEmptyParts);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    const auto skipEmptyParts = Qt::SkipEmptyParts;
+#else
+    const auto skipEmptyParts = QString::SkipEmptyParts;
+#endif
+    QStringList searchWords = searchString.split(" ", skipEmptyParts);
 
     auto escapeRegex = [](const QString &s) { return QRegularExpression::escape(s); };
     std::transform(searchWords.begin(), searchWords.end(), searchWords.begin(), escapeRegex);
