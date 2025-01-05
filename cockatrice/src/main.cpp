@@ -136,6 +136,9 @@ int main(int argc, char *argv[])
     SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
 #endif
 
+    // Set the QT_LOGGING_CONF environment variable
+    qputenv("QT_LOGGING_CONF", "./qtlogging.ini");
+
     QApplication app(argc, argv);
 
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
