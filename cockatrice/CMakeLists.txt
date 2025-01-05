@@ -164,8 +164,9 @@ set(cockatrice_SOURCES
 
 add_subdirectory(sounds)
 add_subdirectory(themes)
-configure_file(${CMAKE_SOURCE_DIR}/cockatrice/resources/config/qtlogging.ini
-        ${CMAKE_BINARY_DIR}/cockatrice/qtlogging.ini COPYONLY)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/cockatrice/resources/config/qtlogging.ini ${CMAKE_BINARY_DIR}/cockatrice/qtlogging.ini COPYONLY
+)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 
