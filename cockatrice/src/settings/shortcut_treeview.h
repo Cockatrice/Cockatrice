@@ -7,7 +7,7 @@
 #include <QTreeView>
 
 /**
- * Custom implementation of QSortFilterProxyModel that also searches in the parent's string when filtering
+ * Custom implementation of QSortFilterProxyModel that appends the source and parent strings together when filtering
  */
 class ShortcutFilterProxyModel : public QSortFilterProxyModel
 {
