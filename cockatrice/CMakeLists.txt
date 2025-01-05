@@ -56,6 +56,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
+    src/dialogs/dlg_load_deck.cpp
     src/game/filters/filter_string.cpp
     src/game/filters/filter_builder.cpp
     src/game/filters/filter_tree.cpp
