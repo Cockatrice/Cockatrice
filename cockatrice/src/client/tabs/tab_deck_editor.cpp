@@ -114,6 +114,12 @@ void TabDeckEditor::createDeckDock()
     auto *tbRemoveCard = new QToolButton(this);
     tbRemoveCard->setDefaultAction(aRemoveCard);
 
+    aSwapCard = new QAction(QString(), this);
+    aSwapCard->setIcon(QPixmap("theme:icons/swap"));
+    connect(aSwapCard, SIGNAL(triggered()), this, SLOT(actSwapCard()));
+    auto *tbSwapCard = new QToolButton(this);
+    tbSwapCard->setDefaultAction(aSwapCard);
+
     auto *upperLayout = new QGridLayout;
     upperLayout->setObjectName("upperLayout");
     upperLayout->addWidget(nameLabel, 0, 0);
@@ -139,7 +145,8 @@ void TabDeckEditor::createDeckDock()
     lowerLayout->addWidget(tbIncrement, 0, 2);
     lowerLayout->addWidget(tbDecrement, 0, 3);
     lowerLayout->addWidget(tbRemoveCard, 0, 4);
-    lowerLayout->addWidget(deckView, 1, 0, 1, 5);
+    lowerLayout->addWidget(tbSwapCard, 0, 5);
+    lowerLayout->addWidget(deckView, 1, 0, 1, 6);
 
     // Create widgets for both layouts to make splitter work correctly
     auto *topWidget = new QWidget;
@@ -1298,6 +1305,7 @@ void TabDeckEditor::actSwapCard()
 
     setModified(true);
     setSaveStatus(true);
+    update();
 }
 
 void TabDeckEditor::actAddCard()
