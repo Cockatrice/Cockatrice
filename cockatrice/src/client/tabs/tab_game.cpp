@@ -4,6 +4,7 @@
 #include "../../deck/deck_loader.h"
 #include "../../deck/deck_view.h"
 #include "../../dialogs/dlg_create_game.h"
+#include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
@@ -288,19 +289,9 @@ void TabGame::refreshShortcuts()
 
 void DeckViewContainer::loadLocalDeck()
 {
-    QFileDialog dialog(this, tr("Load deck"));
-
-    QString startingDir = SettingsCache::instance().recents().getLatestDeckDirPath();
-    if (startingDir.isEmpty()) {
-        startingDir = SettingsCache::instance().getDeckPath();
-    }
-
-    dialog.setDirectory(startingDir);
-    dialog.setNameFilters(DeckLoader::fileNameFilters);
+    DlgLoadDeck dialog(this);
     if (!dialog.exec())
         return;
-
-    SettingsCache::instance().recents().setLatestDeckDirPath(dialog.directory().absolutePath());
 
     loadDeckFromFile(dialog.selectedFiles().at(0));
 }

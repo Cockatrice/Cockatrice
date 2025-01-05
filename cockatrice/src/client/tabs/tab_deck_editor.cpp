@@ -5,6 +5,7 @@
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
+#include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
@@ -927,19 +928,9 @@ void TabDeckEditor::actLoadDeck()
         return;
     }
 
-    QFileDialog dialog(this, tr("Load deck"));
-
-    QString startingDir = SettingsCache::instance().recents().getLatestDeckDirPath();
-    if (startingDir.isEmpty()) {
-        startingDir = SettingsCache::instance().getDeckPath();
-    }
-
-    dialog.setDirectory(startingDir);
-    dialog.setNameFilters(DeckLoader::fileNameFilters);
+    DlgLoadDeck dialog(this);
     if (!dialog.exec())
         return;
-
-    SettingsCache::instance().recents().setLatestDeckDirPath(dialog.directory().absolutePath());
 
     QString fileName = dialog.selectedFiles().at(0);
     openDeckFromFile(fileName, deckOpenLocation);
