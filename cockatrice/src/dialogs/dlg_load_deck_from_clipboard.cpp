@@ -71,3 +71,13 @@ void DlgLoadDeckFromClipboard::actOK()
         delete deckLoader;
     }
 }
+
+void DlgLoadDeckFromClipboard::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
+        event->accept();
+        actOK();
+        return;
+    }
+    QDialog::keyPressEvent(event);
+}
