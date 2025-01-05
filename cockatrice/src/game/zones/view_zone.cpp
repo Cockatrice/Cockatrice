@@ -111,32 +111,35 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 
 void ZoneViewZone::updateCardIds(CardAction action)
 {
+    if (origZone->contentsKnown()) {
+        return;
+    }
+
+    if (cards.isEmpty()) {
+        return;
+    }
+
     int cardCount = cards.size();
-    if (!origZone->contentsKnown()) {
-        if (cards.isEmpty()) {
-            return;
-        }
 
-        auto startId = 0;
+    auto startId = 0;
 
-        if (isReversed) {
-            // these get called after this zone's card list updates but before parent zone's card list updates
-            startId = origZone->getCards().size() - cardCount;
-            switch (action) {
-                case INITIALIZE:
-                    break;
-                case ADD_CARD:
-                    startId += 1;
-                    break;
-                case REMOVE_CARD:
-                    startId -= 1;
-                    break;
-            }
+    if (isReversed) {
+        // the card has not been added to origZone's cardList at this point
+        startId = origZone->getCards().size() - cardCount;
+        switch (action) {
+            case INITIALIZE:
+                break;
+            case ADD_CARD:
+                startId += 1;
+                break;
+            case REMOVE_CARD:
+                startId -= 1;
+                break;
         }
+    }
 
-        for (int i = 0; i < cardCount; ++i) {
-            cards[i]->setId(i + startId);
-        }
+    for (int i = 0; i < cardCount; ++i) {
+        cards[i]->setId(i + startId);
     }
 }
 
@@ -275,21 +278,24 @@ void ZoneViewZone::setPileView(int _pileView)
 
 void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-    // if x is negative set it to add at end
-    if (x < 0 || x >= cards.size()) {
-        x = cards.size();
-    }
-
-    if (isReversed) {
-        if (x != 0) {
-            cards.append(card);
+    if (!isReversed) {
+        // if x is negative set it to add at end
+        if (x < 0) {
+            x = cards.size();
+        }
+        cards.insert(x, card);
+    } else {
+        // map x (which is in origZone indexes) to this viewZone's cardList index
+        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
+        int insertionIndex = x - firstId;
+        if (insertionIndex >= 0) {
+            // card was put into a portion of the deck that's in the view
+            cards.insert(insertionIndex, card);
         } else {
+            // card was put into a portion of the deck that's not in the view
             updateCardIds(ADD_CARD);
-            reorganizeCards();
             return;
         }
-    } else {
-        cards.insert(x, card);
     }
 
     card->setParentItem(this);
@@ -324,7 +330,6 @@ void ZoneViewZone::removeCard(int position)
         position -= cards.first()->getId();
         if (position < 0 || position >= cards.size()) {
             updateCardIds(REMOVE_CARD);
-            reorganizeCards();
             return;
         }
     }
