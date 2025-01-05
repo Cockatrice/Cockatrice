@@ -41,6 +41,8 @@
         <file>resources/config/deckeditor.svg</file>
         <file>resources/config/shorcuts.svg</file>
         <file>resources/config/sound.svg</file>
+        <file>resources/config/debug.ini</file>
+        <file>resources/config/qtlogging.ini</file>
 
         <file>resources/counters/w.svg</file>
         <file>resources/counters/w_highlight.svg</file>

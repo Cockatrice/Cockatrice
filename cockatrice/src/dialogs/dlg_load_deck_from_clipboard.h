@@ -26,6 +26,9 @@ public:
     {
         return deckList;
     }
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif

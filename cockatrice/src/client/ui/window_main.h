@@ -84,6 +84,7 @@ private slots:
     void actTips();
     void actUpdate();
     void actViewLog();
+    void actOpenSettingsFolder();
     void forgotPasswordSuccess();
     void forgotPasswordError();
     void promptForgotPasswordReset();
@@ -134,7 +135,8 @@ private:
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aVisualDeckStorage, *aFullScreen,
         *aSettings, *aExit, *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog,
         *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase,
-        *aShow;
+        *aShow, *aOpenSettingsFolder;
+
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
     RemoteClient *client;

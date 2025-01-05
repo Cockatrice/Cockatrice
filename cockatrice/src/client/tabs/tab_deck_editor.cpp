@@ -5,6 +5,7 @@
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
+#include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
@@ -1007,9 +1008,7 @@ void TabDeckEditor::actLoadDeck()
         return;
     }
 
-    QFileDialog dialog(this, tr("Load deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
-    dialog.setNameFilters(DeckLoader::fileNameFilters);
+    DlgLoadDeck dialog(this);
     if (!dialog.exec())
         return;
 

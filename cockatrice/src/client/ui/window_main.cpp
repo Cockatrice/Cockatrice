@@ -366,6 +366,12 @@ void MainWindow::actViewLog()
     logviewDialog->activateWindow();
 }
 
+void MainWindow::actOpenSettingsFolder()
+{
+    QString dir = SettingsCache::instance().getSettingsPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+}
+
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -687,6 +693,7 @@ void MainWindow::retranslateUi()
     aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aViewLog->setText(tr("View &Debug Log"));
+    aOpenSettingsFolder->setText(tr("Open Settings Folder"));
 
     aShow->setText(tr("Show/Hide"));
 
@@ -743,6 +750,8 @@ void MainWindow::createActions()
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
     aViewLog = new QAction(this);
     connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
+    aOpenSettingsFolder = new QAction(this);
+    connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
 
     aShow = new QAction(this);
     connect(aShow, SIGNAL(triggered()), this, SLOT(actShow()));
@@ -818,6 +827,7 @@ void MainWindow::createMenus()
     helpMenu->addAction(aCheckCardUpdates);
     helpMenu->addSeparator();
     helpMenu->addAction(aViewLog);
+    helpMenu->addAction(aOpenSettingsFolder);
 }
 
 MainWindow::MainWindow(QWidget *parent)

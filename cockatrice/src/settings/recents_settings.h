@@ -16,6 +16,9 @@ public:
     void clearRecentlyOpenedDeckPaths();
     void updateRecentlyOpenedDeckPaths(const QString &deckPath);
 
+    QString getLatestDeckDirPath();
+    void setLatestDeckDirPath(const QString &dirPath);
+
 signals:
     void recentlyOpenedDeckPathsChanged();
 };

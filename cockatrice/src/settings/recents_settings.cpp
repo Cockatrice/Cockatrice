@@ -30,3 +30,13 @@ void RecentsSettings::updateRecentlyOpenedDeckPaths(const QString &deckPath)
     setValue(deckPaths, "deckpaths", "deckbuilder");
     emit recentlyOpenedDeckPathsChanged();
 }
+
+QString RecentsSettings::getLatestDeckDirPath()
+{
+    return getValue("latestDeckDir", "dirs").toString();
+}
+
+void RecentsSettings::setLatestDeckDirPath(const QString &dirPath)
+{
+    setValue(dirPath, "latestDeckDir", "dirs");
+}

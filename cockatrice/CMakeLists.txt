@@ -56,6 +56,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
+    src/dialogs/dlg_load_deck.cpp
     src/game/filters/filter_string.cpp
     src/game/filters/filter_builder.cpp
     src/game/filters/filter_tree.cpp
@@ -168,6 +169,9 @@ set(cockatrice_SOURCES
 
 add_subdirectory(sounds)
 add_subdirectory(themes)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/cockatrice/resources/config/qtlogging.ini ${CMAKE_BINARY_DIR}/cockatrice/qtlogging.ini COPYONLY
+)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 
