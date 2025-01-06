@@ -349,6 +349,10 @@ void DeckViewContainer::loadLocalDeck()
         return;
 
     loadDeckFromFile(dialog.selectedFiles().at(0));
+
+    deckView->setVisible(true);
+    visualDeckStorageWidget->setVisible(false);
+    unloadDeckButton->setEnabled(true);
 }
 
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
