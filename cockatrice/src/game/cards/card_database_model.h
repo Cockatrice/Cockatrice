@@ -87,6 +87,7 @@ public:
     void setIsToken(FilterBool _isToken)
     {
         isToken = _isToken;
+        emit modelDirty();
         dirty();
     }
 
@@ -97,17 +98,20 @@ public:
             filterString = nullptr;
         }
         cardName = sanitizeCardName(_cardName, characterTranslation);
+        emit modelDirty();
         dirty();
     }
     void setStringFilter(const QString &_src)
     {
         delete filterString;
         filterString = new FilterString(_src);
+        emit modelDirty();
         dirty();
     }
     void setCardNameSet(const QSet<QString> &_cardNameSet)
     {
         cardNameSet = _cardNameSet;
+        emit modelDirty();
         dirty();
     }
 
@@ -119,12 +123,8 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     bool canFetchMore(const QModelIndex &parent) const override;
     void fetchMore(const QModelIndex &parent) override;
-
-public slots:
-    void modelDirty()
-    {
-        dirty();
-    }
+signals:
+    void modelDirty();
 
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
