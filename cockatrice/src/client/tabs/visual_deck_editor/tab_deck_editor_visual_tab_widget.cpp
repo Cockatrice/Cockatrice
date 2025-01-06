@@ -2,8 +2,12 @@
 
 #include "../../ui/widgets/visual_database_display/visual_database_display_widget.h"
 
-TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent, DeckListModel *model, CardDatabaseModel *card_database_model, CardDatabaseDisplayModel *card_database_display_model)
-    : QTabWidget(parent), deckModel(model), cardDatabaseModel(card_database_model), cardDatabaseDisplayModel(card_database_display_model)
+TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
+                                                           DeckListModel *model,
+                                                           CardDatabaseModel *card_database_model,
+                                                           CardDatabaseDisplayModel *card_database_display_model)
+    : QTabWidget(parent), deckModel(model), cardDatabaseModel(card_database_model),
+      cardDatabaseDisplayModel(card_database_display_model)
 {
     this->setTabsClosable(true); // Enable tab closing
     connect(this, &QTabWidget::tabCloseRequested, this, &TabDeckEditorVisualTabWidget::handleTabClose);
@@ -16,23 +20,28 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent, Deck
     visualDeckView->setObjectName("visualDeckView");
     visualDeckView->updateDisplay();
     connect(visualDeckView, SIGNAL(activeCardChanged(CardInfoPtr)), this, SLOT(onCardChanged(CardInfoPtr)));
-    connect(visualDeckView, SIGNAL(mainboardCardClicked(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(onMainboardCardClickedDeckEditor(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
-    connect(visualDeckView, SIGNAL(sideboardCardClicked(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(onSideboardCardClickedDeckEditor(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
+    connect(visualDeckView, SIGNAL(mainboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+            SLOT(onMainboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(visualDeckView, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+            SLOT(onSideboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    visualDatabaseDisplay = new VisualDatabaseDisplayWidget(this, this->cardDatabaseModel, this->cardDatabaseDisplayModel);
+    visualDatabaseDisplay =
+        new VisualDatabaseDisplayWidget(this, this->cardDatabaseModel, this->cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     visualDatabaseDisplay->updateDisplay();
-    connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this, SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
-    connect(visualDatabaseDisplay, SIGNAL(cardClickedDatabaseDisplay(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(onCardClickedDatabaseDisplay(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
+    connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this,
+            SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
+    connect(visualDatabaseDisplay,
+            SIGNAL(cardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+            SLOT(onCardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
     deckAnalytics = new DeckAnalyticsWidget(this, this->deckModel);
     deckAnalytics->setObjectName("deckAnalytics");
-    //deckAnalytics->analyzeManaCurve();
+    // deckAnalytics->analyzeManaCurve();
 
     this->addNewTab(visualDeckView, "Visual Deck View");
     this->addNewTab(visualDatabaseDisplay, "Visual Database Display");
     this->addNewTab(deckAnalytics, "Deck Analytics");
-
 }
 
 void TabDeckEditorVisualTabWidget::onCardChanged(CardInfoPtr activeCard)
@@ -45,17 +54,20 @@ void TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay(CardInfoPtr acti
     emit cardChangedDatabaseDisplay(activeCard);
 }
 
-void TabDeckEditorVisualTabWidget::onMainboardCardClickedDeckEditor(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void TabDeckEditorVisualTabWidget::onMainboardCardClickedDeckEditor(QMouseEvent *event,
+                                                                    CardInfoPictureWithTextOverlayWidget *instance)
 {
     emit mainboardCardClicked(event, instance);
 }
 
-void TabDeckEditorVisualTabWidget::onSideboardCardClickedDeckEditor(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void TabDeckEditorVisualTabWidget::onSideboardCardClickedDeckEditor(QMouseEvent *event,
+                                                                    CardInfoPictureWithTextOverlayWidget *instance)
 {
     emit sideboardCardClicked(event, instance);
 }
 
-void TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay(QMouseEvent *event,
+                                                                CardInfoPictureWithTextOverlayWidget *instance)
 {
     emit cardClickedDatabaseDisplay(event, instance);
 }
@@ -70,8 +82,7 @@ void TabDeckEditorVisualTabWidget::removeCurrentTab()
 {
     // Remove the currently selected tab
     int currentIndex = this->currentIndex();
-    if (currentIndex != -1)
-    {
+    if (currentIndex != -1) {
         this->removeTab(currentIndex);
     }
 }
@@ -79,13 +90,12 @@ void TabDeckEditorVisualTabWidget::removeCurrentTab()
 void TabDeckEditorVisualTabWidget::setTabTitle(int index, const QString &title)
 {
     // Set the title of the tab at the given index
-    if (index >= 0 && index < this->count())
-    {
+    if (index >= 0 && index < this->count()) {
         this->setTabText(index, title);
     }
 }
 
-QWidget* TabDeckEditorVisualTabWidget::getCurrentTab() const
+QWidget *TabDeckEditorVisualTabWidget::getCurrentTab() const
 {
     // Return the currently selected tab widget
     return this->currentWidget();

@@ -45,8 +45,8 @@ std::unordered_map<char, int> ManaBaseWidget::analyzeManaBase()
     }
 
     update();
-    //this->setCurve(ManaBaseMap);
-    //mana_curve_widget->updateDisplay();
+    // this->setCurve(ManaBaseMap);
+    // mana_curve_widget->updateDisplay();
     this->updateDisplay();
     update();
     return manaBaseMap;
@@ -85,14 +85,17 @@ void ManaBaseWidget::updateDisplay()
     update(); // Update the widget display
 }
 
-std::unordered_map<char, int> ManaBaseWidget::determineManaProduction(const QString& rulesText) {
+std::unordered_map<char, int> ManaBaseWidget::determineManaProduction(const QString &rulesText)
+{
     // Initialize mana counts
     std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}, {'C', 0}};
 
     // Define regex patterns for different mana production rules
     QRegularExpression tapAddColorless(R"(\{T\}:\s*Add\s*\{C\}|Add\s*one\s*colorless\s*mana)");
-    QRegularExpression tapAddAnyColor(R"(\{T\}:\s*Add\s*one\s*mana\s*of\s*any\s*color|Add\s*one\s*mana\s*of\s*any\s*color)");
-    QRegularExpression tapAddSpecificColor(R"(\{T\}:\s*Add\s*\{(W|U|B|R|G)\}|Add\s*one\s*(white|blue|black|red|green)\s*mana)");
+    QRegularExpression tapAddAnyColor(
+        R"(\{T\}:\s*Add\s*one\s*mana\s*of\s*any\s*color|Add\s*one\s*mana\s*of\s*any\s*color)");
+    QRegularExpression tapAddSpecificColor(
+        R"(\{T\}:\s*Add\s*\{(W|U|B|R|G)\}|Add\s*one\s*(white|blue|black|red|green)\s*mana)");
 
     // Check for mana production rules in the text
     if (tapAddColorless.match(rulesText).hasMatch()) {
@@ -112,18 +115,25 @@ std::unordered_map<char, int> ManaBaseWidget::determineManaProduction(const QStr
     auto match = specificColorRegex.match(rulesText);
     if (match.hasMatch()) {
         QString color = match.captured(1);
-        if (color == "W") manaCounts['W'] += 1;
-        else if (color == "U") manaCounts['U'] += 1;
-        else if (color == "B") manaCounts['B'] += 1;
-        else if (color == "R") manaCounts['R'] += 1;
-        else if (color == "G") manaCounts['G'] += 1;
+        if (color == "W")
+            manaCounts['W'] += 1;
+        else if (color == "U")
+            manaCounts['U'] += 1;
+        else if (color == "B")
+            manaCounts['B'] += 1;
+        else if (color == "R")
+            manaCounts['R'] += 1;
+        else if (color == "G")
+            manaCounts['G'] += 1;
     }
 
     return manaCounts;
 }
 
-void ManaBaseWidget::mergeManaCounts(std::unordered_map<char, int>& manaCounts1, const std::unordered_map<char, int>& manaCounts2) {
-    for (const auto& pair : manaCounts2) {
-        manaCounts1[pair.first] += pair.second;  // Add values for matching keys
+void ManaBaseWidget::mergeManaCounts(std::unordered_map<char, int> &manaCounts1,
+                                     const std::unordered_map<char, int> &manaCounts2)
+{
+    for (const auto &pair : manaCounts2) {
+        manaCounts1[pair.first] += pair.second; // Add values for matching keys
     }
 }

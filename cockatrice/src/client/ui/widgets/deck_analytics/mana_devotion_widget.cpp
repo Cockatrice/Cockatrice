@@ -49,8 +49,8 @@ std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
         qDebug() << "Mana Devotion " << entry.first << " has " << entry.second << " entries";
     }
     update();
-    //this->setCurve(manaDevotionMap);
-    //mana_curve_widget->updateDisplay();
+    // this->setCurve(manaDevotionMap);
+    // mana_curve_widget->updateDisplay();
     this->updateDisplay();
     update();
     return manaDevotionMap;
@@ -90,7 +90,8 @@ void ManaDevotionWidget::updateDisplay()
 }
 
 // Function to count mana symbols W, U, B, R, G in the input string
-std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString& manaString) {
+std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString &manaString)
+{
     // Only track counts for W, U, B, R, G
     std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}};
 
@@ -129,8 +130,10 @@ std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString
     return manaCounts;
 }
 
-void ManaDevotionWidget::mergeManaCounts(std::unordered_map<char, int>& manaCounts1, const std::unordered_map<char, int>& manaCounts2) {
-    for (const auto& pair : manaCounts2) {
-        manaCounts1[pair.first] += pair.second;  // Add values for matching keys
+void ManaDevotionWidget::mergeManaCounts(std::unordered_map<char, int> &manaCounts1,
+                                         const std::unordered_map<char, int> &manaCounts2)
+{
+    for (const auto &pair : manaCounts2) {
+        manaCounts1[pair.first] += pair.second; // Add values for matching keys
     }
 }

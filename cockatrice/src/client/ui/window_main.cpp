@@ -879,7 +879,7 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::refreshShortcuts);
     refreshShortcuts();
     connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFinished()), tabSupervisor,
-                SLOT(addVisualDeckEditorTab()));
+            SLOT(addVisualDeckEditorTab()));
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFailed, this,
             &MainWindow::cardDatabaseLoadingFailed);

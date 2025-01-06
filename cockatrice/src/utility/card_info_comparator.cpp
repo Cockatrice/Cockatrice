@@ -1,9 +1,12 @@
 #include "card_info_comparator.h"
 
 CardInfoComparator::CardInfoComparator(const QStringList &properties, Qt::SortOrder order)
-    : m_properties(properties), m_order(order) {}
+    : m_properties(properties), m_order(order)
+{
+}
 
-bool CardInfoComparator::operator()(const CardInfoPtr &a, const CardInfoPtr &b) const {
+bool CardInfoComparator::operator()(const CardInfoPtr &a, const CardInfoPtr &b) const
+{
     // Iterate over each property in the list
     for (const QString &property : m_properties) {
         QVariant valueA = getProperty(a, property);
@@ -20,7 +23,8 @@ bool CardInfoComparator::operator()(const CardInfoPtr &a, const CardInfoPtr &b) 
     return false;
 }
 
-bool CardInfoComparator::compareVariants(const QVariant &a, const QVariant &b) const {
+bool CardInfoComparator::compareVariants(const QVariant &a, const QVariant &b) const
+{
     if (a.typeId() != b.typeId()) {
         // If they are not the same type, compare as strings
         return a.toString() < b.toString();
@@ -42,7 +46,8 @@ bool CardInfoComparator::compareVariants(const QVariant &a, const QVariant &b) c
     }
 }
 
-QVariant CardInfoComparator::getProperty(const CardInfoPtr &card, const QString &property) const {
+QVariant CardInfoComparator::getProperty(const CardInfoPtr &card, const QString &property) const
+{
     // Check if the property exists in the main fields of the class
     if (property == "name") {
         return card->getName();
