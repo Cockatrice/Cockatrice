@@ -338,7 +338,7 @@ jobs:
         uses: lando/code-sign-action@v3
         with:
           file: "build/cockatrice/cockatrice.app"
-          certificate-id: ${{ PROD_MACOS_CERTIFICATE_NAME }}
+          certificate-id: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
