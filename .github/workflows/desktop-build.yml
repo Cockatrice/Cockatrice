@@ -319,14 +319,28 @@ jobs:
 #          echo "Attach staple"
 #          xcrun stapler staple "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app"
 
-
-      - name: Sign binary
+      - name: Sign binary 2
         uses: lando/code-sign-action@v3
         with:
-          file: ${{steps.build.outputs.path}}
+          file: path/to/binary
           certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-          certificate-id: STKV3NKYBF
           certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          certificate-id: STKV3NKYBF
+          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+#          apple-notary-tool: altool
+          apple-team-id: STKV3NKYBF
+          apple-product-id: cockatrice.us.code-sign-action
+          options: --options runtime -v
+
+
+      #      - name: Sign binary
+#        uses: lando/code-sign-action@v3
+#        with:
+#          file: ${{steps.build.outputs.path}}
+#
+#
+
 
       - name: Upload artifact
         if: matrix.make_package
