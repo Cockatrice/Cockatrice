@@ -37,8 +37,6 @@ std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
                 if (info) {
                     auto devotion = countManaSymbols(info->getManaCost());
                     mergeManaCounts(manaDevotionMap, devotion);
-                } else {
-                    qDebug() << "Card not found in database!";
                 }
             }
         }
