@@ -335,6 +335,11 @@ void DeckViewContainer::unloadDeck()
     visualDeckStorageWidget->setVisible(true);
     deckViewLayout->update();
     unloadDeckButton->setEnabled(false);
+    readyStartButton->setEnabled(false);
+    readyStartButton->setState(false);
+    sideboardLockButton->setEnabled(false);
+    sideboardLockButton->setState(false);
+    setReadyStart(false);
 }
 
 void DeckViewContainer::loadLocalDeck()
