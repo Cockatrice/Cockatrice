@@ -26,6 +26,7 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
                                                            const Qt::Alignment alignment)
     : CardInfoPictureWithTextOverlayWidget(parent, hoverToZoomEnabled, textColor, outlineColor, fontSize, alignment)
 {
+    // TODO Make this hold the deckloader
     singleClickTimer = new QTimer(this);
     singleClickTimer->setSingleShot(true);
     connect(singleClickTimer, &QTimer::timeout, this, [this]() { emit imageClicked(lastMouseEvent, this); });
