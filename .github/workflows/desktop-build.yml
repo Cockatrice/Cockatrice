@@ -287,7 +287,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
 
           # We finally codesign our app bundle, specifying the Hardened runtime option
-          /usr/bin/codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime ${{steps.build.outputs.path}} -v
+          /usr/bin/codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app" -v
 
       - name: Notarize app bundle
         env:
@@ -304,7 +304,7 @@ jobs:
           # Therefore, we create a zip file containing our app bundle, so that we can send it to the
           # notarization service
           echo "Creating temp notarization archive"
-          ditto -c -k --keepParent ${{steps.build.outputs.path}} "notarization.zip"
+          ditto -c -k --keepParent "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app" "notarization.zip"
       
           # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
           # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
@@ -316,7 +316,7 @@ jobs:
           # Finally, we need to "attach the staple" to our executable, which will allow our app to be
           # validated by macOS even when an internet connection is not available.
           echo "Attach staple"
-          xcrun stapler staple ${{steps.build.outputs.path}}
+          xcrun stapler staple "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app"
 
       - name: Upload artifact
         if: matrix.make_package
