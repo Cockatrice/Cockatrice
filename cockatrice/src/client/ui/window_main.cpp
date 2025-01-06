@@ -891,7 +891,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFinished()), tabSupervisor,
-                SLOT(addVisualDeckEditorTab()));
+            SLOT(addVisualDeckEditorTab()));
 
     if (SettingsCache::instance().getVisualDeckStorageShowOnLoad()) {
         connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFinished()), tabSupervisor,

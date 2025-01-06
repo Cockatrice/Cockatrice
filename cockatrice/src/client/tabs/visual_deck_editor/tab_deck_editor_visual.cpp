@@ -357,8 +357,6 @@ void TabDeckEditorVisual::createMenus()
     aDeckAnalyticsDockFloating->setCheckable(true);
     connect(aDeckAnalyticsDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
 
-
-
     aFilterDockVisible = filterDockMenu->addAction(QString());
     aFilterDockVisible->setCheckable(true);
     connect(aFilterDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
@@ -461,7 +459,7 @@ void TabDeckEditorVisual::createSearchAndDatabaseFrame()
     searchAndDatabaseDock->setObjectName("searchAndDatabaseDock");
 
     searchAndDatabaseDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
-                            QDockWidget::DockWidgetMovable);
+                                       QDockWidget::DockWidgetMovable);
     auto *searchAndDatabaseDockContents = new QWidget(this);
     searchAndDatabaseDockContents->setObjectName("filterDockContents");
     searchAndDatabaseDockContents->setLayout(searchAndDatabaseFrame);
@@ -483,22 +481,26 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this->deckModel, this->databaseModel, this->databaseDisplayModel);
+    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this->deckModel, this->databaseModel,
+                                                    this->databaseDisplayModel);
     connect(tabContainer, SIGNAL(cardChanged(CardInfoPtr)), this, SLOT(changeModelIndexAndCardInfo(CardInfoPtr)));
     connect(tabContainer, SIGNAL(cardChangedDatabaseDisplay(CardInfoPtr)), this, SLOT(setCurrentCardInfo(CardInfoPtr)));
-    connect(tabContainer, SIGNAL(mainboardCardClicked(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(processMainboardCardClick(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
-    connect(tabContainer, SIGNAL(sideboardCardClicked(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(processSideboardCardClick(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
+    connect(tabContainer, SIGNAL(mainboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+            SLOT(processMainboardCardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(tabContainer, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+            SLOT(processSideboardCardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    connect(tabContainer, SIGNAL(cardClickedDatabaseDisplay(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(processCardClickDatabaseDisplay(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
+    connect(tabContainer, SIGNAL(cardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
+            this, SLOT(processCardClickDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
     centralFrame->addWidget(tabContainer);
 
     setCentralWidget(centralWidget);
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
-void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
 {
-    (void) instance;
+    (void)instance;
     if (event->button() == Qt::LeftButton) {
         actSwapCard();
     } else if (event->button() == Qt::RightButton) {
@@ -508,9 +510,9 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent* event, CardInfo
     }
 }
 
-void TabDeckEditorVisual::processSideboardCardClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void TabDeckEditorVisual::processSideboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
 {
-    (void) instance;
+    (void)instance;
     if (event->button() == Qt::LeftButton) {
         actSwapCard();
     } else if (event->button() == Qt::RightButton) {
@@ -520,9 +522,10 @@ void TabDeckEditorVisual::processSideboardCardClick(QMouseEvent* event, CardInfo
     }
 }
 
-void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
+                                                          CardInfoPictureWithTextOverlayWidget *instance)
 {
-    (void) instance;
+    (void)instance;
     if (event->button() == Qt::LeftButton) {
         addCardInfo(instance->getInfo(), DECK_ZONE_MAIN);
     } else if (event->button() == Qt::RightButton) {
@@ -700,7 +703,6 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor, QWidget 
     createSearchAndDatabaseFrame();
 
     createCentralFrame();
-
 
     createDeckDock();
     createCardInfoDock();
@@ -1081,8 +1083,10 @@ void TabDeckEditorVisual::addCardInfo(CardInfoPtr info, QString zoneName)
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-
-    QModelIndex newCardIndex = deckModel->addCard(info->getName(), CardDatabaseManager::getInstance()->getSpecificSetForCard(info->getName(), info->getPixmapCacheKey()), zoneName);
+    QModelIndex newCardIndex = deckModel->addCard(
+        info->getName(),
+        CardDatabaseManager::getInstance()->getSpecificSetForCard(info->getName(), info->getPixmapCacheKey()),
+        zoneName);
     recursiveExpand(newCardIndex);
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);
@@ -1105,7 +1109,8 @@ void TabDeckEditorVisual::actSwapCard()
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     // Third argument (true) says create the card no matter what, even if not in DB
-    QModelIndex newCardIndex = deckModel->addCard(cardName, CardDatabaseManager::getInstance()->getPreferredSetForCard(cardName), otherZoneName, true);
+    QModelIndex newCardIndex = deckModel->addCard(
+        cardName, CardDatabaseManager::getInstance()->getPreferredSetForCard(cardName), otherZoneName, true);
     recursiveExpand(newCardIndex);
 
     setModified(true);
@@ -1208,7 +1213,8 @@ void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
     deckView->expandAll();
     setModified(false);
 
-    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(deckModel->getDeckList()->getCardList()));
+    PictureLoader::cacheCardPixmaps(
+        CardDatabaseManager::getInstance()->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
 
@@ -1216,7 +1222,7 @@ void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
     aDeckDockVisible->setChecked(true);
     deckDock->setVisible(aDeckDockVisible->isChecked());
 
-    //tabContainer->deckAnalytics->analyzeManaCurve();
+    // tabContainer->deckAnalytics->analyzeManaCurve();
     tabContainer->visualDeckView->updateDisplay();
 }
 
@@ -1407,6 +1413,6 @@ void TabDeckEditorVisual::showSearchSyntaxHelp()
     browser->document()->setDefaultStyleSheet(sheet);
 
     browser->setHtml(text);
-    connect(browser, &QTextBrowser::anchorClicked, [=](const QUrl &link) { searchEdit->setText(link.fragment()); });
+    connect(browser, &QTextBrowser::anchorClicked, [this](const QUrl &link) { searchEdit->setText(link.fragment()); });
     browser->show();
 }

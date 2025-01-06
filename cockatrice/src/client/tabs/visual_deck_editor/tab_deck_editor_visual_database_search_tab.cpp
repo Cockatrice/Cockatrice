@@ -87,7 +87,7 @@ void TabDeckEditorVisualDatabaseSearchTab::saveDbHeaderState()
 }
 void TabDeckEditorVisualDatabaseSearchTab::setSaveStatus(bool newStatus)
 {
-    (void) newStatus;
+    (void)newStatus;
 }
 void TabDeckEditorVisualDatabaseSearchTab::showSearchSyntaxHelp()
 {
@@ -105,20 +105,20 @@ CardInfoPtr TabDeckEditorVisualDatabaseSearchTab::currentCardInfo() const
 }
 void TabDeckEditorVisualDatabaseSearchTab::addCardHelper(QString zoneName)
 {
-    (void) zoneName;
+    (void)zoneName;
 }
 void TabDeckEditorVisualDatabaseSearchTab::offsetCountAtIndex(const QModelIndex &idx, int offset)
 {
-    (void) idx;
-    (void) offset;
+    (void)idx;
+    (void)offset;
 }
 void TabDeckEditorVisualDatabaseSearchTab::decrementCardHelper(QString zoneName)
 {
-    (void) zoneName;
+    (void)zoneName;
 }
 void TabDeckEditorVisualDatabaseSearchTab::recursiveExpand(const QModelIndex &index)
 {
-    (void) index;
+    (void)index;
 }
 
 void TabDeckEditorVisualDatabaseSearchTab::retranslateUi()
@@ -126,11 +126,11 @@ void TabDeckEditorVisualDatabaseSearchTab::retranslateUi()
 }
 void TabDeckEditorVisualDatabaseSearchTab::setDeck(DeckLoader *_deckLoader)
 {
-    (void) _deckLoader;
+    (void)_deckLoader;
 }
 void TabDeckEditorVisualDatabaseSearchTab::setModified(bool _windowModified)
 {
-    (void) _windowModified;
+    (void)_windowModified;
 }
 bool TabDeckEditorVisualDatabaseSearchTab::confirmClose()
 {

@@ -85,7 +85,7 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
     (void)bottomRight;
     // Necessary to delay this in this manner else the updateDisplay will nuke widgets while their onClick event
     // hasn't returned yet. Interval of 0 means QT will schedule this after the current event loop has finished.
-    QTimer::singleShot(0, this, [=] { updateDisplay(); });
+    QTimer::singleShot(0, this, [this] { updateDisplay(); });
 }
 
 void VisualDeckEditorWidget::updateDisplay()
@@ -223,7 +223,8 @@ void VisualDeckEditorWidget::populateCards()
             if (!currentCard)
                 continue;
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndUUID(currentCard->getName(), currentCard->getCardUuid());
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                    currentCard->getName(), currentCard->getCardProviderId());
                 if (info) {
                     if (currentZone->getName() == DECK_ZONE_MAIN) {
                         mainDeckCards->append(info);

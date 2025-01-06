@@ -1,9 +1,10 @@
 #include "banner_widget.h"
-#include <QVBoxLayout>
-#include <QPainter>
-#include <QLinearGradient>
 
-BannerWidget::BannerWidget(const QString& text, Qt::Orientation orientation, int transparency, QWidget* parent)
+#include <QLinearGradient>
+#include <QPainter>
+#include <QVBoxLayout>
+
+BannerWidget::BannerWidget(const QString &text, Qt::Orientation orientation, int transparency, QWidget *parent)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency, 100))
 {
     // Create the banner label and set properties
@@ -12,7 +13,7 @@ BannerWidget::BannerWidget(const QString& text, Qt::Orientation orientation, int
     bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
 
     // Layout to center the banner label
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(bannerLabel);
     layout->setContentsMargins(0, 20, 0, 20); // Space for the gradient
     setLayout(layout);
@@ -21,7 +22,7 @@ BannerWidget::BannerWidget(const QString& text, Qt::Orientation orientation, int
     setMinimumHeight(100);
 }
 
-void BannerWidget::paintEvent(QPaintEvent* event)
+void BannerWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
@@ -39,7 +40,7 @@ void BannerWidget::paintEvent(QPaintEvent* event)
     }
 
     // Set neutral gradient colors with calculated transparency
-    gradient.setColorAt(0, QColor(200, 200, 200, alpha)); // Light grey with alpha
+    gradient.setColorAt(0, QColor(200, 200, 200, alpha));       // Light grey with alpha
     gradient.setColorAt(1, QColor(100, 100, 100, alpha / 1.5)); // Darker grey, slightly more transparent
 
     // Fill the widget background with the gradient

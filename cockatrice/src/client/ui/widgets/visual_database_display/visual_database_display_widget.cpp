@@ -9,11 +9,14 @@
 #include <QPushButton>
 #include <qpropertyanimation.h>
 
-VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent, CardDatabaseModel *database_model, CardDatabaseDisplayModel *database_display_model)
+VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
+                                                         CardDatabaseModel *database_model,
+                                                         CardDatabaseDisplayModel *database_display_model)
     : QWidget(parent), databaseModel(database_model), databaseDisplayModel(database_display_model)
 {
     cards = new QList<CardInfoPtr>;
-    connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this, &VisualDatabaseDisplayWidget::modelDirty);
+    connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
+            &VisualDatabaseDisplayWidget::modelDirty);
 
     // Set up main layout and widgets
     setMinimumSize(0, 0);
@@ -41,7 +44,7 @@ void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
     loadCurrentPage();
 }
 
-void VisualDatabaseDisplayWidget::onClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance)
+void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
 {
     emit cardClickedDatabaseDisplay(event, instance);
 }
@@ -93,27 +96,27 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
     QPoint originalPos = flow_widget->pos();
 
     // Create the first animation to slide the flow_widget
-    QPropertyAnimation* slideOutAnimation = new QPropertyAnimation(flow_widget, "pos");
-    slideOutAnimation->setDuration(300);  // Adjust for smoothness
-    slideOutAnimation->setStartValue(originalPos);  // Start from the current position
+    QPropertyAnimation *slideOutAnimation = new QPropertyAnimation(flow_widget, "pos");
+    slideOutAnimation->setDuration(300);           // Adjust for smoothness
+    slideOutAnimation->setStartValue(originalPos); // Start from the current position
 
     // Adjust the position (e.g., slide it up or down)
     QPoint slideOutPos = originalPos;
-    slideOutPos.setY(originalPos.y() - flow_widget->height());  // Slide up (adjust direction as needed)
-    slideOutAnimation->setEndValue(slideOutPos);  // End at the new position
+    slideOutPos.setY(originalPos.y() - flow_widget->height()); // Slide up (adjust direction as needed)
+    slideOutAnimation->setEndValue(slideOutPos);               // End at the new position
 
     // Create the second animation to bring it back to its original position
-    QPropertyAnimation* slideBackAnimation = new QPropertyAnimation(flow_widget, "pos");
-    slideBackAnimation->setDuration(300);  // Duration for smooth transition
-    slideBackAnimation->setStartValue(slideOutPos);  // Start from where the first animation ended
-    slideBackAnimation->setEndValue(originalPos);    // End at the original position
+    QPropertyAnimation *slideBackAnimation = new QPropertyAnimation(flow_widget, "pos");
+    slideBackAnimation->setDuration(300);           // Duration for smooth transition
+    slideBackAnimation->setStartValue(slideOutPos); // Start from where the first animation ended
+    slideBackAnimation->setEndValue(originalPos);   // End at the original position
 
     // Connect the end of the first animation to the start of the second
     connect(slideOutAnimation, &QPropertyAnimation::finished, [this, slideBackAnimation]() {
         // After sliding out, adjust the number of cards, load the new page, and start the slide back animation
-        adjustCardsPerPage();  // Adjust the cards per page before loading
-        populateCards();       // Load the new page of cards
-        updateDisplay();       // Update the visual display
+        adjustCardsPerPage(); // Adjust the cards per page before loading
+        populateCards();      // Load the new page of cards
+        updateDisplay();      // Update the visual display
 
         // Start sliding back to original position
         slideBackAnimation->start(QAbstractAnimation::DeleteWhenStopped);
@@ -121,7 +124,7 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
 
     // Once the second animation finishes, allow new animations to start
     connect(slideBackAnimation, &QPropertyAnimation::finished, [this]() {
-        isAnimating = false;  // Reset the flag after animation finishes
+        isAnimating = false; // Reset the flag after animation finishes
     });
 
     // Start the slide-out animation
@@ -136,14 +139,16 @@ void VisualDatabaseDisplayWidget::updateDisplay()
     OverlapWidget *printings_group_widget = new OverlapWidget(flow_widget, 0, cardsPerRow, rowsPerColumn, Qt::Vertical);
 
     // Create card widgets and store their sizes
-    QList<CardInfoPictureWithTextOverlayWidget*> cardDisplays;
-    for (const auto& info : *cards) {
+    QList<CardInfoPictureWithTextOverlayWidget *> cardDisplays;
+    for (const auto &info : *cards) {
         if (info) {
-            CardInfoPictureWithTextOverlayWidget* display = new CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
+            CardInfoPictureWithTextOverlayWidget *display =
+                new CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
             display->setCard(info);
             cardDisplays.append(display);
             printings_group_widget->addWidget(display);
-            connect(display, SIGNAL(imageClicked(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)), this, SLOT(onClick(QMouseEvent*, CardInfoPictureWithTextOverlayWidget*)));
+            connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
             connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
         } else {
             qDebug() << "Card not found in database!";
@@ -151,7 +156,7 @@ void VisualDatabaseDisplayWidget::updateDisplay()
     }
 
     // Calculate the maximum size of the card widgets after they've been added to the layout
-    //adjustCardsPerPage();
+    // adjustCardsPerPage();
 
     overlap_control_widget->connectOverlapWidget(printings_group_widget);
     flow_widget->addWidget(printings_group_widget);
@@ -160,15 +165,18 @@ void VisualDatabaseDisplayWidget::updateDisplay()
     update(); // Update the widget display
 }
 
-void VisualDatabaseDisplayWidget::adjustCardsPerPage() {
+void VisualDatabaseDisplayWidget::adjustCardsPerPage()
+{
     // Calculate available width and height in the OverlapWidget
     int availableWidth = flow_widget->width();
     int availableHeight = flow_widget->height();
 
-    QList<CardInfoPictureWithTextOverlayWidget*> cardDisplays;
-    for (OverlapWidget* child : flow_widget->findChildren<OverlapWidget*>()) {
-        for (CardInfoPictureWithTextOverlayWidget* overlapChild : child->findChildren<CardInfoPictureWithTextOverlayWidget*>()) {
-            if (CardInfoPictureWithTextOverlayWidget* cardDisplay = qobject_cast<CardInfoPictureWithTextOverlayWidget*>(overlapChild)) {
+    QList<CardInfoPictureWithTextOverlayWidget *> cardDisplays;
+    for (OverlapWidget *child : flow_widget->findChildren<OverlapWidget *>()) {
+        for (CardInfoPictureWithTextOverlayWidget *overlapChild :
+             child->findChildren<CardInfoPictureWithTextOverlayWidget *>()) {
+            if (CardInfoPictureWithTextOverlayWidget *cardDisplay =
+                    qobject_cast<CardInfoPictureWithTextOverlayWidget *>(overlapChild)) {
                 cardDisplays.append(cardDisplay);
             }
         }
@@ -183,30 +191,31 @@ void VisualDatabaseDisplayWidget::adjustCardsPerPage() {
         // Calculate how many cards can fit horizontally and vertically
         cardsPerRow = availableWidth / (cardWidth + overlapMargin);
         rowsPerColumn = availableHeight / (cardHeight + overlapMargin);
-        //qDebug() << "available width " << availableWidth << "available height: " << availableHeight;
-        //qDebug() << "width: " << cardWidth << "height: " << cardHeight << "cardsPerRow: " << cardsPerRow << "rowsPerColumn: " << rowsPerColumn;
+        // qDebug() << "available width " << availableWidth << "available height: " << availableHeight;
+        // qDebug() << "width: " << cardWidth << "height: " << cardHeight << "cardsPerRow: " << cardsPerRow <<
+        // "rowsPerColumn: " << rowsPerColumn;
 
         // Update cardsPerPage based on rows and columns
         cardsPerPage = cardsPerRow * rowsPerColumn;
-        //qDebug() << "Adjusted cards per page to:" << cardsPerPage;
+        // qDebug() << "Adjusted cards per page to:" << cardsPerPage;
     }
 }
-
 
 void VisualDatabaseDisplayWidget::modelDirty()
 {
     debounce_timer->start(debounce_time);
 }
 
-void VisualDatabaseDisplayWidget::sortCardList( const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder) {
+void VisualDatabaseDisplayWidget::sortCardList(const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder)
+{
     CardInfoComparator comparator(properties, order);
     std::sort(cards->begin(), cards->end(), comparator);
 }
 
 void VisualDatabaseDisplayWidget::databaseDataChanged(QModelIndex topLeft, QModelIndex bottomRight)
 {
-    (void) topLeft;
-    (void) bottomRight;
+    (void)topLeft;
+    (void)bottomRight;
     updateDisplay();
 }
 
@@ -220,26 +229,27 @@ void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
         // Scrolling up
         if (currentPage > 0) {
             currentPage--;
-            loadCurrentPage();  // Load the previous page
+            loadCurrentPage(); // Load the previous page
         }
     } else if (event->angleDelta().y() < 0) {
         // Scrolling down
         if ((currentPage + 1) * cardsPerPage < databaseDisplayModel->rowCount()) {
             currentPage++;
-            loadCurrentPage();  // Load the next page
+            loadCurrentPage(); // Load the next page
         }
     }
 
     // Prevent overscrolling by stopping the event if needed
     if ((currentPage == 0 && event->angleDelta().y() > 0) ||
         ((currentPage + 1) * cardsPerPage >= databaseDisplayModel->rowCount() && event->angleDelta().y() < 0)) {
-        event->ignore();  // Ignore the event to prevent overscrolling
-        } else {
-            event->accept();  // Accept the event if scrolling is valid
-        }
+        event->ignore(); // Ignore the event to prevent overscrolling
+    } else {
+        event->accept(); // Accept the event if scrolling is valid
+    }
 }
 
-void VisualDatabaseDisplayWidget::setupPaginationControls() {
+void VisualDatabaseDisplayWidget::setupPaginationControls()
+{
     QPushButton *prevButton = new QPushButton("Previous", this);
     QPushButton *nextButton = new QPushButton("Next", this);
 
