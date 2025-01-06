@@ -8,7 +8,6 @@
 #ifndef MANA_BASE_WIDGET_H
 #define MANA_BASE_WIDGET_H
 
-
 class ManaBaseWidget : public QWidget
 {
     Q_OBJECT
@@ -27,4 +26,4 @@ private:
     QHBoxLayout *layout;
 };
 
-#endif //MANA_BASE_WIDGET_H
+#endif // MANA_BASE_WIDGET_H

@@ -22,4 +22,4 @@ private:
     QHBoxLayout *layout;
 };
 
-#endif //MANA_CURVE_WIDGET_H
+#endif // MANA_CURVE_WIDGET_H
