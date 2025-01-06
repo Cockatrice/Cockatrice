@@ -1157,7 +1157,8 @@ void MainWindow::actCheckCardUpdates()
 
     connect(cardUpdateProcess, &QProcess::errorOccurred, this, &MainWindow::cardUpdateError);
 
-    connect(cardUpdateProcess, &QProcess::finished, this, &MainWindow::cardUpdateFinished);
+    connect(cardUpdateProcess, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+            &MainWindow::cardUpdateFinished);
 
     // full "run the update" command; leave empty if not present
     QString updaterCmd;
