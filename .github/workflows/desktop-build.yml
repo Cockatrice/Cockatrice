@@ -260,7 +260,7 @@ jobs:
         env:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_TEST: 1
-          MAKE_PACKAGE: '${{matrix.make_package}}'
+          # MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
         # macOS runner have 3 cores usually - only the macos-13 image has 4:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
