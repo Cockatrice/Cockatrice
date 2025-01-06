@@ -175,7 +175,6 @@ void VisualDatabaseDisplayWidget::updateDisplay()
     update(); // Update the widget display
 }
 
-
 void VisualDatabaseDisplayWidget::adjustCardsPerPage()
 {
     // Calculate available width and height in the OverlapWidget
