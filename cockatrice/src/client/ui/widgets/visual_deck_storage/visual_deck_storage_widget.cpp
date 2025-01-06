@@ -96,6 +96,8 @@ void VisualDeckStorageWidget::refreshBannerCards()
     flowWidget->clearLayout(); // Clear existing widgets in the flow layout
 
     foreach (const QString &file, filteredFiles) {
+        // TODO: We load the deck here to retrieve information (we sorta really have to) but since we do the work,
+        // we may as well persist the deckLoader to save ourselves some heavy lifting later?
         auto deckLoader = new DeckLoader();
         deckLoader->loadFromFile(file, DeckLoader::CockatriceFormat);
         deckListModel->setDeckList(new DeckLoader(*deckLoader));
