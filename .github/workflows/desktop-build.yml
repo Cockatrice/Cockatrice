@@ -319,19 +319,19 @@ jobs:
 #          echo "Attach staple"
 #          xcrun stapler staple "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app"
 
-      - name: Sign binary 2
-        uses: lando/code-sign-action@v3
-        with:
-          file: "build/cockatrice/cockatrice.app"
-          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-          certificate-id: STKV3NKYBF
-          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-#          apple-notary-tool: altool
-          apple-team-id: STKV3NKYBF
-          apple-product-id: cockatrice.us.code-sign-action
-          options: --options runtime -v
+#      - name: Sign binary 2
+#        uses: lando/code-sign-action@v3
+#        with:
+#          file: "build/cockatrice/cockatrice.app"
+#          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+#          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+#          certificate-id: STKV3NKYBF
+#          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+#          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+##          apple-notary-tool: altool
+#          apple-team-id: STKV3NKYBF
+#          apple-product-id: cockatrice.us.code-sign-action
+#          options: --options runtime -v
 
 
       #      - name: Sign binary
@@ -341,6 +341,15 @@ jobs:
 #
 #
 
+      - name: Sign and notarize the release build
+        uses: toitlang/action-macos-sign-notarize@v1.2.0
+        with:
+          certificate: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+          apple-team-id: "STKV3NKYBF"
+          app-path: "build/cockatrice/cockatrice.app"
 
       - name: Upload artifact
         if: matrix.make_package
