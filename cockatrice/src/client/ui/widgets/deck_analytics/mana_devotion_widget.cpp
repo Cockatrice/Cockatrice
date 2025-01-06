@@ -24,7 +24,6 @@ ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListModel *deck_list
 std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
 {
     manaDevotionMap = std::unordered_map<char, int>();
-    qDebug() << "Analyzing mana devotion";
     InnerDecklistNode *listRoot = deck_list_model->getDeckList()->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
@@ -45,9 +44,6 @@ std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
         }
     }
 
-    for (auto entry : manaDevotionMap) {
-        qDebug() << "Mana Devotion " << entry.first << " has " << entry.second << " entries";
-    }
     update();
     // this->setCurve(manaDevotionMap);
     // mana_curve_widget->updateDisplay();
@@ -58,7 +54,6 @@ std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
 
 void ManaDevotionWidget::updateDisplay()
 {
-    qDebug() << "ManaDevotionWidget::updateDisplay Starting";
 
     // Clear the layout first
     if (layout != nullptr) {
