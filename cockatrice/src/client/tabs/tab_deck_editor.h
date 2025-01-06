@@ -111,6 +111,7 @@ private:
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
+    bool swapCard(const QModelIndex &idx);
     void recursiveExpand(const QModelIndex &index);
     void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 

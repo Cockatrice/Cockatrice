@@ -1368,18 +1368,50 @@ void TabDeckEditor::addCardHelper(QString zoneName)
 
 void TabDeckEditor::actSwapCard()
 {
-    const QModelIndex currentIndex = deckView->selectionModel()->currentIndex();
+    auto selectedRows = getSelectedCardNodes();
+
+    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
+    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    if (selectedRows.length() == 1) {
+        deckView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
+    bool modified = false;
+    for (const auto &currentIndex : selectedRows) {
+        if (swapCard(currentIndex)) {
+            modified = true;
+        }
+    }
+
+    deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    if (modified) {
+        setModified(true);
+        setSaveStatus(true);
+    }
+
+    update();
+}
+
+/**
+ * Swaps the card at the index between the maindeck and sideboard
+ *
+ * @param currentIndex The index to swap.
+ * @return True if the swap was successful
+ */
+bool TabDeckEditor::swapCard(const QModelIndex &currentIndex)
+{
     if (!currentIndex.isValid())
-        return;
+        return false;
     const QString cardName = currentIndex.sibling(currentIndex.row(), 1).data().toString();
     const QString cardProviderID = currentIndex.sibling(currentIndex.row(), 4).data().toString();
     const QModelIndex gparent = currentIndex.parent().parent();
 
     if (!gparent.isValid())
-        return;
+        return false;
 
     const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
-    actDecrement();
+    offsetCountAtIndex(currentIndex, -1);
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     // Third argument (true) says create the card no matter what, even if not in DB
@@ -1388,9 +1420,7 @@ void TabDeckEditor::actSwapCard()
         true);
     recursiveExpand(newCardIndex);
 
-    setModified(true);
-    setSaveStatus(true);
-    update();
+    return true;
 }
 
 void TabDeckEditor::actAddCard()
