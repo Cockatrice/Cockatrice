@@ -10,15 +10,19 @@ ShortcutFilterProxyModel::ShortcutFilterProxyModel(QObject *parent) : QSortFilte
 }
 
 /**
- * @return True if this row or its parent matches the search string
+ * Appends the parent and source row together before doing the regex match.
  */
 bool ShortcutFilterProxyModel::filterAcceptsRow(const int sourceRow, const QModelIndex &sourceParent) const
 {
     QModelIndex nameIndex = sourceModel()->index(sourceRow, filterKeyColumn(), sourceParent);
     QModelIndex parentIndex = sourceModel()->index(sourceParent.row(), filterKeyColumn(), sourceParent.parent());
 
-    return sourceModel()->data(nameIndex).toString().contains(filterRegularExpression()) ||
-           sourceModel()->data(parentIndex).toString().contains(filterRegularExpression());
+    QString name = sourceModel()->data(nameIndex).toString();
+    QString parentName = sourceModel()->data(parentIndex).toString();
+
+    QString searchedString = parentName + " " + name;
+
+    return searchedString.contains(filterRegularExpression());
 }
 
 ShortcutTreeView::ShortcutTreeView(QWidget *parent) : QTreeView(parent)
@@ -140,8 +144,24 @@ void ShortcutTreeView::currentChanged(const QModelIndex &current, const QModelIn
     }
 }
 
+/**
+ * The search string is split by word.
+ * A String is a match as long as it contains all the words in the search string in order
+ */
 void ShortcutTreeView::updateSearchString(const QString &searchString)
 {
-    proxyModel->setFilterFixedString(searchString);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    const auto skipEmptyParts = Qt::SkipEmptyParts;
+#else
+    const auto skipEmptyParts = QString::SkipEmptyParts;
+#endif
+    QStringList searchWords = searchString.split(" ", skipEmptyParts);
+
+    auto escapeRegex = [](const QString &s) { return QRegularExpression::escape(s); };
+    std::transform(searchWords.begin(), searchWords.end(), searchWords.begin(), escapeRegex);
+
+    auto regex = QRegularExpression(searchWords.join(".*"), QRegularExpression::CaseInsensitiveOption);
+
+    proxyModel->setFilterRegularExpression(regex);
     expandAll();
 }
