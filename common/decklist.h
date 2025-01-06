@@ -252,6 +252,7 @@ class DeckList : public QObject
 private:
     QString name, comments, bannerCard;
     QString deckHash;
+    QString lastLoadedTimestamp;
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
@@ -283,6 +284,10 @@ public slots:
     {
         bannerCard = _bannerCard;
     }
+    void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
+    {
+        lastLoadedTimestamp = _lastLoadedTimestamp;
+    }
 
 public:
     explicit DeckList();
@@ -300,6 +305,10 @@ public:
     QString getBannerCard() const
     {
         return bannerCard;
+    }
+    QString getLastLoadedTimestamp() const
+    {
+        return lastLoadedTimestamp;
     }
     QList<MoveCard_ToZone> getCurrentSideboardPlan();
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);

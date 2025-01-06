@@ -307,7 +307,7 @@ void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckP
     QString deckString;
     DeckLoader deck;
 
-    bool error = !deck.loadFromFile(fileName, fmt);
+    bool error = !deck.loadFromFile(fileName, fmt, true);
     if (!error) {
         deckString = deck.writeToString_Native();
         error = deckString.length() > MAX_FILE_LENGTH;
@@ -357,7 +357,7 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
     QString deckString;
     DeckLoader deck;
 
-    bool error = !deck.loadFromFile(filePath, fmt);
+    bool error = !deck.loadFromFile(filePath, fmt, true);
     if (!error) {
         deckString = deck.writeToString_Native();
         error = deckString.length() > MAX_FILE_LENGTH;

@@ -7,6 +7,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QRegularExpression>
 #include <QStringList>
 
@@ -34,7 +35,7 @@ DeckLoader::DeckLoader(const DeckLoader &other)
 {
 }
 
-bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
+bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -50,7 +51,7 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
             result = loadFromFile_Native(&file);
             qDebug() << "Loaded from" << fileName << "-" << result;
             if (!result) {
-                qDebug() << "Retying as plain format";
+                qDebug() << "Retrying as plain format";
                 file.seek(0);
                 result = loadFromFile_Plain(&file);
                 fmt = PlainTextFormat;
@@ -65,6 +66,9 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
     if (result) {
         lastFileName = fileName;
         lastFileFormat = fmt;
+        if (userRequest) {
+            updateLastLoadedTimestamp(fileName, fmt);
+        }
 
         emit deckLoaded();
     }
@@ -110,6 +114,59 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     return result;
 }
 
+bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt)
+{
+    QFileInfo fileInfo(fileName);
+    if (!fileInfo.exists()) {
+        qWarning() << "File does not exist:" << fileName;
+        return false;
+    }
+
+    QDateTime originalTimestamp = fileInfo.lastModified();
+
+    // Open the file for writing
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open file for writing:" << fileName;
+        return false;
+    }
+
+    bool result = false;
+
+    // Perform file modifications
+    switch (fmt) {
+        case PlainTextFormat:
+            break;
+        case CockatriceFormat:
+            setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+            result = saveToFile_Native(&file);
+            break;
+    }
+
+    file.close(); // Close the file to ensure changes are flushed
+
+    if (result) {
+        lastFileName = fileName;
+        lastFileFormat = fmt;
+
+        // Re-open the file and set the original timestamp
+        if (!file.open(QIODevice::ReadWrite)) {
+            qWarning() << "Failed to re-open file to set timestamp:" << fileName;
+            return false;
+        }
+
+        if (!file.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
+            qWarning() << "Failed to set modification time for file:" << fileName;
+            file.close();
+            return false;
+        }
+
+        file.close();
+    }
+
+    return result;
+}
+
 // This struct is here to support the forEachCard function call, defined in decklist. It
 // requires a function to be called for each card, and passes an inner node and a card for
 // each card in the decklist.
@@ -120,7 +177,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
