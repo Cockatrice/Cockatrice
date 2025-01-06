@@ -12,8 +12,8 @@ set(cockatrice_SOURCES
     src/game/board/abstract_graphics_item.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
-        src/client/ui/widgets/general/display/bar_widget.cpp
-        src/client/ui/widgets/general/display/banner_widget.cpp
+    src/client/ui/widgets/general/display/bar_widget.cpp
+    src/client/ui/widgets/general/display/banner_widget.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
     src/game/cards/card_database_model.cpp

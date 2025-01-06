@@ -5,9 +5,9 @@
 #include "../../../../game/cards/card_database.h"
 #include "../../layouts/flow_layout.h"
 #include "../../layouts/vertical_flow_layout.h"
+#include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
 
 #include <QWidget>
 #include <qscrollarea.h>
@@ -28,15 +28,15 @@ public:
     void sortCardList(QStringList properties, Qt::SortOrder order);
     void setDeckList(const DeckList &new_deck_list_model);
 
-    signals:
+signals:
     void activeCardChanged(CardInfoPtr activeCard);
-    void mainboardCardClicked(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void sideboardCardClicked(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
+    void mainboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void sideboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 protected slots:
     void onHover(CardInfoPtr hoveredCard);
-    void onMainboardClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void onSideboardClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
+    void onMainboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onSideboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void activeSortCriteriaChanged();
 
@@ -55,4 +55,4 @@ private:
     QWidget *container;
 };
 
-#endif //VISUAL_DECK_EDITOR_H
+#endif // VISUAL_DECK_EDITOR_H

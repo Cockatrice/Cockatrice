@@ -1,14 +1,14 @@
 #ifndef TAB_DECK_EDITOR_VISUAL_DATABASE_SEARCH_TAB_H
 #define TAB_DECK_EDITOR_VISUAL_DATABASE_SEARCH_TAB_H
+#include "../../../client/game_logic/key_signals.h"
+#include "../../../deck/deck_list_model.h"
 #include "../../../game/cards/card_database.h"
 #include "../../../game/cards/card_database_model.h"
 #include "../../ui/widgets/cards/card_info_frame_widget.h"
 #include "../../ui/widgets/deck_analytics/deck_analytics_widget.h"
-#include "../../../deck/deck_list_model.h"
-#include "../../../client/game_logic/key_signals.h"
+#include "../../ui/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 #include "../tab.h"
 #include "../tab_deck_editor.h"
-#include "../../ui/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 
 #include <QTreeView>
 
@@ -64,12 +64,12 @@ private:
     QWidget *filterBox;
 
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *filterDockMenu;
-    QAction  *aClose;
+    QAction *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating,
-            *aDeckAnalyticsDockFloating, *aDeckAnalyticsDockVisible, *aFilterDockVisible, *aFilterDockFloating;
+        *aDeckAnalyticsDockFloating, *aDeckAnalyticsDockVisible, *aFilterDockVisible, *aFilterDockFloating;
 
     bool modified;
     QVBoxLayout *layout;
@@ -95,4 +95,4 @@ signals:
     void deckEditorClosing(TabDeckEditorVisualDatabaseSearchTab *tab);
 };
 
-#endif //TAB_DECK_EDITOR_VISUAL_DATABASE_SEARCH_TAB_H
+#endif // TAB_DECK_EDITOR_VISUAL_DATABASE_SEARCH_TAB_H

@@ -1,12 +1,12 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
-
+#include "../../../../deck/deck_list_model.h"
+#include "../../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "mana_base_widget.h"
 #include "mana_curve_widget.h"
 #include "mana_devotion_widget.h"
-#include "../../../../deck/deck_list_model.h"
-#include "../../../ui/widgets/general/layout_containers/flow_widget.h"
+
 #include <QHBoxLayout>
 #include <QWidget>
 #include <decklist.h>
@@ -31,5 +31,4 @@ private:
     ManaBaseWidget *mana_base_widget;
 };
 
-
-#endif //DECK_ANALYTICS_WIDGET_H
+#endif // DECK_ANALYTICS_WIDGET_H
