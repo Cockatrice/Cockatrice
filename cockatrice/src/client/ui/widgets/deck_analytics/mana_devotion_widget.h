@@ -25,4 +25,4 @@ private:
     QHBoxLayout *layout;
 };
 
-#endif //MANA_DEVOTION_WIDGET_H
+#endif // MANA_DEVOTION_WIDGET_H

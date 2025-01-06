@@ -7,7 +7,8 @@
 #include <QVariant>
 #include <Qt>
 
-class CardInfoComparator {
+class CardInfoComparator
+{
 public:
     explicit CardInfoComparator(const QStringList &properties, Qt::SortOrder order = Qt::AscendingOrder);
     bool operator()(const CardInfoPtr &a, const CardInfoPtr &b) const;

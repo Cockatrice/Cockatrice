@@ -14,13 +14,16 @@ class TabDeckEditorVisualTabWidget : public QTabWidget
     Q_OBJECT
 
 public:
-    explicit TabDeckEditorVisualTabWidget(QWidget *parent = nullptr, DeckListModel *deckModel = nullptr, CardDatabaseModel *card_database_model = nullptr, CardDatabaseDisplayModel *card_database_display_model = nullptr);
+    explicit TabDeckEditorVisualTabWidget(QWidget *parent = nullptr,
+                                          DeckListModel *deckModel = nullptr,
+                                          CardDatabaseModel *card_database_model = nullptr,
+                                          CardDatabaseDisplayModel *card_database_display_model = nullptr);
 
     // Utility functions
     void addNewTab(QWidget *widget, const QString &title);
     void removeCurrentTab();
     void setTabTitle(int index, const QString &title);
-    QWidget* getCurrentTab() const;
+    QWidget *getCurrentTab() const;
     int getTabCount() const;
 
     VisualDeckEditorWidget *visualDeckView;
@@ -30,27 +33,25 @@ public:
 public slots:
     void onCardChanged(CardInfoPtr activeCard);
     void onCardChangedDatabaseDisplay(CardInfoPtr activeCard);
-    void onMainboardCardClickedDeckEditor(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void onSideboardCardClickedDeckEditor(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void onCardClickedDatabaseDisplay(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
+    void onMainboardCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onSideboardCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onCardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 signals:
     void cardChanged(CardInfoPtr activeCard);
     void cardChangedDatabaseDisplay(CardInfoPtr activeCard);
-    void mainboardCardClicked(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void sideboardCardClicked(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void cardClickedDatabaseDisplay(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
+    void mainboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void sideboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 private:
-    QVBoxLayout *layout;   // Layout for the tab widget and other controls
+    QVBoxLayout *layout; // Layout for the tab widget and other controls
     DeckListModel *deckModel;
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
 
-
-
-    private slots:
-        void handleTabClose(int index); // Slot for closing a tab
+private slots:
+    void handleTabClose(int index); // Slot for closing a tab
 };
 
 #endif // TAB_DECK_EDITOR_VISUAL_TAB_WIDGET_H

@@ -1,11 +1,11 @@
 #ifndef WINDOW_DECKEDITORVISUAL_H
 #define WINDOW_DECKEDITORVISUAL_H
 
-#include "tab_deck_editor_visual_tab_widget.h"
-#include "../tab.h"
-#include "../../game_logic/key_signals.h"
 #include "../../../deck/custom_line_edit.h"
+#include "../../game_logic/key_signals.h"
+#include "../tab.h"
 #include "../tab_deck_editor.h"
+#include "tab_deck_editor_visual_tab_widget.h"
 
 #include <QAbstractItemModel>
 #include <QDir>
@@ -107,7 +107,7 @@ private:
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating,
-            *aDeckAnalyticsDockFloating, *aDeckAnalyticsDockVisible, *aFilterDockVisible, *aFilterDockFloating;
+        *aDeckAnalyticsDockFloating, *aDeckAnalyticsDockVisible, *aFilterDockVisible, *aFilterDockFloating;
 
     bool modified;
     QVBoxLayout *centralFrame;
@@ -140,9 +140,9 @@ public slots:
     void closeRequest() override;
     void setCurrentCardInfo(CardInfoPtr activeCard);
     void changeModelIndexAndCardInfo(CardInfoPtr activeCard);
-    void processMainboardCardClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void processSideboardCardClick(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
-    void processCardClickDatabaseDisplay(QMouseEvent* event, CardInfoPictureWithTextOverlayWidget* instance);
+    void processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void processSideboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void processCardClickDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 signals:
     void deckEditorClosing(TabDeckEditorVisual *tab);
 };
