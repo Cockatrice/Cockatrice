@@ -193,7 +193,7 @@ void MainWindow::activateAccepted()
 void MainWindow::actConnect()
 {
     dlgConnect = new DlgConnect(this);
-    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
+    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, &MainWindow::actForgotPasswordRequest);
 
     if (dlgConnect->exec()) {
         client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
@@ -703,58 +703,58 @@ void MainWindow::retranslateUi()
 void MainWindow::createActions()
 {
     aConnect = new QAction(this);
-    connect(aConnect, SIGNAL(triggered()), this, SLOT(actConnect()));
+    connect(aConnect, &QAction::triggered, this, &MainWindow::actConnect);
     aDisconnect = new QAction(this);
     aDisconnect->setEnabled(false);
-    connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
+    connect(aDisconnect, &QAction::triggered, this, &MainWindow::actDisconnect);
     aSinglePlayer = new QAction(this);
-    connect(aSinglePlayer, SIGNAL(triggered()), this, SLOT(actSinglePlayer()));
+    connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
-    connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
+    connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
     aDeckEditor = new QAction(this);
-    connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+    connect(aDeckEditor, &QAction::triggered, this, &MainWindow::actDeckEditor);
     aVisualDeckStorage = new QAction(this);
-    connect(aVisualDeckStorage, SIGNAL(triggered()), this, SLOT(actVisualDeckStorage()));
+    connect(aVisualDeckStorage, &QAction::triggered, this, &MainWindow::actVisualDeckStorage);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
     aRegister = new QAction(this);
-    connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
+    connect(aRegister, &QAction::triggered, this, &MainWindow::actRegister);
     aForgotPassword = new QAction(this);
-    connect(aForgotPassword, SIGNAL(triggered()), this, SLOT(actForgotPasswordRequest()));
+    connect(aForgotPassword, &QAction::triggered, this, &MainWindow::actForgotPasswordRequest);
     aSettings = new QAction(this);
-    connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
+    connect(aSettings, &QAction::triggered, this, &MainWindow::actSettings);
     aExit = new QAction(this);
-    connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
+    connect(aExit, &QAction::triggered, this, &MainWindow::actExit);
 
     aManageSets = new QAction(QString(), this);
-    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
+    connect(aManageSets, &QAction::triggered, this, &MainWindow::actManageSets);
     aEditTokens = new QAction(QString(), this);
-    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    connect(aEditTokens, &QAction::triggered, this, &MainWindow::actEditTokens);
     aOpenCustomFolder = new QAction(QString(), this);
-    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+    connect(aOpenCustomFolder, &QAction::triggered, this, &MainWindow::actOpenCustomFolder);
     aOpenCustomsetsFolder = new QAction(QString(), this);
-    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+    connect(aOpenCustomsetsFolder, &QAction::triggered, this, &MainWindow::actOpenCustomsetsFolder);
     aAddCustomSet = new QAction(QString(), this);
-    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+    connect(aAddCustomSet, &QAction::triggered, this, &MainWindow::actAddCustomSet);
     aReloadCardDatabase = new QAction(QString(), this);
-    connect(aReloadCardDatabase, SIGNAL(triggered()), this, SLOT(actReloadCardDatabase()));
+    connect(aReloadCardDatabase, &QAction::triggered, this, &MainWindow::actReloadCardDatabase);
 
     aAbout = new QAction(this);
-    connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+    connect(aAbout, &QAction::triggered, this, &MainWindow::actAbout);
     aTips = new QAction(this);
-    connect(aTips, SIGNAL(triggered()), this, SLOT(actTips()));
+    connect(aTips, &QAction::triggered, this, &MainWindow::actTips);
     aUpdate = new QAction(this);
-    connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
+    connect(aUpdate, &QAction::triggered, this, &MainWindow::actUpdate);
     aCheckCardUpdates = new QAction(this);
-    connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
+    connect(aCheckCardUpdates, &QAction::triggered, this, &MainWindow::actCheckCardUpdates);
     aViewLog = new QAction(this);
-    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
+    connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
 
     aShow = new QAction(this);
-    connect(aShow, SIGNAL(triggered()), this, SLOT(actShow()));
+    connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
 
 #if defined(__APPLE__) /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
