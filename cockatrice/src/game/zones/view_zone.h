@@ -34,6 +34,16 @@ private:
     bool revealZone, writeableRevealZone;
     CardList::SortOption groupBy, sortBy;
     bool pileView;
+    bool isReversed;
+
+    enum CardAction
+    {
+        INITIALIZE,
+        ADD_CARD,
+        REMOVE_CARD
+    };
+
+    void updateCardIds(CardAction action);
 
     struct GridSize
     {
@@ -49,7 +59,8 @@ public:
                  int _numberCards = -1,
                  bool _revealZone = false,
                  bool _writeableRevealZone = false,
-                 QGraphicsItem *parent = nullptr);
+                 QGraphicsItem *parent = nullptr,
+                 bool _isReversed = false);
     ~ZoneViewZone();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -74,6 +85,10 @@ public:
         return writeableRevealZone;
     }
     void setWriteableRevealZone(bool _writeableRevealZone);
+    bool getIsReversed() const
+    {
+        return isReversed;
+    }
 public slots:
     void setGroupBy(CardList::SortOption _groupBy);
     void setSortBy(CardList::SortOption _sortBy);

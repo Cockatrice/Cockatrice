@@ -47,7 +47,7 @@ public:
     void registerAnimationItem(AbstractCardItem *item);
     void unregisterAnimationItem(AbstractCardItem *card);
 public slots:
-    void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
+    void toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed = false);
     void addRevealedZoneView(Player *player,
                              CardZone *zone,
                              const QList<const ServerInfo_Card *> &cardList,

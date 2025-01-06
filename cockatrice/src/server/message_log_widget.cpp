@@ -378,7 +378,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty
     }
 }
 
-void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
+void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards, bool isReversed)
 {
     if (numberCards == -1) {
         appendHtmlServerMessage(tr("%1 is looking at %2.")
@@ -386,10 +386,11 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     } else {
         appendHtmlServerMessage(
-            tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
+            tr("%1 is looking at the %4 %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
                 .arg(sanitizeHtml(player->getName()))
                 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
-                .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>"));
+                .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>")
+                .arg(isReversed ? tr("bottom") : tr("top")));
     }
 }
 
@@ -850,7 +851,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this,
             SLOT(logAttachCard(Player *, QString, Player *, QString)));
     connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));
-    connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
+    connect(player, &Player::logDumpZone, this, &MessageLogWidget::logDumpZone);
     connect(player, SIGNAL(logDrawCards(Player *, int, bool)), this, SLOT(logDrawCards(Player *, int, bool)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
     connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int, bool)), this,

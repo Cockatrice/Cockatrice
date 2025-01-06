@@ -142,7 +142,7 @@ void GameScene::rearrange()
     processViewSizeChange(viewSize);
 }
 
-void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
+void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
 {
     for (auto &view : zoneViews) {
         ZoneViewZone *temp = view->getZone();
@@ -151,7 +151,8 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
         }
     }
 
-    ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false);
+    ZoneViewWidget *item =
+        new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
     zoneViews.append(item);
     connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
