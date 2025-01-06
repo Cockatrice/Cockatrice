@@ -334,29 +334,35 @@ jobs:
 #          options: --options runtime -v
 
 
-      #      - name: Sign binary
-#        uses: lando/code-sign-action@v3
-#        with:
-#          file: ${{steps.build.outputs.path}}
-#
-#
-
-      - name: Sign and notarize the release build
-        uses: toitlang/action-macos-sign-notarize@v1.2.0
+      - name: Sign binary
+        uses: lando/code-sign-action@v3
         with:
-          certificate: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          file: "build/cockatrice/cockatrice.app"
+          certificate-id: ${{ PROD_MACOS_CERTIFICATE_NAME }}
+          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-          username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          apple-notary-tool: 'notarytool'
           apple-team-id: "STKV3NKYBF"
-          app-path: "build/cockatrice/cockatrice.app"
+
+
+#      - name: Sign and notarize the release build
+#        uses: toitlang/action-macos-sign-notarize@v1.2.0
+#        with:
+#          certificate: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+#          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+#          username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+#          password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+#          apple-team-id: "STKV3NKYBF"
+#          app-path: "build/cockatrice/cockatrice.app"
 
       - name: Upload artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
           name: macOS${{matrix.target}}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-dmg
-          path: ${{steps.build.outputs.path}}
+          path: "build/cockatrice/cockatrice.app"
           if-no-files-found: error
 
       - name: Upload to release
