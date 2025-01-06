@@ -9,7 +9,6 @@
 #include <QRegularExpression>
 #include <decklist.h>
 #include <regex>
-#include <string>
 #include <unordered_map>
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *deck_list_model)
@@ -37,8 +36,6 @@ std::unordered_map<char, int> ManaBaseWidget::analyzeManaBase()
                 if (info) {
                     auto devotion = determineManaProduction(info->getText());
                     mergeManaCounts(manaBaseMap, devotion);
-                } else {
-                    qDebug() << "Card not found in database!";
                 }
             }
         }
@@ -54,8 +51,6 @@ std::unordered_map<char, int> ManaBaseWidget::analyzeManaBase()
 
 void ManaBaseWidget::updateDisplay()
 {
-    qDebug() << "ManaBaseWidget::updateDisplay Starting";
-
     // Clear the layout first
     if (layout != nullptr) {
         QLayoutItem *item;
