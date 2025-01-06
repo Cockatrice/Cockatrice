@@ -323,7 +323,7 @@ jobs:
       - name: Sign binary
         uses: lando/code-sign-action@v3
         with:
-          file: "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app"
+          file: ${{steps.build.outputs.path}}
           certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           certificate-id: STKV3NKYBF
           certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
