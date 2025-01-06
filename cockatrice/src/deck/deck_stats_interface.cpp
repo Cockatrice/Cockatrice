@@ -85,7 +85,7 @@ struct CopyIfNotAToken
     }
 };
 
-void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList &destination)
+void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
 {
     CopyIfNotAToken copyIfNotAToken(cardDatabase, destination);
     source.forEachCard(copyIfNotAToken);
