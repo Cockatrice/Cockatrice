@@ -834,7 +834,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
-    connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
+    connect(&SettingsCache::instance(), &SettingsCache::pixmapCacheSizeChanged, this,
+            &MainWindow::pixmapCacheSizeChanged);
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
 
     client = new RemoteClient;
@@ -866,9 +867,9 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     tabSupervisor = new TabSupervisor(client);
-    connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
-    connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
-    connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
+    connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
+    connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
+    connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
     tabSupervisor->addDeckEditorTab(nullptr);
 
     setCentralWidget(tabSupervisor);
@@ -884,19 +885,20 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayIcon();
     }
 
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &MainWindow::refreshShortcuts);
     refreshShortcuts();
 
     if (SettingsCache::instance().getVisualDeckStorageShowOnLoad()) {
-        connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFinished()), tabSupervisor,
-                SLOT(addVisualDeckStorageTab()));
+        connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, tabSupervisor,
+                &TabSupervisor::addVisualDeckStorageTab);
     }
-    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFailed()), this,
-            SLOT(cardDatabaseLoadingFailed()));
-    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this,
-            SLOT(cardDatabaseNewSetsFound(int, QStringList)));
-    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseAllNewSetsEnabled()), this,
-            SLOT(cardDatabaseAllNewSetsEnabled()));
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFailed, this,
+            &MainWindow::cardDatabaseLoadingFailed);
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseNewSetsFound, this,
+            &MainWindow::cardDatabaseNewSetsFound);
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseAllNewSetsEnabled, this,
+            &MainWindow::cardDatabaseAllNewSetsEnabled);
 
     tip = new DlgTipOfTheDay();
 
