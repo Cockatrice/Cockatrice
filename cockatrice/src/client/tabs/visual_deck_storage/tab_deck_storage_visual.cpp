@@ -78,7 +78,7 @@ void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardP
 {
     (void)event;
     DeckLoader deckLoader;
-    if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat))
+    if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat, true))
         return;
 
     emit openDeckEditor(&deckLoader);

@@ -1045,7 +1045,7 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
     auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt)) {
+    if (l->loadFromFile(fileName, fmt, true)) {
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
         updateBannerCardComboBox();
         if (!l->getBannerCard().isEmpty()) {
