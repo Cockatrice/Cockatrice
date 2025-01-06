@@ -14,8 +14,6 @@ ManaCurveWidget::ManaCurveWidget(QWidget *parent) : QWidget(parent)
 
 void ManaCurveWidget::updateDisplay()
 {
-    qDebug() << "ManaCurveWidget::updateDisplay Starting";
-
     // Clear the layout first
     if (layout != nullptr) {
         QLayoutItem *item;
