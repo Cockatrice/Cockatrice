@@ -26,6 +26,7 @@ public:
     void adjustCardsPerPage();
     void populateCards();
     void searchModelChanged();
+    void loadNextPage();
     void loadCurrentPage();
     void sortCardList(QStringList properties, Qt::SortOrder order);
     void setDeckList(const DeckList &new_deck_list_model);

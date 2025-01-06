@@ -7,6 +7,7 @@
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 
 #include <QPushButton>
+#include <QScrollBar>
 #include <qpropertyanimation.h>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
@@ -17,6 +18,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     cards = new QList<CardInfoPtr>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
             &VisualDatabaseDisplayWidget::modelDirty);
+    connect(databaseDisplayModel, &QSortFilterProxyModel::invalidate, this, &VisualDatabaseDisplayWidget::modelDirty);
 
     // Set up main layout and widgets
     setMinimumSize(0, 0);
@@ -78,57 +80,65 @@ void VisualDatabaseDisplayWidget::populateCards()
 
 void VisualDatabaseDisplayWidget::searchModelChanged()
 {
+    qDebug() << "Search Model changed";
+    // Clear the current page and prepare for new data
+    flow_widget->clearLayout(); // Clear existing cards
+    cards->clear();             // Clear the card list
+    // Reset scrollbar position to the top after loading new cards
+    QScrollBar *scrollBar = flow_widget->scrollArea->verticalScrollBar();
+    if (scrollBar) {
+        scrollBar->setValue(0); // Reset scrollbar to top
+    }
+
     currentPage = 0;
     loadCurrentPage();
+    updateDisplay();
+}
+
+void VisualDatabaseDisplayWidget::loadNextPage()
+{
+    // Calculate the start and end indices for the next page
+    int rowCount = databaseDisplayModel->rowCount();
+    int start = (currentPage + 1) * cardsPerPage;
+    int end = qMin(start + cardsPerPage, rowCount);
+
+    // Load more cards if we are at the end of the current list and can fetch more
+    if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
+        databaseDisplayModel->fetchMore(QModelIndex());
+    }
+
+    // Load the next page of cards and add them to the flow widget
+    for (int row = start; row < end; ++row) {
+        QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
+        QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
+        CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
+        if (info) {
+            CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
+            display->setCard(info);
+            flow_widget->addWidget(display);
+            connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+            connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        } else {
+            qDebug() << "Card not found in database!";
+        }
+    }
+
+    // Update the current page
+    currentPage++;
+    adjustCardsPerPage(); // Adjust the cards per page if needed
 }
 
 void VisualDatabaseDisplayWidget::loadCurrentPage()
 {
-    // If an animation is already in progress, don't start a new one
-    if (isAnimating) {
-        return;
+    // Ensure only the initial page is loaded
+    if (currentPage == 0) {
+        // Only load the first page initially
+        populateCards();
+    } else {
+        // If not the first page, just load the next page and append to the flow widget
+        loadNextPage();
     }
-
-    // Set the flag indicating animation is in progress
-    isAnimating = true;
-
-    // Store the original position of the widget
-    QPoint originalPos = flow_widget->pos();
-
-    // Create the first animation to slide the flow_widget
-    QPropertyAnimation *slideOutAnimation = new QPropertyAnimation(flow_widget, "pos");
-    slideOutAnimation->setDuration(300);           // Adjust for smoothness
-    slideOutAnimation->setStartValue(originalPos); // Start from the current position
-
-    // Adjust the position (e.g., slide it up or down)
-    QPoint slideOutPos = originalPos;
-    slideOutPos.setY(originalPos.y() - flow_widget->height()); // Slide up (adjust direction as needed)
-    slideOutAnimation->setEndValue(slideOutPos);               // End at the new position
-
-    // Create the second animation to bring it back to its original position
-    QPropertyAnimation *slideBackAnimation = new QPropertyAnimation(flow_widget, "pos");
-    slideBackAnimation->setDuration(300);           // Duration for smooth transition
-    slideBackAnimation->setStartValue(slideOutPos); // Start from where the first animation ended
-    slideBackAnimation->setEndValue(originalPos);   // End at the original position
-
-    // Connect the end of the first animation to the start of the second
-    connect(slideOutAnimation, &QPropertyAnimation::finished, [this, slideBackAnimation]() {
-        // After sliding out, adjust the number of cards, load the new page, and start the slide back animation
-        adjustCardsPerPage(); // Adjust the cards per page before loading
-        populateCards();      // Load the new page of cards
-        updateDisplay();      // Update the visual display
-
-        // Start sliding back to original position
-        slideBackAnimation->start(QAbstractAnimation::DeleteWhenStopped);
-    });
-
-    // Once the second animation finishes, allow new animations to start
-    connect(slideBackAnimation, &QPropertyAnimation::finished, [this]() {
-        isAnimating = false; // Reset the flag after animation finishes
-    });
-
-    // Start the slide-out animation
-    slideOutAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void VisualDatabaseDisplayWidget::updateDisplay()
