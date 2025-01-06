@@ -193,7 +193,7 @@ void MainWindow::activateAccepted()
 void MainWindow::actConnect()
 {
     dlgConnect = new DlgConnect(this);
-    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, &MainWindow::actForgotPasswordRequest);
+    connect(dlgConnect, &DlgConnect::sigStartForgotPasswordRequest, this, &MainWindow::actForgotPasswordRequest);
 
     if (dlgConnect->exec()) {
         client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
@@ -717,7 +717,7 @@ void MainWindow::createActions()
     connect(aVisualDeckStorage, &QAction::triggered, this, &MainWindow::actVisualDeckStorage);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
-    connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
+    connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
     aRegister = new QAction(this);
     connect(aRegister, &QAction::triggered, this, &MainWindow::actRegister);
     aForgotPassword = new QAction(this);
@@ -1157,8 +1157,7 @@ void MainWindow::actCheckCardUpdates()
 
     connect(cardUpdateProcess, &QProcess::errorOccurred, this, &MainWindow::cardUpdateError);
 
-    connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-            SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
+    connect(cardUpdateProcess, &QProcess::finished, this, &MainWindow::cardUpdateFinished);
 
     // full "run the update" command; leave empty if not present
     QString updaterCmd;
