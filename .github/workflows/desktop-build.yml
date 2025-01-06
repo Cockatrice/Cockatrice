@@ -334,20 +334,49 @@ jobs:
 #          options: --options runtime -v
 
 
-      - name: Sign binary
-        uses: lando/code-sign-action@v3
+#      - name: Sign binary
+#        uses: lando/code-sign-action@v3
+#        with:
+#          file: "build/cockatrice/cockatrice.app"
+#          certificate-id: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+#          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+#          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+#          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+#          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+#          apple-notary-tool: 'notarytool'
+#          apple-team-id: "STKV3NKYBF"
+
+
+      - name: Code Sign (macOS)
+        env:
+          MACOS_CODE_CERT_DATA: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          MACOS_CODE_CERT_PASS: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          MACOS_CODE_CERT_TEAM_ID: "STKV3NKYBF"
+          MACOS_EXECUTABLE_PATH: "./build/cockatrice/cockatrice.app"
+        run: |
+          echo $MACOS_CODE_CERT_DATA | base64 --decode > certificate.p12
+          security create-keychain -p $MACOS_CODE_CERT_PASS build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $MACOS_CODE_CERT_PASS build.keychain
+          security import certificate.p12 -k build.keychain -P $MACOS_CODE_CERT_PASS -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CODE_CERT_PASS build.keychain
+          /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --entitlements ./src-tauri/entitlements.plist --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
+
+      - name: Notarize (macOS)
+        env:
+          MACOS_NOTARY_USER: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          MACOS_NOTARY_PASS: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+        uses: lando/notarize-action@v2
         with:
-          file: "build/cockatrice/cockatrice.app"
-          certificate-id: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
-          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          apple-notary-tool: 'notarytool'
-          apple-team-id: "STKV3NKYBF"
+          primary-bundle-id: org.cockatrice.client
+          product-path: "./build/cockatrice/cockatrice.app"
+          verbose: true
+          appstore-connect-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+          appstore-connect-team-id: "STKV3NKYBF"
+          appstore-connect-username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
 
 
-#      - name: Sign and notarize the release build
+      #      - name: Sign and notarize the release build
 #        uses: toitlang/action-macos-sign-notarize@v1.2.0
 #        with:
 #          certificate: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -362,7 +391,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macOS${{matrix.target}}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-dmg
-          path: "build/cockatrice/cockatrice.app"
+          path: "./build/cockatrice/cockatrice.app"
           if-no-files-found: error
 
       - name: Upload to release
