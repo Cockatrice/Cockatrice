@@ -838,29 +838,25 @@ MainWindow::MainWindow(QWidget *parent)
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
 
     client = new RemoteClient;
-    connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this,
-            SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
-    connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this,
-            SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
-    connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32, QList<QString>)), this,
-            SLOT(loginError(Response::ResponseCode, QString, quint32, QList<QString>)));
-    connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
-    connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
-    connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
-    connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
-    connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this,
-            SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
-    connect(client, SIGNAL(notifyUserAboutUpdate()), this, SLOT(notifyUserAboutUpdate()));
-    connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
-    connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
-    connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this,
-            SLOT(registerError(Response::ResponseCode, QString, quint32)));
-    connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
-    connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
-    connect(client, SIGNAL(sigForgotPasswordSuccess()), this, SLOT(forgotPasswordSuccess()));
-    connect(client, SIGNAL(sigForgotPasswordError()), this, SLOT(forgotPasswordError()));
-    connect(client, SIGNAL(sigPromptForForgotPasswordReset()), this, SLOT(promptForgotPasswordReset()));
-    connect(client, SIGNAL(sigPromptForForgotPasswordChallenge()), this, SLOT(promptForgotPasswordChallenge()));
+    connect(client, &RemoteClient::connectionClosedEventReceived, this, &MainWindow::processConnectionClosedEvent);
+    connect(client, &RemoteClient::serverShutdownEventReceived, this, &MainWindow::processServerShutdownEvent);
+    connect(client, &RemoteClient::loginError, this, &MainWindow::loginError);
+    connect(client, &RemoteClient::socketError, this, &MainWindow::socketError);
+    connect(client, &RemoteClient::serverTimeout, this, &MainWindow::serverTimeout);
+    connect(client, &RemoteClient::statusChanged, this, &MainWindow::statusChanged);
+    connect(client, &RemoteClient::protocolVersionMismatch, this, &MainWindow::protocolVersionMismatch);
+    connect(client, &RemoteClient::userInfoChanged, this, &MainWindow::userInfoReceived, Qt::BlockingQueuedConnection);
+    connect(client, &RemoteClient::notifyUserAboutUpdate, this, &MainWindow::notifyUserAboutUpdate);
+    connect(client, &RemoteClient::registerAccepted, this, &MainWindow::registerAccepted);
+    connect(client, &RemoteClient::registerAcceptedNeedsActivate, this, &MainWindow::registerAcceptedNeedsActivate);
+    connect(client, &RemoteClient::registerError, this, &MainWindow::registerError);
+    connect(client, &RemoteClient::activateAccepted, this, &MainWindow::activateAccepted);
+    connect(client, &RemoteClient::activateError, this, &MainWindow::activateError);
+    connect(client, &RemoteClient::sigForgotPasswordSuccess, this, &MainWindow::forgotPasswordSuccess);
+    connect(client, &RemoteClient::sigForgotPasswordError, this, &MainWindow::forgotPasswordError);
+    connect(client, &RemoteClient::sigPromptForForgotPasswordReset, this, &MainWindow::promptForgotPasswordReset);
+    connect(client, &RemoteClient::sigPromptForForgotPasswordChallenge, this,
+            &MainWindow::promptForgotPasswordChallenge);
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
