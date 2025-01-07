@@ -360,7 +360,7 @@ jobs:
           security unlock-keychain -p $MACOS_CODE_CERT_PASS build.keychain
           security import certificate.p12 -k build.keychain -P $MACOS_CODE_CERT_PASS -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CODE_CERT_PASS build.keychain
-          /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --entitlements ./src-tauri/entitlements.plist --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
+          /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
 
       - name: Notarize (macOS)
         env:
