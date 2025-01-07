@@ -267,6 +267,21 @@ jobs:
         # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
         run: .ci/compile.sh --server --parallel ${{matrix.core_count}}
 
+      - name: Codesign app bundle
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
+        run: |
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain 
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          /usr/bin/codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime "build/cockatrice/cockatrice.app" -v
+
 #      - name: CodeSign app bundle
 #        env:
 #          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -347,33 +362,34 @@ jobs:
 #          apple-team-id: "STKV3NKYBF"
 
 
-      - name: Code Sign (macOS)
-        env:
-          MACOS_CODE_CERT_DATA: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-          MACOS_CODE_CERT_PASS: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-          MACOS_CODE_CERT_TEAM_ID: "STKV3NKYBF"
-          MACOS_EXECUTABLE_PATH: "./build/cockatrice/cockatrice.app"
-        run: |
-          echo $MACOS_CODE_CERT_DATA | base64 --decode > certificate.p12
-          security create-keychain -p $MACOS_CODE_CERT_PASS build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p $MACOS_CODE_CERT_PASS build.keychain
-          security import certificate.p12 -k build.keychain -P $MACOS_CODE_CERT_PASS -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CODE_CERT_PASS build.keychain
-          /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
+#      - name: Code Sign (macOS)
+#        env:
+#          MACOS_CODE_CERT_DATA: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+#          MACOS_CODE_CERT_PASS: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+#          MACOS_CODE_CERT_TEAM_ID: "STKV3NKYBF"
+#          MACOS_EXECUTABLE_PATH: "./build/cockatrice/cockatrice.app"
+#        run: |
+#          echo $MACOS_CODE_CERT_DATA | base64 --decode > certificate.p12
+#          security create-keychain -p $MACOS_CODE_CERT_PASS build.keychain
+#          security default-keychain -s build.keychain
+#          security unlock-keychain -p $MACOS_CODE_CERT_PASS build.keychain
+#          security import certificate.p12 -k build.keychain -P $MACOS_CODE_CERT_PASS -T /usr/bin/codesign
+#          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CODE_CERT_PASS build.keychain
+#          /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
+#
+#      - name: Notarize (macOS)
+#        env:
+#          MACOS_NOTARY_USER: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+#          MACOS_NOTARY_PASS: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+#        uses: lando/notarize-action@v2
+#        with:
+#          primary-bundle-id: org.cockatrice.client
+#          product-path: "./build/cockatrice/cockatrice.app"
+#          verbose: true
+#          appstore-connect-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+#          appstore-connect-team-id: "STKV3NKYBF"
+#          appstore-connect-username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
 
-      - name: Notarize (macOS)
-        env:
-          MACOS_NOTARY_USER: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          MACOS_NOTARY_PASS: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-        uses: lando/notarize-action@v2
-        with:
-          primary-bundle-id: org.cockatrice.client
-          product-path: "./build/cockatrice/cockatrice.app"
-          verbose: true
-          appstore-connect-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-          appstore-connect-team-id: "STKV3NKYBF"
-          appstore-connect-username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
 
 
       #      - name: Sign and notarize the release build
