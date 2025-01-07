@@ -49,7 +49,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     leftToolBar->addAction(aDeleteLocalDeck);
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
             &TabDeckStorageVisual::actOpenLocalDeck);
 
     // layout->addWidget(leftToolBar);
@@ -74,7 +74,7 @@ QString TabDeckStorageVisual::getTargetPath() const
     return {};
 }
 
-void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
+void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     (void)event;
     DeckLoader deckLoader;

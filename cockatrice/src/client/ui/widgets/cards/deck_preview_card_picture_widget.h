@@ -12,21 +12,16 @@ class DeckPreviewCardPictureWidget final : public CardInfoPictureWithTextOverlay
     Q_OBJECT
 
 public:
-    explicit DeckPreviewCardPictureWidget(QWidget *parent = nullptr,
+    explicit DeckPreviewCardPictureWidget(QWidget *parent,
                                           bool hoverToZoomEnabled = false,
                                           const QColor &textColor = Qt::white,
                                           const QColor &outlineColor = Qt::black,
                                           int fontSize = 12,
                                           Qt::Alignment alignment = Qt::AlignCenter);
 
-    QString filePath;
-
 signals:
     void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
-
-public slots:
-    void setFilePath(const QString &filePath);
 
 private:
     QTimer *singleClickTimer;

@@ -162,8 +162,10 @@ set(cockatrice_SOURCES
     src/game/zones/view_zone.cpp
     src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     ${VERSION_STRING_CPP}
 )
 
