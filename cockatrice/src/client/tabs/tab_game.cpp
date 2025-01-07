@@ -145,7 +145,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     deckView->setVisible(false);
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
             &DeckViewContainer::replaceDeckStorageWithDeckView);
 
     deckViewLayout = new QVBoxLayout;
@@ -299,20 +299,12 @@ void TabGame::refreshShortcuts()
     }
 }
 
-void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
+void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     Q_UNUSED(event);
-    QString fileName = instance->filePath;
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
-    QString deckString;
-    DeckLoader deck;
+    QString deckString = instance->deckLoader->writeToString_Native();
 
-    bool error = !deck.loadFromFile(fileName, fmt, true);
-    if (!error) {
-        deckString = deck.writeToString_Native();
-        error = deckString.length() > MAX_FILE_LENGTH;
-    }
-    if (error) {
+    if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
         return;
     }
