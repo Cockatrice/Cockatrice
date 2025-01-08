@@ -250,7 +250,8 @@ class DeckList : public QObject
 {
     Q_OBJECT
 private:
-    QString name, comments, bannerCard;
+    QString name, comments;
+    QPair<QString, QString> bannerCard;
     QString deckHash;
     QString lastLoadedTimestamp;
     QMap<QString, SideboardPlan *> sideboardPlans;
@@ -280,7 +281,7 @@ public slots:
     {
         comments = _comments;
     }
-    void setBannerCard(const QString &_bannerCard = QString())
+    void setBannerCard(const QPair<QString, QString> &_bannerCard = QPair<QString, QString>())
     {
         bannerCard = _bannerCard;
     }
@@ -302,7 +303,7 @@ public:
     {
         return comments;
     }
-    QString getBannerCard() const
+    QPair<QString, QString> getBannerCard() const
     {
         return bannerCard;
     }

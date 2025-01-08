@@ -14,9 +14,10 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *parent, const QString &_filePath) 
     deckLoader = new DeckLoader();
     deckLoader->loadFromFile(filePath, DeckLoader::CockatriceFormat);
 
-    auto bannerCard = deckLoader->getBannerCard().isEmpty()
+    auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
                           ? CardInfoPtr()
-                          : CardDatabaseManager::getInstance()->getCard(deckLoader->getBannerCard());
+                          : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                                deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
 
     bannerCardDisplayWidget = new DeckPreviewCardPictureWidget(this);
 

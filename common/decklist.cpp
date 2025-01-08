@@ -427,7 +427,9 @@ bool DeckList::readElement(QXmlStreamReader *xml)
         else if (childName == "comments")
             comments = xml->readElementText();
         else if (childName == "bannerCard") {
-            bannerCard = xml->readElementText();
+            QString providerId = xml->attributes().value("providerId").toString();
+            QString cardName = xml->readElementText();
+            bannerCard = QPair<QString, QString>(cardName, providerId);
         } else if (childName == "zone") {
             InnerDecklistNode *newZone = getZoneObjFromName(xml->attributes().value("name").toString());
             newZone->readElement(xml);
@@ -449,8 +451,11 @@ void DeckList::write(QXmlStreamWriter *xml)
     xml->writeAttribute("version", "1");
     xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
     xml->writeTextElement("deckname", name);
+    xml->writeStartElement("bannerCard");
+    xml->writeAttribute("providerId", bannerCard.second);
+    xml->writeCharacters(bannerCard.first);
+    xml->writeEndElement();
     xml->writeTextElement("comments", comments);
-    xml->writeTextElement("bannerCard", bannerCard);
 
     for (int i = 0; i < root->size(); i++)
         root->at(i)->writeElement(xml);
@@ -458,6 +463,7 @@ void DeckList::write(QXmlStreamWriter *xml)
     QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
     while (i.hasNext())
         i.next().value()->write(xml);
+
     xml->writeEndElement();
 }
 
