@@ -16,7 +16,7 @@ public:
     explicit VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent);
     void updateSortOrder();
     QString getSearchText();
-    QStringList filterFiles(QStringList &files);
+    QList<DeckPreviewWidget *> &filterFiles(QList<DeckPreviewWidget *> &widgets);
 
 public slots:
     void showEvent(QShowEvent *event) override;
@@ -28,7 +28,9 @@ private:
     enum SortOrder
     {
         Alphabetical,
-        ByLastModified
+        ByLastModified,
+        ByLastLoaded,
+        ByName,
     };
     QHBoxLayout *layout;
     VisualDeckStorageWidget *parent;

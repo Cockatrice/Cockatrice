@@ -58,6 +58,7 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 void VisualDeckStorageWidget::refreshBannerCards()
 {
     QStringList allFiles;
+    QList<DeckPreviewWidget *> allDecks;
 
     // QDirIterator with QDir::Files and QDir::NoSymLinks ensures only files are listed (no directories or symlinks)
     QDirIterator it(SettingsCache::instance().getDeckPath(), QDir::Files | QDir::NoSymLinks,
@@ -67,11 +68,7 @@ void VisualDeckStorageWidget::refreshBannerCards()
         allFiles << it.next(); // Add each file path to the list
     }
 
-    auto filteredFiles = searchWidget->filterFiles(sortWidget->filterFiles(allFiles), searchWidget->getSearchText());
-
-    flowWidget->clearLayout(); // Clear existing widgets in the flow layout
-
-    foreach (const QString &file, filteredFiles) {
+    foreach (const QString &file, allFiles) {
         auto *display = new DeckPreviewWidget(flowWidget, file);
 
         connect(display, &DeckPreviewWidget::deckPreviewClicked, this,
@@ -81,6 +78,14 @@ void VisualDeckStorageWidget::refreshBannerCards()
         connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display->bannerCardDisplayWidget,
                 &CardInfoPictureWidget::setScaleFactor);
         display->bannerCardDisplayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
-        flowWidget->addWidget(display);
+        allDecks.append(display);
+    }
+
+    auto filteredFiles = searchWidget->filterFiles(sortWidget->filterFiles(allDecks), searchWidget->getSearchText());
+
+    flowWidget->clearLayout(); // Clear existing widgets in the flow layout
+
+    foreach (DeckPreviewWidget *deck, filteredFiles) {
+        flowWidget->addWidget(deck);
     }
 }

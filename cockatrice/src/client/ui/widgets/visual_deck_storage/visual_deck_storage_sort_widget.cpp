@@ -18,8 +18,10 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
 
     // ComboBox for sorting options
     sortComboBox = new QComboBox(this);
+    sortComboBox->addItem("Sort Alphabetically (Deck Name)", ByName);
     sortComboBox->addItem("Sort Alphabetically (Filename)", Alphabetical);
     sortComboBox->addItem("Sort by Last Modified", ByLastModified);
+    sortComboBox->addItem("Sort by Last Loaded", ByLastLoaded);
 
     // Connect sorting change signal to refresh the file list
     connect(sortComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
@@ -42,22 +44,30 @@ void VisualDeckStorageSortWidget::updateSortOrder()
     emit sortOrderChanged();
 }
 
-QStringList VisualDeckStorageSortWidget::filterFiles(QStringList &files)
+QList<DeckPreviewWidget *> &VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> &widgets)
 {
-    // Sort files based on the current sort order
-    std::sort(files.begin(), files.end(), [this](const QString &file1, const QString &file2) {
-        QFileInfo info1(file1);
-        QFileInfo info2(file2);
+    // Sort the widgets list based on the current sort order
+    std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
+        if (!widget1 || !widget2) {
+            return false; // Handle null pointers gracefully
+        }
+
+        QFileInfo info1(widget1->filePath);
+        QFileInfo info2(widget2->filePath);
 
         switch (sortOrder) {
+            case ByName:
+                return widget1->deckLoader->getName() < widget2->deckLoader->getName();
             case Alphabetical:
                 return info1.fileName().toLower() < info2.fileName().toLower();
             case ByLastModified:
                 return info1.lastModified() > info2.lastModified();
+            case ByLastLoaded:
+                return widget1->deckLoader->getLastLoadedTimestamp() > widget2->deckLoader->getLastLoadedTimestamp();
         }
 
-        return false; // Default case
+        return false; // Default case, no sorting applied
     });
 
-    return files;
+    return widgets;
 }
