@@ -35,11 +35,13 @@ void VisualDeckStorageSortWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
+    updateSortOrder();
 }
 
 void VisualDeckStorageSortWidget::updateSortOrder()
 {
     sortOrder = static_cast<SortOrder>(sortComboBox->currentData().toInt());
+    qDebug() << "Sort order updated to: " << sortOrder;
     SettingsCache::instance().setVisualDeckStorageSortingOrder(sortComboBox->currentData().toInt());
     emit sortOrderChanged();
 }
