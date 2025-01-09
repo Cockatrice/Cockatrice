@@ -9,6 +9,7 @@
 #include "pb/event_notify_user.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/game_event_container.pb.h"
+#include "pb/game_replay.pb.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/room_event.pb.h"
