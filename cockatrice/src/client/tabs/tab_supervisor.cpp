@@ -113,18 +113,14 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     tabBar()->setStyle(new MacOSTabFixStyle);
 #endif
 
-    connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
+    connect(this, &TabSupervisor::currentChanged, this, &TabSupervisor::updateCurrent);
 
-    connect(client, SIGNAL(roomEventReceived(const RoomEvent &)), this, SLOT(processRoomEvent(const RoomEvent &)));
-    connect(client, SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this,
-            SLOT(processGameEventContainer(const GameEventContainer &)));
-    connect(client, SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this,
-            SLOT(gameJoined(const Event_GameJoined &)));
-    connect(client, SIGNAL(userMessageEventReceived(const Event_UserMessage &)), this,
-            SLOT(processUserMessageEvent(const Event_UserMessage &)));
-    connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
-    connect(client, SIGNAL(notifyUserEventReceived(const Event_NotifyUser &)), this,
-            SLOT(processNotifyUserEvent(const Event_NotifyUser &)));
+    connect(client, &AbstractClient::roomEventReceived, this, &TabSupervisor::processRoomEvent);
+    connect(client, &AbstractClient::gameEventContainerReceived, this, &TabSupervisor::processGameEventContainer);
+    connect(client, &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::gameJoined);
+    connect(client, &AbstractClient::userMessageEventReceived, this, &TabSupervisor::processUserMessageEvent);
+    connect(client, &AbstractClient::maxPingTime, this, &TabSupervisor::updatePingTime);
+    connect(client, &AbstractClient::notifyUserEventReceived, this, &TabSupervisor::processNotifyUserEvent);
 
     retranslateUi();
 }
@@ -204,8 +200,8 @@ QString TabSupervisor::sanitizeHtml(QString dirty) const
 
 int TabSupervisor::myAddTab(Tab *tab)
 {
-    connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
-    connect(tab, SIGNAL(tabTextChanged(Tab *, QString)), this, SLOT(updateTabText(Tab *, QString)));
+    connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
+    connect(tab, &TabGame::tabTextChanged, this, &TabSupervisor::updateTabText);
 
     QString tabText = tab->getTabText();
     int idx = addTab(tab, sanitizeTabName(tabText));
@@ -220,27 +216,24 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     userInfo = new ServerInfo_User(_userInfo);
 
     tabServer = new TabServer(this, client);
-    connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this,
-            SLOT(addRoomTab(const ServerInfo_Room &, bool)));
+    connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
     myAddTab(tabServer);
 
     tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SLOT(addMessageTab(const QString &, bool)));
-    connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
-    connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
+    connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
+    connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
+    connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
     myAddTab(tabUserLists);
 
     updatePingTime(0, -1);
 
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
         tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, SIGNAL(openDeckEditor(const DeckLoader *)), this,
-                SLOT(addDeckEditorTab(const DeckLoader *)));
+        connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
         myAddTab(tabDeckStorage);
 
         tabReplays = new TabReplays(this, client);
-        connect(tabReplays, SIGNAL(openReplay(GameReplay *)), this, SLOT(openReplay(GameReplay *)));
+        connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
         myAddTab(tabReplays);
     } else {
         tabDeckStorage = 0;
@@ -249,7 +242,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
         tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
-        connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
+        connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
         myAddTab(tabAdmin);
 
         tabLog = new TabLog(this, client);
@@ -273,10 +266,9 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     userInfo = new ServerInfo_User;
     localClients = _clients;
     for (int i = 0; i < localClients.size(); ++i)
-        connect(localClients[i], SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this,
-                SLOT(processGameEventContainer(const GameEventContainer &)));
-    connect(localClients.first(), SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this,
-            SLOT(localGameJoined(const Event_GameJoined &)));
+        connect(localClients[i], &AbstractClient::gameEventContainerReceived, this,
+                &TabSupervisor::processGameEventContainer);
+    connect(localClients.first(), &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::localGameJoined);
 }
 
 void TabSupervisor::stop()
@@ -351,7 +343,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
     QTabBar::ButtonPosition closeSide =
         (QTabBar::ButtonPosition)tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar());
     CloseButton *closeButton = new CloseButton;
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeButtonPressed()));
+    connect(closeButton, &CloseButton::clicked, this, &TabSupervisor::closeButtonPressed);
     closeButton->setProperty("tab", QVariant::fromValue((QObject *)tab));
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
@@ -368,9 +360,9 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
                                  QString::fromStdString(event.game_types(i).description()));
 
     TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
-    connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
-    connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-    connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
+    connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
+    connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
+    connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     gameTabs.insert(event.game_info().game_id(), tab);
@@ -380,8 +372,8 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
     TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
-    connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
-    connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
+    connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
+    connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     gameTabs.insert(event.game_info().game_id(), tab);
@@ -409,9 +401,9 @@ void TabSupervisor::gameLeft(TabGame *tab)
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
     TabRoom *tab = new TabRoom(this, client, userInfo, info);
-    connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
-    connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
-    connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+    connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
+    connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
+    connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     roomTabs.insert(info.room_id(), tab);
@@ -431,7 +423,7 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 void TabSupervisor::openReplay(GameReplay *replay)
 {
     TabGame *replayTab = new TabGame(this, replay);
-    connect(replayTab, SIGNAL(gameClosing(TabGame *)), this, SLOT(replayLeft(TabGame *)));
+    connect(replayTab, &TabGame::gameClosing, this, &TabSupervisor::replayLeft);
     int tabIndex = myAddTab(replayTab);
     addCloseButtonToTab(replayTab, tabIndex);
     replayTabs.append(replayTab);
@@ -467,8 +459,8 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     }
 
     tab = new TabMessage(this, client, *userInfo, otherUser);
-    connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
-    connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
+    connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
+    connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
@@ -496,8 +488,8 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     TabDeckEditor *tab = new TabDeckEditor(this);
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
-    connect(tab, SIGNAL(deckEditorClosing(TabDeckEditor *)), this, SLOT(deckEditorClosed(TabDeckEditor *)));
-    connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
+    connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
+    connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     deckEditorTabs.append(tab);

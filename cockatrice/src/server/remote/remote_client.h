@@ -13,7 +13,6 @@ class RemoteClient : public AbstractClient
 {
     Q_OBJECT
 signals:
-    void maxPingTime(int seconds, int maxSeconds);
     void serverTimeout();
     void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
