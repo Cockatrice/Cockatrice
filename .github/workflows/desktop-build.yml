@@ -254,163 +254,85 @@ jobs:
           brew update
           brew install protobuf qt --force-bottle
 
-      - name: Build on Xcode ${{matrix.xcode}}
+      - name: Build & Sign on Xcode ${{matrix.xcode}}
         shell: bash
         id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_TEST: 1
-          # MAKE_PACKAGE: '${{matrix.make_package}}'
+          MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
+          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
         # macOS runner have 3 cores usually - only the macos-13 image has 4:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
         # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-        run: .ci/compile.sh --server --parallel ${{matrix.core_count}}
+        run: |
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          security default-keychain -s build.keychain
+          security set-keychain-settings -t 3600 -l build.keychain
+          security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+          .ci/compile.sh --server --parallel ${{matrix.core_count}}
 
-      - name: Codesign app bundle
+      - name: Sign app bundle
         env:
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
         run: |
-          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
-          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain 
-          security default-keychain -s build.keychain
           security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-          /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "./build/cockatrice/cockatrice.app" 
-          /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "./build/oracle/oracle.app"
-          /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "./build/servatrice/servatrice.app"
-          /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "./build/dbconverter/dbconverter.app"
+          /usr/bin/codesign
+            --sign="$MACOS_CERTIFICATE_NAME" 
+            --entitlements="../../.ci/macos.entitlements" 
+            --options=runtime 
+            --force 
+            --deep 
+            --timestamp 
+            --verbose $(find . -name "*.dmg")
 
-#      - name: CodeSign app bundle
-#        env:
-#          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-#          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-#          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
-#          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-#        run: |
-#          # Turn our base64-encoded certificate back to a regular .p12 file
-#          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
-#
-#          # We need to create a new keychain, otherwise using the certificate will prompt
-#          # with a UI dialog asking for the certificate password, which we can't
-#          # use in a headless CI environment
-#          security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-#          security default-keychain -s build.keychain
-#          security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-#          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
-#          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-#
-#          # We finally codesign our app bundle, specifying the Hardened runtime option
-#          codesign --force -s "$MACOS_CERTIFICATE_NAME" --options runtime "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app" -v
-#          codesign --verify --deep --strict "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app"
-#
-#      - name: Notarize app bundle
-#        env:
-#          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-#          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
-#          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-#        run: |
-#          # Store the notarization credentials so that we can prevent a UI password dialog
-#          # from blocking the CI
-#          echo "Create keychain profile"
-#          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
-#
-#          # We can't notarize an app bundle directly, but we need to compress it as an archive.
-#          # Therefore, we create a zip file containing our app bundle, so that we can send it to the
-#          # notarization service
-#          echo "Creating temp notarization archive"
-#          ditto -c -k --keepParent "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app" "notarization.zip"
-#
-#          # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
-#          # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
-#          # characteristics. Visit the Notarization docs for more information and strategies on how to optimize it if
-#          # you're curious
-#          echo "Notarize app"
-#          xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
-#
-#          # Finally, we need to "attach the staple" to our executable, which will allow our app to be
-#          # validated by macOS even when an internet connection is not available.
-#          echo "Attach staple"
-#          xcrun stapler staple "/Users/runner/work/Cockatrice/Cockatrice/build/cockatrice/cockatrice.app"
+      - name: Notarize app bundle
+        env:
+          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
+          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
+          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+        run: |
+          # Store the notarization credentials so that we can prevent a UI password dialog from blocking the CI
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "notarytool-profile" 
+            --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" 
+            --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" 
+            --password "$PROD_MACOS_NOTARIZATION_PWD"
 
-#      - name: Sign binary 2
-#        uses: lando/code-sign-action@v3
-#        with:
-#          file: "build/cockatrice/cockatrice.app"
-#          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-#          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-#          certificate-id: STKV3NKYBF
-#          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-#          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-##          apple-notary-tool: altool
-#          apple-team-id: STKV3NKYBF
-#          apple-product-id: cockatrice.us.code-sign-action
-#          options: --options runtime -v
+          # We can't notarize an app bundle directly, but we need to compress it as an archive.
+          # Therefore, we create a zip file containing our app bundle, so that we can send it to the
+          # notarization service
+          echo "Creating temp notarization archive"
+          ditto -c -k --keepParent ${{steps.build.outputs.path}} "notarization.zip"
 
+          # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
+          # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
+          # characteristics. Visit the Notarization docs for more information and strategies on how to optimize it if
+          # you're curious
+          echo "Notarize app"
+          xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
 
-#      - name: Sign binary
-#        uses: lando/code-sign-action@v3
-#        with:
-#          file: "build/cockatrice/cockatrice.app"
-#          certificate-id: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
-#          certificate-data: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-#          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-#          apple-notary-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-#          apple-notary-user: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-#          apple-notary-tool: 'notarytool'
-#          apple-team-id: "STKV3NKYBF"
-
-
-#      - name: Code Sign (macOS)
-#        env:
-#          MACOS_CODE_CERT_DATA: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-#          MACOS_CODE_CERT_PASS: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-#          MACOS_CODE_CERT_TEAM_ID: "STKV3NKYBF"
-#          MACOS_EXECUTABLE_PATH: "./build/cockatrice/cockatrice.app"
-#        run: |
-#          echo $MACOS_CODE_CERT_DATA | base64 --decode > certificate.p12
-#          security create-keychain -p $MACOS_CODE_CERT_PASS build.keychain
-#          security default-keychain -s build.keychain
-#          security unlock-keychain -p $MACOS_CODE_CERT_PASS build.keychain
-#          security import certificate.p12 -k build.keychain -P $MACOS_CODE_CERT_PASS -T /usr/bin/codesign
-#          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CODE_CERT_PASS build.keychain
-#          /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
-#
-#      - name: Notarize (macOS)
-#        env:
-#          MACOS_NOTARY_USER: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-#          MACOS_NOTARY_PASS: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-#        uses: lando/notarize-action@v2
-#        with:
-#          primary-bundle-id: org.cockatrice.client
-#          product-path: "./build/cockatrice/cockatrice.app"
-#          verbose: true
-#          appstore-connect-password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-#          appstore-connect-team-id: "STKV3NKYBF"
-#          appstore-connect-username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-
-
-
-      #      - name: Sign and notarize the release build
-#        uses: toitlang/action-macos-sign-notarize@v1.2.0
-#        with:
-#          certificate: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-#          certificate-password: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-#          username: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-#          password: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
-#          apple-team-id: "STKV3NKYBF"
-#          app-path: "build/cockatrice/cockatrice.app"
+          # Finally, we need to "attach the staple" to our executable, which will allow our app to be
+          # validated by macOS even when an internet connection is not available.
+          echo "Attach staple"
+          xcrun stapler staple ${{steps.build.outputs.path}}
 
       - name: Upload artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
           name: macOS${{matrix.target}}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-dmg
-          path: "./build/cockatrice/cockatrice.app"
+          path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
       - name: Upload to release
