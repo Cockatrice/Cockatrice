@@ -18,8 +18,8 @@ DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
     deckList = new DeckLoader;
-    connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
-    connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
+    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
+    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     root = new InnerDecklistNode;
 }
 
@@ -474,8 +474,8 @@ void DeckListModel::setDeckList(DeckLoader *_deck)
 {
     delete deckList;
     deckList = _deck;
-    connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
-    connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
+    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
+    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     rebuildTree();
 }
 
