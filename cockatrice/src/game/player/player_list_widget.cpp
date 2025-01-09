@@ -72,8 +72,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
         setItemDelegate(itemDelegate);
 
         userContextMenu = new UserContextMenu(tabSupervisor, this, game);
-        connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this,
-                SIGNAL(openMessageDialog(QString, bool)));
+        connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &PlayerListWidget::openMessageDialog);
     } else {
         userContextMenu = nullptr;
     }
