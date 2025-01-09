@@ -40,7 +40,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 
     setLayout(layout);
 
-    connect(filterCombo, &QComboBox::activated, edit, [this] { setFocus(); });
+    connect(filterCombo, &QComboBox::activated, edit, [this](int) { setFocus(); });
     connect(edit, &LineEditUnfocusable::returnPressed, this, &FilterBuilder::emit_add);
     connect(ok, &QPushButton::released, this, &FilterBuilder::emit_add);
     fltr = NULL;
