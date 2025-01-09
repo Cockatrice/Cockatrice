@@ -28,10 +28,6 @@ private:
     qreal realZValue;
 private slots:
     void pixmapUpdated();
-    void callUpdate()
-    {
-        update();
-    }
 
 public slots:
     void refreshCardInfo();

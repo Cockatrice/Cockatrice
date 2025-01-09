@@ -24,7 +24,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
-    connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, &AbstractCardItem::callUpdate);
+    connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
     refreshCardInfo();
 }
 
