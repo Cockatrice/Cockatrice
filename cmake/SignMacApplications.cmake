@@ -11,15 +11,15 @@ if(APPLE)
 
     foreach(INTERIOR_DLL IN LISTS INTERIOR_DLLS_LIST)
       execute_process(
-        COMMAND "codesign" "--sign" "$ENV{MACOS_CERTIFICATE_NAME}" "--entitlements" ".ci/macos.entitlements"
+        COMMAND "codesign" "--sign" "$ENV{MACOS_CERTIFICATE_NAME}" "--entitlements" "../.ci/macos.entitlements"
                 "--options" "runtime" "--force" "--deep" "--timestamp" "--verbose" "${INTERIOR_DLL}"
       )
     endforeach()
 
     message(STATUS "Signing Exterior Applications ${app_name}.app")
     execute_process(
-      COMMAND "codesign" "--sign" "$ENV{MACOS_CERTIFICATE_NAME}" "--entitlements" ".ci/macos.entitlements" "--options"
-              "runtime" "--force" "--deep" "--timestamp" "--verbose" "${FULL_APP_PATH}"
+      COMMAND "codesign" "--sign" "$ENV{MACOS_CERTIFICATE_NAME}" "--entitlements" "../.ci/macos.entitlements"
+              "--options" "runtime" "--force" "--deep" "--timestamp" "--verbose" "${FULL_APP_PATH}"
     )
   endforeach()
 endif()
