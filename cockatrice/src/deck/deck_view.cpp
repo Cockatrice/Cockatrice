@@ -496,9 +496,9 @@ DeckView::DeckView(QWidget *parent) : QGraphicsView(parent)
     setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing /* | QPainter::SmoothPixmapTransform*/);
     setScene(deckViewScene);
 
-    connect(deckViewScene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
-    connect(deckViewScene, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
-    connect(deckViewScene, SIGNAL(sideboardPlanChanged()), this, SIGNAL(sideboardPlanChanged()));
+    connect(deckViewScene, &DeckViewScene::sceneRectChanged, this, &DeckView::updateSceneRect);
+    connect(deckViewScene, &DeckViewScene::newCardAdded, this, &DeckView::newCardAdded);
+    connect(deckViewScene, &DeckViewScene::sideboardPlanChanged, this, &DeckView::sideboardPlanChanged);
 }
 
 void DeckView::resizeEvent(QResizeEvent *event)

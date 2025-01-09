@@ -24,8 +24,8 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     layout->addWidget(clearButton);
     layout->addWidget(defaultButton);
 
-    connect(clearButton, SIGNAL(clicked()), this, SLOT(removeLastShortcut()));
-    connect(defaultButton, SIGNAL(clicked()), this, SLOT(restoreDefault()));
+    connect(clearButton, &QPushButton::clicked, this, &SequenceEdit::removeLastShortcut);
+    connect(defaultButton, &QPushButton::clicked, this, &SequenceEdit::restoreDefault);
     lineEdit->installEventFilter(this);
 
     setShortcutName(_shortcutName);
