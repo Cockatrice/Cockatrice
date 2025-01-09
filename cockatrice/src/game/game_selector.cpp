@@ -73,16 +73,16 @@ GameSelector::GameSelector(AbstractClient *_client,
 
     filterButton = new QPushButton;
     filterButton->setIcon(QPixmap("theme:icons/search"));
-    connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
+    connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
-    connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
+    connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
 
     if (room) {
         createButton = new QPushButton;
-        connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
+        connect(createButton, &QPushButton::clicked, this, &GameSelector::actCreate);
     } else {
         createButton = nullptr;
     }
@@ -111,18 +111,15 @@ GameSelector::GameSelector(AbstractClient *_client,
     setMinimumWidth((qreal)(gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
     setMinimumHeight(200);
 
-    connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(gameListView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
-            SLOT(actSelectedGameChanged(const QModelIndex &, const QModelIndex &)));
-    connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
+    connect(joinButton, &QPushButton::clicked, this, &GameSelector::actJoin);
+    connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actJoin);
+    connect(gameListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &GameSelector::actSelectedGameChanged);
+    connect(gameListView, &QTreeView::activated, this, &GameSelector::actJoin);
 
-    connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this,
-            SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
-    connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this,
-            SLOT(processAddToListEvent(const Event_AddToList &)));
-    connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this,
-            SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
+    connect(client, &AbstractClient::ignoreListReceived, this, &GameSelector::ignoreListReceived);
+    connect(client, &AbstractClient::addToListEventReceived, this, &GameSelector::processAddToListEvent);
+    connect(client, &AbstractClient::removeFromListEventReceived, this, &GameSelector::processRemoveFromListEvent);
 }
 
 void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &)
@@ -196,7 +193,9 @@ void GameSelector::actCreate()
     updateTitle();
 }
 
-void GameSelector::checkResponse(const Response &response)
+void GameSelector::checkResponse(const Response &response,
+                                 const CommandContainer & /* commandContainer */,
+                                 const QVariant & /* extraData */)
 {
     // NB: We re-enable buttons for the currently selected game, which may not
     // be the same game as the one for which we are processing a response.
@@ -274,7 +273,8 @@ void GameSelector::actJoin()
     }
 
     PendingCommand *pend = r->prepareRoomCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
+    connect(pend, qOverload<const Response &, const CommandContainer &, const QVariant &>(&PendingCommand::finished),
+            this, &GameSelector::checkResponse);
     r->sendRoomCommand(pend);
 
     disableButtons();

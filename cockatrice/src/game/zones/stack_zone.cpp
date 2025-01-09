@@ -14,7 +14,7 @@
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
 {
-    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    connect(themeManager, &ThemeManager::themeChanged, this, &StackZone::updateBg);
     updateBg();
     setCacheMode(DeviceCoordinateCache);
 }

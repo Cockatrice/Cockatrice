@@ -24,7 +24,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
-    connect(&SettingsCache::instance(), SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
+    connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
     refreshCardInfo();
 }
 
@@ -62,7 +62,7 @@ void AbstractCardItem::refreshCardInfo()
                                      CardInfoPerSetMap(), false, false, -1, false);
     }
     if (info.data()) {
-        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+        connect(info.data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
     }
 
     cacheBgColor();

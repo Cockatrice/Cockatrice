@@ -24,9 +24,6 @@ private:
     QVariantHash loadCardPropertiesFromXml(QXmlStreamReader &xml);
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
-signals:
-    void addCard(CardInfoPtr card) override;
-    void addSet(CardSetPtr set) override;
 };
 
 #endif

@@ -24,9 +24,6 @@ private:
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
     QString getMainCardType(QString &type);
-signals:
-    void addCard(CardInfoPtr card) override;
-    void addSet(CardSetPtr set) override;
 };
 
 #endif

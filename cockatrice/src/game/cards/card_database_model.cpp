@@ -9,9 +9,10 @@
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
     : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
 {
-    connect(db, SIGNAL(cardAdded(CardInfoPtr)), this, SLOT(cardAdded(CardInfoPtr)));
-    connect(db, SIGNAL(cardRemoved(CardInfoPtr)), this, SLOT(cardRemoved(CardInfoPtr)));
-    connect(db, SIGNAL(cardDatabaseEnabledSetsChanged()), this, SLOT(cardDatabaseEnabledSetsChanged()));
+    connect(db, &CardDatabase::cardAdded, this, &CardDatabaseModel::cardAdded);
+    connect(db, &CardDatabase::cardRemoved, this, &CardDatabaseModel::cardRemoved);
+    connect(db, &CardDatabase::cardDatabaseEnabledSetsChanged, this,
+            &CardDatabaseModel::cardDatabaseEnabledSetsChanged);
 
     cardDatabaseEnabledSetsChanged();
 }
@@ -131,7 +132,7 @@ void CardDatabaseModel::cardAdded(CardInfoPtr card)
         beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
         cardList.append(card);
         cardListSet.insert(card);
-        connect(card.data(), SIGNAL(cardInfoChanged(CardInfoPtr)), this, SLOT(cardInfoChanged(CardInfoPtr)));
+        connect(card.data(), &CardInfo::cardInfoChanged, this, &CardDatabaseModel::cardInfoChanged);
         endInsertRows();
     }
 }
@@ -342,7 +343,7 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
         disconnect(this->filterTree, nullptr, this, nullptr);
 
     this->filterTree = _filterTree;
-    connect(this->filterTree, SIGNAL(changed()), this, SLOT(filterTreeChanged()));
+    connect(this->filterTree, &FilterTree::changed, this, &CardDatabaseDisplayModel::filterTreeChanged);
     invalidate();
 }
 

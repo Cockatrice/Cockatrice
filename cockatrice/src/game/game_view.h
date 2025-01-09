@@ -3,6 +3,7 @@
 
 #include <QGraphicsView>
 
+class GameScene;
 class QRubberBand;
 
 class GameView : public QGraphicsView
@@ -24,7 +25,7 @@ public slots:
     void updateSceneRect(const QRectF &rect);
 
 public:
-    GameView(QGraphicsScene *scene, QWidget *parent = nullptr);
+    GameView(GameScene *scene, QWidget *parent = nullptr);
 };
 
 #endif

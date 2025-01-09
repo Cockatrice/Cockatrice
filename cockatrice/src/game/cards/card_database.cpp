@@ -375,11 +375,12 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     availableParsers << new CockatriceXml3Parser;
 
     for (auto &parser : availableParsers) {
-        connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)), Qt::DirectConnection);
-        connect(parser, SIGNAL(addSet(CardSetPtr)), this, SLOT(addSet(CardSetPtr)), Qt::DirectConnection);
+        connect(parser, &ICardDatabaseParser::addCard, this, &CardDatabase::addCard, Qt::DirectConnection);
+        connect(parser, &ICardDatabaseParser::addSet, this, &CardDatabase::addSet, Qt::DirectConnection);
     }
 
-    connect(&SettingsCache::instance(), SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
+    connect(&SettingsCache::instance(), &SettingsCache::cardDatabasePathChanged, this,
+            &CardDatabase::loadCardDatabases);
 }
 
 CardDatabase::~CardDatabase()

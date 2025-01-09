@@ -4,6 +4,7 @@
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
+#include <pb/commands.pb.h>
 
 class ZoneViewWidget;
 class Response;
@@ -94,7 +95,7 @@ public slots:
     void setSortBy(CardList::SortOption _sortBy);
     void setPileView(int _pileView);
 private slots:
-    void zoneDumpReceived(const Response &r);
+    void zoneDumpReceived(const Response &r, const CommandContainer &, const QVariant &);
 signals:
     void beingDeleted();
     void optimumRectChanged();
