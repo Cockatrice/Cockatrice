@@ -22,8 +22,9 @@ const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     : SelectZone(_p, "table", true, false, true, parent), active(false)
 {
-    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
-    connect(&SettingsCache::instance(), SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
+    connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
+    connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,
+            &TableZone::reorganizeCards);
 
     updateBg();
 

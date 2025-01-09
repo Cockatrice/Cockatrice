@@ -110,8 +110,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     zone =
         new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer, _isReversed);
-    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), scrollBarProxy,
-            SLOT(recieveWheelEvent(QGraphicsSceneWheelEvent *)));
+    connect(zone, &ZoneViewZone::wheelEventReceived, scrollBarProxy, &ScrollableGraphicsProxyWidget::recieveWheelEvent);
 
     retranslateUi();
 
@@ -133,8 +132,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     setLayout(vbox);
 
-    connect(zone, SIGNAL(optimumRectChanged()), this, SLOT(resizeToZoneContents()));
-    connect(zone, SIGNAL(beingDeleted()), this, SLOT(zoneDeleted()));
+    connect(zone, &ZoneViewZone::optimumRectChanged, this, &ZoneViewWidget::resizeToZoneContents);
+    connect(zone, &ZoneViewZone::beingDeleted, this, &ZoneViewWidget::zoneDeleted);
     zone->initializeCards(cardList);
 
     // QLabel sizes aren't taken into account until the widget is rendered.
@@ -315,7 +314,7 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
-    disconnect(zone, SIGNAL(beingDeleted()), this, 0);
+    disconnect(zone, &ZoneViewZone::beingDeleted, this, 0);
     if (shuffleCheckBox.isChecked())
         player->sendGameCommand(Command_Shuffle());
     emit closePressed(this);

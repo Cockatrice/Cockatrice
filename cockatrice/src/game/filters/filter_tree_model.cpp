@@ -8,14 +8,10 @@
 FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
 {
     fTree = new FilterTree;
-    connect(fTree, SIGNAL(preInsertRow(const FilterTreeNode *, int)), this,
-            SLOT(proxyBeginInsertRow(const FilterTreeNode *, int)));
-    connect(fTree, SIGNAL(postInsertRow(const FilterTreeNode *, int)), this,
-            SLOT(proxyEndInsertRow(const FilterTreeNode *, int)));
-    connect(fTree, SIGNAL(preRemoveRow(const FilterTreeNode *, int)), this,
-            SLOT(proxyBeginRemoveRow(const FilterTreeNode *, int)));
-    connect(fTree, SIGNAL(postRemoveRow(const FilterTreeNode *, int)), this,
-            SLOT(proxyEndRemoveRow(const FilterTreeNode *, int)));
+    connect(fTree, &FilterTree::preInsertRow, this, &FilterTreeModel::proxyBeginInsertRow);
+    connect(fTree, &FilterTree::postInsertRow, this, &FilterTreeModel::proxyEndInsertRow);
+    connect(fTree, &FilterTree::preRemoveRow, this, &FilterTreeModel::proxyBeginRemoveRow);
+    connect(fTree, &FilterTree::postRemoveRow, this, &FilterTreeModel::proxyEndRemoveRow);
 }
 
 FilterTreeModel::~FilterTreeModel()

@@ -379,7 +379,8 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
         connect(parser, &ICardDatabaseParser::addSet, this, &CardDatabase::addSet, Qt::DirectConnection);
     }
 
-    connect(&SettingsCache::instance(), SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
+    connect(&SettingsCache::instance(), &SettingsCache::cardDatabasePathChanged, this,
+            &CardDatabase::loadCardDatabases);
 }
 
 CardDatabase::~CardDatabase()

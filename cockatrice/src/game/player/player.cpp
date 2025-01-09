@@ -82,7 +82,7 @@ static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QObject(), QGraphicsItem(parentItem)
 {
     setCacheMode(DeviceCoordinateCache);
-    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    connect(themeManager, &ThemeManager::themeChanged, this, &PlayerArea::updateBg);
     updateBg();
 }
 
@@ -121,8 +121,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
 
-    connect(&SettingsCache::instance(), SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
-    connect(&SettingsCache::instance(), SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
+    connect(&SettingsCache::instance(), &SettingsCache::horizontalHandChanged, this, &Player::rearrangeZones);
+    connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this, &Player::rearrangeZones);
 
     playerArea = new PlayerArea(this);
 
@@ -151,20 +151,20 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     sb->setVisible(false);
 
     table = new TableZone(this, this);
-    connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
+    connect(table, &TableZone::sizeChanged, this, &Player::updateBoundingRect);
 
     stack = new StackZone(this, (int)table->boundingRect().height(), this);
 
     hand = new HandZone(this, _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
                         (int)table->boundingRect().height(), this);
-    connect(hand, SIGNAL(cardCountChanged()), handCounter, SLOT(updateNumber()));
-    connect(handCounter, SIGNAL(showContextMenu(const QPoint &)), hand, SLOT(showContextMenu(const QPoint &)));
+    connect(hand, &HandZone::cardCountChanged, handCounter, &HandCounter::updateNumber);
+    connect(handCounter, &HandCounter::showContextMenu, hand, &HandZone::showContextMenu);
 
     updateBoundingRect();
 
     if (local || judge) {
-        connect(_parent, SIGNAL(playerAdded(Player *)), this, SLOT(addPlayer(Player *)));
-        connect(_parent, SIGNAL(playerRemoved(Player *)), this, SLOT(removePlayer(Player *)));
+        connect(_parent, &TabGame::playerAdded, this, &Player::addPlayer);
+        connect(_parent, &TabGame::playerRemoved, this, &Player::removePlayer);
     }
 
     if (local || judge) {
@@ -177,10 +177,10 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aMoveHandToRfg = new QAction(this);
         aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
 
-        connect(aMoveHandToTopLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
-        connect(aMoveHandToBottomLibrary, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
-        connect(aMoveHandToGrave, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
-        connect(aMoveHandToRfg, SIGNAL(triggered()), hand, SLOT(moveAllToZone()));
+        connect(aMoveHandToTopLibrary, &QAction::triggered, hand, &HandZone::moveAllToZone);
+        connect(aMoveHandToBottomLibrary, &QAction::triggered, hand, &HandZone::moveAllToZone);
+        connect(aMoveHandToGrave, &QAction::triggered, hand, &HandZone::moveAllToZone);
+        connect(aMoveHandToRfg, &QAction::triggered, hand, &HandZone::moveAllToZone);
 
         aMoveGraveToTopLibrary = new QAction(this);
         aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
@@ -191,10 +191,10 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aMoveGraveToRfg = new QAction(this);
         aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
 
-        connect(aMoveGraveToTopLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
-        connect(aMoveGraveToBottomLibrary, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
-        connect(aMoveGraveToHand, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
-        connect(aMoveGraveToRfg, SIGNAL(triggered()), grave, SLOT(moveAllToZone()));
+        connect(aMoveGraveToTopLibrary, &QAction::triggered, grave, &PileZone::moveAllToZone);
+        connect(aMoveGraveToBottomLibrary, &QAction::triggered, grave, &PileZone::moveAllToZone);
+        connect(aMoveGraveToHand, &QAction::triggered, grave, &PileZone::moveAllToZone);
+        connect(aMoveGraveToRfg, &QAction::triggered, grave, &PileZone::moveAllToZone);
 
         aMoveRfgToTopLibrary = new QAction(this);
         aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
@@ -205,87 +205,87 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aMoveRfgToGrave = new QAction(this);
         aMoveRfgToGrave->setData(QList<QVariant>() << "grave" << 0);
 
-        connect(aMoveRfgToTopLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
-        connect(aMoveRfgToBottomLibrary, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
-        connect(aMoveRfgToHand, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
-        connect(aMoveRfgToGrave, SIGNAL(triggered()), rfg, SLOT(moveAllToZone()));
+        connect(aMoveRfgToTopLibrary, &QAction::triggered, rfg, &PileZone::moveAllToZone);
+        connect(aMoveRfgToBottomLibrary, &QAction::triggered, rfg, &PileZone::moveAllToZone);
+        connect(aMoveRfgToHand, &QAction::triggered, rfg, &PileZone::moveAllToZone);
+        connect(aMoveRfgToGrave, &QAction::triggered, rfg, &PileZone::moveAllToZone);
 
         aViewLibrary = new QAction(this);
-        connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
+        connect(aViewLibrary, &QAction::triggered, this, &Player::actViewLibrary);
         aViewHand = new QAction(this);
-        connect(aViewHand, SIGNAL(triggered()), this, SLOT(actViewHand()));
+        connect(aViewHand, &QAction::triggered, this, &Player::actViewHand);
 
         aViewTopCards = new QAction(this);
-        connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
+        connect(aViewTopCards, &QAction::triggered, this, &Player::actViewTopCards);
         aViewBottomCards = new QAction(this);
         connect(aViewBottomCards, &QAction::triggered, this, &Player::actViewBottomCards);
         aAlwaysRevealTopCard = new QAction(this);
         aAlwaysRevealTopCard->setCheckable(true);
-        connect(aAlwaysRevealTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysRevealTopCard()));
+        connect(aAlwaysRevealTopCard, &QAction::triggered, this, &Player::actAlwaysRevealTopCard);
         aAlwaysLookAtTopCard = new QAction(this);
         aAlwaysLookAtTopCard->setCheckable(true);
-        connect(aAlwaysLookAtTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysLookAtTopCard()));
+        connect(aAlwaysLookAtTopCard, &QAction::triggered, this, &Player::actAlwaysLookAtTopCard);
         aOpenDeckInDeckEditor = new QAction(this);
         aOpenDeckInDeckEditor->setEnabled(false);
-        connect(aOpenDeckInDeckEditor, SIGNAL(triggered()), this, SLOT(actOpenDeckInDeckEditor()));
+        connect(aOpenDeckInDeckEditor, &QAction::triggered, this, &Player::actOpenDeckInDeckEditor);
     }
 
     aViewGraveyard = new QAction(this);
-    connect(aViewGraveyard, SIGNAL(triggered()), this, SLOT(actViewGraveyard()));
+    connect(aViewGraveyard, &QAction::triggered, this, &Player::actViewGraveyard);
 
     aViewRfg = new QAction(this);
-    connect(aViewRfg, SIGNAL(triggered()), this, SLOT(actViewRfg()));
+    connect(aViewRfg, &QAction::triggered, this, &Player::actViewRfg);
 
     if (local || judge) {
         aViewSideboard = new QAction(this);
-        connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
+        connect(aViewSideboard, &QAction::triggered, this, &Player::actViewSideboard);
 
         aDrawCard = new QAction(this);
-        connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
+        connect(aDrawCard, &QAction::triggered, this, &Player::actDrawCard);
         aDrawCards = new QAction(this);
-        connect(aDrawCards, SIGNAL(triggered()), this, SLOT(actDrawCards()));
+        connect(aDrawCards, &QAction::triggered, this, &Player::actDrawCards);
         aUndoDraw = new QAction(this);
-        connect(aUndoDraw, SIGNAL(triggered()), this, SLOT(actUndoDraw()));
+        connect(aUndoDraw, &QAction::triggered, this, &Player::actUndoDraw);
         aShuffle = new QAction(this);
-        connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
+        connect(aShuffle, &QAction::triggered, this, &Player::actShuffle);
         aMulligan = new QAction(this);
-        connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
+        connect(aMulligan, &QAction::triggered, this, &Player::actMulligan);
 
         aMoveTopToPlay = new QAction(this);
-        connect(aMoveTopToPlay, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlay()));
+        connect(aMoveTopToPlay, &QAction::triggered, this, &Player::actMoveTopCardToPlay);
         aMoveTopToPlayFaceDown = new QAction(this);
-        connect(aMoveTopToPlayFaceDown, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlayFaceDown()));
+        connect(aMoveTopToPlayFaceDown, &QAction::triggered, this, &Player::actMoveTopCardToPlayFaceDown);
         aMoveTopCardToGraveyard = new QAction(this);
-        connect(aMoveTopCardToGraveyard, SIGNAL(triggered()), this, SLOT(actMoveTopCardToGrave()));
+        connect(aMoveTopCardToGraveyard, &QAction::triggered, this, &Player::actMoveTopCardToGrave);
         aMoveTopCardToExile = new QAction(this);
-        connect(aMoveTopCardToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardToExile()));
+        connect(aMoveTopCardToExile, &QAction::triggered, this, &Player::actMoveTopCardToExile);
         aMoveTopCardsToGraveyard = new QAction(this);
-        connect(aMoveTopCardsToGraveyard, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave()));
+        connect(aMoveTopCardsToGraveyard, &QAction::triggered, this, &Player::actMoveTopCardsToGrave);
         aMoveTopCardsToExile = new QAction(this);
-        connect(aMoveTopCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile()));
+        connect(aMoveTopCardsToExile, &QAction::triggered, this, &Player::actMoveTopCardsToExile);
         aMoveTopCardsUntil = new QAction(this);
-        connect(aMoveTopCardsUntil, SIGNAL(triggered()), this, SLOT(actMoveTopCardsUntil()));
+        connect(aMoveTopCardsUntil, &QAction::triggered, this, &Player::actMoveTopCardsUntil);
         aMoveTopCardToBottom = new QAction(this);
-        connect(aMoveTopCardToBottom, SIGNAL(triggered()), this, SLOT(actMoveTopCardToBottom()));
+        connect(aMoveTopCardToBottom, &QAction::triggered, this, &Player::actMoveTopCardToBottom);
 
         aDrawBottomCard = new QAction(this);
-        connect(aDrawBottomCard, SIGNAL(triggered()), this, SLOT(actDrawBottomCard()));
+        connect(aDrawBottomCard, &QAction::triggered, this, &Player::actDrawBottomCard);
         aDrawBottomCards = new QAction(this);
-        connect(aDrawBottomCards, SIGNAL(triggered()), this, SLOT(actDrawBottomCards()));
+        connect(aDrawBottomCards, &QAction::triggered, this, &Player::actDrawBottomCards);
         aMoveBottomToPlay = new QAction(this);
-        connect(aMoveBottomToPlay, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToPlay()));
+        connect(aMoveBottomToPlay, &QAction::triggered, this, &Player::actMoveBottomCardToPlay);
         aMoveBottomToPlayFaceDown = new QAction(this);
-        connect(aMoveBottomToPlayFaceDown, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToPlayFaceDown()));
+        connect(aMoveBottomToPlayFaceDown, &QAction::triggered, this, &Player::actMoveBottomCardToPlayFaceDown);
         aMoveBottomCardToGraveyard = new QAction(this);
-        connect(aMoveBottomCardToGraveyard, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToGrave()));
+        connect(aMoveBottomCardToGraveyard, &QAction::triggered, this, &Player::actMoveBottomCardToGrave);
         aMoveBottomCardToExile = new QAction(this);
-        connect(aMoveBottomCardToExile, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToExile()));
+        connect(aMoveBottomCardToExile, &QAction::triggered, this, &Player::actMoveBottomCardToExile);
         aMoveBottomCardsToGraveyard = new QAction(this);
-        connect(aMoveBottomCardsToGraveyard, SIGNAL(triggered()), this, SLOT(actMoveBottomCardsToGrave()));
+        connect(aMoveBottomCardsToGraveyard, &QAction::triggered, this, &Player::actMoveBottomCardsToGrave);
         aMoveBottomCardsToExile = new QAction(this);
-        connect(aMoveBottomCardsToExile, SIGNAL(triggered()), this, SLOT(actMoveBottomCardsToExile()));
+        connect(aMoveBottomCardsToExile, &QAction::triggered, this, &Player::actMoveBottomCardsToExile);
         aMoveBottomCardToTop = new QAction(this);
-        connect(aMoveBottomCardToTop, SIGNAL(triggered()), this, SLOT(actMoveBottomCardToTop()));
+        connect(aMoveBottomCardToTop, &QAction::triggered, this, &Player::actMoveBottomCardToTop);
     }
 
     playerMenu = new TearOffMenu();
@@ -361,7 +361,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         mRevealRandomGraveyardCard = graveMenu->addMenu(QString());
         QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
         newAction->setData(-1);
-        connect(newAction, SIGNAL(triggered()), this, SLOT(actRevealRandomGraveyardCard()));
+        connect(newAction, &QAction::triggered, this, &Player::actRevealRandomGraveyardCard);
         allPlayersActions.append(newAction);
         mRevealRandomGraveyardCard->addSeparator();
     }
@@ -395,16 +395,16 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         sb->setMenu(sbMenu, aViewSideboard);
 
         aUntapAll = new QAction(this);
-        connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
+        connect(aUntapAll, &QAction::triggered, this, &Player::actUntapAll);
 
         aRollDie = new QAction(this);
-        connect(aRollDie, SIGNAL(triggered()), this, SLOT(actRollDie()));
+        connect(aRollDie, &QAction::triggered, this, &Player::actRollDie);
 
         aCreateToken = new QAction(this);
-        connect(aCreateToken, SIGNAL(triggered()), this, SLOT(actCreateToken()));
+        connect(aCreateToken, &QAction::triggered, this, &Player::actCreateToken);
 
         aCreateAnotherToken = new QAction(this);
-        connect(aCreateAnotherToken, SIGNAL(triggered()), this, SLOT(actCreateAnotherToken()));
+        connect(aCreateAnotherToken, &QAction::triggered, this, &Player::actCreateAnotherToken);
         aCreateAnotherToken->setEnabled(false);
 
         createPredefinedTokenMenu = new QMenu(QString());
@@ -425,7 +425,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     if (local) {
         sayMenu = playerMenu->addMenu(QString());
-        connect(&SettingsCache::instance().messages(), SIGNAL(messageMacrosChanged()), this, SLOT(initSayMenu()));
+        connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this,
+                &Player::initSayMenu);
         initSayMenu();
     }
 
@@ -439,7 +440,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         for (auto &playerList : playerLists) {
             QAction *newAction = playerList->addAction(QString());
             newAction->setData(-1);
-            connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
+            connect(newAction, &QAction::triggered, this, &Player::playerListActionTriggered);
             allPlayersActions.append(newAction);
             playerList->addSeparator();
         }
@@ -454,47 +455,47 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     aTap = new QAction(this);
     aTap->setData(cmTap);
-    connect(aTap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aTap, &QAction::triggered, this, &Player::cardMenuAction);
     aDoesntUntap = new QAction(this);
     aDoesntUntap->setData(cmDoesntUntap);
-    connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aDoesntUntap, &QAction::triggered, this, &Player::cardMenuAction);
     aAttach = new QAction(this);
-    connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
+    connect(aAttach, &QAction::triggered, this, &Player::actAttach);
     aUnattach = new QAction(this);
-    connect(aUnattach, SIGNAL(triggered()), this, SLOT(actUnattach()));
+    connect(aUnattach, &QAction::triggered, this, &Player::actUnattach);
     aDrawArrow = new QAction(this);
-    connect(aDrawArrow, SIGNAL(triggered()), this, SLOT(actDrawArrow()));
+    connect(aDrawArrow, &QAction::triggered, this, &Player::actDrawArrow);
     aIncP = new QAction(this);
-    connect(aIncP, SIGNAL(triggered()), this, SLOT(actIncP()));
+    connect(aIncP, &QAction::triggered, this, &Player::actIncP);
     aDecP = new QAction(this);
-    connect(aDecP, SIGNAL(triggered()), this, SLOT(actDecP()));
+    connect(aDecP, &QAction::triggered, this, &Player::actDecP);
     aIncT = new QAction(this);
-    connect(aIncT, SIGNAL(triggered()), this, SLOT(actIncT()));
+    connect(aIncT, &QAction::triggered, this, &Player::actIncT);
     aDecT = new QAction(this);
-    connect(aDecT, SIGNAL(triggered()), this, SLOT(actDecT()));
+    connect(aDecT, &QAction::triggered, this, &Player::actDecT);
     aIncPT = new QAction(this);
-    connect(aIncPT, SIGNAL(triggered()), this, SLOT(actIncPT()));
+    connect(aIncPT, &QAction::triggered, this, [this] { actIncPT(); });
     aDecPT = new QAction(this);
-    connect(aDecPT, SIGNAL(triggered()), this, SLOT(actDecPT()));
+    connect(aDecPT, &QAction::triggered, this, &Player::actDecPT);
     aFlowP = new QAction(this);
-    connect(aFlowP, SIGNAL(triggered()), this, SLOT(actFlowP()));
+    connect(aFlowP, &QAction::triggered, this, &Player::actFlowP);
     aFlowT = new QAction(this);
-    connect(aFlowT, SIGNAL(triggered()), this, SLOT(actFlowT()));
+    connect(aFlowT, &QAction::triggered, this, &Player::actFlowT);
     aSetPT = new QAction(this);
-    connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
+    connect(aSetPT, &QAction::triggered, this, &Player::actSetPT);
     aResetPT = new QAction(this);
-    connect(aResetPT, SIGNAL(triggered()), this, SLOT(actResetPT()));
+    connect(aResetPT, &QAction::triggered, this, &Player::actResetPT);
     aSetAnnotation = new QAction(this);
-    connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
+    connect(aSetAnnotation, &QAction::triggered, this, &Player::actSetAnnotation);
     aFlip = new QAction(this);
     aFlip->setData(cmFlip);
-    connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aFlip, &QAction::triggered, this, &Player::cardMenuAction);
     aPeek = new QAction(this);
     aPeek->setData(cmPeek);
-    connect(aPeek, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aPeek, &QAction::triggered, this, &Player::cardMenuAction);
     aClone = new QAction(this);
     aClone->setData(cmClone);
-    connect(aClone, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aClone, &QAction::triggered, this, &Player::cardMenuAction);
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
     aMoveToBottomLibrary = new QAction(this);
@@ -506,26 +507,26 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     aMoveToGraveyard->setData(cmMoveToGraveyard);
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
-    connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-    connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-    connect(aMoveToXfromTopOfLibrary, SIGNAL(triggered()), this, SLOT(actMoveCardXCardsFromTop()));
-    connect(aMoveToHand, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-    connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-    connect(aMoveToExile, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aMoveToTopLibrary, &QAction::triggered, this, &Player::cardMenuAction);
+    connect(aMoveToBottomLibrary, &QAction::triggered, this, &Player::cardMenuAction);
+    connect(aMoveToXfromTopOfLibrary, &QAction::triggered, this, &Player::actMoveCardXCardsFromTop);
+    connect(aMoveToHand, &QAction::triggered, this, &Player::cardMenuAction);
+    connect(aMoveToGraveyard, &QAction::triggered, this, &Player::cardMenuAction);
+    connect(aMoveToExile, &QAction::triggered, this, &Player::cardMenuAction);
 
     aSelectAll = new QAction(this);
-    connect(aSelectAll, SIGNAL(triggered()), this, SLOT(actSelectAll()));
+    connect(aSelectAll, &QAction::triggered, this, &Player::actSelectAll);
     aSelectRow = new QAction(this);
-    connect(aSelectRow, SIGNAL(triggered()), this, SLOT(actSelectRow()));
+    connect(aSelectRow, &QAction::triggered, this, &Player::actSelectRow);
     aSelectColumn = new QAction(this);
-    connect(aSelectColumn, SIGNAL(triggered()), this, SLOT(actSelectColumn()));
+    connect(aSelectColumn, &QAction::triggered, this, &Player::actSelectColumn);
 
     aPlay = new QAction(this);
-    connect(aPlay, SIGNAL(triggered()), this, SLOT(actPlay()));
+    connect(aPlay, &QAction::triggered, this, &Player::actPlay);
     aHide = new QAction(this);
-    connect(aHide, SIGNAL(triggered()), this, SLOT(actHide()));
+    connect(aHide, &QAction::triggered, this, &Player::actHide);
     aPlayFacedown = new QAction(this);
-    connect(aPlayFacedown, SIGNAL(triggered()), this, SLOT(actPlayFacedown()));
+    connect(aPlayFacedown, &QAction::triggered, this, &Player::actPlayFacedown);
 
     for (int i = 0; i < 3; ++i) {
         auto *tempAddCounter = new QAction(this);
@@ -537,9 +538,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aAddCounter.append(tempAddCounter);
         aRemoveCounter.append(tempRemoveCounter);
         aSetCounter.append(tempSetCounter);
-        connect(tempAddCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
-        connect(tempRemoveCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
-        connect(tempSetCounter, SIGNAL(triggered()), this, SLOT(actCardCounterTrigger()));
+        connect(tempAddCounter, &QAction::triggered, this, &Player::actCardCounterTrigger);
+        connect(tempRemoveCounter, &QAction::triggered, this, &Player::actCardCounterTrigger);
+        connect(tempSetCounter, &QAction::triggered, this, &Player::actCardCounterTrigger);
     }
 
     const QList<Player *> &players = game->getPlayers().values();
@@ -554,7 +555,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     rearrangeZones();
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &Player::refreshShortcuts);
     refreshShortcuts();
 }
 
@@ -606,7 +608,7 @@ void Player::addPlayerToList(QMenu *playerList, Player *player)
 {
     QAction *newAction = playerList->addAction(player->getName());
     newAction->setData(player->getId());
-    connect(newAction, SIGNAL(triggered()), this, SLOT(playerListActionTriggered()));
+    connect(newAction, &QAction::triggered, this, &Player::playerListActionTriggered);
 }
 
 void Player::removePlayer(Player *player)
@@ -1070,7 +1072,7 @@ void Player::initSayMenu()
         if (i < 10) {
             newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }
-        connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
+        connect(newAction, &QAction::triggered, this, &Player::actSayMessage);
         sayMenu->addAction(newAction);
     }
 }
@@ -1106,7 +1108,7 @@ void Player::setDeck(const DeckLoader &_deck)
             if (i < 10) {
                 a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
             }
-            connect(a, SIGNAL(triggered()), this, SLOT(actCreatePredefinedToken()));
+            connect(a, &QAction::triggered, this, &Player::actCreatePredefinedToken);
         }
     }
 }
@@ -3997,7 +3999,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
         auto *createRelated = new QAction(text, this);
         createRelated->setData(QVariant(index++));
-        connect(createRelated, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+        connect(createRelated, &QAction::triggered, this, &Player::actCreateRelatedCard);
         cardMenu->addAction(createRelated);
     }
 
@@ -4006,7 +4008,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
             createRelatedCards->setShortcut(
                 SettingsCache::instance().shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
         }
-        connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
+        connect(createRelatedCards, &QAction::triggered, this, &Player::actCreateAllRelatedCards);
         cardMenu->addAction(createRelatedCards);
     }
 }

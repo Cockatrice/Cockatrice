@@ -158,7 +158,7 @@ AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, 
     playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this, game);
     playerCounter->setPos(boundingRect().width() - playerCounter->boundingRect().width(),
                           boundingRect().height() - playerCounter->boundingRect().height());
-    connect(playerCounter, SIGNAL(destroyed()), this, SLOT(counterDeleted()));
+    connect(playerCounter, &PlayerCounter::destroyed, this, &PlayerTarget::counterDeleted);
 
     return playerCounter;
 }

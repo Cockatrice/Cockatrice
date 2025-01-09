@@ -20,7 +20,8 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance(), SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
+    connect(&SettingsCache::instance(), &SettingsCache::minPlayersForMultiColumnLayoutChanged, this,
+            &GameScene::rearrange);
 
     rearrange();
 }
@@ -41,8 +42,8 @@ void GameScene::addPlayer(Player *player)
     qDebug() << "GameScene::addPlayer name=" << player->getName();
     players << player;
     addItem(player);
-    connect(player, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
-    connect(player, SIGNAL(playerCountChanged()), this, SLOT(rearrange()));
+    connect(player, &Player::sizeChanged, this, &GameScene::rearrange);
+    connect(player, &Player::playerCountChanged, this, &GameScene::rearrange);
 }
 
 void GameScene::removePlayer(Player *player)
@@ -154,7 +155,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
     ZoneViewWidget *item =
         new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
     zoneViews.append(item);
-    connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
     if (zoneName == "grave") {
         item->setPos(360, 100);
@@ -172,7 +173,7 @@ void GameScene::addRevealedZoneView(Player *player,
 {
     ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
     zoneViews.append(item);
-    connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
     item->setPos(600, 80);
 }
