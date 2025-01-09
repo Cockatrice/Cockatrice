@@ -285,7 +285,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
         run: |
           security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-          /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements="../../.ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
+          /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
 
       - name: Notarize app bundle
         env:
