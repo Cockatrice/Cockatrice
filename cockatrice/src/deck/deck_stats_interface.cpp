@@ -73,7 +73,7 @@ struct CopyIfNotAToken
     DeckList &destination;
 
     CopyIfNotAToken(CardDatabase &_cardDatabase, DeckList &_destination)
-        : cardDatabase(_cardDatabase), destination(_destination) {};
+        : cardDatabase(_cardDatabase), destination(_destination){};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
