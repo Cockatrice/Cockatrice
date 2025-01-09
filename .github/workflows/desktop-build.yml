@@ -280,10 +280,10 @@ jobs:
           security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-          /usr/bin/codesign --force --deep -s "$MACOS_CERTIFICATE_NAME" --entitlements "../.ci/macos.entitlements" --options runtime "./cockatrice/cockatrice.app" -vvv
-          /usr/bin/codesign --force --deep -s "$MACOS_CERTIFICATE_NAME" --entitlements "../.ci/macos.entitlements" --options runtime "./oracle/oracle.app" -vvv
-          /usr/bin/codesign --force --deep -s "$MACOS_CERTIFICATE_NAME" --entitlements "../.ci/macos.entitlements" --options runtime "./servatrice/servatrice.app" -vvv
-          /usr/bin/codesign --force --deep -s "$MACOS_CERTIFICATE_NAME" --entitlements "../.ci/macos.entitlements" --options runtime "./dbconverter/dbconverter.app" -vvv
+          /usr/bin/codesign --force --deep --sign="$MACOS_CERTIFICATE_NAME" --entitlements="../.ci/macos.entitlements2" --options=runtime --verify "./cockatrice/cockatrice.app" 
+          /usr/bin/codesign --force --deep --sign="$MACOS_CERTIFICATE_NAME" --entitlements="../.ci/macos.entitlements" --options=runtime --verify "./oracle/oracle.app"
+          /usr/bin/codesign --force --deep --sign="$MACOS_CERTIFICATE_NAME" --entitlements="../.ci/macos.entitlements" --options=runtime --verify "./servatrice/servatrice.app"
+          /usr/bin/codesign --force --deep --sign="$MACOS_CERTIFICATE_NAME" --entitlements="../.ci/macos.entitlements" --options=runtime --verify "./dbconverter/dbconverter.app"
 
 #      - name: CodeSign app bundle
 #        env:
