@@ -48,6 +48,7 @@ class AbstractClient : public QObject
     Q_OBJECT
 signals:
     void statusChanged(ClientStatus _status);
+    void maxPingTime(int seconds, int maxSeconds);
 
     // Room events
     void roomEventReceived(const RoomEvent &event);
