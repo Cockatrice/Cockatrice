@@ -304,19 +304,28 @@ void TabSupervisor::stop()
     tabAdmin = 0;
     tabLog = 0;
 
-    QMapIterator<int, TabRoom *> roomIterator(roomTabs);
-    while (roomIterator.hasNext())
-        roomIterator.next().value()->deleteLater();
+    for (const auto tab : deckEditorTabs) {
+        disconnect(tab, nullptr, this, nullptr);
+        tab->deleteLater();
+    }
+    deckEditorTabs.clear();
+
+    for (auto i = roomTabs.cbegin(), end = roomTabs.cend(); i != end; ++i) {
+        disconnect(i.value(), nullptr, this, nullptr);
+        i.value()->deleteLater();
+    }
     roomTabs.clear();
 
-    QMapIterator<int, TabGame *> gameIterator(gameTabs);
-    while (gameIterator.hasNext())
-        gameIterator.next().value()->deleteLater();
+    for (auto i = gameTabs.cbegin(), end = gameTabs.cend(); i != end; ++i) {
+        disconnect(i.value(), nullptr, this, nullptr);
+        i.value()->deleteLater();
+    }
     gameTabs.clear();
 
-    QListIterator<TabGame *> replayIterator(replayTabs);
-    while (replayIterator.hasNext())
-        replayIterator.next()->deleteLater();
+    for (const auto tab : replayTabs) {
+        disconnect(tab, nullptr, this, nullptr);
+        tab->deleteLater();
+    }
     replayTabs.clear();
 
     delete userInfo;
