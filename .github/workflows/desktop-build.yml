@@ -280,6 +280,7 @@ jobs:
           .ci/compile.sh --server --parallel ${{matrix.core_count}}
 
       - name: Sign app bundle
+        if: matrix.make_package
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
@@ -288,6 +289,7 @@ jobs:
           /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
 
       - name: Notarize app bundle
+        if: matrix.make_package
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
