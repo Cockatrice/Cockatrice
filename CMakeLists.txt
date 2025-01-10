@@ -122,14 +122,6 @@ if(UNIX)
       set(CMAKE_XCODE_ATTRIBUTE_CXX "${CMAKE_BINARY_DIR}/launch-cxx")
       set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
       set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
-
-      # This tells Xcode's signing phase to pretend that the binary was signed by the linker.
-      # Then install_name_tool is willing to revise the ad-hoc signature.
-      # See: https://gitlab.kitware.com/cmake/cmake/-/issues/21854#note_907691
-      set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
-
-      # Stripping the files will invalidate the signatures.
-      set(CPACK_STRIP_FILES FALSE)
     endif()
   else()
     # Linux / BSD
