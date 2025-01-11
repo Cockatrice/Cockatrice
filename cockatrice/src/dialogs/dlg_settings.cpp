@@ -356,7 +356,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
 
     visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setMinimum(0);
-    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setMaximum(255);
+    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setMaximum(100);
     visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setValue(
         settings.getVisualDeckStorageUnusedColorIdentitiesOpacity());
     connect(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, &QSpinBox::valueChanged, &settings,
@@ -508,6 +508,7 @@ void AppearanceSettingsPage::retranslateUi()
     visualDeckStorageDrawUnusedColorIdentitiesCheckBox.setText(
         tr("Draw missing color identities in visual deck storage without color label"));
     visualDeckStorageUnusedColorIdentitiesOpacityLabel.setText((tr("Missing color identity opacity")));
+    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setSuffix("%");
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));

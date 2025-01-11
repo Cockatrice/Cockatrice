@@ -79,7 +79,8 @@ void DeckPreviewColorCircleWidget::paintEvent(QPaintEvent *event)
     if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities() || isActive) {
         // Make the circle faint if it is not active
         if (!isActive) {
-            circleColor.setAlpha(SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
+            circleColor.setAlpha(SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity() / 100.0 *
+                                 255.0);
         }
 
         // Draw the circle
@@ -100,12 +101,10 @@ void DeckPreviewColorCircleWidget::paintEvent(QPaintEvent *event)
             painter.setPen(Qt::black);
         }
 
-
         // Center the text within the circle
         painter.drawText(circleRect, Qt::AlignCenter, colorChar);
     }
 }
-
 
 void DeckPreviewColorCircleWidget::setColorActive(bool active)
 {
