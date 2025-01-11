@@ -32,7 +32,41 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *parent, const QString &_filePath) 
     bannerCardDisplayWidget->setFontSize(24);
     setFilePath(deckLoader->getLastFileName());
 
+    colorIdentityWidget = new DeckPreviewColorIdentityWidget(getColorIdentity());
+
     layout->addWidget(bannerCardDisplayWidget);
+    layout->addWidget(colorIdentityWidget);
+}
+
+QString DeckPreviewWidget::getColorIdentity()
+{
+    QStringList cardList = deckLoader->getCardList();
+    if (cardList.isEmpty()) {
+        return "";
+    }
+
+    QSet<QChar> colorSet; // A set to collect unique color symbols (e.g., W, U, B, R, G)
+
+    for (const QString &cardName : cardList) {
+        CardInfoPtr currentCard = CardDatabaseManager::getInstance()->getCard(cardName);
+        if (currentCard) {
+            QString colors = currentCard->getColors(); // Assuming this returns something like "WUB"
+            for (const QChar &color : colors) {
+                colorSet.insert(color);
+            }
+        }
+    }
+
+    // Ensure the color identity is in WUBRG order
+    QString colorIdentity;
+    const QString wubrgOrder = "WUBRG";
+    for (const QChar &color : wubrgOrder) {
+        if (colorSet.contains(color)) {
+            colorIdentity.append(color);
+        }
+    }
+
+    return colorIdentity;
 }
 
 void DeckPreviewWidget::setFilePath(const QString &_filePath)
