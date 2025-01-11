@@ -286,18 +286,24 @@ void TabSupervisor::stop()
 
         emit localGameEnded();
     } else {
-        if (tabUserLists)
-            tabUserLists->deleteLater();
-        if (tabServer)
-            tabServer->deleteLater();
-        if (tabDeckStorage)
-            tabDeckStorage->deleteLater();
-        if (tabReplays)
-            tabReplays->deleteLater();
-        if (tabAdmin)
-            tabAdmin->deleteLater();
-        if (tabLog)
-            tabLog->deleteLater();
+        if (tabUserLists) {
+            tabUserLists->closeRequest(true);
+        }
+        if (tabServer) {
+            tabServer->closeRequest(true);
+        }
+        if (tabDeckStorage) {
+            tabDeckStorage->closeRequest(true);
+        }
+        if (tabReplays) {
+            tabReplays->closeRequest(true);
+        }
+        if (tabAdmin) {
+            tabAdmin->closeRequest(true);
+        }
+        if (tabLog) {
+            tabLog->closeRequest(true);
+        }
     }
     tabUserLists = 0;
     tabServer = 0;
