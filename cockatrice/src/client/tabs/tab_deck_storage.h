@@ -64,8 +64,8 @@ private slots:
 
 public:
     TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
-    void retranslateUi();
-    QString getTabText() const
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Deck storage");
     }

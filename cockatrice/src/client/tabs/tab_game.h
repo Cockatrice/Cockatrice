@@ -72,7 +72,7 @@ signals:
     void stateChanged();
 
 public:
-    ToggleButton(QWidget *parent = nullptr);
+    explicit ToggleButton(QWidget *parent = nullptr);
     bool getState() const
     {
         return state;
@@ -80,7 +80,7 @@ public:
     void setState(bool _state);
 
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 };
 
 class DeckViewContainer : public QWidget

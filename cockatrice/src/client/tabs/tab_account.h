@@ -50,8 +50,8 @@ public:
                  AbstractClient *_client,
                  const ServerInfo_User &userInfo,
                  QWidget *parent = nullptr);
-    void retranslateUi();
-    QString getTabText() const
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Account");
     }

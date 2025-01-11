@@ -54,9 +54,9 @@ private slots:
 
 public:
     TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
-    ~TabLog();
-    void retranslateUi();
-    QString getTabText() const
+    ~TabLog() override;
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Logs");
     }

@@ -38,28 +38,28 @@ class MacOSTabFixStyle : public QProxyStyle
 {
     Q_OBJECT
 public:
-    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const;
+    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const override;
 };
 
 class CloseButton : public QAbstractButton
 {
     Q_OBJECT
 public:
-    CloseButton(QWidget *parent = nullptr);
-    QSize sizeHint() const;
-    inline QSize minimumSizeHint() const
+    explicit CloseButton(QWidget *parent = nullptr);
+    QSize sizeHint() const override;
+    inline QSize minimumSizeHint() const override
     {
         return sizeHint();
     }
 
 protected:
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    void enterEvent(QEnterEvent *event);
+    void enterEvent(QEnterEvent *event) override;
 #else
-    void enterEvent(QEvent *event);
+    void enterEvent(QEvent *event) override;
 #endif
-    void leaveEvent(QEvent *event);
-    void paintEvent(QPaintEvent *event);
+    void leaveEvent(QEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 };
 
 class TabSupervisor : public QTabWidget, public UserlistProxy
@@ -87,8 +87,8 @@ private:
     bool isLocalGame;
 
 public:
-    TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
-    ~TabSupervisor();
+    explicit TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
+    ~TabSupervisor() override;
     void retranslateUi();
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
@@ -116,11 +116,11 @@ public:
     }
     bool getAdminLocked() const;
     bool closeRequest();
-    bool isOwnUserRegistered() const;
-    QString getOwnUsername() const;
-    bool isUserBuddy(const QString &userName) const;
-    bool isUserIgnored(const QString &userName) const;
-    const ServerInfo_User *getOnlineUser(const QString &userName) const;
+    bool isOwnUserRegistered() const override;
+    QString getOwnUsername() const override;
+    bool isUserBuddy(const QString &userName) const override;
+    bool isUserIgnored(const QString &userName) const override;
+    const ServerInfo_User *getOnlineUser(const QString &userName) const override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
     void actShowPopup(const QString &message);
 signals:

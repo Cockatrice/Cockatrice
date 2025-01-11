@@ -59,8 +59,8 @@ signals:
 
 public:
     TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client);
-    void retranslateUi();
-    QString getTabText() const
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Game replays");
     }

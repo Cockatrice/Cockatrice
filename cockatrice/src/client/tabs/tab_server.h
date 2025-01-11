@@ -34,7 +34,7 @@ signals:
     void joinRoomRequest(int, bool setCurrent);
 
 public:
-    RoomSelector(AbstractClient *_client, QWidget *parent = nullptr);
+    explicit RoomSelector(AbstractClient *_client, QWidget *parent = nullptr);
     void retranslateUi();
 };
 
@@ -56,8 +56,8 @@ private:
 
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
-    void retranslateUi();
-    QString getTabText() const
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Server");
     }
