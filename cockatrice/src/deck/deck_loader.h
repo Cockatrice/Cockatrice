@@ -42,9 +42,10 @@ public:
 
     static FileFormat getFormatFromName(const QString &fileName);
 
-    bool loadFromFile(const QString &fileName, FileFormat fmt);
+    bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
+    bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
     QString exportDeckToDecklist();
 
     void resolveSetNameAndNumberToProviderID();

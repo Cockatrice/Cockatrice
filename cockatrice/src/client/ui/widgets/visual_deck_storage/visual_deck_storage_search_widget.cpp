@@ -38,22 +38,23 @@ QString VisualDeckStorageSearchWidget::getSearchText()
     return searchBar->text();
 }
 
-QStringList VisualDeckStorageSearchWidget::filterFiles(const QStringList &files, const QString &searchText)
+QList<DeckPreviewWidget *> VisualDeckStorageSearchWidget::filterFiles(QList<DeckPreviewWidget *> &widgets,
+                                                                      const QString &searchText)
 {
     if (searchText.isEmpty() || searchText.isNull()) {
-        return files;
+        return widgets;
     }
 
-    QStringList filteredFiles;
+    QList<DeckPreviewWidget *> filteredWidgets;
 
-    for (const auto &file : files) {
-        QFileInfo fileInfo(file);
+    for (const auto &file : widgets) {
+        QFileInfo fileInfo(file->filePath);
         QString fileName = fileInfo.fileName().toLower();
 
         if (fileName.contains(searchText.toLower())) {
-            filteredFiles << file;
+            filteredWidgets << file;
         }
     }
 
-    return filteredFiles;
+    return filteredWidgets;
 }

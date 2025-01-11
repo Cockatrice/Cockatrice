@@ -203,7 +203,7 @@ void TabDeckStorage::actOpenLocalDeck()
         QString filePath = localDirModel->filePath(curLeft);
 
         DeckLoader deckLoader;
-        if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat))
+        if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat, true))
             continue;
 
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(filePath);

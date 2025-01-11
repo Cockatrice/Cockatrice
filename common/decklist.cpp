@@ -368,7 +368,8 @@ DeckList::DeckList()
 
 // TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
-    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard), deckHash(other.deckHash)
+    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard), deckHash(other.deckHash),
+      lastLoadedTimestamp(other.lastLoadedTimestamp)
 {
     root = new InnerDecklistNode(other.getRoot());
 
@@ -419,13 +420,16 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 {
     const QString childName = xml->name().toString();
     if (xml->isStartElement()) {
-        if (childName == "deckname")
+        if (childName == "lastLoadedTimestamp") {
+            lastLoadedTimestamp = xml->readElementText();
+        } else if (childName == "deckname")
             name = xml->readElementText();
         else if (childName == "comments")
             comments = xml->readElementText();
         else if (childName == "bannerCard") {
-            bannerCard = xml->readElementText();
-            qDebug() << "Deckloader found the banner card " << bannerCard;
+            QString providerId = xml->attributes().value("providerId").toString();
+            QString cardName = xml->readElementText();
+            bannerCard = QPair<QString, QString>(cardName, providerId);
         } else if (childName == "zone") {
             InnerDecklistNode *newZone = getZoneObjFromName(xml->attributes().value("name").toString());
             newZone->readElement(xml);
@@ -445,9 +449,13 @@ void DeckList::write(QXmlStreamWriter *xml)
 {
     xml->writeStartElement("cockatrice_deck");
     xml->writeAttribute("version", "1");
+    xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
     xml->writeTextElement("deckname", name);
+    xml->writeStartElement("bannerCard");
+    xml->writeAttribute("providerId", bannerCard.second);
+    xml->writeCharacters(bannerCard.first);
+    xml->writeEndElement();
     xml->writeTextElement("comments", comments);
-    xml->writeTextElement("bannerCard", bannerCard);
 
     for (int i = 0; i < root->size(); i++)
         root->at(i)->writeElement(xml);
@@ -455,6 +463,7 @@ void DeckList::write(QXmlStreamWriter *xml)
     QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
     while (i.hasNext())
         i.next().value()->write(xml);
+
     xml->writeEndElement();
 }
 
