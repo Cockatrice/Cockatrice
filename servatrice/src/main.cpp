@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setApplicationName("Servatrice");
+    QCoreApplication::setApplicationDisplayName("Servatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
     QCommandLineParser parser;
