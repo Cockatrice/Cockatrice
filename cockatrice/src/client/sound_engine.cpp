@@ -12,7 +12,7 @@
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
 
-SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(nullptr)
+SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(nullptr), audioOutput(nullptr)
 {
     ensureThemeDirectoryExists();
     connect(&SettingsCache::instance(), &SettingsCache::soundThemeChanged, this, &SoundEngine::themeChangedSlot);
