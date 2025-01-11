@@ -110,15 +110,14 @@ QStringMap &SoundEngine::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-//    dir.setPath(qApp->applicationDirPath() +
-//#ifdef Q_OS_MAC
-//                "/../Resources/sounds"
-//#elif defined(Q_OS_WIN)
-//                "/sounds"
-//#else // linux
-//                "/../share/cockatrice/sounds"
-//#endif
-    dir.setPath("/Applications/Cockatrice.app/Contents/Resources/sounds"
+    dir.setPath(qApp->applicationDirPath() +
+#ifdef Q_OS_MAC
+                "/../Resources/sounds"
+#elif defined(Q_OS_WIN)
+                "/sounds"
+#else // linux
+                "/../share/cockatrice/sounds"
+#endif
     );
 
     for (const QString &themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
