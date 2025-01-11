@@ -1,12 +1,12 @@
 #ifndef SOUNDENGINE_H
 #define SOUNDENGINE_H
 
+#include <QAudioOutput>
 #include <QMap>
 #include <QMediaPlayer>
 #include <QObject>
 #include <QString>
 
-class QAudioOutput;
 class QBuffer;
 
 typedef QMap<QString, QString> QStringMap;
