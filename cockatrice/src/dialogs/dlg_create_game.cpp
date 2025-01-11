@@ -180,6 +180,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsCanTalkCheckBox->setEnabled(false);
     spectatorsSeeEverythingCheckBox->setEnabled(false);
     createGameAsSpectatorCheckBox->setEnabled(false);
+    startingLifeTotalEdit->setEnabled(false);
 
     descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
     maxPlayersEdit->setValue(gameInfo.max_players());
