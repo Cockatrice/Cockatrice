@@ -23,6 +23,7 @@ public:
 private:
     QStringMap availableThemes;
     QMap<QString, QString> audioData;
+    QAudioOutput *audioOutput;
     QMediaPlayer *player;
 
 protected:

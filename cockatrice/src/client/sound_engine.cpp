@@ -28,6 +28,10 @@ SoundEngine::~SoundEngine()
         player->deleteLater();
         player = nullptr;
     }
+    if (audioOutput) {
+        audioOutput->deleteLater();
+        audioOutput = nullptr;
+    }
 }
 
 void SoundEngine::soundEnabledChanged()
@@ -37,8 +41,8 @@ void SoundEngine::soundEnabledChanged()
         if (!player) {
             player = new QMediaPlayer;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-            auto qAudioOutput = new QAudioOutput;
-            player->setAudioOutput(qAudioOutput);
+            audioOutput = new QAudioOutput(player);
+            player->setAudioOutput(audioOutput);
 #endif
         }
     } else {
@@ -47,6 +51,10 @@ void SoundEngine::soundEnabledChanged()
             player->stop();
             player->deleteLater();
             player = nullptr;
+        }
+        if (audioOutput) {
+            audioOutput->deleteLater();
+            audioOutput = nullptr;
         }
     }
 }
@@ -102,14 +110,15 @@ QStringMap &SoundEngine::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-    dir.setPath(qApp->applicationDirPath() +
-#ifdef Q_OS_MAC
-                "/../Resources/sounds"
-#elif defined(Q_OS_WIN)
-                "/sounds"
-#else // linux
-                "/../share/cockatrice/sounds"
-#endif
+//    dir.setPath(qApp->applicationDirPath() +
+//#ifdef Q_OS_MAC
+//                "/../Resources/sounds"
+//#elif defined(Q_OS_WIN)
+//                "/sounds"
+//#else // linux
+//                "/../share/cockatrice/sounds"
+//#endif
+    dir.setPath("/Applications/Cockatrice.app/Contents/Resources/sounds"
     );
 
     for (const QString &themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {

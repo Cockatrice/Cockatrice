@@ -292,7 +292,8 @@ if(APPLE)
   set(plugin_dest_dir cockatrice.app/Contents/Plugins)
   set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
+  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6),
+  # platforms, printsupport (Qt5), styles, tls (Qt6)
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -303,6 +304,7 @@ if(APPLE)
     PATTERN "audio/*.dylib"
     PATTERN "iconengines/*.dylib"
     PATTERN "imageformats/*.dylib"
+    PATTERN "multimedia/*.dylib"
     PATTERN "platforms/*.dylib"
     PATTERN "printsupport/*.dylib"
     PATTERN "styles/*.dylib"
