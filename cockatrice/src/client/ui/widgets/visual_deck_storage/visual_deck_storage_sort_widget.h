@@ -27,10 +27,10 @@ signals:
 private:
     enum SortOrder
     {
+        ByName,
         Alphabetical,
         ByLastModified,
         ByLastLoaded,
-        ByName,
     };
     QHBoxLayout *layout;
     VisualDeckStorageWidget *parent;

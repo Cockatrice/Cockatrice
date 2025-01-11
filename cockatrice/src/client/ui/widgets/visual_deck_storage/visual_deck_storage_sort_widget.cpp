@@ -22,6 +22,7 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
     sortComboBox->addItem("Sort Alphabetically (Filename)", Alphabetical);
     sortComboBox->addItem("Sort by Last Modified", ByLastModified);
     sortComboBox->addItem("Sort by Last Loaded", ByLastLoaded);
+    sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
 
     // Connect sorting change signal to refresh the file list
     connect(sortComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
@@ -40,9 +41,9 @@ void VisualDeckStorageSortWidget::showEvent(QShowEvent *event)
 
 void VisualDeckStorageSortWidget::updateSortOrder()
 {
-    sortOrder = static_cast<SortOrder>(sortComboBox->currentData().toInt());
+    sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
     qDebug() << "Sort order updated to: " << sortOrder;
-    SettingsCache::instance().setVisualDeckStorageSortingOrder(sortComboBox->currentData().toInt());
+    SettingsCache::instance().setVisualDeckStorageSortingOrder(sortComboBox->currentIndex());
     emit sortOrderChanged();
 }
 
