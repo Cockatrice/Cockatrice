@@ -86,7 +86,7 @@ QString TabMessage::getTabText() const
     return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
-void TabMessage::closeRequest()
+void TabMessage::closeRequest(bool forced)
 {
     actLeave();
 }

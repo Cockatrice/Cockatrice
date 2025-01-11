@@ -93,7 +93,7 @@ public:
             const ServerInfo_Room &info);
     ~TabRoom() override;
     void retranslateUi() override;
-    void closeRequest() override;
+    void closeRequest(bool forced = false) override;
     void tabActivated() override;
     void processRoomEvent(const RoomEvent &event);
     int getRoomId() const

@@ -278,7 +278,7 @@ public:
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
-    void closeRequest() override;
+    void closeRequest(bool forced = false) override;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;

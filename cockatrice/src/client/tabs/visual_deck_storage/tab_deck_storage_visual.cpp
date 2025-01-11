@@ -58,7 +58,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     retranslateUi();
 }
 
-void TabDeckStorageVisual::closeRequest()
+void TabDeckStorageVisual::closeRequest(bool forced)
 {
     this->close();
 }

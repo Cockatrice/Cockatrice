@@ -175,7 +175,7 @@ void TabRoom::actShowPopup(const QString &message)
     }
 }
 
-void TabRoom::closeRequest()
+void TabRoom::closeRequest(bool forced)
 {
     actLeaveRoom();
 }

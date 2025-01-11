@@ -701,7 +701,7 @@ void TabGame::retranslateUi()
     scene->retranslateUi();
 }
 
-void TabGame::closeRequest()
+void TabGame::closeRequest(bool forced)
 {
     actLeaveGame();
 }

@@ -179,7 +179,7 @@ public:
     void updateCardInfo(CardInfoPtr _card);
 
 public slots:
-    void closeRequest() override;
+    void closeRequest(bool forced = false) override;
     void showPrintingSelector();
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);

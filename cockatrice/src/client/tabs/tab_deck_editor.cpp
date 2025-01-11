@@ -980,7 +980,7 @@ bool TabDeckEditor::confirmClose()
     return true;
 }
 
-void TabDeckEditor::closeRequest()
+void TabDeckEditor::closeRequest(bool forced)
 {
     if (confirmClose())
         deleteLater();

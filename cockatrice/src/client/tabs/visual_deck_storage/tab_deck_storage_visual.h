@@ -33,7 +33,7 @@ public:
     }
 public slots:
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    void closeRequest() override;
+    void closeRequest(bool forced = false) override;
     void actOpenLocalDeck(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void actDeleteLocalDeck();
 signals:
