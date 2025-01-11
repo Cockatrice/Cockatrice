@@ -341,10 +341,6 @@ void DeckViewContainer::loadLocalDeck()
         return;
 
     loadDeckFromFile(dialog.selectedFiles().at(0));
-
-    deckView->setVisible(true);
-    visualDeckStorageWidget->setVisible(false);
-    unloadDeckButton->setEnabled(true);
 }
 
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
@@ -391,6 +387,9 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
     // TODO CHANGE THIS TO BE SELECTED BY UUID
     PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
+    deckView->setVisible(true);
+    visualDeckStorageWidget->setVisible(false);
+    unloadDeckButton->setEnabled(true);
 }
 
 void DeckViewContainer::readyStart()
