@@ -330,7 +330,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
-          name: macOS${{matrix.target}}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-dmg
+          name: macOS${{matrix.target}}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-package
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
