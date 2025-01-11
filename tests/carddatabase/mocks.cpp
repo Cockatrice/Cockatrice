@@ -197,6 +197,14 @@ void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSi
 void SettingsCache::setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T /* _visualDeckStorageShowOnLoad */)
 {
 }
+void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
+    QT_STATE_CHANGED_T /* _visualDeckStorageDrawUnusedColorIdentities */)
+{
+}
+void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(
+    int /* _visualDeckStorageUnusedColorIdentitiesOpacity */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }

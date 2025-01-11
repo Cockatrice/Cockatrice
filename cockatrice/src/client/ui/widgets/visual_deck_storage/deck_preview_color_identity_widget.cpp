@@ -1,7 +1,10 @@
 #include "deck_preview_color_identity_widget.h"
 
+#include "../../../../settings/cache_settings.h"
+
 #include <QPainter>
 #include <QResizeEvent>
+#include <QSet>
 
 DeckPreviewColorCircleWidget::DeckPreviewColorCircleWidget(QChar color, QWidget *parent)
     : QWidget(parent), colorChar(color), circleDiameter(0), isActive(false)
@@ -52,35 +55,38 @@ void DeckPreviewColorCircleWidget::paintEvent(QPaintEvent *event)
 
     // Map color characters to their respective colors
     QColor circleColor;
-    if (isActive) {
-        switch (colorChar.unicode()) {
-            case 'W':
-                circleColor = Qt::white;
-                break;
-            case 'U':
-                circleColor = QColor(0, 115, 230);
-                break; // Blue
-            case 'B':
-                circleColor = QColor(50, 50, 50);
-                break; // Black
-            case 'R':
-                circleColor = QColor(230, 30, 30);
-                break; // Red
-            case 'G':
-                circleColor = QColor(30, 180, 30);
-                break; // Green
-            default:
-                circleColor = Qt::transparent;
-                break; // Fallback
-        }
-    } else {
-        circleColor = Qt::gray; // Grey out unused colors
+    switch (colorChar.unicode()) {
+        case 'W':
+            circleColor = Qt::white;
+            break;
+        case 'U':
+            circleColor = QColor(0, 115, 230);
+            break; // Blue
+        case 'B':
+            circleColor = QColor(50, 50, 50);
+            break; // Black
+        case 'R':
+            circleColor = QColor(230, 30, 30);
+            break; // Red
+        case 'G':
+            circleColor = QColor(30, 180, 30);
+            break; // Green
+        default:
+            circleColor = Qt::transparent;
+            break; // Fallback
     }
 
-    // Draw the circle
-    painter.setBrush(circleColor);
-    painter.setPen(Qt::black);
-    painter.drawEllipse(circleRect);
+    if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities() || isActive) {
+        // Make the circle faint if it is not active
+        if (!isActive) {
+            circleColor.setAlpha(SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
+        }
+
+        // Draw the circle
+        painter.setBrush(circleColor);
+        painter.setPen(Qt::black);
+        painter.drawEllipse(circleRect);
+    }
 
     // Draw the color character only if the circle is active
     if (isActive) {
@@ -88,12 +94,18 @@ void DeckPreviewColorCircleWidget::paintEvent(QPaintEvent *event)
         font.setBold(true);
         font.setPointSize(circleDiameter * 0.4); // Adjust font size relative to circle diameter
         painter.setFont(font);
-        painter.setPen(Qt::black);
+        if (colorChar.unicode() == 'B') {
+            painter.setPen(Qt::white);
+        } else {
+            painter.setPen(Qt::black);
+        }
+
 
         // Center the text within the circle
         painter.drawText(circleRect, Qt::AlignCenter, colorChar);
     }
 }
+
 
 void DeckPreviewColorCircleWidget::setColorActive(bool active)
 {
