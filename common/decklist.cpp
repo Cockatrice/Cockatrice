@@ -432,8 +432,8 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             bannerCard = QPair<QString, QString>(cardName, providerId);
         } else if (childName == "tags") {
             tags.clear(); // Clear existing tags
-            while (!(xml->isEndElement() && xml->name() == "tags")) {
-                if (xml->readNextStartElement() && xml->name() == "tag") {
+            while (!(xml->isEndElement() && childName == "tags")) {
+                if (xml->readNextStartElement() && childName == "tag") {
                     tags.append(xml->readElementText());
                 }
             }
