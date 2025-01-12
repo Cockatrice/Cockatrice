@@ -280,6 +280,9 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     connect(localClients.first(), &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::localGameJoined);
 }
 
+/**
+ * Call this when Cockatrice disconnects from the server in order to clean up.
+ */
 void TabSupervisor::stop()
 {
     if ((!client) && localClients.isEmpty())
