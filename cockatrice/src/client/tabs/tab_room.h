@@ -91,10 +91,10 @@ public:
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
             const ServerInfo_Room &info);
-    ~TabRoom();
-    void retranslateUi();
-    void closeRequest();
-    void tabActivated();
+    ~TabRoom() override;
+    void retranslateUi() override;
+    void closeRequest() override;
+    void tabActivated() override;
     void processRoomEvent(const RoomEvent &event);
     int getRoomId() const
     {
@@ -108,7 +108,7 @@ public:
     {
         return roomName;
     }
-    QString getTabText() const
+    QString getTabText() const override
     {
         return roomName;
     }

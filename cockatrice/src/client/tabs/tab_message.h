@@ -39,12 +39,12 @@ public:
                AbstractClient *_client,
                const ServerInfo_User &_ownUserInfo,
                const ServerInfo_User &_otherUserInfo);
-    ~TabMessage();
-    void retranslateUi();
-    void closeRequest();
-    void tabActivated();
+    ~TabMessage() override;
+    void retranslateUi() override;
+    void closeRequest() override;
+    void tabActivated() override;
     QString getUserName() const;
-    QString getTabText() const;
+    QString getTabText() const override;
 
     void processUserMessageEvent(const Event_UserMessage &event);
 
