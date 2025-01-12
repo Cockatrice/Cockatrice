@@ -38,7 +38,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     vbox->addWidget(sayEdit);
 
     aLeave = new QAction(this);
-    connect(aLeave, SIGNAL(triggered()), this, SLOT(actLeave()));
+    connect(aLeave, &QAction::triggered, this, [this] { closeRequest(); });
 
     messageMenu = new QMenu(this);
     messageMenu->addAction(aLeave);
@@ -53,7 +53,6 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
 
 TabMessage::~TabMessage()
 {
-    emit talkClosing(this);
     delete ownUserInfo;
     delete otherUserInfo;
 }
@@ -86,9 +85,10 @@ QString TabMessage::getTabText() const
     return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
-void TabMessage::closeRequest()
+void TabMessage::closeRequest(bool /*forced*/)
 {
-    actLeave();
+    emit talkClosing(this);
+    deleteLater();
 }
 
 void TabMessage::sendMessage()
@@ -112,11 +112,6 @@ void TabMessage::messageSent(const Response &response)
     if (response.response_code() == Response::RespInIgnoreList)
         chatView->appendMessage(tr(
             "This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
-}
-
-void TabMessage::actLeave()
-{
-    deleteLater();
 }
 
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)

@@ -101,7 +101,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     hbox->addWidget(userList, 1);
 
     aLeaveRoom = new QAction(this);
-    connect(aLeaveRoom, SIGNAL(triggered()), this, SLOT(actLeaveRoom()));
+    connect(aLeaveRoom, &QAction::triggered, this, [this] { closeRequest(); });
 
     roomMenu = new QMenu(this);
     roomMenu->addAction(aLeaveRoom);
@@ -133,11 +133,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
-}
-
-TabRoom::~TabRoom()
-{
-    emit roomClosing(this);
 }
 
 void TabRoom::retranslateUi()
@@ -175,9 +170,11 @@ void TabRoom::actShowPopup(const QString &message)
     }
 }
 
-void TabRoom::closeRequest()
+void TabRoom::closeRequest(bool /*forced*/)
 {
-    actLeaveRoom();
+    sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
+    emit roomClosing(this);
+    deleteLater();
 }
 
 void TabRoom::tabActivated()
@@ -214,12 +211,6 @@ void TabRoom::sayFinished(const Response &response)
 {
     if (response.response_code() == Response::RespChatFlood)
         chatView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
-}
-
-void TabRoom::actLeaveRoom()
-{
-    sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
-    deleteLater();
 }
 
 void TabRoom::actClearChat()

@@ -304,29 +304,26 @@ void TabSupervisor::stop()
     tabAdmin = 0;
     tabLog = 0;
 
-    for (const auto tab : deckEditorTabs) {
-        disconnect(tab, nullptr, this, nullptr);
-        tab->deleteLater();
-    }
-    deckEditorTabs.clear();
+    QList<Tab *> tabsToDelete;
 
     for (auto i = roomTabs.cbegin(), end = roomTabs.cend(); i != end; ++i) {
-        disconnect(i.value(), nullptr, this, nullptr);
-        i.value()->deleteLater();
+        tabsToDelete << i.value();
     }
     roomTabs.clear();
 
     for (auto i = gameTabs.cbegin(), end = gameTabs.cend(); i != end; ++i) {
-        disconnect(i.value(), nullptr, this, nullptr);
-        i.value()->deleteLater();
+        tabsToDelete << i.value();
     }
     gameTabs.clear();
 
     for (const auto tab : replayTabs) {
-        disconnect(tab, nullptr, this, nullptr);
-        tab->deleteLater();
+        tabsToDelete << tab;
     }
     replayTabs.clear();
+
+    for (const auto tab : tabsToDelete) {
+        tab->closeRequest(true);
+    }
 
     delete userInfo;
     userInfo = 0;

@@ -358,7 +358,7 @@ void TabDeckEditor::createMenus()
     analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
     aClose = new QAction(QString(), this);
-    connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
+    connect(aClose, &QAction::triggered, this, [this] { closeRequest(); });
 
     aClearFilterAll = new QAction(QString(), this);
     aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
@@ -721,11 +721,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     loadLayout();
 }
 
-TabDeckEditor::~TabDeckEditor()
-{
-    emit deckEditorClosing(this);
-}
-
 void TabDeckEditor::retranslateUi()
 {
     cardInfo->retranslateUi();
@@ -980,10 +975,14 @@ bool TabDeckEditor::confirmClose()
     return true;
 }
 
-void TabDeckEditor::closeRequest()
+void TabDeckEditor::closeRequest(bool forced)
 {
-    if (confirmClose())
-        deleteLater();
+    if (!forced && !confirmClose()) {
+        return;
+    }
+
+    emit deckEditorClosing(this);
+    deleteLater();
 }
 
 void TabDeckEditor::actNewDeck()

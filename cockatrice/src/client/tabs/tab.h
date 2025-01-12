@@ -50,7 +50,13 @@ public:
     }
     virtual QString getTabText() const = 0;
     virtual void retranslateUi() = 0;
-    virtual void closeRequest()
+    /**
+     * Sends a request to close the tab.
+     * Signals for cleanup should be emitted from this method instead of the destructor.
+     *
+     * @param forced whether this close request was initiated by the user or forced by the server.
+     */
+    virtual void closeRequest(bool /*forced*/ = false)
     {
     }
     virtual void tabActivated()
