@@ -121,7 +121,7 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
 {
     QFileInfo fileInfo(fileName);
     if (!fileInfo.exists()) {
-        qWarning() << "File does not exist:" << fileName;
+        qCWarning(DeckLoaderLog) << "File does not exist:" << fileName;
         return false;
     }
 
@@ -130,7 +130,7 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
     // Open the file for writing
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open file for writing:" << fileName;
+        qCWarning(DeckLoaderLog) << "Failed to open file for writing:" << fileName;
         return false;
     }
 
@@ -154,12 +154,12 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
 
         // Re-open the file and set the original timestamp
         if (!file.open(QIODevice::ReadWrite)) {
-            qWarning() << "Failed to re-open file to set timestamp:" << fileName;
+            qCWarning(DeckLoaderLog) << "Failed to re-open file to set timestamp:" << fileName;
             return false;
         }
 
         if (!file.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
-            qWarning() << "Failed to set modification time for file:" << fileName;
+            qCWarning(DeckLoaderLog) << "Failed to set modification time for file:" << fileName;
             file.close();
             return false;
         }

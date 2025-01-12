@@ -48,7 +48,7 @@ QString DeckPreviewWidget::getColorIdentity()
 {
     QStringList cardList = deckLoader->getCardList();
     if (cardList.isEmpty()) {
-        return "";
+        return {};
     }
 
     QSet<QChar> colorSet; // A set to collect unique color symbols (e.g., W, U, B, R, G)

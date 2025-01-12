@@ -61,24 +61,39 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
         "🌏 Land",
         "🪄 Aura",
 
-        // Tribal Types
-        "🐉 Tribal",
-        "🐠 Merfolk",
-        "🐺 Werewolves",
-        "🦴 Skeletons",
-        "🦅 Flying",
-        "👾 Eldrazi",
-        "🧛 Vampires",
-        "🦇 Bats",
-        "🐺 Wolves",
-        "🐉 Dragons",
-        "🍄 Fungus",
-        "🦗 Insects",
-        "🦅 Birds",
-        "🐚 Sea Creatures",
-        "🎩 Wizards",
-        "🎻 Bards",
-
+        // Kindred Types
+        "🐉 Kindred",         // Kindred
+        "🐠 Merfolk",         // Merfolk
+        "🐺 Werewolves",      // Werewolves
+        "🦴 Skeletons",       // Skeletons
+        "🦅 Birds",           // Birds
+        "👾 Eldrazi",         // Eldrazi
+        "🐉 Dragons",         // Dragons
+        "🧛 Vampires",        // Vampires
+        "🦇 Bats",            // Bats
+        "🐺 Wolves",          // Wolves
+        "🍄 Fungus",          // Fungus
+        "🦗 Insects",         // Insects
+        "🐚 Sea Creatures",   // Octopus, Leviathan, etc.
+        "🎩 Wizards",         // Wizards
+        "🎻 Bards",           // Bards
+        "😇 Angels",          // Angels
+        "⚔️ Soldiers",        // Soldiers
+        "🛡️ Knights",         // Knights
+        "🧙 Humans",          // Humans
+        "🧝 Elves",           // Elves
+        "💀 Zombies",         // Zombies
+        "👹 Demons",          // Demons
+        "🌲 Dryads",          // Dryads
+        "🐗 Boars",           // Boars
+        "🦁 Cats",            // Cats
+        "🦊 Foxes",           // Foxes
+        "🐀 Rats",            // Rats
+        "🦄 Unicorns",        // Unicorns
+        "🐘 Elephants",       // Elephants
+        "🐻 Bears",           // Bears
+        "🦏 Rhinos",          // Rhinos
+        "🦂 Scorpions",       // Scorpions
     };
 
     // Merge knownTags with defaultTags, ensuring no duplicates
@@ -89,8 +104,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     auto *mainLayout = new QVBoxLayout(this);
 
     // Instruction label
-    auto *instructionLabel =
-        new QLabel("Manage your deck tags. Check or uncheck tags as needed, or add new ones:", this);
+    instructionLabel = new QLabel(this);
     instructionLabel->setWordWrap(true);
     mainLayout->addWidget(instructionLabel);
 
@@ -111,8 +125,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     // Add tag input layout
     auto *addTagLayout = new QHBoxLayout();
     newTagInput_ = new QLineEdit(this);
-    newTagInput_->setPlaceholderText("Add a new tag (e.g., Aggro️)");
-    addTagButton_ = new QPushButton("Add Tag", this);
+    addTagButton_ = new QPushButton(this);
     addTagLayout->addWidget(newTagInput_);
     addTagLayout->addWidget(addTagButton_);
     mainLayout->addLayout(addTagLayout);
@@ -121,8 +134,8 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
 
     // OK and Cancel buttons
     auto *buttonLayout = new QHBoxLayout();
-    auto *okButton = new QPushButton("OK", this);
-    auto *cancelButton = new QPushButton("Cancel", this);
+    okButton = new QPushButton(this);
+    cancelButton = new QPushButton(this);
     buttonLayout->addStretch();
     buttonLayout->addWidget(okButton);
     buttonLayout->addWidget(cancelButton);
@@ -130,6 +143,16 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
 
     connect(okButton, &QPushButton::clicked, this, &DeckPreviewTagDialog::accept);
     connect(cancelButton, &QPushButton::clicked, this, &DeckPreviewTagDialog::reject);
+    retranslateUi();
+}
+
+void DeckPreviewTagDialog::retranslateUi()
+{
+    instructionLabel->setText(tr("Manage your deck tags. Check or uncheck tags as needed, or add new ones:"));
+    newTagInput_->setPlaceholderText(tr("Add a new tag (e.g., Aggro️)"));
+    addTagButton_->setText(tr("Add Tag"));
+    okButton->setText(tr("OK"));
+    cancelButton->setText(tr("Cancel"));
 }
 
 QStringList DeckPreviewTagDialog::getActiveTags() const
@@ -141,7 +164,7 @@ void DeckPreviewTagDialog::addTag()
 {
     QString newTag = newTagInput_->text().trimmed();
     if (newTag.isEmpty()) {
-        QMessageBox::warning(this, "Invalid Input", "Tag name cannot be empty!");
+        QMessageBox::warning(this, tr("Invalid Input"), tr("Tag name cannot be empty!"));
         return;
     }
 
@@ -150,7 +173,7 @@ void DeckPreviewTagDialog::addTag()
         auto *item = tagListView_->item(i);
         auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView_->itemWidget(item));
         if (tagWidget && tagWidget->checkBox()->text() == newTag) {
-            QMessageBox::warning(this, "Duplicate Tag", "This tag already exists.");
+            QMessageBox::warning(this, tr("Duplicate Tag"), tr("This tag already exists."));
             return;
         }
     }

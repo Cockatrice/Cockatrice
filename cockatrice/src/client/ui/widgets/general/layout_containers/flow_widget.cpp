@@ -87,9 +87,9 @@ void FlowWidget::addWidget(QWidget *widget_to_add) const
     flowLayout->addWidget(widget_to_add);
 }
 
-void FlowWidget::removeWidget(QWidget *widget_to_remove) const
+void FlowWidget::removeWidget(QWidget *widgetToRemove) const
 {
-    flowLayout->removeWidget(widget_to_remove);
+    flowLayout->removeWidget(widgetToRemove);
 }
 
 /**

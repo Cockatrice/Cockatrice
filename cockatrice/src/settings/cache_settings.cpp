@@ -265,7 +265,7 @@ SettingsCache::SettingsCache()
     visualDeckStorageDrawUnusedColorIdentities =
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
-        settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 30).toInt();
+        settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();

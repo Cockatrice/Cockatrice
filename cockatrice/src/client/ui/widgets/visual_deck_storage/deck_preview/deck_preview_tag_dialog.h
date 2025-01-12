@@ -3,6 +3,7 @@
 
 #include <QCheckBox>
 #include <QDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
@@ -21,11 +22,15 @@ public:
 private slots:
     void addTag();
     void onCheckboxStateChanged();
+    void retranslateUi();
 
 private:
+    QLabel *instructionLabel;
     QListWidget *tagListView_;
     QLineEdit *newTagInput_;
     QPushButton *addTagButton_;
+    QPushButton *okButton;
+    QPushButton *cancelButton;
     QStringList activeTags_;
 };
 
