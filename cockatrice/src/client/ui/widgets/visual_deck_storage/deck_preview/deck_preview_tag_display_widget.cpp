@@ -14,25 +14,25 @@ DeckPreviewTagDisplayWidget::DeckPreviewTagDisplayWidget(QWidget *parent, const 
     layout->setSpacing(5);
 
     // Add a stretch spacer for text and close button separation
-    layout->addStretch(); // Ensures the close button stays at the far-right side
+    // layout->addStretch(); // Ensures the close button stays at the far-right side
 
     // Create close button
-    closeButton = new QPushButton("x", this);
-    closeButton->setFixedSize(16, 16); // Small square button
-    closeButton->setFocusPolicy(Qt::NoFocus);
+    // closeButton = new QPushButton("x", this);
+    // closeButton->setFixedSize(16, 16); // Small square button
+    // closeButton->setFocusPolicy(Qt::NoFocus);
 
     // Set font for close button to ensure the "x" appears correctly
-    QFont closeButtonFont = closeButton->font();
-    closeButtonFont.setPointSize(10); // Adjust the size to make the "x" clear
-    closeButton->setFont(closeButtonFont);
+    // QFont closeButtonFont = closeButton->font();
+    // closeButtonFont.setPointSize(10); // Adjust the size to make the "x" clear
+    // closeButton->setFont(closeButtonFont);
 
-    layout->addWidget(closeButton);
+    // layout->addWidget(closeButton);
 
     // Adjust widget size
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     // Connect close button to the remove signal
-    connect(closeButton, &QPushButton::clicked, this, &DeckPreviewTagDisplayWidget::tagClosed);
+    // connect(closeButton, &QPushButton::clicked, this, &DeckPreviewTagDisplayWidget::tagClosed);
 }
 
 QSize DeckPreviewTagDisplayWidget::sizeHint() const
@@ -40,7 +40,7 @@ QSize DeckPreviewTagDisplayWidget::sizeHint() const
     // Calculate the size based on the tag name and close button
     QFontMetrics fm(font());
     int textWidth = fm.horizontalAdvance(tagName);
-    int width = textWidth + closeButton->width() + 50; // Add extra padding
+    int width = textWidth + 50;    // Add extra padding
     int height = fm.height() + 10;                     // Height based on font size + padding
 
     return QSize(width, height);
@@ -86,9 +86,9 @@ void DeckPreviewTagDisplayWidget::paintEvent(QPaintEvent *event)
     painter.setFont(font);
 
     // Calculate text rect to avoid overlap with the close button
-    int closeButtonWidth = closeButton->width();
+    // int closeButtonWidth = closeButton->width();
     int margin = 10; // Left and right margins
-    QRect textRect(margin, 0, width() - closeButtonWidth - margin * 2, height());
+    QRect textRect(margin, 0, width() - margin * 2, height());
 
     // Draw the text with a black border for better legibility
     painter.setPen(Qt::black);

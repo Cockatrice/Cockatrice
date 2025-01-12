@@ -19,15 +19,15 @@ DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(DeckPreviewDeckTagsDi
     layout->addWidget(tagLabel_);
 
     // Create close button
-    closeButton_ = new QPushButton("x", this);
-    closeButton_->setFixedSize(16, 16); // Small square button
-    layout->addWidget(closeButton_);
+    // closeButton_ = new QPushButton("x", this);
+    // closeButton_->setFixedSize(16, 16); // Small square button
+    // layout->addWidget(closeButton_);
 
     // Adjust widget size
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
     // Connect close button to the remove signal
-    connect(closeButton_, &QPushButton::clicked, this, &DeckPreviewTagAdditionWidget::tagClosed);
+    // connect(closeButton_, &QPushButton::clicked, this, &DeckPreviewTagAdditionWidget::tagClosed);
 }
 
 void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)

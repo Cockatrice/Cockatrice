@@ -26,6 +26,6 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(DeckPreviewWi
     for (const QString &tag : this->deckLoader->getTags()) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
-    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Add tags ...")));
+    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Edit tags ...")));
     layout->addWidget(flowWidget);
 }
