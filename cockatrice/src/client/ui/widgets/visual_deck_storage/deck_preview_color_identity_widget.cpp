@@ -4,7 +4,6 @@
 
 #include <QPainter>
 #include <QResizeEvent>
-#include <QSet>
 
 DeckPreviewColorCircleWidget::DeckPreviewColorCircleWidget(QChar color, QWidget *parent)
     : QWidget(parent), colorChar(color), circleDiameter(0), isActive(false)
