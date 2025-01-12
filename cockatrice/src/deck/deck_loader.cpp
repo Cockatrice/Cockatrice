@@ -10,6 +10,9 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QStringList>
+#include <qloggingcategory.h>
+
+Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
                                                 << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
@@ -49,9 +52,9 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
             break;
         case CockatriceFormat: {
             result = loadFromFile_Native(&file);
-            qDebug() << "Loaded from" << fileName << "-" << result;
+            qCDebug(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
-                qDebug() << "Retrying as plain format";
+                qCDebug(DeckLoaderLog) << "Retrying as plain format";
                 file.seek(0);
                 result = loadFromFile_Plain(&file);
                 fmt = PlainTextFormat;
@@ -73,7 +76,7 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
         emit deckLoaded();
     }
 
-    qDebug() << "Deck was loaded -" << result;
+    qCDebug(DeckLoaderLog) << "Deck was loaded -" << result;
     return result;
 }
 
