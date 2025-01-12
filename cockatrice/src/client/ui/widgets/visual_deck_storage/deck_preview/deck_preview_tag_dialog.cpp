@@ -49,7 +49,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
         "🚀 Vehicles",
         "💉 Infect",
         "🩸 Madness",
-        "🌀 Morph"
+        "🌀 Morph",
 
         // Card Types
         "⚔️ Creature",
