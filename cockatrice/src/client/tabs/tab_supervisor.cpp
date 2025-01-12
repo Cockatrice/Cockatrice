@@ -208,6 +208,8 @@ int TabSupervisor::myAddTab(Tab *tab)
     int idx = addTab(tab, sanitizeTabName(tabText));
     setTabToolTip(idx, sanitizeHtml(tabText));
 
+    addCloseButtonToTab(tab, idx);
+
     return idx;
 }
 
@@ -363,8 +365,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
 }
@@ -374,8 +375,7 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
     TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
 
@@ -404,8 +404,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent)
         setCurrentWidget(tab);
@@ -424,8 +423,7 @@ void TabSupervisor::openReplay(GameReplay *replay)
 {
     TabGame *replayTab = new TabGame(this, replay);
     connect(replayTab, &TabGame::gameClosing, this, &TabSupervisor::replayLeft);
-    int tabIndex = myAddTab(replayTab);
-    addCloseButtonToTab(replayTab, tabIndex);
+    myAddTab(replayTab);
     replayTabs.append(replayTab);
     setCurrentWidget(replayTab);
 }
@@ -461,8 +459,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     messageTabs.insert(receiverName, tab);
     if (focus)
         setCurrentWidget(tab);
@@ -490,8 +487,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
     connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     deckEditorTabs.append(tab);
     setCurrentWidget(tab);
     return tab;
@@ -500,8 +496,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 TabDeckStorageVisual *TabSupervisor::addVisualDeckStorageTab()
 {
     TabDeckStorageVisual *tab = new TabDeckStorageVisual(this, client);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }
