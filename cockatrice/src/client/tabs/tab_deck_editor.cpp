@@ -842,7 +842,8 @@ void TabDeckEditor::updateBannerCardComboBox()
                 CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
                     currentCard->getName(), currentCard->getCardProviderId());
                 if (info) {
-                    bannerCardSet.insert(QPair(currentCard->getName(), currentCard->getCardProviderId()));
+                    bannerCardSet.insert(
+                        QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
                 }
             }
         }
@@ -885,8 +886,7 @@ void TabDeckEditor::updateBannerCardComboBox()
 void TabDeckEditor::setBannerCard(int /* changedIndex */)
 {
     QVariantMap data = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
-    qDebug() << "Banner card is " << data["name"].toString() << " and " << data["uuid"].toString();
-    deckModel->getDeckList()->setBannerCard(QPair(data["name"].toString(), data["uuid"].toString()));
+    deckModel->getDeckList()->setBannerCard(QPair<QString, QString>(data["name"].toString(), data["uuid"].toString()));
 }
 
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
