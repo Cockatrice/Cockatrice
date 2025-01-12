@@ -981,7 +981,7 @@ void TabDeckEditor::closeRequest(bool forced)
     }
 
     emit deckEditorClosing(this);
-    deleteLater();
+    close();
 }
 
 void TabDeckEditor::actNewDeck()
