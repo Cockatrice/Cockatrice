@@ -21,7 +21,7 @@ signals:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     DeckPreviewDeckTagsDisplayWidget *parent;
