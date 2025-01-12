@@ -100,9 +100,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
     style()->drawPrimitive(QStyle::PE_IndicatorTabClose, &opt, &p, this);
 }
 
-TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0),
-      tabAdmin(0), tabLog(0)
+TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
+    : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabServer(0), tabUserLists(0),
+      tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);

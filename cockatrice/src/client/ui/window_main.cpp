@@ -692,6 +692,8 @@ void MainWindow::retranslateUi()
     aAddCustomSet->setText(tr("Add custom sets/cards"));
     aReloadCardDatabase->setText(tr("Reload card database"));
 
+    tabsMenu->setTitle(tr("Tabs"));
+
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
     aTips->setText(tr("&Tip of the Day"));
@@ -824,6 +826,8 @@ void MainWindow::createMenus()
     dbMenu->addSeparator();
     dbMenu->addAction(aReloadCardDatabase);
 
+    tabsMenu = menuBar()->addMenu(QString());
+
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
     helpMenu->addAction(aTips);
@@ -871,7 +875,7 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
-    tabSupervisor = new TabSupervisor(client, this);
+    tabSupervisor = new TabSupervisor(client, tabsMenu, this);
     connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
     connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
     connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);

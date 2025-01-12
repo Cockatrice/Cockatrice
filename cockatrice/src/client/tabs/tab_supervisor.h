@@ -69,6 +69,7 @@ private:
     ServerInfo_User *userInfo;
     AbstractClient *client;
     QList<AbstractClient *> localClients;
+    QMenu *tabsMenu;
     TabServer *tabServer;
     TabUserLists *tabUserLists;
     TabDeckStorage *tabDeckStorage;
@@ -87,7 +88,7 @@ private:
     bool isLocalGame;
 
 public:
-    explicit TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
+    explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
     ~TabSupervisor() override;
     void retranslateUi();
     void start(const ServerInfo_User &userInfo);
