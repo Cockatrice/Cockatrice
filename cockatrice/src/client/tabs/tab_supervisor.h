@@ -69,6 +69,7 @@ private:
     ServerInfo_User *userInfo;
     AbstractClient *client;
     QList<AbstractClient *> localClients;
+    QMenu *tabsMenu;
     TabServer *tabServer;
     TabUserLists *tabUserLists;
     TabDeckStorage *tabDeckStorage;
@@ -80,14 +81,18 @@ private:
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
     QList<TabDeckEditor *> deckEditorTabs;
+    bool isLocalGame;
+
+    QAction *aTabDeckEditor, *aTabServer, *aTabUserLists, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
+
     int myAddTab(Tab *tab);
     void addCloseButtonToTab(Tab *tab, int tabIndex);
     QString sanitizeTabName(QString dirty) const;
     QString sanitizeHtml(QString dirty) const;
-    bool isLocalGame;
+    void resetTabsMenu();
 
 public:
-    explicit TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
+    explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
     ~TabSupervisor() override;
     void retranslateUi();
     void start(const ServerInfo_User &userInfo);
@@ -135,6 +140,15 @@ public slots:
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
+    void refreshShortcuts();
+
+    void actTabServer(bool checked);
+    void actTabUserLists(bool checked);
+    void actTabDeckStorage(bool checked);
+    void actTabReplays(bool checked);
+    void actTabAdmin(bool checked);
+    void actTabLog(bool checked);
+
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
     void gameJoined(const Event_GameJoined &event);

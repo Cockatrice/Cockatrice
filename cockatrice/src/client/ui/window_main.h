@@ -73,7 +73,6 @@ private slots:
     void actDisconnect();
     void actSinglePlayer();
     void actWatchReplay();
-    void actDeckEditor();
     void actVisualDeckStorage();
     void actFullScreen(bool checked);
     void actRegister();
@@ -131,11 +130,11 @@ private:
     void startLocalGame(int numberPlayers);
 
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
-    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aVisualDeckStorage, *aFullScreen,
-        *aSettings, *aExit, *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog,
-        *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase,
-        *aShow, *aOpenSettingsFolder;
+    QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
+    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aVisualDeckStorage, *aFullScreen, *aSettings,
+        *aExit, *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets,
+        *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase, *aShow,
+        *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;

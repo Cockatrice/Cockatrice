@@ -82,6 +82,11 @@ const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 
+/**
+ * Replaces the tab-specific menus that are shown in the menuBar.
+ *
+ * @param newMenuList The tab-specific menus to show in the menuBar
+ */
 void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
     for (auto &tabMenu : tabMenus)
@@ -283,11 +288,6 @@ void MainWindow::localGameEnded()
     aRegister->setEnabled(true);
     aForgotPassword->setEnabled(true);
     aSinglePlayer->setEnabled(true);
-}
-
-void MainWindow::actDeckEditor()
-{
-    tabSupervisor->addDeckEditorTab(nullptr);
 }
 
 void MainWindow::actVisualDeckStorage()
@@ -664,7 +664,6 @@ void MainWindow::retranslateUi()
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
-    aDeckEditor->setText(tr("&Deck editor"));
     aVisualDeckStorage->setText(tr("&Visual Deck storage"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
@@ -686,6 +685,8 @@ void MainWindow::retranslateUi()
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
     aReloadCardDatabase->setText(tr("Reload card database"));
+
+    tabsMenu->setTitle(tr("Tabs"));
 
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
@@ -711,8 +712,6 @@ void MainWindow::createActions()
     connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
     connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
-    aDeckEditor = new QAction(this);
-    connect(aDeckEditor, &QAction::triggered, this, &MainWindow::actDeckEditor);
     aVisualDeckStorage = new QAction(this);
     connect(aVisualDeckStorage, &QAction::triggered, this, &MainWindow::actVisualDeckStorage);
     aFullScreen = new QAction(this);
@@ -801,7 +800,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
-    cockatriceMenu->addAction(aDeckEditor);
     cockatriceMenu->addAction(aVisualDeckStorage);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aFullScreen);
@@ -818,6 +816,8 @@ void MainWindow::createMenus()
     dbMenu->addAction(aAddCustomSet);
     dbMenu->addSeparator();
     dbMenu->addAction(aReloadCardDatabase);
+
+    tabsMenu = menuBar()->addMenu(QString());
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
@@ -866,7 +866,7 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
-    tabSupervisor = new TabSupervisor(client, this);
+    tabSupervisor = new TabSupervisor(client, tabsMenu, this);
     connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
     connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
     connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
@@ -1283,7 +1283,6 @@ void MainWindow::refreshShortcuts()
     aDisconnect->setShortcuts(shortcuts.getShortcut("MainWindow/aDisconnect"));
     aSinglePlayer->setShortcuts(shortcuts.getShortcut("MainWindow/aSinglePlayer"));
     aWatchReplay->setShortcuts(shortcuts.getShortcut("MainWindow/aWatchReplay"));
-    aDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
     aFullScreen->setShortcuts(shortcuts.getShortcut("MainWindow/aFullScreen"));
     aRegister->setShortcuts(shortcuts.getShortcut("MainWindow/aRegister"));
     aSettings->setShortcuts(shortcuts.getShortcut("MainWindow/aSettings"));

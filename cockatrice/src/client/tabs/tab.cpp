@@ -4,6 +4,7 @@
 #include "./tab_supervisor.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QDebug>
 #include <QScreen>
 
@@ -41,4 +42,18 @@ void Tab::deleteCardInfoPopup(const QString &cardName)
             infoPopup = 0;
         }
     }
+}
+
+/**
+ * Overrides the closeEvent in order to emit a close signal
+ */
+void Tab::closeEvent(QCloseEvent *event)
+{
+    emit closed();
+    event->accept();
+}
+
+void Tab::closeRequest(bool /*forced*/)
+{
+    close();
 }

@@ -100,9 +100,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
     style()->drawPrimitive(QStyle::PE_IndicatorTabClose, &opt, &p, this);
 }
 
-TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0),
-      tabAdmin(0), tabLog(0)
+TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
+    : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabServer(0), tabUserLists(0),
+      tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -114,14 +114,50 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     tabBar()->setStyle(new MacOSTabFixStyle);
 #endif
 
+    // connect tab changes
     connect(this, &TabSupervisor::currentChanged, this, &TabSupervisor::updateCurrent);
 
+    // connect client
     connect(client, &AbstractClient::roomEventReceived, this, &TabSupervisor::processRoomEvent);
     connect(client, &AbstractClient::gameEventContainerReceived, this, &TabSupervisor::processGameEventContainer);
     connect(client, &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::gameJoined);
     connect(client, &AbstractClient::userMessageEventReceived, this, &TabSupervisor::processUserMessageEvent);
     connect(client, &AbstractClient::maxPingTime, this, &TabSupervisor::updatePingTime);
     connect(client, &AbstractClient::notifyUserEventReceived, this, &TabSupervisor::processNotifyUserEvent);
+
+    // create tabs menu actions
+    aTabDeckEditor = new QAction(this);
+    connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(nullptr); });
+
+    aTabServer = new QAction(this);
+    aTabServer->setCheckable(true);
+    connect(aTabServer, &QAction::toggled, this, &TabSupervisor::actTabServer);
+
+    aTabUserLists = new QAction(this);
+    aTabUserLists->setCheckable(true);
+    connect(aTabUserLists, &QAction::toggled, this, &TabSupervisor::actTabUserLists);
+
+    aTabDeckStorage = new QAction(this);
+    aTabDeckStorage->setCheckable(true);
+    connect(aTabDeckStorage, &QAction::toggled, this, &TabSupervisor::actTabDeckStorage);
+
+    aTabReplays = new QAction(this);
+    aTabReplays->setCheckable(true);
+    connect(aTabReplays, &QAction::toggled, this, &TabSupervisor::actTabReplays);
+
+    aTabAdmin = new QAction(this);
+    aTabAdmin->setCheckable(true);
+    connect(aTabAdmin, &QAction::toggled, this, &TabSupervisor::actTabAdmin);
+
+    aTabLog = new QAction(this);
+    aTabLog->setCheckable(true);
+    connect(aTabLog, &QAction::toggled, this, &TabSupervisor::actTabLog);
+
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &TabSupervisor::refreshShortcuts);
+    refreshShortcuts();
+
+    resetTabsMenu();
 
     retranslateUi();
 }
@@ -133,6 +169,16 @@ TabSupervisor::~TabSupervisor()
 
 void TabSupervisor::retranslateUi()
 {
+    // tab menu actions
+    aTabDeckEditor->setText(tr("Deck Editor"));
+    aTabServer->setText(tr("Server"));
+    aTabUserLists->setText(tr("Account"));
+    aTabDeckStorage->setText(tr("Deck storage"));
+    aTabReplays->setText(tr("Game replays"));
+    aTabAdmin->setText(tr("Administration"));
+    aTabLog->setText(tr("Logs"));
+
+    // tabs
     QList<Tab *> tabs;
     tabs.append(tabServer);
     tabs.append(tabReplays);
@@ -164,6 +210,12 @@ void TabSupervisor::retranslateUi()
             setTabToolTip(idx, sanitizeHtml(tabText));
             tabs[i]->retranslateUi();
         }
+}
+
+void TabSupervisor::refreshShortcuts()
+{
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    aTabDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
 }
 
 bool TabSupervisor::closeRequest()
@@ -208,7 +260,18 @@ int TabSupervisor::myAddTab(Tab *tab)
     int idx = addTab(tab, sanitizeTabName(tabText));
     setTabToolTip(idx, sanitizeHtml(tabText));
 
+    addCloseButtonToTab(tab, idx);
+
     return idx;
+}
+
+/**
+ * Resets the tabs menu to the tabs that are always available
+ */
+void TabSupervisor::resetTabsMenu()
+{
+    tabsMenu->clear();
+    tabsMenu->addAction(aTabDeckEditor);
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -216,41 +279,32 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
 
-    tabServer = new TabServer(this, client);
-    connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
-    myAddTab(tabServer);
+    resetTabsMenu();
 
-    tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
-    connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
-    connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
-    myAddTab(tabUserLists);
+    tabsMenu->addSeparator();
+    tabsMenu->addAction(aTabServer);
+    tabsMenu->addAction(aTabUserLists);
+
+    aTabServer->setChecked(true);
+    aTabUserLists->setChecked(true);
 
     updatePingTime(0, -1);
 
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
-        tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-        myAddTab(tabDeckStorage);
+        tabsMenu->addAction(aTabDeckStorage);
+        tabsMenu->addAction(aTabReplays);
 
-        tabReplays = new TabReplays(this, client);
-        connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
-        myAddTab(tabReplays);
-    } else {
-        tabDeckStorage = 0;
-        tabReplays = 0;
+        aTabDeckStorage->setChecked(true);
+        aTabReplays->setChecked(true);
     }
 
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
-        connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
-        myAddTab(tabAdmin);
+        tabsMenu->addSeparator();
+        tabsMenu->addAction(aTabAdmin);
+        tabsMenu->addAction(aTabLog);
 
-        tabLog = new TabLog(this, client);
-        myAddTab(tabLog);
-    } else {
-        tabAdmin = 0;
-        tabLog = 0;
+        aTabAdmin->setChecked(true);
+        aTabLog->setChecked(true);
     }
 
     retranslateUi();
@@ -258,6 +312,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
 void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
+    resetTabsMenu();
+
     tabUserLists = 0;
     tabDeckStorage = 0;
     tabReplays = 0;
@@ -272,10 +328,15 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     connect(localClients.first(), &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::localGameJoined);
 }
 
+/**
+ * Call this when Cockatrice disconnects from the server in order to clean up.
+ */
 void TabSupervisor::stop()
 {
     if ((!client) && localClients.isEmpty())
         return;
+
+    resetTabsMenu();
 
     if (!localClients.isEmpty()) {
         for (int i = 0; i < localClients.size(); ++i)
@@ -284,42 +345,39 @@ void TabSupervisor::stop()
 
         emit localGameEnded();
     } else {
-        if (tabUserLists)
-            tabUserLists->deleteLater();
-        if (tabServer)
-            tabServer->deleteLater();
-        if (tabDeckStorage)
-            tabDeckStorage->deleteLater();
-        if (tabReplays)
-            tabReplays->deleteLater();
-        if (tabAdmin)
-            tabAdmin->deleteLater();
-        if (tabLog)
-            tabLog->deleteLater();
+        if (tabUserLists) {
+            tabUserLists->closeRequest(true);
+        }
+        if (tabServer) {
+            tabServer->closeRequest(true);
+        }
+        if (tabDeckStorage) {
+            tabDeckStorage->closeRequest(true);
+        }
+        if (tabReplays) {
+            tabReplays->closeRequest(true);
+        }
+        if (tabAdmin) {
+            tabAdmin->closeRequest(true);
+        }
+        if (tabLog) {
+            tabLog->closeRequest(true);
+        }
     }
-    tabUserLists = 0;
-    tabServer = 0;
-    tabDeckStorage = 0;
-    tabReplays = 0;
-    tabAdmin = 0;
-    tabLog = 0;
 
     QList<Tab *> tabsToDelete;
 
     for (auto i = roomTabs.cbegin(), end = roomTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
-    roomTabs.clear();
 
     for (auto i = gameTabs.cbegin(), end = gameTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
-    gameTabs.clear();
 
     for (auto i = messageTabs.cbegin(), end = messageTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
-    messageTabs.clear();
 
     for (const auto tab : tabsToDelete) {
         tab->closeRequest(true);
@@ -327,6 +385,97 @@ void TabSupervisor::stop()
 
     delete userInfo;
     userInfo = 0;
+}
+
+void TabSupervisor::actTabServer(bool checked)
+{
+    if (checked && !tabServer) {
+        tabServer = new TabServer(this, client);
+        connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
+        myAddTab(tabServer);
+        connect(tabServer, &Tab::closed, this, [this] {
+            tabServer = nullptr;
+            aTabServer->setChecked(false);
+        });
+    } else if (!checked && tabServer) {
+        tabServer->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabUserLists(bool checked)
+{
+    if (checked && !tabUserLists) {
+        tabUserLists = new TabUserLists(this, client, *userInfo);
+        connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
+        connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
+        connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
+        myAddTab(tabUserLists);
+        connect(tabUserLists, &Tab::closed, this, [this] {
+            tabUserLists = nullptr;
+            aTabUserLists->setChecked(false);
+        });
+    } else if (!checked && tabUserLists) {
+        tabUserLists->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabDeckStorage(bool checked)
+{
+    if (checked && !tabDeckStorage) {
+        tabDeckStorage = new TabDeckStorage(this, client);
+        connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+        myAddTab(tabDeckStorage);
+        connect(tabDeckStorage, &Tab::closed, this, [this] {
+            tabDeckStorage = nullptr;
+            aTabDeckStorage->setChecked(false);
+        });
+    } else if (!checked && tabDeckStorage) {
+        tabDeckStorage->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabReplays(bool checked)
+{
+    if (checked && !tabReplays) {
+        tabReplays = new TabReplays(this, client);
+        connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
+        myAddTab(tabReplays);
+        connect(tabReplays, &Tab::closed, this, [this] {
+            tabReplays = nullptr;
+            aTabReplays->setChecked(false);
+        });
+    } else if (!checked && tabReplays) {
+        tabReplays->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabAdmin(bool checked)
+{
+    if (checked && !tabAdmin) {
+        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+        connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
+        myAddTab(tabAdmin);
+        connect(tabAdmin, &Tab::closed, this, [this] {
+            tabAdmin = nullptr;
+            aTabAdmin->setChecked(false);
+        });
+    } else if (!checked && tabAdmin) {
+        tabAdmin->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabLog(bool checked)
+{
+    if (checked && !tabLog) {
+        tabLog = new TabLog(this, client);
+        myAddTab(tabLog);
+        connect(tabLog, &Tab::closed, this, [this] {
+            tabLog = nullptr;
+            aTabAdmin->setChecked(false);
+        });
+    } else if (!checked && tabLog) {
+        tabLog->closeRequest();
+    }
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
@@ -363,8 +512,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
 }
@@ -374,8 +522,7 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
     TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
 
@@ -404,8 +551,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent)
         setCurrentWidget(tab);
@@ -424,8 +570,7 @@ void TabSupervisor::openReplay(GameReplay *replay)
 {
     TabGame *replayTab = new TabGame(this, replay);
     connect(replayTab, &TabGame::gameClosing, this, &TabSupervisor::replayLeft);
-    int tabIndex = myAddTab(replayTab);
-    addCloseButtonToTab(replayTab, tabIndex);
+    myAddTab(replayTab);
     replayTabs.append(replayTab);
     setCurrentWidget(replayTab);
 }
@@ -461,8 +606,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     messageTabs.insert(receiverName, tab);
     if (focus)
         setCurrentWidget(tab);
@@ -490,8 +634,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
     connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     deckEditorTabs.append(tab);
     setCurrentWidget(tab);
     return tab;
@@ -500,8 +643,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 TabDeckStorageVisual *TabSupervisor::addVisualDeckStorageTab()
 {
     TabDeckStorageVisual *tab = new TabDeckStorageVisual(this, client);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }
