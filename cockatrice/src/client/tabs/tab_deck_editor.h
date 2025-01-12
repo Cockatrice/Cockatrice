@@ -164,7 +164,6 @@ private:
 
 public:
     explicit TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = nullptr);
-    ~TabDeckEditor() override;
     void retranslateUi() override;
     QString getTabText() const override;
     void setDeck(DeckLoader *_deckLoader);

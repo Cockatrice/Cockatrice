@@ -70,7 +70,6 @@ signals:
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);
-    void actLeaveRoom();
     void actClearChat();
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
@@ -91,7 +90,6 @@ public:
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
             const ServerInfo_Room &info);
-    ~TabRoom() override;
     void retranslateUi() override;
     void closeRequest(bool forced = false) override;
     void tabActivated() override;

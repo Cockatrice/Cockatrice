@@ -581,16 +581,14 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
+    scene->clearViews();
+
     delete replay;
 
     QMapIterator<int, Player *> i(players);
     while (i.hasNext()) {
         delete i.next().value();
     }
-
-    players.clear();
-
-    emit gameClosing(this);
 }
 
 void TabGame::updatePlayerListDockTitle()
@@ -703,7 +701,13 @@ void TabGame::retranslateUi()
 
 void TabGame::closeRequest(bool forced)
 {
-    actLeaveGame();
+    if (!forced && !leaveGame()) {
+        return;
+    }
+
+    emit gameClosing(this);
+
+    deleteLater();
 }
 
 void TabGame::replayNextEvent(Player::EventProcessingOptions options)
@@ -794,19 +798,23 @@ void TabGame::actConcede()
     }
 }
 
-void TabGame::actLeaveGame()
+/**
+ * Confirms the leave game and sends the leave game command, if applicable.
+ *
+ * @return True if the leave game is confirmed
+ */
+bool TabGame::leaveGame()
 {
     if (!gameClosed) {
         if (!spectator)
             if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
-                return;
+                return false;
 
         if (!replay)
             sendGameCommand(Command_LeaveGame());
     }
-    scene->clearViews();
-    deleteLater();
+    return true;
 }
 
 void TabGame::actSay()
@@ -1598,7 +1606,7 @@ void TabGame::createMenuItems()
     aConcede = new QAction(this);
     connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
     aLeaveGame = new QAction(this);
-    connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+    connect(aLeaveGame, &QAction::triggered, this, [this](bool) { closeRequest(); });
     aFocusChat = new QAction(this);
     connect(aFocusChat, SIGNAL(triggered()), sayEdit, SLOT(setFocus()));
     aCloseReplay = nullptr;
@@ -1648,7 +1656,7 @@ void TabGame::createReplayMenuItems()
     aFocusChat = nullptr;
     aLeaveGame = nullptr;
     aCloseReplay = new QAction(this);
-    connect(aCloseReplay, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+    connect(aCloseReplay, &QAction::triggered, this, [this](bool) { closeRequest(); });
 
     phasesMenu = nullptr;
     gameMenu = new QMenu(this);

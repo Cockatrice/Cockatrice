@@ -29,7 +29,6 @@ signals:
     void maximizeClient();
 private slots:
     void sendMessage();
-    void actLeave();
     void messageSent(const Response &response);
     void addMentionTag(QString mentionTag);
     void messageClicked();
