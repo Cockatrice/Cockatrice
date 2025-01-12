@@ -38,7 +38,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     vbox->addWidget(sayEdit);
 
     aLeave = new QAction(this);
-    connect(aLeave, &QAction::triggered, this, [this](bool) { closeRequest(); });
+    connect(aLeave, &QAction::triggered, this, [this] { closeRequest(); });
 
     messageMenu = new QMenu(this);
     messageMenu->addAction(aLeave);

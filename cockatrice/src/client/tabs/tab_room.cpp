@@ -101,7 +101,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     hbox->addWidget(userList, 1);
 
     aLeaveRoom = new QAction(this);
-    connect(aLeaveRoom, &QAction::triggered, this, [this](bool) { closeRequest(); });
+    connect(aLeaveRoom, &QAction::triggered, this, [this] { closeRequest(); });
 
     roomMenu = new QMenu(this);
     roomMenu->addAction(aLeaveRoom);

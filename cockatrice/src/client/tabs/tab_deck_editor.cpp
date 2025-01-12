@@ -358,7 +358,7 @@ void TabDeckEditor::createMenus()
     analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
     aClose = new QAction(QString(), this);
-    connect(aClose, &QAction::triggered, this, [this](bool) { closeRequest(); });
+    connect(aClose, &QAction::triggered, this, [this] { closeRequest(); });
 
     aClearFilterAll = new QAction(QString(), this);
     aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));

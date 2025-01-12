@@ -1606,7 +1606,7 @@ void TabGame::createMenuItems()
     aConcede = new QAction(this);
     connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
     aLeaveGame = new QAction(this);
-    connect(aLeaveGame, &QAction::triggered, this, [this](bool) { closeRequest(); });
+    connect(aLeaveGame, &QAction::triggered, this, [this] { closeRequest(); });
     aFocusChat = new QAction(this);
     connect(aFocusChat, SIGNAL(triggered()), sayEdit, SLOT(setFocus()));
     aCloseReplay = nullptr;
@@ -1656,7 +1656,7 @@ void TabGame::createReplayMenuItems()
     aFocusChat = nullptr;
     aLeaveGame = nullptr;
     aCloseReplay = new QAction(this);
-    connect(aCloseReplay, &QAction::triggered, this, [this](bool) { closeRequest(); });
+    connect(aCloseReplay, &QAction::triggered, this, [this] { closeRequest(); });
 
     phasesMenu = nullptr;
     gameMenu = new QMenu(this);
