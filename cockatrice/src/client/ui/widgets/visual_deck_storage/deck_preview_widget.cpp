@@ -4,6 +4,7 @@
 #include "../cards/deck_preview_card_picture_widget.h"
 
 #include <QFileInfo>
+#include <QMouseEvent>
 #include <QSet>
 #include <QVBoxLayout>
 
