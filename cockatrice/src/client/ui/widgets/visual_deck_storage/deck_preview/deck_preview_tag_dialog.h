@@ -1,6 +1,7 @@
 #ifndef DECK_PREVIEW_TAG_DIALOG_H
 #define DECK_PREVIEW_TAG_DIALOG_H
 
+#include <QCheckBox>
 #include <QDialog>
 #include <QLineEdit>
 #include <QListWidget>
