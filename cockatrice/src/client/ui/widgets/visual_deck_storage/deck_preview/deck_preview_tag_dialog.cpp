@@ -13,7 +13,6 @@
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const QStringList &activeTags, QWidget *parent)
     : QDialog(parent), activeTags_(activeTags)
 {
-    setWindowTitle("Deck Tags Manager");
     resize(400, 500);
 
     QStringList defaultTags = {
@@ -154,6 +153,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
 
 void DeckPreviewTagDialog::retranslateUi()
 {
+    setWindowTitle(tr("Deck Tags Manager"));
     instructionLabel->setText(tr("Manage your deck tags. Check or uncheck tags as needed, or add new ones:"));
     newTagInput_->setPlaceholderText(tr("Add a new tag (e.g., Aggro️)"));
     addTagButton_->setText(tr("Add Tag"));
