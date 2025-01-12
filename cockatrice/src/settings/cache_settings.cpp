@@ -262,6 +262,10 @@ SettingsCache::SettingsCache()
     visualDeckStorageCardSize = settings->value("cards/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageShowOnLoad = settings->value("interface/visualdeckstorageshowonload", true).toBool();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
+    visualDeckStorageDrawUnusedColorIdentities =
+        settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
+    visualDeckStorageUnusedColorIdentitiesOpacity =
+        settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -629,6 +633,20 @@ void SettingsCache::setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T _visualDec
 {
     visualDeckStorageShowOnLoad = _visualDeckStorageShowOnLoad;
     settings->setValue("interface/visualdeckstorageshowonload", visualDeckStorageShowOnLoad);
+}
+
+void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
+    QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities)
+{
+    visualDeckStorageDrawUnusedColorIdentities = _visualDeckStorageDrawUnusedColorIdentities;
+    settings->setValue("cards/visualdeckstoragedrawunusedcoloridentities", visualDeckStorageDrawUnusedColorIdentities);
+}
+
+void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity)
+{
+    visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
+    settings->setValue("cards/visualdeckstorageunusedcoloridentitiesopacity",
+                       visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

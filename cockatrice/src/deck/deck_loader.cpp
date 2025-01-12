@@ -7,8 +7,12 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QRegularExpression>
 #include <QStringList>
+#include <qloggingcategory.h>
+
+Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
                                                 << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
@@ -34,7 +38,7 @@ DeckLoader::DeckLoader(const DeckLoader &other)
 {
 }
 
-bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
+bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -48,9 +52,9 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
             break;
         case CockatriceFormat: {
             result = loadFromFile_Native(&file);
-            qDebug() << "Loaded from" << fileName << "-" << result;
+            qCDebug(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
-                qDebug() << "Retying as plain format";
+                qCDebug(DeckLoaderLog) << "Retrying as plain format";
                 file.seek(0);
                 result = loadFromFile_Plain(&file);
                 fmt = PlainTextFormat;
@@ -65,11 +69,14 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
     if (result) {
         lastFileName = fileName;
         lastFileFormat = fmt;
+        if (userRequest) {
+            updateLastLoadedTimestamp(fileName, fmt);
+        }
 
         emit deckLoaded();
     }
 
-    qDebug() << "Deck was loaded -" << result;
+    qCDebug(DeckLoaderLog) << "Deck was loaded -" << result;
     return result;
 }
 
@@ -107,6 +114,59 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
         lastFileName = fileName;
         lastFileFormat = fmt;
     }
+    return result;
+}
+
+bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt)
+{
+    QFileInfo fileInfo(fileName);
+    if (!fileInfo.exists()) {
+        qCWarning(DeckLoaderLog) << "File does not exist:" << fileName;
+        return false;
+    }
+
+    QDateTime originalTimestamp = fileInfo.lastModified();
+
+    // Open the file for writing
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qCWarning(DeckLoaderLog) << "Failed to open file for writing:" << fileName;
+        return false;
+    }
+
+    bool result = false;
+
+    // Perform file modifications
+    switch (fmt) {
+        case PlainTextFormat:
+            break;
+        case CockatriceFormat:
+            setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+            result = saveToFile_Native(&file);
+            break;
+    }
+
+    file.close(); // Close the file to ensure changes are flushed
+
+    if (result) {
+        lastFileName = fileName;
+        lastFileFormat = fmt;
+
+        // Re-open the file and set the original timestamp
+        if (!file.open(QIODevice::ReadWrite)) {
+            qCWarning(DeckLoaderLog) << "Failed to re-open file to set timestamp:" << fileName;
+            return false;
+        }
+
+        if (!file.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
+            qCWarning(DeckLoaderLog) << "Failed to set modification time for file:" << fileName;
+            file.close();
+            return false;
+        }
+
+        file.close();
+    }
+
     return result;
 }
 

@@ -96,6 +96,9 @@ private:
     QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
     QCheckBox showVisualDeckStorageOnLoadCheckBox;
+    QCheckBox visualDeckStorageDrawUnusedColorIdentitiesCheckBox;
+    QLabel visualDeckStorageUnusedColorIdentitiesOpacityLabel;
+    QSpinBox visualDeckStorageUnusedColorIdentitiesOpacitySpinBox;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;

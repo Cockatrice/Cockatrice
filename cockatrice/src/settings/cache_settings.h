@@ -126,6 +126,8 @@ private:
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     int visualDeckStorageCardSize;
+    bool visualDeckStorageDrawUnusedColorIdentities;
+    int visualDeckStorageUnusedColorIdentitiesOpacity;
     bool visualDeckStorageShowOnLoad;
     bool horizontalHand;
     bool invertVerticalCoordinate;
@@ -380,6 +382,14 @@ public:
     int getVisualDeckStorageCardSize() const
     {
         return visualDeckStorageCardSize;
+    }
+    bool getVisualDeckStorageDrawUnusedColorIdentities() const
+    {
+        return visualDeckStorageDrawUnusedColorIdentities;
+    }
+    int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
+    {
+        return visualDeckStorageUnusedColorIdentitiesOpacity;
     }
     bool getVisualDeckStorageShowOnLoad() const
     {
@@ -695,6 +705,8 @@ public slots:
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
+    void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
+    void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
     void setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T _visualDeckStorageShowOnLoad);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);

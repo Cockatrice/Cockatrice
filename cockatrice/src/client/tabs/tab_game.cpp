@@ -145,7 +145,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     deckView->setVisible(false);
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::imageDoubleClicked, this,
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
             &DeckViewContainer::replaceDeckStorageWithDeckView);
 
     deckViewLayout = new QVBoxLayout;
@@ -299,20 +299,12 @@ void TabGame::refreshShortcuts()
     }
 }
 
-void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
+void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     Q_UNUSED(event);
-    QString fileName = instance->filePath;
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
-    QString deckString;
-    DeckLoader deck;
+    QString deckString = instance->deckLoader->writeToString_Native();
 
-    bool error = !deck.loadFromFile(fileName, fmt);
-    if (!error) {
-        deckString = deck.writeToString_Native();
-        error = deckString.length() > MAX_FILE_LENGTH;
-    }
-    if (error) {
+    if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
         return;
     }
@@ -335,6 +327,11 @@ void DeckViewContainer::unloadDeck()
     visualDeckStorageWidget->setVisible(true);
     deckViewLayout->update();
     unloadDeckButton->setEnabled(false);
+    readyStartButton->setEnabled(false);
+    readyStartButton->setState(false);
+    sideboardLockButton->setEnabled(false);
+    sideboardLockButton->setState(false);
+    setReadyStart(false);
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -352,7 +349,7 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
     QString deckString;
     DeckLoader deck;
 
-    bool error = !deck.loadFromFile(filePath, fmt);
+    bool error = !deck.loadFromFile(filePath, fmt, true);
     if (!error) {
         deckString = deck.writeToString_Native();
         error = deckString.length() > MAX_FILE_LENGTH;
@@ -390,6 +387,9 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
     // TODO CHANGE THIS TO BE SELECTED BY UUID
     PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
+    deckView->setVisible(true);
+    visualDeckStorageWidget->setVisible(false);
+    unloadDeckButton->setEnabled(true);
 }
 
 void DeckViewContainer::readyStart()

@@ -250,8 +250,11 @@ class DeckList : public QObject
 {
     Q_OBJECT
 private:
-    QString name, comments, bannerCard;
+    QString name, comments;
+    QPair<QString, QString> bannerCard;
     QString deckHash;
+    QString lastLoadedTimestamp;
+    QStringList tags;
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
@@ -279,9 +282,25 @@ public slots:
     {
         comments = _comments;
     }
-    void setBannerCard(const QString &_bannerCard = QString())
+    void setTags(const QStringList &_tags = QStringList())
+    {
+        tags = _tags;
+    }
+    void addTag(const QString &_tag)
+    {
+        tags.append(_tag);
+    }
+    void clearTags()
+    {
+        tags.clear();
+    }
+    void setBannerCard(const QPair<QString, QString> &_bannerCard = QPair<QString, QString>())
     {
         bannerCard = _bannerCard;
+    }
+    void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
+    {
+        lastLoadedTimestamp = _lastLoadedTimestamp;
     }
 
 public:
@@ -297,9 +316,17 @@ public:
     {
         return comments;
     }
-    QString getBannerCard() const
+    QStringList getTags() const
+    {
+        return tags;
+    }
+    QPair<QString, QString> getBannerCard() const
     {
         return bannerCard;
+    }
+    QString getLastLoadedTimestamp() const
+    {
+        return lastLoadedTimestamp;
     }
     QList<MoveCard_ToZone> getCurrentSideboardPlan();
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);

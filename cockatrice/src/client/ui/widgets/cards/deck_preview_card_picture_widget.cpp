@@ -1,6 +1,7 @@
 #include "deck_preview_card_picture_widget.h"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QFontMetrics>
 #include <QMouseEvent>
 #include <QPainterPath>
@@ -15,6 +16,7 @@
  * @param outlineColor The color of the outline around the text.
  * @param fontSize The font size of the overlay text.
  * @param alignment The alignment of the text within the overlay.
+ * @param _deckLoader The Deck Loader holding the Deck associated with this preview.
  *
  * Sets the widget's size policy and default border style.
  */
@@ -45,9 +47,4 @@ void DeckPreviewCardPictureWidget::mouseDoubleClickEvent(QMouseEvent *event)
         singleClickTimer->stop(); // Prevent single-click logic
         emit imageDoubleClicked(lastMouseEvent, this);
     }
-}
-
-void DeckPreviewCardPictureWidget::setFilePath(const QString &_filePath)
-{
-    filePath = _filePath;
 }

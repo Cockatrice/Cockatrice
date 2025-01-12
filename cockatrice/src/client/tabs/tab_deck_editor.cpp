@@ -823,7 +823,7 @@ void TabDeckEditor::updateBannerCardComboBox()
     bannerCardComboBox->clear();
 
     // Prepare the new items with deduplication
-    QSet<QString> bannerCardSet;
+    QSet<QPair<QString, QString>> bannerCardSet;
     InnerDecklistNode *listRoot = deckModel->getDeckList()->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
@@ -833,23 +833,30 @@ void TabDeckEditor::updateBannerCardComboBox()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                    currentCard->getName(), currentCard->getCardProviderId());
                 if (info) {
-                    bannerCardSet.insert(currentCard->getName());
+                    bannerCardSet.insert(
+                        QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
                 }
             }
         }
     }
 
-    // Convert the QSet to a sorted QStringList
-    QStringList bannerCardChoices;
-    for (const QString &entry : bannerCardSet) {
-        bannerCardChoices.append(entry);
-    }
-    bannerCardChoices.sort(Qt::CaseInsensitive);
+    QList<QPair<QString, QString>> pairList = bannerCardSet.values();
 
-    // Populate the combo box with new items
-    bannerCardComboBox->addItems(bannerCardChoices);
+    // Sort QList by the first() element of the QPair
+    std::sort(pairList.begin(), pairList.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
+        return a.first.toLower() < b.first.toLower();
+    });
+
+    for (const auto &pair : pairList) {
+        QVariantMap dataMap;
+        dataMap["name"] = pair.first;
+        dataMap["uuid"] = pair.second;
+
+        bannerCardComboBox->addItem(pair.first, dataMap);
+    }
 
     // Try to restore the previous selection by finding the currentText
     int restoredIndex = bannerCardComboBox->findText(currentText);
@@ -857,7 +864,7 @@ void TabDeckEditor::updateBannerCardComboBox()
         bannerCardComboBox->setCurrentIndex(restoredIndex);
     } else {
         // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard());
+        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().first);
         if (bannerIndex != -1) {
             bannerCardComboBox->setCurrentIndex(bannerIndex);
         } else {
@@ -872,8 +879,8 @@ void TabDeckEditor::updateBannerCardComboBox()
 
 void TabDeckEditor::setBannerCard(int /* changedIndex */)
 {
-    qDebug() << "Banner card was set to: " << bannerCardComboBox->currentText();
-    deckModel->getDeckList()->setBannerCard(bannerCardComboBox->currentText());
+    QVariantMap data = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
+    deckModel->getDeckList()->setBannerCard(QPair<QString, QString>(data["name"].toString(), data["uuid"].toString()));
 }
 
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
@@ -1043,11 +1050,11 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
     auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt)) {
+    if (l->loadFromFile(fileName, fmt, true)) {
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
         updateBannerCardComboBox();
-        if (!l->getBannerCard().isEmpty()) {
-            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard()));
+        if (!l->getBannerCard().first.isEmpty()) {
+            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard().first));
         }
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
@@ -1542,13 +1549,13 @@ void TabDeckEditor::actDecrement()
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
 {
-    qDebug() << " ORIGINAL BANNER CARD " << _deck->getBannerCard();
+    qDebug() << " ORIGINAL BANNER CARD " << _deck->getBannerCard().first;
     deckModel->setDeckList(_deck);
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
     qDebug() << deckModel->getDeckList()->getBannerCard() << " was the banner card";
-    bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard());
+    bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard().first);
     updateBannerCardComboBox();
     updateHash();
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
