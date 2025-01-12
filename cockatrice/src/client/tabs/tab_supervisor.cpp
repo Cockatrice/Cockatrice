@@ -393,7 +393,7 @@ void TabSupervisor::actTabServer(bool checked)
         tabServer = new TabServer(this, client);
         connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
         myAddTab(tabServer);
-        connect(tabServer, &Tab::destroyed, this, [this] {
+        connect(tabServer, &Tab::closed, this, [this] {
             tabServer = nullptr;
             aTabServer->setChecked(false);
         });
@@ -410,7 +410,7 @@ void TabSupervisor::actTabUserLists(bool checked)
         connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
         connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
         myAddTab(tabUserLists);
-        connect(tabUserLists, &Tab::destroyed, this, [this] {
+        connect(tabUserLists, &Tab::closed, this, [this] {
             tabUserLists = nullptr;
             aTabUserLists->setChecked(false);
         });
@@ -425,7 +425,7 @@ void TabSupervisor::actTabDeckStorage(bool checked)
         tabDeckStorage = new TabDeckStorage(this, client);
         connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
         myAddTab(tabDeckStorage);
-        connect(tabDeckStorage, &Tab::destroyed, this, [this] {
+        connect(tabDeckStorage, &Tab::closed, this, [this] {
             tabDeckStorage = nullptr;
             aTabDeckStorage->setChecked(false);
         });
@@ -440,7 +440,7 @@ void TabSupervisor::actTabReplays(bool checked)
         tabReplays = new TabReplays(this, client);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
         myAddTab(tabReplays);
-        connect(tabReplays, &Tab::destroyed, this, [this] {
+        connect(tabReplays, &Tab::closed, this, [this] {
             tabReplays = nullptr;
             aTabReplays->setChecked(false);
         });
@@ -455,7 +455,7 @@ void TabSupervisor::actTabAdmin(bool checked)
         tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
         myAddTab(tabAdmin);
-        connect(tabAdmin, &Tab::destroyed, this, [this] {
+        connect(tabAdmin, &Tab::closed, this, [this] {
             tabAdmin = nullptr;
             aTabAdmin->setChecked(false);
         });
@@ -469,7 +469,7 @@ void TabSupervisor::actTabLog(bool checked)
     if (checked && !tabLog) {
         tabLog = new TabLog(this, client);
         myAddTab(tabLog);
-        connect(tabLog, &Tab::destroyed, this, [this] {
+        connect(tabLog, &Tab::closed, this, [this] {
             tabLog = nullptr;
             aTabAdmin->setChecked(false);
         });
