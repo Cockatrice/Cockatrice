@@ -3,8 +3,8 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../cards/deck_preview_card_picture_widget.h"
 
-#include <QSet>
 #include <QFileInfo>
+#include <QSet>
 #include <QVBoxLayout>
 
 DeckPreviewWidget::DeckPreviewWidget(QWidget *parent, const QString &_filePath) : QWidget(parent), filePath(_filePath)
