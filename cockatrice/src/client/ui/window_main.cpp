@@ -82,6 +82,11 @@ const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 
+/**
+ * Replaces the tab-specific menus that are shown in the menuBar.
+ *
+ * @param newMenuList The tab-specific menus to show in the menuBar
+ */
 void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
     for (auto &tabMenu : tabMenus)
