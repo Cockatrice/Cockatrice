@@ -41,7 +41,7 @@ QSize DeckPreviewTagDisplayWidget::sizeHint() const
     QFontMetrics fm(font());
     int textWidth = fm.horizontalAdvance(tagName);
     int width = textWidth + 50;    // Add extra padding
-    int height = fm.height() + 10;                     // Height based on font size + padding
+    int height = fm.height() + 10; // Height based on font size + padding
 
     return QSize(width, height);
 }
