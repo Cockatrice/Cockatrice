@@ -29,7 +29,6 @@ signals:
     void maximizeClient();
 private slots:
     void sendMessage();
-    void actLeave();
     void messageSent(const Response &response);
     void addMentionTag(QString mentionTag);
     void messageClicked();
@@ -39,12 +38,12 @@ public:
                AbstractClient *_client,
                const ServerInfo_User &_ownUserInfo,
                const ServerInfo_User &_otherUserInfo);
-    ~TabMessage();
-    void retranslateUi();
-    void closeRequest();
-    void tabActivated();
+    ~TabMessage() override;
+    void retranslateUi() override;
+    void closeRequest(bool forced = false) override;
+    void tabActivated() override;
     QString getUserName() const;
-    QString getTabText() const;
+    QString getTabText() const override;
 
     void processUserMessageEvent(const Event_UserMessage &event);
 

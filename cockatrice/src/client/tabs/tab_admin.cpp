@@ -54,8 +54,8 @@ int ShutdownDialog::getMinutes() const
     return minutesEdit->value();
 }
 
-TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent)
-    : Tab(_tabSupervisor, parent), locked(true), client(_client), fullAdmin(_fullAdmin)
+TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin)
+    : Tab(_tabSupervisor), locked(true), client(_client), fullAdmin(_fullAdmin)
 {
     updateServerMessageButton = new QPushButton;
     connect(updateServerMessageButton, &QPushButton::clicked, this, &TabAdmin::actUpdateServerMessage);

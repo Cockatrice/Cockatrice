@@ -46,12 +46,9 @@ private:
     void addToList(const std::string &listName, const QString &userName);
 
 public:
-    TabUserLists(TabSupervisor *_tabSupervisor,
-                 AbstractClient *_client,
-                 const ServerInfo_User &userInfo,
-                 QWidget *parent = nullptr);
-    void retranslateUi();
-    QString getTabText() const
+    TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo);
+    void retranslateUi() override;
+    QString getTabText() const override
     {
         return tr("Account");
     }

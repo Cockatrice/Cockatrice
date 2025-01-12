@@ -304,29 +304,26 @@ void TabSupervisor::stop()
     tabAdmin = 0;
     tabLog = 0;
 
-    for (const auto tab : deckEditorTabs) {
-        disconnect(tab, nullptr, this, nullptr);
-        tab->deleteLater();
-    }
-    deckEditorTabs.clear();
+    QList<Tab *> tabsToDelete;
 
     for (auto i = roomTabs.cbegin(), end = roomTabs.cend(); i != end; ++i) {
-        disconnect(i.value(), nullptr, this, nullptr);
-        i.value()->deleteLater();
+        tabsToDelete << i.value();
     }
     roomTabs.clear();
 
     for (auto i = gameTabs.cbegin(), end = gameTabs.cend(); i != end; ++i) {
-        disconnect(i.value(), nullptr, this, nullptr);
-        i.value()->deleteLater();
+        tabsToDelete << i.value();
     }
     gameTabs.clear();
 
-    for (const auto tab : replayTabs) {
-        disconnect(tab, nullptr, this, nullptr);
-        tab->deleteLater();
+    for (auto i = messageTabs.cbegin(), end = messageTabs.cend(); i != end; ++i) {
+        tabsToDelete << i.value();
     }
-    replayTabs.clear();
+    messageTabs.clear();
+
+    for (const auto tab : tabsToDelete) {
+        tab->closeRequest(true);
+    }
 
     delete userInfo;
     userInfo = 0;
@@ -342,19 +339,12 @@ void TabSupervisor::updatePingTime(int value, int max)
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
-void TabSupervisor::closeButtonPressed()
-{
-    Tab *tab = static_cast<Tab *>(static_cast<CloseButton *>(sender())->property("tab").value<QObject *>());
-    tab->closeRequest();
-}
-
 void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 {
-    QTabBar::ButtonPosition closeSide =
-        (QTabBar::ButtonPosition)tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar());
-    CloseButton *closeButton = new CloseButton;
-    connect(closeButton, &CloseButton::clicked, this, &TabSupervisor::closeButtonPressed);
-    closeButton->setProperty("tab", QVariant::fromValue((QObject *)tab));
+    auto closeSide = static_cast<QTabBar::ButtonPosition>(
+        tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
+    auto *closeButton = new CloseButton(tab);
+    connect(closeButton, &CloseButton::clicked, tab, [tab] { tab->closeRequest(); });
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
 

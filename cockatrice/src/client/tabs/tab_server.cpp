@@ -138,8 +138,7 @@ void RoomSelector::joinClicked()
     emit joinRoomRequest(id, true);
 }
 
-TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
-    : Tab(_tabSupervisor, parent), client(_client)
+TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
 {
     roomSelector = new RoomSelector(client);
     serverInfoBox = new QTextBrowser;

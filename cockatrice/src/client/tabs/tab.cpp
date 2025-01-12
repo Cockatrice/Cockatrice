@@ -1,13 +1,14 @@
 #include "tab.h"
 
 #include "../ui/widgets/cards/card_info_display_widget.h"
+#include "./tab_supervisor.h"
 
 #include <QApplication>
 #include <QDebug>
 #include <QScreen>
 
-Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
-    : QMainWindow(parent), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
+Tab::Tab(TabSupervisor *_tabSupervisor)
+    : QMainWindow(_tabSupervisor), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 }

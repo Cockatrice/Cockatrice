@@ -358,7 +358,7 @@ void TabDeckEditor::createMenus()
     analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
     aClose = new QAction(QString(), this);
-    connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
+    connect(aClose, &QAction::triggered, this, [this] { closeRequest(); });
 
     aClearFilterAll = new QAction(QString(), this);
     aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
@@ -698,8 +698,7 @@ void TabDeckEditor::loadLayout()
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
-TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
-    : Tab(_tabSupervisor, parent), modified(false)
+TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor), modified(false)
 {
     setObjectName("TabDeckEditor");
 
@@ -719,11 +718,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     refreshShortcuts();
 
     loadLayout();
-}
-
-TabDeckEditor::~TabDeckEditor()
-{
-    emit deckEditorClosing(this);
 }
 
 void TabDeckEditor::retranslateUi()
@@ -987,10 +981,14 @@ bool TabDeckEditor::confirmClose()
     return true;
 }
 
-void TabDeckEditor::closeRequest()
+void TabDeckEditor::closeRequest(bool forced)
 {
-    if (confirmClose())
-        deleteLater();
+    if (!forced && !confirmClose()) {
+        return;
+    }
+
+    emit deckEditorClosing(this);
+    close();
 }
 
 void TabDeckEditor::actNewDeck()

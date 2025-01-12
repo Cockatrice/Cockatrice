@@ -72,7 +72,7 @@ signals:
     void stateChanged();
 
 public:
-    ToggleButton(QWidget *parent = nullptr);
+    explicit ToggleButton(QWidget *parent = nullptr);
     bool getState() const
     {
         return state;
@@ -80,7 +80,7 @@ public:
     void setState(bool _state);
 
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 };
 
 class DeckViewContainer : public QWidget
@@ -189,6 +189,7 @@ private:
     void startGame(bool resuming);
     void stopGame();
     void closeGame();
+    bool leaveGame();
 
     void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
     void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
@@ -242,7 +243,6 @@ private slots:
 
     void actGameInfo();
     void actConcede();
-    void actLeaveGame();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();
@@ -278,7 +278,7 @@ public:
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
-    void closeRequest() override;
+    void closeRequest(bool forced = false) override;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;
