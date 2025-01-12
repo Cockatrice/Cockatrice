@@ -339,19 +339,12 @@ void TabSupervisor::updatePingTime(int value, int max)
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
-void TabSupervisor::closeButtonPressed()
-{
-    Tab *tab = static_cast<Tab *>(static_cast<CloseButton *>(sender())->property("tab").value<QObject *>());
-    tab->closeRequest();
-}
-
 void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 {
-    QTabBar::ButtonPosition closeSide =
-        (QTabBar::ButtonPosition)tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar());
-    CloseButton *closeButton = new CloseButton;
-    connect(closeButton, &CloseButton::clicked, this, &TabSupervisor::closeButtonPressed);
-    closeButton->setProperty("tab", QVariant::fromValue((QObject *)tab));
+    auto closeSide = static_cast<QTabBar::ButtonPosition>(
+        tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
+    auto *closeButton = new CloseButton(tab);
+    connect(closeButton, &CloseButton::clicked, tab, &Tab::closeRequest);
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
 
