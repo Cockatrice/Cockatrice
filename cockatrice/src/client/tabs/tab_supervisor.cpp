@@ -221,12 +221,14 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     tabServer = new TabServer(this, client);
     connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
     myAddTab(tabServer);
+    connect(tabServer, &Tab::destroyed, this, [this] { tabServer = nullptr; });
 
     tabUserLists = new TabUserLists(this, client, *userInfo);
     connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
     connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
     myAddTab(tabUserLists);
+    connect(tabUserLists, &Tab::destroyed, this, [this] { tabUserLists = nullptr; });
 
     updatePingTime(0, -1);
 
@@ -234,10 +236,12 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabDeckStorage = new TabDeckStorage(this, client);
         connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
         myAddTab(tabDeckStorage);
+        connect(tabDeckStorage, &Tab::destroyed, this, [this] { tabDeckStorage = nullptr; });
 
         tabReplays = new TabReplays(this, client);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
         myAddTab(tabReplays);
+        connect(tabReplays, &Tab::destroyed, this, [this] { tabReplays = nullptr; });
     } else {
         tabDeckStorage = 0;
         tabReplays = 0;
@@ -247,9 +251,11 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
         myAddTab(tabAdmin);
+        connect(tabAdmin, &Tab::destroyed, this, [this] { tabAdmin = nullptr; });
 
         tabLog = new TabLog(this, client);
         myAddTab(tabLog);
+        connect(tabLog, &Tab::destroyed, this, [this] { tabLog = nullptr; });
     } else {
         tabAdmin = 0;
         tabLog = 0;
