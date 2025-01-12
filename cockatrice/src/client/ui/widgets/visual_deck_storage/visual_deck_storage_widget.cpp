@@ -22,10 +22,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
+    deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
 
-    // Add combo box to the main layout
     layout->addWidget(sortWidget);
     layout->addWidget(searchWidget);
+    layout->addWidget(deckPreviewColorIdentityFilterWidget);
 
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
@@ -81,7 +82,9 @@ void VisualDeckStorageWidget::refreshBannerCards()
         allDecks.append(display);
     }
 
-    auto filteredFiles = searchWidget->filterFiles(sortWidget->filterFiles(allDecks), searchWidget->getSearchText());
+    auto filteredByColorIdentity =
+        deckPreviewColorIdentityFilterWidget->filterWidgets(sortWidget->filterFiles(allDecks));
+    auto filteredFiles = searchWidget->filterFiles(filteredByColorIdentity, searchWidget->getSearchText());
 
     flowWidget->clearLayout(); // Clear existing widgets in the flow layout
 
