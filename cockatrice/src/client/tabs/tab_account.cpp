@@ -18,11 +18,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
-                           AbstractClient *_client,
-                           const ServerInfo_User &userInfo,
-                           QWidget *parent)
-    : Tab(_tabSupervisor, parent), client(_client)
+TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
+    : Tab(_tabSupervisor), client(_client)
 {
     allUsersList = new UserList(_tabSupervisor, client, UserList::AllUsersList);
     buddyList = new UserList(_tabSupervisor, client, UserList::BuddyList);

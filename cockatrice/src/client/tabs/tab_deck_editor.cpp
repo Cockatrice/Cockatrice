@@ -698,8 +698,7 @@ void TabDeckEditor::loadLayout()
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
-TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
-    : Tab(_tabSupervisor, parent), modified(false)
+TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor), modified(false)
 {
     setObjectName("TabDeckEditor");
 
