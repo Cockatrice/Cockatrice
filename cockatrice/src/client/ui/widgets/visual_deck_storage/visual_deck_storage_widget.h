@@ -35,6 +35,7 @@ signals:
 
 private:
     QVBoxLayout *layout;
+    QHBoxLayout *searchAndSortLayout;
     FlowWidget *flowWidget;
     DeckListModel *deckListModel;
     QMap<QString, DeckViewCardContainer *> cardContainers;

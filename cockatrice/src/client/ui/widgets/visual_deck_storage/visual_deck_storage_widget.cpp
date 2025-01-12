@@ -20,12 +20,15 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout = new QVBoxLayout();
     setLayout(layout);
 
+    searchAndSortLayout = new QHBoxLayout();
+
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
 
-    layout->addWidget(sortWidget);
-    layout->addWidget(searchWidget);
+    searchAndSortLayout->addWidget(sortWidget);
+    searchAndSortLayout->addWidget(searchWidget);
+    layout->addLayout(searchAndSortLayout);
     layout->addWidget(deckPreviewColorIdentityFilterWidget);
 
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
