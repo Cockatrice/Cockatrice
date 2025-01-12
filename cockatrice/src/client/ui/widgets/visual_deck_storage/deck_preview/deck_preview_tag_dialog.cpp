@@ -62,38 +62,38 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
         "🪄 Aura",
 
         // Kindred Types
-        "🐉 Kindred",         // Kindred
-        "🐠 Merfolk",         // Merfolk
-        "🐺 Werewolves",      // Werewolves
-        "🦴 Skeletons",       // Skeletons
-        "🦅 Birds",           // Birds
-        "👾 Eldrazi",         // Eldrazi
-        "🐉 Dragons",         // Dragons
-        "🧛 Vampires",        // Vampires
-        "🦇 Bats",            // Bats
-        "🐺 Wolves",          // Wolves
-        "🍄 Fungus",          // Fungus
-        "🦗 Insects",         // Insects
-        "🐚 Sea Creatures",   // Octopus, Leviathan, etc.
-        "🎩 Wizards",         // Wizards
-        "🎻 Bards",           // Bards
-        "😇 Angels",          // Angels
-        "⚔️ Soldiers",        // Soldiers
-        "🛡️ Knights",         // Knights
-        "🧙 Humans",          // Humans
-        "🧝 Elves",           // Elves
-        "💀 Zombies",         // Zombies
-        "👹 Demons",          // Demons
-        "🌲 Dryads",          // Dryads
-        "🐗 Boars",           // Boars
-        "🦁 Cats",            // Cats
-        "🦊 Foxes",           // Foxes
-        "🐀 Rats",            // Rats
-        "🦄 Unicorns",        // Unicorns
-        "🐘 Elephants",       // Elephants
-        "🐻 Bears",           // Bears
-        "🦏 Rhinos",          // Rhinos
-        "🦂 Scorpions",       // Scorpions
+        "🐉 Kindred",
+        "🐠 Merfolk",
+        "🐺 Werewolves",
+        "🦴 Skeletons",
+        "🦅 Birds",
+        "👾 Eldrazi",
+        "🐉 Dragons",
+        "🧛 Vampires",
+        "🦇 Bats",
+        "🐺 Wolves",
+        "🍄 Fungus",
+        "🦗 Insects",
+        "🐚 Sea Creatures",
+        "🎩 Wizards",
+        "🎻 Bards",
+        "😇 Angels",
+        "⚔️ Soldiers",
+        "🛡️ Knights",
+        "🧙 Humans",
+        "🧝 Elves",
+        "💀 Zombies",
+        "👹 Demons",
+        "🌲 Dryads",
+        "🐗 Boars",
+        "🦁 Cats",
+        "🦊 Foxes",
+        "🐀 Rats",
+        "🦄 Unicorns",
+        "🐘 Elephants",
+        "🐻 Bears",
+        "🦏 Rhinos",
+        "🦂 Scorpions",
     };
 
     // Merge knownTags with defaultTags, ensuring no duplicates
