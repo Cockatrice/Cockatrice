@@ -45,5 +45,6 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
         qDebug() << "Updated active tags:" << updatedTags;
         parent->deckLoader->setTags(updatedTags);
         parent->deckLoader->saveToFile(parent->parent->filePath, DeckLoader::CockatriceFormat);
+        parent->parent->parent->refreshBannerCards();
     }
 }
