@@ -105,8 +105,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
         tagListView_->addItem(item);
         tagListView_->setItemWidget(item, tagWidget);
 
-        connect(tagWidget->checkBox(), &QCheckBox::toggled, this,
-                &DeckPreviewTagDialog::onCheckboxStateChanged);
+        connect(tagWidget->checkBox(), &QCheckBox::toggled, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
     }
 
     // Add tag input layout
