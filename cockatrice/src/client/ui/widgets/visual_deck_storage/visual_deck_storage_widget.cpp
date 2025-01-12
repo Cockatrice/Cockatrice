@@ -28,11 +28,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
 
+    searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
     layout->addLayout(searchAndSortLayout);
     layout->addWidget(tagFilterWidget);
-    layout->addWidget(deckPreviewColorIdentityFilterWidget);
 
     flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);

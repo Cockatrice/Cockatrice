@@ -6,7 +6,7 @@
 #include <QPainter>
 
 DeckPreviewColorIdentityFilterCircleWidget::DeckPreviewColorIdentityFilterCircleWidget(QChar color, QWidget *parent)
-    : QWidget(parent), colorChar(color), isActive(false), circleDiameter(50)
+    : QWidget(parent), colorChar(color), isActive(false), circleDiameter(30)
 {
     setFixedSize(circleDiameter, circleDiameter);
 }
@@ -94,6 +94,7 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
     QString fullColorIdentity = "WUBRG";
     for (const QChar &color : fullColorIdentity) {
         auto *circle = new DeckPreviewColorIdentityFilterCircleWidget(color, this);
+
         layout->addWidget(circle);
 
         // Initialize the activeColors map
