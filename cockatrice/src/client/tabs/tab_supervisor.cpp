@@ -114,14 +114,50 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     tabBar()->setStyle(new MacOSTabFixStyle);
 #endif
 
+    // connect tab changes
     connect(this, &TabSupervisor::currentChanged, this, &TabSupervisor::updateCurrent);
 
+    // connect client
     connect(client, &AbstractClient::roomEventReceived, this, &TabSupervisor::processRoomEvent);
     connect(client, &AbstractClient::gameEventContainerReceived, this, &TabSupervisor::processGameEventContainer);
     connect(client, &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::gameJoined);
     connect(client, &AbstractClient::userMessageEventReceived, this, &TabSupervisor::processUserMessageEvent);
     connect(client, &AbstractClient::maxPingTime, this, &TabSupervisor::updatePingTime);
     connect(client, &AbstractClient::notifyUserEventReceived, this, &TabSupervisor::processNotifyUserEvent);
+
+    // create tabs menu actions
+    aTabDeckEditor = new QAction(this);
+    connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(nullptr); });
+
+    aTabServer = new QAction(this);
+    aTabServer->setCheckable(true);
+    connect(aTabServer, &QAction::toggled, this, &TabSupervisor::actTabServer);
+
+    aTabUserLists = new QAction(this);
+    aTabUserLists->setCheckable(true);
+    connect(aTabUserLists, &QAction::toggled, this, &TabSupervisor::actTabUserLists);
+
+    aTabDeckStorage = new QAction(this);
+    aTabDeckStorage->setCheckable(true);
+    connect(aTabDeckStorage, &QAction::toggled, this, &TabSupervisor::actTabDeckStorage);
+
+    aTabReplays = new QAction(this);
+    aTabReplays->setCheckable(true);
+    connect(aTabReplays, &QAction::toggled, this, &TabSupervisor::actTabReplays);
+
+    aTabAdmin = new QAction(this);
+    aTabAdmin->setCheckable(true);
+    connect(aTabAdmin, &QAction::toggled, this, &TabSupervisor::actTabAdmin);
+
+    aTabLog = new QAction(this);
+    aTabLog->setCheckable(true);
+    connect(aTabLog, &QAction::toggled, this, &TabSupervisor::actTabLog);
+
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &TabSupervisor::refreshShortcuts);
+    refreshShortcuts();
+
+    resetTabsMenu();
 
     retranslateUi();
 }
@@ -133,6 +169,16 @@ TabSupervisor::~TabSupervisor()
 
 void TabSupervisor::retranslateUi()
 {
+    // tab menu actions
+    aTabDeckEditor->setText(tr("Deck Editor"));
+    aTabServer->setText(tr("Server"));
+    aTabUserLists->setText(tr("Account"));
+    aTabDeckStorage->setText(tr("Deck storage"));
+    aTabReplays->setText(tr("Game replays"));
+    aTabAdmin->setText(tr("Administration"));
+    aTabLog->setText(tr("Logs"));
+
+    // tabs
     QList<Tab *> tabs;
     tabs.append(tabServer);
     tabs.append(tabReplays);
@@ -164,6 +210,12 @@ void TabSupervisor::retranslateUi()
             setTabToolTip(idx, sanitizeHtml(tabText));
             tabs[i]->retranslateUi();
         }
+}
+
+void TabSupervisor::refreshShortcuts()
+{
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    aTabDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
 }
 
 bool TabSupervisor::closeRequest()
@@ -213,52 +265,46 @@ int TabSupervisor::myAddTab(Tab *tab)
     return idx;
 }
 
+/**
+ * Resets the tabs menu to the tabs that are always available
+ */
+void TabSupervisor::resetTabsMenu()
+{
+    tabsMenu->clear();
+    tabsMenu->addAction(aTabDeckEditor);
+}
+
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
 {
     isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
 
-    tabServer = new TabServer(this, client);
-    connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
-    myAddTab(tabServer);
-    connect(tabServer, &Tab::destroyed, this, [this] { tabServer = nullptr; });
+    resetTabsMenu();
 
-    tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
-    connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
-    connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
-    myAddTab(tabUserLists);
-    connect(tabUserLists, &Tab::destroyed, this, [this] { tabUserLists = nullptr; });
+    tabsMenu->addSeparator();
+    tabsMenu->addAction(aTabServer);
+    tabsMenu->addAction(aTabUserLists);
+
+    aTabServer->setChecked(true);
+    aTabUserLists->setChecked(true);
 
     updatePingTime(0, -1);
 
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
-        tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-        myAddTab(tabDeckStorage);
-        connect(tabDeckStorage, &Tab::destroyed, this, [this] { tabDeckStorage = nullptr; });
+        tabsMenu->addAction(aTabDeckStorage);
+        tabsMenu->addAction(aTabReplays);
 
-        tabReplays = new TabReplays(this, client);
-        connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
-        myAddTab(tabReplays);
-        connect(tabReplays, &Tab::destroyed, this, [this] { tabReplays = nullptr; });
-    } else {
-        tabDeckStorage = 0;
-        tabReplays = 0;
+        aTabDeckStorage->setChecked(true);
+        aTabReplays->setChecked(true);
     }
 
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
-        connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
-        myAddTab(tabAdmin);
-        connect(tabAdmin, &Tab::destroyed, this, [this] { tabAdmin = nullptr; });
+        tabsMenu->addSeparator();
+        tabsMenu->addAction(aTabAdmin);
+        tabsMenu->addAction(aTabLog);
 
-        tabLog = new TabLog(this, client);
-        myAddTab(tabLog);
-        connect(tabLog, &Tab::destroyed, this, [this] { tabLog = nullptr; });
-    } else {
-        tabAdmin = 0;
-        tabLog = 0;
+        aTabAdmin->setChecked(true);
+        aTabLog->setChecked(true);
     }
 
     retranslateUi();
@@ -266,6 +312,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
 void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
+    resetTabsMenu();
+
     tabUserLists = 0;
     tabDeckStorage = 0;
     tabReplays = 0;
@@ -287,6 +335,8 @@ void TabSupervisor::stop()
 {
     if ((!client) && localClients.isEmpty())
         return;
+
+    resetTabsMenu();
 
     if (!localClients.isEmpty()) {
         for (int i = 0; i < localClients.size(); ++i)
@@ -335,6 +385,97 @@ void TabSupervisor::stop()
 
     delete userInfo;
     userInfo = 0;
+}
+
+void TabSupervisor::actTabServer(bool checked)
+{
+    if (checked && !tabServer) {
+        tabServer = new TabServer(this, client);
+        connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
+        myAddTab(tabServer);
+        connect(tabServer, &Tab::destroyed, this, [this] {
+            tabServer = nullptr;
+            aTabServer->setChecked(false);
+        });
+    } else if (!checked && tabServer) {
+        tabServer->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabUserLists(bool checked)
+{
+    if (checked && !tabUserLists) {
+        tabUserLists = new TabUserLists(this, client, *userInfo);
+        connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
+        connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
+        connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
+        myAddTab(tabUserLists);
+        connect(tabUserLists, &Tab::destroyed, this, [this] {
+            tabUserLists = nullptr;
+            aTabUserLists->setChecked(false);
+        });
+    } else if (!checked && tabUserLists) {
+        tabUserLists->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabDeckStorage(bool checked)
+{
+    if (checked && !tabDeckStorage) {
+        tabDeckStorage = new TabDeckStorage(this, client);
+        connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+        myAddTab(tabDeckStorage);
+        connect(tabDeckStorage, &Tab::destroyed, this, [this] {
+            tabDeckStorage = nullptr;
+            aTabDeckStorage->setChecked(false);
+        });
+    } else if (!checked && tabDeckStorage) {
+        tabDeckStorage->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabReplays(bool checked)
+{
+    if (checked && !tabReplays) {
+        tabReplays = new TabReplays(this, client);
+        connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
+        myAddTab(tabReplays);
+        connect(tabReplays, &Tab::destroyed, this, [this] {
+            tabReplays = nullptr;
+            aTabReplays->setChecked(false);
+        });
+    } else if (!checked && tabReplays) {
+        tabReplays->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabAdmin(bool checked)
+{
+    if (checked && !tabAdmin) {
+        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+        connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
+        myAddTab(tabAdmin);
+        connect(tabAdmin, &Tab::destroyed, this, [this] {
+            tabAdmin = nullptr;
+            aTabAdmin->setChecked(false);
+        });
+    } else if (!checked && tabAdmin) {
+        tabAdmin->closeRequest();
+    }
+}
+
+void TabSupervisor::actTabLog(bool checked)
+{
+    if (checked && !tabLog) {
+        tabLog = new TabLog(this, client);
+        myAddTab(tabLog);
+        connect(tabLog, &Tab::destroyed, this, [this] {
+            tabLog = nullptr;
+            aTabAdmin->setChecked(false);
+        });
+    } else if (!checked && tabLog) {
+        tabLog->closeRequest();
+    }
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
