@@ -316,10 +316,10 @@ void TabSupervisor::stop()
     }
     gameTabs.clear();
 
-    for (const auto tab : replayTabs) {
-        tabsToDelete << tab;
+    for (auto i = messageTabs.cbegin(), end = messageTabs.cend(); i != end; ++i) {
+        tabsToDelete << i.value();
     }
-    replayTabs.clear();
+    messageTabs.clear();
 
     for (const auto tab : tabsToDelete) {
         tab->closeRequest(true);
