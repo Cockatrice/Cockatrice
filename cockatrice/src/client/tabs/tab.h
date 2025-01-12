@@ -56,7 +56,7 @@ public:
      *
      * @param forced whether this close request was initiated by the user or forced by the server.
      */
-    virtual void closeRequest(bool forced = false)
+    virtual void closeRequest(bool /*forced*/ = false)
     {
     }
     virtual void tabActivated()
