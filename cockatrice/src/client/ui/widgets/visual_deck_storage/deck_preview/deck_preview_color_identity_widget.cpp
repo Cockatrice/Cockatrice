@@ -1,6 +1,6 @@
 #include "deck_preview_color_identity_widget.h"
 
-#include "../../../../settings/cache_settings.h"
+#include "../../../../../settings/cache_settings.h"
 
 #include <QPainter>
 #include <QResizeEvent>

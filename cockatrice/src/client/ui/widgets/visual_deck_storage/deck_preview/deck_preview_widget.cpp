@@ -1,7 +1,7 @@
 #include "deck_preview_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
-#include "../cards/deck_preview_card_picture_widget.h"
+#include "../../../../../game/cards/card_database_manager.h"
+#include "../../cards/deck_preview_card_picture_widget.h"
 
 #include <QFileInfo>
 #include <QMouseEvent>

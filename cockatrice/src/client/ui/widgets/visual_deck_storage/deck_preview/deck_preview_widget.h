@@ -1,8 +1,8 @@
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H
 
-#include "../../../../deck/deck_loader.h"
-#include "../cards/deck_preview_card_picture_widget.h"
+#include "../../../../../deck/deck_loader.h"
+#include "../../cards/deck_preview_card_picture_widget.h"
 #include "deck_preview_color_identity_widget.h"
 
 #include <QVBoxLayout>
