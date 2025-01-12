@@ -311,29 +311,20 @@ void TabSupervisor::stop()
             tabLog->closeRequest(true);
         }
     }
-    tabUserLists = 0;
-    tabServer = 0;
-    tabDeckStorage = 0;
-    tabReplays = 0;
-    tabAdmin = 0;
-    tabLog = 0;
 
     QList<Tab *> tabsToDelete;
 
     for (auto i = roomTabs.cbegin(), end = roomTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
-    roomTabs.clear();
 
     for (auto i = gameTabs.cbegin(), end = gameTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
-    gameTabs.clear();
 
     for (auto i = messageTabs.cbegin(), end = messageTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
-    messageTabs.clear();
 
     for (const auto tab : tabsToDelete) {
         tab->closeRequest(true);
