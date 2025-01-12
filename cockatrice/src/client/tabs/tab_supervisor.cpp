@@ -344,7 +344,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
     auto closeSide = static_cast<QTabBar::ButtonPosition>(
         tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
     auto *closeButton = new CloseButton(tab);
-    connect(closeButton, &CloseButton::clicked, tab, &Tab::closeRequest);
+    connect(closeButton, &CloseButton::clicked, tab, [tab] { tab->closeRequest(); });
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
 
