@@ -13,6 +13,7 @@ class DeckPreviewTagAdditionWidget : public QWidget
 
 public:
     explicit DeckPreviewTagAdditionWidget(DeckPreviewDeckTagsDisplayWidget *_parent, const QString &tagName);
+    QSize sizeHint() const;
 
 signals:
     void tagClicked(); // Emitted when the tag is clicked
@@ -20,6 +21,7 @@ signals:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent *event);
 
 private:
     DeckPreviewDeckTagsDisplayWidget *parent;
