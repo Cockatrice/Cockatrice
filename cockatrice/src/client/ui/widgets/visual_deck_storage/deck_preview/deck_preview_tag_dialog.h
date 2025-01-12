@@ -18,6 +18,7 @@ public:
                                   const QStringList &activeTags,
                                   QWidget *parent = nullptr);
     QStringList getActiveTags() const;
+    void filterTags(const QString &text);
 
 private slots:
     void addTag();
@@ -27,6 +28,7 @@ private slots:
 private:
     QLabel *instructionLabel;
     QListWidget *tagListView_;
+    QLineEdit *filterInput_;
     QLineEdit *newTagInput_;
     QPushButton *addTagButton_;
     QPushButton *okButton;

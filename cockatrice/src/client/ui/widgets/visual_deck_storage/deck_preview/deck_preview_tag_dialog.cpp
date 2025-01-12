@@ -97,11 +97,17 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     };
 
     // Merge knownTags with defaultTags, ensuring no duplicates
-    QStringList combinedTags = knownTags + defaultTags + activeTags;
+    QStringList combinedTags = defaultTags + knownTags + activeTags;
     combinedTags.removeDuplicates();
 
     // Main layout
     auto *mainLayout = new QVBoxLayout(this);
+
+    // Filter bar
+    filterInput_ = new QLineEdit(this);
+    mainLayout->addWidget(filterInput_);
+
+    connect(filterInput_, &QLineEdit::textChanged, this, &DeckPreviewTagDialog::filterTags);
 
     // Instruction label
     instructionLabel = new QLabel(this);
@@ -151,6 +157,7 @@ void DeckPreviewTagDialog::retranslateUi()
     instructionLabel->setText(tr("Manage your deck tags. Check or uncheck tags as needed, or add new ones:"));
     newTagInput_->setPlaceholderText(tr("Add a new tag (e.g., Aggro️)"));
     addTagButton_->setText(tr("Add Tag"));
+    filterInput_->setPlaceholderText(tr("Filter tags..."));
     okButton->setText(tr("OK"));
     cancelButton->setText(tr("Cancel"));
 }
@@ -189,6 +196,18 @@ void DeckPreviewTagDialog::addTag()
 
     // Clear the input field
     newTagInput_->clear();
+}
+
+void DeckPreviewTagDialog::filterTags(const QString &text)
+{
+    for (int i = 0; i < tagListView_->count(); ++i) {
+        auto *item = tagListView_->item(i);
+        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView_->itemWidget(item));
+        if (tagWidget) {
+            bool matches = tagWidget->checkBox()->text().contains(text, Qt::CaseInsensitive);
+            item->setHidden(!matches);
+        }
+    }
 }
 
 void DeckPreviewTagDialog::onCheckboxStateChanged()
