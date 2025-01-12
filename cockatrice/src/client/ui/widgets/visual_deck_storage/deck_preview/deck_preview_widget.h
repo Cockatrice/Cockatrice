@@ -3,23 +3,29 @@
 
 #include "../../../../../deck/deck_loader.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
+#include "../visual_deck_storage_widget.h"
 #include "deck_preview_color_identity_widget.h"
+#include "deck_preview_deck_tags_display_widget.h"
 
 #include <QVBoxLayout>
 #include <QWidget>
 
+class VisualDeckStorageWidget;
+class DeckPreviewDeckTagsDisplayWidget;
 class DeckPreviewWidget final : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DeckPreviewWidget(QWidget *parent, const QString &_filePath);
+    explicit DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QString &_filePath);
     QString getColorIdentity();
 
+    VisualDeckStorageWidget *parent;
     QVBoxLayout *layout;
     QString filePath;
     DeckLoader *deckLoader;
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
     DeckPreviewColorIdentityWidget *colorIdentityWidget;
+    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
 
 signals:
     void deckPreviewClicked(QMouseEvent *event, DeckPreviewWidget *instance);

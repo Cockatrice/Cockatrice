@@ -161,12 +161,19 @@ set(cockatrice_SOURCES
     src/game/zones/view_zone_widget.cpp
     src/game/zones/view_zone.cpp
     src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
-    src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_widget.cpp
+    src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_addition_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_display_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     ${VERSION_STRING_CPP}
 )
 

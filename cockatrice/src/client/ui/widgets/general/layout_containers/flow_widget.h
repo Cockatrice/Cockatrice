@@ -13,6 +13,7 @@ class FlowWidget final : public QWidget
 public:
     FlowWidget(QWidget *parent, Qt::ScrollBarPolicy horizontalPolicy, Qt::ScrollBarPolicy verticalPolicy);
     void addWidget(QWidget *widget_to_add) const;
+    void removeWidget(QWidget *widget_to_remove) const;
     void clearLayout();
     [[nodiscard]] int count() const;
     [[nodiscard]] QLayoutItem *itemAt(int index) const;

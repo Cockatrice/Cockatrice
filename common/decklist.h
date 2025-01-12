@@ -254,6 +254,7 @@ private:
     QPair<QString, QString> bannerCard;
     QString deckHash;
     QString lastLoadedTimestamp;
+    QStringList tags;
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
@@ -281,6 +282,18 @@ public slots:
     {
         comments = _comments;
     }
+    void setTags(const QStringList &_tags = QStringList())
+    {
+        tags = _tags;
+    }
+    void addTag(const QString &_tag)
+    {
+        tags.append(_tag);
+    }
+    void clearTags()
+    {
+        tags.clear();
+    }
     void setBannerCard(const QPair<QString, QString> &_bannerCard = QPair<QString, QString>())
     {
         bannerCard = _bannerCard;
@@ -302,6 +315,10 @@ public:
     QString getComments() const
     {
         return comments;
+    }
+    QStringList getTags() const
+    {
+        return tags;
     }
     QPair<QString, QString> getBannerCard() const
     {

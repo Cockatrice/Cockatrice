@@ -17,8 +17,8 @@ void DeckPreviewColorCircleWidget::resizeEvent(QResizeEvent *event)
     // Get the parent of the DeckPreviewColorIdentityWidget
     QWidget *identityParent = parentWidget() ? parentWidget()->parentWidget() : nullptr;
     if (identityParent) {
-        // Calculate the circle diameter as 10% of the parent's height
-        int maxSize = identityParent->height() * 0.1;
+        // Calculate the circle diameter as 15% of the parent's height
+        int maxSize = identityParent->width() * 0.15;
         circleDiameter = maxSize;
 
         // Update the widget size based on the diameter
@@ -123,6 +123,8 @@ DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(const QString &co
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
+
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // Define the full WUBRG set (White, Blue, Black, Red, Green)
     QString fullColorIdentity = "WUBRG";

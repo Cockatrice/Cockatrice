@@ -422,26 +422,35 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     if (xml->isStartElement()) {
         if (childName == "lastLoadedTimestamp") {
             lastLoadedTimestamp = xml->readElementText();
-        } else if (childName == "deckname")
+        } else if (childName == "deckname") {
             name = xml->readElementText();
-        else if (childName == "comments")
+        } else if (childName == "comments") {
             comments = xml->readElementText();
-        else if (childName == "bannerCard") {
+        } else if (childName == "bannerCard") {
             QString providerId = xml->attributes().value("providerId").toString();
             QString cardName = xml->readElementText();
             bannerCard = QPair<QString, QString>(cardName, providerId);
+        } else if (childName == "tags") {
+            tags.clear(); // Clear existing tags
+            while (!(xml->isEndElement() && xml->name() == "tags")) {
+                if (xml->readNextStartElement() && xml->name() == "tag") {
+                    tags.append(xml->readElementText());
+                }
+            }
         } else if (childName == "zone") {
             InnerDecklistNode *newZone = getZoneObjFromName(xml->attributes().value("name").toString());
             newZone->readElement(xml);
         } else if (childName == "sideboard_plan") {
             SideboardPlan *newSideboardPlan = new SideboardPlan;
-            if (newSideboardPlan->readElement(xml))
+            if (newSideboardPlan->readElement(xml)) {
                 sideboardPlans.insert(newSideboardPlan->getName(), newSideboardPlan);
-            else
+            } else {
                 delete newSideboardPlan;
+            }
         }
-    } else if (xml->isEndElement() && (childName == "cockatrice_deck"))
+    } else if (xml->isEndElement() && (childName == "cockatrice_deck")) {
         return false;
+    }
     return true;
 }
 
@@ -457,14 +466,25 @@ void DeckList::write(QXmlStreamWriter *xml)
     xml->writeEndElement();
     xml->writeTextElement("comments", comments);
 
-    for (int i = 0; i < root->size(); i++)
-        root->at(i)->writeElement(xml);
-
-    QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
-    while (i.hasNext())
-        i.next().value()->write(xml);
-
+    // Write tags
+    xml->writeStartElement("tags");
+    for (const QString &tag : tags) {
+        xml->writeTextElement("tag", tag);
+    }
     xml->writeEndElement();
+
+    // Write zones
+    for (int i = 0; i < root->size(); i++) {
+        root->at(i)->writeElement(xml);
+    }
+
+    // Write sideboard plans
+    QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
+    while (i.hasNext()) {
+        i.next().value()->write(xml);
+    }
+
+    xml->writeEndElement(); // Close "cockatrice_deck"
 }
 
 bool DeckList::loadFromXml(QXmlStreamReader *xml)

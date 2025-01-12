@@ -87,6 +87,11 @@ void FlowWidget::addWidget(QWidget *widget_to_add) const
     flowLayout->addWidget(widget_to_add);
 }
 
+void FlowWidget::removeWidget(QWidget *widget_to_remove) const
+{
+    flowLayout->removeWidget(widget_to_remove);
+}
+
 /**
  * @brief Clears all widgets from the flow layout.
  *

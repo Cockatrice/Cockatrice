@@ -2,13 +2,15 @@
 
 #include "../../../../../game/cards/card_database_manager.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
+#include "deck_preview_deck_tags_display_widget.h"
 
 #include <QFileInfo>
 #include <QMouseEvent>
 #include <QSet>
 #include <QVBoxLayout>
 
-DeckPreviewWidget::DeckPreviewWidget(QWidget *parent, const QString &_filePath) : QWidget(parent), filePath(_filePath)
+DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QString &_filePath)
+    : QWidget(_parent), parent(_parent), filePath(_filePath)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -35,9 +37,11 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *parent, const QString &_filePath) 
     setFilePath(deckLoader->getLastFileName());
 
     colorIdentityWidget = new DeckPreviewColorIdentityWidget(getColorIdentity());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
 
     layout->addWidget(bannerCardDisplayWidget);
     layout->addWidget(colorIdentityWidget);
+    layout->addWidget(deckTagsDisplayWidget);
 }
 
 QString DeckPreviewWidget::getColorIdentity()
