@@ -3668,7 +3668,7 @@ Cockatrice will now reload the card database.</translation>
         <source>%1 is looking at the %4 %3 card(s) %2.</source>
         <oldsource>%1 is looking at the top %3 card(s) %2.</oldsource>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation><numerusform>%1 is looking at the %4 %3 card(s) %2.</numerusform><numerusform>%1 is looking at the %4 %3 card(s) %2.</numerusform></translation>
+        <translation><numerusform>%1 is looking at the %4 %3 card %2.</numerusform><numerusform>%1 is looking at the %4 %3 cards %2.</numerusform></translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="393"/>
