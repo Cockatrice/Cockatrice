@@ -164,7 +164,7 @@ void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
-    unloadDeckButton->setText(tr("Unload deck..."));
+    unloadDeckButton->setText(tr("Unload deck"));
     readyStartButton->setText(tr("Ready to start"));
     forceStartGameButton->setText(tr("Force start"));
     updateSideboardLockButtonText();
