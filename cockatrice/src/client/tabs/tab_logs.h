@@ -53,7 +53,7 @@ private slots:
     void restartLayout();
 
 public:
-    TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
+    TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client);
     ~TabLog() override;
     void retranslateUi() override;
     QString getTabText() const override

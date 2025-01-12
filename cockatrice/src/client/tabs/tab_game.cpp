@@ -707,7 +707,7 @@ void TabGame::closeRequest(bool forced)
 
     emit gameClosing(this);
 
-    deleteLater();
+    close();
 }
 
 void TabGame::replayNextEvent(Player::EventProcessingOptions options)

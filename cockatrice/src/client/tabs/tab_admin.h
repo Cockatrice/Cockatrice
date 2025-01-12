@@ -54,7 +54,7 @@ private slots:
     void actLock();
 
 public:
-    TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent = nullptr);
+    TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin);
     void retranslateUi() override;
     QString getTabText() const override
     {

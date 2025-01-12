@@ -55,7 +55,7 @@ private:
     bool shouldEmitUpdate = false;
 
 public:
-    TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
+    TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client);
     void retranslateUi() override;
     QString getTabText() const override
     {

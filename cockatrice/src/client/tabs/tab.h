@@ -31,7 +31,7 @@ private:
     QList<QMenu *> tabMenus;
 
 public:
-    explicit Tab(TabSupervisor *_tabSupervisor, QWidget *parent = nullptr);
+    explicit Tab(TabSupervisor *_tabSupervisor);
     const QList<QMenu *> &getTabMenus() const
     {
         return tabMenus;
