@@ -105,7 +105,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
         tagListView_->addItem(item);
         tagListView_->setItemWidget(item, tagWidget);
 
-        connect(tagWidget->checkBox(), &QCheckBox::checkStateChanged, this,
+        connect(tagWidget->checkBox(), &QCheckBox::toggled, this,
                 &DeckPreviewTagDialog::onCheckboxStateChanged);
     }
 
@@ -163,7 +163,7 @@ void DeckPreviewTagDialog::addTag()
     tagListView_->setItemWidget(item, tagWidget);
     activeTags_.append(newTag);
 
-    connect(tagWidget->checkBox(), &QCheckBox::checkStateChanged, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
+    connect(tagWidget->checkBox(), &QCheckBox::toggled, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
 
     // Clear the input field
     newTagInput_->clear();
