@@ -359,8 +359,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setMaximum(100);
     visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setValue(
         settings.getVisualDeckStorageUnusedColorIdentitiesOpacity());
-    connect(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, &QSpinBox::valueChanged, &settings,
-            &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
+    connect(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            &settings, &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
 
     visualDeckStorageUnusedColorIdentitiesOpacityLabel.setBuddy(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox);
 
