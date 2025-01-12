@@ -14,6 +14,7 @@ class VisualDeckStorageSortWidget : public QWidget
 
 public:
     explicit VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent);
+    void retranslateUi();
     void updateSortOrder();
     QString getSearchText();
     QList<DeckPreviewWidget *> &filterFiles(QList<DeckPreviewWidget *> &widgets);

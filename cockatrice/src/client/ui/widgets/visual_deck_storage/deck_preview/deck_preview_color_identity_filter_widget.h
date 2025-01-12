@@ -41,6 +41,7 @@ class DeckPreviewColorIdentityFilterWidget : public QWidget
 
 public:
     explicit DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent);
+    void retranslateUi();
     QList<DeckPreviewWidget *> filterWidgets(QList<DeckPreviewWidget *> &widgets);
 
 signals:

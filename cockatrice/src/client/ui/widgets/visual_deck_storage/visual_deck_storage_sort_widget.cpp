@@ -16,12 +16,11 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
     layout = new QHBoxLayout(this);
     setLayout(layout);
 
-    // ComboBox for sorting options
+    // Initialize the ComboBox
     sortComboBox = new QComboBox(this);
-    sortComboBox->addItem("Sort Alphabetically (Deck Name)", ByName);
-    sortComboBox->addItem("Sort Alphabetically (Filename)", Alphabetical);
-    sortComboBox->addItem("Sort by Last Modified", ByLastModified);
-    sortComboBox->addItem("Sort by Last Loaded", ByLastLoaded);
+    layout->addWidget(sortComboBox);
+
+    // Set the current sort order
     sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
 
     // Connect sorting change signal to refresh the file list
@@ -29,7 +28,26 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
             &VisualDeckStorageSortWidget::updateSortOrder);
     connect(this, &VisualDeckStorageSortWidget::sortOrderChanged, parent, &VisualDeckStorageWidget::updateSortOrder);
 
-    layout->addWidget(sortComboBox);
+    retranslateUi();
+}
+
+void VisualDeckStorageSortWidget::retranslateUi()
+{
+    // Block signals to avoid triggering unnecessary updates while changing text
+    sortComboBox->blockSignals(true);
+
+    // Clear and repopulate the ComboBox with translated items
+    sortComboBox->clear();
+    sortComboBox->addItem(tr("Sort Alphabetically (Deck Name)"), ByName);
+    sortComboBox->addItem(tr("Sort Alphabetically (Filename)"), Alphabetical);
+    sortComboBox->addItem(tr("Sort by Last Modified"), ByLastModified);
+    sortComboBox->addItem(tr("Sort by Last Loaded"), ByLastLoaded);
+
+    // Restore the current index
+    sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
+
+    // Re-enable signals
+    sortComboBox->blockSignals(false);
 }
 
 void VisualDeckStorageSortWidget::showEvent(QShowEvent *event)

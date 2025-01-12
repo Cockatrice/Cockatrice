@@ -103,8 +103,9 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
         connect(circle, &DeckPreviewColorIdentityFilterCircleWidget::colorToggled, this,
                 &DeckPreviewColorIdentityFilterWidget::handleColorToggled);
     }
-    toggleButton = new QPushButton("Mode: Includes", this);
-    toggleButton->setCheckable(true); // Enable checkable state
+
+    toggleButton = new QPushButton(this);
+    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
 
     // Connect the button's toggled signal
@@ -113,6 +114,15 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
             &VisualDeckStorageWidget::refreshBannerCards);
     connect(this, &DeckPreviewColorIdentityFilterWidget::filterModeChanged, parent,
             &VisualDeckStorageWidget::refreshBannerCards);
+
+    // Call retranslateUi to set the initial text
+    retranslateUi();
+}
+
+void DeckPreviewColorIdentityFilterWidget::retranslateUi()
+{
+    // Set the toggle button text based on the current mode
+    toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
 }
 
 void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar color, bool active)
@@ -124,7 +134,7 @@ void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar color, bool 
 void DeckPreviewColorIdentityFilterWidget::updateFilterMode(bool checked)
 {
     exactMatchMode = checked; // Toggle between modes
-    toggleButton->setText(checked ? "Mode: Exact Match" : "Mode: Includes");
+    retranslateUi();          // Update the button text
     emit filterModeChanged(exactMatchMode);
 }
 
