@@ -507,7 +507,7 @@ void AppearanceSettingsPage::retranslateUi()
     showVisualDeckStorageOnLoadCheckBox.setText(tr("Show visual deck storage on database load"));
     visualDeckStorageDrawUnusedColorIdentitiesCheckBox.setText(
         tr("Draw missing color identities in visual deck storage without color label"));
-    visualDeckStorageUnusedColorIdentitiesOpacityLabel.setText((tr("Missing color identity opacity")));
+    visualDeckStorageUnusedColorIdentitiesOpacityLabel.setText(tr("Missing color identity opacity"));
     visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setSuffix("%");
 
     cardsGroupBox->setTitle(tr("Card rendering"));
