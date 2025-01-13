@@ -7,7 +7,7 @@
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 
-class DeckLoader : public DeckList
+    class DeckLoader : public DeckList
 {
     Q_OBJECT
 signals:

@@ -13,7 +13,6 @@
 #include <QStringList>
 #include <QtConcurrentRun>
 
-
 const QStringList DeckLoader::fileNameFilters = QStringList()
                                                 << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
                                                 << QObject::tr("All files (*.*)");
@@ -105,7 +104,6 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             return false;
         }
-
 
         switch (fmt) {
             case PlainTextFormat:
@@ -229,7 +227,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
