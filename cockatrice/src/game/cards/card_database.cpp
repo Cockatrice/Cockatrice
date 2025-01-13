@@ -1,7 +1,7 @@
 #include "card_database.h"
 
 #include "../../client/network/spoiler_background_updater.h"
-#include "../../client/ui/picture_loader.h"
+#include "../../client/ui/picture_loader/picture_loader.h"
 #include "../../settings/cache_settings.h"
 #include "../../utility/card_set_comparator.h"
 #include "../game_specific_terms.h"

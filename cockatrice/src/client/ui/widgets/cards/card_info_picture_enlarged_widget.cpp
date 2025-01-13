@@ -1,6 +1,6 @@
 #include "card_info_picture_enlarged_widget.h"
 
-#include "../../picture_loader.h"
+#include "../../picture_loader/picture_loader.h"
 
 #include <QPainterPath>
 #include <QStylePainter>

@@ -1,6 +1,6 @@
 #include "abstract_card_item.h"
 
-#include "../../client/ui/picture_loader.h"
+#include "../../client/ui/picture_loader/picture_loader.h"
 #include "../../settings/cache_settings.h"
 #include "../game_scene.h"
 #include "card_database.h"
