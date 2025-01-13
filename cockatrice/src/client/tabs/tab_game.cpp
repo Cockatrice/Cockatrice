@@ -65,105 +65,6 @@
 #include <QToolButton>
 #include <QWidget>
 
-void TabGame::refreshShortcuts()
-{
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-    for (int i = 0; i < phaseActions.size(); ++i) {
-        QAction *temp = phaseActions.at(i);
-        switch (i) {
-            case 0:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase0"));
-                break;
-            case 1:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase1"));
-                break;
-            case 2:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase2"));
-                break;
-            case 3:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase3"));
-                break;
-            case 4:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase4"));
-                break;
-            case 5:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase5"));
-                break;
-            case 6:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase6"));
-                break;
-            case 7:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase7"));
-                break;
-            case 8:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase8"));
-                break;
-            case 9:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase9"));
-                break;
-            case 10:
-                temp->setShortcuts(shortcuts.getShortcut("Player/phase10"));
-                break;
-            default:;
-        }
-    }
-
-    if (aNextPhase) {
-        aNextPhase->setShortcuts(shortcuts.getShortcut("Player/aNextPhase"));
-    }
-    if (aNextPhaseAction) {
-        aNextPhaseAction->setShortcuts(shortcuts.getShortcut("Player/aNextPhaseAction"));
-    }
-    if (aNextTurn) {
-        aNextTurn->setShortcuts(shortcuts.getShortcut("Player/aNextTurn"));
-    }
-    if (aReverseTurn) {
-        aReverseTurn->setShortcuts(shortcuts.getShortcut("Player/aReverseTurn"));
-    }
-    if (aRemoveLocalArrows) {
-        aRemoveLocalArrows->setShortcuts(shortcuts.getShortcut("Player/aRemoveLocalArrows"));
-    }
-    if (aRotateViewCW) {
-        aRotateViewCW->setShortcuts(shortcuts.getShortcut("Player/aRotateViewCW"));
-    }
-    if (aRotateViewCCW) {
-        aRotateViewCCW->setShortcuts(shortcuts.getShortcut("Player/aRotateViewCCW"));
-    }
-    if (aConcede) {
-        aConcede->setShortcuts(shortcuts.getShortcut("Player/aConcede"));
-    }
-    if (aLeaveGame) {
-        aLeaveGame->setShortcuts(shortcuts.getShortcut("Player/aLeaveGame"));
-    }
-    if (aCloseReplay) {
-        aCloseReplay->setShortcuts(shortcuts.getShortcut("Player/aCloseReplay"));
-    }
-    if (aResetLayout) {
-        aResetLayout->setShortcuts(shortcuts.getShortcut("Player/aResetLayout"));
-    }
-    if (aFocusChat) {
-        aFocusChat->setShortcuts(shortcuts.getShortcut("Player/aFocusChat"));
-    }
-    if (aReplaySkipForward) {
-        aReplaySkipForward->setShortcuts(shortcuts.getShortcut("Replays/aSkipForward"));
-    }
-    if (aReplaySkipBackward) {
-        aReplaySkipBackward->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackward"));
-    }
-    if (aReplaySkipForwardBig) {
-        aReplaySkipForwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipForwardBig"));
-    }
-    if (aReplaySkipBackwardBig) {
-        aReplaySkipBackwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackwardBig"));
-    }
-    if (replayPlayButton) {
-        replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
-    }
-    if (replayFastForwardButton) {
-        replayFastForwardButton->setShortcut(shortcuts.getSingleShortcut("Replays/fastForwardButton"));
-    }
-}
-
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
       isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), judge(false), gameStateKnown(false),
@@ -402,6 +303,105 @@ void TabGame::retranslateUi()
         j.next().value()->retranslateUi();
 
     scene->retranslateUi();
+}
+
+void TabGame::refreshShortcuts()
+{
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    for (int i = 0; i < phaseActions.size(); ++i) {
+        QAction *temp = phaseActions.at(i);
+        switch (i) {
+            case 0:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase0"));
+                break;
+            case 1:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase1"));
+                break;
+            case 2:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase2"));
+                break;
+            case 3:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase3"));
+                break;
+            case 4:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase4"));
+                break;
+            case 5:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase5"));
+                break;
+            case 6:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase6"));
+                break;
+            case 7:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase7"));
+                break;
+            case 8:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase8"));
+                break;
+            case 9:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase9"));
+                break;
+            case 10:
+                temp->setShortcuts(shortcuts.getShortcut("Player/phase10"));
+                break;
+            default:;
+        }
+    }
+
+    if (aNextPhase) {
+        aNextPhase->setShortcuts(shortcuts.getShortcut("Player/aNextPhase"));
+    }
+    if (aNextPhaseAction) {
+        aNextPhaseAction->setShortcuts(shortcuts.getShortcut("Player/aNextPhaseAction"));
+    }
+    if (aNextTurn) {
+        aNextTurn->setShortcuts(shortcuts.getShortcut("Player/aNextTurn"));
+    }
+    if (aReverseTurn) {
+        aReverseTurn->setShortcuts(shortcuts.getShortcut("Player/aReverseTurn"));
+    }
+    if (aRemoveLocalArrows) {
+        aRemoveLocalArrows->setShortcuts(shortcuts.getShortcut("Player/aRemoveLocalArrows"));
+    }
+    if (aRotateViewCW) {
+        aRotateViewCW->setShortcuts(shortcuts.getShortcut("Player/aRotateViewCW"));
+    }
+    if (aRotateViewCCW) {
+        aRotateViewCCW->setShortcuts(shortcuts.getShortcut("Player/aRotateViewCCW"));
+    }
+    if (aConcede) {
+        aConcede->setShortcuts(shortcuts.getShortcut("Player/aConcede"));
+    }
+    if (aLeaveGame) {
+        aLeaveGame->setShortcuts(shortcuts.getShortcut("Player/aLeaveGame"));
+    }
+    if (aCloseReplay) {
+        aCloseReplay->setShortcuts(shortcuts.getShortcut("Player/aCloseReplay"));
+    }
+    if (aResetLayout) {
+        aResetLayout->setShortcuts(shortcuts.getShortcut("Player/aResetLayout"));
+    }
+    if (aFocusChat) {
+        aFocusChat->setShortcuts(shortcuts.getShortcut("Player/aFocusChat"));
+    }
+    if (aReplaySkipForward) {
+        aReplaySkipForward->setShortcuts(shortcuts.getShortcut("Replays/aSkipForward"));
+    }
+    if (aReplaySkipBackward) {
+        aReplaySkipBackward->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackward"));
+    }
+    if (aReplaySkipForwardBig) {
+        aReplaySkipForwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipForwardBig"));
+    }
+    if (aReplaySkipBackwardBig) {
+        aReplaySkipBackwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackwardBig"));
+    }
+    if (replayPlayButton) {
+        replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
+    }
+    if (replayFastForwardButton) {
+        replayFastForwardButton->setShortcut(shortcuts.getSingleShortcut("Replays/fastForwardButton"));
+    }
 }
 
 void TabGame::closeRequest(bool forced)
