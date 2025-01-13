@@ -96,6 +96,8 @@ private:
     QString lang;
     QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
+    bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
+        tabLogOpen;
     bool checkUpdatesOnStartup;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
@@ -253,6 +255,34 @@ public:
     QString getThemeName() const
     {
         return themeName;
+    }
+    bool getTabVisualDeckStorageOpen() const
+    {
+        return tabVisualDeckStorageOpen;
+    }
+    bool getTabServerOpen() const
+    {
+        return tabServerOpen;
+    }
+    bool getTabAccountOpen() const
+    {
+        return tabAccountOpen;
+    }
+    bool getTabDeckStorageOpen() const
+    {
+        return tabDeckStorageOpen;
+    }
+    bool getTabReplaysOpen() const
+    {
+        return tabReplaysOpen;
+    }
+    bool getTabAdminOpen() const
+    {
+        return tabAdminOpen;
+    }
+    bool getTabLogOpen() const
+    {
+        return tabLogOpen;
     }
     QString getChatMentionColor() const
     {
@@ -681,6 +711,13 @@ public slots:
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
+    void setTabVisualDeckStorageOpen(bool value);
+    void setTabServerOpen(bool value);
+    void setTabAccountOpen(bool value);
+    void setTabDeckStorageOpen(bool value);
+    void setTabReplaysOpen(bool value);
+    void setTabAdminOpen(bool value);
+    void setTabLogOpen(bool value);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(QT_STATE_CHANGED_T _picDownload);

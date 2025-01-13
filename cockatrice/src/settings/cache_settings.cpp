@@ -212,6 +212,14 @@ SettingsCache::SettingsCache()
 
     themeName = settings->value("theme/name").toString();
 
+    tabVisualDeckStorageOpen = settings->value("tabs/visualDeckStorage", true).toBool();
+    tabServerOpen = settings->value("tabs/server", true).toBool();
+    tabAccountOpen = settings->value("tabs/account", true).toBool();
+    tabDeckStorageOpen = settings->value("tabs/deckStorage", true).toBool();
+    tabReplaysOpen = settings->value("tabs/replays", true).toBool();
+    tabAdminOpen = settings->value("tabs/admin", true).toBool();
+    tabLogOpen = settings->value("tabs/log", true).toBool();
+
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
     if (!updateCache) {
@@ -484,6 +492,48 @@ void SettingsCache::setThemeName(const QString &_themeName)
     themeName = _themeName;
     settings->setValue("theme/name", themeName);
     emit themeChanged();
+}
+
+void SettingsCache::setTabVisualDeckStorageOpen(bool value)
+{
+    tabVisualDeckStorageOpen = value;
+    settings->setValue("tabs/visualDeckStorage", tabVisualDeckStorageOpen);
+}
+
+void SettingsCache::setTabServerOpen(bool value)
+{
+    tabServerOpen = value;
+    settings->setValue("tabs/server", tabServerOpen);
+}
+
+void SettingsCache::setTabAccountOpen(bool value)
+{
+    tabAccountOpen = value;
+    settings->setValue("tabs/account", tabAccountOpen);
+}
+
+void SettingsCache::setTabDeckStorageOpen(bool value)
+{
+    tabDeckStorageOpen = value;
+    settings->setValue("tabs/deckStorage", tabDeckStorageOpen);
+}
+
+void SettingsCache::setTabReplaysOpen(bool value)
+{
+    tabReplaysOpen = value;
+    settings->setValue("tabs/replays", tabReplaysOpen);
+}
+
+void SettingsCache::setTabAdminOpen(bool value)
+{
+    tabAdminOpen = value;
+    settings->setValue("tabs/admin", tabAdminOpen);
+}
+
+void SettingsCache::setTabLogOpen(bool value)
+{
+    tabLogOpen = value;
+    settings->setValue("tabs/log", tabLogOpen);
 }
 
 void SettingsCache::setPicDownload(QT_STATE_CHANGED_T _picDownload)
