@@ -164,6 +164,9 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     resetTabsMenu();
 
     retranslateUi();
+
+    // open always-available tabs on startup
+    aTabVisualDeckStorage->setChecked(SettingsCache::instance().getVisualDeckStorageShowOnLoad());
 }
 
 TabSupervisor::~TabSupervisor()
