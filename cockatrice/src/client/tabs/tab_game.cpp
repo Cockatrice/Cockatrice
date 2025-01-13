@@ -1,12 +1,7 @@
 #include "tab_game.h"
 
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
-#include "../../deck/deck_loader.h"
-#include "../../deck/deck_view.h"
 #include "../../dialogs/dlg_create_game.h"
-#include "../../dialogs/dlg_load_deck.h"
-#include "../../dialogs/dlg_load_remote_deck.h"
-#include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
@@ -15,8 +10,7 @@
 #include "../../game/game_view.h"
 #include "../../game/player/player.h"
 #include "../../game/player/player_list_widget.h"
-#include "../../game/zones/view_zone.h"
-#include "../../game/zones/view_zone_widget.h"
+#include "../../game/zones/card_zone.h"
 #include "../../main.h"
 #include "../../server/message_log_widget.h"
 #include "../../server/pending_command.h"
@@ -27,18 +21,15 @@
 #include "../ui/phases_toolbar.h"
 #include "../ui/picture_loader/picture_loader.h"
 #include "../ui/window_main.h"
+#include "./deck_view_container.h"
 #include "get_pb_extension.h"
 #include "pb/command_concede.pb.h"
-#include "pb/command_deck_select.pb.h"
 #include "pb/command_delete_arrow.pb.h"
 #include "pb/command_game_say.pb.h"
 #include "pb/command_leave_game.pb.h"
 #include "pb/command_next_turn.pb.h"
-#include "pb/command_ready_start.pb.h"
 #include "pb/command_reverse_turn.pb.h"
 #include "pb/command_set_active_phase.pb.h"
-#include "pb/command_set_sideboard_lock.pb.h"
-#include "pb/command_set_sideboard_plan.pb.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_deck_select.pb.h"
 #include "pb/context_ping_changed.pb.h"
@@ -56,7 +47,6 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_event_container.pb.h"
 #include "pb/game_replay.pb.h"
-#include "pb/response_deck_download.pb.h"
 #include "tab_supervisor.h"
 #include "trice_limits.h"
 
@@ -74,7 +64,6 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QWidget>
-#include <google/protobuf/descriptor.h>
 
 void TabGame::refreshShortcuts()
 {

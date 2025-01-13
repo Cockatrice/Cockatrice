@@ -1,17 +1,15 @@
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 
-#include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_loader.h"
-#include "pb/event_leave.pb.h"
-#include "tab.h"
 
-#include <QCompleter>
 #include <QPushButton>
-#include <pb/response.pb.h>
 
+class QVBoxLayout;
+class AbstractCardItem;
 class VisualDeckStorageWidget;
 class DeckPreviewWidget;
+class Response;
 class TabGame;
 class DeckView;
 

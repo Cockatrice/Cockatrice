@@ -10,19 +10,17 @@
 
 #include <QCompleter>
 #include <QMap>
-#include <QPushButton>
 
+class DeckViewContainer;
 class AbstractClient;
 class CardDatabase;
 class GameView;
-class DeckView;
 class GameScene;
 class CardInfoFrameWidget;
 class MessageLogWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
-class QPushButton;
 class QToolButton;
 class QMenu;
 class ZoneViewLayout;
@@ -52,7 +50,6 @@ class Event_ReverseTurn;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
-class TabGame;
 class DeckLoader;
 class QVBoxLayout;
 class QHBoxLayout;

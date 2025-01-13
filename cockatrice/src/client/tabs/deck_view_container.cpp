@@ -2,21 +2,16 @@
 
 #include "../../deck/deck_loader.h"
 #include "../../deck/deck_view.h"
-#include "../../dialogs/dlg_create_game.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/game_scene.h"
 #include "../../game/game_view.h"
-#include "../../game/player/player.h"
-#include "../../server/message_log_widget.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
 #include "../game_logic/abstract_client.h"
 #include "../ui/picture_loader.h"
-#include "../ui/window_main.h"
-#include "pb/command_concede.pb.h"
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_ready_start.pb.h"
 #include "pb/command_set_sideboard_lock.pb.h"
@@ -25,10 +20,8 @@
 #include "tab_game.h"
 #include "trice_limits.h"
 
-#include <QCompleter>
-#include <QDockWidget>
-#include <QFileDialog>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QToolButton>
 #include <google/protobuf/descriptor.h>
 
