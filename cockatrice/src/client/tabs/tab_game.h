@@ -63,64 +63,6 @@ class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
 
-class ToggleButton : public QPushButton
-{
-    Q_OBJECT
-private:
-    bool state;
-signals:
-    void stateChanged();
-
-public:
-    explicit ToggleButton(QWidget *parent = nullptr);
-    bool getState() const
-    {
-        return state;
-    }
-    void setState(bool _state);
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-};
-
-class DeckViewContainer : public QWidget
-{
-    Q_OBJECT
-private:
-    QVBoxLayout *deckViewLayout;
-    QPushButton *loadLocalButton, *loadRemoteButton, *unloadDeckButton, *forceStartGameButton;
-    ToggleButton *readyStartButton, *sideboardLockButton;
-    DeckView *deckView;
-    VisualDeckStorageWidget *visualDeckStorageWidget;
-    TabGame *parentGame;
-    int playerId;
-private slots:
-    void replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance);
-    void loadLocalDeck();
-    void loadRemoteDeck();
-    void unloadDeck();
-    void readyStart();
-    void forceStart();
-    void deckSelectFinished(const Response &r);
-    void sideboardPlanChanged();
-    void sideboardLockButtonClicked();
-    void updateSideboardLockButtonText();
-    void refreshShortcuts();
-signals:
-    void newCardAdded(AbstractCardItem *card);
-    void notIdle();
-
-public:
-    DeckViewContainer(int _playerId, TabGame *parent);
-    void retranslateUi();
-    void setButtonsVisible(bool _visible);
-    void setReadyStart(bool ready);
-    void readyAndUpdate();
-    void setSideboardLocked(bool locked);
-    void setDeck(const DeckLoader &deck);
-    void loadDeckFromFile(const QString &filePath);
-};
-
 class TabGame : public Tab
 {
     Q_OBJECT
