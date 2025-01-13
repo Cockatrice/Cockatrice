@@ -139,6 +139,7 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
     // Perform file modifications
     switch (fmt) {
         case PlainTextFormat:
+            result = saveToFile_Plain(&file);
             break;
         case CockatriceFormat:
             setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
