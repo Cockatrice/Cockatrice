@@ -166,6 +166,8 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     retranslateUi();
 
     // open always-available tabs on startup
+    addDeckEditorTab(nullptr);
+
     aTabVisualDeckStorage->setChecked(SettingsCache::instance().getVisualDeckStorageShowOnLoad());
 }
 
@@ -402,6 +404,7 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
     if (checked && !tabVisualDeckStorage) {
         tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
         myAddTab(tabVisualDeckStorage);
+        setCurrentWidget(tabVisualDeckStorage);
         connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
             tabVisualDeckStorage = nullptr;
             aTabVisualDeckStorage->setChecked(false);

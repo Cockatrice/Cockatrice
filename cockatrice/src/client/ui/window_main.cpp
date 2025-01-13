@@ -860,7 +860,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
     connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
     connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
-    tabSupervisor->addDeckEditorTab(nullptr);
 
     setCentralWidget(tabSupervisor);
 
