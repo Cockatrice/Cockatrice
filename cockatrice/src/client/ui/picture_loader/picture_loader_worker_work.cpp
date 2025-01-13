@@ -2,6 +2,7 @@
 
 #include "../../../game/cards/card_database_manager.h"
 #include "../../../settings/cache_settings.h"
+#include "picture_loader_worker.h"
 
 #include <QBuffer>
 #include <QDirIterator>
@@ -16,13 +17,13 @@ Q_LOGGING_CATEGORY(PictureLoaderWorkerWorkLog, "picture_loader.worker");
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
-PictureLoaderWorkerWork::PictureLoaderWorkerWork(PictureLoaderWorker *_worker, CardInfoPtr toLoad)
+PictureLoaderWorkerWork::PictureLoaderWorkerWork(PictureLoaderWorker *_worker, const CardInfoPtr &toLoad)
     : QThread(nullptr), worker(_worker), cardToDownload(toLoad)
 {
-    connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
-
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
-
+    connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::makeRequest,
+            Qt::QueuedConnection);
+    connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::imageLoadedSuccessfully,
+            Qt::QueuedConnection);
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);

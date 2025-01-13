@@ -21,18 +21,18 @@ class PictureLoaderWorkerWork : public QThread
 {
     Q_OBJECT
 public:
-    explicit PictureLoaderWorkerWork(PictureLoaderWorker *worker, CardInfoPtr toLoad);
+    explicit PictureLoaderWorkerWork(PictureLoaderWorker *worker, const CardInfoPtr &toLoad);
     ~PictureLoaderWorkerWork() override;
+    PictureLoaderWorker *worker;
+    PictureToLoad cardToDownload;
 public slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
 
 private:
     static QStringList md5Blacklist;
-    PictureLoaderWorker *worker;
     QThread *pictureLoaderThread;
     QNetworkAccessManager *networkManager;
-    PictureToLoad cardToDownload;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);

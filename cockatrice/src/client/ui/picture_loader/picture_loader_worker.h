@@ -16,6 +16,7 @@
 #define REDIRECT_TIMESTAMP "timestamp"
 #define REDIRECT_CACHE_FILENAME "cache.ini"
 
+class PictureLoaderWorkerWork;
 inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
 
 class PictureLoaderWorker : public QObject
@@ -30,6 +31,7 @@ public:
 
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
+    void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
 
 private:
     static QStringList md5Blacklist;

@@ -20,7 +20,6 @@ PictureLoaderWorker::PictureLoaderWorker()
       customPicsPath(SettingsCache::instance().getCustomPicsPath()),
       picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false)
 {
-    connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
     connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
@@ -42,7 +41,6 @@ PictureLoaderWorker::PictureLoaderWorker()
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
 
     cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
@@ -67,9 +65,9 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-            << " set: " << cardBeingDownloaded.getSetName() << "]: Using cached redirect for " << url.toDisplayString()
-            << " to " << cachedRedirect.toDisplayString();
+            << "PictureLoader: [card: " << worker->cardToDownload.getCard()->getCorrectedName()
+            << " set: " << worker->cardToDownload.getSetName() << "]: Using cached redirect for "
+            << url.toDisplayString() << " to " << cachedRedirect.toDisplayString();
         return makeRequest(cachedRedirect, worker); // Use the cached redirect
     }
 
@@ -105,11 +103,11 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
                 << " set: " << cardBeingDownloaded.getSetName() << "]: Caching redirect from " << url.toDisplayString()
                 << " to " << redirectUrl.toDisplayString();
         }
-
-        reply->deleteLater();
     });
 
-    connect(reply, &QNetworkReply::finished, worker, [reply, worker]() { worker->picDownloadFinished(reply); });
+    connect(
+        reply, &QNetworkReply::finished, worker, [reply, worker]() { worker->picDownloadFinished(reply); },
+        Qt::QueuedConnection);
 
     return reply;
 }
@@ -118,6 +116,11 @@ void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
 {
     auto worker = new PictureLoaderWorkerWork(this, card);
     Q_UNUSED(worker);
+}
+
+void PictureLoaderWorker::imageLoadedSuccessfully(CardInfoPtr card, const QImage &image)
+{
+    emit imageLoaded(card, image);
 }
 
 void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)
