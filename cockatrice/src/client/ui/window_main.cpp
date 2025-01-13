@@ -290,11 +290,6 @@ void MainWindow::localGameEnded()
     aSinglePlayer->setEnabled(true);
 }
 
-void MainWindow::actVisualDeckStorage()
-{
-    tabSupervisor->addVisualDeckStorageTab();
-}
-
 void MainWindow::actFullScreen(bool checked)
 {
     if (checked)
@@ -664,7 +659,6 @@ void MainWindow::retranslateUi()
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
-    aVisualDeckStorage->setText(tr("&Visual Deck storage"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
@@ -712,8 +706,6 @@ void MainWindow::createActions()
     connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
     connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
-    aVisualDeckStorage = new QAction(this);
-    connect(aVisualDeckStorage, &QAction::triggered, this, &MainWindow::actVisualDeckStorage);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
@@ -799,8 +791,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
-    cockatriceMenu->addSeparator();
-    cockatriceMenu->addAction(aVisualDeckStorage);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
@@ -889,10 +879,6 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::refreshShortcuts);
     refreshShortcuts();
 
-    if (SettingsCache::instance().getVisualDeckStorageShowOnLoad()) {
-        connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, tabSupervisor,
-                &TabSupervisor::addVisualDeckStorageTab);
-    }
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFailed, this,
             &MainWindow::cardDatabaseLoadingFailed);
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseNewSetsFound, this,
