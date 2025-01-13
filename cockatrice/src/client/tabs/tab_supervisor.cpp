@@ -101,8 +101,8 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabServer(0), tabUserLists(0),
-      tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
+    : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr), tabServer(0),
+      tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -128,6 +128,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     // create tabs menu actions
     aTabDeckEditor = new QAction(this);
     connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(nullptr); });
+
+    aTabVisualDeckStorage = new QAction(this);
+    aTabVisualDeckStorage->setCheckable(true);
+    connect(aTabVisualDeckStorage, &QAction::toggled, this, &TabSupervisor::actTabVisualDeckStorage);
 
     aTabServer = new QAction(this);
     aTabServer->setCheckable(true);
@@ -171,6 +175,7 @@ void TabSupervisor::retranslateUi()
 {
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
+    aTabVisualDeckStorage->setText(tr("&Visual Deck storage"));
     aTabServer->setText(tr("Server"));
     aTabUserLists->setText(tr("Account"));
     aTabDeckStorage->setText(tr("Deck storage"));
@@ -272,6 +277,8 @@ void TabSupervisor::resetTabsMenu()
 {
     tabsMenu->clear();
     tabsMenu->addAction(aTabDeckEditor);
+    tabsMenu->addSeparator();
+    tabsMenu->addAction(aTabVisualDeckStorage);
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -385,6 +392,20 @@ void TabSupervisor::stop()
 
     delete userInfo;
     userInfo = 0;
+}
+
+void TabSupervisor::actTabVisualDeckStorage(bool checked)
+{
+    if (checked && !tabVisualDeckStorage) {
+        tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
+        myAddTab(tabVisualDeckStorage);
+        connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
+            tabVisualDeckStorage = nullptr;
+            aTabVisualDeckStorage->setChecked(false);
+        });
+    } else if (!checked && tabVisualDeckStorage) {
+        tabVisualDeckStorage->closeRequest();
+    }
 }
 
 void TabSupervisor::actTabServer(bool checked)
@@ -636,14 +657,6 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabDeckStorageVisual *TabSupervisor::addVisualDeckStorageTab()
-{
-    TabDeckStorageVisual *tab = new TabDeckStorageVisual(this, client);
-    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }
