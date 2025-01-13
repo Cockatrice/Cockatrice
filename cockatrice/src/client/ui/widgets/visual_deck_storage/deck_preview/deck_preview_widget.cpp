@@ -16,12 +16,8 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
     setLayout(layout);
 
     deckLoader = new DeckLoader();
-    deckLoader->loadFromFile(filePath, DeckLoader::CockatriceFormat);
-
-    auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
-                          ? CardInfoPtr()
-                          : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                                deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
+    connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
+    deckLoader->loadFromFileAsync(filePath, DeckLoader::CockatriceFormat, false);
 
     bannerCardDisplayWidget = new DeckPreviewCardPictureWidget(this);
 
@@ -30,18 +26,30 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
 
-    bannerCardDisplayWidget->setCard(bannerCard);
-    bannerCardDisplayWidget->setOverlayText(
-        deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
-    bannerCardDisplayWidget->setFontSize(24);
-    setFilePath(deckLoader->getLastFileName());
-
-    colorIdentityWidget = new DeckPreviewColorIdentityWidget(getColorIdentity());
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
-
     layout->addWidget(bannerCardDisplayWidget);
-    layout->addWidget(colorIdentityWidget);
-    layout->addWidget(deckTagsDisplayWidget);
+}
+
+void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
+{
+    if (deckLoadSuccess) {
+        auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
+                              ? CardInfoPtr()
+                              : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                                    deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
+
+        bannerCardDisplayWidget->setCard(bannerCard);
+        bannerCardDisplayWidget->setOverlayText(deckLoader->getName().isEmpty()
+                                                    ? QFileInfo(deckLoader->getLastFileName()).fileName()
+                                                    : deckLoader->getName());
+        bannerCardDisplayWidget->setFontSize(24);
+        setFilePath(deckLoader->getLastFileName());
+
+        colorIdentityWidget = new DeckPreviewColorIdentityWidget(getColorIdentity());
+        deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
+
+        layout->addWidget(colorIdentityWidget);
+        layout->addWidget(deckTagsDisplayWidget);
+    }
 }
 
 QString DeckPreviewWidget::getColorIdentity()

@@ -8,6 +8,7 @@ class DeckLoader : public DeckList
     Q_OBJECT
 signals:
     void deckLoaded();
+    void loadFinished(bool success);
 
 public:
     enum FileFormat
@@ -43,6 +44,7 @@ public:
     static FileFormat getFormatFromName(const QString &fileName);
 
     bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
+    bool loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
