@@ -70,6 +70,7 @@ private:
     AbstractClient *client;
     QList<AbstractClient *> localClients;
     QMenu *tabsMenu;
+    TabDeckStorageVisual *tabVisualDeckStorage;
     TabServer *tabServer;
     TabUserLists *tabUserLists;
     TabDeckStorage *tabDeckStorage;
@@ -83,7 +84,8 @@ private:
     QList<TabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabDeckEditor, *aTabServer, *aTabUserLists, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
+    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabUserLists, *aTabDeckStorage, *aTabReplays,
+        *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab);
     void addCloseButtonToTab(Tab *tab, int tabIndex);
@@ -136,12 +138,12 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
-    TabDeckStorageVisual *addVisualDeckStorageTab();
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
     void refreshShortcuts();
 
+    void actTabVisualDeckStorage(bool checked);
     void actTabServer(bool checked);
     void actTabUserLists(bool checked);
     void actTabDeckStorage(bool checked);

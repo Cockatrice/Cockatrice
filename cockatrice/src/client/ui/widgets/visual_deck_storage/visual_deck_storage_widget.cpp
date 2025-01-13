@@ -39,6 +39,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getVisualDeckStorageCardSize());
     layout->addWidget(cardSizeWidget);
+
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &VisualDeckStorageWidget::refreshBannerCards);
 }
 
 void VisualDeckStorageWidget::showEvent(QShowEvent *event)

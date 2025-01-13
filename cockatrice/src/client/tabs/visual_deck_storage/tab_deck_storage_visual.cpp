@@ -58,11 +58,6 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     retranslateUi();
 }
 
-void TabDeckStorageVisual::closeRequest(bool /*forced*/)
-{
-    this->close();
-}
-
 void TabDeckStorageVisual::retranslateUi()
 {
     aOpenLocalDeck->setText(tr("Open in deck editor"));
