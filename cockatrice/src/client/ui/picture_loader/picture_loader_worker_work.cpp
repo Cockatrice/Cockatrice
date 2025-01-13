@@ -225,10 +225,11 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: Image successfully "
             << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
+    } else {
+        startNextPicDownload();
     }
 
     reply->deleteLater();
-    startNextPicDownload();
 }
 
 bool PictureLoaderWorkerWork::imageIsBlackListed(const QByteArray &picData)
