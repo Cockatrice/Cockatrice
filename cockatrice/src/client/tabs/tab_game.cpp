@@ -25,7 +25,7 @@
 #include "../network/replay_timeline_widget.h"
 #include "../ui/line_edit_completer.h"
 #include "../ui/phases_toolbar.h"
-#include "../ui/picture_loader.h"
+#include "../ui/picture_loader/picture_loader.h"
 #include "../ui/window_main.h"
 #include "get_pb_extension.h"
 #include "pb/command_concede.pb.h"

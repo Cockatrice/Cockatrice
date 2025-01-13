@@ -94,6 +94,9 @@ set(cockatrice_SOURCES
     src/game/phase.cpp
     src/client/ui/phases_toolbar.cpp
     src/client/ui/picture_loader.cpp
+    src/client/ui/picture_loader/picture_loader.cpp
+    src/client/ui/picture_loader/picture_loader_worker.cpp
+    src/client/ui/picture_loader/picture_to_load.cpp
     src/game/zones/pile_zone.cpp
     src/client/ui/pixel_map_generator.cpp
     src/game/player/player.cpp

@@ -3,7 +3,7 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
-#include "../../picture_loader.h"
+#include "../../picture_loader/picture_loader.h"
 
 #include <QMenu>
 #include <QMouseEvent>

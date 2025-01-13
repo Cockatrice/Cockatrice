@@ -14,7 +14,7 @@
 #include "../../main.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
-#include "../ui/picture_loader.h"
+#include "../ui/picture_loader/picture_loader.h"
 #include "../ui/pixel_map_generator.h"
 #include "../ui/widgets/printing_selector/printing_selector.h"
 #include "pb/command_deck_upload.pb.h"
