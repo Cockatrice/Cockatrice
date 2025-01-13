@@ -41,7 +41,8 @@ bool PictureLoaderWorkerWork::cardImageExistsOnDisk(QString &setName, QString &c
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     QList<QString> picsPaths = QList<QString>();
-    QDirIterator it(SettingsCache::instance().getCustomPicsPath(), QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    QDirIterator it(SettingsCache::instance().getCustomPicsPath(),
+                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
     // Recursively check all subdirectories of the CUSTOM folder
     while (it.hasNext()) {
@@ -75,15 +76,15 @@ bool PictureLoaderWorkerWork::cardImageExistsOnDisk(QString &setName, QString &c
         }
         imgReader.setFileName(_picsPath + ".full");
         if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                                                << "]: Picture.full found on disk.";
+            qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << correctedCardname
+                                                          << " set: " << setName << "]: Picture.full found on disk.";
             imageLoaded(cardToDownload.getCard(), image);
             return true;
         }
         imgReader.setFileName(_picsPath + ".xlhq");
         if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
-                                                << "]: Picture.xlhq found on disk.";
+            qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << correctedCardname
+                                                          << " set: " << setName << "]: Picture.xlhq found on disk.";
             imageLoaded(cardToDownload.getCard(), image);
             return true;
         }
@@ -175,9 +176,10 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
     const QByteArray &picData = reply->peek(reply->size());
 
     if (imageIsBlackListed(picData)) {
-        qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
-                                            << " set: " << cardToDownload.getSetName()
-                                            << "]: Picture found, but blacklisted, will consider it as not found";
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName()
+            << "]: Picture found, but blacklisted, will consider it as not found";
 
         picDownloadFailed();
         reply->deleteLater();
