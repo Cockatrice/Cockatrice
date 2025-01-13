@@ -2,6 +2,7 @@
 #define PICTURE_LOADER_WORKER_H
 
 #include "../../../game/cards/card_database.h"
+#include "picture_loader_worker_work.h"
 #include "picture_to_load.h"
 
 #include <QLoggingCategory>
@@ -24,8 +25,11 @@ public:
     explicit PictureLoaderWorker();
     ~PictureLoaderWorker() override;
 
-    void enqueueImageLoad(CardInfoPtr card);
+    void enqueueImageLoad(const CardInfoPtr &card);
     void clearNetworkCache();
+
+public slots:
+    QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
 
 private:
     static QStringList md5Blacklist;
@@ -42,10 +46,7 @@ private:
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
-    void startNextPicDownload();
-    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
-    bool imageIsBlackListed(const QByteArray &);
-    QNetworkReply *makeRequest(const QUrl &url);
+
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
     void loadRedirectCache();
@@ -53,13 +54,8 @@ private:
     void cleanStaleEntries();
 
 private slots:
-    void picDownloadFinished(QNetworkReply *reply);
-    void picDownloadFailed();
-
     void picDownloadChanged();
     void picsPathChanged();
-public slots:
-    void processLoadQueue();
 
 signals:
     void startLoadQueue();
