@@ -88,7 +88,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     // Connect an additional check to the finished signal to check if the request was redirected and if so, save it to
     // the redirection cache
 
-    connect(reply, &QNetworkReply::finished, this, [this, reply, url]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, url, worker]() {
         QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
         if (redirectTarget.isValid()) {
@@ -99,9 +99,9 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
 
             cacheRedirect(url, redirectUrl);
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
-                << " set: " << cardBeingDownloaded.getSetName() << "]: Caching redirect from " << url.toDisplayString()
-                << " to " << redirectUrl.toDisplayString();
+                << "PictureLoader: [card: " << worker->cardToDownload.getCard()->getCorrectedName()
+                << " set: " << worker->cardToDownload.getSetName() << "]: Caching redirect from "
+                << url.toDisplayString() << " to " << redirectUrl.toDisplayString();
         }
     });
 
