@@ -93,7 +93,6 @@ set(cockatrice_SOURCES
     src/server/pending_command.cpp
     src/game/phase.cpp
     src/client/ui/phases_toolbar.cpp
-    src/client/ui/picture_loader.cpp
     src/client/ui/picture_loader/picture_loader.cpp
     src/client/ui/picture_loader/picture_loader_worker.cpp
     src/client/ui/picture_loader/picture_to_load.cpp
