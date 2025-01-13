@@ -116,7 +116,7 @@ QChar DeckPreviewColorCircleWidget::getColorChar() const
     return colorChar;
 }
 
-DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(const QString &colorIdentity, QWidget *parent)
+DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(QWidget *parent, const QString &colorIdentity)
     : QWidget(parent)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);

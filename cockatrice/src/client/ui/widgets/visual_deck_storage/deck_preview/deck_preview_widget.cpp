@@ -31,25 +31,25 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
 
 void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 {
-    if (deckLoadSuccess) {
-        auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
-                              ? CardInfoPtr()
-                              : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                                    deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
-
-        bannerCardDisplayWidget->setCard(bannerCard);
-        bannerCardDisplayWidget->setOverlayText(deckLoader->getName().isEmpty()
-                                                    ? QFileInfo(deckLoader->getLastFileName()).fileName()
-                                                    : deckLoader->getName());
-        bannerCardDisplayWidget->setFontSize(24);
-        setFilePath(deckLoader->getLastFileName());
-
-        colorIdentityWidget = new DeckPreviewColorIdentityWidget(getColorIdentity());
-        deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
-
-        layout->addWidget(colorIdentityWidget);
-        layout->addWidget(deckTagsDisplayWidget);
+    if (!deckLoadSuccess) {
+        return;
     }
+    auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
+                          ? CardInfoPtr()
+                          : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                                deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
+
+    bannerCardDisplayWidget->setCard(bannerCard);
+    bannerCardDisplayWidget->setOverlayText(
+        deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
+    bannerCardDisplayWidget->setFontSize(24);
+    setFilePath(deckLoader->getLastFileName());
+
+    colorIdentityWidget = new DeckPreviewColorIdentityWidget(this, getColorIdentity());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
+
+    layout->addWidget(colorIdentityWidget);
+    layout->addWidget(deckTagsDisplayWidget);
 }
 
 QString DeckPreviewWidget::getColorIdentity()

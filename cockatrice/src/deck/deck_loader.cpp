@@ -11,10 +11,8 @@
 #include <QFutureWatcher>
 #include <QRegularExpression>
 #include <QStringList>
-#include <qloggingcategory.h>
-#include <qtconcurrentrun.h>
+#include <QtConcurrentRun>
 
-Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
                                                 << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
@@ -84,7 +82,7 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
 
 bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest)
 {
-    QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
+    auto *watcher = new QFutureWatcher<bool>(this);
 
     connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, fileName, fmt, userRequest]() {
         const bool result = watcher->result();
@@ -108,23 +106,23 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
             return false;
         }
 
-        bool result = false;
+
         switch (fmt) {
             case PlainTextFormat:
-                result = loadFromFile_Plain(&file);
-                break;
+                return loadFromFile_Plain(&file);
             case CockatriceFormat: {
+                bool result = false;
                 result = loadFromFile_Native(&file);
                 if (!result) {
                     file.seek(0);
-                    result = loadFromFile_Plain(&file);
+                    return loadFromFile_Plain(&file);
                 }
-                break;
+                return result;
             }
             default:
+                return false;
                 break;
         }
-        return result;
     });
 
     watcher->setFuture(future);
