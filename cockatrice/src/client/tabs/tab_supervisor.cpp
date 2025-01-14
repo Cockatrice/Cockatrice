@@ -278,7 +278,7 @@ void TabSupervisor::initStartupTabs()
 {
     addDeckEditorTab(nullptr);
 
-    checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getVisualDeckStorageShowOnLoad());
+    checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
 }
 
 /**

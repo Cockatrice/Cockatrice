@@ -215,9 +215,6 @@ void SettingsCache::setVisualDeckStorageSortingOrder(int /* _visualDeckStorageSo
 void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
 {
 }
-void SettingsCache::setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T /* _visualDeckStorageShowOnLoad */)
-{
-}
 void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
     QT_STATE_CHANGED_T /* _visualDeckStorageDrawUnusedColorIdentities */)
 {
