@@ -139,7 +139,6 @@ private slots:
 signals:
     void openMessageDialog(const QString &userName, bool focus);
 
-
 public:
     explicit UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = nullptr);
     void retranslateUi();
