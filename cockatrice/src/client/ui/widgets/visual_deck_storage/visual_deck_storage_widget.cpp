@@ -47,10 +47,22 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
             &VisualDeckStorageWidget::refreshBannerCards);
 
+    databaseLoadIndicator = new QLabel(this);
+    databaseLoadIndicator->setAlignment(Qt::AlignCenter);
+
+    retranslateUi();
+
     // Don't waste time processing the cards if they're going to get refreshed anyway once the db finishes loading
     if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
         refreshBannerCards();
+    } else {
+        flowWidget->addWidget(databaseLoadIndicator);
     }
+}
+
+void VisualDeckStorageWidget::retranslateUi()
+{
+    databaseLoadIndicator->setText(tr("Loading database ..."));
 }
 
 void VisualDeckStorageWidget::updateSortOrder()

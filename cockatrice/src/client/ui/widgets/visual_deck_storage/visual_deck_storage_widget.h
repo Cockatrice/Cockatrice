@@ -41,6 +41,7 @@ private:
     QHBoxLayout *searchAndSortLayout;
     FlowWidget *flowWidget;
     DeckListModel *deckListModel;
+    QLabel *databaseLoadIndicator;
 
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
