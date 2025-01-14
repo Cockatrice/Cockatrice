@@ -254,6 +254,14 @@ struct FormatDeckListForExport
             mainBoardCards += QString::number(card->getNumber());
             mainBoardCards += "%20";
             mainBoardCards += card->getName();
+            if (!card->getCardSetShortName().isNull()){
+                mainBoardCards += "%20";
+                mainBoardCards += "(" + card->getCardSetShortName() + ")";
+            }
+            if (!card->getCardCollectorNumber().isNull()) {
+                mainBoardCards += "%20";
+                mainBoardCards += card->getCardCollectorNumber();
+            }
             mainBoardCards += "%0A";
         }
     }
@@ -419,7 +427,19 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
             out << "SB: ";
         }
 
-        out << card->getNumber() << " " << card->getName() << "\n";
+        if (card->getNumber()) {
+            out << card->getNumber();
+        }
+        if (!card->getName().isNull() && !card->getName().isEmpty()) {
+            out << " " << card->getName();
+        }
+        if (!card->getCardSetShortName().isNull() && !card->getCardSetShortName().isEmpty()) {
+            out << " " << "(" << card->getCardSetShortName() << ")";
+        }
+        if (!card->getCardCollectorNumber().isNull()) {
+            out << " " << card->getCardCollectorNumber();
+        }
+        out << "\n";
     }
 }
 
