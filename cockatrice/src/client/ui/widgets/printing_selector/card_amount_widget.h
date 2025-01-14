@@ -9,7 +9,6 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QTreeView>
 #include <QWidget>
