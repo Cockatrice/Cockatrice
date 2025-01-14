@@ -228,7 +228,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
@@ -254,7 +254,7 @@ struct FormatDeckListForExport
             mainBoardCards += QString::number(card->getNumber());
             mainBoardCards += "%20";
             mainBoardCards += card->getName();
-            if (!card->getCardSetShortName().isNull()){
+            if (!card->getCardSetShortName().isNull()) {
                 mainBoardCards += "%20";
                 mainBoardCards += "(" + card->getCardSetShortName() + ")";
             }
