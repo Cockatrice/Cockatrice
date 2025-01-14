@@ -1,5 +1,6 @@
 #include "card_amount_widget.h"
 
+#include <QPainter>
 #include <QTimer>
 
 /**

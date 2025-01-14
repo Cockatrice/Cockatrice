@@ -2,7 +2,6 @@
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
 #include "../../../../deck/deck_list_model.h"
-#include "../../../../deck/deck_view.h"
 #include "../../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../cards/card_size_widget.h"
 #include "deck_preview/deck_preview_color_identity_filter_widget.h"
@@ -43,7 +42,6 @@ private:
     QHBoxLayout *searchAndSortLayout;
     FlowWidget *flowWidget;
     DeckListModel *deckListModel;
-    QMap<QString, DeckViewCardContainer *> cardContainers;
 
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;

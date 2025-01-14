@@ -2,7 +2,6 @@
 #define PRINTING_SELECTOR_H
 
 #include "../../../../deck/deck_list_model.h"
-#include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"

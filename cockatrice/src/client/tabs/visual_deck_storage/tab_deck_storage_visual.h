@@ -2,7 +2,6 @@
 #define TAB_DECK_STORAGE_VISUAL_H
 
 #include "../../../deck/deck_list_model.h"
-#include "../../../deck/deck_view.h"
 #include "../../ui/widgets/cards/deck_preview_card_picture_widget.h"
 #include "../../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "../tab.h"
