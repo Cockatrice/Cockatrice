@@ -431,7 +431,7 @@ void TabSupervisor::actTabServer(bool checked)
 void TabSupervisor::actTabUserLists(bool checked)
 {
     if (checked && !tabUserLists) {
-        tabUserLists = new TabUserLists(this, client, *userInfo, userListManager);
+        tabUserLists = new TabUserLists(this, client, userListManager, *userInfo);
         connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
         connect(userListManager, &UserListManager::userJoined, this, &TabSupervisor::processUserJoined);
         connect(userListManager, &UserListManager::userLeft, this, &TabSupervisor::processUserLeft);

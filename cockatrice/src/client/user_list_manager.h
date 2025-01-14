@@ -11,11 +11,9 @@ class Event_ListRooms;
 class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
-class LineEditUnfocusable;
 class Response;
 class ServerInfo_User;
 class TabSupervisor;
-class UserInfoBox;
 class UserList;
 
 class UserListManager : public QWidget
@@ -56,7 +54,7 @@ public slots:
     void handleConnect();
     void handleDisconnect();
     void processListUsersResponse(const Response &response);
-    void addToList(const std::string &listName, const QString &userName);
+    void addToList(const QString &listName, const QString &userName);
 
 signals:
     void userLeft(const QString &userName);

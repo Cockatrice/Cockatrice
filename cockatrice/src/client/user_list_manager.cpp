@@ -14,12 +14,11 @@
 #include "trice_limits.h"
 
 UserListManager::UserListManager(TabSupervisor *_tabSupervisor, AbstractClient *_client)
-    : client(_client), tabSupervisor(_tabSupervisor)
+    : client(_client), tabSupervisor(_tabSupervisor),
+      allUsersList(new UserList(tabSupervisor, client, UserList::AllUsersList)),
+      buddyList(new UserList(tabSupervisor, client, UserList::BuddyList)),
+      ignoreList(new UserList(tabSupervisor, client, UserList::IgnoreList))
 {
-    allUsersList = new UserList(_tabSupervisor, _client, UserList::AllUsersList);
-    buddyList = new UserList(_tabSupervisor, _client, UserList::BuddyList);
-    ignoreList = new UserList(_tabSupervisor, _client, UserList::IgnoreList);
-
     connect(client, &AbstractClient::userJoinedEventReceived, this, &UserListManager::processUserJoinedEvent);
     connect(client, &AbstractClient::userLeftEventReceived, this, &UserListManager::processUserLeftEvent);
     connect(client, &AbstractClient::buddyListReceived, this, &UserListManager::buddyListReceived);
@@ -30,17 +29,15 @@ UserListManager::UserListManager(TabSupervisor *_tabSupervisor, AbstractClient *
 
 void UserListManager::handleConnect()
 {
-
 }
 
 void UserListManager::handleDisconnect()
 {
-
 }
 
 void UserListManager::processListUsersResponse(const Response &response)
 {
-    const Response_ListUsers &resp = response.GetExtension(Response_ListUsers::ext);
+    const auto &resp = response.GetExtension(Response_ListUsers::ext);
 
     const int userListSize = resp.user_list_size();
     for (int i = 0; i < userListSize; ++i) {
@@ -58,8 +55,8 @@ void UserListManager::processListUsersResponse(const Response &response)
 
 void UserListManager::processUserJoinedEvent(const Event_UserJoined &event)
 {
-    const ServerInfo_User &info = event.user_info();
-    const QString userName = QString::fromStdString(info.name());
+    const auto &info = event.user_info();
+    const auto &userName = QString::fromStdString(info.name());
 
     allUsersList->processUserInfo(info, true);
     ignoreList->setUserOnline(userName, true);
@@ -78,7 +75,7 @@ void UserListManager::processUserJoinedEvent(const Event_UserJoined &event)
 
 void UserListManager::processUserLeftEvent(const Event_UserLeft &event)
 {
-    QString userName = QString::fromStdString(event.name());
+    const auto &userName = QString::fromStdString(event.name());
 
     if (buddyList->getUsers().keys().contains(userName)) {
         soundEngine->playSound("buddy_leave");
@@ -96,25 +93,25 @@ void UserListManager::processUserLeftEvent(const Event_UserLeft &event)
 
 void UserListManager::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
-    for (int i = 0; i < _buddyList.size(); ++i) {
-        buddyList->processUserInfo(_buddyList[i], false);
+    for (const auto &buddyUser : _buddyList) {
+        buddyList->processUserInfo(buddyUser, false);
     }
     buddyList->sortItems();
 }
 
 void UserListManager::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 {
-    for (int i = 0; i < _ignoreList.size(); ++i) {
-        ignoreList->processUserInfo(_ignoreList[i], false);
+    for (const auto &ignoredUser : _ignoreList) {
+        ignoreList->processUserInfo(ignoredUser, false);
     }
     ignoreList->sortItems();
 }
 
 void UserListManager::processAddToListEvent(const Event_AddToList &event)
 {
-    const ServerInfo_User &info = event.user_info();
-    bool online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
-    QString list = QString::fromStdString(event.list_name());
+    const auto &info = event.user_info();
+    const auto online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
+    const auto &list = QString::fromStdString(event.list_name());
 
     UserList *userList = nullptr;
     if (list == "buddy") {
@@ -133,8 +130,8 @@ void UserListManager::processAddToListEvent(const Event_AddToList &event)
 
 void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &event)
 {
-    QString list = QString::fromStdString(event.list_name());
-    QString user = QString::fromStdString(event.user_name());
+    const auto &list = QString::fromStdString(event.list_name());
+    const auto &user = QString::fromStdString(event.user_name());
 
     UserList *userList = nullptr;
     if (list == "buddy") {
@@ -150,10 +147,10 @@ void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &eve
     userList->deleteUser(user);
 }
 
-void UserListManager::addToList(const std::string &listName, const QString &userName)
+void UserListManager::addToList(const QString &listName, const QString &userName)
 {
     Command_AddToList cmd;
-    cmd.set_list(listName);
+    cmd.set_list(listName.toStdString());
     cmd.set_user_name(userName.toStdString());
 
     client->sendCommand(client->prepareSessionCommand(cmd));

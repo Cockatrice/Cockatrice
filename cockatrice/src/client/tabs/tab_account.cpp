@@ -21,8 +21,8 @@
 
 TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
                            AbstractClient *_client,
-                           const ServerInfo_User &userInfo,
-                           UserListManager *_userListManager)
+                           UserListManager *_userListManager,
+                           const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client), userListManager(_userListManager)
 {
     userInfoBox = new UserInfoBox(client, true);
@@ -88,8 +88,7 @@ void TabUserLists::addToBuddyList()
     if (userName.length() < 1)
         return;
 
-    std::string listName = "buddy";
-    userListManager->addToList(listName, userName);
+    userListManager->addToList("buddy", userName);
     addBuddyEdit->clear();
 }
 
@@ -99,8 +98,7 @@ void TabUserLists::addToIgnoreList()
     if (userName.length() < 1)
         return;
 
-    std::string listName = "ignore";
-    userListManager->addToList(listName, userName);
+    userListManager->addToList("ignore", userName);
     addIgnoreEdit->clear();
 }
 

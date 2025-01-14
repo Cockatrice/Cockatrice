@@ -36,8 +36,8 @@ private:
 public:
     TabUserLists(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
-                 const ServerInfo_User &userInfo,
-                 UserListManager *_userListManager);
+                 UserListManager *_userListManager,
+                 const ServerInfo_User &userInfo);
     void retranslateUi() override;
     QString getTabText() const override
     {
