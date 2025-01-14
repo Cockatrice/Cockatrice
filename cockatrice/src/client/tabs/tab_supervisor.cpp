@@ -10,7 +10,6 @@
 #include "pb/event_user_message.pb.h"
 #include "pb/game_event_container.pb.h"
 #include "pb/game_replay.pb.h"
-#include "pb/moderator_commands.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/room_event.pb.h"
 #include "pb/serverinfo_room.pb.h"
@@ -28,7 +27,6 @@
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QMessageBox>
 #include <QPainter>
 #include <QSystemTrayIcon>
@@ -49,7 +47,7 @@ CloseButton::CloseButton(QWidget *parent) : QAbstractButton(parent)
 {
     setFocusPolicy(Qt::NoFocus);
     setCursor(Qt::ArrowCursor);
-    resize(sizeHint());
+    resize(CloseButton::sizeHint());
 }
 
 QSize CloseButton::sizeHint() const
@@ -102,7 +100,8 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr), tabServer(0),
-      tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
+      tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0),
+      userListManager(new UserListManager(this, client))
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -432,10 +431,10 @@ void TabSupervisor::actTabServer(bool checked)
 void TabSupervisor::actTabUserLists(bool checked)
 {
     if (checked && !tabUserLists) {
-        tabUserLists = new TabUserLists(this, client, *userInfo);
+        tabUserLists = new TabUserLists(this, client, *userInfo, userListManager);
         connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
-        connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
-        connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
+        connect(userListManager, &UserListManager::userJoined, this, &TabSupervisor::processUserJoined);
+        connect(userListManager, &UserListManager::userLeft, this, &TabSupervisor::processUserLeft);
         myAddTab(tabUserLists);
         connect(tabUserLists, &Tab::closed, this, [this] {
             tabUserLists = nullptr;
@@ -616,7 +615,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         return nullptr;
 
     ServerInfo_User otherUser;
-    UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
+    UserListTWI *twi = userListManager->getAllUsersList()->getUsers().value(receiverName);
     if (twi)
         otherUser = twi->getUserInfo();
     else
@@ -717,7 +716,7 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab) {
-        UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
+        UserListTWI *twi = userListManager->getAllUsersList()->getUsers().value(senderName);
         if (twi) {
             UserLevelFlags userLevel = UserLevelFlags(twi->getUserInfo().user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
@@ -861,33 +860,42 @@ QString TabSupervisor::getOwnUsername() const
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
 {
-    if (!getUserListsTab())
+    if (!getUserListsTab()) {
         return false;
-    if (!getUserListsTab()->getBuddyList())
+    }
+    if (!userListManager->getBuddyList()) {
         return false;
-    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getBuddyList()->getUsers();
+    }
+
+    QMap<QString, UserListTWI *> buddyList = userListManager->getBuddyList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
 }
 
 bool TabSupervisor::isUserIgnored(const QString &userName) const
 {
-    if (!getUserListsTab())
+    if (!getUserListsTab()) {
         return false;
-    if (!getUserListsTab()->getIgnoreList())
+    }
+    if (!userListManager->getIgnoreList()) {
         return false;
-    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getIgnoreList()->getUsers();
+    }
+
+    QMap<QString, UserListTWI *> buddyList = userListManager->getIgnoreList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
 }
 
 const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) const
 {
-    if (!getUserListsTab())
+    if (!getUserListsTab()) {
         return nullptr;
-    if (!getUserListsTab()->getAllUsersList())
+    }
+    if (!userListManager->getAllUsersList()) {
         return nullptr;
-    QMap<QString, UserListTWI *> userList = getUserListsTab()->getAllUsersList()->getUsers();
+    }
+
+    QMap<QString, UserListTWI *> userList = userListManager->getAllUsersList()->getUsers();
     const QString &userNameToMatchLower = userName.toLower();
     QMap<QString, UserListTWI *>::iterator i;
 
@@ -898,7 +906,7 @@ const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) con
         }
 
     return nullptr;
-};
+}
 
 bool TabSupervisor::switchToGameTabIfAlreadyExists(const int gameId)
 {

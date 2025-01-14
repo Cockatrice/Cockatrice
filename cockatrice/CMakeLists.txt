@@ -176,6 +176,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
+    src/client/user_list_manager.cpp
     ${VERSION_STRING_CPP}
 )
 

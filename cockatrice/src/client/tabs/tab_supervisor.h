@@ -3,6 +3,7 @@
 
 #include "../../deck/deck_loader.h"
 #include "../../server/chat_view/user_list_proxy.h"
+#include "../user_list_manager.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
@@ -77,6 +78,7 @@ private:
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
     TabLog *tabLog;
+    UserListManager *userListManager;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
@@ -117,6 +119,9 @@ public:
         return userInfo;
     }
     AbstractClient *getClient() const;
+    const UserListManager *getUserListManger() const {
+        return userListManager;
+    }
     const QMap<int, TabRoom *> &getRoomTabs() const
     {
         return roomTabs;

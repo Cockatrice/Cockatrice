@@ -508,7 +508,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (!showBuddiesOnlyGames && game.only_buddies()) {
         return false;
     }
-    if (hideIgnoredUserGames && tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(
+    if (hideIgnoredUserGames && tabSupervisor->getUserListManger()->getIgnoreList()->getUsers().contains(
                                     QString::fromStdString(game.creator_info().name()))) {
         return false;
     }

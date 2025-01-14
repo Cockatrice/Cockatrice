@@ -282,7 +282,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(senderName))
+    if (tabSupervisor->getUserListManger()->getIgnoreList()->getUsers().contains(senderName))
         return;
 
     UserListTWI *twi = userList->getUsers().value(senderName);

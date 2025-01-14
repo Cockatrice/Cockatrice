@@ -138,13 +138,10 @@ private slots:
     void userClicked(QTreeWidgetItem *item, int column);
 signals:
     void openMessageDialog(const QString &userName, bool focus);
-    void addBuddy(const QString &userName);
-    void removeBuddy(const QString &userName);
-    void addIgnore(const QString &userName);
-    void removeIgnore(const QString &userName);
+
 
 public:
-    UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = nullptr);
+    explicit UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = nullptr);
     void retranslateUi();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);
