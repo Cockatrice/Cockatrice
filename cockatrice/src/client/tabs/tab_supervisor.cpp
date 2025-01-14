@@ -451,6 +451,7 @@ void TabSupervisor::stop()
 
 void TabSupervisor::actTabVisualDeckStorage(bool checked)
 {
+    SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
         tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
         myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
@@ -466,6 +467,7 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
 
 void TabSupervisor::actTabServer(bool checked)
 {
+    SettingsCache::instance().setTabServerOpen(checked);
     if (checked && !tabServer) {
         tabServer = new TabServer(this, client);
         connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
@@ -481,6 +483,7 @@ void TabSupervisor::actTabServer(bool checked)
 
 void TabSupervisor::actTabAccount(bool checked)
 {
+    SettingsCache::instance().setTabAccountOpen(checked);
     if (checked && !tabAccount) {
         tabAccount = new TabAccount(this, client, *userInfo);
         connect(tabAccount, &TabAccount::openMessageDialog, this, &TabSupervisor::addMessageTab);
@@ -498,6 +501,7 @@ void TabSupervisor::actTabAccount(bool checked)
 
 void TabSupervisor::actTabDeckStorage(bool checked)
 {
+    SettingsCache::instance().setTabDeckStorageOpen(checked);
     if (checked && !tabDeckStorage) {
         tabDeckStorage = new TabDeckStorage(this, client);
         connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
@@ -513,6 +517,7 @@ void TabSupervisor::actTabDeckStorage(bool checked)
 
 void TabSupervisor::actTabReplays(bool checked)
 {
+    SettingsCache::instance().setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
         tabReplays = new TabReplays(this, client);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
@@ -528,6 +533,7 @@ void TabSupervisor::actTabReplays(bool checked)
 
 void TabSupervisor::actTabAdmin(bool checked)
 {
+    SettingsCache::instance().setTabAdminOpen(checked);
     if (checked && !tabAdmin) {
         tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
@@ -543,6 +549,7 @@ void TabSupervisor::actTabAdmin(bool checked)
 
 void TabSupervisor::actTabLog(bool checked)
 {
+    SettingsCache::instance().setTabLogOpen(checked);
     if (checked && !tabLog) {
         tabLog = new TabLog(this, client);
         myAddTab(tabLog, aTabLog);
