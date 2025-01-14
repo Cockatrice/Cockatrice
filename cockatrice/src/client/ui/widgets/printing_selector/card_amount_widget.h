@@ -3,14 +3,12 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_loader.h"
-#include "../../../../deck/deck_view.h"
 #include "../../../../game/cards/card_database.h"
 #include "../../../tabs/tab_deck_editor.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QTreeView>
 #include <QWidget>
