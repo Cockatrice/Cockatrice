@@ -20,21 +20,26 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
     sortComboBox = new QComboBox(this);
     layout->addWidget(sortComboBox);
 
+    // Need to retranslateUi first so that the sortComboBox actually has entries and doesn't get its currentIndex
+    // immediately capped to 0 when we try to set it
+    retranslateUi();
+
     // Set the current sort order
     sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
+    sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
 
     // Connect sorting change signal to refresh the file list
     connect(sortComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &VisualDeckStorageSortWidget::updateSortOrder);
     connect(this, &VisualDeckStorageSortWidget::sortOrderChanged, parent, &VisualDeckStorageWidget::updateSortOrder);
-
-    retranslateUi();
 }
 
 void VisualDeckStorageSortWidget::retranslateUi()
 {
     // Block signals to avoid triggering unnecessary updates while changing text
     sortComboBox->blockSignals(true);
+
+    int oldIndex = sortComboBox->currentIndex();
 
     // Clear and repopulate the ComboBox with translated items
     sortComboBox->clear();
@@ -44,7 +49,7 @@ void VisualDeckStorageSortWidget::retranslateUi()
     sortComboBox->addItem(tr("Sort by Last Loaded"), ByLastLoaded);
 
     // Restore the current index
-    sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
+    sortComboBox->setCurrentIndex(oldIndex);
 
     // Re-enable signals
     sortComboBox->blockSignals(false);
