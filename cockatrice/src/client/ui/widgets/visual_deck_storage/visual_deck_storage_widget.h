@@ -29,7 +29,6 @@ public slots:
     void refreshBannerCards(); // Refresh the display of cards based on the current sorting option
     QStringList gatherAllTagsFromFlowWidget() const;
     QStringList gatherAllTags(const QList<DeckPreviewWidget *> &allDecks);
-    void showEvent(QShowEvent *event) override;
     void updateSortOrder();
 
 signals:
