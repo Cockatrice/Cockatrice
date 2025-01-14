@@ -89,8 +89,8 @@ private:
 
     void initStartupTabs();
 
-    int myAddTab(Tab *tab);
-    void addCloseButtonToTab(Tab *tab, int tabIndex);
+    int myAddTab(Tab *tab, QAction *manager = nullptr);
+    void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
     QString sanitizeTabName(QString dirty) const;
     QString sanitizeHtml(QString dirty) const;
     void resetTabsMenu();
