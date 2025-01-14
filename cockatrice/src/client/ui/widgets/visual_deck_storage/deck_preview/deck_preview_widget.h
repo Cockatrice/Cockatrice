@@ -35,6 +35,7 @@ public slots:
     void setFilePath(const QString &filePath);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void initializeUi(bool deckLoadSuccess);
 };
 
 #endif // DECK_PREVIEW_WIDGET_H

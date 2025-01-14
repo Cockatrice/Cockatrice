@@ -11,7 +11,7 @@ class DeckPreviewColorCircleWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeckPreviewColorCircleWidget(QChar color, QWidget *parent = nullptr);
+    explicit DeckPreviewColorCircleWidget(QChar color, QWidget *parent);
 
     void setColorActive(bool active);
     QChar getColorChar() const;
@@ -33,7 +33,7 @@ class DeckPreviewColorIdentityWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeckPreviewColorIdentityWidget(const QString &colorIdentity, QWidget *parent = nullptr);
+    explicit DeckPreviewColorIdentityWidget(QWidget *parent, const QString &colorIdentity);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

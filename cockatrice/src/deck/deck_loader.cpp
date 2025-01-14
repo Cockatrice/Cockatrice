@@ -8,11 +8,10 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QFutureWatcher>
 #include <QRegularExpression>
 #include <QStringList>
-#include <qloggingcategory.h>
-
-Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
+#include <QtConcurrentRun>
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
                                                 << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
@@ -78,6 +77,54 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
 
     qCDebug(DeckLoaderLog) << "Deck was loaded -" << result;
     return result;
+}
+
+bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest)
+{
+    auto *watcher = new QFutureWatcher<bool>(this);
+
+    connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, fileName, fmt, userRequest]() {
+        const bool result = watcher->result();
+        watcher->deleteLater();
+
+        if (result) {
+            lastFileName = fileName;
+            lastFileFormat = fmt;
+            if (userRequest) {
+                updateLastLoadedTimestamp(fileName, fmt);
+            }
+            emit deckLoaded();
+        }
+
+        emit loadFinished(result);
+    });
+
+    QFuture<bool> future = QtConcurrent::run([=, this]() {
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            return false;
+        }
+
+        switch (fmt) {
+            case PlainTextFormat:
+                return loadFromFile_Plain(&file);
+            case CockatriceFormat: {
+                bool result = false;
+                result = loadFromFile_Native(&file);
+                if (!result) {
+                    file.seek(0);
+                    return loadFromFile_Plain(&file);
+                }
+                return result;
+            }
+            default:
+                return false;
+                break;
+        }
+    });
+
+    watcher->setFuture(future);
+    return true; // Return immediately to indicate the async task was started
 }
 
 bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
