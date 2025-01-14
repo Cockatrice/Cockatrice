@@ -131,31 +131,31 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
 
     aTabVisualDeckStorage = new QAction(this);
     aTabVisualDeckStorage->setCheckable(true);
-    connect(aTabVisualDeckStorage, &QAction::toggled, this, &TabSupervisor::actTabVisualDeckStorage);
+    connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
 
     aTabServer = new QAction(this);
     aTabServer->setCheckable(true);
-    connect(aTabServer, &QAction::toggled, this, &TabSupervisor::actTabServer);
+    connect(aTabServer, &QAction::triggered, this, &TabSupervisor::actTabServer);
 
     aTabAccount = new QAction(this);
     aTabAccount->setCheckable(true);
-    connect(aTabAccount, &QAction::toggled, this, &TabSupervisor::actTabAccount);
+    connect(aTabAccount, &QAction::triggered, this, &TabSupervisor::actTabAccount);
 
     aTabDeckStorage = new QAction(this);
     aTabDeckStorage->setCheckable(true);
-    connect(aTabDeckStorage, &QAction::toggled, this, &TabSupervisor::actTabDeckStorage);
+    connect(aTabDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabDeckStorage);
 
     aTabReplays = new QAction(this);
     aTabReplays->setCheckable(true);
-    connect(aTabReplays, &QAction::toggled, this, &TabSupervisor::actTabReplays);
+    connect(aTabReplays, &QAction::triggered, this, &TabSupervisor::actTabReplays);
 
     aTabAdmin = new QAction(this);
     aTabAdmin->setCheckable(true);
-    connect(aTabAdmin, &QAction::toggled, this, &TabSupervisor::actTabAdmin);
+    connect(aTabAdmin, &QAction::triggered, this, &TabSupervisor::actTabAdmin);
 
     aTabLog = new QAction(this);
     aTabLog->setCheckable(true);
-    connect(aTabLog, &QAction::toggled, this, &TabSupervisor::actTabLog);
+    connect(aTabLog, &QAction::triggered, this, &TabSupervisor::actTabLog);
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabSupervisor::refreshShortcuts);
@@ -165,10 +165,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
 
     retranslateUi();
 
-    // open always-available tabs on startup
-    addDeckEditorTab(nullptr);
-
-    aTabVisualDeckStorage->setChecked(SettingsCache::instance().getVisualDeckStorageShowOnLoad());
+    initStartupTabs();
 }
 
 TabSupervisor::~TabSupervisor()
@@ -261,6 +258,29 @@ QString TabSupervisor::sanitizeHtml(QString dirty) const
     return dirty.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
 }
 
+/**
+ * If the action is not in the target checked state, then set it to that state by triggering the action.
+ * If the action is already in the target checked state, then do nothing.
+ *
+ * This allows us to programmatically trigger a QAction::triggered signal for a specific checked state.
+ */
+static void checkAndTrigger(QAction *checkableAction, bool checked)
+{
+    if (checkableAction->isChecked() != checked) {
+        checkableAction->trigger();
+    }
+}
+
+/**
+ * Opens the always-available tabs, depending on settings.
+ */
+void TabSupervisor::initStartupTabs()
+{
+    addDeckEditorTab(nullptr);
+
+    checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getVisualDeckStorageShowOnLoad());
+}
+
 int TabSupervisor::myAddTab(Tab *tab)
 {
     connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
@@ -297,8 +317,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     tabsMenu->addAction(aTabServer);
     tabsMenu->addAction(aTabAccount);
 
-    aTabServer->setChecked(true);
-    aTabAccount->setChecked(true);
+    checkAndTrigger(aTabServer, SettingsCache::instance().getTabServerOpen());
+    checkAndTrigger(aTabAccount, SettingsCache::instance().getTabAccountOpen());
 
     updatePingTime(0, -1);
 
@@ -306,8 +326,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addAction(aTabDeckStorage);
         tabsMenu->addAction(aTabReplays);
 
-        aTabDeckStorage->setChecked(true);
-        aTabReplays->setChecked(true);
+        checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
+        checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
     }
 
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
@@ -315,8 +335,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addAction(aTabAdmin);
         tabsMenu->addAction(aTabLog);
 
-        aTabAdmin->setChecked(true);
-        aTabLog->setChecked(true);
+        checkAndTrigger(aTabAdmin, SettingsCache::instance().getTabAdminOpen());
+        checkAndTrigger(aTabLog, SettingsCache::instance().getTabLogOpen());
     }
 
     retranslateUi();

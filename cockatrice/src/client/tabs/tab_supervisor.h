@@ -87,6 +87,8 @@ private:
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
         *aTabAdmin, *aTabLog;
 
+    void initStartupTabs();
+
     int myAddTab(Tab *tab);
     void addCloseButtonToTab(Tab *tab, int tabIndex);
     QString sanitizeTabName(QString dirty) const;
