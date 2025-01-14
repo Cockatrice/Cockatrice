@@ -119,7 +119,7 @@ public:
         return userInfo;
     }
     AbstractClient *getClient() const;
-    const UserListManager *getUserListManger() const {
+    const UserListManager *getUserListManager() const {
         return userListManager;
     }
     const QMap<int, TabRoom *> &getRoomTabs() const
