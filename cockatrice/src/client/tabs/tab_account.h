@@ -17,7 +17,7 @@ class ServerInfo_User;
 class Event_AddToList;
 class Event_RemoveFromList;
 
-class TabUserLists : public Tab
+class TabAccount : public Tab
 {
     Q_OBJECT
 signals:
@@ -46,7 +46,7 @@ private:
     void addToList(const std::string &listName, const QString &userName);
 
 public:
-    TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo);
+    TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo);
     void retranslateUi() override;
     QString getTabText() const override
     {

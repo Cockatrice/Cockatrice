@@ -21,7 +21,7 @@ class TabDeckStorage;
 class TabReplays;
 class TabAdmin;
 class TabMessage;
-class TabUserLists;
+class TabAccount;
 class TabDeckEditor;
 class TabLog;
 class RoomEvent;
@@ -72,7 +72,7 @@ private:
     QMenu *tabsMenu;
     TabDeckStorageVisual *tabVisualDeckStorage;
     TabServer *tabServer;
-    TabUserLists *tabUserLists;
+    TabAccount *tabAccount;
     TabDeckStorage *tabDeckStorage;
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
@@ -84,7 +84,7 @@ private:
     QList<TabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabUserLists, *aTabDeckStorage, *aTabReplays,
+    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
         *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab);
@@ -108,9 +108,9 @@ public:
     {
         return gameTabs.size();
     }
-    TabUserLists *getUserListsTab() const
+    TabAccount *getTabAccount() const
     {
-        return tabUserLists;
+        return tabAccount;
     }
     ServerInfo_User *getUserInfo() const
     {
@@ -145,7 +145,7 @@ private slots:
 
     void actTabVisualDeckStorage(bool checked);
     void actTabServer(bool checked);
-    void actTabUserLists(bool checked);
+    void actTabAccount(bool checked);
     void actTabDeckStorage(bool checked);
     void actTabReplays(bool checked);
     void actTabAdmin(bool checked);

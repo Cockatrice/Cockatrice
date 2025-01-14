@@ -102,7 +102,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr), tabServer(0),
-      tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
+      tabAccount(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -137,9 +137,9 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabServer->setCheckable(true);
     connect(aTabServer, &QAction::toggled, this, &TabSupervisor::actTabServer);
 
-    aTabUserLists = new QAction(this);
-    aTabUserLists->setCheckable(true);
-    connect(aTabUserLists, &QAction::toggled, this, &TabSupervisor::actTabUserLists);
+    aTabAccount = new QAction(this);
+    aTabAccount->setCheckable(true);
+    connect(aTabAccount, &QAction::toggled, this, &TabSupervisor::actTabAccount);
 
     aTabDeckStorage = new QAction(this);
     aTabDeckStorage->setCheckable(true);
@@ -182,7 +182,7 @@ void TabSupervisor::retranslateUi()
     aTabDeckEditor->setText(tr("Deck Editor"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck storage"));
     aTabServer->setText(tr("Server"));
-    aTabUserLists->setText(tr("Account"));
+    aTabAccount->setText(tr("Account"));
     aTabDeckStorage->setText(tr("Deck storage"));
     aTabReplays->setText(tr("Game replays"));
     aTabAdmin->setText(tr("Administration"));
@@ -194,7 +194,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabReplays);
     tabs.append(tabDeckStorage);
     tabs.append(tabAdmin);
-    tabs.append(tabUserLists);
+    tabs.append(tabAccount);
     tabs.append(tabLog);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext())
@@ -295,10 +295,10 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabServer);
-    tabsMenu->addAction(aTabUserLists);
+    tabsMenu->addAction(aTabAccount);
 
     aTabServer->setChecked(true);
-    aTabUserLists->setChecked(true);
+    aTabAccount->setChecked(true);
 
     updatePingTime(0, -1);
 
@@ -326,7 +326,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
     resetTabsMenu();
 
-    tabUserLists = 0;
+    tabAccount = 0;
     tabDeckStorage = 0;
     tabReplays = 0;
     tabAdmin = 0;
@@ -357,8 +357,8 @@ void TabSupervisor::stop()
 
         emit localGameEnded();
     } else {
-        if (tabUserLists) {
-            tabUserLists->closeRequest(true);
+        if (tabAccount) {
+            tabAccount->closeRequest(true);
         }
         if (tabServer) {
             tabServer->closeRequest(true);
@@ -429,20 +429,20 @@ void TabSupervisor::actTabServer(bool checked)
     }
 }
 
-void TabSupervisor::actTabUserLists(bool checked)
+void TabSupervisor::actTabAccount(bool checked)
 {
-    if (checked && !tabUserLists) {
-        tabUserLists = new TabUserLists(this, client, *userInfo);
-        connect(tabUserLists, &TabUserLists::openMessageDialog, this, &TabSupervisor::addMessageTab);
-        connect(tabUserLists, &TabUserLists::userJoined, this, &TabSupervisor::processUserJoined);
-        connect(tabUserLists, &TabUserLists::userLeft, this, &TabSupervisor::processUserLeft);
-        myAddTab(tabUserLists);
-        connect(tabUserLists, &Tab::closed, this, [this] {
-            tabUserLists = nullptr;
-            aTabUserLists->setChecked(false);
+    if (checked && !tabAccount) {
+        tabAccount = new TabAccount(this, client, *userInfo);
+        connect(tabAccount, &TabAccount::openMessageDialog, this, &TabSupervisor::addMessageTab);
+        connect(tabAccount, &TabAccount::userJoined, this, &TabSupervisor::processUserJoined);
+        connect(tabAccount, &TabAccount::userLeft, this, &TabSupervisor::processUserLeft);
+        myAddTab(tabAccount);
+        connect(tabAccount, &Tab::closed, this, [this] {
+            tabAccount = nullptr;
+            aTabAccount->setChecked(false);
         });
-    } else if (!checked && tabUserLists) {
-        tabUserLists->closeRequest();
+    } else if (!checked && tabAccount) {
+        tabAccount->closeRequest();
     }
 }
 
@@ -616,7 +616,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         return nullptr;
 
     ServerInfo_User otherUser;
-    UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
+    UserListTWI *twi = tabAccount->getAllUsersList()->getUsers().value(receiverName);
     if (twi)
         otherUser = twi->getUserInfo();
     else
@@ -717,7 +717,7 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab) {
-        UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
+        UserListTWI *twi = tabAccount->getAllUsersList()->getUsers().value(senderName);
         if (twi) {
             UserLevelFlags userLevel = UserLevelFlags(twi->getUserInfo().user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
@@ -754,7 +754,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
 {
     QString userName = QString::fromStdString(userInfoJoined.name());
     if (isUserBuddy(userName)) {
-        Tab *tab = static_cast<Tab *>(getUserListsTab());
+        Tab *tab = static_cast<Tab *>(getTabAccount());
 
         if (tab != currentWidget()) {
             tab->setContentsChanged(true);
@@ -861,33 +861,33 @@ QString TabSupervisor::getOwnUsername() const
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
 {
-    if (!getUserListsTab())
+    if (!getTabAccount())
         return false;
-    if (!getUserListsTab()->getBuddyList())
+    if (!getTabAccount()->getBuddyList())
         return false;
-    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getBuddyList()->getUsers();
+    QMap<QString, UserListTWI *> buddyList = getTabAccount()->getBuddyList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
 }
 
 bool TabSupervisor::isUserIgnored(const QString &userName) const
 {
-    if (!getUserListsTab())
+    if (!getTabAccount())
         return false;
-    if (!getUserListsTab()->getIgnoreList())
+    if (!getTabAccount()->getIgnoreList())
         return false;
-    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getIgnoreList()->getUsers();
+    QMap<QString, UserListTWI *> buddyList = getTabAccount()->getIgnoreList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
 }
 
 const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) const
 {
-    if (!getUserListsTab())
+    if (!getTabAccount())
         return nullptr;
-    if (!getUserListsTab()->getAllUsersList())
+    if (!getTabAccount()->getAllUsersList())
         return nullptr;
-    QMap<QString, UserListTWI *> userList = getUserListsTab()->getAllUsersList()->getUsers();
+    QMap<QString, UserListTWI *> userList = getTabAccount()->getAllUsersList()->getUsers();
     const QString &userNameToMatchLower = userName.toLower();
     QMap<QString, UserListTWI *>::iterator i;
 
