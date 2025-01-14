@@ -19,14 +19,18 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     deckListModel->setObjectName("visualDeckModel");
 
     layout = new QVBoxLayout();
+    layout->setSpacing(0);
+    layout->setContentsMargins(9, 0, 9, 5);
     setLayout(layout);
 
     searchAndSortLayout = new QHBoxLayout();
+    searchAndSortLayout->setSpacing(3);
+    searchAndSortLayout->setContentsMargins(9, 0, 9, 0);
 
+    deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
-    deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);

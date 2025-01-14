@@ -11,7 +11,7 @@
 VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWidget *parent) : parent(parent)
 {
     layout = new QHBoxLayout(this);
-    layout->setContentsMargins(9, 0, 9, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
 
     searchBar = new QLineEdit(this);
