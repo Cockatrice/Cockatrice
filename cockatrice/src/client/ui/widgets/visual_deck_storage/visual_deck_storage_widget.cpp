@@ -42,6 +42,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
             &VisualDeckStorageWidget::refreshBannerCards);
+
+    // Don't waste time processing the cards if they're going to get refreshed anyway once the db finishes loading
+    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
+        refreshBannerCards();
+    }
 }
 
 void VisualDeckStorageWidget::updateSortOrder()
