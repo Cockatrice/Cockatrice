@@ -295,6 +295,15 @@ int TabSupervisor::myAddTab(Tab *tab)
     return idx;
 }
 
+void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
+{
+    auto closeSide = static_cast<QTabBar::ButtonPosition>(
+        tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
+    auto *closeButton = new CloseButton(tab);
+    connect(closeButton, &CloseButton::clicked, tab, [tab] { tab->closeRequest(); });
+    tabBar()->setTabButton(tabIndex, closeSide, closeButton);
+}
+
 /**
  * Resets the tabs menu to the tabs that are always available
  */
@@ -533,15 +542,6 @@ void TabSupervisor::updatePingTime(int value, int max)
         return;
 
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
-}
-
-void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
-{
-    auto closeSide = static_cast<QTabBar::ButtonPosition>(
-        tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
-    auto *closeButton = new CloseButton(tab);
-    connect(closeButton, &CloseButton::clicked, tab, [tab] { tab->closeRequest(); });
-    tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
 
 void TabSupervisor::gameJoined(const Event_GameJoined &event)
