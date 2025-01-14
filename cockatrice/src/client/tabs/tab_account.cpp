@@ -18,7 +18,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
+TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client)
 {
     allUsersList = new UserList(_tabSupervisor, client, UserList::AllUsersList);
@@ -27,22 +27,22 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     userInfoBox = new UserInfoBox(client, true);
     userInfoBox->updateInfo(userInfo);
 
-    connect(allUsersList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
-    connect(buddyList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
-    connect(ignoreList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
+    connect(allUsersList, &UserList::openMessageDialog, this, &TabAccount::openMessageDialog);
+    connect(buddyList, &UserList::openMessageDialog, this, &TabAccount::openMessageDialog);
+    connect(ignoreList, &UserList::openMessageDialog, this, &TabAccount::openMessageDialog);
 
-    connect(client, &AbstractClient::userJoinedEventReceived, this, &TabUserLists::processUserJoinedEvent);
-    connect(client, &AbstractClient::userLeftEventReceived, this, &TabUserLists::processUserLeftEvent);
-    connect(client, &AbstractClient::buddyListReceived, this, &TabUserLists::buddyListReceived);
-    connect(client, &AbstractClient::ignoreListReceived, this, &TabUserLists::ignoreListReceived);
-    connect(client, &AbstractClient::addToListEventReceived, this, &TabUserLists::processAddToListEvent);
-    connect(client, &AbstractClient::removeFromListEventReceived, this, &TabUserLists::processRemoveFromListEvent);
+    connect(client, &AbstractClient::userJoinedEventReceived, this, &TabAccount::processUserJoinedEvent);
+    connect(client, &AbstractClient::userLeftEventReceived, this, &TabAccount::processUserLeftEvent);
+    connect(client, &AbstractClient::buddyListReceived, this, &TabAccount::buddyListReceived);
+    connect(client, &AbstractClient::ignoreListReceived, this, &TabAccount::ignoreListReceived);
+    connect(client, &AbstractClient::addToListEventReceived, this, &TabAccount::processAddToListEvent);
+    connect(client, &AbstractClient::removeFromListEventReceived, this, &TabAccount::processRemoveFromListEvent);
 
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
     connect(pend,
             static_cast<void (PendingCommand::*)(const Response &, const CommandContainer &, const QVariant &)>(
                 &PendingCommand::finished),
-            this, &TabUserLists::processListUsersResponse);
+            this, &TabAccount::processListUsersResponse);
     client->sendCommand(pend);
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -53,9 +53,9 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     addBuddyEdit = new LineEditUnfocusable;
     addBuddyEdit->setMaxLength(MAX_NAME_LENGTH);
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
-    connect(addBuddyEdit, &LineEditUnfocusable::returnPressed, this, &TabUserLists::addToBuddyList);
+    connect(addBuddyEdit, &LineEditUnfocusable::returnPressed, this, &TabAccount::addToBuddyList);
     QPushButton *addBuddyButton = new QPushButton("Add");
-    connect(addBuddyButton, &QPushButton::clicked, this, &TabUserLists::addToBuddyList);
+    connect(addBuddyButton, &QPushButton::clicked, this, &TabAccount::addToBuddyList);
     addToBuddyList->addWidget(addBuddyEdit);
     addToBuddyList->addWidget(addBuddyButton);
 
@@ -63,9 +63,9 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     addIgnoreEdit = new LineEditUnfocusable;
     addIgnoreEdit->setMaxLength(MAX_NAME_LENGTH);
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
-    connect(addIgnoreEdit, &LineEditUnfocusable::returnPressed, this, &TabUserLists::addToIgnoreList);
+    connect(addIgnoreEdit, &LineEditUnfocusable::returnPressed, this, &TabAccount::addToIgnoreList);
     QPushButton *addIgnoreButton = new QPushButton("Add");
-    connect(addIgnoreButton, &QPushButton::clicked, this, &TabUserLists::addToIgnoreList);
+    connect(addIgnoreButton, &QPushButton::clicked, this, &TabAccount::addToIgnoreList);
     addToIgnoreList->addWidget(addIgnoreEdit);
     addToIgnoreList->addWidget(addIgnoreButton);
 
@@ -89,7 +89,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     setCentralWidget(mainWidget);
 }
 
-void TabUserLists::addToBuddyList()
+void TabAccount::addToBuddyList()
 {
     QString userName = addBuddyEdit->text();
     if (userName.length() < 1)
@@ -100,7 +100,7 @@ void TabUserLists::addToBuddyList()
     addBuddyEdit->clear();
 }
 
-void TabUserLists::addToIgnoreList()
+void TabAccount::addToIgnoreList()
 {
     QString userName = addIgnoreEdit->text();
     if (userName.length() < 1)
@@ -111,7 +111,7 @@ void TabUserLists::addToIgnoreList()
     addIgnoreEdit->clear();
 }
 
-void TabUserLists::addToList(const std::string &listName, const QString &userName)
+void TabAccount::addToList(const std::string &listName, const QString &userName)
 {
     Command_AddToList cmd;
     cmd.set_list(listName);
@@ -120,7 +120,7 @@ void TabUserLists::addToList(const std::string &listName, const QString &userNam
     client->sendCommand(client->prepareSessionCommand(cmd));
 }
 
-void TabUserLists::retranslateUi()
+void TabAccount::retranslateUi()
 {
     allUsersList->retranslateUi();
     buddyList->retranslateUi();
@@ -128,7 +128,7 @@ void TabUserLists::retranslateUi()
     userInfoBox->retranslateUi();
 }
 
-void TabUserLists::processListUsersResponse(const Response &response)
+void TabAccount::processListUsersResponse(const Response &response)
 {
     const Response_ListUsers &resp = response.GetExtension(Response_ListUsers::ext);
 
@@ -146,7 +146,7 @@ void TabUserLists::processListUsersResponse(const Response &response)
     buddyList->sortItems();
 }
 
-void TabUserLists::processUserJoinedEvent(const Event_UserJoined &event)
+void TabAccount::processUserJoinedEvent(const Event_UserJoined &event)
 {
     const ServerInfo_User &info = event.user_info();
     const QString userName = QString::fromStdString(info.name());
@@ -165,7 +165,7 @@ void TabUserLists::processUserJoinedEvent(const Event_UserJoined &event)
     emit userJoined(info);
 }
 
-void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)
+void TabAccount::processUserLeftEvent(const Event_UserLeft &event)
 {
     QString userName = QString::fromStdString(event.name());
 
@@ -182,21 +182,21 @@ void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)
     }
 }
 
-void TabUserLists::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
+void TabAccount::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
     for (int i = 0; i < _buddyList.size(); ++i)
         buddyList->processUserInfo(_buddyList[i], false);
     buddyList->sortItems();
 }
 
-void TabUserLists::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
+void TabAccount::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 {
     for (int i = 0; i < _ignoreList.size(); ++i)
         ignoreList->processUserInfo(_ignoreList[i], false);
     ignoreList->sortItems();
 }
 
-void TabUserLists::processAddToListEvent(const Event_AddToList &event)
+void TabAccount::processAddToListEvent(const Event_AddToList &event)
 {
     const ServerInfo_User &info = event.user_info();
     bool online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
@@ -213,7 +213,7 @@ void TabUserLists::processAddToListEvent(const Event_AddToList &event)
     userList->sortItems();
 }
 
-void TabUserLists::processRemoveFromListEvent(const Event_RemoveFromList &event)
+void TabAccount::processRemoveFromListEvent(const Event_RemoveFromList &event)
 {
     QString list = QString::fromStdString(event.list_name());
     QString user = QString::fromStdString(event.user_name());

@@ -21,7 +21,7 @@ class TabDeckStorage;
 class TabReplays;
 class TabAdmin;
 class TabMessage;
-class TabUserLists;
+class TabAccount;
 class TabDeckEditor;
 class TabLog;
 class RoomEvent;
@@ -72,7 +72,7 @@ private:
     QMenu *tabsMenu;
     TabDeckStorageVisual *tabVisualDeckStorage;
     TabServer *tabServer;
-    TabUserLists *tabUserLists;
+    TabAccount *tabUserLists;
     TabDeckStorage *tabDeckStorage;
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
@@ -108,7 +108,7 @@ public:
     {
         return gameTabs.size();
     }
-    TabUserLists *getUserListsTab() const
+    TabAccount *getUserListsTab() const
     {
         return tabUserLists;
     }
