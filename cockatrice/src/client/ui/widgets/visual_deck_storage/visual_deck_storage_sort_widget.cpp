@@ -14,6 +14,7 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
     : parent(parent), sortOrder(Alphabetical)
 {
     layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
 
     // Initialize the ComboBox

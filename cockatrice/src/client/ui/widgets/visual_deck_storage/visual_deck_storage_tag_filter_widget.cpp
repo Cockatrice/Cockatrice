@@ -16,8 +16,7 @@ VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckSto
 
     // Create layout
     auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(5, 5, 5, 5);
-    layout->setSpacing(5);
+    layout->setContentsMargins(5, 0, 5, 0);
 
     setFixedHeight(100);
 
