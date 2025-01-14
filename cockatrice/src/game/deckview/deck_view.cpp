@@ -1,9 +1,8 @@
 #include "deck_view.h"
 
-#include "../client/ui/theme_manager.h"
-#include "../game/cards/card_database.h"
-#include "../main.h"
-#include "../settings/cache_settings.h"
+#include "../../client/ui/theme_manager.h"
+#include "../../game/cards/card_database.h"
+#include "../../settings/cache_settings.h"
 #include "decklist.h"
 
 #include <QApplication>

@@ -34,7 +34,6 @@ set(cockatrice_SOURCES
     src/deck/deck_loader.cpp
     src/deck/deck_list_model.cpp
     src/deck/deck_stats_interface.cpp
-    src/deck/deck_view.cpp
     src/dialogs/dlg_connect.cpp
     src/dialogs/dlg_create_token.cpp
     src/dialogs/dlg_create_game.cpp
@@ -57,6 +56,8 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
     src/dialogs/dlg_load_deck.cpp
+    src/game/deckview/deck_view.cpp
+    src/game/deckview/deck_view_container.cpp
     src/game/filters/filter_string.cpp
     src/game/filters/filter_builder.cpp
     src/game/filters/filter_tree.cpp
