@@ -1,5 +1,5 @@
-#ifndef COCKATRICE_USER_LISTS_H
-#define COCKATRICE_USER_LISTS_H
+#ifndef COCKATRICE_USER_LIST_MANAGER_H
+#define COCKATRICE_USER_LIST_MANAGER_H
 
 #include "pb/serverinfo_user.pb.h"
 
@@ -63,4 +63,4 @@ signals:
     void userJoined(const ServerInfo_User &userInfo);
 };
 
-#endif // COCKATRICE_USER_LISTS_H
+#endif // COCKATRICE_USER_LIST_MANAGER_H
