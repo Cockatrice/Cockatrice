@@ -23,10 +23,10 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     searchAndSortLayout = new QHBoxLayout();
 
+    deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
-    deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
