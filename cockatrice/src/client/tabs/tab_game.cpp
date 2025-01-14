@@ -135,6 +135,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addWidget(sideboardLockButton);
     if (forceStartGameButton->isEnabled()) {
         buttonHBox->addWidget(forceStartGameButton);
+        forceStartGameButton->setEnabled(false);
     }
     buttonHBox->setContentsMargins(0, 0, 0, 0);
     buttonHBox->addStretch();
@@ -331,6 +332,7 @@ void DeckViewContainer::unloadDeck()
     readyStartButton->setState(false);
     sideboardLockButton->setEnabled(false);
     sideboardLockButton->setState(false);
+    forceStartGameButton->setEnabled(false);
     setReadyStart(false);
 }
 
@@ -457,6 +459,7 @@ void DeckViewContainer::setDeck(const DeckLoader &deck)
     readyStartButton->setEnabled(true);
     sideboardLockButton->setState(false);
     sideboardLockButton->setEnabled(true);
+    forceStartGameButton->setEnabled(true);
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
