@@ -28,9 +28,13 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     userInfoBox = new UserInfoBox(client, true);
     userInfoBox->updateInfo(userInfo);
 
-    connect(userListManager->getAllUsersList(), &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
-    connect(userListManager->getBuddyList(), &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
-    connect(userListManager->getIgnoreList(), &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
+    allUsersList = new UserList(tabSupervisor, client, UserList::AllUsersList);
+    buddyList = new UserList(tabSupervisor, client, UserList::BuddyList);
+    ignoreList = new UserList(tabSupervisor, client, UserList::IgnoreList);
+
+    connect(allUsersList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
+    connect(buddyList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
+    connect(ignoreList, &UserList::openMessageDialog, this, &TabUserLists::openMessageDialog);
 
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
     connect(pend,
@@ -41,7 +45,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(userInfoBox);
-    vbox->addWidget(userListManager->getAllUsersList());
+    vbox->addWidget(allUsersList);
 
     QHBoxLayout *addToBuddyList = new QHBoxLayout;
     addBuddyEdit = new LineEditUnfocusable;
@@ -64,11 +68,11 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor,
     addToIgnoreList->addWidget(addIgnoreButton);
 
     QVBoxLayout *buddyPanel = new QVBoxLayout;
-    buddyPanel->addWidget(userListManager->getBuddyList());
+    buddyPanel->addWidget(buddyList);
     buddyPanel->addLayout(addToBuddyList);
 
     QVBoxLayout *ignorePanel = new QVBoxLayout;
-    ignorePanel->addWidget(userListManager->getIgnoreList());
+    ignorePanel->addWidget(ignoreList);
     ignorePanel->addLayout(addToIgnoreList);
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addLayout(buddyPanel);

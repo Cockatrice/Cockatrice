@@ -5,12 +5,14 @@
 #include "user_level.h"
 
 #include <QComboBox>
+#include <QDebug>
 #include <QDialog>
 #include <QGroupBox>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
 
+class UserListManager;
 class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
@@ -131,6 +133,7 @@ private:
     QTreeWidget *userTree;
     UserListItemDelegate *itemDelegate;
     UserContextMenu *userContextMenu;
+    UserListManager *userListManager;
     int onlineCount;
     QString titleStr;
     void updateCount();
@@ -140,7 +143,14 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
 
 public:
-    explicit UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = nullptr);
+    explicit UserList(TabSupervisor *_tabSupervisor,
+                      AbstractClient *_client,
+                      UserListType _type,
+                      QWidget *parent = nullptr);
+    ~UserList()
+    {
+        qDebug() << "DESTROYING" << type;
+    }
     void retranslateUi();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);

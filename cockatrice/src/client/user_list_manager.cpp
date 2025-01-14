@@ -14,10 +14,7 @@
 #include "trice_limits.h"
 
 UserListManager::UserListManager(TabSupervisor *_tabSupervisor, AbstractClient *_client)
-    : client(_client), tabSupervisor(_tabSupervisor),
-      allUsersList(new UserList(tabSupervisor, client, UserList::AllUsersList)),
-      buddyList(new UserList(tabSupervisor, client, UserList::BuddyList)),
-      ignoreList(new UserList(tabSupervisor, client, UserList::IgnoreList))
+    : client(_client), tabSupervisor(_tabSupervisor)
 {
     connect(client, &AbstractClient::userJoinedEventReceived, this, &UserListManager::processUserJoinedEvent);
     connect(client, &AbstractClient::userLeftEventReceived, this, &UserListManager::processUserLeftEvent);

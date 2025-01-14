@@ -32,6 +32,7 @@ private:
     UserInfoBox *userInfoBox;
     LineEditUnfocusable *addBuddyEdit;
     LineEditUnfocusable *addIgnoreEdit;
+    UserList *allUsersList, *buddyList, *ignoreList;
 
 public:
     TabUserLists(TabSupervisor *_tabSupervisor,

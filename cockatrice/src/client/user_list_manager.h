@@ -23,7 +23,7 @@ class UserListManager : public QWidget
 private:
     AbstractClient *client;
     TabSupervisor *tabSupervisor;
-    UserList *allUsersList, *buddyList, *ignoreList;
+    QList<ServerInfo_User> allUsersList, buddyList, ignoreList;
 
 private slots:
     void processUserJoinedEvent(const Event_UserJoined &event);
@@ -35,15 +35,15 @@ private slots:
 
 public:
     explicit UserListManager(TabSupervisor *_tabSupervisor, AbstractClient *_client);
-    [[nodiscard]] UserList *getAllUsersList() const
+    [[nodiscard]] QList<ServerInfo_User> getAllUsersList() const
     {
         return allUsersList;
     }
-    [[nodiscard]] UserList *getBuddyList() const
+    [[nodiscard]] QList<ServerInfo_User> getBuddyList() const
     {
         return buddyList;
     }
-    [[nodiscard]] UserList *getIgnoreList() const
+    [[nodiscard]] QList<ServerInfo_User> getIgnoreList() const
     {
         return ignoreList;
     }
