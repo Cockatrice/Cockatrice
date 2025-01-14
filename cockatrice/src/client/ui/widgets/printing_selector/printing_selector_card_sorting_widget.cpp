@@ -103,8 +103,9 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(const CardInfo
         for (auto it = cardInfoPerSets.begin(); it != cardInfoPerSets.end(); ++it) {
             for (const auto &cardInfoPerSet : it.value()) {
                 if (cardInfoPerSet.getPtr() == set) {
-                    sortedCardInfoPerSets << cardInfoPerSet;
-                    break;
+                    if (!sortedCardInfoPerSets.contains(cardInfoPerSet)) {
+                        sortedCardInfoPerSets << cardInfoPerSet;
+                    }
                 }
             }
         }
