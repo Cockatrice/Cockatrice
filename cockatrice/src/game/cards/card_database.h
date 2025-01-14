@@ -144,6 +144,11 @@ public:
     explicit CardInfoPerSet(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
     ~CardInfoPerSet() = default;
 
+    bool operator==(const CardInfoPerSet &other) const
+    {
+        return this->set == other.set && this->properties == other.properties;
+    }
+
 private:
     CardSetPtr set;
     // per-set card properties;
