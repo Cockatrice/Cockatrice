@@ -44,12 +44,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
             &VisualDeckStorageWidget::refreshBannerCards);
 }
 
-void VisualDeckStorageWidget::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
-    updateSortOrder();
-}
-
 void VisualDeckStorageWidget::updateSortOrder()
 {
     refreshBannerCards(); // Refresh the banner cards with the new sort order

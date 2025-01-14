@@ -19,9 +19,6 @@ public:
     QString getSearchText();
     QList<DeckPreviewWidget *> &filterFiles(QList<DeckPreviewWidget *> &widgets);
 
-public slots:
-    void showEvent(QShowEvent *event) override;
-
 signals:
     void sortOrderChanged();
 

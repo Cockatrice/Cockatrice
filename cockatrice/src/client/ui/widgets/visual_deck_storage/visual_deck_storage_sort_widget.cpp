@@ -50,13 +50,6 @@ void VisualDeckStorageSortWidget::retranslateUi()
     sortComboBox->blockSignals(false);
 }
 
-void VisualDeckStorageSortWidget::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
-    sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
-    updateSortOrder();
-}
-
 void VisualDeckStorageSortWidget::updateSortOrder()
 {
     sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
