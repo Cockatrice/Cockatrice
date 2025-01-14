@@ -1,11 +1,11 @@
 #include "deck_view_container.h"
 
 #include "../../deck/deck_loader.h"
-#include "../../deck/deck_view.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
+#include "../../game/deckview/deck_view.h"
 #include "../../game/game_scene.h"
 #include "../../game/game_view.h"
 #include "../../server/pending_command.h"
