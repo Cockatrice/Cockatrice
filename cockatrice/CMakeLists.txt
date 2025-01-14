@@ -57,6 +57,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_view_log.cpp
     src/dialogs/dlg_load_deck.cpp
     src/game/deckview/deck_view.cpp
+    src/game/deckview/deck_view_container.cpp
     src/game/filters/filter_string.cpp
     src/game/filters/filter_builder.cpp
     src/game/filters/filter_tree.cpp
@@ -149,8 +150,6 @@ set(cockatrice_SOURCES
     src/client/tabs/tab_room.cpp
     src/client/tabs/tab_server.cpp
     src/client/tabs/tab_supervisor.cpp
-    src/client/tabs/deck_view_container.cpp
-    src/client/tabs/deck_view_container.h
     src/game/zones/table_zone.cpp
     src/client/tapped_out_interface.cpp
     src/client/ui/theme_manager.cpp
