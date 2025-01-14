@@ -228,7 +228,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
@@ -434,7 +434,8 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
             out << " " << card->getName();
         }
         if (!card->getCardSetShortName().isNull() && !card->getCardSetShortName().isEmpty()) {
-            out << " " << "(" << card->getCardSetShortName() << ")";
+            out << " "
+            << "(" << card->getCardSetShortName() << ")";
         }
         if (!card->getCardCollectorNumber().isNull()) {
             out << " " << card->getCardCollectorNumber();
