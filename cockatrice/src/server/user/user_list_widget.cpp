@@ -325,7 +325,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             static_cast<UserListWidget *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
 #else
-            static_cast<UserList *>(parent())->showContextMenu(mouseEvent->globalPos(), index);
+            static_cast<UserListWidget *>(parent())->showContextMenu(mouseEvent->globalPos(), index);
 #endif
             return true;
         }
