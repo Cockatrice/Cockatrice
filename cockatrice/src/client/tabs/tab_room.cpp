@@ -6,7 +6,7 @@
 #include "../../main.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "get_pb_extension.h"
 #include "pb/event_join_room.pb.h"

@@ -1,4 +1,4 @@
-#include "user_list.h"
+#include "user_list_widget.h"
 
 #include "../../client/game_logic/abstract_client.h"
 #include "../../client/tabs/tab_account.h"

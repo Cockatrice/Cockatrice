@@ -3,7 +3,7 @@
 #include "../../deck/custom_line_edit.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_info_box.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
 #include "pb/event_add_to_list.pb.h"
