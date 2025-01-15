@@ -89,8 +89,6 @@ private:
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
         *aTabAdmin, *aTabLog;
 
-    void initStartupTabs();
-
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
     QString sanitizeTabName(QString dirty) const;
@@ -101,6 +99,7 @@ public:
     explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
     ~TabSupervisor() override;
     void retranslateUi();
+    void initStartupTabs();
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
     void stop();

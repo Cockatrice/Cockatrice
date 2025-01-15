@@ -167,8 +167,6 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     resetTabsMenu();
 
     retranslateUi();
-
-    initStartupTabs();
 }
 
 TabSupervisor::~TabSupervisor()
