@@ -11,6 +11,7 @@
 #include <QProxyStyle>
 #include <QTabWidget>
 
+class UserListManager;
 class QMenu;
 class AbstractClient;
 class Tab;
@@ -62,12 +63,13 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 };
 
-class TabSupervisor : public QTabWidget, public UserlistProxy
+class TabSupervisor : public QTabWidget
 {
     Q_OBJECT
 private:
     ServerInfo_User *userInfo;
     AbstractClient *client;
+    UserListManager *userListManager;
     QList<AbstractClient *> localClients;
     QMenu *tabsMenu;
     TabDeckStorageVisual *tabVisualDeckStorage;
@@ -117,17 +119,16 @@ public:
         return userInfo;
     }
     AbstractClient *getClient() const;
+    const UserListManager *getUserListManager() const
+    {
+        return userListManager;
+    }
     const QMap<int, TabRoom *> &getRoomTabs() const
     {
         return roomTabs;
     }
     bool getAdminLocked() const;
     bool closeRequest();
-    bool isOwnUserRegistered() const override;
-    QString getOwnUsername() const override;
-    bool isUserBuddy(const QString &userName) const override;
-    bool isUserIgnored(const QString &userName) const override;
-    const ServerInfo_User *getOnlineUser(const QString &userName) const override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
     void actShowPopup(const QString &message);
 signals:

@@ -52,18 +52,6 @@ public:
     {
         return tr("Account");
     }
-    const UserListWidget *getAllUsersList() const
-    {
-        return allUsersList;
-    }
-    const UserListWidget *getBuddyList() const
-    {
-        return buddyList;
-    }
-    const UserListWidget *getIgnoreList() const
-    {
-        return ignoreList;
-    }
 };
 
 #endif

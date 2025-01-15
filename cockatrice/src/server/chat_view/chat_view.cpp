@@ -45,7 +45,7 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor,
         linkColor = palette().link().color();
     }
 
-    userContextMenu = new UserContextMenu(tabSupervisor, this, game);
+    userContextMenu = new UserContextMenu(tabSupervisor, userlistProxy, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
     ownUserName = userlistProxy->getOwnUsername();

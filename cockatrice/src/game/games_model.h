@@ -1,7 +1,6 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
-#include "../client/tabs/tab_supervisor.h"
 #include "game_type_map.h"
 #include "pb/serverinfo_game.pb.h"
 
@@ -11,6 +10,8 @@
 #include <QSortFilterProxyModel>
 #include <QStringList>
 #include <QTime>
+
+class UserlistProxy;
 
 class GamesModel : public QAbstractTableModel
 {
@@ -65,8 +66,7 @@ class GamesProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 private:
-    bool ownUserIsRegistered;
-    const TabSupervisor *tabSupervisor;
+    const UserlistProxy *userListProxy;
 
     // If adding any additional filters, make sure to update:
     // - GamesProxyModel()
@@ -88,7 +88,7 @@ private:
         showOnlyIfSpectatorsCanSeeHands;
 
 public:
-    GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
+    GamesProxyModel(QObject *parent = nullptr, const UserlistProxy *_userListProxy = nullptr);
 
     bool getShowBuddiesOnlyGames() const
     {

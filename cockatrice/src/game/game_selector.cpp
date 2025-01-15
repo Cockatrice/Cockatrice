@@ -9,6 +9,7 @@
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
 #include "../server/pending_command.h"
+#include "../server/user/user_list_manager.h"
 #include "games_model.h"
 #include "pb/response.pb.h"
 #include "pb/room_commands.pb.h"
@@ -39,7 +40,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
     if (showFilters) {
-        gameListProxyModel = new GamesProxyModel(this, tabSupervisor);
+        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserListManager());
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);

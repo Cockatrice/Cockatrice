@@ -9,6 +9,8 @@
 #include <QKeyEvent>
 #include <QMap>
 
+class UserlistProxy;
+class UserListManager;
 namespace google
 {
 namespace protobuf
@@ -49,6 +51,7 @@ private:
 
     GameSelector *gameSelector;
     UserListWidget *userList;
+    const UserlistProxy *userListProxy;
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
@@ -89,6 +92,7 @@ public:
     TabRoom(TabSupervisor *_tabSupervisor,
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
+            const UserlistProxy *_userListProxy,
             const ServerInfo_Room &info);
     void retranslateUi() override;
     void closeRequest(bool forced = false) override;

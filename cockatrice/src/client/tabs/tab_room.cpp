@@ -6,6 +6,7 @@
 #include "../../main.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
+#include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "get_pb_extension.h"
@@ -35,9 +36,10 @@
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
                  ServerInfo_User *_ownUser,
+                 const UserlistProxy *_userListProxy,
                  const ServerInfo_Room &info)
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
-      ownUser(_ownUser)
+      ownUser(_ownUser), userListProxy(_userListProxy)
 {
     const int gameTypeListSize = info.gametype_list_size();
     for (int i = 0; i < gameTypeListSize; ++i)
@@ -51,7 +53,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
 
-    chatView = new ChatView(tabSupervisor, tabSupervisor, nullptr, true, this);
+    chatView = new ChatView(tabSupervisor, userListProxy, nullptr, true, this);
     connect(chatView, SIGNAL(showMentionPopup(const QString &)), this, SLOT(actShowMentionPopup(const QString &)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -282,7 +284,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (tabSupervisor->getTabAccount()->getIgnoreList()->getUsers().contains(senderName))
+    if (userListProxy->getOnlineUser(senderName))
         return;
 
     UserListTWI *twi = userList->getUsers().value(senderName);
