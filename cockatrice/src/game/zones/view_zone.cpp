@@ -77,9 +77,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         cmd.set_is_reversed(isReversed);
 
         PendingCommand *pend = player->prepareGameCommand(cmd);
-        connect(pend,
-                qOverload<const Response &, const CommandContainer &, const QVariant &>(&PendingCommand::finished),
-                this, &ZoneViewZone::zoneDumpReceived);
+        connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
         player->sendGameCommand(pend);
     } else {
         const CardList &c = origZone->getCards();

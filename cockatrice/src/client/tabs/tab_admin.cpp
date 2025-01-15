@@ -170,9 +170,7 @@ void TabAdmin::actGrantReplayAccess()
     cmd.set_moderator_name(client->getUserName().toStdString());
 
     auto *pend = client->prepareModeratorCommand(cmd);
-    connect(pend,
-            QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
-            this, &TabAdmin::grantReplayAccessProcessResponse);
+    connect(pend, &PendingCommand::finished, this, &TabAdmin::grantReplayAccessProcessResponse);
     client->sendCommand(pend);
 }
 

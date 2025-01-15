@@ -250,10 +250,8 @@ void UserInfoBox::actPassword()
         cmd.set_user_name(client->getUserName().toStdString());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend,
-                // we need qoverload here in order to select the right version of this function
-                QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
-                this, [=, this](const Response &response, const CommandContainer &, const QVariant &) {
+        connect(pend, &PendingCommand::finished, this,
+                [=, this](const Response &response, const CommandContainer &, const QVariant &) {
                     if (response.response_code() == Response::RespOk) {
                         changePassword(oldPassword, newPassword);
                     } else {

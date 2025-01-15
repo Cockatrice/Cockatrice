@@ -39,10 +39,7 @@ TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     connect(client, &AbstractClient::removeFromListEventReceived, this, &TabAccount::processRemoveFromListEvent);
 
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
-    connect(pend,
-            static_cast<void (PendingCommand::*)(const Response &, const CommandContainer &, const QVariant &)>(
-                &PendingCommand::finished),
-            this, &TabAccount::processListUsersResponse);
+    connect(pend, &PendingCommand::finished, this, &TabAccount::processListUsersResponse);
     client->sendCommand(pend);
 
     QVBoxLayout *vbox = new QVBoxLayout;

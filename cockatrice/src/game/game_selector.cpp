@@ -274,8 +274,7 @@ void GameSelector::actJoin()
     }
 
     PendingCommand *pend = r->prepareRoomCommand(cmd);
-    connect(pend, qOverload<const Response &, const CommandContainer &, const QVariant &>(&PendingCommand::finished),
-            this, &GameSelector::checkResponse);
+    connect(pend, &PendingCommand::finished, this, &GameSelector::checkResponse);
     r->sendRoomCommand(pend);
 
     disableButtons();
