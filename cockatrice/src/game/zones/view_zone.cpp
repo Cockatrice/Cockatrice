@@ -91,9 +91,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
     }
 }
 
-void ZoneViewZone::zoneDumpReceived(const Response &r,
-                                    const CommandContainer & /* commandContainer */,
-                                    const QVariant & /* extraData */)
+void ZoneViewZone::zoneDumpReceived(const Response &r)
 {
     const Response_DumpZone &resp = r.GetExtension(Response_DumpZone::ext);
     const int respCardListSize = resp.zone_info().card_list_size();

@@ -47,8 +47,8 @@ private slots:
     void actReloadConfig();
     void actGrantReplayAccess();
     void actForceActivateUser();
-    void grantReplayAccessProcessResponse(const Response &resp, const CommandContainer &, const QVariant &);
-    void activateUserProcessResponse(const Response &response, const CommandContainer &, const QVariant &);
+    void grantReplayAccessProcessResponse(const Response &response);
+    void activateUserProcessResponse(const Response &response);
 
     void actUnlock();
     void actLock();

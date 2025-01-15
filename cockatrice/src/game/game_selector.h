@@ -29,7 +29,7 @@ private slots:
     void actCreate();
     void actJoin();
     void actSelectedGameChanged(const QModelIndex &current, const QModelIndex &previous);
-    void checkResponse(const Response &response, const CommandContainer &, const QVariant &);
+    void checkResponse(const Response &response);
 
     void ignoreListReceived(const QList<ServerInfo_User> &_ignoreList);
     void processAddToListEvent(const Event_AddToList &event);

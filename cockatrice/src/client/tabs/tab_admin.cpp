@@ -191,7 +191,7 @@ void TabAdmin::actForceActivateUser()
     client->sendCommand(pend);
 }
 
-void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
+void TabAdmin::grantReplayAccessProcessResponse(const Response &response)
 {
     auto *event = new Event_ReplayAdded();
 
@@ -209,7 +209,7 @@ void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const 
     }
 }
 
-void TabAdmin::activateUserProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
+void TabAdmin::activateUserProcessResponse(const Response &response)
 {
     switch (response.response_code()) {
         case Response::RespActivationAccepted:
