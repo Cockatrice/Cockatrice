@@ -123,7 +123,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor,
-                 UserlistProxy *_userListProxy,
+                 UserListProxy *_userListProxy,
                  QList<AbstractClient *> &_clients,
                  const Event_GameJoined &event,
                  const QMap<int, QString> &_roomGameTypes)

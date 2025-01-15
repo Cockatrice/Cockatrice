@@ -36,7 +36,7 @@
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
                  ServerInfo_User *_ownUser,
-                 const UserlistProxy *_userListProxy,
+                 const UserListProxy *_userListProxy,
                  const ServerInfo_Room &info)
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
       ownUser(_ownUser), userListProxy(_userListProxy)

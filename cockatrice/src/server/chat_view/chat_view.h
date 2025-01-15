@@ -15,7 +15,7 @@
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
-class UserlistProxy;
+class UserListProxy;
 class TabGame;
 
 class UserMessagePosition
@@ -44,7 +44,7 @@ private:
         HoveredCard,
         HoveredUser
     };
-    const UserlistProxy *const userlistProxy;
+    const UserListProxy *const userListProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
     QString ownUserName;
@@ -84,7 +84,7 @@ private slots:
 
 public:
     ChatView(TabSupervisor *_tabSupervisor,
-             const UserlistProxy *_userlistProxy,
+             const UserListProxy *_userListProxy,
              TabGame *_game,
              bool _showTimestamps,
              QWidget *parent = nullptr);

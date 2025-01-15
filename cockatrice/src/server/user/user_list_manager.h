@@ -17,7 +17,7 @@ class Response;
 class ServerInfo_User;
 class TabSupervisor;
 
-class UserListManager : public QWidget, public UserlistProxy
+class UserListManager : public QWidget, public UserListProxy
 {
     Q_OBJECT
 
