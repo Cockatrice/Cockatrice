@@ -28,7 +28,8 @@ public:
         SortByManaCost,
         SortByColors,
         SortByPt,
-        SortBySet
+        SortBySet,
+        SortByPrinting
     };
     CardList(bool _contentsKnown);
     CardItem *findCard(const int cardId) const;

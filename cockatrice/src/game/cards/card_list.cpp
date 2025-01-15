@@ -146,6 +146,8 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
             return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getPowTough().rightJustified(10, '0') : ""; };
         case SortBySet:
             return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getSetsNames() : ""; };
+        case SortByPrinting:
+            return [](CardItem *c) { return c->getProviderId(); };
     }
 
     // this line should never be reached
