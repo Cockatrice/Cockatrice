@@ -5,7 +5,6 @@
 #include "../user/user_list_widget.h"
 #include "room_message_type.h"
 #include "user_level.h"
-#include "user_list_proxy.h"
 
 #include <QAction>
 #include <QColor>
@@ -16,6 +15,7 @@
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
+class UserlistProxy;
 class TabGame;
 
 class UserMessagePosition

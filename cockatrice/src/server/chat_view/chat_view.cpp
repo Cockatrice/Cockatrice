@@ -5,6 +5,7 @@
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../user/user_context_menu.h"
+#include "../user/user_list_proxy.h"
 #include "user_level.h"
 
 #include <QApplication>

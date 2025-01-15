@@ -1,8 +1,8 @@
 #ifndef COCKATRICE_USER_LIST_MANAGER_H
 #define COCKATRICE_USER_LIST_MANAGER_H
 
-#include "../chat_view/user_list_proxy.h"
 #include "pb/serverinfo_user.pb.h"
+#include "user_list_proxy.h"
 
 #include <QMap>
 #include <QWidget>

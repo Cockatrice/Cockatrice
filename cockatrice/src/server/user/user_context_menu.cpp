@@ -5,7 +5,6 @@
 #include "../../client/tabs/tab_game.h"
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../game/game_selector.h"
-#include "../../server/chat_view/user_list_proxy.h"
 #include "../chat_view/chat_view.h"
 #include "../pending_command.h"
 #include "pb/command_kick_from_game.pb.h"
@@ -19,6 +18,7 @@
 #include "pb/response_warn_list.pb.h"
 #include "pb/session_commands.pb.h"
 #include "user_info_box.h"
+#include "user_list_proxy.h"
 #include "user_list_widget.h"
 
 #include <QAction>
