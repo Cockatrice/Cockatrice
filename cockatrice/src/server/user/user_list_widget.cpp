@@ -5,6 +5,7 @@
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../game/game_selector.h"
+#include "../../server/user/user_list_manager.h"
 #include "../pending_command.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
@@ -377,7 +378,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     : QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
 {
     itemDelegate = new UserListItemDelegate(this);
-    userContextMenu = new UserContextMenu(tabSupervisor, this);
+    userContextMenu = new UserContextMenu(tabSupervisor, tabSupervisor->getUserListManager(), this);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
     userTree = new QTreeWidget;

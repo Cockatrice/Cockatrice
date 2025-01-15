@@ -123,15 +123,16 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor,
+                 UserlistProxy *_userListProxy,
                  QList<AbstractClient *> &_clients,
                  const Event_GameJoined &event,
                  const QMap<int, QString> &_roomGameTypes)
-    : Tab(_tabSupervisor), clients(_clients), gameInfo(event.game_info()), roomGameTypes(_roomGameTypes),
-      hostId(event.host_id()), localPlayerId(event.player_id()), isLocalGame(_tabSupervisor->getIsLocalGame()),
-      spectator(event.spectator()), judge(event.judge()), gameStateKnown(false), resuming(event.resuming()),
-      currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(nullptr), replayPlayButton(nullptr),
-      replayFastForwardButton(nullptr), aReplaySkipForward(nullptr), aReplaySkipBackward(nullptr),
-      aReplaySkipForwardBig(nullptr), aReplaySkipBackwardBig(nullptr), replayDock(nullptr)
+    : Tab(_tabSupervisor), userListProxy(_userListProxy), clients(_clients), gameInfo(event.game_info()),
+      roomGameTypes(_roomGameTypes), hostId(event.host_id()), localPlayerId(event.player_id()),
+      isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(event.spectator()), judge(event.judge()),
+      gameStateKnown(false), resuming(event.resuming()), currentPhase(-1), activeCard(nullptr), gameClosed(false),
+      replay(nullptr), replayPlayButton(nullptr), replayFastForwardButton(nullptr), aReplaySkipForward(nullptr),
+      aReplaySkipBackward(nullptr), aReplaySkipForwardBig(nullptr), aReplaySkipBackwardBig(nullptr), replayDock(nullptr)
 {
     // THIS CTOR IS USED ON GAMES
     gameInfo.set_started(false);
@@ -1683,7 +1684,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    messageLog = new MessageLogWidget(tabSupervisor, tabSupervisor, this);
+    messageLog = new MessageLogWidget(tabSupervisor, userListProxy, this);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfoFrameWidget, SLOT(setCard(QString)));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));

@@ -11,6 +11,7 @@
 #include <QCompleter>
 #include <QMap>
 
+class UserlistProxy;
 class DeckViewContainer;
 class AbstractClient;
 class CardDatabase;
@@ -66,6 +67,7 @@ class TabGame : public Tab
 private:
     QTimer *gameTimer;
     int secondsElapsed;
+    UserlistProxy *userListProxy;
     QList<AbstractClient *> clients;
     ServerInfo_Game gameInfo;
     QMap<int, QString> roomGameTypes;
@@ -210,6 +212,7 @@ private slots:
 
 public:
     TabGame(TabSupervisor *_tabSupervisor,
+            UserlistProxy *_userListProxy,
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);

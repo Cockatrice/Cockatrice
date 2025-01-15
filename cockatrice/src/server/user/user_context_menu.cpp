@@ -5,6 +5,7 @@
 #include "../../client/tabs/tab_game.h"
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../game/game_selector.h"
+#include "../../server/chat_view/user_list_proxy.h"
 #include "../chat_view/chat_view.h"
 #include "../pending_command.h"
 #include "pb/command_kick_from_game.pb.h"
@@ -27,8 +28,12 @@
 #include <QtGui>
 #include <QtWidgets>
 
-UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
-    : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
+UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor,
+                                 const UserlistProxy *_userListProxy,
+                                 QWidget *parent,
+                                 TabGame *_game)
+    : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),
+      userListProxy(_userListProxy), game(_game)
 {
     aUserName = new QAction(QString(), this);
     aUserName->setEnabled(false);
@@ -284,7 +289,7 @@ void UserContextMenu::warnUser_dialogFinished()
 {
     WarningDialog *dlg = static_cast<WarningDialog *>(sender());
 
-    if (dlg->getName().isEmpty() || tabSupervisor->getOwnUsername().simplified().isEmpty())
+    if (dlg->getName().isEmpty() || userListProxy->getOwnUsername().simplified().isEmpty())
         return;
 
     Command_WarnUser cmd;
@@ -348,14 +353,14 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
     menu->addAction(aChat);
-    if (userLevel.testFlag(ServerInfo_User::IsRegistered) && tabSupervisor->isOwnUserRegistered()) {
+    if (userLevel.testFlag(ServerInfo_User::IsRegistered) && userListProxy->isOwnUserRegistered()) {
         menu->addSeparator();
-        if (tabSupervisor->isUserBuddy(userName)) {
+        if (userListProxy->isUserBuddy(userName)) {
             menu->addAction(aRemoveFromBuddyList);
         } else {
             menu->addAction(aAddToBuddyList);
         }
-        if (tabSupervisor->isUserIgnored(userName)) {
+        if (userListProxy->isUserIgnored(userName)) {
             menu->addAction(aRemoveFromIgnoreList);
         } else {
             menu->addAction(aAddToIgnoreList);
@@ -398,7 +403,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
             menu->addAction(aPromoteToJudge);
         }
     }
-    bool anotherUser = userName != tabSupervisor->getOwnUsername();
+    bool anotherUser = userName != userListProxy->getOwnUsername();
     aDetails->setEnabled(true);
     aChat->setEnabled(anotherUser && online);
     aShowGames->setEnabled(online);

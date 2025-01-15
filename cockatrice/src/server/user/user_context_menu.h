@@ -5,6 +5,7 @@
 
 #include <QObject>
 
+class UserlistProxy;
 class AbstractClient;
 class ChatView;
 class CommandContainer;
@@ -22,6 +23,7 @@ class UserContextMenu : public QObject
 private:
     AbstractClient *client;
     TabSupervisor *tabSupervisor;
+    const UserlistProxy *userListProxy;
     TabGame *game;
 
     QAction *aUserName;
@@ -52,7 +54,10 @@ private slots:
     void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 
 public:
-    UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);
+    UserContextMenu(TabSupervisor *_tabSupervisor,
+                    const UserlistProxy *_userListProxy,
+                    QWidget *_parent,
+                    TabGame *_game = 0);
     void retranslateUi();
     void showContextMenu(const QPoint &pos,
                          const QString &userName,

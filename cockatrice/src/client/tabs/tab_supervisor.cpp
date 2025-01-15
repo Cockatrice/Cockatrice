@@ -2,6 +2,7 @@
 
 #include "../../client/game_logic/abstract_client.h"
 #include "../../main.h"
+#include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "../ui/pixel_map_generator.h"
@@ -113,6 +114,8 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     // where tabs with icons and buttons get drawn incorrectly
     tabBar()->setStyle(new MacOSTabFixStyle);
 #endif
+
+    userListManager = new UserListManager(client, this);
 
     // connect tab changes
     connect(this, &TabSupervisor::currentChanged, this, &TabSupervisor::updateCurrent);
@@ -291,6 +294,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
 
+    userListManager->handleConnect();
+
     resetTabsMenu();
 
     tabsMenu->addSeparator();
@@ -394,6 +399,8 @@ void TabSupervisor::stop()
     for (const auto tab : tabsToDelete) {
         tab->closeRequest(true);
     }
+
+    userListManager->handleDisconnect();
 
     delete userInfo;
     userInfo = 0;
@@ -535,7 +542,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
             roomGameTypes.insert(event.game_types(i).game_type_id(),
                                  QString::fromStdString(event.game_types(i).description()));
 
-    TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
+    TabGame *tab = new TabGame(this, userListManager, QList<AbstractClient *>() << client, event, roomGameTypes);
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
@@ -546,7 +553,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
-    TabGame *tab = new TabGame(this, localClients, event, QMap<int, QString>());
+    TabGame *tab = new TabGame(this, userListManager, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
@@ -574,7 +581,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
-    TabRoom *tab = new TabRoom(this, client, userInfo, info);
+    TabRoom *tab = new TabRoom(this, client, userInfo, userListManager, info);
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
@@ -616,11 +623,11 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         return nullptr;
 
     ServerInfo_User otherUser;
-    UserListTWI *twi = tabAccount->getAllUsersList()->getUsers().value(receiverName);
-    if (twi)
-        otherUser = twi->getUserInfo();
-    else
+    if (auto user = userListManager->getOnlineUser(receiverName)) {
+        otherUser = ServerInfo_User(*user);
+    } else {
         otherUser.set_name(receiverName.toStdString());
+    }
 
     TabMessage *tab;
     tab = messageTabs.value(QString::fromStdString(otherUser.name()));
@@ -717,9 +724,9 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab) {
-        UserListTWI *twi = tabAccount->getAllUsersList()->getUsers().value(senderName);
-        if (twi) {
-            UserLevelFlags userLevel = UserLevelFlags(twi->getUserInfo().user_level());
+        const ServerInfo_User *userInfo = userListManager->getOnlineUser(senderName);
+        if (userInfo) {
+            UserLevelFlags userLevel = UserLevelFlags(userInfo->user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
                 !userLevel.testFlag(ServerInfo_User::IsRegistered))
                 // Flags are additive, so reg/mod/admin are all IsRegistered
@@ -753,15 +760,15 @@ void TabSupervisor::processUserLeft(const QString &userName)
 void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
 {
     QString userName = QString::fromStdString(userInfoJoined.name());
-    if (isUserBuddy(userName)) {
-        Tab *tab = static_cast<Tab *>(getTabAccount());
-
-        if (tab != currentWidget()) {
-            tab->setContentsChanged(true);
-            QPixmap avatarPixmap =
-                UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)userInfoJoined.user_level(), true,
-                                                         QString::fromStdString(userInfoJoined.privlevel()));
-            setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+    if (userListManager->isUserBuddy(userName)) {
+        if (auto *tab = getTabAccount()) {
+            if (tab != currentWidget()) {
+                tab->setContentsChanged(true);
+                QPixmap avatarPixmap =
+                    UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)userInfoJoined.user_level(), true,
+                                                             QString::fromStdString(userInfoJoined.privlevel()));
+                setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+            }
         }
 
         if (SettingsCache::instance().getBuddyConnectNotificationsEnabled()) {
@@ -848,57 +855,6 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
         default:;
     }
 }
-
-bool TabSupervisor::isOwnUserRegistered() const
-{
-    return userInfo != nullptr && (userInfo->user_level() & ServerInfo_User::IsRegistered) != 0;
-}
-
-QString TabSupervisor::getOwnUsername() const
-{
-    return userInfo != nullptr ? QString::fromStdString(userInfo->name()) : QString();
-}
-
-bool TabSupervisor::isUserBuddy(const QString &userName) const
-{
-    if (!getTabAccount())
-        return false;
-    if (!getTabAccount()->getBuddyList())
-        return false;
-    QMap<QString, UserListTWI *> buddyList = getTabAccount()->getBuddyList()->getUsers();
-    bool senderIsBuddy = buddyList.contains(userName);
-    return senderIsBuddy;
-}
-
-bool TabSupervisor::isUserIgnored(const QString &userName) const
-{
-    if (!getTabAccount())
-        return false;
-    if (!getTabAccount()->getIgnoreList())
-        return false;
-    QMap<QString, UserListTWI *> buddyList = getTabAccount()->getIgnoreList()->getUsers();
-    bool senderIsBuddy = buddyList.contains(userName);
-    return senderIsBuddy;
-}
-
-const ServerInfo_User *TabSupervisor::getOnlineUser(const QString &userName) const
-{
-    if (!getTabAccount())
-        return nullptr;
-    if (!getTabAccount()->getAllUsersList())
-        return nullptr;
-    QMap<QString, UserListTWI *> userList = getTabAccount()->getAllUsersList()->getUsers();
-    const QString &userNameToMatchLower = userName.toLower();
-    QMap<QString, UserListTWI *>::iterator i;
-
-    for (i = userList.begin(); i != userList.end(); ++i)
-        if (i.key().toLower() == userNameToMatchLower) {
-            const ServerInfo_User &_userInfo = i.value()->getUserInfo();
-            return &_userInfo;
-        }
-
-    return nullptr;
-};
 
 bool TabSupervisor::switchToGameTabIfAlreadyExists(const int gameId)
 {

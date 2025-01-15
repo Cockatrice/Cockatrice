@@ -2,6 +2,7 @@
 
 #include "../client/tabs/tab_account.h"
 #include "../client/ui/pixel_map_generator.h"
+#include "../server/user/user_list_manager.h"
 #include "../server/user/user_list_widget.h"
 #include "../settings/cache_settings.h"
 #include "pb/serverinfo_game.pb.h"
@@ -284,9 +285,8 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
     endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent, const TabSupervisor *_tabSupervisor)
-    : QSortFilterProxyModel(parent), ownUserIsRegistered(_tabSupervisor->isOwnUserRegistered()),
-      tabSupervisor(_tabSupervisor)
+GamesProxyModel::GamesProxyModel(QObject *parent, const UserlistProxy *_userListProxy)
+    : QSortFilterProxyModel(parent), userListProxy(_userListProxy)
 {
     resetFilterParameters();
     setSortRole(GamesModel::SORT_ROLE);
@@ -508,15 +508,14 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (!showBuddiesOnlyGames && game.only_buddies()) {
         return false;
     }
-    if (hideIgnoredUserGames && tabSupervisor->getTabAccount()->getIgnoreList()->getUsers().contains(
-                                    QString::fromStdString(game.creator_info().name()))) {
+    if (hideIgnoredUserGames && userListProxy->isUserIgnored(QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
     if (!showFullGames && game.player_count() == game.max_players())
         return false;
     if (!showGamesThatStarted && game.started())
         return false;
-    if (!ownUserIsRegistered)
+    if (!userListProxy->isOwnUserRegistered())
         if (game.only_registered())
             return false;
     if (!showPasswordProtectedGames && game.with_password())

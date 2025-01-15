@@ -6,6 +6,7 @@
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../server/user/user_context_menu.h"
+#include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/serverinfo_playerproperties.pb.h"
@@ -71,7 +72,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
         itemDelegate = new PlayerListItemDelegate(this);
         setItemDelegate(itemDelegate);
 
-        userContextMenu = new UserContextMenu(tabSupervisor, this, game);
+        userContextMenu = new UserContextMenu(tabSupervisor, tabSupervisor->getUserListManager(), this, game);
         connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &PlayerListWidget::openMessageDialog);
     } else {
         userContextMenu = nullptr;
