@@ -10,7 +10,7 @@
 class AbstractClient;
 class QTextEdit;
 class QLabel;
-class UserList;
+class UserListWidget;
 class QPushButton;
 
 class Event_ListRooms;

@@ -47,7 +47,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
-    userList = new UserList(tabSupervisor, client, UserList::RoomList);
+    userList = new UserListWidget(tabSupervisor, client, UserListWidget::RoomList);
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
 

@@ -17,7 +17,7 @@ class Message;
 }
 } // namespace google
 class AbstractClient;
-class UserList;
+class UserListWidget;
 class QLabel;
 class ChatView;
 class QPushButton;
@@ -48,7 +48,7 @@ private:
     QMap<int, QString> gameTypes;
 
     GameSelector *gameSelector;
-    UserList *userList;
+    UserListWidget *userList;
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;

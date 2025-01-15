@@ -5,7 +5,7 @@
 #include "tab.h"
 
 class AbstractClient;
-class UserList;
+class UserListWidget;
 class UserInfoBox;
 class LineEditUnfocusable;
 
@@ -37,9 +37,9 @@ private slots:
 
 private:
     AbstractClient *client;
-    UserList *allUsersList;
-    UserList *buddyList;
-    UserList *ignoreList;
+    UserListWidget *allUsersList;
+    UserListWidget *buddyList;
+    UserListWidget *ignoreList;
     UserInfoBox *userInfoBox;
     LineEditUnfocusable *addBuddyEdit;
     LineEditUnfocusable *addIgnoreEdit;
@@ -52,15 +52,15 @@ public:
     {
         return tr("Account");
     }
-    const UserList *getAllUsersList() const
+    const UserListWidget *getAllUsersList() const
     {
         return allUsersList;
     }
-    const UserList *getBuddyList() const
+    const UserListWidget *getBuddyList() const
     {
         return buddyList;
     }
-    const UserList *getIgnoreList() const
+    const UserListWidget *getIgnoreList() const
     {
         return ignoreList;
     }

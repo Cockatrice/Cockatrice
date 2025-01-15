@@ -323,7 +323,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-            static_cast<UserList *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
+            static_cast<UserListWidget *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
 #else
             static_cast<UserList *>(parent())->showContextMenu(mouseEvent->globalPos(), index);
 #endif
@@ -370,7 +370,10 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
 }
 
-UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent)
+UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
+                               AbstractClient *_client,
+                               UserListType _type,
+                               QWidget *parent)
     : QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
 {
     itemDelegate = new UserListItemDelegate(this);
@@ -395,7 +398,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
     retranslateUi();
 }
 
-void UserList::retranslateUi()
+void UserListWidget::retranslateUi()
 {
     userContextMenu->retranslateUi();
     switch (type) {
@@ -415,7 +418,7 @@ void UserList::retranslateUi()
     updateCount();
 }
 
-void UserList::processUserInfo(const ServerInfo_User &user, bool online)
+void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
 {
     const QString userName = QString::fromStdString(user.name());
     UserListTWI *item = users.value(userName);
@@ -432,7 +435,7 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
     item->setOnline(online);
 }
 
-bool UserList::deleteUser(const QString &userName)
+bool UserListWidget::deleteUser(const QString &userName)
 {
     UserListTWI *twi = users.value(userName);
     if (twi) {
@@ -448,7 +451,7 @@ bool UserList::deleteUser(const QString &userName)
     return false;
 }
 
-void UserList::setUserOnline(const QString &userName, bool online)
+void UserListWidget::setUserOnline(const QString &userName, bool online)
 {
     UserListTWI *twi = users.value(userName);
     if (!twi)
@@ -462,7 +465,7 @@ void UserList::setUserOnline(const QString &userName, bool online)
     updateCount();
 }
 
-void UserList::updateCount()
+void UserListWidget::updateCount()
 {
     QString str = titleStr;
     if ((type == BuddyList) || (type == IgnoreList))
@@ -470,12 +473,12 @@ void UserList::updateCount()
     setTitle(str.arg(userTree->topLevelItemCount()));
 }
 
-void UserList::userClicked(QTreeWidgetItem *item, int /*column*/)
+void UserListWidget::userClicked(QTreeWidgetItem *item, int /*column*/)
 {
     emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
 }
 
-void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
+void UserListWidget::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
     const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
     bool online = index.sibling(index.row(), 0).data(Qt::UserRole + 1).toBool();
@@ -484,7 +487,7 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
                                      UserLevelFlags(userInfo.user_level()), online);
 }
 
-void UserList::sortItems()
+void UserListWidget::sortItems()
 {
     userTree->sortItems(1, Qt::AscendingOrder);
 }
