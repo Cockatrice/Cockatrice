@@ -164,6 +164,9 @@ void ZoneViewZone::reorganizeCards()
         if (sortBy != CardList::SortByName) {
             sortOptions << CardList::SortByName;
         }
+
+        // group printings together
+        sortOptions << CardList::SortByPrinting;
     }
 
     cardsToDisplay.sortBy(sortOptions);
