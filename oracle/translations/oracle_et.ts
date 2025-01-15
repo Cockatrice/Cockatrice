@@ -245,7 +245,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="492"/>
+        <location filename="src/oracleimporter.cpp" line="465"/>
         <source>Dummy set containing tokens</source>
         <translation>Nukk-komplekt mis sisaldab märgistusi</translation>
     </message>
