@@ -245,7 +245,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="492"/>
+        <location filename="src/oracleimporter.cpp" line="465"/>
         <source>Dummy set containing tokens</source>
         <translation>Fausse édition contenant les jetons</translation>
     </message>
@@ -395,7 +395,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Opération ZIP complétée avec succès.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
@@ -410,7 +410,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de créer ou ouvrir le fichier.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
@@ -420,12 +420,12 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archive corrompue.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Mauvais mot de passe.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
@@ -475,7 +475,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Erreur inconnue.</translation>
     </message>
 </context>
 <context>
@@ -498,7 +498,7 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de créer ou d&apos;ouvrir le fichier.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
