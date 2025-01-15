@@ -18,7 +18,7 @@
 #include "pb/response_warn_list.pb.h"
 #include "pb/session_commands.pb.h"
 #include "user_info_box.h"
-#include "user_list.h"
+#include "user_list_widget.h"
 
 #include <QAction>
 #include <QMenu>

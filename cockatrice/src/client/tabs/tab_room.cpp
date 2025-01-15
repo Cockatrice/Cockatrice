@@ -6,7 +6,7 @@
 #include "../../main.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "get_pb_extension.h"
 #include "pb/event_join_room.pb.h"
@@ -47,7 +47,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
-    userList = new UserList(tabSupervisor, client, UserList::RoomList);
+    userList = new UserListWidget(tabSupervisor, client, UserListWidget::RoomList);
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
 

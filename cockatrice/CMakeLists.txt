@@ -159,7 +159,7 @@ set(cockatrice_SOURCES
     src/server/user/user_context_menu.cpp
     src/server/user/user_info_connection.cpp
     src/server/user/user_info_box.cpp
-    src/server/user/user_list.cpp
+    src/server/user/user_list_widget.cpp
     src/client/ui/window_main.cpp
     src/game/zones/view_zone_widget.cpp
     src/game/zones/view_zone.cpp

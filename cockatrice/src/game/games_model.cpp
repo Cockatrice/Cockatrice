@@ -2,7 +2,7 @@
 
 #include "../client/tabs/tab_account.h"
 #include "../client/ui/pixel_map_generator.h"
-#include "../server/user/user_list.h"
+#include "../server/user/user_list_widget.h"
 #include "../settings/cache_settings.h"
 #include "pb/serverinfo_game.pb.h"
 

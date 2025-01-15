@@ -111,7 +111,7 @@ public:
     bool operator<(const QTreeWidgetItem &other) const;
 };
 
-class UserList : public QGroupBox
+class UserListWidget : public QGroupBox
 {
     Q_OBJECT
 public:
@@ -144,7 +144,10 @@ signals:
     void removeIgnore(const QString &userName);
 
 public:
-    UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = nullptr);
+    UserListWidget(TabSupervisor *_tabSupervisor,
+                   AbstractClient *_client,
+                   UserListType _type,
+                   QWidget *parent = nullptr);
     void retranslateUi();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);

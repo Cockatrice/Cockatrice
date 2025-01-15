@@ -3,7 +3,7 @@
 #include "../../deck/custom_line_edit.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_info_box.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
 #include "pb/event_add_to_list.pb.h"
@@ -21,15 +21,15 @@
 TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client)
 {
-    allUsersList = new UserList(_tabSupervisor, client, UserList::AllUsersList);
-    buddyList = new UserList(_tabSupervisor, client, UserList::BuddyList);
-    ignoreList = new UserList(_tabSupervisor, client, UserList::IgnoreList);
+    allUsersList = new UserListWidget(_tabSupervisor, client, UserListWidget::AllUsersList);
+    buddyList = new UserListWidget(_tabSupervisor, client, UserListWidget::BuddyList);
+    ignoreList = new UserListWidget(_tabSupervisor, client, UserListWidget::IgnoreList);
     userInfoBox = new UserInfoBox(client, true);
     userInfoBox->updateInfo(userInfo);
 
-    connect(allUsersList, &UserList::openMessageDialog, this, &TabAccount::openMessageDialog);
-    connect(buddyList, &UserList::openMessageDialog, this, &TabAccount::openMessageDialog);
-    connect(ignoreList, &UserList::openMessageDialog, this, &TabAccount::openMessageDialog);
+    connect(allUsersList, &UserListWidget::openMessageDialog, this, &TabAccount::openMessageDialog);
+    connect(buddyList, &UserListWidget::openMessageDialog, this, &TabAccount::openMessageDialog);
+    connect(ignoreList, &UserListWidget::openMessageDialog, this, &TabAccount::openMessageDialog);
 
     connect(client, &AbstractClient::userJoinedEventReceived, this, &TabAccount::processUserJoinedEvent);
     connect(client, &AbstractClient::userLeftEventReceived, this, &TabAccount::processUserLeftEvent);
@@ -201,7 +201,7 @@ void TabAccount::processAddToListEvent(const Event_AddToList &event)
     const ServerInfo_User &info = event.user_info();
     bool online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
     QString list = QString::fromStdString(event.list_name());
-    UserList *userList = 0;
+    UserListWidget *userList = 0;
     if (list == "buddy")
         userList = buddyList;
     else if (list == "ignore")
@@ -217,7 +217,7 @@ void TabAccount::processRemoveFromListEvent(const Event_RemoveFromList &event)
 {
     QString list = QString::fromStdString(event.list_name());
     QString user = QString::fromStdString(event.user_name());
-    UserList *userList = 0;
+    UserListWidget *userList = 0;
     if (list == "buddy")
         userList = buddyList;
     else if (list == "ignore")

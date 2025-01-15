@@ -2,7 +2,7 @@
 
 #include "../../client/game_logic/abstract_client.h"
 #include "../../main.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "../ui/pixel_map_generator.h"
 #include "pb/event_game_joined.pb.h"

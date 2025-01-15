@@ -6,7 +6,7 @@
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../server/user/user_context_menu.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/serverinfo_playerproperties.pb.h"
 #include "pb/session_commands.pb.h"

@@ -2,7 +2,7 @@
 
 #include "../../client/game_logic/abstract_client.h"
 #include "../../server/pending_command.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_widget.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/response_join_room.pb.h"
