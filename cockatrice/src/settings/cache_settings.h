@@ -96,6 +96,8 @@ private:
     QString lang;
     QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
+    bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
+        tabLogOpen;
     bool checkUpdatesOnStartup;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
@@ -128,7 +130,6 @@ private:
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
-    bool visualDeckStorageShowOnLoad;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -253,6 +254,34 @@ public:
     QString getThemeName() const
     {
         return themeName;
+    }
+    bool getTabVisualDeckStorageOpen() const
+    {
+        return tabVisualDeckStorageOpen;
+    }
+    bool getTabServerOpen() const
+    {
+        return tabServerOpen;
+    }
+    bool getTabAccountOpen() const
+    {
+        return tabAccountOpen;
+    }
+    bool getTabDeckStorageOpen() const
+    {
+        return tabDeckStorageOpen;
+    }
+    bool getTabReplaysOpen() const
+    {
+        return tabReplaysOpen;
+    }
+    bool getTabAdminOpen() const
+    {
+        return tabAdminOpen;
+    }
+    bool getTabLogOpen() const
+    {
+        return tabLogOpen;
     }
     QString getChatMentionColor() const
     {
@@ -390,10 +419,6 @@ public:
     int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
     {
         return visualDeckStorageUnusedColorIdentitiesOpacity;
-    }
-    bool getVisualDeckStorageShowOnLoad() const
-    {
-        return visualDeckStorageShowOnLoad;
     }
     bool getHorizontalHand() const
     {
@@ -681,6 +706,13 @@ public slots:
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
+    void setTabVisualDeckStorageOpen(bool value);
+    void setTabServerOpen(bool value);
+    void setTabAccountOpen(bool value);
+    void setTabDeckStorageOpen(bool value);
+    void setTabReplaysOpen(bool value);
+    void setTabAdminOpen(bool value);
+    void setTabLogOpen(bool value);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(QT_STATE_CHANGED_T _picDownload);
@@ -707,7 +739,6 @@ public slots:
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
-    void setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T _visualDeckStorageShowOnLoad);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

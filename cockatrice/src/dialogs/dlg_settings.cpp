@@ -346,10 +346,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
     connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
 
-    showVisualDeckStorageOnLoadCheckBox.setChecked(settings.getVisualDeckStorageShowOnLoad());
-    connect(&showVisualDeckStorageOnLoadCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setVisualDeckStorageShowOnLoad);
-
     visualDeckStorageDrawUnusedColorIdentitiesCheckBox.setChecked(
         settings.getVisualDeckStorageDrawUnusedColorIdentities());
     connect(&visualDeckStorageDrawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
@@ -366,10 +362,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     auto *menuGrid = new QGridLayout;
     menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
-    menuGrid->addWidget(&showVisualDeckStorageOnLoadCheckBox, 1, 0);
-    menuGrid->addWidget(&visualDeckStorageDrawUnusedColorIdentitiesCheckBox, 2, 0);
-    menuGrid->addWidget(&visualDeckStorageUnusedColorIdentitiesOpacityLabel, 3, 0);
-    menuGrid->addWidget(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, 3, 1);
+    menuGrid->addWidget(&visualDeckStorageDrawUnusedColorIdentitiesCheckBox, 1, 0);
+    menuGrid->addWidget(&visualDeckStorageUnusedColorIdentitiesOpacityLabel, 2, 0);
+    menuGrid->addWidget(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, 2, 1);
 
     menuGroupBox = new QGroupBox;
     menuGroupBox->setLayout(menuGrid);
@@ -504,7 +499,6 @@ void AppearanceSettingsPage::retranslateUi()
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
-    showVisualDeckStorageOnLoadCheckBox.setText(tr("Show visual deck storage on database load"));
     visualDeckStorageDrawUnusedColorIdentitiesCheckBox.setText(
         tr("Draw missing color identities in visual deck storage without color label"));
     visualDeckStorageUnusedColorIdentitiesOpacityLabel.setText(tr("Missing color identity opacity"));

@@ -124,6 +124,27 @@ void SettingsCache::setTokenDatabasePath(const QString & /* _tokenDatabasePath *
 void SettingsCache::setThemeName(const QString & /* _themeName */)
 {
 }
+void SettingsCache::setTabVisualDeckStorageOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabServerOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabAccountOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabDeckStorageOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabReplaysOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabAdminOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabLogOpen(bool /*value*/)
+{
+}
 void SettingsCache::setPicDownload(QT_STATE_CHANGED_T /* _picDownload */)
 {
 }
@@ -188,9 +209,6 @@ void SettingsCache::setVisualDeckStorageSortingOrder(int /* _visualDeckStorageSo
 {
 }
 void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
-{
-}
-void SettingsCache::setVisualDeckStorageShowOnLoad(QT_STATE_CHANGED_T /* _visualDeckStorageShowOnLoad */)
 {
 }
 void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
