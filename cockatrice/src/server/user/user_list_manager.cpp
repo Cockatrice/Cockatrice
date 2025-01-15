@@ -51,8 +51,7 @@ void UserListManager::setOwnUserInfo(const ServerInfo_User &userInfo)
 void UserListManager::populateInitialOnlineUsers()
 {
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
-    connect(pend, qOverload<const Response &, const CommandContainer &, const QVariant &>(&PendingCommand::finished),
-            this, &UserListManager::processListUsersResponse);
+    connect(pend, &PendingCommand::finished, this, &UserListManager::processListUsersResponse);
     client->sendCommand(pend);
 }
 

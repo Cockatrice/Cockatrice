@@ -11,7 +11,6 @@ class PendingCommand : public QObject
     Q_OBJECT
 signals:
     void finished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
-    void finished(Response::ResponseCode respCode);
 
 private:
     CommandContainer commandContainer;

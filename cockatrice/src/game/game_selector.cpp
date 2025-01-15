@@ -194,9 +194,7 @@ void GameSelector::actCreate()
     updateTitle();
 }
 
-void GameSelector::checkResponse(const Response &response,
-                                 const CommandContainer & /* commandContainer */,
-                                 const QVariant & /* extraData */)
+void GameSelector::checkResponse(const Response &response)
 {
     // NB: We re-enable buttons for the currently selected game, which may not
     // be the same game as the one for which we are processing a response.
@@ -274,8 +272,7 @@ void GameSelector::actJoin()
     }
 
     PendingCommand *pend = r->prepareRoomCommand(cmd);
-    connect(pend, qOverload<const Response &, const CommandContainer &, const QVariant &>(&PendingCommand::finished),
-            this, &GameSelector::checkResponse);
+    connect(pend, &PendingCommand::finished, this, &GameSelector::checkResponse);
     r->sendRoomCommand(pend);
 
     disableButtons();

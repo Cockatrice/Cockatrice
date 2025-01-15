@@ -170,9 +170,7 @@ void TabAdmin::actGrantReplayAccess()
     cmd.set_moderator_name(client->getUserName().toStdString());
 
     auto *pend = client->prepareModeratorCommand(cmd);
-    connect(pend,
-            QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
-            this, &TabAdmin::grantReplayAccessProcessResponse);
+    connect(pend, &PendingCommand::finished, this, &TabAdmin::grantReplayAccessProcessResponse);
     client->sendCommand(pend);
 }
 
@@ -193,7 +191,7 @@ void TabAdmin::actForceActivateUser()
     client->sendCommand(pend);
 }
 
-void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
+void TabAdmin::grantReplayAccessProcessResponse(const Response &response)
 {
     auto *event = new Event_ReplayAdded();
 
@@ -211,7 +209,7 @@ void TabAdmin::grantReplayAccessProcessResponse(const Response &response, const 
     }
 }
 
-void TabAdmin::activateUserProcessResponse(const Response &response, const CommandContainer &, const QVariant &)
+void TabAdmin::activateUserProcessResponse(const Response &response)
 {
     switch (response.response_code()) {
         case Response::RespActivationAccepted:

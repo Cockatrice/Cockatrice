@@ -95,7 +95,7 @@ public slots:
     void setSortBy(CardList::SortOption _sortBy);
     void setPileView(int _pileView);
 private slots:
-    void zoneDumpReceived(const Response &r, const CommandContainer &, const QVariant &);
+    void zoneDumpReceived(const Response &r);
 signals:
     void beingDeleted();
     void optimumRectChanged();
