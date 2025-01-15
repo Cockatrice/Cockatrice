@@ -51,7 +51,7 @@ private:
     TabGame *parentGame;
     int playerId;
 private slots:
-    void replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance);
+    void loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance);
     void loadLocalDeck();
     void loadRemoteDeck();
     void unloadDeck();

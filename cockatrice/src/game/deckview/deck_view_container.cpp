@@ -94,7 +94,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
-            &DeckViewContainer::replaceDeckStorageWithDeckView);
+            &DeckViewContainer::loadVisualDeck);
 
     deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
@@ -148,7 +148,7 @@ void DeckViewContainer::refreshShortcuts()
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
-void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance)
+void DeckViewContainer::loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     Q_UNUSED(event);
     QString deckString = instance->deckLoader->writeToString_Native();
