@@ -2,7 +2,7 @@
 #define TAB_SUPERVISOR_H
 
 #include "../../deck/deck_loader.h"
-#include "../../server/chat_view/user_list_proxy.h"
+#include "../../server/user/user_list_proxy.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>

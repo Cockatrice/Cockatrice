@@ -5,7 +5,6 @@
 #include "../user/user_list_widget.h"
 #include "room_message_type.h"
 #include "user_level.h"
-#include "user_list_proxy.h"
 
 #include <QAction>
 #include <QColor>
@@ -16,6 +15,7 @@
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
+class UserListProxy;
 class TabGame;
 
 class UserMessagePosition
@@ -44,7 +44,7 @@ private:
         HoveredCard,
         HoveredUser
     };
-    const UserlistProxy *const userlistProxy;
+    const UserListProxy *const userListProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
     QString ownUserName;
@@ -84,7 +84,7 @@ private slots:
 
 public:
     ChatView(TabSupervisor *_tabSupervisor,
-             const UserlistProxy *_userlistProxy,
+             const UserListProxy *_userListProxy,
              TabGame *_game,
              bool _showTimestamps,
              QWidget *parent = nullptr);

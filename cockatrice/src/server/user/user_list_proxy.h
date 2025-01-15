@@ -8,7 +8,7 @@ class ServerInfo_User;
  * Responsible for providing a bare-bones minimal interface into userlist information,
  * including your current connection to the server as well as buddy/ignore/alluser lists.
  */
-class UserlistProxy
+class UserListProxy
 {
 public:
     virtual bool isOwnUserRegistered() const = 0;

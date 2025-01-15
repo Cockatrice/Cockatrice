@@ -9,7 +9,7 @@
 #include <QKeyEvent>
 #include <QMap>
 
-class UserlistProxy;
+class UserListProxy;
 class UserListManager;
 namespace google
 {
@@ -51,7 +51,7 @@ private:
 
     GameSelector *gameSelector;
     UserListWidget *userList;
-    const UserlistProxy *userListProxy;
+    const UserListProxy *userListProxy;
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
@@ -92,7 +92,7 @@ public:
     TabRoom(TabSupervisor *_tabSupervisor,
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
-            const UserlistProxy *_userListProxy,
+            const UserListProxy *_userListProxy,
             const ServerInfo_Room &info);
     void retranslateUi() override;
     void closeRequest(bool forced = false) override;

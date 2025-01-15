@@ -11,7 +11,7 @@
 #include <QStringList>
 #include <QTime>
 
-class UserlistProxy;
+class UserListProxy;
 
 class GamesModel : public QAbstractTableModel
 {
@@ -66,7 +66,7 @@ class GamesProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 private:
-    const UserlistProxy *userListProxy;
+    const UserListProxy *userListProxy;
 
     // If adding any additional filters, make sure to update:
     // - GamesProxyModel()
@@ -88,7 +88,7 @@ private:
         showOnlyIfSpectatorsCanSeeHands;
 
 public:
-    GamesProxyModel(QObject *parent = nullptr, const UserlistProxy *_userListProxy = nullptr);
+    GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
     bool getShowBuddiesOnlyGames() const
     {

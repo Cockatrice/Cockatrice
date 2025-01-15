@@ -863,10 +863,10 @@ void MessageLogWidget::connectToPlayer(Player *player)
 }
 
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor,
-                                   const UserlistProxy *_userlistProxy,
+                                   const UserListProxy *_userListProxy,
                                    TabGame *_game,
                                    QWidget *parent)
-    : ChatView(_tabSupervisor, _userlistProxy, _game, true, parent), mulliganNumber(0),
+    : ChatView(_tabSupervisor, _userListProxy, _game, true, parent), mulliganNumber(0),
       currentContext(MessageContext_None)
 {
 }

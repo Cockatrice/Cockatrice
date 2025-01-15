@@ -285,7 +285,7 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
     endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent, const UserlistProxy *_userListProxy)
+GamesProxyModel::GamesProxyModel(QObject *parent, const UserListProxy *_userListProxy)
     : QSortFilterProxyModel(parent), userListProxy(_userListProxy)
 {
     resetFilterParameters();

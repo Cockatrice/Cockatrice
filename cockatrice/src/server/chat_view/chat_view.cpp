@@ -5,6 +5,7 @@
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../user/user_context_menu.h"
+#include "../user/user_list_proxy.h"
 #include "user_level.h"
 
 #include <QApplication>
@@ -22,11 +23,11 @@ UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
 }
 
 ChatView::ChatView(TabSupervisor *_tabSupervisor,
-                   const UserlistProxy *_userlistProxy,
+                   const UserListProxy *_userListProxy,
                    TabGame *_game,
                    bool _showTimestamps,
                    QWidget *parent)
-    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), userlistProxy(_userlistProxy), evenNumber(true),
+    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), userListProxy(_userListProxy), evenNumber(true),
       showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
 {
     if (palette().windowText().color().lightness() > 200) {
@@ -45,10 +46,10 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor,
         linkColor = palette().link().color();
     }
 
-    userContextMenu = new UserContextMenu(tabSupervisor, userlistProxy, this, game);
+    userContextMenu = new UserContextMenu(tabSupervisor, userListProxy, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
-    ownUserName = userlistProxy->getOwnUsername();
+    ownUserName = userListProxy->getOwnUsername();
     mention = "@" + ownUserName;
 
     mentionFormat.setFontWeight(QFont::Bold);
@@ -189,7 +190,7 @@ void ChatView::appendMessage(QString message,
             cursor.insertText("    ");
         } else {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-            bool isBuddy = userlistProxy->isUserBuddy(userName);
+            bool isBuddy = userListProxy->isUserBuddy(userName);
             cursor.insertImage(
                 UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, UserPrivLevel).toImage());
             cursor.insertText(" ");
@@ -328,7 +329,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
     QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
     while (fullMentionUpToSpaceOrEnd.size()) {
-        const ServerInfo_User *onlineUser = userlistProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
+        const ServerInfo_User *onlineUser = userListProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
         if (onlineUser) // Is there a user online named this?
         {
             if (ownUserName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
