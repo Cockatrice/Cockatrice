@@ -23,7 +23,6 @@ QVariant PendingCommand::getExtraData() const
 void PendingCommand::processResponse(const Response &response)
 {
     emit finished(response, commandContainer, extraData);
-    emit finished(response.response_code());
 }
 
 int PendingCommand::tick()
