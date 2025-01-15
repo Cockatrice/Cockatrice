@@ -3,6 +3,7 @@
 
 #include "../../deck/deck_loader.h"
 #include "../../server/user/user_list_proxy.h"
+#include "api/edhrec/tab_edhrec.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
@@ -143,6 +144,7 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabEdhRec *addEdhrecTab(CardInfoPtr cardToQuery);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:

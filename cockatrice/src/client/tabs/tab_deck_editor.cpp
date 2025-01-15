@@ -541,14 +541,16 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     const CardInfoPtr info = currentCardInfo();
 
     // add to deck and sideboard options
-    QAction *addToDeck, *addToSideboard, *selectPrinting;
+    QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRec;
     addToDeck = menu.addAction(tr("Add to Deck"));
     addToSideboard = menu.addAction(tr("Add to Sideboard"));
     selectPrinting = menu.addAction(tr("Select Printing"));
+    edhRec = menu.addAction(tr("Show on EDHREC"));
 
     connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
     connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
     connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
+    connect(edhRec, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
 
     // filling out the related cards submenu
     auto *relatedMenu = new QMenu(tr("Show Related cards"));
