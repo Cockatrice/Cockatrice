@@ -118,15 +118,6 @@ void DeckViewContainer::retranslateUi()
     updateSideboardLockButtonText();
 }
 
-void DeckViewContainer::setButtonsVisible(bool _visible)
-{
-    loadLocalButton->setVisible(_visible);
-    loadRemoteButton->setVisible(_visible);
-    readyStartButton->setVisible(_visible);
-    forceStartGameButton->setVisible(_visible);
-    sideboardLockButton->setVisible(_visible);
-}
-
 void DeckViewContainer::updateSideboardLockButtonText()
 {
     if (sideboardLockButton->getState()) {

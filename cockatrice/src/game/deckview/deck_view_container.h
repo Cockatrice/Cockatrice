@@ -69,7 +69,6 @@ signals:
 public:
     DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
-    void setButtonsVisible(bool _visible);
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
