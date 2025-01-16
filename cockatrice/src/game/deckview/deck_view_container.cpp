@@ -53,13 +53,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
     unloadDeckButton = new QPushButton;
-    unloadDeckButton->setEnabled(false);
     readyStartButton = new ToggleButton;
-    readyStartButton->setEnabled(false);
     forceStartGameButton = new QPushButton;
-    forceStartGameButton->setEnabled(parent->isHost());
     sideboardLockButton = new ToggleButton;
-    sideboardLockButton->setEnabled(false);
 
     connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
     connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
@@ -82,7 +78,6 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addWidget(sideboardLockButton);
     if (forceStartGameButton->isEnabled()) {
         buttonHBox->addWidget(forceStartGameButton);
-        forceStartGameButton->setEnabled(false);
     }
     buttonHBox->setContentsMargins(0, 0, 0, 0);
     buttonHBox->addStretch();
@@ -90,7 +85,6 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     deckView = new DeckView;
     connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
-    deckView->setVisible(false);
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
@@ -106,6 +100,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
+
+    switchToDeckSelectView();
 }
 
 void DeckViewContainer::retranslateUi()
@@ -116,6 +112,28 @@ void DeckViewContainer::retranslateUi()
     readyStartButton->setText(tr("Ready to start"));
     forceStartGameButton->setText(tr("Force start"));
     updateSideboardLockButtonText();
+}
+
+void DeckViewContainer::switchToDeckSelectView()
+{
+    deckView->setVisible(false);
+    visualDeckStorageWidget->setVisible(true);
+    deckViewLayout->update();
+    unloadDeckButton->setEnabled(false);
+    readyStartButton->setEnabled(false);
+    readyStartButton->setState(false);
+    sideboardLockButton->setEnabled(false);
+    sideboardLockButton->setState(false);
+    forceStartGameButton->setEnabled(false);
+    setReadyStart(false);
+}
+
+void DeckViewContainer::switchToDeckLoadedView()
+{
+    deckView->setVisible(true);
+    visualDeckStorageWidget->setVisible(false);
+    unloadDeckButton->setEnabled(true);
+    forceStartGameButton->setEnabled(parentGame->isHost());
 }
 
 void DeckViewContainer::updateSideboardLockButtonText()
@@ -224,9 +242,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
     // TODO CHANGE THIS TO BE SELECTED BY UUID
     PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
-    deckView->setVisible(true);
-    visualDeckStorageWidget->setVisible(false);
-    unloadDeckButton->setEnabled(true);
+    switchToDeckLoadedView();
 }
 
 void DeckViewContainer::readyStart()

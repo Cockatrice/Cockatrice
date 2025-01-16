@@ -51,6 +51,8 @@ private:
     TabGame *parentGame;
     int playerId;
 private slots:
+    void switchToDeckSelectView();
+    void switchToDeckLoadedView();
     void loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance);
     void loadLocalDeck();
     void loadRemoteDeck();
