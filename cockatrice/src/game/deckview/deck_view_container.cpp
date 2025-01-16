@@ -79,7 +79,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     if (forceStartGameButton->isEnabled()) {
         buttonHBox->addWidget(forceStartGameButton);
     }
-    buttonHBox->setContentsMargins(0, 0, 0, 0);
+    buttonHBox->setContentsMargins(11, 0, 11, 0);
     buttonHBox->addStretch();
 
     deckView = new DeckView;
