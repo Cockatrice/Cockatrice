@@ -11,8 +11,8 @@
 #include "pb/session_commands.pb.h"
 #include "user_info_box.h"
 
-UserListManager::UserListManager(AbstractClient *_client, QWidget *parent)
-    : QWidget(parent), client(_client), ownUserInfo(nullptr)
+UserListManager::UserListManager(AbstractClient *_client, QObject *parent)
+    : QObject(parent), client(_client), ownUserInfo(nullptr)
 {
     connect(client, &AbstractClient::userJoinedEventReceived, this, &UserListManager::processUserJoinedEvent);
     connect(client, &AbstractClient::userLeftEventReceived, this, &UserListManager::processUserLeftEvent);

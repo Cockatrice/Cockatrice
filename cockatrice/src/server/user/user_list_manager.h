@@ -17,7 +17,7 @@ class Response;
 class ServerInfo_User;
 class TabSupervisor;
 
-class UserListManager : public QWidget, public UserListProxy
+class UserListManager : public QObject, public UserListProxy
 {
     Q_OBJECT
 
@@ -38,7 +38,7 @@ private slots:
     void processRemoveFromListEvent(const Event_RemoveFromList &event);
 
 public:
-    explicit UserListManager(AbstractClient *_client, QWidget *parent = nullptr);
+    explicit UserListManager(AbstractClient *_client, QObject *parent = nullptr);
     ~UserListManager() override;
 
     [[nodiscard]] QMap<QString, ServerInfo_User> getAllUsersList() const
