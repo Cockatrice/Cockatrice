@@ -55,6 +55,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     // Don't waste time processing the cards if they're going to get refreshed anyway once the db finishes loading
     if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
         refreshBannerCards();
+        databaseLoadIndicator->setVisible(false);
     } else {
         flowWidget->addWidget(databaseLoadIndicator);
     }
