@@ -136,7 +136,7 @@ void DeckViewContainer::switchToDeckSelectView()
     readyStartButton->setState(false);
     sideboardLockButton->setState(false);
 
-    setReadyStart(false);
+    sendReadyStartCommand(false);
 }
 
 void DeckViewContainer::switchToDeckLoadedView()
@@ -255,9 +255,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 
 void DeckViewContainer::readyStart()
 {
-    Command_ReadyStart cmd;
-    cmd.set_ready(!readyStartButton->getState());
-    parentGame->sendGameCommand(cmd, playerId);
+    sendReadyStartCommand(!readyStartButton->getState());
 }
 
 void DeckViewContainer::forceStart()
@@ -285,6 +283,22 @@ void DeckViewContainer::sideboardPlanChanged()
     parentGame->sendGameCommand(cmd, playerId);
 }
 
+/**
+ * Sends the basic ReadyStart command.
+ */
+void DeckViewContainer::sendReadyStartCommand(bool ready)
+{
+    Command_ReadyStart cmd;
+    cmd.set_ready(ready);
+    parentGame->sendGameCommand(cmd, playerId);
+}
+
+/**
+ * Updates the buttons to make the client-side ready state match the given state.
+ *
+ * Notably, this method only updates the client and *does not* send a ReadyStart command to the server.
+ * This method is intended to be called upon receiving the response from a ReadyStart command.
+ */
 void DeckViewContainer::setReadyStart(bool ready)
 {
     readyStartButton->setState(ready);
@@ -293,15 +307,11 @@ void DeckViewContainer::setReadyStart(bool ready)
 }
 
 /**
- * Sets the ready start to true, then sends the ready command so the server responds to the update
+ * Sends a ReadyStart command with ready=true to the server
  */
 void DeckViewContainer::readyAndUpdate()
 {
-    setReadyStart(true);
-
-    Command_ReadyStart cmd;
-    cmd.set_ready(true);
-    parentGame->sendGameCommand(cmd, playerId);
+    sendReadyStartCommand(true);
 }
 
 void DeckViewContainer::setSideboardLocked(bool locked)
