@@ -181,6 +181,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &GeneralSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 QStringList GeneralSettingsPage::findQmFiles()
@@ -464,6 +467,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addStretch();
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &AppearanceSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void AppearanceSettingsPage::themeBoxChanged(int index)
@@ -648,6 +654,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     mainLayout->addStretch();
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &UserInterfaceSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
@@ -820,6 +829,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpMainLayout->addWidget(mpSpoilerGroupBox);
 
     setLayout(lpMainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DeckEditorSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
@@ -1122,6 +1134,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     setLayout(mainLayout);
 
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &MessagesSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -1296,6 +1309,9 @@ SoundSettingsPage::SoundSettingsPage()
     mainLayout->addStretch();
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &SoundSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void SoundSettingsPage::themeBoxChanged(int index)
@@ -1388,6 +1404,9 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
 
     connect(shortcutsTable, &ShortcutTreeView::currentItemChanged, this, &ShortcutSettingsPage::currentItemChanged);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ShortcutSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void ShortcutSettingsPage::currentItemChanged(const QString &key)
@@ -1475,6 +1494,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DlgSettings::retranslateUi);
     retranslateUi();
 
     adjustSize();
@@ -1541,13 +1561,6 @@ void DlgSettings::updateLanguage()
 {
     qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     installNewTranslator();
-}
-
-void DlgSettings::changeEvent(QEvent *event)
-{
-    if (event->type() == QEvent::LanguageChange)
-        retranslateUi();
-    QDialog::changeEvent(event);
 }
 
 void DlgSettings::closeEvent(QCloseEvent *event)
@@ -1637,9 +1650,6 @@ void DlgSettings::retranslateUi()
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
     shortcutsButton->setText(tr("Shortcuts"));
-
-    for (int i = 0; i < pagesWidget->count(); i++)
-        dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
 
     contentsWidget->reset();
 }

@@ -323,7 +323,6 @@ private:
     void retranslateUi();
 
 protected:
-    void changeEvent(QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 
