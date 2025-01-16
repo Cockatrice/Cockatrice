@@ -114,17 +114,28 @@ void DeckViewContainer::retranslateUi()
     updateSideboardLockButtonText();
 }
 
+static void setVisibility(QPushButton *button, bool visible)
+{
+    button->setHidden(!visible);
+    button->setEnabled(visible);
+}
+
 void DeckViewContainer::switchToDeckSelectView()
 {
     deckView->setVisible(false);
     visualDeckStorageWidget->setVisible(true);
     deckViewLayout->update();
-    unloadDeckButton->setEnabled(false);
-    readyStartButton->setEnabled(false);
+
+    setVisibility(loadLocalButton, true);
+    setVisibility(loadRemoteButton, true);
+    setVisibility(unloadDeckButton, false);
+    setVisibility(readyStartButton, false);
+    setVisibility(sideboardLockButton, false);
+    setVisibility(forceStartGameButton, false);
+
     readyStartButton->setState(false);
-    sideboardLockButton->setEnabled(false);
     sideboardLockButton->setState(false);
-    forceStartGameButton->setEnabled(false);
+
     setReadyStart(false);
 }
 
@@ -132,8 +143,14 @@ void DeckViewContainer::switchToDeckLoadedView()
 {
     deckView->setVisible(true);
     visualDeckStorageWidget->setVisible(false);
-    unloadDeckButton->setEnabled(true);
-    forceStartGameButton->setEnabled(parentGame->isHost());
+    deckViewLayout->update();
+
+    setVisibility(loadLocalButton, false);
+    setVisibility(loadRemoteButton, false);
+    setVisibility(unloadDeckButton, true);
+    setVisibility(readyStartButton, true);
+    setVisibility(sideboardLockButton, true);
+    setVisibility(forceStartGameButton, true);
 }
 
 void DeckViewContainer::updateSideboardLockButtonText()
@@ -177,16 +194,7 @@ void DeckViewContainer::loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *in
 
 void DeckViewContainer::unloadDeck()
 {
-    deckView->setVisible(false);
-    visualDeckStorageWidget->setVisible(true);
-    deckViewLayout->update();
-    unloadDeckButton->setEnabled(false);
-    readyStartButton->setEnabled(false);
-    readyStartButton->setState(false);
-    sideboardLockButton->setEnabled(false);
-    sideboardLockButton->setState(false);
-    forceStartGameButton->setEnabled(false);
-    setReadyStart(false);
+    switchToDeckSelectView();
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -307,8 +315,5 @@ void DeckViewContainer::setSideboardLocked(bool locked)
 void DeckViewContainer::setDeck(const DeckLoader &deck)
 {
     deckView->setDeck(deck);
-    readyStartButton->setEnabled(true);
-    sideboardLockButton->setState(false);
-    sideboardLockButton->setEnabled(true);
-    forceStartGameButton->setEnabled(true);
+    switchToDeckLoadedView();
 }
