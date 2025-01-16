@@ -668,10 +668,10 @@ void TabDeckEditor::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
-    aCardInfoDockVisible->setChecked(cardInfoDock->isVisible());
-    aFilterDockVisible->setChecked(filterDock->isVisible());
-    aDeckDockVisible->setChecked(deckDock->isVisible());
-    aPrintingSelectorDockVisible->setChecked(printingSelectorDock->isVisible());
+    aCardInfoDockVisible->setChecked(!cardInfoDock->isHidden());
+    aFilterDockVisible->setChecked(!filterDock->isHidden());
+    aDeckDockVisible->setChecked(!deckDock->isHidden());
+    aPrintingSelectorDockVisible->setChecked(!printingSelectorDock->isHidden());
 
     aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
     aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
@@ -1641,25 +1641,25 @@ void TabDeckEditor::dockVisibleTriggered()
 {
     QObject *o = sender();
     if (o == aCardInfoDockVisible) {
-        cardInfoDock->setVisible(aCardInfoDockVisible->isChecked());
+        cardInfoDock->setHidden(!aCardInfoDockVisible->isChecked());
         aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
         return;
     }
 
     if (o == aDeckDockVisible) {
-        deckDock->setVisible(aDeckDockVisible->isChecked());
+        deckDock->setHidden(!aDeckDockVisible->isChecked());
         aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
         return;
     }
 
     if (o == aFilterDockVisible) {
-        filterDock->setVisible(aFilterDockVisible->isChecked());
+        filterDock->setHidden(!aFilterDockVisible->isChecked());
         aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
         return;
     }
 
     if (o == aPrintingSelectorDockVisible) {
-        printingSelectorDock->setVisible(aPrintingSelectorDockVisible->isChecked());
+        printingSelectorDock->setHidden(!aPrintingSelectorDockVisible->isChecked());
         aPrintingSelectorDockFloating->setEnabled(aPrintingSelectorDockVisible->isChecked());
         return;
     }
