@@ -102,8 +102,8 @@ void FlowWidget::clearLayout()
     if (flowLayout != nullptr) {
         QLayoutItem *item;
         while ((item = flowLayout->takeAt(0)) != nullptr) {
-            delete item->widget(); // Delete the widget
-            delete item;           // Delete the layout item
+            item->widget()->deleteLater(); // Delete the widget
+            delete item;                   // Delete the layout item
         }
     } else {
         if (scrollArea->horizontalScrollBarPolicy() != Qt::ScrollBarAlwaysOff &&
