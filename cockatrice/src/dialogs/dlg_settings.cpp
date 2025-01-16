@@ -34,6 +34,8 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QSlider>
 #include <QSpinBox>
 #include <QStackedWidget>
@@ -1454,6 +1456,19 @@ void ShortcutSettingsPage::retranslateUi()
     searchEdit->setPlaceholderText(tr("Search by shortcut name"));
 }
 
+static QScrollArea *makeScrollable(QWidget *widget)
+{
+    widget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+
+    auto *scrollArea = new QScrollArea;
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setContentsMargins(0, 0, 0, 0);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->horizontalScrollBar()->setEnabled(false);
+    scrollArea->setWidget(widget);
+    return scrollArea;
+}
+
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
     auto rec = QGuiApplication::primaryScreen()->availableGeometry();
@@ -1471,8 +1486,8 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(new GeneralSettingsPage);
-    pagesWidget->addWidget(new AppearanceSettingsPage);
-    pagesWidget->addWidget(new UserInterfaceSettingsPage);
+    pagesWidget->addWidget(makeScrollable(new AppearanceSettingsPage));
+    pagesWidget->addWidget(makeScrollable(new UserInterfaceSettingsPage));
     pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
