@@ -890,7 +890,8 @@ void TabDeckEditor::updateBannerCardComboBox()
 void TabDeckEditor::setBannerCard(int /* changedIndex */)
 {
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
-    deckModel->getDeckList()->setBannerCard(QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    deckModel->getDeckList()->setBannerCard(
+        QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
 }
 
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
