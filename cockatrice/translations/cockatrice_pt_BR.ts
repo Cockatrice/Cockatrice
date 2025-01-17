@@ -86,17 +86,17 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="507"/>
         <source>Show visual deck storage on database load</source>
-        <translation>Mostrar armazenamento visual de decks ao carregar o banco de dados</translation>
+        <translation>Mostrar decks visuais ao carregar o banco de dados</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="509"/>
         <source>Draw missing color identities in visual deck storage without color label</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar indetidades de cor nos decks visuais sem rótulo</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="510"/>
         <source>Missing color identity opacity</source>
-        <translation type="unfinished"/>
+        <translation>Opacidade da identidade de cor ausente</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="513"/>
@@ -823,12 +823,12 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp" line="126"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Modo: Correspondência Exata</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp" line="126"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Modo: Inclui</translation>
     </message>
 </context>
 <context>
@@ -836,7 +836,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp" line="29"/>
         <source>Edit tags ...</source>
-        <translation type="unfinished"/>
+        <translation>Editar tags ...</translation>
     </message>
 </context>
 <context>
@@ -844,57 +844,57 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="156"/>
         <source>Deck Tags Manager</source>
-        <translation type="unfinished"/>
+        <translation>Gerenciador de Tags de Deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="157"/>
         <source>Manage your deck tags. Check or uncheck tags as needed, or add new ones:</source>
-        <translation type="unfinished"/>
+        <translation>Gerencie suas tags de deck. Marque ou desmarque as tags conforme necessário ou adicione novas:</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="158"/>
         <source>Add a new tag (e.g., Aggro️)</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar uma nova tag (ex.: Aggro)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="159"/>
         <source>Add Tag</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar Tag</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="160"/>
         <source>Filter tags...</source>
-        <translation type="unfinished"/>
+        <translation>Filtrar tags...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="161"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="162"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="174"/>
         <source>Invalid Input</source>
-        <translation type="unfinished"/>
+        <translation>Entrada Inválida</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="174"/>
         <source>Tag name cannot be empty!</source>
-        <translation type="unfinished"/>
+        <translation>O nome da tag não pode estar vazio!</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="183"/>
         <source>Duplicate Tag</source>
-        <translation type="unfinished"/>
+        <translation>Tag Duplicada</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="183"/>
         <source>This tag already exists.</source>
-        <translation type="unfinished"/>
+        <translation>Essa tag já existe.</translation>
     </message>
 </context>
 <context>
@@ -927,7 +927,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="src/client/tabs/tab_game.cpp" line="167"/>
         <source>Unload deck</source>
         <oldsource>Unload deck...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Descarregar deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="168"/>
@@ -3164,12 +3164,12 @@ A versão local é %1 e a versão remota é %2.</translation>
         <location filename="src/client/ui/window_main.cpp" line="667"/>
         <source>&amp;Visual Deck storage</source>
         <oldsource>&amp;Deck editor</oldsource>
-        <translation>Armazenamento Visual de Deck</translation>
+        <translation>Decks Visuais</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="667"/>
         <source>&amp;Visual Deck storage</source>
-        <translation>Armazenamento Visual de Deck</translation>
+        <translation>Decks Visuais</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="668"/>
@@ -3244,7 +3244,7 @@ A versão local é %1 e a versão remota é %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="689"/>
         <source>Tabs</source>
-        <translation type="unfinished"/>
+        <translation>Abas</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="691"/>
@@ -3766,17 +3766,17 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
         <source>%1 is looking at the %4 %3 card(s) %2.</source>
         <oldsource>%1 is looking at the top %3 card(s) %2.</oldsource>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation><numerusform>%1 está olhando para as %4 %3 carta(s) %2.</numerusform><numerusform>%1 está olhando para as %4 %3 carta(s) %2.</numerusform><numerusform>%1 está olhando para as %4 %3 carta(s) %2.</numerusform></translation>
+        <translation><numerusform>%1 está olhando para a(s) %3 carta(s) %4 %2.</numerusform><numerusform>%1 está olhando para a(s) %3 carta(s) %4 %2.</numerusform><numerusform>%1 está olhando para a(s) %3 carta(s) %4 %2.</numerusform></translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="393"/>
         <source>bottom</source>
-        <translation>fundo</translation>
+        <translation>de fundo</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="393"/>
         <source>top</source>
-        <translation>topo</translation>
+        <translation>de topo</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="401"/>
@@ -6202,7 +6202,7 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="src/client/tabs/visual_deck_storage/tab_deck_storage_visual.h" line="32"/>
         <source>Visual Deck storage</source>
-        <translation>Armazenamento Visual de Deck</translation>
+        <translation>Decks Visuais</translation>
     </message>
 </context>
 <context>
@@ -6813,37 +6813,37 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="173"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Editor de Deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="174"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Servidor</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="175"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Conta</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="176"/>
         <source>Deck storage</source>
-        <translation type="unfinished"/>
+        <translation>Armazenamento de Deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="177"/>
         <source>Game replays</source>
-        <translation type="unfinished"/>
+        <translation>Repetições de Jogo</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="178"/>
         <source>Administration</source>
-        <translation type="unfinished"/>
+        <translation>Administração</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="179"/>
         <source>Logs</source>
-        <translation type="unfinished"/>
+        <translation>Registros</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="224"/>
@@ -7499,22 +7499,22 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="41"/>
         <source>Sort Alphabetically (Deck Name)</source>
-        <translation type="unfinished"/>
+        <translation>Ordenar Alfabeticamente (Nome do Deck)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="42"/>
         <source>Sort Alphabetically (Filename)</source>
-        <translation type="unfinished"/>
+        <translation>Ordenar Alfabeticamente (Nome do Arquivo)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="43"/>
         <source>Sort by Last Modified</source>
-        <translation type="unfinished"/>
+        <translation>Ordenar por Última Modificação</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="44"/>
         <source>Sort by Last Loaded</source>
-        <translation type="unfinished"/>
+        <translation>Ordenar por Último Carregamento</translation>
     </message>
 </context>
 <context>
