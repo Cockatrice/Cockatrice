@@ -92,7 +92,6 @@ public:
     TabRoom(TabSupervisor *_tabSupervisor,
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
-            const UserListProxy *_userListProxy,
             const ServerInfo_Room &info);
     void retranslateUi() override;
     void closeRequest(bool forced = false) override;

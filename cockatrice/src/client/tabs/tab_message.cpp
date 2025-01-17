@@ -26,7 +26,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)),
       otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
 {
-    chatView = new ChatView(tabSupervisor, tabSupervisor->getUserListManager(), 0, true);
+    chatView = new ChatView(tabSupervisor, 0, true);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));

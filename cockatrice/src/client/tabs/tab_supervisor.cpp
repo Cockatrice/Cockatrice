@@ -588,7 +588,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
             roomGameTypes.insert(event.game_types(i).game_type_id(),
                                  QString::fromStdString(event.game_types(i).description()));
 
-    auto *tab = new TabGame(this, userListManager, QList<AbstractClient *>() << client, event, roomGameTypes);
+    auto *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
@@ -599,7 +599,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
-    auto *tab = new TabGame(this, userListManager, localClients, event, QMap<int, QString>());
+    auto *tab = new TabGame(this, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
@@ -627,7 +627,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
-    auto *tab = new TabRoom(this, client, userInfo, userListManager, info);
+    auto *tab = new TabRoom(this, client, userInfo, info);
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
