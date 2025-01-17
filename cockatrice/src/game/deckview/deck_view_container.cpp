@@ -135,6 +135,8 @@ void DeckViewContainer::switchToDeckSelectView()
     readyStartButton->setState(false);
     sideboardLockButton->setState(false);
 
+    deckView->setLocked(true);
+
     sendReadyStartCommand(false);
 }
 
