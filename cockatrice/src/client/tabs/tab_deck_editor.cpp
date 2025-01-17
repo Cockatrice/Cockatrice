@@ -3,7 +3,6 @@
 #include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
-#include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
@@ -16,7 +15,6 @@
 #include "../../settings/cache_settings.h"
 #include "../ui/picture_loader/picture_loader.h"
 #include "../ui/pixel_map_generator.h"
-#include "../ui/widgets/printing_selector/printing_selector.h"
 #include "pb/command_deck_upload.pb.h"
 #include "pb/response.pb.h"
 #include "tab_supervisor.h"
@@ -891,8 +889,9 @@ void TabDeckEditor::updateBannerCardComboBox()
 
 void TabDeckEditor::setBannerCard(int /* changedIndex */)
 {
-    QVariantMap data = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
-    deckModel->getDeckList()->setBannerCard(QPair<QString, QString>(data["name"].toString(), data["uuid"].toString()));
+    QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
+    deckModel->getDeckList()->setBannerCard(
+        QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
 }
 
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
@@ -1411,16 +1410,16 @@ void TabDeckEditor::actSwapCard()
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
-    bool modified = false;
+    bool isModified = false;
     for (const auto &currentIndex : selectedRows) {
         if (swapCard(currentIndex)) {
-            modified = true;
+            isModified = true;
         }
     }
 
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    if (modified) {
+    if (isModified) {
         setModified(true);
         setSaveStatus(true);
     }
@@ -1483,18 +1482,18 @@ void TabDeckEditor::actRemoveCard()
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
-    bool modified = false;
+    bool isModified = false;
     for (const auto &index : selectedRows) {
         if (!index.isValid() || deckModel->hasChildren(index)) {
             continue;
         }
         deckModel->removeRow(index.row(), index.parent());
-        modified = true;
+        isModified = true;
     }
 
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    if (modified) {
+    if (isModified) {
         DeckLoader *const deck = deckModel->getDeckList();
         setSaveStatus(!deck->isEmpty());
         setModified(true);

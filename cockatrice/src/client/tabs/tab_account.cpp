@@ -16,7 +16,6 @@
 #include "tab_supervisor.h"
 #include "trice_limits.h"
 
-#include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -44,72 +43,74 @@ TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     buddyListReceived(tabSupervisor->getUserListManager()->getBuddyList().values());
     ignoreListReceived(tabSupervisor->getUserListManager()->getIgnoreList().values());
 
-    PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
+    PendingCommand *pend = AbstractClient::prepareSessionCommand(Command_ListUsers());
     connect(pend, &PendingCommand::finished, this, &TabAccount::processListUsersResponse);
     client->sendCommand(pend);
 
-    QVBoxLayout *vbox = new QVBoxLayout;
+    auto *vbox = new QVBoxLayout;
     vbox->addWidget(userInfoBox);
     vbox->addWidget(allUsersList);
 
-    QHBoxLayout *addToBuddyList = new QHBoxLayout;
+    auto *addToBuddyList = new QHBoxLayout;
     addBuddyEdit = new LineEditUnfocusable;
     addBuddyEdit->setMaxLength(MAX_NAME_LENGTH);
     addBuddyEdit->setPlaceholderText(tr("Add to Buddy List"));
     connect(addBuddyEdit, &LineEditUnfocusable::returnPressed, this, &TabAccount::addToBuddyList);
-    QPushButton *addBuddyButton = new QPushButton("Add");
+    auto *addBuddyButton = new QPushButton("Add");
     connect(addBuddyButton, &QPushButton::clicked, this, &TabAccount::addToBuddyList);
     addToBuddyList->addWidget(addBuddyEdit);
     addToBuddyList->addWidget(addBuddyButton);
 
-    QHBoxLayout *addToIgnoreList = new QHBoxLayout;
+    auto *addToIgnoreList = new QHBoxLayout;
     addIgnoreEdit = new LineEditUnfocusable;
     addIgnoreEdit->setMaxLength(MAX_NAME_LENGTH);
     addIgnoreEdit->setPlaceholderText(tr("Add to Ignore List"));
     connect(addIgnoreEdit, &LineEditUnfocusable::returnPressed, this, &TabAccount::addToIgnoreList);
-    QPushButton *addIgnoreButton = new QPushButton("Add");
+    auto *addIgnoreButton = new QPushButton("Add");
     connect(addIgnoreButton, &QPushButton::clicked, this, &TabAccount::addToIgnoreList);
     addToIgnoreList->addWidget(addIgnoreEdit);
     addToIgnoreList->addWidget(addIgnoreButton);
 
-    QVBoxLayout *buddyPanel = new QVBoxLayout;
+    auto *buddyPanel = new QVBoxLayout;
     buddyPanel->addWidget(buddyList);
     buddyPanel->addLayout(addToBuddyList);
 
-    QVBoxLayout *ignorePanel = new QVBoxLayout;
+    auto *ignorePanel = new QVBoxLayout;
     ignorePanel->addWidget(ignoreList);
     ignorePanel->addLayout(addToIgnoreList);
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
+    auto *mainLayout = new QHBoxLayout;
     mainLayout->addLayout(buddyPanel);
     mainLayout->addLayout(ignorePanel);
     mainLayout->addLayout(vbox);
 
     retranslateUi();
 
-    QWidget *mainWidget = new QWidget(this);
+    auto *mainWidget = new QWidget(this);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
 }
 
 void TabAccount::addToBuddyList()
 {
-    QString userName = addBuddyEdit->text();
-    if (userName.length() < 1)
+    const QString &userName = addBuddyEdit->text();
+    if (userName.isEmpty()) {
         return;
+    }
 
-    std::string listName = "buddy";
+    const std::string listName = "buddy";
     addToList(listName, userName);
     addBuddyEdit->clear();
 }
 
 void TabAccount::addToIgnoreList()
 {
-    QString userName = addIgnoreEdit->text();
-    if (userName.length() < 1)
+    const QString &userName = addIgnoreEdit->text();
+    if (userName.isEmpty()) {
         return;
+    }
 
-    std::string listName = "ignore";
+    const std::string listName = "ignore";
     addToList(listName, userName);
     addIgnoreEdit->clear();
 }
@@ -120,7 +121,7 @@ void TabAccount::addToList(const std::string &listName, const QString &userName)
     cmd.set_list(listName);
     cmd.set_user_name(userName.toStdString());
 
-    client->sendCommand(client->prepareSessionCommand(cmd));
+    client->sendCommand(AbstractClient::prepareSessionCommand(cmd));
 }
 
 void TabAccount::retranslateUi()
@@ -134,11 +135,9 @@ void TabAccount::retranslateUi()
 void TabAccount::processListUsersResponse(const Response &response)
 {
     const Response_ListUsers &resp = response.GetExtension(Response_ListUsers::ext);
-
-    const int userListSize = resp.user_list_size();
-    for (int i = 0; i < userListSize; ++i) {
+    for (int i = 0; i < resp.user_list_size(); ++i) {
         const ServerInfo_User &info = resp.user_list(i);
-        const QString userName = QString::fromStdString(info.name());
+        const QString &userName = QString::fromStdString(info.name());
         allUsersList->processUserInfo(info, true);
         ignoreList->setUserOnline(userName, true);
         buddyList->setUserOnline(userName, true);
@@ -152,7 +151,7 @@ void TabAccount::processListUsersResponse(const Response &response)
 void TabAccount::processUserJoinedEvent(const Event_UserJoined &event)
 {
     const ServerInfo_User &info = event.user_info();
-    const QString userName = QString::fromStdString(info.name());
+    const QString &userName = QString::fromStdString(info.name());
 
     allUsersList->processUserInfo(info, true);
     ignoreList->setUserOnline(userName, true);
@@ -162,18 +161,20 @@ void TabAccount::processUserJoinedEvent(const Event_UserJoined &event)
     ignoreList->sortItems();
     buddyList->sortItems();
 
-    if (buddyList->getUsers().keys().contains(userName))
+    if (buddyList->getUsers().keys().contains(userName)) {
         soundEngine->playSound("buddy_join");
+    }
 
     emit userJoined(info);
 }
 
 void TabAccount::processUserLeftEvent(const Event_UserLeft &event)
 {
-    QString userName = QString::fromStdString(event.name());
+    const QString &userName = QString::fromStdString(event.name());
 
-    if (buddyList->getUsers().keys().contains(userName))
+    if (buddyList->getUsers().keys().contains(userName)) {
         soundEngine->playSound("buddy_leave");
+    }
 
     if (allUsersList->deleteUser(userName)) {
         ignoreList->setUserOnline(userName, false);
@@ -187,30 +188,34 @@ void TabAccount::processUserLeftEvent(const Event_UserLeft &event)
 
 void TabAccount::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
-    for (const auto &user : _buddyList)
+    for (const auto &user : _buddyList) {
         buddyList->processUserInfo(user, false);
+    }
     buddyList->sortItems();
 }
 
 void TabAccount::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 {
-    for (const auto &user : _ignoreList)
+    for (const auto &user : _ignoreList) {
         ignoreList->processUserInfo(user, false);
+    }
     ignoreList->sortItems();
 }
 
 void TabAccount::processAddToListEvent(const Event_AddToList &event)
 {
     const ServerInfo_User &info = event.user_info();
-    bool online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
-    QString list = QString::fromStdString(event.list_name());
-    UserListWidget *userList = 0;
-    if (list == "buddy")
+    const bool online = allUsersList->getUsers().contains(QString::fromStdString(info.name()));
+    const QString &list = QString::fromStdString(event.list_name());
+
+    UserListWidget *userList;
+    if (list == "buddy") {
         userList = buddyList;
-    else if (list == "ignore")
+    } else if (list == "ignore") {
         userList = ignoreList;
-    if (!userList)
+    } else {
         return;
+    }
 
     userList->processUserInfo(info, online);
     userList->sortItems();
@@ -218,14 +223,17 @@ void TabAccount::processAddToListEvent(const Event_AddToList &event)
 
 void TabAccount::processRemoveFromListEvent(const Event_RemoveFromList &event)
 {
-    QString list = QString::fromStdString(event.list_name());
-    QString user = QString::fromStdString(event.user_name());
-    UserListWidget *userList = 0;
-    if (list == "buddy")
+    const auto &list = QString::fromStdString(event.list_name());
+    const auto &user = QString::fromStdString(event.user_name());
+
+    UserListWidget *userList;
+    if (list == "buddy") {
         userList = buddyList;
-    else if (list == "ignore")
+    } else if (list == "ignore") {
         userList = ignoreList;
-    if (!userList)
+    } else {
         return;
+    }
+
     userList->deleteUser(user);
 }
