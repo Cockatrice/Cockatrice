@@ -76,9 +76,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addWidget(unloadDeckButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
-    if (forceStartGameButton->isEnabled()) {
-        buttonHBox->addWidget(forceStartGameButton);
-    }
+    buttonHBox->addWidget(forceStartGameButton);
+
     buttonHBox->setContentsMargins(11, 0, 11, 0);
     buttonHBox->addStretch();
 
@@ -150,7 +149,10 @@ void DeckViewContainer::switchToDeckLoadedView()
     setVisibility(unloadDeckButton, true);
     setVisibility(readyStartButton, true);
     setVisibility(sideboardLockButton, true);
-    setVisibility(forceStartGameButton, true);
+
+    if (parentGame->isHost()) {
+        setVisibility(forceStartGameButton, true);
+    }
 }
 
 void DeckViewContainer::updateSideboardLockButtonText()
