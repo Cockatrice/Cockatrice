@@ -4,12 +4,12 @@
 #include "../game/cards/card_database.h"
 #include "decklist.h"
 
-#include <QObject>
 #include <QLoggingCategory>
+#include <QObject>
 
 inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface.debug")
 
-class QByteArray;
+    class QByteArray;
 class QNetworkAccessManager;
 class QNetworkReply;
 class DeckList;

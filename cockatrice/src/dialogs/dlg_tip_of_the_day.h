@@ -5,8 +5,8 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
-#include <QLoggingCategory>
 #include <QLineEdit>
+#include <QLoggingCategory>
 #include <QPushButton>
 #include <QVBoxLayout>
 

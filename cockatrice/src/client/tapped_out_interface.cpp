@@ -57,8 +57,8 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         }
 
         QString errorMessage = errorMessageList.join("\n");
-        qCDebug(TappedOutInterfaceLog) << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size() << "message"
-                 << errorMessage;
+        qCDebug(TappedOutInterfaceLog) << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size()
+                                       << "message" << errorMessage;
 
         QMessageBox::critical(nullptr, tr("Error"), errorMessage);
     }
@@ -98,7 +98,7 @@ struct CopyMainOrSide
     DeckList &mainboard, &sideboard;
 
     CopyMainOrSide(CardDatabase &_cardDatabase, DeckList &_mainboard, DeckList &_sideboard)
-        : cardDatabase(_cardDatabase), mainboard(_mainboard), sideboard(_sideboard){};
+        : cardDatabase(_cardDatabase), mainboard(_mainboard), sideboard(_sideboard) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {

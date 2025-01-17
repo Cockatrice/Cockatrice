@@ -198,7 +198,8 @@ QString GeneralSettingsPage::languageName(const QString &lang)
     QString appNameHint = translationPrefix + "_" + lang;
     bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
-        qCDebug(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
+        qCDebug(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
+                                << translationPath;
     }
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);

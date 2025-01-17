@@ -102,7 +102,7 @@ void installNewTranslator()
 
     bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {
-        qCDebug(QtTranslatorDebug) << "aaUnable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
+        qCDebug(QtTranslatorDebug) << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
     } else {
         qCDebug(QtTranslatorDebug) << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
     }
@@ -111,10 +111,11 @@ void installNewTranslator()
     QString appNameHint = translationPrefix + "_" + lang;
     bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
-        qCDebug(QtTranslatorDebug) << "aaUnable to load" << translationPrefix << "translation" << appNameHint << "at"
+        qCDebug(QtTranslatorDebug) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
                                    << translationPath;
     } else {
-        qCDebug(QtTranslatorDebug) << "Loaded" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
+        qCDebug(QtTranslatorDebug) << "Loaded" << translationPrefix << "translation" << appNameHint << "at"
+                                   << translationPath;
     }
     qApp->installTranslator(translator);
 }

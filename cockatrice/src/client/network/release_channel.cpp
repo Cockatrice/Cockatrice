@@ -148,8 +148,8 @@ void StableReleaseChannel::releaseListFinished()
     qCDebug(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
     qCDebug(ReleaseChannelLog) << "Got reply from release server, name=" << lastRelease->getName()
-             << "desc=" << lastRelease->getDescriptionUrl() << "date=" << lastRelease->getPublishDate()
-             << "url=" << lastRelease->getDownloadUrl();
+                               << "desc=" << lastRelease->getDescriptionUrl()
+                               << "date=" << lastRelease->getPublishDate() << "url=" << lastRelease->getDownloadUrl();
 
     const QString &tagName = resultMap["tag_name"].toString();
     QString url = QString(STABLETAG_URL) + tagName;
@@ -249,9 +249,9 @@ void BetaReleaseChannel::releaseListFinished()
     lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
     lastRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
 
-    qCDebug(ReleaseChannelLog) << "Got reply from release server, size=" << resultMap.size() << "name=" << lastRelease->getName()
-             << "desc=" << lastRelease->getDescriptionUrl() << "commit=" << lastRelease->getCommitHash()
-             << "date=" << lastRelease->getPublishDate();
+    qCDebug(ReleaseChannelLog) << "Got reply from release server, size=" << resultMap.size()
+                               << "name=" << lastRelease->getName() << "desc=" << lastRelease->getDescriptionUrl()
+                               << "commit=" << lastRelease->getCommitHash() << "date=" << lastRelease->getPublishDate();
 
     QString betaBuildDownloadUrl = resultMap["assets_url"].toString();
 

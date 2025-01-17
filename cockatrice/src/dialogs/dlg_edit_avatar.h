@@ -8,7 +8,7 @@
 
 inline Q_LOGGING_CATEGORY(DlgEditAvatarLog, "dlg_edit_avatar.debug")
 
-class QLabel;
+    class QLabel;
 class QPushButton;
 class QCheckBox;
 

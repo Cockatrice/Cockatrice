@@ -9,8 +9,8 @@
 #include "tab.h"
 
 #include <QCompleter>
-#include <QMap>
 #include <QLoggingCategory>
+#include <QMap>
 
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game.debug");
 
