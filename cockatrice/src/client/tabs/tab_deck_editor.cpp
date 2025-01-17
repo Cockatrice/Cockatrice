@@ -753,7 +753,7 @@ void TabDeckEditor::retranslateUi()
     aSaveDeckToClipboard->setText(tr("Annotated"));
     aSaveDeckToClipboardNoSetNameAndNumber->setText(tr("Annotated (No set name or number)"));
     aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
-    aSaveDeckToClipboardRawNoSetNameAndNumber->setText(tr("Not Annotated (No set name or number"));
+    aSaveDeckToClipboardRawNoSetNameAndNumber->setText(tr("Not Annotated (No set name or number)"));
 
     aPrintDeck->setText(tr("&Print deck..."));
 
