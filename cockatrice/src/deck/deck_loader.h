@@ -45,6 +45,7 @@ public:
         return lastRemoteDeckId;
     }
 
+    void clearSetNamesAndNumbers();
     static FileFormat getFormatFromName(const QString &fileName);
 
     bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
@@ -57,15 +58,19 @@ public:
     void resolveSetNameAndNumberToProviderID();
 
     // overload
-    bool saveToStream_Plain(QTextStream &out, bool addComments = true);
+    bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true);
 
 protected:
     void saveToStream_DeckHeader(QTextStream &out);
-    void saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode, bool addComments = true);
+    void saveToStream_DeckZone(QTextStream &out,
+                               const InnerDecklistNode *zoneNode,
+                               bool addComments = true,
+                               bool addSetNameAndNumber = true);
     void saveToStream_DeckZoneCards(QTextStream &out,
                                     const InnerDecklistNode *zoneNode,
                                     QList<DecklistCardNode *> cards,
-                                    bool addComments = true);
+                                    bool addComments = true,
+                                    bool addSetNameAndNumber = true);
     [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName) override;
     [[nodiscard]] QString getCompleteCardName(const QString &cardName) const override;
 };

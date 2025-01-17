@@ -56,7 +56,9 @@ private slots:
     bool actSaveDeckAs();
     void actLoadDeckFromClipboard();
     void actSaveDeckToClipboard();
+    void actSaveDeckToClipboardNoSetNameAndNumber();
     void actSaveDeckToClipboardRaw();
+    void actSaveDeckToClipboardRawNoSetNameAndNumber();
     void actPrintDeck();
     void actExportDeckDecklist();
     void actAnalyzeDeckDeckstats();
@@ -145,7 +147,8 @@ private:
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu,
         *analyzeDeckMenu, *saveDeckToClipboardMenu, *loadRecentDeckMenu;
     QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
-        *aSaveDeckToClipboard, *aSaveDeckToClipboardRaw, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats,
+        *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetNameAndNumber, *aSaveDeckToClipboardRaw,
+        *aSaveDeckToClipboardRawNoSetNameAndNumber, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats,
         *aAnalyzeDeckTappedout, *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;

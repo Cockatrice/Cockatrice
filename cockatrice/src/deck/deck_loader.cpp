@@ -228,7 +228,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
@@ -328,6 +328,37 @@ void DeckLoader::resolveSetNameAndNumberToProviderID()
     forEachCard(setProviderId);
 }
 
+// This struct is here to support the forEachCard function call, defined in decklist.
+// It requires a function to be called for each card, and it will set the providerId.
+struct ClearSetNameAndNumber
+{
+    // Main operator for struct, allowing the foreachcard to work.
+    ClearSetNameAndNumber()
+    {
+    }
+
+    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
+    {
+        Q_UNUSED(node);
+        // Set the providerId on the card
+        card->setCardSetShortName(nullptr);
+        card->setCardCollectorNumber(nullptr);
+    }
+};
+
+/**
+ * This function iterates through each card in the decklist and sets the providerId
+ * on each card based on its set name and collector number.
+ */
+void DeckLoader::clearSetNamesAndNumbers()
+{
+    // Set up the struct to call.
+    ClearSetNameAndNumber clearSetNameAndNumber;
+
+    // Call the forEachCard method for each card in the deck
+    forEachCard(clearSetNameAndNumber);
+}
+
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 {
     if (fileName.endsWith(".cod", Qt::CaseInsensitive)) {
@@ -336,7 +367,7 @@ DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
     return PlainTextFormat;
 }
 
-bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments)
+bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool addSetNameAndNumber)
 {
     if (addComments) {
         saveToStream_DeckHeader(out);
@@ -346,7 +377,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments)
     for (int i = 0; i < getRoot()->size(); i++) {
         const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(getRoot()->at(i));
 
-        saveToStream_DeckZone(out, zoneNode, addComments);
+        saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
         out << "\n";
@@ -370,7 +401,10 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
     }
 }
 
-void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode, bool addComments)
+void DeckLoader::saveToStream_DeckZone(QTextStream &out,
+                                       const InnerDecklistNode *zoneNode,
+                                       bool addComments,
+                                       bool addSetNameAndNumber)
 {
     // group cards by card type and count the subtotals
     QMultiMap<QString, DecklistCardNode *> cardsByType;
@@ -406,7 +440,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode
 
         QList<DecklistCardNode *> cards = cardsByType.values(cardType);
 
-        saveToStream_DeckZoneCards(out, zoneNode, cards, addComments);
+        saveToStream_DeckZoneCards(out, zoneNode, cards, addComments, addSetNameAndNumber);
 
         if (addComments) {
             out << "\n";
@@ -417,7 +451,8 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode
 void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
                                             const InnerDecklistNode *zoneNode,
                                             QList<DecklistCardNode *> cards,
-                                            bool addComments)
+                                            bool addComments,
+                                            bool addSetNameAndNumber)
 {
     // QMultiMap sorts values in reverse order
     for (int i = cards.size() - 1; i >= 0; --i) {
@@ -433,12 +468,14 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
         if (!card->getName().isNull() && !card->getName().isEmpty()) {
             out << " " << card->getName();
         }
-        if (!card->getCardSetShortName().isNull() && !card->getCardSetShortName().isEmpty()) {
-            out << " "
-                << "(" << card->getCardSetShortName() << ")";
-        }
-        if (!card->getCardCollectorNumber().isNull()) {
-            out << " " << card->getCardCollectorNumber();
+        if (addSetNameAndNumber) {
+            if (!card->getCardSetShortName().isNull() && !card->getCardSetShortName().isEmpty()) {
+                out << " "
+                    << "(" << card->getCardSetShortName() << ")";
+            }
+            if (!card->getCardCollectorNumber().isNull()) {
+                out << " " << card->getCardCollectorNumber();
+            }
         }
         out << "\n";
     }

@@ -337,8 +337,16 @@ void TabDeckEditor::createMenus()
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
 
+    aSaveDeckToClipboardNoSetNameAndNumber = new QAction(QString(), this);
+    connect(aSaveDeckToClipboardNoSetNameAndNumber, SIGNAL(triggered()), this,
+            SLOT(actSaveDeckToClipboardNoSetNameAndNumber()));
+
     aSaveDeckToClipboardRaw = new QAction(QString(), this);
     connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboardRaw()));
+
+    aSaveDeckToClipboardRawNoSetNameAndNumber = new QAction(QString(), this);
+    connect(aSaveDeckToClipboardRawNoSetNameAndNumber, SIGNAL(triggered()), this,
+            SLOT(actSaveDeckToClipboardRawNoSetNameAndNumber()));
 
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
@@ -370,7 +378,9 @@ void TabDeckEditor::createMenus()
 
     saveDeckToClipboardMenu = new QMenu(this);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboard);
+    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardNoSetNameAndNumber);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRaw);
+    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRawNoSetNameAndNumber);
 
     deckMenu = new QMenu(this);
     deckMenu->addAction(aNewDeck);
@@ -741,7 +751,9 @@ void TabDeckEditor::retranslateUi()
 
     saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
     aSaveDeckToClipboard->setText(tr("Annotated"));
+    aSaveDeckToClipboardNoSetNameAndNumber->setText(tr("Annotated (No set name or number)"));
     aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
+    aSaveDeckToClipboardRawNoSetNameAndNumber->setText(tr("Not Annotated (No set name or number"));
 
     aPrintDeck->setText(tr("&Print deck..."));
 
@@ -1172,11 +1184,29 @@ void TabDeckEditor::actSaveDeckToClipboard()
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
+void TabDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
+{
+    QString buffer;
+    QTextStream stream(&buffer);
+    deckModel->getDeckList()->saveToStream_Plain(stream, true, false);
+    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
+    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+}
+
 void TabDeckEditor::actSaveDeckToClipboardRaw()
 {
     QString buffer;
     QTextStream stream(&buffer);
     deckModel->getDeckList()->saveToStream_Plain(stream, false);
+    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
+    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+}
+
+void TabDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
+{
+    QString buffer;
+    QTextStream stream(&buffer);
+    deckModel->getDeckList()->saveToStream_Plain(stream, false, false);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
@@ -1723,7 +1753,9 @@ void TabDeckEditor::setSaveStatus(bool newStatus)
     aSaveDeck->setEnabled(newStatus);
     aSaveDeckAs->setEnabled(newStatus);
     aSaveDeckToClipboard->setEnabled(newStatus);
+    aSaveDeckToClipboardNoSetNameAndNumber->setEnabled(newStatus);
     aSaveDeckToClipboardRaw->setEnabled(newStatus);
+    aSaveDeckToClipboardRawNoSetNameAndNumber->setEnabled(newStatus);
     saveDeckToClipboardMenu->setEnabled(newStatus);
     aPrintDeck->setEnabled(newStatus);
     analyzeDeckMenu->setEnabled(newStatus);
