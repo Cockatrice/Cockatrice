@@ -6,6 +6,8 @@
 #include "../tab_supervisor.h"
 #include "pb/command_deck_del.pb.h"
 
+#include <QMouseEvent>
+
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
     : Tab(_tabSupervisor), visualDeckStorageWidget(new VisualDeckStorageWidget(this))
 {
