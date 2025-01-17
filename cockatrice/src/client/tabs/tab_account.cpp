@@ -3,6 +3,7 @@
 #include "../../deck/custom_line_edit.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_info_box.h"
+#include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"
 #include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
@@ -12,6 +13,7 @@
 #include "pb/event_user_left.pb.h"
 #include "pb/response_list_users.pb.h"
 #include "pb/session_commands.pb.h"
+#include "tab_supervisor.h"
 #include "trice_limits.h"
 
 #include <QHBoxLayout>
@@ -37,6 +39,10 @@ TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     connect(client, &AbstractClient::ignoreListReceived, this, &TabAccount::ignoreListReceived);
     connect(client, &AbstractClient::addToListEventReceived, this, &TabAccount::processAddToListEvent);
     connect(client, &AbstractClient::removeFromListEventReceived, this, &TabAccount::processRemoveFromListEvent);
+
+    // Attempt to populate the tab with the cache
+    buddyListReceived(tabSupervisor->getUserListManager()->getBuddyList().values());
+    ignoreListReceived(tabSupervisor->getUserListManager()->getIgnoreList().values());
 
     PendingCommand *pend = client->prepareSessionCommand(Command_ListUsers());
     connect(pend, &PendingCommand::finished, this, &TabAccount::processListUsersResponse);
@@ -181,15 +187,15 @@ void TabAccount::processUserLeftEvent(const Event_UserLeft &event)
 
 void TabAccount::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
-    for (int i = 0; i < _buddyList.size(); ++i)
-        buddyList->processUserInfo(_buddyList[i], false);
+    for (const auto &user : _buddyList)
+        buddyList->processUserInfo(user, false);
     buddyList->sortItems();
 }
 
 void TabAccount::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 {
-    for (int i = 0; i < _ignoreList.size(); ++i)
-        ignoreList->processUserInfo(_ignoreList[i], false);
+    for (const auto &user : _ignoreList)
+        ignoreList->processUserInfo(user, false);
     ignoreList->sortItems();
 }
 

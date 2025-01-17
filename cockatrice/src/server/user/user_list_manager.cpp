@@ -103,16 +103,16 @@ void UserListManager::processAddToListEvent(const Event_AddToList &event)
 
     const auto &userListType = QString::fromStdString(event.list_name());
 
-    QMap<QString, ServerInfo_User> userMap;
+    QMap<QString, ServerInfo_User> *userMap;
     if (userListType == "buddy") {
-        userMap = buddyUsers;
+        userMap = &buddyUsers;
     } else if (userListType == "ignore") {
-        userMap = ignoredUsers;
+        userMap = &ignoredUsers;
     } else {
         return;
     }
 
-    userMap.insert(userName, user);
+    userMap->insert(userName, user);
 }
 
 void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &event)
@@ -120,16 +120,16 @@ void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &eve
     const auto &userListType = QString::fromStdString(event.list_name());
     const auto &userName = QString::fromStdString(event.user_name());
 
-    QMap<QString, ServerInfo_User> userMap;
+    QMap<QString, ServerInfo_User> *userMap;
     if (userListType == "buddy") {
-        userMap = buddyUsers;
+        userMap = &buddyUsers;
     } else if (userListType == "ignore") {
-        userMap = ignoredUsers;
+        userMap = &ignoredUsers;
     } else {
         return;
     }
 
-    userMap.remove(userName);
+    userMap->remove(userName);
 }
 
 bool UserListManager::isOwnUserRegistered() const
