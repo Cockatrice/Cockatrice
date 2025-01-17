@@ -4,6 +4,7 @@
 #include "../settings/cache_settings.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QClipboard>
 #include <QDialogButtonBox>
 #include <QMessageBox>
@@ -24,9 +25,16 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(pa
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
+    loadSetNameAndNumberCheckBox = new QCheckBox(tr("Parse Set Name and Number (if available)"));
+    loadSetNameAndNumberCheckBox->setChecked(true);
+
+    auto *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(loadSetNameAndNumberCheckBox);
+    buttonLayout->addWidget(buttonBox);
+
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(contentsEdit);
-    mainLayout->addWidget(buttonBox);
+    mainLayout->addLayout(buttonLayout);
 
     setLayout(mainLayout);
 
@@ -65,7 +73,11 @@ void DlgLoadDeckFromClipboard::actOK()
         }
     } else if (deckLoader->loadFromStream_Plain(stream)) {
         deckList = deckLoader;
-        deckList->resolveSetNameAndNumberToProviderID();
+        if (loadSetNameAndNumberCheckBox->isChecked()) {
+            deckList->resolveSetNameAndNumberToProviderID();
+        } else {
+            deckList->clearSetNamesAndNumbers();
+        }
         accept();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
