@@ -6,10 +6,11 @@
 
 #include <QLoggingCategory>
 
-inline Q_LOGGING_CATEGORY(PictureLoaderLog, "picture_loader")
-inline Q_LOGGING_CATEGORY(PictureLoaderCardBackCacheFailLog, "picture_loader.card_back_cache_fail");
+inline Q_LOGGING_CATEGORY(PictureLoaderLog,
+                          "picture_loader") inline Q_LOGGING_CATEGORY(PictureLoaderCardBackCacheFailLog,
+                                                                      "picture_loader.card_back_cache_fail");
 
-    class PictureLoader : public QObject
+class PictureLoader : public QObject
 {
     Q_OBJECT
 public:
