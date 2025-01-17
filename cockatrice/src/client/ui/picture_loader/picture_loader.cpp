@@ -49,7 +49,7 @@ void PictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize si
 {
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderLog) << "PictureLoader: cache fail for" << backCacheKey;
+        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache fail for" << backCacheKey;
         pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
@@ -59,7 +59,7 @@ void PictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size)
 {
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderLog) << "PictureLoader: cache fail for" << backCacheKey;
+        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache fail for" << backCacheKey;
         pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
@@ -89,6 +89,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     }
 
     // add the card to the load queue
+    qCDebug(PictureLoaderLog) << "PictureLoader: Enqueuing " << card->getName() << " for " << card->getPixmapCacheKey();
     getInstance().worker->enqueueImageLoad(card);
 }
 
