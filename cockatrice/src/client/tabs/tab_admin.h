@@ -36,7 +36,7 @@ private:
     bool fullAdmin;
     QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton,
         *activateUserButton;
-    QGroupBox *adminGroupBox;
+    QGroupBox *adminGroupBox, *moderatorGroupBox;
     QPushButton *unlockButton, *lockButton;
     QLineEdit *replayIdToGrant, *userToActivate;
 signals:
