@@ -4,9 +4,12 @@
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
+#include <QLoggingCategory>
 #include <pb/commands.pb.h>
 
-class ZoneViewWidget;
+inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone.debug")
+
+    class ZoneViewWidget;
 class Response;
 class ServerInfo_Card;
 class QGraphicsSceneWheelEvent;

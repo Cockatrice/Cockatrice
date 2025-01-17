@@ -5,7 +5,10 @@
 #include "../board/abstract_graphics_item.h"
 #include "../cards/card_list.h"
 
+#include <QLoggingCategory>
 #include <QString>
+
+inline Q_LOGGING_CATEGORY(CardZoneLog, "card_zone.debug");
 
 class Player;
 class ZoneViewZone;

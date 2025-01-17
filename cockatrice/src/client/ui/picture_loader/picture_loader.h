@@ -4,7 +4,11 @@
 #include "../../../game/cards/card_database.h"
 #include "picture_loader_worker.h"
 
-class PictureLoader : public QObject
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(PictureLoaderLog, "picture_loader")
+
+    class PictureLoader : public QObject
 {
     Q_OBJECT
 public:

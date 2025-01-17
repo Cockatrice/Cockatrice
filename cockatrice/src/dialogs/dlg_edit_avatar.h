@@ -4,6 +4,9 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(DlgEditAvatarLog, "dlg_edit_avatar.debug")
 
 class QLabel;
 class QPushButton;

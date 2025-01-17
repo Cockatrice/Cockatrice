@@ -904,13 +904,13 @@ void MainWindow::startupConfigCheck()
 
     if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
-        qDebug() << "Startup: old client version empty, assuming first start after clean install";
+        qCDebug(WindowMainStartupVersionLog) << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
-        qDebug() << "Startup: old client version" << SettingsCache::instance().getClientVersion()
+        qCDebug(WindowMainStartupVersionLog) << "Startup: old client version" << SettingsCache::instance().getClientVersion()
                  << "differs, assuming first start after update";
         if (SettingsCache::instance().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
@@ -918,13 +918,13 @@ void MainWindow::startupConfigCheck()
             const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
 
-        qDebug() << "[MainWindow] Migrating shortcuts after update detected.";
+        qCDebug(WindowMainStartupShortcutsLog) << "[MainWindow] Migrating shortcuts after update detected.";
         SettingsCache::instance().shortcuts().migrateShortcuts();
 
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
-        qDebug() << "Startup: found config with current version";
+        qCDebug(WindowMainStartupVersionLog) << "Startup: found config with current version";
         const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 
         // Run the tips dialog only on subsequent startups.
@@ -1036,11 +1036,11 @@ void MainWindow::changeEvent(QEvent *event)
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
             if (!connectTo.isEmpty()) {
-                qDebug() << "Command line connect to " << connectTo;
+                qCDebug(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
                 client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
             } else if (SettingsCache::instance().servers().getAutoConnect() &&
                        !SettingsCache::instance().debug().getLocalGameOnStartup()) {
-                qDebug() << "Attempting auto-connect...";
+                qCDebug(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                         dlg.getPassword());

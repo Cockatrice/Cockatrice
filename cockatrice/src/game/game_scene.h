@@ -3,8 +3,12 @@
 
 #include <QGraphicsScene>
 #include <QList>
+#include <QLoggingCategory>
 #include <QPointer>
 #include <QSet>
+
+inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene.debug");
+inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.debug.player_addition_removal");
 
 class Player;
 class ZoneViewWidget;

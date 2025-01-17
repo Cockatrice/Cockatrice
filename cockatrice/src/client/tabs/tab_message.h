@@ -3,6 +3,10 @@
 
 #include "tab.h"
 
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(TabMessageLog, "tab_message.debug");
+
 class AbstractClient;
 class ChatView;
 class LineEditUnfocusable;

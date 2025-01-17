@@ -3,7 +3,11 @@
 
 #include "../../../game/cards/card_database.h"
 
-class PictureToLoad
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(PictureToLoadLog, "picture_loader.picture_to_load")
+
+    class PictureToLoad
 {
 private:
     class SetDownloadPriorityComparator

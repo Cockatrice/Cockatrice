@@ -3,9 +3,12 @@
 
 #include "card_database_parser.h"
 
+#include <QLoggingCategory>
 #include <QXmlStreamReader>
 
-class CockatriceXml4Parser : public ICardDatabaseParser
+inline Q_LOGGING_CATEGORY(CockatriceXml4Log, "cockatrice_xml.debug.xml_4_parser")
+
+    class CockatriceXml4Parser : public ICardDatabaseParser
 {
     Q_OBJECT
     Q_INTERFACES(ICardDatabaseParser)

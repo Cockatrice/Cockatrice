@@ -24,11 +24,18 @@
 #include "pb/response.pb.h"
 
 #include <QList>
+#include <QLoggingCategory>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QProcess>
 #include <QSystemTrayIcon>
 #include <QtNetwork>
+
+inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main.debug");
+inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.debug.startup");
+inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.debug.startup.version");
+inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.debug.startup.shortcuts");
+inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.debug.startup.autoconnect");
 
 class Release;
 class DlgConnect;

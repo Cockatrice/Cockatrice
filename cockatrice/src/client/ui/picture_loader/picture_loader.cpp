@@ -15,10 +15,7 @@
 #include <QScreen>
 #include <QThread>
 #include <algorithm>
-#include <qloggingcategory.h>
 #include <utility>
-
-Q_LOGGING_CATEGORY(PictureLoaderLog, "picture_loader")
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300

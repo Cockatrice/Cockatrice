@@ -5,6 +5,9 @@
 #include "decklist.h"
 
 #include <QObject>
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface.debug")
 
 class QByteArray;
 class QNetworkAccessManager;

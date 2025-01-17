@@ -5,9 +5,12 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QLoggingCategory>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+inline Q_LOGGING_CATEGORY(DlgTipOfTheDayLog, "dlg_tip_of_the_day.debug");
 
 class QLabel;
 class QPushButton;

@@ -102,7 +102,7 @@ public:
     inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
     {
         if (a.isNull() || b.isNull()) {
-            qDebug() << "SetList::KeyCompareFunctor a or b is null";
+            qCDebug(SetListLog) << "SetList::KeyCompareFunctor a or b is null";
             return false;
         }
 
@@ -170,7 +170,7 @@ void SetList::enableAll()
         CardSetPtr set = at(i);
 
         if (set == nullptr) {
-            qDebug() << "enabledAll has null";
+            qCDebug(SetListLog) << "enabledAll has null";
             continue;
         }
 
@@ -201,7 +201,7 @@ void SetList::guessSortKeys()
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
         if (set.isNull()) {
-            qDebug() << "guessSortKeys set is null";
+            qCDebug(SetListLog) << "guessSortKeys set is null";
             continue;
         }
         set->setSortKey(i);
@@ -415,7 +415,7 @@ void CardDatabase::clear()
 void CardDatabase::addCard(CardInfoPtr card)
 {
     if (card == nullptr) {
-        qDebug() << "addCard(nullptr)";
+        qCDebug(CardDatabaseLog) << "CardDatabase::addCard(nullptr)";
         return;
     }
 
@@ -440,7 +440,7 @@ void CardDatabase::addCard(CardInfoPtr card)
 void CardDatabase::removeCard(CardInfoPtr card)
 {
     if (card.isNull()) {
-        qDebug() << "removeCard(nullptr)";
+        qCDebug(CardDatabaseLog) << "CardDatabase::removeCard(nullptr)";
         return;
     }
 
@@ -582,8 +582,8 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     }
 
     int msecs = startTime.msecsTo(QTime::currentTime());
-    qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus
-             << "Cards =" << cards.size() << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
+    qCDebug(CardDatabaseLoadingLog) << "[CardDatabase] loadCardDatabase(): Path =" << path
+                                    << "Status =" << tempLoadStatus << "Cards =" << cards.size() << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
 
     return tempLoadStatus;
 }
@@ -592,7 +592,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 {
     reloadDatabaseMutex->lock();
 
-    qDebug() << "CardDatabase::loadCardDatabases start";
+    qCDebug(CardDatabaseLoadingLog) << "CardDatabase::loadCardDatabases start";
 
     clear(); // remove old db
 
@@ -613,7 +613,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     for (auto i = 0; i < databasePaths.size(); ++i) {
         const auto &databasePath = databasePaths.at(i);
-        qDebug() << "Loading Custom Set" << i << "(" << databasePath << ")";
+        qCDebug(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << databasePath << ")";
         loadCardDatabase(databasePath);
     }
 
@@ -626,10 +626,10 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     if (loadStatus == Ok) {
         checkUnknownSets(); // update deck editors, etc
-        qDebug() << "CardDatabase::loadCardDatabases success";
+        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "CardDatabase::loadCardDatabases success";
         emit cardDatabaseLoadingFinished();
     } else {
-        qDebug() << "CardDatabase::loadCardDatabases failed";
+        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "CardDatabase::loadCardDatabases failed";
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 

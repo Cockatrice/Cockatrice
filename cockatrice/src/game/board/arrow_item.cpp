@@ -22,7 +22,6 @@ ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTar
     : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), targetLocked(false),
       color(_color), fullColor(true)
 {
-    qDebug() << "ArrowItem constructor: startItem=" << static_cast<QGraphicsItem *>(startItem);
     setZValue(2000000005);
 
     if (startItem)
@@ -36,7 +35,6 @@ ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTar
 
 ArrowItem::~ArrowItem()
 {
-    qDebug() << "ArrowItem destructor";
 }
 
 void ArrowItem::delArrow()

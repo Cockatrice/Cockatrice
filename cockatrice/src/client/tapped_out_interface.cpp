@@ -33,7 +33,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
          * can be extracted from the header. The http status is a 302 "redirect".
          */
         QString deckUrl = reply->rawHeader("Location");
-        qDebug() << "Tappedout: good reply, http status" << httpStatus << "location" << deckUrl;
+        qCDebug(TappedOutInterfaceLog) << "Tappedout: good reply, http status" << httpStatus << "location" << deckUrl;
         QDesktopServices::openUrl("https://tappedout.net" + deckUrl);
     } else {
         /*
@@ -57,7 +57,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         }
 
         QString errorMessage = errorMessageList.join("\n");
-        qDebug() << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size() << "message"
+        qCDebug(TappedOutInterfaceLog) << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size() << "message"
                  << errorMessage;
 
         QMessageBox::critical(nullptr, tr("Error"), errorMessage);

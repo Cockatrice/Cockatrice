@@ -33,7 +33,7 @@ ReleaseChannel::~ReleaseChannel()
 void ReleaseChannel::checkForUpdates()
 {
     QString releaseChannelUrl = getReleaseChannelUrl();
-    qDebug() << "Searching for updates on the channel: " << releaseChannelUrl;
+    qCDebug(ReleaseChannelLog) << "Searching for updates on the channel: " << releaseChannelUrl;
     response = netMan->get(QNetworkRequest(releaseChannelUrl));
     connect(response, &QNetworkReply::finished, this, &ReleaseChannel::releaseListFinished);
 }
@@ -145,15 +145,15 @@ void StableReleaseChannel::releaseListFinished()
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
-    qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
+    qCDebug(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
-    qDebug() << "Got reply from release server, name=" << lastRelease->getName()
+    qCDebug(ReleaseChannelLog) << "Got reply from release server, name=" << lastRelease->getName()
              << "desc=" << lastRelease->getDescriptionUrl() << "date=" << lastRelease->getPublishDate()
              << "url=" << lastRelease->getDownloadUrl();
 
     const QString &tagName = resultMap["tag_name"].toString();
     QString url = QString(STABLETAG_URL) + tagName;
-    qDebug() << "Searching for commit hash corresponding to stable channel tag: " << tagName;
+    qCDebug(ReleaseChannelLog) << "Searching for commit hash corresponding to stable channel tag: " << tagName;
     response = netMan->get(QNetworkRequest(url));
     connect(response, &QNetworkReply::finished, this, &StableReleaseChannel::tagListFinished);
 }
@@ -178,11 +178,11 @@ void StableReleaseChannel::tagListFinished()
     }
 
     lastRelease->setCommitHash(resultMap["object"].toMap()["sha"].toString());
-    qDebug() << "Got reply from tag server, commit=" << lastRelease->getCommitHash();
+    qCDebug(ReleaseChannelLog) << "Got reply from tag server, commit=" << lastRelease->getCommitHash();
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
-    qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
+    qCDebug(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
     const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
 
     emit finishedCheck(needToUpdate, lastRelease->isCompatibleVersionFound(), lastRelease);
@@ -249,13 +249,13 @@ void BetaReleaseChannel::releaseListFinished()
     lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
     lastRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
 
-    qDebug() << "Got reply from release server, size=" << resultMap.size() << "name=" << lastRelease->getName()
+    qCDebug(ReleaseChannelLog) << "Got reply from release server, size=" << resultMap.size() << "name=" << lastRelease->getName()
              << "desc=" << lastRelease->getDescriptionUrl() << "commit=" << lastRelease->getCommitHash()
              << "date=" << lastRelease->getPublishDate();
 
     QString betaBuildDownloadUrl = resultMap["assets_url"].toString();
 
-    qDebug() << "Searching for a corresponding file on the beta channel: " << betaBuildDownloadUrl;
+    qCDebug(ReleaseChannelLog) << "Searching for a corresponding file on the beta channel: " << betaBuildDownloadUrl;
     response = netMan->get(QNetworkRequest(betaBuildDownloadUrl));
     connect(response, &QNetworkReply::finished, this, &BetaReleaseChannel::fileListFinished);
 }
@@ -275,7 +275,7 @@ void BetaReleaseChannel::fileListFinished()
     QVariantList resultList = jsonResponse.toVariant().toList();
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
-    qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
+    qCDebug(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
     bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
     bool compatibleVersion = false;
@@ -292,7 +292,7 @@ void BetaReleaseChannel::fileListFinished()
         if (downloadMatchesCurrentOS(*url)) {
             compatibleVersion = true;
             lastRelease->setDownloadUrl(*url);
-            qDebug() << "Found compatible version url=" << *url;
+            qCDebug(ReleaseChannelLog) << "Found compatible version url=" << *url;
             break;
         }
     }

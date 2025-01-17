@@ -4,10 +4,13 @@
 #include "../cards/card_database.h"
 #include "filter_tree.h"
 
+#include <QLoggingCategory>
 #include <QMap>
 #include <QString>
 #include <functional>
 #include <utility>
+
+inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string.debug");
 
 typedef CardInfoPtr CardData;
 typedef std::function<bool(const CardData &)> Filter;

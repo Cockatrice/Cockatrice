@@ -562,7 +562,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
 Player::~Player()
 {
-    qDebug() << "Player destructor:" << getName();
+    qCDebug(PlayerLog) << "Player destructor:" << getName();
 
     static_cast<GameScene *>(scene())->removePlayer(this);
 

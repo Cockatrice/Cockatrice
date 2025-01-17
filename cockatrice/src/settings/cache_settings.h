@@ -13,9 +13,12 @@
 #include "servers_settings.h"
 #include "shortcuts_settings.h"
 
+#include <QLoggingCategory>
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+
+inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache.debug");
 
 class ReleaseChannel;
 

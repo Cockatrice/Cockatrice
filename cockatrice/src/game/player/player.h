@@ -9,9 +9,12 @@
 #include "pb/game_event.pb.h"
 
 #include <QInputDialog>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QPoint>
 #include <QTimer>
+
+inline Q_LOGGING_CATEGORY(PlayerLog, "player.debug");
 
 namespace google
 {

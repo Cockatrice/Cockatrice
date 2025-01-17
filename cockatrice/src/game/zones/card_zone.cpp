@@ -42,7 +42,7 @@ CardZone::CardZone(Player *_p,
 
 CardZone::~CardZone()
 {
-    qDebug() << "CardZone destructor: " << name;
+    qCDebug(CardZoneLog) << "CardZone destructor: " << name;
     for (auto *view : views) {
         if (view != nullptr) {
             view->deleteLater();
@@ -147,7 +147,7 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
     if (!card) {
-        qDebug() << "CardZone::addCard() card is null, this shouldn't normally happen";
+        qCDebug(CardZoneLog) << "CardZone::addCard() card is null, this shouldn't normally happen";
         return;
     }
 
@@ -171,7 +171,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
     CardItem *c = cards.findCard(cardId);
     if (!c) {
-        qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
+        qCDebug(CardZoneLog) << "CardZone::getCard: card id=" << cardId << "not found";
         return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
@@ -216,7 +216,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 void CardZone::removeCard(CardItem *card)
 {
     if (!card) {
-        qDebug() << "CardZone::removeCard: card is null, this shouldn't normally happen";
+        qCDebug(CardZoneLog) << "CardZone::removeCard: card is null, this shouldn't normally happen";
         return;
     }
 

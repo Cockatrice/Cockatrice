@@ -5,13 +5,10 @@
 
 #include <QBuffer>
 #include <QDirIterator>
-#include <QLoggingCategory>
 #include <QMovie>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
-
-Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
 
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";

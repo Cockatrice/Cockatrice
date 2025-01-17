@@ -148,7 +148,7 @@ void TabMessage::showSystemPopup(const Event_UserMessage &event)
                               event.message().c_str());
         connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
     } else {
-        qDebug() << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
+        qCDebug(TabMessageLog) << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
     }
 }
 

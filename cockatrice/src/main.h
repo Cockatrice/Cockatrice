@@ -3,6 +3,10 @@
 
 #include "utility/macros.h"
 
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(QtTranslatorDebug, "qt_translator.debug");
+
 class CardDatabase;
 class QString;
 class QSystemTrayIcon;

@@ -4,6 +4,9 @@
 #include <QByteArray>
 #include <QObject>
 #include <QProcess>
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(SpoilerBackgroundUpdaterLog, "spoiler_background_updater.debug");
 
 class SpoilerBackgroundUpdater : public QObject
 {
