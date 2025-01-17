@@ -194,13 +194,13 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
-    qDebug("main(): starting main program");
+    qCDebug(MainLog) << "main(): starting main program";
 
     MainWindow ui;
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
-    qDebug("main(): MainWindow constructor finished");
+    qCDebug(MainLog) << "main(): MainWindow constructor finished";
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     ui.show();
-    qDebug("main(): ui.show() finished");
+    qCDebug(MainLog) << "main(): ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
