@@ -60,6 +60,10 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
+    if (!startZone) {
+        return;
+    }
+
     Command_MoveCard cmd;
     cmd.set_start_player_id(startZone->getPlayer()->getId());
     cmd.set_start_zone(startZone->getName().toStdString());
@@ -74,7 +78,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
                                              cards.at(0)->boundingRect().height(), true));
     }
     if (startZone == this) {
-        if (cards.at(index)->getId() == dragItems.at(0)->getId()) {
+        if (dragItems.at(0) != nullptr && cards.at(index)->getId() == dragItems.at(0)->getId()) {
             return;
         }
     }
@@ -82,7 +86,9 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
     cmd.set_y(0);
 
     for (CardDragItem *item : dragItems) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(item->getId());
+        if (item) {
+            cmd.mutable_cards_to_move()->add_card()->set_card_id(item->getId());
+        }
     }
 
     player->sendGameCommand(cmd);
