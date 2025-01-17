@@ -54,10 +54,7 @@ private slots:
     void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 
 public:
-    UserContextMenu(TabSupervisor *_tabSupervisor,
-                    const UserListProxy *_userListProxy,
-                    QWidget *_parent,
-                    TabGame *_game = 0);
+    UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);
     void retranslateUi();
     void showContextMenu(const QPoint &pos,
                          const QString &userName,

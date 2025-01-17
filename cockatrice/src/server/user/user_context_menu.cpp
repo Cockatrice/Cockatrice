@@ -18,6 +18,7 @@
 #include "pb/response_warn_list.pb.h"
 #include "pb/session_commands.pb.h"
 #include "user_info_box.h"
+#include "user_list_manager.h"
 #include "user_list_proxy.h"
 #include "user_list_widget.h"
 
@@ -28,12 +29,9 @@
 #include <QtGui>
 #include <QtWidgets>
 
-UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor,
-                                 const UserListProxy *_userListProxy,
-                                 QWidget *parent,
-                                 TabGame *_game)
+UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),
-      userListProxy(_userListProxy), game(_game)
+      userListProxy(_tabSupervisor->getUserListManager()), game(_game)
 {
     aUserName = new QAction(QString(), this);
     aUserName->setEnabled(false);

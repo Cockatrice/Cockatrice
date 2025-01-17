@@ -36,10 +36,9 @@
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
                  ServerInfo_User *_ownUser,
-                 const UserListProxy *_userListProxy,
                  const ServerInfo_Room &info)
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
-      ownUser(_ownUser), userListProxy(_userListProxy)
+      ownUser(_ownUser), userListProxy(_tabSupervisor->getUserListManager())
 {
     const int gameTypeListSize = info.gametype_list_size();
     for (int i = 0; i < gameTypeListSize; ++i)
@@ -53,7 +52,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
 
-    chatView = new ChatView(tabSupervisor, userListProxy, nullptr, true, this);
+    chatView = new ChatView(tabSupervisor, nullptr, true, this);
     connect(chatView, SIGNAL(showMentionPopup(const QString &)), this, SLOT(actShowMentionPopup(const QString &)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));

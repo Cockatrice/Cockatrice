@@ -378,7 +378,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     : QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
 {
     itemDelegate = new UserListItemDelegate(this);
-    userContextMenu = new UserContextMenu(tabSupervisor, tabSupervisor->getUserListManager(), this);
+    userContextMenu = new UserContextMenu(tabSupervisor, this);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
     userTree = new QTreeWidget;

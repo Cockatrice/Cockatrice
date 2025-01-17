@@ -67,7 +67,7 @@ class TabGame : public Tab
 private:
     QTimer *gameTimer;
     int secondsElapsed;
-    UserListProxy *userListProxy;
+    const UserListProxy *userListProxy;
     QList<AbstractClient *> clients;
     ServerInfo_Game gameInfo;
     QMap<int, QString> roomGameTypes;
@@ -212,7 +212,6 @@ private slots:
 
 public:
     TabGame(TabSupervisor *_tabSupervisor,
-            UserListProxy *_userListProxy,
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
