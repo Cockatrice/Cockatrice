@@ -126,7 +126,7 @@ void PictureLoaderWorker::imageLoadedSuccessfully(CardInfoPtr card, const QImage
 void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)
 {
     redirectCache[originalUrl] = qMakePair(redirectUrl, QDateTime::currentDateTimeUtc());
-    saveRedirectCache();
+    //saveRedirectCache();
 }
 
 QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
