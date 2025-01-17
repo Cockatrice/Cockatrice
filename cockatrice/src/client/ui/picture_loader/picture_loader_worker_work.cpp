@@ -12,8 +12,6 @@
 #include <QNetworkReply>
 #include <QThread>
 
-Q_LOGGING_CATEGORY(PictureLoaderWorkerWorkLog, "picture_loader.worker");
-
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 

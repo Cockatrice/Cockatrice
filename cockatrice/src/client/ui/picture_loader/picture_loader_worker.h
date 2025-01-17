@@ -16,6 +16,8 @@
 #define REDIRECT_TIMESTAMP "timestamp"
 #define REDIRECT_CACHE_FILENAME "cache.ini"
 
+inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
+
 class PictureLoaderWorkerWork;
 inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
 
