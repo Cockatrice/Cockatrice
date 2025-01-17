@@ -216,7 +216,7 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
-    TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
+    TabGame(TabSupervisor *_tabSupervisor, UserListProxy *_userListProxy, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();

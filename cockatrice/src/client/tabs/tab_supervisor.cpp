@@ -648,7 +648,7 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 
 void TabSupervisor::openReplay(GameReplay *replay)
 {
-    auto *replayTab = new TabGame(this, replay);
+    auto *replayTab = new TabGame(this, userListManager, replay);
     connect(replayTab, &TabGame::gameClosing, this, &TabSupervisor::replayLeft);
     myAddTab(replayTab);
     replayTabs.append(replayTab);

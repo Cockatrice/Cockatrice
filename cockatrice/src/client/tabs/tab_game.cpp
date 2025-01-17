@@ -65,8 +65,8 @@
 #include <QToolButton>
 #include <QWidget>
 
-TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
+TabGame::TabGame(TabSupervisor *_tabSupervisor, UserListProxy *_userListProxy, GameReplay *_replay)
+    : Tab(_tabSupervisor), userListProxy(_userListProxy), secondsElapsed(0), hostId(-1), localPlayerId(-1),
       isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), judge(false), gameStateKnown(false),
       resuming(false), currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
       sayLabel(nullptr), sayEdit(nullptr)
