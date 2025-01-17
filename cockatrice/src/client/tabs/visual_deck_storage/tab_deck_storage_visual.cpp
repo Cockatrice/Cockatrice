@@ -20,10 +20,8 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
     layout->addWidget(visualDeckStorageWidget);
 }
 
-void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent *event, DeckPreviewWidget *instance)
+void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent * /*event*/, DeckPreviewWidget *instance)
 {
-    Q_UNUSED(event);
-
     DeckLoader deckLoader;
     if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat, true)) {
         return;

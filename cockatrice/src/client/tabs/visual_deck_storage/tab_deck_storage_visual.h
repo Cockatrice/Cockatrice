@@ -28,7 +28,7 @@ public:
     }
 
 public slots:
-    void actOpenLocalDeck(QMouseEvent *event, DeckPreviewWidget *instance);
+    void actOpenLocalDeck(QMouseEvent * /*event*/, DeckPreviewWidget *instance);
 
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);

@@ -1,6 +1,5 @@
 #include "visual_deck_storage_widget.h"
 
-#include "../../../../deck/deck_loader.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 #include "deck_preview/deck_preview_widget.h"
