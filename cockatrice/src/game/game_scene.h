@@ -7,8 +7,8 @@
 #include <QPointer>
 #include <QSet>
 
-inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene.debug");
-inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.debug.player_addition_removal");
+inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
+inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");
 
 class Player;
 class ZoneViewWidget;

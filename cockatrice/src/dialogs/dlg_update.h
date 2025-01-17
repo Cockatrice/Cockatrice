@@ -8,7 +8,7 @@
 #include <QProgressDialog>
 #include <QtNetwork>
 
-inline Q_LOGGING_CATEGORY(DlgUpdateLog, "dlg_update.debug");
+inline Q_LOGGING_CATEGORY(DlgUpdateLog, "dlg_update");
 
 class Release;
 

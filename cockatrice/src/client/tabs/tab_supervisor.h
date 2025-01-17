@@ -12,7 +12,7 @@
 #include <QProxyStyle>
 #include <QTabWidget>
 
-inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor.debug");
+inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
 class QMenu;

@@ -9,7 +9,7 @@
 #include <QPixmap>
 #include <QString>
 
-inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager.debug");
+inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
 typedef QMap<QString, QString> QStringMap;
 typedef QMap<int, QBrush> QBrushMap;

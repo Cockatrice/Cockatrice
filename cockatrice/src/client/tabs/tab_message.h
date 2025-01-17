@@ -5,7 +5,7 @@
 
 #include <QLoggingCategory>
 
-inline Q_LOGGING_CATEGORY(TabMessageLog, "tab_message.debug");
+inline Q_LOGGING_CATEGORY(TabMessageLog, "tab_message");
 
 class AbstractClient;
 class ChatView;

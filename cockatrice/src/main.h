@@ -5,7 +5,7 @@
 
 #include <QLoggingCategory>
 
-inline Q_LOGGING_CATEGORY(QtTranslatorDebug, "qt_translator.debug");
+inline Q_LOGGING_CATEGORY(QtTranslatorDebug, "qt_translator");
 
 class CardDatabase;
 class QString;

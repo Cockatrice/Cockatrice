@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QProcess>
 
-inline Q_LOGGING_CATEGORY(SpoilerBackgroundUpdaterLog, "spoiler_background_updater.debug");
+inline Q_LOGGING_CATEGORY(SpoilerBackgroundUpdaterLog, "spoiler_background_updater");
 
 class SpoilerBackgroundUpdater : public QObject
 {

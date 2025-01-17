@@ -8,7 +8,7 @@
 #include <QVariantMap>
 #include <utility>
 
-inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel.debug")
+inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel")
 
     class QNetworkReply;
 class QNetworkAccessManager;

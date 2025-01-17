@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QString>
 
-inline Q_LOGGING_CATEGORY(SoundEngineLog, "sound_engine.debug");
+inline Q_LOGGING_CATEGORY(SoundEngineLog, "sound_engine");
 
 class QBuffer;
 

@@ -8,7 +8,7 @@
 #include <QLoggingCategory>
 #include <QString>
 
-inline Q_LOGGING_CATEGORY(CardZoneLog, "card_zone.debug");
+inline Q_LOGGING_CATEGORY(CardZoneLog, "card_zone");
 
 class Player;
 class ZoneViewZone;

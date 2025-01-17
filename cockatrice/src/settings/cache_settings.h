@@ -18,7 +18,7 @@
 #include <QSize>
 #include <QStringList>
 
-inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache.debug");
+inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 
 class ReleaseChannel;
 

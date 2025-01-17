@@ -10,7 +10,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-inline Q_LOGGING_CATEGORY(DlgTipOfTheDayLog, "dlg_tip_of_the_day.debug");
+inline Q_LOGGING_CATEGORY(DlgTipOfTheDayLog, "dlg_tip_of_the_day");
 
 class QLabel;
 class QPushButton;

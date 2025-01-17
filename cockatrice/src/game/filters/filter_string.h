@@ -10,7 +10,7 @@
 #include <functional>
 #include <utility>
 
-inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string.debug");
+inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string");
 
 typedef CardInfoPtr CardData;
 typedef std::function<bool(const CardData &)> Filter;

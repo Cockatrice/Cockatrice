@@ -12,7 +12,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 
-inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game.debug");
+inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
 class DeckViewContainer;

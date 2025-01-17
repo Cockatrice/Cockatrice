@@ -31,11 +31,11 @@
 #include <QSystemTrayIcon>
 #include <QtNetwork>
 
-inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main.debug");
-inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.debug.startup");
-inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.debug.startup.version");
-inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.debug.startup.shortcuts");
-inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.debug.startup.autoconnect");
+inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");
+inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.startup");
+inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.startup.version");
+inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.shortcuts");
+inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
 
 class Release;
 class DlgConnect;

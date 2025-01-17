@@ -14,7 +14,7 @@
 #include <QPoint>
 #include <QTimer>
 
-inline Q_LOGGING_CATEGORY(PlayerLog, "player.debug");
+inline Q_LOGGING_CATEGORY(PlayerLog, "player");
 
 namespace google
 {

@@ -4,7 +4,7 @@
 #include <QList>
 #include <QLoggingCategory>
 
-inline Q_LOGGING_CATEGORY(CardListLog, "card_list.debug");
+inline Q_LOGGING_CATEGORY(CardListLog, "card_list");
 
 class CardItem;
 

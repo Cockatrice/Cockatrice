@@ -7,7 +7,7 @@
 #include <QLoggingCategory>
 #include <pb/commands.pb.h>
 
-inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone.debug")
+inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone")
 
     class ZoneViewWidget;
 class Response;
