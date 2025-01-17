@@ -53,13 +53,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
     unloadDeckButton = new QPushButton;
-    unloadDeckButton->setEnabled(false);
     readyStartButton = new ToggleButton;
-    readyStartButton->setEnabled(false);
     forceStartGameButton = new QPushButton;
-    forceStartGameButton->setEnabled(parent->isHost());
     sideboardLockButton = new ToggleButton;
-    sideboardLockButton->setEnabled(false);
 
     connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
     connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
@@ -80,21 +76,18 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addWidget(unloadDeckButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
-    if (forceStartGameButton->isEnabled()) {
-        buttonHBox->addWidget(forceStartGameButton);
-        forceStartGameButton->setEnabled(false);
-    }
-    buttonHBox->setContentsMargins(0, 0, 0, 0);
+    buttonHBox->addWidget(forceStartGameButton);
+
+    buttonHBox->setContentsMargins(11, 0, 11, 0);
     buttonHBox->addStretch();
 
     deckView = new DeckView;
     connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
-    deckView->setVisible(false);
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
-            &DeckViewContainer::replaceDeckStorageWithDeckView);
+            &DeckViewContainer::loadVisualDeck);
 
     deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
@@ -106,6 +99,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
+
+    switchToDeckSelectView();
 }
 
 void DeckViewContainer::retranslateUi()
@@ -118,13 +113,46 @@ void DeckViewContainer::retranslateUi()
     updateSideboardLockButtonText();
 }
 
-void DeckViewContainer::setButtonsVisible(bool _visible)
+static void setVisibility(QPushButton *button, bool visible)
 {
-    loadLocalButton->setVisible(_visible);
-    loadRemoteButton->setVisible(_visible);
-    readyStartButton->setVisible(_visible);
-    forceStartGameButton->setVisible(_visible);
-    sideboardLockButton->setVisible(_visible);
+    button->setHidden(!visible);
+    button->setEnabled(visible);
+}
+
+void DeckViewContainer::switchToDeckSelectView()
+{
+    deckView->setVisible(false);
+    visualDeckStorageWidget->setVisible(true);
+    deckViewLayout->update();
+
+    setVisibility(loadLocalButton, true);
+    setVisibility(loadRemoteButton, true);
+    setVisibility(unloadDeckButton, false);
+    setVisibility(readyStartButton, false);
+    setVisibility(sideboardLockButton, false);
+    setVisibility(forceStartGameButton, false);
+
+    readyStartButton->setState(false);
+    sideboardLockButton->setState(false);
+
+    sendReadyStartCommand(false);
+}
+
+void DeckViewContainer::switchToDeckLoadedView()
+{
+    deckView->setVisible(true);
+    visualDeckStorageWidget->setVisible(false);
+    deckViewLayout->update();
+
+    setVisibility(loadLocalButton, false);
+    setVisibility(loadRemoteButton, false);
+    setVisibility(unloadDeckButton, true);
+    setVisibility(readyStartButton, true);
+    setVisibility(sideboardLockButton, true);
+
+    if (parentGame->isHost()) {
+        setVisibility(forceStartGameButton, true);
+    }
 }
 
 void DeckViewContainer::updateSideboardLockButtonText()
@@ -148,7 +176,7 @@ void DeckViewContainer::refreshShortcuts()
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
-void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance)
+void DeckViewContainer::loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     Q_UNUSED(event);
     QString deckString = instance->deckLoader->writeToString_Native();
@@ -168,16 +196,7 @@ void DeckViewContainer::replaceDeckStorageWithDeckView(QMouseEvent *event, DeckP
 
 void DeckViewContainer::unloadDeck()
 {
-    deckView->setVisible(false);
-    visualDeckStorageWidget->setVisible(true);
-    deckViewLayout->update();
-    unloadDeckButton->setEnabled(false);
-    readyStartButton->setEnabled(false);
-    readyStartButton->setState(false);
-    sideboardLockButton->setEnabled(false);
-    sideboardLockButton->setState(false);
-    forceStartGameButton->setEnabled(false);
-    setReadyStart(false);
+    switchToDeckSelectView();
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -233,16 +252,12 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
     // TODO CHANGE THIS TO BE SELECTED BY UUID
     PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
     setDeck(newDeck);
-    deckView->setVisible(true);
-    visualDeckStorageWidget->setVisible(false);
-    unloadDeckButton->setEnabled(true);
+    switchToDeckLoadedView();
 }
 
 void DeckViewContainer::readyStart()
 {
-    Command_ReadyStart cmd;
-    cmd.set_ready(!readyStartButton->getState());
-    parentGame->sendGameCommand(cmd, playerId);
+    sendReadyStartCommand(!readyStartButton->getState());
 }
 
 void DeckViewContainer::forceStart()
@@ -270,6 +285,22 @@ void DeckViewContainer::sideboardPlanChanged()
     parentGame->sendGameCommand(cmd, playerId);
 }
 
+/**
+ * Sends the basic ReadyStart command.
+ */
+void DeckViewContainer::sendReadyStartCommand(bool ready)
+{
+    Command_ReadyStart cmd;
+    cmd.set_ready(ready);
+    parentGame->sendGameCommand(cmd, playerId);
+}
+
+/**
+ * Updates the buttons to make the client-side ready state match the given state.
+ *
+ * Notably, this method only updates the client and *does not* send a ReadyStart command to the server.
+ * This method is intended to be called upon receiving the response from a ReadyStart command.
+ */
 void DeckViewContainer::setReadyStart(bool ready)
 {
     readyStartButton->setState(ready);
@@ -278,15 +309,11 @@ void DeckViewContainer::setReadyStart(bool ready)
 }
 
 /**
- * Sets the ready start to true, then sends the ready command so the server responds to the update
+ * Sends a ReadyStart command with ready=true to the server
  */
 void DeckViewContainer::readyAndUpdate()
 {
-    setReadyStart(true);
-
-    Command_ReadyStart cmd;
-    cmd.set_ready(true);
-    parentGame->sendGameCommand(cmd, playerId);
+    sendReadyStartCommand(true);
 }
 
 void DeckViewContainer::setSideboardLocked(bool locked)
@@ -300,8 +327,5 @@ void DeckViewContainer::setSideboardLocked(bool locked)
 void DeckViewContainer::setDeck(const DeckLoader &deck)
 {
     deckView->setDeck(deck);
-    readyStartButton->setEnabled(true);
-    sideboardLockButton->setState(false);
-    sideboardLockButton->setEnabled(true);
-    forceStartGameButton->setEnabled(true);
+    switchToDeckLoadedView();
 }

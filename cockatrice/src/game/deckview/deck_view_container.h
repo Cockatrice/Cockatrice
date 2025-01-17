@@ -50,8 +50,12 @@ private:
     VisualDeckStorageWidget *visualDeckStorageWidget;
     TabGame *parentGame;
     int playerId;
+
+    void sendReadyStartCommand(bool ready);
 private slots:
-    void replaceDeckStorageWithDeckView(QMouseEvent *event, DeckPreviewWidget *instance);
+    void switchToDeckSelectView();
+    void switchToDeckLoadedView();
+    void loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance);
     void loadLocalDeck();
     void loadRemoteDeck();
     void unloadDeck();
@@ -69,7 +73,6 @@ signals:
 public:
     DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
-    void setButtonsVisible(bool _visible);
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
