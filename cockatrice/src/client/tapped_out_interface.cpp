@@ -98,7 +98,7 @@ struct CopyMainOrSide
     DeckList &mainboard, &sideboard;
 
     CopyMainOrSide(CardDatabase &_cardDatabase, DeckList &_mainboard, DeckList &_sideboard)
-        : cardDatabase(_cardDatabase), mainboard(_mainboard), sideboard(_sideboard) {};
+        : cardDatabase(_cardDatabase), mainboard(_mainboard), sideboard(_sideboard){};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
