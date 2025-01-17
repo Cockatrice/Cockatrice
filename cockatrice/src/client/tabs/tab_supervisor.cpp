@@ -11,7 +11,6 @@
 #include "pb/event_user_message.pb.h"
 #include "pb/game_event_container.pb.h"
 #include "pb/game_replay.pb.h"
-#include "pb/moderator_commands.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/room_event.pb.h"
 #include "pb/serverinfo_room.pb.h"
@@ -29,7 +28,6 @@
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QMessageBox>
 #include <QPainter>
 #include <QSystemTrayIcon>
@@ -50,15 +48,15 @@ CloseButton::CloseButton(QWidget *parent) : QAbstractButton(parent)
 {
     setFocusPolicy(Qt::NoFocus);
     setCursor(Qt::ArrowCursor);
-    resize(sizeHint());
+    resize(this->sizeHint());
 }
 
 QSize CloseButton::sizeHint() const
 {
     ensurePolished();
-    int width = style()->pixelMetric(QStyle::PM_TabCloseIndicatorWidth, 0, this);
-    int height = style()->pixelMetric(QStyle::PM_TabCloseIndicatorHeight, 0, this);
-    return QSize(width, height);
+    int width = style()->pixelMetric(QStyle::PM_TabCloseIndicatorWidth, nullptr, this);
+    int height = style()->pixelMetric(QStyle::PM_TabCloseIndicatorHeight, nullptr, this);
+    return {width, height};
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -90,10 +88,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
     if (isDown())
         opt.state |= QStyle::State_Sunken;
 
-    if (const QTabBar *tb = qobject_cast<const QTabBar *>(parent())) {
+    if (const auto *tb = qobject_cast<const QTabBar *>(parent())) {
         int index = tb->currentIndex();
-        QTabBar::ButtonPosition position =
-            (QTabBar::ButtonPosition)style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tb);
+        auto position = (QTabBar::ButtonPosition)style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tb);
         if (tb->tabButton(index, position) == this)
             opt.state |= QStyle::State_Selected;
     }
@@ -102,8 +99,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr), tabServer(0),
-      tabAccount(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
+    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
+      tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
+      tabLog(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -210,14 +208,15 @@ void TabSupervisor::retranslateUi()
     while (messageIterator.hasNext())
         tabs.append(messageIterator.next().value());
 
-    for (int i = 0; i < tabs.size(); ++i)
-        if (tabs[i]) {
-            int idx = indexOf(tabs[i]);
-            QString tabText = tabs[i]->getTabText();
+    for (auto &tab : tabs) {
+        if (tab) {
+            int idx = indexOf(tab);
+            QString tabText = tab->getTabText();
             setTabText(idx, sanitizeTabName(tabText));
             setTabToolTip(idx, sanitizeHtml(tabText));
-            tabs[i]->retranslateUi();
+            tab->retranslateUi();
         }
+    }
 }
 
 void TabSupervisor::refreshShortcuts()
@@ -249,12 +248,12 @@ AbstractClient *TabSupervisor::getClient() const
     return localClients.isEmpty() ? client : localClients.first();
 }
 
-QString TabSupervisor::sanitizeTabName(QString dirty) const
+QString TabSupervisor::sanitizeTabName(QString dirty)
 {
     return dirty.replace("&", "&&");
 }
 
-QString TabSupervisor::sanitizeHtml(QString dirty) const
+QString TabSupervisor::sanitizeHtml(QString dirty)
 {
     return dirty.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
 }
@@ -379,11 +378,11 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
     resetTabsMenu();
 
-    tabAccount = 0;
-    tabDeckStorage = 0;
-    tabReplays = 0;
-    tabAdmin = 0;
-    tabLog = 0;
+    tabAccount = nullptr;
+    tabDeckStorage = nullptr;
+    tabReplays = nullptr;
+    tabAdmin = nullptr;
+    tabLog = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
@@ -404,8 +403,9 @@ void TabSupervisor::stop()
     resetTabsMenu();
 
     if (!localClients.isEmpty()) {
-        for (int i = 0; i < localClients.size(); ++i)
-            localClients[i]->deleteLater();
+        for (auto &localClient : localClients) {
+            localClient->deleteLater();
+        }
         localClients.clear();
 
         emit localGameEnded();
@@ -451,14 +451,14 @@ void TabSupervisor::stop()
     userListManager->handleDisconnect();
 
     delete userInfo;
-    userInfo = 0;
+    userInfo = nullptr;
 }
 
 void TabSupervisor::actTabVisualDeckStorage(bool checked)
 {
     SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
-        tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
+        tabVisualDeckStorage = new TabDeckStorageVisual(this);
         myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
         setCurrentWidget(tabVisualDeckStorage);
         connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
@@ -588,7 +588,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
             roomGameTypes.insert(event.game_types(i).game_type_id(),
                                  QString::fromStdString(event.game_types(i).description()));
 
-    TabGame *tab = new TabGame(this, userListManager, QList<AbstractClient *>() << client, event, roomGameTypes);
+    auto *tab = new TabGame(this, userListManager, QList<AbstractClient *>() << client, event, roomGameTypes);
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
@@ -599,7 +599,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
-    TabGame *tab = new TabGame(this, userListManager, localClients, event, QMap<int, QString>());
+    auto *tab = new TabGame(this, userListManager, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
@@ -627,7 +627,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
-    TabRoom *tab = new TabRoom(this, client, userInfo, userListManager, info);
+    auto *tab = new TabRoom(this, client, userInfo, userListManager, info);
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
@@ -648,7 +648,7 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 
 void TabSupervisor::openReplay(GameReplay *replay)
 {
-    TabGame *replayTab = new TabGame(this, replay);
+    auto *replayTab = new TabGame(this, replay);
     connect(replayTab, &TabGame::gameClosing, this, &TabSupervisor::replayLeft);
     myAddTab(replayTab);
     replayTabs.append(replayTab);
@@ -709,7 +709,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
 TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 {
-    TabDeckEditor *tab = new TabDeckEditor(this);
+    auto *tab = new TabDeckEditor(this);
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
     connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
@@ -770,9 +770,9 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab) {
-        const ServerInfo_User *userInfo = userListManager->getOnlineUser(senderName);
-        if (userInfo) {
-            UserLevelFlags userLevel = UserLevelFlags(userInfo->user_level());
+        const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
+        if (onlineUserInfo) {
+            auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
                 !userLevel.testFlag(ServerInfo_User::IsRegistered))
                 // Flags are additive, so reg/mod/admin are all IsRegistered

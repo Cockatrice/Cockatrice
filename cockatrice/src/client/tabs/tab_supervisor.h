@@ -91,8 +91,8 @@ private:
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
-    QString sanitizeTabName(QString dirty) const;
-    QString sanitizeHtml(QString dirty) const;
+    static QString sanitizeTabName(QString dirty) ;
+    static QString sanitizeHtml(QString dirty) ;
     void resetTabsMenu();
 
 public:
@@ -131,7 +131,7 @@ public:
     bool getAdminLocked() const;
     bool closeRequest();
     bool switchToGameTabIfAlreadyExists(const int gameId);
-    void actShowPopup(const QString &message);
+    static void actShowPopup(const QString &message);
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();

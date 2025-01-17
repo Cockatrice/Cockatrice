@@ -5,17 +5,16 @@
 #include "tab.h"
 
 class AbstractClient;
-class UserListWidget;
-class UserInfoBox;
-class LineEditUnfocusable;
-
+class Event_AddToList;
 class Event_ListRooms;
+class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
+class LineEditUnfocusable;
 class Response;
 class ServerInfo_User;
-class Event_AddToList;
-class Event_RemoveFromList;
+class UserInfoBox;
+class UserListWidget;
 
 class TabAccount : public Tab
 {
@@ -24,6 +23,7 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
     void userLeft(const QString &userName);
     void userJoined(const ServerInfo_User &userInfo);
+
 private slots:
     void processListUsersResponse(const Response &response);
     void processUserJoinedEvent(const Event_UserJoined &event);
@@ -46,9 +46,9 @@ private:
     void addToList(const std::string &listName, const QString &userName);
 
 public:
-    TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo);
+    explicit TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo);
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Account");
     }
