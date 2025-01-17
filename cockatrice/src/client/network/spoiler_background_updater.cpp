@@ -167,7 +167,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     if (trayIcon) {
         QList<QByteArray> lines = data.split('\n');
 
-        foreach (QByteArray line, lines) {
+        for (const QByteArray &line : lines) {
             if (line.contains("Created At:")) {
                 QString timeStamp = QString(line).replace("Created At:", "").trimmed();
                 timeStamp.chop(6); // Remove " (UTC)"

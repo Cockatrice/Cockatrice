@@ -375,7 +375,7 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId, ServerInfo_Deck
     while (query->next())
         results[query->value(0).toInt()] = query->value(1).toString();
 
-    foreach (int key, results.keys()) {
+    for (int key : results.keys()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
         newItem->set_id(key);
         newItem->set_name(results.value(key).toStdString());
@@ -840,7 +840,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
 #else
     QStringList warningsList = officialWarnings.split(",", QString::SkipEmptyParts);
 #endif
-    foreach (QString warning, warningsList) {
+    for (const QString &warning : warningsList) {
         re->add_warning(warning.toStdString());
     }
     re->set_user_name(nameFromStdString(cmd.user_name()).toStdString());

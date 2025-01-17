@@ -30,7 +30,7 @@ VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPrev
 {
     // Collect selected tags from DeckPreviewTagDisplayWidget
     QStringList selectedTags;
-    foreach (DeckPreviewTagDisplayWidget *tagWidget, findChildren<DeckPreviewTagDisplayWidget *>()) {
+    for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
         if (tagWidget->getSelected()) {
             selectedTags.append(tagWidget->getTagName());
         }
@@ -61,7 +61,7 @@ VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPrev
 void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QStringList &tags)
 {
     // Iterate through all DeckPreviewTagDisplayWidgets
-    foreach (DeckPreviewTagDisplayWidget *tagWidget, findChildren<DeckPreviewTagDisplayWidget *>()) {
+    for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
         // If the tag is not in the provided tags list, remove the widget
         if (!tags.contains(tagWidget->getTagName())) {
             auto *flowWidget = findChild<FlowWidget *>();
@@ -82,7 +82,7 @@ void VisualDeckStorageTagFilterWidget::addTagIfNotPresent(const QString &tag)
 {
     // Check if the tag already exists in the flow widget
     bool tagExists = false;
-    foreach (DeckPreviewTagDisplayWidget *tagWidget, findChildren<DeckPreviewTagDisplayWidget *>()) {
+    for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
         if (tagWidget->getTagName() == tag) {
             tagExists = true;
             break;

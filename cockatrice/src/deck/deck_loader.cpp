@@ -394,7 +394,7 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
 
     if (!getComments().isEmpty()) {
         QStringList commentRows = getComments().split(QRegularExpression("\n|\r\n|\r"));
-        foreach (QString row, commentRows) {
+        for (const QString &row : commentRows) {
             out << "// " << row << "\n";
         }
         out << "\n";
@@ -433,7 +433,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
     }
 
     // print cards to stream
-    foreach (QString cardType, cardsByType.uniqueKeys()) {
+    for (const QString &cardType : cardsByType.uniqueKeys()) {
         if (addComments) {
             out << "// " << cardTotalByType[cardType] << " " << cardType << "\n";
         }

@@ -69,7 +69,7 @@ void ServerLogger::logMessage(const QString &message, void *caller)
 
     if (!logFilters.trimmed().isEmpty()) {
         shouldWeSkipLine = true;
-        foreach (QString logFilter, listlogFilters) {
+        for (const QString &logFilter : listlogFilters) {
             if (message.contains(logFilter, Qt::CaseInsensitive)) {
                 shouldWeSkipLine = false;
                 break;
