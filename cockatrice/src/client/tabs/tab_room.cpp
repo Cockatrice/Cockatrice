@@ -284,7 +284,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (userListProxy->getOnlineUser(senderName))
+    if (userListProxy->isUserIgnored(senderName))
         return;
 
     UserListTWI *twi = userList->getUsers().value(senderName);
