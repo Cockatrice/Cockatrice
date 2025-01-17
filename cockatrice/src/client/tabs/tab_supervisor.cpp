@@ -236,7 +236,7 @@ bool TabSupervisor::closeRequest()
         }
     }
 
-    foreach (TabDeckEditor *tab, deckEditorTabs) {
+    for (TabDeckEditor *tab : deckEditorTabs) {
         if (!tab->confirmClose())
             return false;
     }

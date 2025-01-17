@@ -121,7 +121,7 @@ void installNewTranslator()
 QString const generateClientID()
 {
     QString macList;
-    foreach (QNetworkInterface networkInterface, QNetworkInterface::allInterfaces()) {
+    for (const QNetworkInterface &networkInterface : QNetworkInterface::allInterfaces()) {
         if (networkInterface.hardwareAddress() != "")
             if (networkInterface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
                 macList += networkInterface.hardwareAddress() + ".";

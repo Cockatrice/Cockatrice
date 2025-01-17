@@ -38,7 +38,7 @@ void DlgViewLog::actCheckBoxChanged(bool abNewValue)
 void DlgViewLog::loadInitialLogBuffer()
 {
     QList<QString> logBuffer = Logger::getInstance().getLogBuffer();
-    foreach (QString message, logBuffer)
+    for (const QString &message : logBuffer)
         logEntryAdded(message);
 }
 

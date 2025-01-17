@@ -313,7 +313,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
     countryEdit->setCurrentIndex(0);
     QStringList countries = SettingsCache::instance().getCountries();
-    foreach (QString c, countries)
+    for (const QString &c : countries)
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
 
     realnameLabel = new QLabel(tr("Real name:"));

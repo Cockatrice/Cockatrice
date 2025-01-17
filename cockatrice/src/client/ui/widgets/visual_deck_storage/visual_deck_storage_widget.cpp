@@ -94,7 +94,7 @@ void VisualDeckStorageWidget::refreshBannerCards()
         allFiles << it.next(); // Add each file path to the list
     }
 
-    foreach (const QString &file, allFiles) {
+    for (const QString &file : allFiles) {
         auto *display = new DeckPreviewWidget(this, file);
 
         connect(display, &DeckPreviewWidget::deckPreviewClicked, this,
@@ -117,7 +117,7 @@ void VisualDeckStorageWidget::refreshBannerCards()
 
     flowWidget->clearLayout(); // Clear existing widgets in the flow layout
 
-    foreach (DeckPreviewWidget *deck, filteredFiles) {
+    for (DeckPreviewWidget *deck : filteredFiles) {
         flowWidget->addWidget(deck);
     }
 
@@ -130,7 +130,7 @@ QStringList VisualDeckStorageWidget::gatherAllTagsFromFlowWidget() const
 
     if (flowWidget) {
         // Iterate through all DeckPreviewWidgets
-        foreach (DeckPreviewWidget *display, flowWidget->findChildren<DeckPreviewWidget *>()) {
+        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             // Get tags from each DeckPreviewWidget
             QStringList tags = display->deckLoader->getTags();
 

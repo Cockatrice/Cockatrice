@@ -468,7 +468,7 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName) const
 QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;
-    foreach (QString cardName, cardNames) {
+    for (const QString &cardName : cardNames) {
         CardInfoPtr ptr = getCardFromMap(cards, cardName);
         if (ptr)
             cardInfos.append(ptr);
@@ -783,7 +783,7 @@ void CardDatabase::refreshCachedReverseRelatedCards()
             continue;
         }
 
-        foreach (CardRelation *cardRelation, card->getReverseRelatedCards()) {
+        for (CardRelation *cardRelation : card->getReverseRelatedCards()) {
             const QString &targetCard = cardRelation->getName();
             if (!cards.contains(targetCard)) {
                 continue;
@@ -886,7 +886,7 @@ CardRelation::CardRelation(const QString &_name,
 
 void CardInfo::resetReverseRelatedCards2Me()
 {
-    foreach (CardRelation *cardRelation, this->getReverseRelatedCards2Me()) {
+    for (CardRelation *cardRelation : this->getReverseRelatedCards2Me()) {
         cardRelation->deleteLater();
     }
     reverseRelatedCardsToMe = QList<CardRelation *>();

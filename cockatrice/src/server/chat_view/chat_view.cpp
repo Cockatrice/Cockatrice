@@ -403,7 +403,7 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
     }
 
     // check word mentions
-    foreach (QString word, highlightedWords) {
+    for (const QString &word : highlightedWords) {
         if (fullWordUpToSpaceOrEnd.compare(word, Qt::CaseInsensitive) == 0) {
             // You have received a valid mention of custom word!!
             highlightFormat.setBackground(QBrush(getCustomHighlightColor()));
