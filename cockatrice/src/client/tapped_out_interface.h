@@ -7,9 +7,9 @@
 #include <QLoggingCategory>
 #include <QObject>
 
-inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface")
+inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 
-    class QByteArray;
+class QByteArray;
 class QNetworkAccessManager;
 class QNetworkReply;
 class DeckList;

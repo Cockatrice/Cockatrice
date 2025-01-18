@@ -7,9 +7,9 @@
 #include <QLoggingCategory>
 #include <pb/commands.pb.h>
 
-inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone")
+inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone");
 
-    class ZoneViewWidget;
+class ZoneViewWidget;
 class Response;
 class ServerInfo_Card;
 class QGraphicsSceneWheelEvent;

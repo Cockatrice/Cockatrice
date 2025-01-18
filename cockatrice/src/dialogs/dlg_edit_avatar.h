@@ -6,9 +6,9 @@
 #include <QLineEdit>
 #include <QLoggingCategory>
 
-inline Q_LOGGING_CATEGORY(DlgEditAvatarLog, "dlg_edit_avatar")
+inline Q_LOGGING_CATEGORY(DlgEditAvatarLog, "dlg_edit_avatar");
 
-    class QLabel;
+class QLabel;
 class QPushButton;
 class QCheckBox;
 

@@ -5,9 +5,9 @@
 
 #include <QLoggingCategory>
 
-inline Q_LOGGING_CATEGORY(PictureToLoadLog, "picture_loader.picture_to_load")
+inline Q_LOGGING_CATEGORY(PictureToLoadLog, "picture_loader.picture_to_load");
 
-    class PictureToLoad
+class PictureToLoad
 {
 private:
     class SetDownloadPriorityComparator

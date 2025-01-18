@@ -6,9 +6,9 @@
 #include <QLoggingCategory>
 #include <QXmlStreamReader>
 
-inline Q_LOGGING_CATEGORY(CockatriceXml3Log, "cockatrice_xml.xml_3_parser")
+inline Q_LOGGING_CATEGORY(CockatriceXml3Log, "cockatrice_xml.xml_3_parser");
 
-    class CockatriceXml3Parser : public ICardDatabaseParser
+class CockatriceXml3Parser : public ICardDatabaseParser
 {
     Q_OBJECT
     Q_INTERFACES(ICardDatabaseParser)
