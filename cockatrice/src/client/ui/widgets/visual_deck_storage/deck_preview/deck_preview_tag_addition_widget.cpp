@@ -45,7 +45,6 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
         QStringList updatedTags = dialog.getActiveTags();
         parent->deckLoader->setTags(updatedTags);
         parent->deckLoader->saveToFile(parent->parent->filePath, DeckLoader::CockatriceFormat);
-        parent->parent->parent->refreshBannerCards();
     }
 }
 

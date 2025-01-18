@@ -13,7 +13,9 @@ class DeckPreviewDeckTagsDisplayWidget : public QWidget
 
 public:
     explicit DeckPreviewDeckTagsDisplayWidget(DeckPreviewWidget *_parent, DeckLoader *_deckLoader);
+    void refreshTags();
     DeckPreviewWidget *parent;
     DeckLoader *deckLoader;
+    FlowWidget *flowWidget;
 };
 #endif // DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
