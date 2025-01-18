@@ -140,12 +140,15 @@ endif()
 
 # Define proper compilation flags
 if(MSVC)
-  # Visual Studio: Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc")
+  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-  # Visual Studio: No Optimization, Multi-threaded Debug DLL, Debug Symbols
-  set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd /Zi")
+  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+  set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
+
+  # Generate PDB, even when in release (So developers can better analyze crash logs)
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
 elseif(CMAKE_COMPILER_IS_GNUCXX)

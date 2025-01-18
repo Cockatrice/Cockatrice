@@ -414,6 +414,12 @@ jobs:
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
+      - name: Upload pdb database
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows${{matrix.target}}-debug.pdb
+          path: "build/**/*.pdb"
+
       - name: Upload to release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
