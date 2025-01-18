@@ -87,17 +87,22 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     activateUserLayout->addWidget(userToActivate, 0, 0);
     activateUserLayout->addWidget(activateUserButton, 0, 1);
 
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(updateServerMessageButton);
-    vbox->addWidget(shutdownServerButton);
-    vbox->addWidget(reloadConfigButton);
-    vbox->addLayout(grandReplayAccessLayout);
-    vbox->addLayout(activateUserLayout);
-    vbox->addStretch();
+    auto *adminVBox = new QVBoxLayout;
+    adminVBox->addWidget(updateServerMessageButton);
+    adminVBox->addWidget(shutdownServerButton);
+    adminVBox->addWidget(reloadConfigButton);
 
     adminGroupBox = new QGroupBox;
-    adminGroupBox->setLayout(vbox);
+    adminGroupBox->setLayout(adminVBox);
     adminGroupBox->setEnabled(false);
+
+    auto *moderatorVBox = new QVBoxLayout;
+    moderatorVBox->addLayout(grandReplayAccessLayout);
+    moderatorVBox->addLayout(activateUserLayout);
+
+    moderatorGroupBox = new QGroupBox;
+    moderatorGroupBox->setLayout(moderatorVBox);
+    moderatorGroupBox->setEnabled(false);
 
     unlockButton = new QPushButton;
     connect(unlockButton, &QPushButton::clicked, this, &TabAdmin::actUnlock);
@@ -107,6 +112,8 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(adminGroupBox);
+    mainLayout->addWidget(moderatorGroupBox);
+    mainLayout->addStretch();
     mainLayout->addWidget(unlockButton);
     mainLayout->addWidget(lockButton);
 
@@ -125,6 +132,7 @@ void TabAdmin::retranslateUi()
     shutdownServerButton->setText(tr("&Shut down server"));
     reloadConfigButton->setText(tr("&Reload configuration"));
     adminGroupBox->setTitle(tr("Server administration functions"));
+    moderatorGroupBox->setTitle(tr("Server moderator functions"));
 
     replayIdToGrant->setPlaceholderText(tr("Replay ID"));
     grantReplayAccessButton->setText(tr("Grant Replay Access"));
@@ -229,20 +237,28 @@ void TabAdmin::activateUserProcessResponse(const Response &response)
 
 void TabAdmin::actUnlock()
 {
-    if (fullAdmin)
+    if (fullAdmin) {
         adminGroupBox->setEnabled(true);
+    }
+
+    moderatorGroupBox->setEnabled(true);
     lockButton->setEnabled(true);
     unlockButton->setEnabled(false);
     locked = false;
+
     emit adminLockChanged(false);
 }
 
 void TabAdmin::actLock()
 {
-    if (fullAdmin)
+    if (fullAdmin) {
         adminGroupBox->setEnabled(false);
+    }
+
+    moderatorGroupBox->setEnabled(false);
     lockButton->setEnabled(false);
     unlockButton->setEnabled(true);
     locked = true;
+
     emit adminLockChanged(true);
 }
