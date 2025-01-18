@@ -92,8 +92,13 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
     path /= "cockatrice.crash." + std::to_string(std::time(0)) + ".dmp";
 
     // Create and write crash files
+#ifdef UNICODE
     HANDLE hDumpFile =
         CreateFile(path.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+#else
+    HANDLE hDumpFile =
+        CreateFile(path.string().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+#endif
 
     MINIDUMP_EXCEPTION_INFORMATION mei;
     mei.ExceptionPointers = exceptionPointers;
