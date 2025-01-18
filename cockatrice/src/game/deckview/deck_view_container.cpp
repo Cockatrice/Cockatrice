@@ -181,6 +181,7 @@ void DeckViewContainer::refreshShortcuts()
 void DeckViewContainer::loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     Q_UNUSED(event);
+    instance->deckLoader->loadFromFile(instance->filePath, DeckLoader::CockatriceFormat, false);
     QString deckString = instance->deckLoader->writeToString_Native();
 
     if (deckString.length() > MAX_FILE_LENGTH) {
