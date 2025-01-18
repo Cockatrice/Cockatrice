@@ -65,25 +65,45 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
 // clang-format off
 #include <Windows.h>
 #include <DbgHelp.h>
-#include <tchar.h>
+#include <ShlObj.h>
+#include <ctime>
+#include <filesystem>
 #pragma comment(lib, "DbgHelp.lib") // Link the DbgHelp library
 // clang-format on
 
-LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *pExceptionPointers)
+LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPointers)
 {
-    HANDLE hDumpFile =
-        CreateFile(_T("cockatrice.crash.dmp"), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    std::filesystem::path path;
 
-    if (hDumpFile != INVALID_HANDLE_VALUE) {
-        MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
-        dumpInfo.ExceptionPointers = pExceptionPointers;
-        dumpInfo.ThreadId = GetCurrentThreadId();
-        dumpInfo.ClientPointers = TRUE;
-
-        MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &dumpInfo,
-                          NULL, NULL);
-        CloseHandle(hDumpFile);
+    // Find %LOCALAPPDATA% (or cheat at finding it)
+    wchar_t *localAppDataFolder;
+    if (SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &localAppDataFolder) != S_OK) {
+        path = std::filesystem::temp_directory_path().parent_path().parent_path();
+    } else {
+        path = std::filesystem::path(localAppDataFolder);
     }
+
+    // Plan on writing crash files into %LOCALAPPDATA%/CrashDumps/Cockatrice/cockatrice.crash.*.dmp
+    path /= "CrashDumps";
+    path /= "Cockatrice";
+    if (!std::filesystem::exists(path)) {
+        std::filesystem::create_directories(path);
+    }
+    path /= "cockatrice.crash." + std::to_string(std::time(0)) + ".dmp";
+
+    // Create and write crash files
+    HANDLE hDumpFile =
+        CreateFile(path.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+    MINIDUMP_EXCEPTION_INFORMATION mei;
+    mei.ExceptionPointers = exceptionPointers;
+    mei.ThreadId = GetCurrentThreadId();
+    mei.ClientPointers = 1;
+
+    MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &mei, nullptr,
+                      nullptr);
+
+    CloseHandle(hDumpFile);
 
     return EXCEPTION_EXECUTE_HANDLER;
 }

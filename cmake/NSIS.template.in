@@ -238,7 +238,7 @@ ${If} $PortableMode = 0
 
 	; Enable Windows User-Mode Dumps
 	; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
-	WriteRegStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
+	WriteRegExpandStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpCount" "5"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpType" "2"
 
