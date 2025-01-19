@@ -42,6 +42,7 @@ private slots:
     void showSearchSyntaxHelp();
 
 private:
+    QWidget *parent;
     CardInfoPtr currentCardInfo() const;
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
@@ -82,15 +83,13 @@ private:
     QWidget *centralWidget;
 
 public:
-    explicit TabDeckEditorVisualDatabaseSearchTab(TabSupervisor *_tabSupervisor, QWidget *parent = nullptr);
+    explicit TabDeckEditorVisualDatabaseSearchTab(TabSupervisor *_tabSupervisor, QWidget *_parent);
     ~TabDeckEditorVisualDatabaseSearchTab() override;
     void retranslateUi() override;
     void setDeck(DeckLoader *_deckLoader);
     void setModified(bool _windowModified);
     bool confirmClose();
 
-public slots:
-    void closeRequest() override;
 signals:
     void deckEditorClosing(TabDeckEditorVisualDatabaseSearchTab *tab);
 };

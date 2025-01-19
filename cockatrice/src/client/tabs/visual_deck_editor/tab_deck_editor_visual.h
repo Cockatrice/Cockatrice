@@ -73,6 +73,8 @@ private:
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
 
+    QWidget *parent;
+
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
     DeckListModel *deckModel;
@@ -137,7 +139,6 @@ public:
     void createCentralFrame();
 
 public slots:
-    void closeRequest() override;
     void setCurrentCardInfo(CardInfoPtr activeCard);
     void changeModelIndexAndCardInfo(CardInfoPtr activeCard);
     void processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);

@@ -719,17 +719,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab()
 {
     TabDeckEditorVisual *tab = new TabDeckEditorVisual(this);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabDeckStorageVisual *TabSupervisor::addVisualDeckStorageTab()
-{
-    TabDeckStorageVisual *tab = new TabDeckStorageVisual(this, client);
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }
