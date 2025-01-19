@@ -61,7 +61,7 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
     QString logMessage = qFormatLogMessage(type, ctx, message);
 
     // Regular expression to match the full path in the square brackets and extract only the filename and line number
-    QRegularExpression regex(R"(\[\/.*\/([^\/]+\:\d+)\])");
+    QRegularExpression regex(R"(\[(?:.:)?[\/\\].*[\/\\]([^\/\\]+\:\d+)\])");
     QRegularExpressionMatch match = regex.match(logMessage);
 
     if (match.hasMatch()) {
