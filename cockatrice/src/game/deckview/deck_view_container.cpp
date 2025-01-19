@@ -127,11 +127,7 @@ void DeckViewContainer::switchToDeckSelectView()
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, true);
-    if (parentGame->getIsLocalGame()) {
-        setVisibility(loadRemoteButton, false);
-    } else {
-        setVisibility(loadRemoteButton, true);
-    }
+    setVisibility(loadRemoteButton, !parentGame->getIsLocalGame());
     setVisibility(unloadDeckButton, false);
     setVisibility(readyStartButton, false);
     setVisibility(sideboardLockButton, false);
