@@ -765,11 +765,10 @@ void TabDeckEditor::retranslateUi()
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
 
-    aRemoveCard->setText(tr("&Remove row"));
-
     aIncrement->setText(tr("&Increment number"));
-
     aDecrement->setText(tr("&Decrement number"));
+    aRemoveCard->setText(tr("&Remove row"));
+    aSwapCard->setText(tr("Swap card to/from sideboard"));
 
     deckMenu->setTitle(tr("&Deck Editor"));
 
