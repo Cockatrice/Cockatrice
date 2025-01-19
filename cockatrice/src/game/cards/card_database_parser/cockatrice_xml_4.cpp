@@ -58,8 +58,7 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
                 } else if (xmlName == "cards") {
                     loadCardsFromXml(xml);
                 } else if (!xmlName.isEmpty()) {
-                    qCDebug(CockatriceXml4Log)
-                        << "Unknown item" << xmlName << ", trying to continue anyway";
+                    qCDebug(CockatriceXml4Log) << "Unknown item" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -97,8 +96,7 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 } else if (xmlName == "priority") {
                     priority = xml.readElementText(QXmlStreamReader::IncludeChildElements).toShort();
                 } else if (!xmlName.isEmpty()) {
-                    qCDebug(CockatriceXml4Log)
-                        << "Unknown set property" << xmlName << ", trying to continue anyway";
+                    qCDebug(CockatriceXml4Log) << "Unknown set property" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -231,8 +229,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         relatedCards << relation;
                     }
                 } else if (!xmlName.isEmpty()) {
-                    qCDebug(CockatriceXml4Log)
-                        << "Unknown card property" << xmlName << ", trying to continue anyway";
+                    qCDebug(CockatriceXml4Log) << "Unknown card property" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
