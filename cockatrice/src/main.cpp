@@ -58,7 +58,21 @@ QString translationPath;
 
 static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, const QString &message)
 {
-    Logger::getInstance().log(type, ctx, message);
+    QString logMessage = qFormatLogMessage(type, ctx, message);
+
+    // Regular expression to match the full path in the square brackets and extract only the filename and line number
+    QRegularExpression regex(R"(\[\/.*\/([^\/]+\:\d+)\])");
+    QRegularExpressionMatch match = regex.match(logMessage);
+
+    if (match.hasMatch()) {
+        // Extract the filename and line number (e.g., "main.cpp:211")
+        QString filenameLine = match.captured(1);
+
+        // Replace the full path in square brackets with just the filename and line number
+        logMessage.replace(match.captured(0), QString("[%1]").arg(filenameLine));
+    }
+
+    Logger::getInstance().log(type, ctx, logMessage);
 }
 
 #ifdef Q_OS_WIN
@@ -140,7 +154,7 @@ int main(int argc, char *argv[])
 
     // Set the QT_LOGGING_CONF environment variable
     qputenv("QT_LOGGING_CONF", "./qtlogging.ini");
-
+qSetMessagePattern("\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} %{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
@@ -194,13 +208,13 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
-    qCDebug(MainLog) << "main(): starting main program";
+    qCDebug(MainLog) << "Starting main program";
 
     MainWindow ui;
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
-    qCDebug(MainLog) << "main(): MainWindow constructor finished";
+    qCDebug(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
@@ -215,7 +229,7 @@ int main(int argc, char *argv[])
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     ui.show();
-    qCDebug(MainLog) << "main(): ui.show() finished";
+    qCDebug(MainLog) << "ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
