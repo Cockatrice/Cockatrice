@@ -154,7 +154,10 @@ int main(int argc, char *argv[])
 
     // Set the QT_LOGGING_CONF environment variable
     qputenv("QT_LOGGING_CONF", "./qtlogging.ini");
-qSetMessagePattern("\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} %{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
+    qSetMessagePattern(
+        "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
+        "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
+        "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
