@@ -582,7 +582,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     }
 
     int msecs = startTime.msecsTo(QTime::currentTime());
-    qCDebug(CardDatabaseLoadingLog) << "[CardDatabase] loadCardDatabase(): Path =" << path
+    qCDebug(CardDatabaseLoadingLog) << "Path =" << path
                                     << "Status =" << tempLoadStatus << "Cards =" << cards.size()
                                     << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
 
@@ -593,7 +593,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 {
     reloadDatabaseMutex->lock();
 
-    qCDebug(CardDatabaseLoadingLog) << "CardDatabase::loadCardDatabases start";
+    qCDebug(CardDatabaseLoadingLog) << "Started";
 
     clear(); // remove old db
 
@@ -627,10 +627,10 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     if (loadStatus == Ok) {
         checkUnknownSets(); // update deck editors, etc
-        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "CardDatabase::loadCardDatabases success";
+        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "Success";
         emit cardDatabaseLoadingFinished();
     } else {
-        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "CardDatabase::loadCardDatabases failed";
+        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "Failed";
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 

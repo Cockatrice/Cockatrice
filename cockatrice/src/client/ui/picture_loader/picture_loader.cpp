@@ -89,7 +89,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     }
 
     // add the card to the load queue
-    qCDebug(PictureLoaderLog) << "PictureLoader: Enqueuing " << card->getName() << " for " << card->getPixmapCacheKey();
+    qCDebug(PictureLoaderLog) << "Enqueuing " << card->getName() << " for " << card->getPixmapCacheKey();
     getInstance().worker->enqueueImageLoad(card);
 }
 

@@ -81,7 +81,7 @@ void PictureLoaderWorker::processLoadQueue()
         QString correctedCardName = cardBeingLoaded.getCard()->getCorrectedName();
 
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Trying to load picture";
+            << "[card: " << cardName << " set: " << setName << "]: Trying to load picture";
 
         if (CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(
                 cardName, cardBeingLoaded.getCard()->getPixmapCacheKey())) {
@@ -90,7 +90,7 @@ void PictureLoaderWorker::processLoadQueue()
             }
         }
 
-        qCDebug(PictureLoaderWorkerLog).nospace() << "PictureLoader: [card: " << cardName << " set: " << setName
+        qCDebug(PictureLoaderWorkerLog).nospace() << "[card: " << cardName << " set: " << setName
                                                   << "]: No custom picture, trying to download";
         cardsToDownload.append(cardBeingLoaded);
         cardBeingLoaded.clear();
@@ -134,20 +134,20 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
         imgReader.setFileName(_picsPath);
         if (imgReader.read(&image)) {
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "PictureLoader: [card: " << correctedCardname << " set: " << setName << "]: Picture found on disk.";
+                << "[card: " << correctedCardname << " set: " << setName << "]: Picture found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(_picsPath + ".full");
         if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderWorkerLog).nospace() << "PictureLoader: [card: " << correctedCardname
+            qCDebug(PictureLoaderWorkerLog).nospace() << "[card: " << correctedCardname
                                                       << " set: " << setName << "]: Picture.full found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(_picsPath + ".xlhq");
         if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderWorkerLog).nospace() << "PictureLoader: [card: " << correctedCardname
+            qCDebug(PictureLoaderWorkerLog).nospace() << "[card: " << correctedCardname
                                                       << " set: " << setName << "]: Picture.xlhq found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
@@ -177,7 +177,7 @@ void PictureLoaderWorker::startNextPicDownload()
     } else {
         QUrl url(picUrl);
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+            << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Trying to fetch picture from url "
             << url.toDisplayString();
         makeRequest(url);
@@ -196,7 +196,7 @@ void PictureLoaderWorker::picDownloadFailed()
         mutex.unlock();
     } else {
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+            << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
             << ", no more url combinations to try: BAILING OUT";
@@ -218,7 +218,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+            << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Using cached redirect for " << url.toDisplayString()
             << " to " << cachedRedirect.toDisplayString();
         return makeRequest(cachedRedirect); // Use the cached redirect
@@ -243,7 +243,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
 
             cacheRedirect(url, redirectUrl);
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
                 << " set: " << cardBeingDownloaded.getSetName() << "]: Caching redirect from " << url.toDisplayString()
                 << " to " << redirectUrl.toDisplayString();
         }
@@ -323,7 +323,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     if (reply->error()) {
         if (isFromCache) {
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                << "[card: " << cardBeingDownloaded.getCard()->getName()
                 << " set: " << cardBeingDownloaded.getSetName() << "]: Removing corrupted cache file for url "
                 << reply->url().toDisplayString() << " and retrying (" << reply->errorString() << ")";
 
@@ -332,7 +332,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
             makeRequest(reply->url());
         } else {
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                << "[card: " << cardBeingDownloaded.getCard()->getName()
                 << " set: " << cardBeingDownloaded.getSetName() << "]: " << (picDownload ? "Download" : "Cache search")
                 << " failed for url " << reply->url().toDisplayString() << " (" << reply->errorString() << ")";
 
@@ -350,7 +350,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         statusCode == 308) {
         QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+            << "[card: " << cardBeingDownloaded.getCard()->getName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: following "
             << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
         makeRequest(redirectUrl);
@@ -363,7 +363,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 
     if (imageIsBlackListed(picData)) {
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+            << "[card: " << cardBeingDownloaded.getCard()->getName()
             << " set: " << cardBeingDownloaded.getSetName()
             << "]: Picture found, but blacklisted, will consider it as not found";
 
@@ -399,7 +399,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         logSuccessMessage = true;
     } else {
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+            << "[card: " << cardBeingDownloaded.getCard()->getName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Possible " << (isFromCache ? "cached" : "downloaded")
             << " picture at " << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
 
@@ -408,7 +408,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 
     if (logSuccessMessage) {
         qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+            << "[card: " << cardBeingDownloaded.getCard()->getName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully "
             << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
     }
