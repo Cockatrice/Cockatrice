@@ -3,6 +3,7 @@
 
 #include "../../../../game/cards/card_database.h"
 
+#include <QPushButton>
 #include <QTabWidget>
 
 class AbstractCardItem;
@@ -18,6 +19,7 @@ private:
     CardInfoPtr info;
     CardInfoPictureWidget *pic;
     CardInfoTextWidget *text;
+    QPushButton *viewTransformationButton;
     bool cardTextOnly;
     QWidget *tab1, *tab2, *tab3;
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
@@ -43,6 +45,7 @@ public slots:
     void setCard(const QString &cardName);
     void setCard(const QString &cardName, const QString &providerId);
     void setCard(AbstractCardItem *card);
+    void viewTransformation();
     void clearCard();
     void setViewMode(int mode);
 };

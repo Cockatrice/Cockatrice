@@ -23,6 +23,11 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     text->setObjectName("text");
     connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
+    viewTransformationButton = new QPushButton();
+    viewTransformationButton->setObjectName("viewTransformationButton");
+    connect(viewTransformationButton, &QPushButton::clicked, this, &CardInfoFrameWidget::viewTransformation);
+    viewTransformationButton->setVisible(false);
+
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
     tab3 = new QWidget(this);
@@ -69,6 +74,7 @@ void CardInfoFrameWidget::retranslateUi()
     setTabText(ImageOnlyView, tr("Image"));
     setTabText(TextOnlyView, tr("Description"));
     setTabText(ImageAndTextView, tr("Both"));
+    viewTransformationButton->setText(tr("View transformation"));
 }
 
 void CardInfoFrameWidget::setViewMode(int mode)
@@ -80,10 +86,12 @@ void CardInfoFrameWidget::setViewMode(int mode)
         case ImageOnlyView:
         case TextOnlyView:
             tab1Layout->addWidget(pic);
+            tab1Layout->addWidget(viewTransformationButton);
             tab2Layout->addWidget(text);
             break;
         case ImageAndTextView:
             splitter->addWidget(pic);
+            splitter->addWidget(viewTransformationButton);
             splitter->addWidget(text);
             break;
         default:
@@ -95,6 +103,7 @@ void CardInfoFrameWidget::setViewMode(int mode)
 
 void CardInfoFrameWidget::setCard(CardInfoPtr card)
 {
+    viewTransformationButton->setVisible(false);
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
     }
@@ -103,6 +112,16 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
 
     if (info) {
         connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
+    }
+
+    if (info) {
+        auto relations = info->getAllRelatedCards();
+
+        for (auto relation : relations) {
+            if (relation->getDoesTransform()) {
+                viewTransformationButton->setVisible(true);
+            }
+        }
     }
 
     text->setCard(info);
@@ -123,6 +142,19 @@ void CardInfoFrameWidget::setCard(AbstractCardItem *card)
 {
     if (card) {
         setCard(card->getInfo());
+    }
+}
+
+void CardInfoFrameWidget::viewTransformation()
+{
+    if (info) {
+        auto relations = info->getAllRelatedCards();
+
+        for (auto relation : relations) {
+            if (relation->getDoesTransform()) {
+                setCard(relation->getName());
+            }
+        }
     }
 }
 
