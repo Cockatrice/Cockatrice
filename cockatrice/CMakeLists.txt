@@ -152,6 +152,7 @@ set(cockatrice_SOURCES
     src/client/tabs/api/edhrec/edhrec_commander_api_response_display_widget.cpp
     src/client/tabs/api/edhrec/edhrec_commander_api_response_card_details_display_widget.cpp
     src/client/tabs/api/edhrec/edhrec_commander_api_response_card_list_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_commander_details_display_widget.cpp
     src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_archidekt_links.cpp
     src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_average_deck_statistics.cpp
     src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_details.cpp
