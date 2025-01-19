@@ -151,7 +151,7 @@ void CardInfoFrameWidget::viewTransformation()
         const auto &cardRelations = info->getAllRelatedCards();
         for (const auto &cardRelation : cardRelations) {
             if (cardRelation->getDoesTransform()) {
-                viewTransformationButton->setVisible(true);
+                setCard(cardRelation->getName());
                 break;
             }
         }
