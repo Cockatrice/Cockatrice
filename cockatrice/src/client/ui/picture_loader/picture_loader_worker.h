@@ -19,8 +19,6 @@
 inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
 
 class PictureLoaderWorkerWork;
-inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
-
 class PictureLoaderWorker : public QObject
 {
     Q_OBJECT
