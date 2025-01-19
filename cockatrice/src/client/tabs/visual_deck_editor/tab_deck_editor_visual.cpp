@@ -12,7 +12,7 @@
 #include "../../../settings/cache_settings.h"
 #include "../../game_logic/abstract_client.h"
 #include "../../tapped_out_interface.h"
-#include "../../ui/picture_loader.h"
+#include "../../ui/picture_loader/picture_loader.h"
 #include "../../ui/pixel_map_generator.h"
 #include "../../ui/widgets/cards/card_info_frame_widget.h"
 #include "../../ui/widgets/deck_analytics/deck_analytics_widget.h"
@@ -693,8 +693,8 @@ void TabDeckEditorVisual::loadLayout()
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
-TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor, QWidget *parent)
-    : Tab(_tabSupervisor, parent), modified(false)
+TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor, QWidget *_parent)
+    : Tab(_tabSupervisor), parent(_parent), modified(false)
 {
     setObjectName("TabDeckEditorVisual");
 
@@ -846,12 +846,6 @@ bool TabDeckEditorVisual::confirmClose()
             return false;
     }
     return true;
-}
-
-void TabDeckEditorVisual::closeRequest()
-{
-    if (confirmClose())
-        deleteLater();
 }
 
 void TabDeckEditorVisual::actNewDeck()

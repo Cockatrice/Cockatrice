@@ -4,8 +4,8 @@
 #include "../../../main.h"
 
 TabDeckEditorVisualDatabaseSearchTab::TabDeckEditorVisualDatabaseSearchTab(TabSupervisor *_tabSupervisor,
-                                                                           QWidget *parent)
-    : Tab(_tabSupervisor, parent)
+                                                                           QWidget *_parent)
+    : Tab(_tabSupervisor), parent(_parent)
 {
     // Set up the layout and add tab widget
     layout = new QVBoxLayout(this);
@@ -135,8 +135,4 @@ void TabDeckEditorVisualDatabaseSearchTab::setModified(bool _windowModified)
 bool TabDeckEditorVisualDatabaseSearchTab::confirmClose()
 {
     return true;
-}
-void TabDeckEditorVisualDatabaseSearchTab::closeRequest()
-{
-    Tab::closeRequest();
 }
