@@ -4,7 +4,10 @@
 #include "../game/cards/card_database.h"
 #include "decklist.h"
 
+#include <QLoggingCategory>
 #include <QObject>
+
+inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 
 class QByteArray;
 class QNetworkAccessManager;

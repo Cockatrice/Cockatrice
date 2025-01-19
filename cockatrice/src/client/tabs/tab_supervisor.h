@@ -7,9 +7,12 @@
 
 #include <QAbstractButton>
 #include <QCommonStyle>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
+
+inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
 class QMenu;

@@ -2,10 +2,13 @@
 #define RELEASECHANNEL_H
 
 #include <QDate>
+#include <QLoggingCategory>
 #include <QObject>
 #include <QString>
 #include <QVariantMap>
 #include <utility>
+
+inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel");
 
 class QNetworkReply;
 class QNetworkAccessManager;

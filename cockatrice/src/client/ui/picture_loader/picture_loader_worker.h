@@ -4,6 +4,7 @@
 #include "../../../game/cards/card_database.h"
 #include "picture_to_load.h"
 
+#include <QLoggingCategory>
 #include <QMutex>
 #include <QNetworkAccessManager>
 #include <QObject>
@@ -13,6 +14,8 @@
 #define REDIRECT_URL "redirect"
 #define REDIRECT_TIMESTAMP "timestamp"
 #define REDIRECT_CACHE_FILENAME "cache.ini"
+
+inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
 
 class PictureLoaderWorker : public QObject
 {

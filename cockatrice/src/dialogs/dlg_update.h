@@ -4,8 +4,12 @@
 #include "../client/update_downloader.h"
 
 #include <QDialogButtonBox>
+#include <QLoggingCategory>
 #include <QProgressDialog>
 #include <QtNetwork>
+
+inline Q_LOGGING_CATEGORY(DlgUpdateLog, "dlg_update");
+
 class Release;
 
 class DlgUpdate : public QDialog

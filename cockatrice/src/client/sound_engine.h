@@ -2,10 +2,13 @@
 #define SOUNDENGINE_H
 
 #include <QAudioOutput>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QMediaPlayer>
 #include <QObject>
 #include <QString>
+
+inline Q_LOGGING_CATEGORY(SoundEngineLog, "sound_engine");
 
 class QBuffer;
 

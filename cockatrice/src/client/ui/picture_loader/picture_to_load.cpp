@@ -7,9 +7,6 @@
 #include <QRegularExpression>
 #include <QUrl>
 #include <algorithm>
-#include <qloggingcategory.h>
-
-Q_LOGGING_CATEGORY(PictureToLoadLog, "picture_loader.picture_to_load")
 
 PictureToLoad::PictureToLoad(CardInfoPtr _card)
     : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())

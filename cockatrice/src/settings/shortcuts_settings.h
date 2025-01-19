@@ -3,7 +3,10 @@
 
 #include <QApplication>
 #include <QKeySequence>
+#include <QLoggingCategory>
 #include <QSettings>
+
+inline Q_LOGGING_CATEGORY(ShortcutsSettingsLog, "shortcuts_settings");
 
 class ShortcutGroup
 {

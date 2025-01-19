@@ -3,9 +3,12 @@
 
 #include "settings_manager.h"
 
+#include <QLoggingCategory>
 #include <QObject>
 #define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
 #define SERVERSETTINGS_DEFAULT_PORT "4748"
+
+inline Q_LOGGING_CATEGORY(ServersSettingsLog, "servers_settings");
 
 class ServersSettings : public SettingsManager
 {

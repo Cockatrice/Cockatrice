@@ -382,7 +382,7 @@ FilterString::FilterString(const QString &expr)
     });
 
     if (!search.parse(ba.data(), result)) {
-        qDebug().nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
+        qCDebug(FilterStringLog).nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
         result = [](const CardData &) -> bool { return false; };
     }
 }

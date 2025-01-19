@@ -32,7 +32,7 @@ void ThemeManager::ensureThemeDirectoryExists()
 {
     if (SettingsCache::instance().getThemeName().isEmpty() ||
         !getAvailableThemes().contains(SettingsCache::instance().getThemeName())) {
-        qDebug() << "Theme name not set, setting default value";
+        qCDebug(ThemeManagerLog) << "Theme name not set, setting default value";
         SettingsCache::instance().setThemeName(NONE_THEME_NAME);
     }
 }
@@ -105,7 +105,7 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
-    qDebug() << "Theme changed:" << themeName;
+    qCDebug(ThemeManagerLog) << "Theme changed:" << themeName;
 
     QString dirPath = getAvailableThemes().value(themeName);
     QDir dir = dirPath;

@@ -15,10 +15,7 @@
 #include <QScreen>
 #include <QThread>
 #include <algorithm>
-#include <qloggingcategory.h>
 #include <utility>
-
-Q_LOGGING_CATEGORY(PictureLoaderLog, "picture_loader")
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
@@ -52,7 +49,7 @@ void PictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize si
 {
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderLog) << "PictureLoader: cache fail for" << backCacheKey;
+        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache fail for" << backCacheKey;
         pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
@@ -62,7 +59,7 @@ void PictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size)
 {
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderLog) << "PictureLoader: cache fail for" << backCacheKey;
+        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache fail for" << backCacheKey;
         pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
@@ -92,6 +89,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     }
 
     // add the card to the load queue
+    qCDebug(PictureLoaderLog) << "Enqueuing " << card->getName() << " for " << card->getPixmapCacheKey();
     getInstance().worker->enqueueImageLoad(card);
 }
 

@@ -151,6 +151,6 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
     }
 
     // this line should never be reached
-    qDebug() << "cardlist.cpp: Could not find extractor for SortOption" << option;
+    qCDebug(CardListLog) << "cardlist.cpp: Could not find extractor for SortOption" << option;
     return [](CardItem *) { return ""; };
 }

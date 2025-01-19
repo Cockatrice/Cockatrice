@@ -67,7 +67,7 @@ void ShortcutsSettings::migrateShortcuts()
         shortCutsFile.beginGroup(custom);
 
         if (shortCutsFile.contains("Textbox/unfocusTextBox")) {
-            qDebug()
+            qCDebug(ShortcutsSettingsLog)
                 << "[ShortcutsSettings] Textbox/unfocusTextBox shortcut found. Migrating to Player/unfocusTextBox.";
             QString unfocusTextBox = shortCutsFile.value("Textbox/unfocusTextBox", "").toString();
             this->setShortcuts("Player/unfocusTextBox", unfocusTextBox);
@@ -75,7 +75,8 @@ void ShortcutsSettings::migrateShortcuts()
         }
 
         if (shortCutsFile.contains("tab_game/aFocusChat")) {
-            qDebug() << "[ShortcutsSettings] tab_game/aFocusChat shortcut found. Migrating to Player/aFocusChat.";
+            qCDebug(ShortcutsSettingsLog)
+                << "[ShortcutsSettings] tab_game/aFocusChat shortcut found. Migrating to Player/aFocusChat.";
             QString aFocusChat = shortCutsFile.value("tab_game/aFocusChat", "").toString();
             this->setShortcuts("Player/aFocusChat", aFocusChat);
             shortCutsFile.remove("tab_game/aFocusChat");

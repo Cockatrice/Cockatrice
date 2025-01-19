@@ -5,6 +5,7 @@
 #include <QDate>
 #include <QHash>
 #include <QList>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QMetaType>
 #include <QSharedPointer>
@@ -12,6 +13,10 @@
 #include <QVariant>
 #include <QVector>
 #include <utility>
+
+inline Q_LOGGING_CATEGORY(CardDatabaseLog, "card_database");
+inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
+inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");
 
 class CardDatabase;
 class CardInfo;

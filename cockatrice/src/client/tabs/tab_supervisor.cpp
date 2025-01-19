@@ -760,7 +760,7 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
     if (tab)
         tab->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()), {});
     else
-        qDebug() << "gameEvent: invalid gameId";
+        qCDebug(TabSupervisorLog) << "gameEvent: invalid gameId";
 }
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
@@ -787,9 +787,9 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 
 void TabSupervisor::actShowPopup(const QString &message)
 {
-    qDebug() << "ACT SHOW POPUP";
+    qCDebug(TabSupervisorLog) << "ACT SHOW POPUP";
     if (trayIcon && (QApplication::activeWindow() == nullptr || QApplication::focusWidget() == nullptr)) {
-        qDebug() << "LAUNCHING POPUP";
+        qCDebug(TabSupervisorLog) << "LAUNCHING POPUP";
         // disconnect(trayIcon, SIGNAL(messageClicked()), nullptr, nullptr);
         trayIcon->showMessage(message, tr("Click to view"));
         // connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));

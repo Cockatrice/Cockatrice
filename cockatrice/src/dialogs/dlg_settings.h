@@ -8,8 +8,11 @@
 #include <QDialog>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLoggingCategory>
 #include <QPushButton>
 #include <QSpinBox>
+
+inline Q_LOGGING_CATEGORY(DlgSettingsLog, "dlg_settings");
 
 class ShortcutTreeView;
 class SearchLineEdit;

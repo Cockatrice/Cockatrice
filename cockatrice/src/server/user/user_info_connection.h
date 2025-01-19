@@ -4,8 +4,11 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QLoggingCategory>
 #include <QSettings>
 #include <QStandardPaths>
+
+inline Q_LOGGING_CATEGORY(UserInfoConnectionLog, "user_info_connection");
 
 class UserConnection_Information
 {

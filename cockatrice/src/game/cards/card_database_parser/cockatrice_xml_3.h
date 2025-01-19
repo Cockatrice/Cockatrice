@@ -3,7 +3,10 @@
 
 #include "card_database_parser.h"
 
+#include <QLoggingCategory>
 #include <QXmlStreamReader>
+
+inline Q_LOGGING_CATEGORY(CockatriceXml3Log, "cockatrice_xml.xml_3_parser");
 
 class CockatriceXml3Parser : public ICardDatabaseParser
 {

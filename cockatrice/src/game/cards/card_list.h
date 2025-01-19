@@ -2,6 +2,9 @@
 #define CARDLIST_H
 
 #include <QList>
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(CardListLog, "card_list");
 
 class CardItem;
 

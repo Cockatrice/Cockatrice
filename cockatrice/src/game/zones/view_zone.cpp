@@ -246,7 +246,7 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         if (cols < 2)
             cols = 2;
 
-        qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
+        qCDebug(ViewZoneLog) << "reorganizeCards: rows=" << rows << "cols=" << cols;
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
