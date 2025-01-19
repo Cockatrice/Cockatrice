@@ -78,6 +78,7 @@ void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPr
 void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     emit deckPreviewDoubleClicked(event, instance);
+    emit deckLoadRequested(instance->filePath);
 }
 
 void VisualDeckStorageWidget::refreshBannerCards()

@@ -86,8 +86,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
 
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
-            &DeckViewContainer::loadVisualDeck);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
+            &DeckViewContainer::loadDeckFromFile);
 
     deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
@@ -176,24 +176,6 @@ void DeckViewContainer::refreshShortcuts()
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
     readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
-}
-
-void DeckViewContainer::loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance)
-{
-    Q_UNUSED(event);
-    QString deckString = instance->deckLoader->writeToString_Native();
-
-    if (deckString.length() > MAX_FILE_LENGTH) {
-        QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
-        return;
-    }
-
-    Command_DeckSelect cmd;
-    cmd.set_deck(deckString.toStdString());
-    PendingCommand *pend = parentGame->prepareGameCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(deckSelectFinished(const Response &)));
-    parentGame->sendGameCommand(pend, playerId);
 }
 
 void DeckViewContainer::unloadDeck()

@@ -21,11 +21,21 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(DeckPreviewWi
 
     setFixedHeight(100);
 
-    auto *flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    connect(deckLoader, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
 
+    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     for (const QString &tag : this->deckLoader->getTags()) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
     flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Edit tags ...")));
     layout->addWidget(flowWidget);
+}
+
+void DeckPreviewDeckTagsDisplayWidget::refreshTags()
+{
+    flowWidget->clearLayout();
+    for (const QString &tag : this->deckLoader->getTags()) {
+        flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
+    }
+    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Edit tags ...")));
 }

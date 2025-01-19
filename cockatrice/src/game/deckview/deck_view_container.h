@@ -55,7 +55,6 @@ private:
 private slots:
     void switchToDeckSelectView();
     void switchToDeckLoadedView();
-    void loadVisualDeck(QMouseEvent *event, DeckPreviewWidget *instance);
     void loadLocalDeck();
     void loadRemoteDeck();
     void unloadDeck();
@@ -77,6 +76,8 @@ public:
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
     void setDeck(const DeckLoader &deck);
+
+public slots:
     void loadDeckFromFile(const QString &filePath);
 };
 

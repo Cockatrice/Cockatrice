@@ -272,6 +272,7 @@ protected:
 
 signals:
     void deckHashChanged();
+    void deckTagsChanged();
 
 public slots:
     void setName(const QString &_name = QString())
@@ -285,14 +286,17 @@ public slots:
     void setTags(const QStringList &_tags = QStringList())
     {
         tags = _tags;
+        emit deckTagsChanged();
     }
     void addTag(const QString &_tag)
     {
         tags.append(_tag);
+        emit deckTagsChanged();
     }
     void clearTags()
     {
         tags.clear();
+        emit deckTagsChanged();
     }
     void setBannerCard(const QPair<QString, QString> &_bannerCard = QPair<QString, QString>())
     {
