@@ -115,11 +115,11 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
     }
 
     if (info) {
-        auto relations = info->getAllRelatedCards();
-
-        for (auto relation : relations) {
-            if (relation->getDoesTransform()) {
+        const auto &cardRelations = info->getAllRelatedCards();
+        for (const auto &cardRelation : cardRelations) {
+            if (cardRelation->getDoesTransform()) {
                 viewTransformationButton->setVisible(true);
+                break;
             }
         }
     }
@@ -148,11 +148,11 @@ void CardInfoFrameWidget::setCard(AbstractCardItem *card)
 void CardInfoFrameWidget::viewTransformation()
 {
     if (info) {
-        auto relations = info->getAllRelatedCards();
-
-        for (auto relation : relations) {
-            if (relation->getDoesTransform()) {
-                setCard(relation->getName());
+        const auto &cardRelations = info->getAllRelatedCards();
+        for (const auto &cardRelation : cardRelations) {
+            if (cardRelation->getDoesTransform()) {
+                viewTransformationButton->setVisible(true);
+                break;
             }
         }
     }
