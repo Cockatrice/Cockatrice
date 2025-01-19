@@ -35,6 +35,7 @@ signals:
     void bannerCardsRefreshed();
     void deckPreviewClicked(QMouseEvent *event, DeckPreviewWidget *instance);
     void deckPreviewDoubleClicked(QMouseEvent *event, DeckPreviewWidget *instance);
+    void deckLoadRequested(QString &filePath);
 
 private:
     QVBoxLayout *layout;
