@@ -65,6 +65,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
 
     if (parentGame->getIsLocalGame()) {
+        loadRemoteButton->setVisible(false);
         loadRemoteButton->setEnabled(false);
     } else {
         connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
@@ -126,7 +127,11 @@ void DeckViewContainer::switchToDeckSelectView()
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, true);
-    setVisibility(loadRemoteButton, true);
+    if (parentGame->getIsLocalGame()) {
+        setVisibility(loadRemoteButton, false);
+    } else {
+        setVisibility(loadRemoteButton, true);
+    }
     setVisibility(unloadDeckButton, false);
     setVisibility(readyStartButton, false);
     setVisibility(sideboardLockButton, false);
