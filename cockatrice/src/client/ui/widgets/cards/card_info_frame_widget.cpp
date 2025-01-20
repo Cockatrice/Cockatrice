@@ -26,7 +26,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     viewTransformationButton = new QPushButton();
     viewTransformationButton->setObjectName("viewTransformationButton");
     connect(viewTransformationButton, &QPushButton::clicked, this, &CardInfoFrameWidget::viewTransformation);
-    viewTransformationButton->setVisible(false);
+    viewTransformationButton->setHidden(true);
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
@@ -103,7 +103,7 @@ void CardInfoFrameWidget::setViewMode(int mode)
 
 void CardInfoFrameWidget::setCard(CardInfoPtr card)
 {
-    viewTransformationButton->setVisible(false);
+    viewTransformationButton->setHidden(true);
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
     }
@@ -118,7 +118,7 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
         const auto &cardRelations = info->getAllRelatedCards();
         for (const auto &cardRelation : cardRelations) {
             if (cardRelation->getDoesTransform()) {
-                viewTransformationButton->setVisible(true);
+                viewTransformationButton->setHidden(false);
                 break;
             }
         }
