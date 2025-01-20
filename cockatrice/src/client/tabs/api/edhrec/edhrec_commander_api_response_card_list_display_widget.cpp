@@ -11,11 +11,13 @@ EdhrecCommanderApiResponseCardListDisplayWidget::EdhrecCommanderApiResponseCardL
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumSize(0, 0);
 
     auto header = new QLabel(this);
     header->setText(toDisplay.header);
 
-    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     foreach (EdhrecCommanderApiResponseCardDetails card_detail, toDisplay.cardViews) {
         auto widget = new EdhrecCommanderApiResponseCardDetailsDisplayWidget(flowWidget, card_detail);

@@ -5,6 +5,8 @@
 #include "api_response/edhrec_commander_api_response.h"
 #include "edhrec_commander_api_response_card_list_display_widget.h"
 
+#include <QResizeEvent>
+
 EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget(QWidget *parent,
                                                                                  EdhrecCommanderApiResponse response)
     : QWidget(parent)
@@ -12,14 +14,24 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
+    setMinimumSize(QSize(0, 0));
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->setAlignment(Qt::AlignHCenter);
+
     auto commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(
         CardDatabaseManager::getInstance()->getCard(response.container.getCommanderDetails().getName()));
-    layout->addWidget(commanderPicture);
+    layout->addWidget(commanderPicture, 0, Qt::AlignHCenter);
 
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();
     foreach (EdhrecCommanderApiResponseCardList card_list, edhrec_commander_api_response_card_lists) {
         auto cardListDisplayWidget = new EdhrecCommanderApiResponseCardListDisplayWidget(this, card_list);
-        layout->addWidget(cardListDisplayWidget);
+        layout->addWidget(cardListDisplayWidget, 0, Qt::AlignHCenter);
     }
+}
+
+void EdhrecCommanderApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    qDebug() << event->size();
 }

@@ -4,6 +4,7 @@
 #include "../../../../game/cards/card_database.h"
 #include "../../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../../tab.h"
+#include "edhrec_commander_api_response_display_widget.h"
 
 #include <QHBoxLayout>
 #include <QNetworkAccessManager>
@@ -29,10 +30,9 @@ public slots:
     void setCard(CardInfoPtr _cardToQuery);
 
 private:
-    QWidget *container;
     FlowWidget *flowWidget;
-    QHBoxLayout *layout;
     CardInfoPtr cardToQuery;
+    EdhrecCommanderApiResponseDisplayWidget *displayWidget;
 };
 
 #endif // TAB_EDHREC_H

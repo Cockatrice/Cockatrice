@@ -14,14 +14,11 @@
 TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
     setMinimumSize(0, 0);
-    container = new QWidget(this);
-    layout = new QHBoxLayout(this);
-    container->setLayout(layout);
-    setCentralWidget(container);
-    flowWidget = new FlowWidget(container, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
-    layout->addWidget(flowWidget);
-    networkManager = new QNetworkAccessManager(this);
 
+
+    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    networkManager = new QNetworkAccessManager(this);
+    setCentralWidget(flowWidget);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     networkManager->setTransferTimeout(); // Use Qt's default timeout
 #endif
@@ -77,8 +74,8 @@ void TabEdhRec::processApiJson(QNetworkReply *reply)
     EdhrecCommanderApiResponse deckData;
     deckData.fromJson(jsonObj);
 
-    auto widget = new EdhrecCommanderApiResponseDisplayWidget(this, deckData);
-    flowWidget->addWidget(widget);
+    displayWidget = new EdhrecCommanderApiResponseDisplayWidget(flowWidget, deckData);
+    flowWidget->addWidget(displayWidget);
 
     reply->deleteLater();
     update();

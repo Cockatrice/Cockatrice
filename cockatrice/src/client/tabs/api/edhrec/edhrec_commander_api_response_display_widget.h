@@ -12,6 +12,7 @@ class EdhrecCommanderApiResponseDisplayWidget : public QWidget
 
 public:
     explicit EdhrecCommanderApiResponseDisplayWidget(QWidget *parent, EdhrecCommanderApiResponse response);
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     QVBoxLayout *layout;

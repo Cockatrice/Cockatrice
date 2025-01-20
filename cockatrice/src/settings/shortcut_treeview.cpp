@@ -153,7 +153,7 @@ void ShortcutTreeView::updateSearchString(const QString &searchString)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     const auto skipEmptyParts = Qt::SkipEmptyParts;
 #else
-    const auto skipEmptyParts = QString::SkipEmptyParts;
+    const auto skipEmptyParts = Qt::SkipEmptyParts;
 #endif
     QStringList searchWords = searchString.split(" ", skipEmptyParts);
 
