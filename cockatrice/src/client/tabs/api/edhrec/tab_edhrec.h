@@ -30,7 +30,7 @@ public slots:
     void setCard(CardInfoPtr _cardToQuery);
 
 private:
-    FlowWidget *flowWidget;
+    QScrollArea *scrollArea;
     CardInfoPtr cardToQuery;
     EdhrecCommanderApiResponseDisplayWidget *displayWidget;
 };

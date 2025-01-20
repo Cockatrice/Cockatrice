@@ -21,12 +21,12 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     auto commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(
         CardDatabaseManager::getInstance()->getCard(response.container.getCommanderDetails().getName()));
-    layout->addWidget(commanderPicture, 0, Qt::AlignHCenter);
+    layout->addWidget(commanderPicture);
 
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();
     foreach (EdhrecCommanderApiResponseCardList card_list, edhrec_commander_api_response_card_lists) {
         auto cardListDisplayWidget = new EdhrecCommanderApiResponseCardListDisplayWidget(this, card_list);
-        layout->addWidget(cardListDisplayWidget, 0, Qt::AlignHCenter);
+        layout->addWidget(cardListDisplayWidget);
     }
 }
 
@@ -34,4 +34,7 @@ void EdhrecCommanderApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     qDebug() << event->size();
+    layout->invalidate();
+    layout->activate();
+    layout->update();
 }
