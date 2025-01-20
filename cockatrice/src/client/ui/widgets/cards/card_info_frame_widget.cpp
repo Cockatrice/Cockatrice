@@ -82,6 +82,11 @@ void CardInfoFrameWidget::setViewMode(int mode)
     if (currentIndex() != mode)
         setCurrentIndex(mode);
 
+    /* This weird code is to work around the following:
+     * - Widgets can only have one parent; adding an already-parented widget will cause the new parent to "steal" it
+     * from the old parent
+     * - Unparented widgets become freefloating, which we do not want
+     */
     switch (mode) {
         case ImageOnlyView:
         case TextOnlyView:
