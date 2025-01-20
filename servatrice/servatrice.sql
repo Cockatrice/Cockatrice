@@ -197,8 +197,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   KEY `username` (`user_name`),
   INDEX `idx_start_time` (`start_time`),
   INDEX `idx_clientid` (`clientid`),
-  INDEX `idx_ip_address` (`ip_address`),
-  INDEX `idx_end_time` (`end_time`)
+  INDEX `idx_ip_address` (`ip_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- server moderation
