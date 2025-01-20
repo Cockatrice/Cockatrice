@@ -561,6 +561,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPlayToStack);
 
+    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().getCloseEmptyCardView());
+    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setCloseEmptyCardView);
+
     annotateTokensCheckBox.setChecked(SettingsCache::instance().getAnnotateTokens());
     connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setAnnotateTokens);
@@ -573,8 +577,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
     generalGrid->addWidget(&playToStackCheckBox, 2, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 3, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 4, 0);
+    generalGrid->addWidget(&closeEmptyCardViewCheckBox, 3, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 5, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -650,6 +655,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     clickPlaysAllSelectedCheckBox.setText(tr("&Clicking plays all selected cards (instead of just the clicked card)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
+    closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
