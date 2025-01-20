@@ -133,7 +133,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     setLayout(vbox);
 
     connect(zone, &ZoneViewZone::optimumRectChanged, this, &ZoneViewWidget::resizeToZoneContents);
-    connect(zone, &ZoneViewZone::beingDeleted, this, &ZoneViewWidget::zoneDeleted);
+    connect(zone, &ZoneViewZone::closed, this, &ZoneViewWidget::zoneDeleted);
     zone->initializeCards(cardList);
 
     // QLabel sizes aren't taken into account until the widget is rendered.
@@ -314,11 +314,12 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
-    disconnect(zone, &ZoneViewZone::beingDeleted, this, 0);
+    disconnect(zone, &ZoneViewZone::closed, this, 0);
+    // manually call zone->close in order to remove it from the origZones views
+    zone->close();
     if (shuffleCheckBox.isChecked())
         player->sendGameCommand(Command_Shuffle());
-    emit closePressed(this);
-    deleteLater();
+    zoneDeleted();
     event->accept();
 }
 

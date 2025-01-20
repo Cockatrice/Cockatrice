@@ -2083,7 +2083,7 @@ void Player::eventShuffle(const Event_Shuffle &event)
             int length = view->getCards().length();
             // we want to close empty views as well
             if (length == 0 || length > absStart) { // note this assumes views always start at the top of the library
-                view->deleteLater();
+                view->close();
                 break;
             }
         } else {
