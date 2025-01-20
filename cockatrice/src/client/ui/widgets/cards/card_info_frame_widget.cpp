@@ -39,7 +39,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     insertTab(ImageOnlyView, tab1, QString());
     insertTab(TextOnlyView, tab2, QString());
     insertTab(ImageAndTextView, tab3, QString());
-    connect(this, SIGNAL(currentChanged(int)), this, SLOT(setViewMode(int)));
+    connect(this, &CardInfoFrameWidget::currentChanged, this, &CardInfoFrameWidget::setViewMode);
 
     tab1Layout = new QVBoxLayout();
     tab1Layout->setObjectName("tab1Layout");
