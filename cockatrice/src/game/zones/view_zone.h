@@ -65,7 +65,6 @@ public:
                  bool _writeableRevealZone = false,
                  QGraphicsItem *parent = nullptr,
                  bool _isReversed = false);
-    ~ZoneViewZone();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void reorganizeCards();
