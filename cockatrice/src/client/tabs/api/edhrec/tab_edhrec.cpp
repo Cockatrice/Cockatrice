@@ -10,12 +10,11 @@
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QResizeEvent>
 
 TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
-    setMinimumSize(0, 0);
-
-    scrollArea = new QScrollArea();
+    scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -28,6 +27,18 @@ TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
+}
+
+void TabEdhRec::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    qDebug() << "resizeEvent: " << event->size();
+    if (scrollArea) {
+        if (scrollArea->widget()) {
+            scrollArea->widget()->resize(event->size());
+        }
+    }
+
 }
 
 void TabEdhRec::retranslateUi()
@@ -77,7 +88,7 @@ void TabEdhRec::processApiJson(QNetworkReply *reply)
     EdhrecCommanderApiResponse deckData;
     deckData.fromJson(jsonObj);
 
-    displayWidget = new EdhrecCommanderApiResponseDisplayWidget(this, deckData);
+    displayWidget = new EdhrecCommanderApiResponseDisplayWidget(scrollArea, deckData);
     // flowWidget->addWidget(displayWidget);
     scrollArea->setWidget(displayWidget);
 

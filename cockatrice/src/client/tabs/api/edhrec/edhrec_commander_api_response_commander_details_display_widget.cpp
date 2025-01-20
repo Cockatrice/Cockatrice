@@ -13,9 +13,6 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    setMinimumWidth(0);
-
     auto commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(CardDatabaseManager::getInstance()->getCard(commanderDetails.getName()));
 

@@ -12,8 +12,6 @@ EdhrecCommanderApiResponseCardListDisplayWidget::EdhrecCommanderApiResponseCardL
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-
     auto header = new QLabel(this);
     header->setText(toDisplay.header);
 

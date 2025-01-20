@@ -14,8 +14,6 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    setMinimumSize(QSize(0, 0));
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->setAlignment(Qt::AlignHCenter);
 
     auto commanderPicture = new CardInfoPictureWidget(this);

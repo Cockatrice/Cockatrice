@@ -14,6 +14,7 @@ class TabEdhRec : public Tab
     Q_OBJECT
 public:
     explicit TabEdhRec(TabSupervisor *_tabSupervisor);
+    void resizeEvent(QResizeEvent *event);
 
     void retranslateUi() override;
     QString getTabText() const override
