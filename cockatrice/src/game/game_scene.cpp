@@ -29,6 +29,13 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 GameScene::~GameScene()
 {
     delete animationTimer;
+
+    // DO NOT call clearViews() here
+    // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
+    // deleteLater() deletes the zoneView without allowing it to send signals
+    for (const auto &zoneView : zoneViews) {
+        zoneView->deleteLater();
+    }
 }
 
 void GameScene::retranslateUi()
@@ -76,7 +83,7 @@ void GameScene::rearrange()
     QListIterator<Player *> playersIter(players);
     while (playersIter.hasNext()) {
         Player *p = playersIter.next();
-        if (!p->getConceded()) {
+        if (p && !p->getConceded()) {
             playersPlaying.append(p);
             if (!firstPlayerFound && (p->getLocal())) {
                 firstPlayerIndex = playersPlaying.size() - 1;

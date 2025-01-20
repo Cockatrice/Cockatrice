@@ -189,14 +189,7 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    scene->clearViews();
-
     delete replay;
-
-    QMapIterator<int, Player *> i(players);
-    while (i.hasNext()) {
-        delete i.next().value();
-    }
 }
 
 void TabGame::updatePlayerListDockTitle()
