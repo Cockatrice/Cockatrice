@@ -1090,6 +1090,7 @@ void TabGame::eventLeave(const Event_Leave &event, int eventPlayerId, const Game
     players.remove(eventPlayerId);
     emit playerRemoved(player);
     player->clear();
+    scene->removePlayer(player);
     player->deleteLater();
 
     // Rearrange all remaining zones so that attachment relationship updates take place

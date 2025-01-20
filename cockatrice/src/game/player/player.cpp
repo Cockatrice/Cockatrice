@@ -564,9 +564,6 @@ Player::~Player()
 {
     qCDebug(PlayerLog) << "Player destructor:" << getName();
 
-    static_cast<GameScene *>(scene())->removePlayer(this);
-
-    clear();
     QMapIterator<QString, CardZone *> i(zones);
     while (i.hasNext())
         delete i.next().value();
