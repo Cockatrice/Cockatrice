@@ -11,22 +11,83 @@
 #include <QVBoxLayout>
 #include <utility>
 
+CardPictureAndButtonWidget::CardPictureAndButtonWidget(QWidget *parent) : QWidget(parent)
+{
+    auto *mainLayout = new QVBoxLayout();
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    setLayout(mainLayout);
+
+    pic = new CardInfoPictureWidget();
+    pic->setObjectName("pic");
+    connect(pic, &CardInfoPictureWidget::cardChanged, this, [this](auto card) { emit cardChanged(card); });
+
+    setMinimumHeight(pic->minimumHeight());
+
+    layout()->addWidget(pic);
+
+    retranslateUi();
+}
+
+void CardPictureAndButtonWidget::retranslateUi()
+{
+    if (viewTransformationButton) {
+        viewTransformationButton->setText(tr("View transformation"));
+    }
+}
+
+QPushButton *CardPictureAndButtonWidget::createViewTransformationButton()
+{
+    auto *pushButton = new QPushButton();
+    pushButton->setObjectName("viewTransformationButton");
+    pushButton->setContentsMargins(0, 0, 0, 0);
+    connect(pushButton, &QPushButton::clicked, this, [this] { emit transformationButtonClicked(); });
+    return pushButton;
+}
+
+void CardPictureAndButtonWidget::setTransformButtonVisibility(bool visible)
+{
+    if (visible && !viewTransformationButton) {
+        viewTransformationButton = createViewTransformationButton();
+        layout()->addWidget(viewTransformationButton);
+        retranslateUi();
+    } else if (!visible && viewTransformationButton) {
+        layout()->removeWidget(viewTransformationButton);
+        viewTransformationButton->deleteLater();
+        viewTransformationButton = nullptr;
+    }
+}
+
+static bool hasTransformation(const CardInfoPtr &info)
+{
+    if (!info) {
+        return false;
+    }
+
+    const auto &relatedCards = info->getAllRelatedCards();
+    return std::any_of(relatedCards.cbegin(), relatedCards.cend(),
+                       [](const auto &cardRelation) { return cardRelation->getDoesTransform(); });
+}
+
+void CardPictureAndButtonWidget::setCard(const CardInfoPtr &card)
+{
+    pic->setCard(card);
+    setTransformButtonVisibility(hasTransformation(card));
+}
+
 CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *parent)
     : QTabWidget(parent), info(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
-    pic = new CardInfoPictureWidget();
+    pic = new CardPictureAndButtonWidget();
     pic->setObjectName("pic");
-    connect(pic, &CardInfoPictureWidget::cardChanged, this, qOverload<CardInfoPtr>(&CardInfoFrameWidget::setCard));
+    connect(pic, &CardPictureAndButtonWidget::cardChanged, this, qOverload<CardInfoPtr>(&CardInfoFrameWidget::setCard));
+    connect(pic, &CardPictureAndButtonWidget::transformationButtonClicked, this,
+            &CardInfoFrameWidget::viewTransformation);
 
     text = new CardInfoTextWidget();
     text->setObjectName("text");
     connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
-
-    viewTransformationButton = new QPushButton();
-    viewTransformationButton->setObjectName("viewTransformationButton");
-    connect(viewTransformationButton, &QPushButton::clicked, this, &CardInfoFrameWidget::viewTransformation);
-    viewTransformationButton->setHidden(true);
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
@@ -74,7 +135,6 @@ void CardInfoFrameWidget::retranslateUi()
     setTabText(ImageOnlyView, tr("Image"));
     setTabText(TextOnlyView, tr("Description"));
     setTabText(ImageAndTextView, tr("Both"));
-    viewTransformationButton->setText(tr("View transformation"));
 }
 
 void CardInfoFrameWidget::setViewMode(int mode)
@@ -91,12 +151,10 @@ void CardInfoFrameWidget::setViewMode(int mode)
         case ImageOnlyView:
         case TextOnlyView:
             tab1Layout->addWidget(pic);
-            tab1Layout->addWidget(viewTransformationButton);
             tab2Layout->addWidget(text);
             break;
         case ImageAndTextView:
             splitter->addWidget(pic);
-            splitter->addWidget(viewTransformationButton);
             splitter->addWidget(text);
             break;
         default:
@@ -108,7 +166,6 @@ void CardInfoFrameWidget::setViewMode(int mode)
 
 void CardInfoFrameWidget::setCard(CardInfoPtr card)
 {
-    viewTransformationButton->setHidden(true);
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
     }
@@ -117,16 +174,6 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
 
     if (info) {
         connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
-    }
-
-    if (info) {
-        const auto &cardRelations = info->getAllRelatedCards();
-        for (const auto &cardRelation : cardRelations) {
-            if (cardRelation->getDoesTransform()) {
-                viewTransformationButton->setHidden(false);
-                break;
-            }
-        }
     }
 
     text->setCard(info);
