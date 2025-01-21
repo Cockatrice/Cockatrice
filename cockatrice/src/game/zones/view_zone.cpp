@@ -350,7 +350,7 @@ void ZoneViewZone::removeCard(int position)
     card->deleteLater();
 
     if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView()) {
-        deleteLater();
+        close();
         return;
     }
 
