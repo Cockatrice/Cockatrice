@@ -348,6 +348,12 @@ void ZoneViewZone::removeCard(int position)
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
+
+    if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView()) {
+        deleteLater();
+        return;
+    }
+
     updateCardIds(REMOVE_CARD);
     reorganizeCards();
 }

@@ -159,6 +159,7 @@ private:
     QString knownMissingFeatures;
     bool useTearOffMenus;
     int cardViewInitialRowsMax;
+    bool closeEmptyCardView;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -619,6 +620,7 @@ public:
     void setKnownMissingFeatures(const QString &_knownMissingFeatures);
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
+    void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     QString getClientID()
     {
         return clientID;
@@ -638,6 +640,10 @@ public:
     int getCardViewInitialRowsMax() const
     {
         return cardViewInitialRowsMax;
+    }
+    bool getCloseEmptyCardView() const
+    {
+        return closeEmptyCardView;
     }
     ShortcutsSettings &shortcuts() const
     {
