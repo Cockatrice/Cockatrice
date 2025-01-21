@@ -40,13 +40,17 @@ ZoneViewZone::ZoneViewZone(Player *_p,
     }
 }
 
-ZoneViewZone::~ZoneViewZone()
+/**
+ * Deletes this ZoneView and removes it from the origZone's views.
+ * You should normally call this method instead of deleteLater()
+ */
+void ZoneViewZone::close()
 {
-    emit beingDeleted();
-    qDebug("ZoneViewZone destructor");
+    emit closed();
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().removeOne(this);
     }
+    deleteLater();
 }
 
 QRectF ZoneViewZone::boundingRect() const

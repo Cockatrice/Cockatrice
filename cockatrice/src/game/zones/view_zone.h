@@ -65,7 +65,6 @@ public:
                  bool _writeableRevealZone = false,
                  QGraphicsItem *parent = nullptr,
                  bool _isReversed = false);
-    ~ZoneViewZone();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void reorganizeCards();
@@ -94,13 +93,14 @@ public:
         return isReversed;
     }
 public slots:
+    void close();
     void setGroupBy(CardList::SortOption _groupBy);
     void setSortBy(CardList::SortOption _sortBy);
     void setPileView(int _pileView);
 private slots:
     void zoneDumpReceived(const Response &r);
 signals:
-    void beingDeleted();
+    void closed();
     void optimumRectChanged();
     void wheelEventReceived(QGraphicsSceneWheelEvent *event);
 

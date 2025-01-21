@@ -40,17 +40,6 @@ CardZone::CardZone(Player *_p,
             &CardZone::refreshCardInfos);
 }
 
-CardZone::~CardZone()
-{
-    qCDebug(CardZoneLog) << "CardZone destructor: " << name;
-    for (auto *view : views) {
-        if (view != nullptr) {
-            view->deleteLater();
-        }
-    }
-    clearContents();
-}
-
 void CardZone::retranslateUi()
 {
     for (int i = 0; i < cards.size(); ++i)

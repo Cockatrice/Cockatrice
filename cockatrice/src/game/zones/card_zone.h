@@ -67,7 +67,6 @@ public:
              bool _contentsKnown,
              QGraphicsItem *parent = nullptr,
              bool _isView = false);
-    ~CardZone();
     void retranslateUi();
     void clearContents();
     bool getHasCardAttr() const
