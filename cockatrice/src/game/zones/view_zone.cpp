@@ -282,7 +282,8 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
     if (!isReversed) {
         // if x is negative set it to add at end
-        if (x < 0) {
+        // if x is out-of-bounds then also set it to add at the end
+        if (x < 0 || x >= cards.size()) {
             x = cards.size();
         }
         cards.insert(x, card);
@@ -292,7 +293,8 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
         int insertionIndex = x - firstId;
         if (insertionIndex >= 0) {
             // card was put into a portion of the deck that's in the view
-            cards.insert(insertionIndex, card);
+            // qMin to prevent out-of-bounds error when bottoming a card that is already in the view
+            cards.insert(qMin(insertionIndex, cards.size()), card);
         } else {
             // card was put into a portion of the deck that's not in the view
             updateCardIds(ADD_CARD);
