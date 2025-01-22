@@ -67,6 +67,10 @@ QList<DeckPreviewWidget *> &VisualDeckStorageSortWidget::filterFiles(QList<DeckP
 {
     // Sort the widgets list based on the current sort order
     std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
+        if (!widget1 || !widget2) {
+            return false; // Handle null pointers gracefully
+        }
+
         QFileInfo info1(widget1->filePath);
         QFileInfo info2(widget2->filePath);
 
