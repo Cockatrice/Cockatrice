@@ -1,5 +1,6 @@
 #include "edhrec_commander_api_response.h"
 
+#include <QDebug>
 #include <QJsonArray>
 
 void EdhrecCommanderApiResponse::fromJson(const QJsonObject &json)

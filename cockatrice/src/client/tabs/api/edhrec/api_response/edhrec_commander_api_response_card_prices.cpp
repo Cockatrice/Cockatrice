@@ -1,5 +1,7 @@
 #include "edhrec_commander_api_response_card_prices.h"
 
+#include <QDebug>
+
 void CardPrices::fromJson(const QJsonObject &json)
 {
     // Parse prices from various sources

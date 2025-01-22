@@ -1,5 +1,6 @@
 #include "edhrec_commander_api_response_card_container.h"
 
+#include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 

@@ -1,5 +1,7 @@
 #include "edhrec_commander_api_response_commander_details.h"
 
+#include <QDebug>
+
 void EdhrecCommanderApiResponseCommanderDetails::fromJson(const QJsonObject &json)
 {
     // Parse card-related data
