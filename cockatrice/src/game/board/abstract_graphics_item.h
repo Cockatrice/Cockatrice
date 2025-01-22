@@ -24,7 +24,7 @@ protected:
     void paintNumberEllipse(int number, int radius, const QColor &color, int position, int count, QPainter *painter);
 
 public:
-    AbstractGraphicsItem(QGraphicsItem *parent = nullptr) : QObject(), QGraphicsItem(parent)
+    explicit AbstractGraphicsItem(QGraphicsItem *parent = nullptr) : QGraphicsItem(parent)
     {
     }
 };

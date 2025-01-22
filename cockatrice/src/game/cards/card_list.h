@@ -34,7 +34,7 @@ public:
         SortBySet,
         SortByPrinting
     };
-    CardList(bool _contentsKnown);
+    explicit CardList(bool _contentsKnown);
     CardItem *findCard(const int cardId) const;
     bool getContentsKnown() const
     {

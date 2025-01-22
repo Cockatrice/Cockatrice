@@ -46,25 +46,25 @@ public:
     {
         Type = typeCard
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
-    CardItem(Player *_owner,
-             QGraphicsItem *parent = nullptr,
-             const QString &_name = QString(),
-             const QString &_providerId = QString(),
-             int _cardid = -1,
-             bool revealedCard = false,
-             CardZone *_zone = nullptr);
-    ~CardItem();
+    explicit CardItem(Player *_owner,
+                      QGraphicsItem *parent = nullptr,
+                      const QString &_name = QString(),
+                      const QString &_providerId = QString(),
+                      int _cardid = -1,
+                      bool revealedCard = false,
+                      CardZone *_zone = nullptr);
+    ~CardItem() override;
     void retranslateUi();
     CardZone *getZone() const
     {
         return zone;
     }
     void setZone(CardZone *_zone);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QPoint getGridPoint() const
     {
         return gridPoint;
@@ -163,10 +163,10 @@ public:
     void playCard(bool faceDown);
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 };
 
 #endif

@@ -15,7 +15,7 @@ private:
     QPointF selectionOrigin;
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 private slots:
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint);
@@ -25,7 +25,7 @@ public slots:
     void updateSceneRect(const QRectF &rect);
 
 public:
-    GameView(GameScene *scene, QWidget *parent = nullptr);
+    explicit GameView(GameScene *scene, QWidget *parent = nullptr);
 };
 
 #endif

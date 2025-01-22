@@ -37,8 +37,8 @@ private:
     void updateHover(const QPointF &scenePos);
 
 public:
-    GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
-    ~GameScene();
+    explicit GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
+    ~GameScene() override;
     void retranslateUi();
     void processViewSizeChange(const QSize &newSize);
     QTransform getViewTransform() const;
@@ -65,8 +65,8 @@ public slots:
     void rearrange();
 
 protected:
-    bool event(QEvent *event);
-    void timerEvent(QTimerEvent *event);
+    bool event(QEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
 signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint);
