@@ -522,7 +522,7 @@ class AnnotationDialog : public QInputDialog
     void keyPressEvent(QKeyEvent *e) override;
 
 public:
-    AnnotationDialog(QWidget *parent) : QInputDialog(parent)
+    explicit AnnotationDialog(QWidget *parent) : QInputDialog(parent)
     {
     }
 };

@@ -89,7 +89,7 @@ public slots:
     /**
        Reorganizes CardItems in the TableZone
      */
-    void reorganizeCards();
+    void reorganizeCards() override;
 
 public:
     /**
@@ -98,12 +98,12 @@ public:
        @param _p the Player
        @param parent defaults to null
      */
-    TableZone(Player *_p, QGraphicsItem *parent = nullptr);
+    explicit TableZone(Player *_p, QGraphicsItem *parent = nullptr);
 
     /**
        @return a QRectF of the TableZone bounding box.
      */
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
 
     /**
        Render the TableZone
@@ -111,7 +111,7 @@ public:
        @param painter
        @param option
      */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     /**
        Toggles the selected items as tapped.
@@ -121,7 +121,7 @@ public:
     /**
        See HandleDropEventByGrid
      */
-    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
+    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint) override;
 
     /**
        Handles the placement of cards
@@ -138,7 +138,7 @@ public:
      */
     CardItem *getCardFromCoords(const QPointF &point) const;
 
-    QPointF closestGridPoint(const QPointF &point);
+    QPointF closestGridPoint(const QPointF &point) override;
 
     static int clampValidTableRow(const int row);
 
@@ -150,7 +150,7 @@ public:
        @param canResize defaults to true
        @return CardItem that has been removed
      */
-    CardItem *takeCard(int position, int cardId, bool canResize = true);
+    CardItem *takeCard(int position, int cardId, bool canResize = true) override;
 
     /**
        Resizes the TableZone in case CardItems are within or
@@ -178,7 +178,7 @@ public:
     }
 
 protected:
-    void addCardImpl(CardItem *card, int x, int y);
+    void addCardImpl(CardItem *card, int x, int y) override;
 
 private:
     void paintZoneOutline(QPainter *painter);

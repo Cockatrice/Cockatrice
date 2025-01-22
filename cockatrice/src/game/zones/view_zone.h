@@ -33,7 +33,6 @@ private:
 
     QRectF bRect, optimumRect;
     int minRows, numberCards;
-    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
     CardZone *origZone;
     bool revealZone, writeableRevealZone;
     CardList::SortOption groupBy, sortBy;
@@ -57,6 +56,8 @@ private:
 
     GridSize positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption = CardList::NoSort);
 
+    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint) override;
+
 public:
     ZoneViewZone(Player *_p,
                  CardZone *_origZone,
@@ -65,16 +66,16 @@ public:
                  bool _writeableRevealZone = false,
                  QGraphicsItem *parent = nullptr,
                  bool _isReversed = false);
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void reorganizeCards();
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void reorganizeCards() override;
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
     void removeCard(int position);
     int getNumberCards() const
     {
         return numberCards;
     }
-    void setGeometry(const QRectF &rect);
+    void setGeometry(const QRectF &rect) override;
     QRectF getOptimumRect() const
     {
         return optimumRect;
@@ -105,9 +106,9 @@ signals:
     void wheelEventReceived(QGraphicsSceneWheelEvent *event);
 
 protected:
-    void addCardImpl(CardItem *card, int x, int y);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-    void wheelEvent(QGraphicsSceneWheelEvent *event);
+    void addCardImpl(CardItem *card, int x, int y) override;
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
+    void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 };
 
 #endif

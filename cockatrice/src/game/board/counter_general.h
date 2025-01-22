@@ -20,8 +20,8 @@ public:
                    bool useNameForShortcut = false,
                    QGraphicsItem *parent = nullptr,
                    QWidget *game = nullptr);
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
 
 #endif

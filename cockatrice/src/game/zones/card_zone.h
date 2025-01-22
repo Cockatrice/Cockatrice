@@ -37,8 +37,8 @@ protected:
     bool isShufflable;
     bool isView;
     bool alwaysRevealTopCard;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void addCardImpl(CardItem *card, int x, int y) = 0;
 signals:
     void cardCountChanged();
@@ -54,7 +54,7 @@ public:
     {
         Type = typeZone
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }

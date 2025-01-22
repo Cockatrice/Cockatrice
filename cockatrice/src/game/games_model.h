@@ -27,16 +27,16 @@ public:
     static const int SORT_ROLE = Qt::UserRole + 1;
 
     GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = nullptr);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
         return parent.isValid() ? 0 : gameList.size();
     }
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const
+    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override
     {
         return NUM_COLS;
     }
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     static const QString getGameCreatedString(const int secs);
     const ServerInfo_Game &getGame(int row);
 
@@ -88,7 +88,7 @@ private:
         showOnlyIfSpectatorsCanSeeHands;
 
 public:
-    GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
+    explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
     bool getShowBuddiesOnlyGames() const
     {
@@ -173,7 +173,7 @@ public:
     void refresh();
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     bool filterAcceptsRow(int sourceRow) const;
 };
 

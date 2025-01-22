@@ -24,20 +24,20 @@ private:
     DeckViewCardDragItem *dragItem;
 
 public:
-    DeckViewCard(QGraphicsItem *parent = nullptr,
-                 const QString &_name = QString(),
-                 const QString &_providerId = QString(),
-                 const QString &_originZone = QString());
-    ~DeckViewCard();
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    explicit DeckViewCard(QGraphicsItem *parent = nullptr,
+                          const QString &_name = QString(),
+                          const QString &_providerId = QString(),
+                          const QString &_originZone = QString());
+    ~DeckViewCard() override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     const QString &getOriginZone() const
     {
         return originZone;
     }
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
 };
 
 class DeckViewCardDragItem : public AbstractCardDragItem
@@ -48,10 +48,10 @@ private:
 
 public:
     DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
-    void updatePosition(const QPointF &cursorScenePos);
+    void updatePosition(const QPointF &cursorScenePos) override;
 
 protected:
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 class DeckViewCardContainer : public QGraphicsItem
@@ -73,13 +73,13 @@ public:
     {
         Type = typeDeckViewCardContainer
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
-    DeckViewCardContainer(const QString &_name);
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    explicit DeckViewCardContainer(const QString &_name);
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void addCard(DeckViewCard *card);
     void removeCard(DeckViewCard *card);
     const QList<DeckViewCard *> &getCards() const
@@ -113,8 +113,8 @@ private:
     void rebuildTree();
 
 public:
-    DeckViewScene(QObject *parent = nullptr);
-    ~DeckViewScene();
+    explicit DeckViewScene(QObject *parent = nullptr);
+    ~DeckViewScene() override;
     void setLocked(bool _locked)
     {
         locked = _locked;
@@ -142,7 +142,7 @@ private:
     DeckViewScene *deckViewScene;
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 public slots:
     void updateSceneRect(const QRectF &rect);
 signals:
@@ -150,7 +150,7 @@ signals:
     void sideboardPlanChanged();
 
 public:
-    DeckView(QWidget *parent = nullptr);
+    explicit DeckView(QWidget *parent = nullptr);
     void setDeck(const DeckList &_deck);
     void setLocked(bool _locked)
     {
@@ -160,7 +160,7 @@ public:
     {
         return deckViewScene->getSideboardPlan();
     }
-    void mouseDoubleClickEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void resetSideboardPlan();
 };
 

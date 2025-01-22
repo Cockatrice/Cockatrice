@@ -15,16 +15,18 @@ class UserContextMenu;
 class PlayerListItemDelegate : public QStyledItemDelegate
 {
 public:
-    PlayerListItemDelegate(QObject *const parent);
-    bool
-    editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+    explicit PlayerListItemDelegate(QObject *parent);
+    bool editorEvent(QEvent *event,
+                     QAbstractItemModel *model,
+                     const QStyleOptionViewItem &option,
+                     const QModelIndex &index) override;
 };
 
 class PlayerListTWI : public QTreeWidgetItem
 {
 public:
     PlayerListTWI();
-    bool operator<(const QTreeWidgetItem &other) const;
+    bool operator<(const QTreeWidgetItem &other) const override;
 };
 
 class PlayerListWidget : public QTreeWidget
