@@ -315,6 +315,11 @@ bool ZoneViewZone::prepareAddCard(int x)
         }
     }
 
+    // autoclose check is done both here and in removeCard
+    if (cards.isEmpty() && !doInsert && SettingsCache::instance().getCloseEmptyCardView()) {
+        close();
+    }
+
     return doInsert;
 }
 
@@ -382,7 +387,11 @@ void ZoneViewZone::removeCard(int position, bool toNewZone)
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
 
-    if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView()) {
+    // The toNewZone check is to prevent the view from auto-closing if the view contains only a single card and that
+    // card gets dragged within the view.
+    // Another autoclose check is done in prepareAddCard so that the view autocloses if the last card was moved to an
+    // unrevealed portion of the same zone.
+    if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView() && toNewZone) {
         close();
         return;
     }
