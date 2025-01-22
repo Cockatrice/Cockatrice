@@ -1,6 +1,5 @@
 #include "edhrec_commander_api_response_display_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
 #include "../../../ui/widgets/cards/card_info_picture_widget.h"
 #include "api_response/edhrec_commander_api_response.h"
 #include "edhrec_commander_api_response_card_list_display_widget.h"
@@ -21,12 +20,13 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
 
     cardDisplayLayout = new QVBoxLayout(this);
 
-    // Create a QSplitter to hold the ListView and ScrollArea side by side
+    // Create a QSplitter to hold the ListView and ScrollArea holding CardListdisplayWidgets side by side
     auto splitter = new QSplitter(this);
-    splitter->setOrientation(Qt::Horizontal); // Horizontal splitter to divide ListView and ScrollArea
+    splitter->setOrientation(Qt::Horizontal);
 
-    // Create the list view
-    auto listView = new QListView(splitter); // Set list view as part of the splitter
+    auto listView = new QListView(splitter);
+    listView->setMinimumWidth(50);
+    listView->setMaximumWidth(150);
     auto listModel = new QStringListModel(this);
     QStringList widgetNames;
 
@@ -44,16 +44,16 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     }
 
     // Create a QScrollArea to hold the card display widgets
-    scrollArea = new QScrollArea(splitter); // Set scroll area as part of the splitter
+    scrollArea = new QScrollArea(splitter);
     scrollArea->setWidgetResizable(true);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // Set the cardDisplayLayout inside the scroll area
-    auto scrollWidget = new QWidget(scrollArea); // Create a QWidget to contain the layout
-    scrollWidget->setLayout(cardDisplayLayout);  // Set the layout for the widget
+    auto scrollWidget = new QWidget(scrollArea);
+    scrollWidget->setLayout(cardDisplayLayout);
     connect(splitter, &QSplitter::splitterMoved, this, &EdhrecCommanderApiResponseDisplayWidget::onSplitterChange);
-    scrollArea->setWidget(scrollWidget); // Set the widget inside the scroll area
+    scrollArea->setWidget(scrollWidget);
 
     // Configure the list view
     listModel->setStringList(widgetNames);
@@ -77,10 +77,10 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     });
 
     // Add splitter to the main layout
-    splitter->addWidget(listView);   // Add listView to the splitter
-    splitter->addWidget(scrollArea); // Add scrollArea to the splitter
+    splitter->addWidget(listView);
+    splitter->addWidget(scrollArea);
 
-    layout->addWidget(splitter); // Add the splitter to the main layout
+    layout->addWidget(splitter);
 }
 
 void EdhrecCommanderApiResponseDisplayWidget::onSplitterChange()

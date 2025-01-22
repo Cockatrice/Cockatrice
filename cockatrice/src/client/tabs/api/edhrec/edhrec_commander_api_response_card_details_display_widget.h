@@ -6,17 +6,20 @@
 
 #include <QHBoxLayout>
 #include <QWidget>
+#include <QLabel>
 
 class EdhrecCommanderApiResponseCardDetailsDisplayWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit EdhrecCommanderApiResponseCardDetailsDisplayWidget(QWidget *parent,
-                                                                EdhrecCommanderApiResponseCardDetails toDisplay);
+        const EdhrecCommanderApiResponseCardDetails &_toDisplay);
 
 private:
-    QHBoxLayout *layout;
+    EdhrecCommanderApiResponseCardDetails toDisplay;
+    QVBoxLayout *layout;
     CardInfoPictureWidget *cardPictureWidget;
+    QLabel *label;
 };
 
 #endif // EDHREC_COMMANDER_API_RESPONSE_CARD_DETAILS_DISPLAY_WIDGET_H
