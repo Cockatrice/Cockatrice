@@ -720,11 +720,11 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     return tab;
 }
 
-TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr cardToQuery)
+TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr cardToQuery, bool isCommander)
 {
     TabEdhRec *tab = new TabEdhRec(this);
     if (cardToQuery)
-        tab->setCard(cardToQuery);
+        tab->setCard(cardToQuery, isCommander);
     // connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     // connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);

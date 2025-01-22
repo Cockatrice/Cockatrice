@@ -28,7 +28,7 @@ public:
 public slots:
     void processApiJson(QNetworkReply *reply);
     void prettyPrintJson(const QJsonValue &value, int indentLevel);
-    void setCard(CardInfoPtr _cardToQuery);
+    void setCard(CardInfoPtr _cardToQuery, bool isCommander = false);
 
 private:
     QScrollArea *scrollArea;

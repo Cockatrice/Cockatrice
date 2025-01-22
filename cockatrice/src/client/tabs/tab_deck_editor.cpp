@@ -542,16 +542,23 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
 
     if (info) {
         // add to deck and sideboard options
-        QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRec;
+        QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
         selectPrinting = menu.addAction(tr("Select Printing"));
-        edhRec = menu.addAction(tr("Show on EDHREC"));
+        if ((info->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
+             info->getCardType().contains("Creature", Qt::CaseInsensitive)) ||
+            info->getText().contains("can be your commander", Qt::CaseInsensitive)) {
+            edhRecCommander = menu.addAction(tr("Show on EDHREC (Commander)"));
+            connect(edhRecCommander, &QAction::triggered, this,
+                    [this, info] { this->tabSupervisor->addEdhrecTab(info, true); });
+        }
+        edhRecCard = menu.addAction(tr("Show on EDHREC (Card)"));
 
         connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
         connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
         connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
-        connect(edhRec, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
+        connect(edhRecCard, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
 
         // filling out the related cards submenu
         auto *relatedMenu = new QMenu(tr("Show Related cards"));

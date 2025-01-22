@@ -43,7 +43,7 @@ void TabEdhRec::retranslateUi()
 {
 }
 
-void TabEdhRec::setCard(CardInfoPtr _cardToQuery)
+void TabEdhRec::setCard(CardInfoPtr _cardToQuery, bool isCommander)
 {
     cardToQuery = _cardToQuery;
 
@@ -55,7 +55,12 @@ void TabEdhRec::setCard(CardInfoPtr _cardToQuery)
     QString cardName = cardToQuery->getName();
     QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
 
-    QString url = QString("https://json.edhrec.com/pages/commanders/%1.json").arg(formattedName);
+    QString url;
+    if (isCommander) {
+        url = QString("https://json.edhrec.com/pages/commanders/%1.json").arg(formattedName);
+    } else {
+        url = QString("https://json.edhrec.com/pages/cards/%1.json").arg(formattedName);
+    }
 
     QNetworkRequest request{QUrl(url)};
 
