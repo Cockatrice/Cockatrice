@@ -110,7 +110,6 @@ private:
 
     bool isBlankNewDeck() const;
     CardInfoPtr currentCardInfo() const;
-    void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
     bool swapCard(const QModelIndex &idx);
@@ -179,6 +178,7 @@ public:
     void createMenus();
     void createCentralFrame();
     void updateCardInfo(CardInfoPtr _card);
+    void addCardHelper(CardInfoPtr info, QString zoneName);
 
 public slots:
     void closeRequest(bool forced = false) override;

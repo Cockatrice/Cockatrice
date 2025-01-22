@@ -1387,9 +1387,8 @@ QModelIndexList TabDeckEditor::getSelectedCardNodes() const
     return selectedRows;
 }
 
-void TabDeckEditor::addCardHelper(QString zoneName)
+void TabDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
 {
-    const CardInfoPtr info = currentCardInfo();
     if (!info)
         return;
     if (info->getIsToken())
@@ -1465,13 +1464,13 @@ void TabDeckEditor::actAddCard()
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard();
     else
-        addCardHelper(DECK_ZONE_MAIN);
+        addCardHelper(currentCardInfo(), DECK_ZONE_MAIN);
     setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
 {
-    addCardHelper(DECK_ZONE_SIDE);
+    addCardHelper(currentCardInfo(), DECK_ZONE_SIDE);
     setSaveStatus(true);
 }
 

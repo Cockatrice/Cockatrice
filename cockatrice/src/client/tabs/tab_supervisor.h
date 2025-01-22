@@ -132,6 +132,10 @@ public:
     {
         return roomTabs;
     }
+    QList<TabDeckEditor *> getDeckEditorTabs() const
+    {
+        return deckEditorTabs;
+    }
     bool getAdminLocked() const;
     bool closeRequest();
     bool switchToGameTabIfAlreadyExists(const int gameId);
