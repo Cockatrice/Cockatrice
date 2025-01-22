@@ -18,6 +18,10 @@ public:
     {
         buddy = _buddy;
     }
+    QString getText() const
+    {
+        return bannerLabel->text();
+    }
 
 protected:
     void paintEvent(QPaintEvent *event) override;
