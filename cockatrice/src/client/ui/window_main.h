@@ -163,7 +163,7 @@ public:
     }
     ~MainWindow() override;
 
-    TabSupervisor* getTabSupervisor() const
+    TabSupervisor *getTabSupervisor() const
     {
         return tabSupervisor;
     }

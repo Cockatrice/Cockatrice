@@ -1,6 +1,7 @@
 #include "edhrec_commander_api_response_commander_details.h"
 
-void EdhrecCommanderApiResponseCommanderDetails::fromJson(const QJsonObject &json) {
+void EdhrecCommanderApiResponseCommanderDetails::fromJson(const QJsonObject &json)
+{
     // Parse card-related data
     aetherhubUri = json.value("aetherhub_uri").toString();
     archidektUri = json.value("archidekt_uri").toString();
@@ -44,7 +45,8 @@ void EdhrecCommanderApiResponseCommanderDetails::fromJson(const QJsonObject &jso
     url = json.value("url").toString();
 }
 
-void EdhrecCommanderApiResponseCommanderDetails::debugPrint() const {
+void EdhrecCommanderApiResponseCommanderDetails::debugPrint() const
+{
     qDebug() << "Card Data:";
     qDebug() << "Aetherhub URI:" << aetherhubUri;
     qDebug() << "Archidekt URI:" << archidektUri;

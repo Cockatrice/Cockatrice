@@ -6,8 +6,6 @@
 #include <QLoggingCategory>
 #include <QWidget>
 #include <qscrollarea.h>
-#include <QLoggingCategory>
-
 
 inline Q_LOGGING_CATEGORY(FlowWidgetLog, "flow_widget");
 inline Q_LOGGING_CATEGORY(FlowWidgetSizeLog, "flow_widget.size");

@@ -1,6 +1,7 @@
 #include "edhrec_commander_api_response_average_deck_statistics.h"
 
-void EdhrecCommanderApiResponseAverageDeckStatistics::fromJson(const QJsonObject &json) {
+void EdhrecCommanderApiResponseAverageDeckStatistics::fromJson(const QJsonObject &json)
+{
     creature = json.value("creature").toInt(0);
     instant = json.value("instant").toInt(0);
     sorcery = json.value("sorcery").toInt(0);

@@ -31,7 +31,8 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     QStringList widgetNames;
 
     // Add commander details
-    auto commanderPicture = new EdhrecCommanderResponseCommanderDetailsDisplayWidget(this, response.container.getCommanderDetails());
+    auto commanderPicture =
+        new EdhrecCommanderResponseCommanderDetailsDisplayWidget(this, response.container.getCommanderDetails());
     cardDisplayLayout->addWidget(commanderPicture);
     widgetNames.append("Commander Details");
 

@@ -1,4 +1,5 @@
 #include "edhrec_commander_api_response_card_list.h"
+
 #include <QDebug>
 
 EdhrecCommanderApiResponseCardList::EdhrecCommanderApiResponseCardList()

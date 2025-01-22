@@ -1,10 +1,14 @@
 #include "edhrec_commander_api_response_card_details.h"
+
 #include <QDebug>
 
 EdhrecCommanderApiResponseCardDetails::EdhrecCommanderApiResponseCardDetails()
-    : synergy(0.0), inclusion(0), numDecks(0), potentialDecks(0) {}
+    : synergy(0.0), inclusion(0), numDecks(0), potentialDecks(0)
+{
+}
 
-void EdhrecCommanderApiResponseCardDetails::fromJson(const QJsonObject &json) {
+void EdhrecCommanderApiResponseCardDetails::fromJson(const QJsonObject &json)
+{
     // Parse the fields from the JSON object
     name = json.value("name").toString();
     sanitized = json.value("sanitized").toString();
@@ -17,7 +21,8 @@ void EdhrecCommanderApiResponseCardDetails::fromJson(const QJsonObject &json) {
     potentialDecks = json.value("potential_decks").toInt(0);
 }
 
-void EdhrecCommanderApiResponseCardDetails::debugPrint() const {
+void EdhrecCommanderApiResponseCardDetails::debugPrint() const
+{
     // Print out all the fields for debugging
     qDebug() << "Name:" << name;
     qDebug() << "Sanitized:" << sanitized;

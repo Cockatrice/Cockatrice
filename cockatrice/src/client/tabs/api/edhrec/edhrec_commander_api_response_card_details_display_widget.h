@@ -5,14 +5,15 @@
 #include "api_response/edhrec_commander_api_response_card_details.h"
 
 #include <QHBoxLayout>
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
 
 class EdhrecCommanderApiResponseCardDetailsDisplayWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit EdhrecCommanderApiResponseCardDetailsDisplayWidget(QWidget *parent,
+    explicit EdhrecCommanderApiResponseCardDetailsDisplayWidget(
+        QWidget *parent,
         const EdhrecCommanderApiResponseCardDetails &_toDisplay);
 
 private:

@@ -14,7 +14,7 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
 
     // Layout to center the banner label
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(bannerLabel);
     layout->setContentsMargins(0, 20, 0, 20); // Space for the gradient
     setLayout(layout);
@@ -37,7 +37,7 @@ void BannerWidget::toggleBuddyVisibility() const
     }
 }
 
-void BannerWidget::paintEvent(QPaintEvent* event)
+void BannerWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
@@ -55,7 +55,7 @@ void BannerWidget::paintEvent(QPaintEvent* event)
     }
 
     // Set neutral gradient colors with calculated transparency
-    gradient.setColorAt(0, QColor(200, 200, 200, alpha)); // Light grey with alpha
+    gradient.setColorAt(0, QColor(200, 200, 200, alpha));       // Light grey with alpha
     gradient.setColorAt(1, QColor(100, 100, 100, alpha / 1.5)); // Darker grey, slightly more transparent
 
     // Fill the widget background with the gradient
