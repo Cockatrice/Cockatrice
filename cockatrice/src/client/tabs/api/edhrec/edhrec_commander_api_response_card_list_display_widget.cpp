@@ -1,5 +1,6 @@
 #include "edhrec_commander_api_response_card_list_display_widget.h"
 
+#include "../../../ui/widgets/general/display/banner_widget.h"
 #include "edhrec_commander_api_response_card_details_display_widget.h"
 
 #include <QLabel>
@@ -12,8 +13,7 @@ EdhrecCommanderApiResponseCardListDisplayWidget::EdhrecCommanderApiResponseCardL
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    auto header = new QLabel(this);
-    header->setText(toDisplay.header);
+    auto header = new BannerWidget(toDisplay.header, Qt::Vertical, 80, this);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 

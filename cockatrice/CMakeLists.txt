@@ -80,6 +80,7 @@ set(cockatrice_SOURCES
     src/utility/logger.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
+    src/client/ui/widgets/general/display/banner_widget.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
