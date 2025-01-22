@@ -1,9 +1,11 @@
 #include "banner_widget.h"
-#include <QVBoxLayout>
-#include <QPainter>
-#include <QLinearGradient>
 
-BannerWidget::BannerWidget(const QString& text, Qt::Orientation orientation, int transparency, QWidget* parent)
+#include <QLinearGradient>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QVBoxLayout>
+
+BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency, 100))
 {
     // Create the banner label and set properties
@@ -19,6 +21,20 @@ BannerWidget::BannerWidget(const QString& text, Qt::Orientation orientation, int
 
     // Set minimum height for the widget
     setMinimumHeight(100);
+    connect(this, &BannerWidget::buddyVisibilityChanged, this, &BannerWidget::toggleBuddyVisibility);
+}
+
+void BannerWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    emit buddyVisibilityChanged();
+}
+
+void BannerWidget::toggleBuddyVisibility() const
+{
+    if (buddy) {
+        buddy->setVisible(!buddy->isVisible());
+    }
 }
 
 void BannerWidget::paintEvent(QPaintEvent* event)

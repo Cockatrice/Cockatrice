@@ -13,9 +13,10 @@ EdhrecCommanderApiResponseCardListDisplayWidget::EdhrecCommanderApiResponseCardL
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    auto header = new BannerWidget(toDisplay.header, Qt::Vertical, 80, this);
+    auto header = new BannerWidget(this, toDisplay.header);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    header->setBuddy(flowWidget);
 
     foreach (EdhrecCommanderApiResponseCardDetails card_detail, toDisplay.cardViews) {
         auto widget = new EdhrecCommanderApiResponseCardDetailsDisplayWidget(flowWidget, card_detail);
