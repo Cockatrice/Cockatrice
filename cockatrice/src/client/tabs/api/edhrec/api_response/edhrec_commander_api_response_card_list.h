@@ -8,7 +8,8 @@
 #include <QList>
 #include <QString>
 
-class EdhrecCommanderApiResponseCardList {
+class EdhrecCommanderApiResponseCardList
+{
 public:
     QString header;
     QList<EdhrecCommanderApiResponseCardDetails> cardViews;

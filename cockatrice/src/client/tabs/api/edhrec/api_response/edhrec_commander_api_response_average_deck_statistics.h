@@ -4,7 +4,8 @@
 #include <QJsonObject>
 
 // Represents the typical deck statistics (collapsed section)
-struct EdhrecCommanderApiResponseAverageDeckStatistics {
+struct EdhrecCommanderApiResponseAverageDeckStatistics
+{
     int creature = 0;
     int instant = 0;
     int sorcery = 0;
@@ -17,6 +18,5 @@ struct EdhrecCommanderApiResponseAverageDeckStatistics {
     int nonbasic = 0;
 
     void fromJson(const QJsonObject &json);
-
 };
-#endif //AVERAGE_DECK_STATISTICS_H
+#endif // AVERAGE_DECK_STATISTICS_H

@@ -8,7 +8,8 @@
 #include <QString>
 #include <QVector>
 
-class EdhrecCommanderApiResponseCommanderDetails {
+class EdhrecCommanderApiResponseCommanderDetails
+{
 public:
     // Constructor
     EdhrecCommanderApiResponseCommanderDetails() = default;
@@ -20,35 +21,122 @@ public:
     void debugPrint() const;
 
     // Getters for the card data
-    const QString& getAetherhubUri() const { return aetherhubUri; }
-    const QString& getArchidektUri() const { return archidektUri; }
-    int getCmc() const { return cmc; }
-    const QJsonArray& getColorIdentity() const { return colorIdentity; }
-    bool isCombos() const { return combos; }
-    const QString& getDeckstatsUri() const { return deckstatsUri; }
-    const QVector<QString>& getImageUris() const { return imageUris; }
-    int getInclusion() const { return inclusion; }
-    bool getIsCommander() const { return isCommander; }
-    const QString& getLabel() const { return label; }
-    const QString& getLayout() const { return layout; }
-    bool getLegalCommander() const { return legalCommander; }
-    const QString& getMoxfieldUri() const { return moxfieldUri; }
-    const QString& getMtggoldfishUri() const { return mtggoldfishUri; }
-    const QString& getName() const { return name; }
-    const QJsonArray& getNames() const { return names; }
-    int getNumDecks() const { return numDecks; }
-    int getPotentialDecks() const { return potentialDecks; }
-    const QString& getPrecon() const { return precon; }
-    const CardPrices& getPrices() const { return prices; }
-    const QString& getPrimaryType() const { return primaryType; }
-    const QString& getRarity() const { return rarity; }
-    double getSalt() const { return salt; }
-    const QString& getSanitized() const { return sanitized; }
-    const QString& getSanitizedWo() const { return sanitizedWo; }
-    const QString& getScryfallUri() const { return scryfallUri; }
-    const QString& getSpellbookUri() const { return spellbookUri; }
-    const QString& getType() const { return type; }
-    const QString& getUrl() const { return url; }
+    const QString &getAetherhubUri() const
+    {
+        return aetherhubUri;
+    }
+    const QString &getArchidektUri() const
+    {
+        return archidektUri;
+    }
+    int getCmc() const
+    {
+        return cmc;
+    }
+    const QJsonArray &getColorIdentity() const
+    {
+        return colorIdentity;
+    }
+    bool isCombos() const
+    {
+        return combos;
+    }
+    const QString &getDeckstatsUri() const
+    {
+        return deckstatsUri;
+    }
+    const QVector<QString> &getImageUris() const
+    {
+        return imageUris;
+    }
+    int getInclusion() const
+    {
+        return inclusion;
+    }
+    bool getIsCommander() const
+    {
+        return isCommander;
+    }
+    const QString &getLabel() const
+    {
+        return label;
+    }
+    const QString &getLayout() const
+    {
+        return layout;
+    }
+    bool getLegalCommander() const
+    {
+        return legalCommander;
+    }
+    const QString &getMoxfieldUri() const
+    {
+        return moxfieldUri;
+    }
+    const QString &getMtggoldfishUri() const
+    {
+        return mtggoldfishUri;
+    }
+    const QString &getName() const
+    {
+        return name;
+    }
+    const QJsonArray &getNames() const
+    {
+        return names;
+    }
+    int getNumDecks() const
+    {
+        return numDecks;
+    }
+    int getPotentialDecks() const
+    {
+        return potentialDecks;
+    }
+    const QString &getPrecon() const
+    {
+        return precon;
+    }
+    const CardPrices &getPrices() const
+    {
+        return prices;
+    }
+    const QString &getPrimaryType() const
+    {
+        return primaryType;
+    }
+    const QString &getRarity() const
+    {
+        return rarity;
+    }
+    double getSalt() const
+    {
+        return salt;
+    }
+    const QString &getSanitized() const
+    {
+        return sanitized;
+    }
+    const QString &getSanitizedWo() const
+    {
+        return sanitizedWo;
+    }
+    const QString &getScryfallUri() const
+    {
+        return scryfallUri;
+    }
+    const QString &getSpellbookUri() const
+    {
+        return spellbookUri;
+    }
+    const QString &getType() const
+    {
+        return type;
+    }
+    const QString &getUrl() const
+    {
+        return url;
+    }
 
 private:
     QString aetherhubUri;
@@ -82,4 +170,4 @@ private:
     QString url;
 };
 
-#endif //EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_H
+#endif // EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_H

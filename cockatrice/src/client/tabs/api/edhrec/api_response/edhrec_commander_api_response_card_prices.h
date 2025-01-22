@@ -3,7 +3,8 @@
 
 #include <QJsonObject>
 
-class CardPrices {
+class CardPrices
+{
 public:
     // Constructor
     CardPrices() = default;
@@ -13,15 +14,42 @@ public:
     void debugPrint() const;
 
     // Getter methods for card prices
-    const QJsonObject& getCardhoarder() const { return cardhoarder; }
-    const QJsonObject& getCardkingdom() const { return cardkingdom; }
-    const QJsonObject& getCardmarket() const { return cardmarket; }
-    const QJsonObject& getFace2face() const { return face2face; }
-    const QJsonObject& getManapool() const { return manapool; }
-    const QJsonObject& getMtgstocks() const { return mtgstocks; }
-    const QJsonObject& getScg() const { return scg; }
-    const QJsonObject& getTcgl() const { return tcgl; }
-    const QJsonObject& getTcgplayer() const { return tcgplayer; }
+    const QJsonObject &getCardhoarder() const
+    {
+        return cardhoarder;
+    }
+    const QJsonObject &getCardkingdom() const
+    {
+        return cardkingdom;
+    }
+    const QJsonObject &getCardmarket() const
+    {
+        return cardmarket;
+    }
+    const QJsonObject &getFace2face() const
+    {
+        return face2face;
+    }
+    const QJsonObject &getManapool() const
+    {
+        return manapool;
+    }
+    const QJsonObject &getMtgstocks() const
+    {
+        return mtgstocks;
+    }
+    const QJsonObject &getScg() const
+    {
+        return scg;
+    }
+    const QJsonObject &getTcgl() const
+    {
+        return tcgl;
+    }
+    const QJsonObject &getTcgplayer() const
+    {
+        return tcgplayer;
+    }
 
 private:
     QJsonObject cardhoarder;
@@ -35,4 +63,4 @@ private:
     QJsonObject tcgplayer;
 };
 
-#endif //EDHREC_COMMANDER_API_RESPONSE_CARD_PRICES_H
+#endif // EDHREC_COMMANDER_API_RESPONSE_CARD_PRICES_H

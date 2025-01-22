@@ -10,7 +10,8 @@
 #include <QString>
 #include <QVector>
 
-class EdhrecCommanderApiResponseCardContainer {
+class EdhrecCommanderApiResponseCardContainer
+{
 public:
     // Constructor
     EdhrecCommanderApiResponseCardContainer() = default;
@@ -22,12 +23,30 @@ public:
     void debugPrint() const;
 
     // Getter methods for deck container
-    const QString& getDescription() const { return description; }
-    const QVector<QJsonObject>& getBreadcrumb() const { return breadcrumb; }
-    const EdhrecCommanderApiResponseCommanderDetails& getCommanderDetails() const { return card; }
-    const QVector<EdhrecCommanderApiResponseCardList>& getCardlists() const { return cardlists; }
-    const QString& getKeywords() const { return keywords; }
-    const QString& getTitle() const { return title; }
+    const QString &getDescription() const
+    {
+        return description;
+    }
+    const QVector<QJsonObject> &getBreadcrumb() const
+    {
+        return breadcrumb;
+    }
+    const EdhrecCommanderApiResponseCommanderDetails &getCommanderDetails() const
+    {
+        return card;
+    }
+    const QVector<EdhrecCommanderApiResponseCardList> &getCardlists() const
+    {
+        return cardlists;
+    }
+    const QString &getKeywords() const
+    {
+        return keywords;
+    }
+    const QString &getTitle() const
+    {
+        return title;
+    }
 
 private:
     QString description;
