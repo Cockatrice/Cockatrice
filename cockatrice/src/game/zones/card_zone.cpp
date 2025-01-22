@@ -173,7 +173,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
     return c;
 }
 
-CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
+CardItem *CardZone::takeCard(int position, int cardId, bool toNewZone)
 {
     if (position == -1) {
         // position == -1 means either that the zone is indexed by card id

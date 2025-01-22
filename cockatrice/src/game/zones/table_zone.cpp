@@ -244,10 +244,10 @@ void TableZone::toggleTapped()
     player->sendGameCommand(player->prepareGameCommand(cmdList));
 }
 
-CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
+CardItem *TableZone::takeCard(int position, int cardId, bool toNewZone)
 {
     CardItem *result = CardZone::takeCard(position, cardId);
-    if (canResize)
+    if (toNewZone)
         resizeToContents();
     return result;
 }
