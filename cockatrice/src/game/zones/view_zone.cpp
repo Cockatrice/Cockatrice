@@ -365,7 +365,7 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     player->sendGameCommand(cmd);
 }
 
-void ZoneViewZone::removeCard(int position)
+void ZoneViewZone::removeCard(int position, bool toNewZone)
 {
     if (isReversed) {
         position -= cards.first()->getId();

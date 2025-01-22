@@ -190,7 +190,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool toNewZone)
         return nullptr;
 
     for (auto *view : views) {
-        view->removeCard(position);
+        view->removeCard(position, toNewZone);
     }
 
     CardItem *c = cards.takeAt(position);
