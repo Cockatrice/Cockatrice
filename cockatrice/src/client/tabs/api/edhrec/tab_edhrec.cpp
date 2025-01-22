@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QRegularExpression>
 #include <QResizeEvent>
 
 TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
