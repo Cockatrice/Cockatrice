@@ -25,6 +25,9 @@ private:
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
     QSplitter *splitter;
 
+    void setViewTransformationButtonVisibility(bool visible);
+    void refreshLayout();
+
 public:
     enum ViewMode
     {

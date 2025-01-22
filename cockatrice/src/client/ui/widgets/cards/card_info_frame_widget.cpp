@@ -12,7 +12,7 @@
 #include <utility>
 
 CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *parent)
-    : QTabWidget(parent), info(nullptr), cardTextOnly(false)
+    : QTabWidget(parent), info(nullptr), viewTransformationButton(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPictureWidget();
@@ -22,11 +22,6 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     text = new CardInfoTextWidget();
     text->setObjectName("text");
     connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
-
-    viewTransformationButton = new QPushButton();
-    viewTransformationButton->setObjectName("viewTransformationButton");
-    connect(viewTransformationButton, &QPushButton::clicked, this, &CardInfoFrameWidget::viewTransformation);
-    viewTransformationButton->setVisible(false);
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
@@ -74,36 +69,84 @@ void CardInfoFrameWidget::retranslateUi()
     setTabText(ImageOnlyView, tr("Image"));
     setTabText(TextOnlyView, tr("Description"));
     setTabText(ImageAndTextView, tr("Both"));
-    viewTransformationButton->setText(tr("View transformation"));
+
+    if (viewTransformationButton) {
+        viewTransformationButton->setText(tr("View transformation"));
+    }
 }
 
-void CardInfoFrameWidget::setViewMode(int mode)
+void CardInfoFrameWidget::setViewTransformationButtonVisibility(bool visible)
 {
-    if (currentIndex() != mode)
-        setCurrentIndex(mode);
+    if (!viewTransformationButton && visible) {
+        viewTransformationButton = new QPushButton();
+        viewTransformationButton->setObjectName("viewTransformationButton");
+        connect(viewTransformationButton, &QPushButton::clicked, this, &CardInfoFrameWidget::viewTransformation);
+        refreshLayout();
+    } else if (viewTransformationButton && !visible) {
+        // Deleting a widget automatically removes it from its parent
+        viewTransformationButton->deleteLater();
+        viewTransformationButton = nullptr;
+    }
+}
 
-    switch (mode) {
+/**
+ * Adds the widgets to the layouts that are relevant to the currently active tab.
+ *
+ * QWidgets can only have one parent, so we need to re-parent the shared widgets whenever we switch tabs.
+ */
+void CardInfoFrameWidget::refreshLayout()
+{
+    switch (currentIndex()) {
         case ImageOnlyView:
         case TextOnlyView:
+            // We need to always parent all widgets, even the ones that aren't visible,
+            // since an unparented widget becomes free-floating.
             tab1Layout->addWidget(pic);
-            tab1Layout->addWidget(viewTransformationButton);
+            if (viewTransformationButton) {
+                tab1Layout->addWidget(viewTransformationButton);
+            }
             tab2Layout->addWidget(text);
             break;
         case ImageAndTextView:
             splitter->addWidget(pic);
-            splitter->addWidget(viewTransformationButton);
+            if (viewTransformationButton) {
+                splitter->addWidget(viewTransformationButton);
+            }
             splitter->addWidget(text);
             break;
         default:
             break;
     }
+    retranslateUi();
+}
+
+void CardInfoFrameWidget::setViewMode(int mode)
+{
+    if (currentIndex() != mode) {
+        setCurrentIndex(mode);
+    }
+
+    refreshLayout();
 
     SettingsCache::instance().setCardInfoViewMode(mode);
 }
 
+static bool hasTransformation(const CardInfoPtr &info)
+{
+    if (!info) {
+        return false;
+    }
+
+    for (const auto &cardRelation : info->getAllRelatedCards()) {
+        if (cardRelation->getDoesTransform()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void CardInfoFrameWidget::setCard(CardInfoPtr card)
 {
-    viewTransformationButton->setVisible(false);
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
     }
@@ -114,15 +157,7 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
         connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
     }
 
-    if (info) {
-        const auto &cardRelations = info->getAllRelatedCards();
-        for (const auto &cardRelation : cardRelations) {
-            if (cardRelation->getDoesTransform()) {
-                viewTransformationButton->setVisible(true);
-                break;
-            }
-        }
-    }
+    setViewTransformationButtonVisibility(hasTransformation(info));
 
     text->setCard(info);
     pic->setCard(info);
