@@ -540,33 +540,35 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     QMenu menu;
     const CardInfoPtr info = currentCardInfo();
 
-    // add to deck and sideboard options
-    QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRec;
-    addToDeck = menu.addAction(tr("Add to Deck"));
-    addToSideboard = menu.addAction(tr("Add to Sideboard"));
-    selectPrinting = menu.addAction(tr("Select Printing"));
-    edhRec = menu.addAction(tr("Show on EDHREC"));
+    if (info) {
+        // add to deck and sideboard options
+        QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRec;
+        addToDeck = menu.addAction(tr("Add to Deck"));
+        addToSideboard = menu.addAction(tr("Add to Sideboard"));
+        selectPrinting = menu.addAction(tr("Select Printing"));
+        edhRec = menu.addAction(tr("Show on EDHREC"));
 
-    connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
-    connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-    connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
-    connect(edhRec, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
+        connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
+        connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
+        connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
+        connect(edhRec, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
 
-    // filling out the related cards submenu
-    auto *relatedMenu = new QMenu(tr("Show Related cards"));
-    menu.addMenu(relatedMenu);
-    auto relatedCards = info->getAllRelatedCards();
-    if (relatedCards.isEmpty()) {
-        relatedMenu->setDisabled(true);
-    } else {
-        for (const CardRelation *rel : relatedCards) {
-            const QString &relatedCardName = rel->getName();
-            QAction *relatedCard = relatedMenu->addAction(relatedCardName);
-            connect(relatedCard, &QAction::triggered, cardInfo,
-                    [this, relatedCardName] { cardInfo->setCard(relatedCardName); });
+        // filling out the related cards submenu
+        auto *relatedMenu = new QMenu(tr("Show Related cards"));
+        menu.addMenu(relatedMenu);
+        auto relatedCards = info->getAllRelatedCards();
+        if (relatedCards.isEmpty()) {
+            relatedMenu->setDisabled(true);
+        } else {
+            for (const CardRelation *rel : relatedCards) {
+                const QString &relatedCardName = rel->getName();
+                QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+                connect(relatedCard, &QAction::triggered, cardInfo,
+                        [this, relatedCardName] { cardInfo->setCard(relatedCardName); });
+            }
         }
+        menu.exec(databaseView->mapToGlobal(point));
     }
-    menu.exec(databaseView->mapToGlobal(point));
 }
 
 void TabDeckEditor::decklistCustomMenu(QPoint point)

@@ -13,7 +13,7 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    auto commanderPicture = new CardInfoPictureWidget(this);
+    commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(CardDatabaseManager::getInstance()->getCard(commanderDetails.getName()));
 
     commanderDetails.debugPrint();

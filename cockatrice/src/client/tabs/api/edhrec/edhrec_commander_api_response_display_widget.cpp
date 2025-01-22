@@ -4,6 +4,7 @@
 #include "../../../ui/widgets/cards/card_info_picture_widget.h"
 #include "api_response/edhrec_commander_api_response.h"
 #include "edhrec_commander_api_response_card_list_display_widget.h"
+#include "edhrec_commander_api_response_commander_details_display_widget.h"
 
 #include <QResizeEvent>
 
@@ -16,9 +17,7 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
 
     layout->setAlignment(Qt::AlignHCenter);
 
-    auto commanderPicture = new CardInfoPictureWidget(this);
-    commanderPicture->setCard(
-        CardDatabaseManager::getInstance()->getCard(response.container.getCommanderDetails().getName()));
+    auto commanderPicture = new EdhrecCommanderResponseCommanderDetailsDisplayWidget(this, response.container.getCommanderDetails());
     layout->addWidget(commanderPicture);
 
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();

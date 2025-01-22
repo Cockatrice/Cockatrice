@@ -18,7 +18,7 @@ TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     scrollArea->setWidgetResizable(true);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    // flowWidget = new FlowWidget(this, Qt::Vertical, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+
     networkManager = new QNetworkAccessManager(this);
     setCentralWidget(scrollArea);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
@@ -32,13 +32,11 @@ TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 void TabEdhRec::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    qDebug() << "resizeEvent: " << event->size();
     if (scrollArea) {
         if (scrollArea->widget()) {
             scrollArea->widget()->resize(event->size());
         }
     }
-
 }
 
 void TabEdhRec::retranslateUi()
@@ -54,14 +52,14 @@ void TabEdhRec::setCard(CardInfoPtr _cardToQuery)
         return;
     }
 
-    QString cardName = cardToQuery->getName(); // Assuming `getName()` fetches the card's name.
+    QString cardName = cardToQuery->getName();
     QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
 
     QString url = QString("https://json.edhrec.com/pages/commanders/%1.json").arg(formattedName);
 
     QNetworkRequest request{QUrl(url)};
 
-    networkManager->get(request); // Issue the GET request.
+    networkManager->get(request);
 }
 
 void TabEdhRec::processApiJson(QNetworkReply *reply)
