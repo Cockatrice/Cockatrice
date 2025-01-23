@@ -14,7 +14,7 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
     setLayout(layout);
     setMinimumSize(QSize(0, 0));
 
-    banner = new BannerWidget(bannerText, Qt::Orientation::Vertical, bannerOpacity, this);
+    banner = new BannerWidget(this, bannerText, Qt::Orientation::Vertical, bannerOpacity);
     overlapWidget = new OverlapWidget(this, 80, 1, 1, Qt::Vertical, true);
 
     layout->addWidget(banner);

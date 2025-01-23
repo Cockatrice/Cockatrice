@@ -3,8 +3,6 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../game/cards/card_database.h"
-#include "../../layouts/flow_layout.h"
-#include "../../layouts/vertical_flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"

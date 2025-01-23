@@ -10,7 +10,7 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListModel *deck_li
     main_layout = new QHBoxLayout();
     this->setLayout(main_layout);
 
-    flow_widget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    flow_widget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     this->main_layout->addWidget(flow_widget);
 
     mana_curve_widget = new ManaCurveWidget(flow_widget);
