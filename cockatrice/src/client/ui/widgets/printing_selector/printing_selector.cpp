@@ -45,7 +45,7 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     searchBar->setVisible(SettingsCache::instance().getPrintingSelectorSearchBarVisible());
     layout->addWidget(searchBar);
 
-    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());

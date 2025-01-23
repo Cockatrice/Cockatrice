@@ -3,15 +3,22 @@
 #include "../../../layouts/flow_layout.h"
 
 #include <QHBoxLayout>
+#include <QLoggingCategory>
 #include <QWidget>
 #include <qscrollarea.h>
+
+inline Q_LOGGING_CATEGORY(FlowWidgetLog, "flow_widget");
+inline Q_LOGGING_CATEGORY(FlowWidgetSizeLog, "flow_widget.size");
 
 class FlowWidget final : public QWidget
 {
     Q_OBJECT
 
 public:
-    FlowWidget(QWidget *parent, Qt::ScrollBarPolicy horizontalPolicy, Qt::ScrollBarPolicy verticalPolicy);
+    FlowWidget(QWidget *parent,
+               Qt::Orientation orientation,
+               Qt::ScrollBarPolicy horizontalPolicy,
+               Qt::ScrollBarPolicy verticalPolicy);
     void addWidget(QWidget *widget_to_add) const;
     void removeWidget(QWidget *widgetToRemove) const;
     void clearLayout();
@@ -27,6 +34,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
+    Qt::Orientation flowDirection;
     QHBoxLayout *mainLayout;
     FlowLayout *flowLayout;
     QWidget *container;

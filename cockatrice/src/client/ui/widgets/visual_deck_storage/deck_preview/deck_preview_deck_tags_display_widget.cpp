@@ -23,7 +23,7 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(DeckPreviewWi
 
     connect(deckLoader, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
 
-    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     for (const QString &tag : this->deckLoader->getTags()) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
