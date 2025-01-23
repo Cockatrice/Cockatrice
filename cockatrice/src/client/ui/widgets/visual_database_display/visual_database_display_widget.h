@@ -58,9 +58,7 @@ private:
     bool isAnimating = false;
     int debounce_time = 300;
     int currentPage = 0;  // Current page index
-    int cardsPerPage = 9; // Number of cards per page
-    int cardsPerRow = 0;
-    int rowsPerColumn = 0;
+    int cardsPerPage = 50; // Number of cards per page
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
