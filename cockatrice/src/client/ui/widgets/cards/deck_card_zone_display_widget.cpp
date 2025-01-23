@@ -14,7 +14,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    banner = new BannerWidget(bannerText, Qt::Orientation::Vertical, bannerOpacity, this);
+    banner = new BannerWidget(this, bannerText, Qt::Orientation::Vertical, bannerOpacity);
     layout->addWidget(banner);
 
     displayCards();
