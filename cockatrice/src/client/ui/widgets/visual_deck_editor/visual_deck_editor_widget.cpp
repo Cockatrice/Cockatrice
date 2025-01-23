@@ -6,15 +6,11 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../main.h"
 #include "../../../../utility/card_info_comparator.h"
-#include "../../layouts/flow_layout.h"
 #include "../../layouts/overlap_layout.h"
-#include "../../layouts/vertical_flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
-#include "../cards/overlapped_card_group_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
-#include "../general/layout_containers/overlap_widget.h"
 
 #include <QHBoxLayout>
 #include <QResizeEvent>
@@ -56,7 +52,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *d
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
 
-    flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     overlap_control_widget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
 
