@@ -1,5 +1,6 @@
 #include "overlap_layout.h"
 
+#include <QDebug>
 #include <QtMath>
 
 /**
@@ -158,6 +159,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
             // Calculate the maximum possible columns given the available width and overlap.
             const int availableColumns = (availableWidth + overlapOffsetWidth) / (maxItemWidth - overlapOffsetWidth);
             // Use the smaller of maxColumns and availableColumns.
+            qDebug() << " Max Columns " << maxColumns << " available columns " << availableColumns;
             columns = qMin(maxColumns, availableColumns);
         } else {
             // If no maxColumns constraint, allow as many columns as possible.
@@ -175,6 +177,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
             // Calculate the maximum possible rows given the available height and overlap.
             const int availableRows = (availableHeight + overlapOffsetHeight) / (maxItemHeight - overlapOffsetHeight);
             // Use the smaller of maxRows and availableRows.
+            qDebug() << " Max Rows " << maxRows << " available rows " << availableRows;
             rows = qMin(maxRows, availableRows);
         } else {
             // If no maxRows constraint, allow as many rows as possible.

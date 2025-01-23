@@ -6,6 +6,7 @@
 #include "../../../../game/cards/card_database_model.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 
@@ -38,9 +39,9 @@ signals:
 protected slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
     void onHover(CardInfoPtr hoveredCard);
+    void addCard(CardInfoPtr cardToAdd);
     void databaseDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void wheelEvent(QWheelEvent *event) override;
-    void setupPaginationControls();
     void modelDirty();
 
 private:
@@ -53,15 +54,13 @@ private:
     QWidget *overlap_categories;
     QVBoxLayout *overlap_categories_layout;
     OverlapControlWidget *overlap_control_widget;
+    CardSizeWidget *cardSizeWidget;
     QWidget *container;
     QTimer *debounce_timer;
 
-    bool isAnimating = false;
     int debounce_time = 300;
-    int currentPage = 0;  // Current page index
-    int cardsPerPage = 9; // Number of cards per page
-    int cardsPerRow = 0;
-    int rowsPerColumn = 0;
+    int currentPage = 0;    // Current page index
+    int cardsPerPage = 200; // Number of cards per page
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
