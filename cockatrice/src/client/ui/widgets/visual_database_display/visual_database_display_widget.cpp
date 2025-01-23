@@ -127,7 +127,7 @@ void VisualDatabaseDisplayWidget::loadNextPage()
 {
     // Calculate the start and end indices for the next page
     int rowCount = databaseDisplayModel->rowCount();
-    int start = (currentPage + 1) * cardsPerPage;
+    int start = currentPage * cardsPerPage;
     int end = qMin(start + cardsPerPage, rowCount);
 
     // Load more cards if we are at the end of the current list and can fetch more
@@ -184,29 +184,20 @@ void VisualDatabaseDisplayWidget::databaseDataChanged(QModelIndex topLeft, QMode
 
 void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
 {
-    if (isAnimating) {
-        return;
-    }
-    // Check scroll direction
-    if (event->angleDelta().y() > 0) {
-        // Scrolling up
-        if (currentPage > 0) {
-            currentPage--;
-            loadCurrentPage(); // Load the previous page
-        }
-    } else if (event->angleDelta().y() < 0) {
-        // Scrolling down
-        if ((currentPage + 1) * cardsPerPage < databaseDisplayModel->rowCount()) {
-            currentPage++;
+    int totalRows = databaseDisplayModel->rowCount(); // Total number of cards
+    int nextPageStartIndex = (currentPage + 1) * cardsPerPage;
+
+    // Handle scrolling down
+    if (event->angleDelta().y() < 0) {
+        // Check if the next page has any cards to load
+        if (nextPageStartIndex < totalRows) {
             loadCurrentPage(); // Load the next page
+            event->accept();   // Accept the event as valid
+            return;
         }
+        qDebug() << nextPageStartIndex << ":" << totalRows;
     }
 
-    // Prevent overscrolling by stopping the event if needed
-    if ((currentPage == 0 && event->angleDelta().y() > 0) ||
-        ((currentPage + 1) * cardsPerPage >= databaseDisplayModel->rowCount() && event->angleDelta().y() < 0)) {
-        event->ignore(); // Ignore the event to prevent overscrolling
-    } else {
-        event->accept(); // Accept the event if scrolling is valid
-    }
+    // Prevent overscrolling when there's no more data to load
+    event->ignore();
 }
