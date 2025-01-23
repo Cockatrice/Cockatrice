@@ -28,7 +28,6 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     visualDatabaseDisplay =
         new VisualDatabaseDisplayWidget(this, this->cardDatabaseModel, this->cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
-    visualDatabaseDisplay->updateDisplay();
     connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this,
             SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
     connect(visualDatabaseDisplay,
