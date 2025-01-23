@@ -37,7 +37,14 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     connect(debounce_timer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
-    loadCurrentPage(); // Load the first page of cards
+    auto loadCardsTimer = new QTimer(this);
+    loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
+
+    connect(loadCardsTimer, &QTimer::timeout, this, [this]() {
+        qDebug() << "timer timed out";
+        loadCurrentPage();
+    });
+    loadCardsTimer->start(5000);
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -58,15 +65,7 @@ void VisualDatabaseDisplayWidget::onHover(CardInfoPtr hoveredCard)
 
 void VisualDatabaseDisplayWidget::populateCards()
 {
-    this->cards->clear();
     int rowCount = databaseDisplayModel->rowCount();
-    QModelIndex firstIndex = databaseDisplayModel->index(0, CardDatabaseModel::NameColumn);
-    QVariant firstName = databaseDisplayModel->data(firstIndex, Qt::DisplayRole);
-    CardInfoPtr firstInfo = CardDatabaseManager::getInstance()->getCard(firstName.toString());
-    cards->append(firstInfo);
-
-    adjustCardsPerPage();
-
     cards->clear();
 
     // Calculate the start and end indices for the current page
@@ -84,6 +83,7 @@ void VisualDatabaseDisplayWidget::populateCards()
         qDebug() << "Adding " << row;
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
+        qDebug() << name.toString();
         CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
         if (info) {
             cards->append(info);
@@ -147,7 +147,6 @@ void VisualDatabaseDisplayWidget::loadNextPage()
 
     // Update the current page
     currentPage++;
-    adjustCardsPerPage(); // Adjust the cards per page if needed
 }
 
 void VisualDatabaseDisplayWidget::loadCurrentPage()
@@ -160,42 +159,6 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
     } else {
         // If not the first page, just load the next page and append to the flow widget
         loadNextPage();
-    }
-}
-
-void VisualDatabaseDisplayWidget::adjustCardsPerPage()
-{
-    // Calculate available width and height in the OverlapWidget
-    int availableWidth = flow_widget->width();
-    int availableHeight = flow_widget->height();
-
-    QList<CardInfoPictureWithTextOverlayWidget *> cardDisplays;
-    for (OverlapWidget *child : flow_widget->findChildren<OverlapWidget *>()) {
-        for (CardInfoPictureWithTextOverlayWidget *overlapChild :
-             child->findChildren<CardInfoPictureWithTextOverlayWidget *>()) {
-            if (CardInfoPictureWithTextOverlayWidget *cardDisplay =
-                    qobject_cast<CardInfoPictureWithTextOverlayWidget *>(overlapChild)) {
-                cardDisplays.append(cardDisplay);
-            }
-        }
-    }
-
-    // Measure the size of the first card display to determine the size of cards
-    if (!cardDisplays.isEmpty()) {
-        int cardWidth = cardDisplays.first()->sizeHint().width();
-        int cardHeight = cardDisplays.first()->sizeHint().height();
-        const int overlapMargin = 10; // Margin between cards
-
-        // Calculate how many cards can fit horizontally and vertically
-        cardsPerRow = availableWidth / (cardWidth + overlapMargin);
-        rowsPerColumn = availableHeight / (cardHeight + overlapMargin);
-        qDebug() << "available width " << availableWidth << "available height: " << availableHeight;
-        qDebug() << "width: " << cardWidth << "height: " << cardHeight << "cardsPerRow: " << cardsPerRow
-                 << "rowsPerColumn: " << rowsPerColumn;
-
-        // Update cardsPerPage based on rows and columns
-        cardsPerPage = cardsPerRow * rowsPerColumn;
-        qDebug() << "Adjusted cards per page to:" << cardsPerPage;
     }
 }
 
