@@ -279,6 +279,7 @@ void TabSupervisor::initStartupTabs()
     addDeckEditorTab(nullptr);
 
     checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
+    checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
 }
 
 /**
@@ -334,6 +335,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
+    tabsMenu->addAction(aTabDeckStorage);
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -355,10 +357,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     updatePingTime(0, -1);
 
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
-        tabsMenu->addAction(aTabDeckStorage);
         tabsMenu->addAction(aTabReplays);
 
-        checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
         checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
     }
 
@@ -379,7 +379,6 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     resetTabsMenu();
 
     tabAccount = nullptr;
-    tabDeckStorage = nullptr;
     tabReplays = nullptr;
     tabAdmin = nullptr;
     tabLog = nullptr;
@@ -415,9 +414,6 @@ void TabSupervisor::stop()
         }
         if (tabServer) {
             tabServer->closeRequest(true);
-        }
-        if (tabDeckStorage) {
-            tabDeckStorage->closeRequest(true);
         }
         if (tabReplays) {
             tabReplays->closeRequest(true);
