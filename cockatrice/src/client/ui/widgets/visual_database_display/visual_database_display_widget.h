@@ -39,6 +39,7 @@ signals:
 protected slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
     void onHover(CardInfoPtr hoveredCard);
+    void addCard(CardInfoPtr cardToAdd);
     void databaseDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void wheelEvent(QWheelEvent *event) override;
     void modelDirty();

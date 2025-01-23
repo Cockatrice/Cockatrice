@@ -63,6 +63,19 @@ void VisualDatabaseDisplayWidget::onHover(CardInfoPtr hoveredCard)
     emit cardHoveredDatabaseDisplay(hoveredCard);
 }
 
+void VisualDatabaseDisplayWidget::addCard(CardInfoPtr cardToAdd)
+{
+    cards->append(cardToAdd);
+    CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, false);
+    display->setScaleFactor(cardSizeWidget->getSlider()->value());
+    display->setCard(cardToAdd);
+    flow_widget->addWidget(display);
+    connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+            SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
+}
+
 void VisualDatabaseDisplayWidget::populateCards()
 {
     int rowCount = databaseDisplayModel->rowCount();
@@ -86,15 +99,7 @@ void VisualDatabaseDisplayWidget::populateCards()
         qDebug() << name.toString();
         CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
         if (info) {
-            cards->append(info);
-            CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
-            display->setCard(info);
-            flow_widget->addWidget(display);
-            connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-            connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display,
-                    &CardInfoPictureWidget::setScaleFactor);
+            addCard(info);
         } else {
             qDebug() << "Card not found in database!";
         }
@@ -136,13 +141,7 @@ void VisualDatabaseDisplayWidget::loadNextPage()
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
         if (info) {
-            CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
-            display->setScaleFactor(cardSizeWidget->getSlider()->value());
-            display->setCard(info);
-            flow_widget->addWidget(display);
-            connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-            connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+            addCard(info);
         } else {
             qDebug() << "Card not found in database!";
         }
