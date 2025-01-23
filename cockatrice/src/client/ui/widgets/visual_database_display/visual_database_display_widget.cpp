@@ -26,7 +26,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     main_layout = new QVBoxLayout();
     setLayout(main_layout);
 
-    flow_widget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    flow_widget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     main_layout->addWidget(flow_widget);
 
     overlap_control_widget = new OverlapControlWidget(80, 10, 10, Qt::Vertical, flow_widget);
