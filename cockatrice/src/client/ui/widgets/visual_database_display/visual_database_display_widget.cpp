@@ -36,7 +36,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     debounce_timer->setSingleShot(true); // Ensure it only fires once after the timeout
 
     connect(debounce_timer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
-    setupPaginationControls();
+
     loadCurrentPage(); // Load the first page of cards
 }
 
@@ -60,27 +60,48 @@ void VisualDatabaseDisplayWidget::populateCards()
 {
     this->cards->clear();
     int rowCount = databaseDisplayModel->rowCount();
+    QModelIndex firstIndex = databaseDisplayModel->index(0, CardDatabaseModel::NameColumn);
+    QVariant firstName = databaseDisplayModel->data(firstIndex, Qt::DisplayRole);
+    CardInfoPtr firstInfo = CardDatabaseManager::getInstance()->getCard(firstName.toString());
+    cards->append(firstInfo);
+
+    adjustCardsPerPage();
+
+    cards->clear();
 
     // Calculate the start and end indices for the current page
     int start = currentPage * cardsPerPage;
     int end = qMin(start + cardsPerPage, rowCount);
 
+    qDebug() << "Fetching from " << start << " to " << end << " cards";
     // Load more cards if we are at the end of the current list and can fetch more
     if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
+        qDebug() << "We gotta load more";
         databaseDisplayModel->fetchMore(QModelIndex());
     }
 
     for (int row = start; row < end; ++row) {
+        qDebug() << "Adding " << row;
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
-        cards->append(info);
+        if (info) {
+            cards->append(info);
+            CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
+            display->setCard(info);
+            flow_widget->addWidget(display);
+            connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+            connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        } else {
+            qDebug() << "Card not found in database!";
+        }
     }
+    currentPage++;
 }
 
 void VisualDatabaseDisplayWidget::searchModelChanged()
 {
-    qDebug() << "Search Model changed";
     // Clear the current page and prepare for new data
     flow_widget->clearLayout(); // Clear existing cards
     cards->clear();             // Clear the card list
@@ -92,7 +113,7 @@ void VisualDatabaseDisplayWidget::searchModelChanged()
 
     currentPage = 0;
     loadCurrentPage();
-    updateDisplay();
+    qDebug() << "Search model changed";
 }
 
 void VisualDatabaseDisplayWidget::loadNextPage()
@@ -134,45 +155,12 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
     // Ensure only the initial page is loaded
     if (currentPage == 0) {
         // Only load the first page initially
+        qDebug() << "Loading the first page";
         populateCards();
     } else {
         // If not the first page, just load the next page and append to the flow widget
         loadNextPage();
     }
-}
-
-void VisualDatabaseDisplayWidget::updateDisplay()
-{
-    // Clear the layout first
-    flow_widget->clearLayout();
-
-    OverlapWidget *printings_group_widget = new OverlapWidget(flow_widget, 0, cardsPerRow, rowsPerColumn, Qt::Vertical);
-
-    // Create card widgets and store their sizes
-    QList<CardInfoPictureWithTextOverlayWidget *> cardDisplays;
-    for (const auto &info : *cards) {
-        if (info) {
-            CardInfoPictureWithTextOverlayWidget *display =
-                new CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
-            display->setCard(info);
-            cardDisplays.append(display);
-            printings_group_widget->addWidget(display);
-            connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-            connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
-
-    // Calculate the maximum size of the card widgets after they've been added to the layout
-    // adjustCardsPerPage();
-
-    overlap_control_widget->connectOverlapWidget(printings_group_widget);
-    flow_widget->addWidget(printings_group_widget);
-    flow_widget->update();
-
-    update(); // Update the widget display
 }
 
 void VisualDatabaseDisplayWidget::adjustCardsPerPage()
@@ -201,13 +189,13 @@ void VisualDatabaseDisplayWidget::adjustCardsPerPage()
         // Calculate how many cards can fit horizontally and vertically
         cardsPerRow = availableWidth / (cardWidth + overlapMargin);
         rowsPerColumn = availableHeight / (cardHeight + overlapMargin);
-        // qDebug() << "available width " << availableWidth << "available height: " << availableHeight;
-        // qDebug() << "width: " << cardWidth << "height: " << cardHeight << "cardsPerRow: " << cardsPerRow <<
-        // "rowsPerColumn: " << rowsPerColumn;
+        qDebug() << "available width " << availableWidth << "available height: " << availableHeight;
+        qDebug() << "width: " << cardWidth << "height: " << cardHeight << "cardsPerRow: " << cardsPerRow
+                 << "rowsPerColumn: " << rowsPerColumn;
 
         // Update cardsPerPage based on rows and columns
         cardsPerPage = cardsPerRow * rowsPerColumn;
-        // qDebug() << "Adjusted cards per page to:" << cardsPerPage;
+        qDebug() << "Adjusted cards per page to:" << cardsPerPage;
     }
 }
 
@@ -226,7 +214,7 @@ void VisualDatabaseDisplayWidget::databaseDataChanged(QModelIndex topLeft, QMode
 {
     (void)topLeft;
     (void)bottomRight;
-    updateDisplay();
+    qDebug() << "Database Data changed";
 }
 
 void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
@@ -256,28 +244,4 @@ void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
     } else {
         event->accept(); // Accept the event if scrolling is valid
     }
-}
-
-void VisualDatabaseDisplayWidget::setupPaginationControls()
-{
-    QPushButton *prevButton = new QPushButton("Previous", this);
-    QPushButton *nextButton = new QPushButton("Next", this);
-
-    connect(prevButton, &QPushButton::clicked, this, [this]() {
-        if (currentPage > 0) {
-            currentPage--;
-            loadCurrentPage();
-        }
-    });
-
-    connect(nextButton, &QPushButton::clicked, this, [this]() {
-        if ((currentPage + 1) * cardsPerPage < databaseDisplayModel->rowCount()) {
-            currentPage++;
-            loadCurrentPage();
-        }
-    });
-
-    // Add buttons to layout (for example, at the bottom of the main layout)
-    main_layout->addWidget(prevButton);
-    main_layout->addWidget(nextButton);
 }

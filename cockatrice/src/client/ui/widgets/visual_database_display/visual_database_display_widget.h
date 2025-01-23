@@ -40,7 +40,6 @@ protected slots:
     void onHover(CardInfoPtr hoveredCard);
     void databaseDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void wheelEvent(QWheelEvent *event) override;
-    void setupPaginationControls();
     void modelDirty();
 
 private:
