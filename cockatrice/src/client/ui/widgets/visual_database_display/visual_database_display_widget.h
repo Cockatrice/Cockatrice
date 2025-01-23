@@ -6,6 +6,7 @@
 #include "../../../../game/cards/card_database_model.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 
@@ -52,13 +53,14 @@ private:
     QWidget *overlap_categories;
     QVBoxLayout *overlap_categories_layout;
     OverlapControlWidget *overlap_control_widget;
+    CardSizeWidget *cardSizeWidget;
     QWidget *container;
     QTimer *debounce_timer;
 
     bool isAnimating = false;
     int debounce_time = 300;
     int currentPage = 0;  // Current page index
-    int cardsPerPage = 50; // Number of cards per page
+    int cardsPerPage = 200; // Number of cards per page
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

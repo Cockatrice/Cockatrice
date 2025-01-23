@@ -29,8 +29,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     flow_widget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     main_layout->addWidget(flow_widget);
 
-    overlap_control_widget = new OverlapControlWidget(80, 10, 10, Qt::Vertical, flow_widget);
-    main_layout->addWidget(overlap_control_widget);
+    cardSizeWidget = new CardSizeWidget(this, flow_widget);
+    main_layout->addWidget(cardSizeWidget);
 
     debounce_timer = new QTimer(this);
     debounce_timer->setSingleShot(true); // Ensure it only fires once after the timeout
@@ -93,6 +93,8 @@ void VisualDatabaseDisplayWidget::populateCards()
             connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                     SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
             connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display,
+                    &CardInfoPictureWidget::setScaleFactor);
         } else {
             qDebug() << "Card not found in database!";
         }
@@ -135,6 +137,7 @@ void VisualDatabaseDisplayWidget::loadNextPage()
         CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
         if (info) {
             CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, true);
+            display->setScaleFactor(cardSizeWidget->getSlider()->value());
             display->setCard(info);
             flow_widget->addWidget(display);
             connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
