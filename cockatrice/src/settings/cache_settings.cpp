@@ -274,6 +274,9 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
         settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
+    visualDeckStoragePromptForConversion =
+        settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
+    visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -697,6 +700,18 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
     settings->setValue("cards/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
+}
+
+void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)
+{
+    visualDeckStoragePromptForConversion = _visualDeckStoragePromptForConversion;
+    settings->setValue("interface/visualdeckstoragepromptforconversion", visualDeckStoragePromptForConversion);
+}
+
+void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert)
+{
+    visualDeckStorageAlwaysConvert = _visualDeckStorageAlwaysConvert;
+    settings->setValue("interface/visualdeckstoragealwaysconvert", visualDeckStorageAlwaysConvert);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

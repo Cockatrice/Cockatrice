@@ -59,6 +59,7 @@ public:
 
     // overload
     bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true);
+    bool convertToCockatriceFormat(QString fileName);
 
 protected:
     void saveToStream_DeckHeader(QTextStream &out);

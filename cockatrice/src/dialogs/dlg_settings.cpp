@@ -573,6 +573,15 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
 
+    visualDeckStoragePromptForConversionCheckBox.setChecked(
+        SettingsCache::instance().getVisualDeckStoragePromptForConversion());
+    connect(&visualDeckStoragePromptForConversionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStoragePromptForConversion);
+
+    visualDeckStorageAlwaysConvertCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageAlwaysConvert());
+    connect(&visualDeckStorageAlwaysConvertCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageAlwaysConvert);
+
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
@@ -580,6 +589,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&closeEmptyCardViewCheckBox, 3, 0);
     generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
     generalGrid->addWidget(&useTearOffMenusCheckBox, 5, 0);
+    generalGrid->addWidget(&visualDeckStoragePromptForConversionCheckBox, 6, 0);
+    generalGrid->addWidget(&visualDeckStorageAlwaysConvertCheckBox, 7, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -658,6 +669,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
+    visualDeckStoragePromptForConversionCheckBox.setText(tr("Prompt before converting .txt decks to .cod format"));
+    visualDeckStorageAlwaysConvertCheckBox.setText(tr("Always convert if not prompted"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));

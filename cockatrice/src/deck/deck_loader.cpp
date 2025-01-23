@@ -481,6 +481,52 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
     }
 }
 
+bool DeckLoader::convertToCockatriceFormat(QString fileName)
+{
+    // Change the file extension to .cod
+    QFileInfo fileInfo(fileName);
+    QString newFileName = fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod";
+
+    // Open the new file for writing
+    QFile file(newFileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qCWarning(DeckLoaderLog) << "Failed to open file for writing:" << newFileName;
+        return false;
+    }
+
+    bool result = false;
+
+    // Perform file modifications based on the detected format
+    switch (getFormatFromName(fileName)) {
+        case PlainTextFormat:
+            // Save in Cockatrice's native format
+            result = saveToFile_Native(&file);
+            break;
+        case CockatriceFormat:
+            qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
+            result = true;
+            break;
+        default:
+            qCWarning(DeckLoaderLog) << "Unsupported file format for conversion:" << fileName;
+            result = false;
+    }
+
+    file.close();
+
+    // Delete the old file if conversion was successful
+    if (result) {
+        if (!QFile::remove(fileName)) {
+            qCWarning(DeckLoaderLog) << "Failed to delete original file:" << fileName;
+        } else {
+            qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
+        }
+        lastFileName = newFileName;
+        lastFileFormat = CockatriceFormat;
+    }
+
+    return result;
+}
+
 QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneName)
 {
     CardInfoPtr card = CardDatabaseManager::getInstance()->getCard(cardName);

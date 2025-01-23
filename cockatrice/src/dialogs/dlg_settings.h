@@ -142,6 +142,8 @@ private:
     QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
+    QCheckBox visualDeckStoragePromptForConversionCheckBox;
+    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel rewindBufferingMsLabel;
