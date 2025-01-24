@@ -123,7 +123,6 @@ void PictureLoaderWorkerWork::picDownloadFailed()
             << (picDownload ? "download failed" : "downloads disabled")
             << ", no more url combinations to try: BAILING OUT";
         imageLoaded(cardToDownload.getCard(), QImage());
-        cardToDownload.clear();
     }
     emit startLoadQueue();
 }

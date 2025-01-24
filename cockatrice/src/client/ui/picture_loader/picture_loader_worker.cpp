@@ -106,18 +106,26 @@ void PictureLoaderWorker::handleRateLimit(QNetworkReply *reply, const QUrl &url,
 {
     QByteArray responseData = reply->readAll();
     QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+
     if (jsonDoc.isObject()) {
         QJsonObject jsonObj = jsonDoc.object();
         if (jsonObj.value("object").toString() == "error" && jsonObj.value("code").toString() == "rate_limited") {
-            int retryAfter = 70;
+            int retryAfter = 70; // Default retry delay
 
-            // Enable rate-limiting and queue the request
-            rateLimited = true;
-            qWarning() << "Scryfall rate limit hit!";
+            // Prevent multiple rate-limit handling
+            if (!rateLimited) {
+                rateLimited = true;
+                qWarning() << "Scryfall rate limit hit! Queuing requests for" << retryAfter << "seconds.";
+
+                // Start a timer to reset the rate-limited state
+                rateLimitTimer.singleShot(retryAfter * 1000, this, [this]() {
+                    qWarning() << "Rate limit expired. Resuming queued requests.";
+                    processQueuedRequests();
+                });
+            }
+
+            // Always queue the request even if already rate-limited
             requestQueue.append(qMakePair(url, worker));
-
-            // Start a timer to reset rate-limiting
-            rateLimitTimer.singleShot(retryAfter * 1000, this, &PictureLoaderWorker::processQueuedRequests);
         }
     }
 }
