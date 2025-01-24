@@ -54,6 +54,8 @@ private:
     bool rateLimited = false;
     QTimer rateLimitTimer;
     QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
+    QHash<QUrl, QDateTime> lastRequestTime; // Tracks the last request time for each URL
+    QTimer requestTimer;                    // Timer for processing delayed requests
 
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
