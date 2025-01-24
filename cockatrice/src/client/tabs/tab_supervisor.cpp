@@ -504,7 +504,7 @@ void TabSupervisor::actTabDeckStorage(bool checked)
 {
     SettingsCache::instance().setTabDeckStorageOpen(checked);
     if (checked && !tabDeckStorage) {
-        tabDeckStorage = new TabDeckStorage(this, client);
+        tabDeckStorage = new TabDeckStorage(this, client, userInfo);
         connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
         myAddTab(tabDeckStorage, aTabDeckStorage);
         connect(tabDeckStorage, &Tab::closed, this, [this] {
