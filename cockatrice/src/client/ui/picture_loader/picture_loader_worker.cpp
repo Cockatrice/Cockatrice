@@ -5,6 +5,7 @@
 #include "picture_loader_worker_work.h"
 
 #include <QDirIterator>
+#include <QJsonDocument>
 #include <QMovie>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
@@ -60,55 +61,76 @@ PictureLoaderWorker::~PictureLoaderWorker()
 
 QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWorkerWork *worker)
 {
-    // Check if the request leads to a cached redirect
-    QUrl cachedRedirect = getCachedRedirect(url);
-    if (!cachedRedirect.isEmpty()) {
-        qCDebug(PictureLoaderWorkerLog).nospace()
-            << "PictureLoader: [card: " << worker->cardToDownload.getCard()->getCorrectedName()
-            << " set: " << worker->cardToDownload.getSetName() << "]: Using cached redirect for "
-            << url.toDisplayString() << " to " << cachedRedirect.toDisplayString();
-        return makeRequest(cachedRedirect, worker); // Use the cached redirect
+    if (rateLimited) {
+        // Queue the request if currently rate-limited
+        requestQueue.append(qMakePair(url, worker));
+        return nullptr; // No immediate request
     }
 
-    // It's not cached so we actually have to make the request
+    QUrl cachedRedirect = getCachedRedirect(url);
+    if (!cachedRedirect.isEmpty()) {
+        return makeRequest(cachedRedirect, worker);
+    }
 
     QNetworkRequest req(url);
-
-    // If the user requests not to "download card images on the fly", we have to cache this network request
-
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
     }
 
-    // Make the actual network request
-
     QNetworkReply *reply = networkManager->get(req);
-
-    // Connect an additional check to the finished signal to check if the request was redirected and if so, save it to
-    // the redirection cache
 
     connect(reply, &QNetworkReply::finished, this, [this, reply, url, worker]() {
         QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-
         if (redirectTarget.isValid()) {
             QUrl redirectUrl = redirectTarget.toUrl();
             if (redirectUrl.isRelative()) {
                 redirectUrl = url.resolved(redirectUrl);
             }
-
             cacheRedirect(url, redirectUrl);
-            qCDebug(PictureLoaderWorkerLog).nospace()
-                << "PictureLoader: [card: " << worker->cardToDownload.getCard()->getCorrectedName()
-                << " set: " << worker->cardToDownload.getSetName() << "]: Caching redirect from "
-                << url.toDisplayString() << " to " << redirectUrl.toDisplayString();
         }
+
+        if (reply->error() == QNetworkReply::NoError) {
+            worker->picDownloadFinished(reply);
+        } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
+            handleRateLimit(reply, url, worker);
+        } else {
+            worker->picDownloadFinished(reply);
+        }
+        reply->deleteLater();
     });
 
-    connect(
-        reply, &QNetworkReply::finished, worker, [reply, worker]() { worker->picDownloadFinished(reply); },
-        Qt::QueuedConnection);
-
     return reply;
+}
+
+void PictureLoaderWorker::handleRateLimit(QNetworkReply *reply, const QUrl &url, PictureLoaderWorkerWork *worker)
+{
+    QByteArray responseData = reply->readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    if (jsonDoc.isObject()) {
+        QJsonObject jsonObj = jsonDoc.object();
+        if (jsonObj.value("object").toString() == "error" && jsonObj.value("code").toString() == "rate_limited") {
+            int retryAfter = 70;
+
+            // Enable rate-limiting and queue the request
+            rateLimited = true;
+            qWarning() << "Scryfall rate limit hit!";
+            requestQueue.append(qMakePair(url, worker));
+
+            // Start a timer to reset rate-limiting
+            rateLimitTimer.singleShot(retryAfter * 1000, this, &PictureLoaderWorker::processQueuedRequests);
+        }
+    }
+}
+
+void PictureLoaderWorker::processQueuedRequests()
+{
+    qWarning() << "Resuming queued requests";
+    rateLimited = false;
+
+    while (!requestQueue.isEmpty()) {
+        QPair<QUrl, PictureLoaderWorkerWork *> request = requestQueue.takeFirst();
+        makeRequest(request.first, request.second);
+    }
 }
 
 void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
@@ -119,7 +141,7 @@ void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
 
 void PictureLoaderWorker::imageLoadedSuccessfully(CardInfoPtr card, const QImage &image)
 {
-    emit imageLoaded(card, image);
+    emit imageLoaded(std::move(card), image);
 }
 
 void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)

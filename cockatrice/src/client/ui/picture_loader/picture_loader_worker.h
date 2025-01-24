@@ -9,6 +9,7 @@
 #include <QMutex>
 #include <QNetworkAccessManager>
 #include <QObject>
+#include <QTimer>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"
@@ -31,6 +32,8 @@ public:
 
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
+    void handleRateLimit(QNetworkReply *reply, const QUrl &url, PictureLoaderWorkerWork *worker);
+    void processQueuedRequests();
     void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
 
 private:
@@ -48,6 +51,9 @@ private:
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
+    bool rateLimited = false;
+    QTimer rateLimitTimer;
+    QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
 
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
