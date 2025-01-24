@@ -170,6 +170,10 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
         return;
     }
 
+    if (statusCode == 429) {
+        qWarning() << "Scryfall API limit reached!";
+    }
+
     // peek is used to keep the data in the buffer for use by QImageReader
     const QByteArray &picData = reply->peek(reply->size());
 
