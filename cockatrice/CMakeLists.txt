@@ -35,6 +35,7 @@ set(cockatrice_SOURCES
     src/deck/deck_list_model.cpp
     src/deck/deck_stats_interface.cpp
     src/dialogs/dlg_connect.cpp
+    src/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/dialogs/dlg_create_token.cpp
     src/dialogs/dlg_create_game.cpp
     src/dialogs/dlg_edit_avatar.cpp
@@ -169,7 +170,6 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_addition_widget.cpp
-    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_deck_format_conversion_dialog.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp

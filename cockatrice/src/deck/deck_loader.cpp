@@ -6,6 +6,7 @@
 #include "decklist.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
@@ -228,7 +229,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
@@ -485,7 +486,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
 {
     // Change the file extension to .cod
     QFileInfo fileInfo(fileName);
-    QString newFileName = fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod";
+    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
 
     // Open the new file for writing
     QFile file(newFileName);
@@ -509,6 +510,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
         default:
             qCWarning(DeckLoaderLog) << "Unsupported file format for conversion:" << fileName;
             result = false;
+            break;
     }
 
     file.close();

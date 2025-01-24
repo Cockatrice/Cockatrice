@@ -1,7 +1,7 @@
 #include "deck_preview_tag_addition_widget.h"
 
+#include "../../../../../dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../../../settings/cache_settings.h"
-#include "deck_preview_tag_deck_format_conversion_dialog.h"
 #include "deck_preview_tag_dialog.h"
 
 #include <QFontMetrics>
@@ -56,7 +56,7 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
             }
         } else {
             // Show the dialog to the user
-            DeckPreviewTagDeckFormatConversionDialog conversionDialog(parent);
+            DialogConvertDeckToCodFormat conversionDialog(parent);
             if (conversionDialog.exec() == QDialog::Accepted) {
                 parent->deckLoader->convertToCockatriceFormat(parent->parent->filePath);
                 parent->parent->filePath = parent->deckLoader->getLastFileName();
