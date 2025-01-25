@@ -116,7 +116,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
         if (reply->error() == QNetworkReply::NoError) {
             worker->picDownloadFinished(reply);
         } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
-            handleRateLimit(reply, url, worker);
+            handleRateLimit(url, worker);
         } else {
             worker->picDownloadFinished(reply);
         }
@@ -126,32 +126,23 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     return reply;
 }
 
-void PictureLoaderWorker::handleRateLimit(QNetworkReply *reply, const QUrl &url, PictureLoaderWorkerWork *worker)
+void PictureLoaderWorker::handleRateLimit(const QUrl &url, PictureLoaderWorkerWork *worker)
 {
-    QByteArray responseData = reply->readAll();
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    // Prevent multiple rate-limit handling
+    if (!rateLimited) {
+        int retryAfter = 70;
+        rateLimited = true;
+        qWarning() << "Rate limit exceeded! Queuing requests for" << retryAfter << "seconds.";
 
-    if (jsonDoc.isObject()) {
-        QJsonObject jsonObj = jsonDoc.object();
-        if (jsonObj.value("object").toString() == "error" && jsonObj.value("code").toString() == "rate_limited") {
-            int retryAfter = 70; // Default retry delay
-
-            // Prevent multiple rate-limit handling
-            if (!rateLimited) {
-                rateLimited = true;
-                qWarning() << "Scryfall rate limit hit! Queuing requests for" << retryAfter << "seconds.";
-
-                // Start a timer to reset the rate-limited state
-                rateLimitTimer.singleShot(retryAfter * 1000, this, [this]() {
-                    qWarning() << "Rate limit expired. Resuming queued requests.";
-                    processQueuedRequests();
-                });
-            }
-
-            // Always queue the request even if already rate-limited
-            requestQueue.append(qMakePair(url, worker));
-        }
+        // Start a timer to reset the rate-limited state
+        rateLimitTimer.singleShot(retryAfter * 1000, this, [this]() {
+            qWarning() << "Rate limit expired. Resuming queued requests.";
+            processQueuedRequests();
+        });
     }
+
+    // Always queue the request even if already rate-limited
+    requestQueue.append(qMakePair(url, worker));
 }
 
 void PictureLoaderWorker::processQueuedRequests()

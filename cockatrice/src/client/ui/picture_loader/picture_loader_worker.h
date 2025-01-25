@@ -32,7 +32,7 @@ public:
 
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
-    void handleRateLimit(QNetworkReply *reply, const QUrl &url, PictureLoaderWorkerWork *worker);
+    void handleRateLimit(const QUrl &url, PictureLoaderWorkerWork *worker);
     void processQueuedRequests();
     void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
 
