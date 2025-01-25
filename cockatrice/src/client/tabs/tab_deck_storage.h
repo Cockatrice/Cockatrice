@@ -74,7 +74,7 @@ public:
     void retranslateUi() override;
     QString getTabText() const override
     {
-        return tr("Deck storage");
+        return tr("Deck Storage");
     }
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);

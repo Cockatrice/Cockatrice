@@ -24,7 +24,7 @@ public:
     void retranslateUi() override{};
     [[nodiscard]] QString getTabText() const override
     {
-        return tr("Visual Deck storage");
+        return tr("Visual Deck Storage");
     }
 
 public slots:

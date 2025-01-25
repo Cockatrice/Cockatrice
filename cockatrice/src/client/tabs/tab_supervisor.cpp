@@ -176,11 +176,11 @@ void TabSupervisor::retranslateUi()
 {
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
-    aTabVisualDeckStorage->setText(tr("&Visual Deck storage"));
+    aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabServer->setText(tr("Server"));
     aTabAccount->setText(tr("Account"));
-    aTabDeckStorage->setText(tr("Deck storage"));
-    aTabReplays->setText(tr("Game replays"));
+    aTabDeckStorage->setText(tr("Deck Storage"));
+    aTabReplays->setText(tr("Game Replays"));
     aTabAdmin->setText(tr("Administration"));
     aTabLog->setText(tr("Logs"));
 
@@ -456,7 +456,6 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
     if (checked && !tabVisualDeckStorage) {
         tabVisualDeckStorage = new TabDeckStorageVisual(this);
         myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
-        setCurrentWidget(tabVisualDeckStorage);
         connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
             tabVisualDeckStorage = nullptr;
             aTabVisualDeckStorage->setChecked(false);
