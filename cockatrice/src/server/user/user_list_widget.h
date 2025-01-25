@@ -39,7 +39,7 @@ private slots:
     void enableTemporaryEdits(bool enabled);
 
 public:
-    BanDialog(const ServerInfo_User &info, QWidget *parent = nullptr);
+    explicit BanDialog(const ServerInfo_User &info, QWidget *parent = nullptr);
     QString getBanName() const;
     QString getBanIP() const;
     QString getBanId() const;
@@ -90,9 +90,11 @@ public:
 class UserListItemDelegate : public QStyledItemDelegate
 {
 public:
-    UserListItemDelegate(QObject *const parent);
-    bool
-    editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+    explicit UserListItemDelegate(QObject *const parent);
+    bool editorEvent(QEvent *event,
+                     QAbstractItemModel *model,
+                     const QStyleOptionViewItem &option,
+                     const QModelIndex &index) override;
 };
 
 class UserListTWI : public QTreeWidgetItem
@@ -101,14 +103,14 @@ private:
     ServerInfo_User userInfo;
 
 public:
-    UserListTWI(const ServerInfo_User &_userInfo);
+    explicit UserListTWI(const ServerInfo_User &_userInfo);
     const ServerInfo_User &getUserInfo() const
     {
         return userInfo;
     }
     void setUserInfo(const ServerInfo_User &_userInfo);
     void setOnline(bool online);
-    bool operator<(const QTreeWidgetItem &other) const;
+    bool operator<(const QTreeWidgetItem &other) const override;
 };
 
 class UserListWidget : public QGroupBox

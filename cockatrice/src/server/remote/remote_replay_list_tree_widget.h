@@ -24,10 +24,10 @@ private:
         QString name;
 
     public:
-        Node(const QString &_name) : name(_name)
+        explicit Node(const QString &_name) : name(_name)
         {
         }
-        virtual ~Node(){};
+        virtual ~Node() = default;
         QString getName() const
         {
             return name;
@@ -39,8 +39,8 @@ private:
         ServerInfo_ReplayMatch matchInfo;
 
     public:
-        MatchNode(const ServerInfo_ReplayMatch &_matchInfo);
-        ~MatchNode();
+        explicit MatchNode(const ServerInfo_ReplayMatch &_matchInfo);
+        ~MatchNode() override;
         void clearTree();
         const ServerInfo_ReplayMatch &getMatchInfo()
         {
@@ -82,18 +82,18 @@ private slots:
     void replayListFinished(const Response &r);
 
 public:
-    RemoteReplayList_TreeModel(AbstractClient *_client, QObject *parent = nullptr);
-    ~RemoteReplayList_TreeModel();
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const
+    explicit RemoteReplayList_TreeModel(AbstractClient *_client, QObject *parent = nullptr);
+    ~RemoteReplayList_TreeModel() override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override
     {
         return numberOfColumns;
     }
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
     void clearTree();
     void refreshTree();
     ServerInfo_Replay const *getReplay(const QModelIndex &index) const;
@@ -111,7 +111,7 @@ private:
     QSortFilterProxyModel *proxyModel;
 
 public:
-    RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
+    explicit RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
     ServerInfo_Replay const *getReplay(const QModelIndex &ind) const;
     ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &ind) const;
     QList<ServerInfo_Replay const *> getSelectedReplays() const;
