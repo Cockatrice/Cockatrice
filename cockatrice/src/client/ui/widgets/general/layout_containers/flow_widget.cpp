@@ -85,15 +85,6 @@ FlowWidget::FlowWidget(QWidget *parent,
  */
 void FlowWidget::addWidget(QWidget *widget_to_add) const
 {
-    // Adjust size policy if scrollbars are disabled
-    // if (scrollArea->horizontalScrollBarPolicy() == Qt::ScrollBarAlwaysOff) {
-    // widget_to_add->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    //}
-    // if (scrollArea->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOff) {
-    // widget_to_add->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-    //}
-
-    // Add the widget to the flow layout
     flowLayout->addWidget(widget_to_add);
 }
 
@@ -145,7 +136,6 @@ void FlowWidget::resizeEvent(QResizeEvent *event)
         qCDebug(FlowWidgetSizeLog) << "Got a scrollarea: " << scrollArea->widget()->size();
         scrollArea->widget()->adjustSize();
     } else {
-        qCDebug(FlowWidgetSizeLog) << "Rawdogging the container, daddy: " << container->size();
         container->adjustSize();
     }
 }

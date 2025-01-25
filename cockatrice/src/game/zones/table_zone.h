@@ -147,10 +147,10 @@ public:
 
        @param position card position
        @param cardId id of card to take
-       @param canResize defaults to true
+       @param toNewZone Whether the destination of the card is not the same as the starting zone. Defaults to true
        @return CardItem that has been removed
      */
-    CardItem *takeCard(int position, int cardId, bool canResize = true) override;
+    CardItem *takeCard(int position, int cardId, bool toNewZone = true) override;
 
     /**
        Resizes the TableZone in case CardItems are within or

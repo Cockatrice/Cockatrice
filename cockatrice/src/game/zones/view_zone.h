@@ -70,7 +70,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void reorganizeCards() override;
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
-    void removeCard(int position);
+    bool prepareAddCard(int x);
+    void removeCard(int position, bool toNewZone);
     int getNumberCards() const
     {
         return numberCards;

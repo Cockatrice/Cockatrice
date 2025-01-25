@@ -17,7 +17,7 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
 
     deckLoader = new DeckLoader();
     connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
-    deckLoader->loadFromFileAsync(filePath, DeckLoader::CockatriceFormat, false);
+    deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
 
     bannerCardDisplayWidget = new DeckPreviewCardPictureWidget(this);
 
@@ -86,6 +86,12 @@ QString DeckPreviewWidget::getColorIdentity()
 void DeckPreviewWidget::setFilePath(const QString &_filePath)
 {
     filePath = _filePath;
+}
+
+void DeckPreviewWidget::refreshBannerCardText()
+{
+    bannerCardDisplayWidget->setOverlayText(
+        deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

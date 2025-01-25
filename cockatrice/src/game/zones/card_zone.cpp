@@ -141,7 +141,7 @@ void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const
     }
 
     for (auto *view : views) {
-        if (view->getIsReversed() || (x <= view->getCards().size()) || (view->getNumberCards() == -1)) {
+        if (view->prepareAddCard(x)) {
             view->addCard(new CardItem(player, nullptr, card->getName(), card->getProviderId(), card->getId()),
                           reorganize, x, y);
         }
@@ -173,7 +173,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
     return c;
 }
 
-CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
+CardItem *CardZone::takeCard(int position, int cardId, bool toNewZone)
 {
     if (position == -1) {
         // position == -1 means either that the zone is indexed by card id
@@ -190,7 +190,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
         return nullptr;
 
     for (auto *view : views) {
-        view->removeCard(position);
+        view->removeCard(position, toNewZone);
     }
 
     CardItem *c = cards.takeAt(position);

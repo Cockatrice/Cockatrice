@@ -35,6 +35,7 @@ set(cockatrice_SOURCES
     src/deck/deck_list_model.cpp
     src/deck/deck_stats_interface.cpp
     src/dialogs/dlg_connect.cpp
+    src/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/dialogs/dlg_create_token.cpp
     src/dialogs/dlg_create_game.cpp
     src/dialogs/dlg_edit_avatar.cpp
