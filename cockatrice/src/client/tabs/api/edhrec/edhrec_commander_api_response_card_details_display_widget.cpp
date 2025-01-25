@@ -14,7 +14,7 @@ EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCa
     cardPictureWidget->setCard(CardDatabaseManager::getInstance()->getCard(toDisplay.name));
 
     label = new QLabel(this);
-    label->setText(toDisplay.label);
+    label->setText(toDisplay.name + "\n" + toDisplay.label);
     label->setAlignment(Qt::AlignHCenter);
 
     // Set label color based on inclusion rate
