@@ -75,11 +75,11 @@ private:
     // - loadFilterParameters()
     // - saveFilterParameters()
     // - filterAcceptsRow()
-    bool showBuddiesOnlyGames;
+    bool hideBuddiesOnlyGames;
     bool hideIgnoredUserGames;
-    bool showFullGames;
-    bool showGamesThatStarted;
-    bool showPasswordProtectedGames;
+    bool hideFullGames;
+    bool hideGamesThatStarted;
+    bool hidePasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
@@ -90,31 +90,31 @@ private:
 public:
     explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
-    bool getShowBuddiesOnlyGames() const
+    bool getHideBuddiesOnlyGames() const
     {
-        return showBuddiesOnlyGames;
+        return hideBuddiesOnlyGames;
     }
-    void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
+    void setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     bool getHideIgnoredUserGames() const
     {
         return hideIgnoredUserGames;
     }
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
-    bool getShowFullGames() const
+    bool getHideFullGames() const
     {
-        return showFullGames;
+        return hideFullGames;
     }
-    void setShowFullGames(bool _showFullGames);
-    bool getShowGamesThatStarted() const
+    void setHideFullGames(bool _showFullGames);
+    bool getHideGamesThatStarted() const
     {
-        return showGamesThatStarted;
+        return hideGamesThatStarted;
     }
-    void setShowGamesThatStarted(bool _showGamesThatStarted);
-    bool getShowPasswordProtectedGames() const
+    void setHideGamesThatStarted(bool _showGamesThatStarted);
+    bool getHidePasswordProtectedGames() const
     {
-        return showPasswordProtectedGames;
+        return hidePasswordProtectedGames;
     }
-    void setShowPasswordProtectedGames(bool _showPasswordProtectedGames);
+    void setHidePasswordProtectedGames(bool _showPasswordProtectedGames);
     QString getGameNameFilter() const
     {
         return gameNameFilter;

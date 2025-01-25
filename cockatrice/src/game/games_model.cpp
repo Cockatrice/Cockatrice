@@ -26,15 +26,6 @@ enum GameListColumn
     SPECTATORS
 };
 
-const bool DEFAULT_SHOW_FULL_GAMES = false;
-const bool DEFAULT_SHOW_GAMES_THAT_STARTED = false;
-const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
-const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
-const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
-const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_WATCH = false;
-const bool DEFAULT_SHOW_SPECTATOR_PASSWORD_PROTECTED = true;
-const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_CHAT = false;
-const bool DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_SEE_HANDS = false;
 const int DEFAULT_MAX_PLAYERS_MIN = 1;
 const int DEFAULT_MAX_PLAYERS_MAX = 99;
 constexpr QTime DEFAULT_MAX_GAME_AGE = QTime();
@@ -293,9 +284,9 @@ GamesProxyModel::GamesProxyModel(QObject *parent, const UserListProxy *_userList
     setDynamicSortFilter(true);
 }
 
-void GamesProxyModel::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
+void GamesProxyModel::setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames)
 {
-    showBuddiesOnlyGames = _showBuddiesOnlyGames;
+    hideBuddiesOnlyGames = _showBuddiesOnlyGames;
     invalidateFilter();
 }
 
@@ -305,21 +296,21 @@ void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
     invalidateFilter();
 }
 
-void GamesProxyModel::setShowFullGames(bool _showFullGames)
+void GamesProxyModel::setHideFullGames(bool _showFullGames)
 {
-    showFullGames = _showFullGames;
+    hideFullGames = _showFullGames;
     invalidateFilter();
 }
 
-void GamesProxyModel::setShowGamesThatStarted(bool _showGamesThatStarted)
+void GamesProxyModel::setHideGamesThatStarted(bool _showGamesThatStarted)
 {
-    showGamesThatStarted = _showGamesThatStarted;
+    hideGamesThatStarted = _showGamesThatStarted;
     invalidateFilter();
 }
 
-void GamesProxyModel::setShowPasswordProtectedGames(bool _showPasswordProtectedGames)
+void GamesProxyModel::setHidePasswordProtectedGames(bool _showPasswordProtectedGames)
 {
-    showPasswordProtectedGames = _showPasswordProtectedGames;
+    hidePasswordProtectedGames = _showPasswordProtectedGames;
     invalidateFilter();
 }
 
@@ -395,47 +386,43 @@ int GamesProxyModel::getNumFilteredGames() const
 
 void GamesProxyModel::resetFilterParameters()
 {
-    showFullGames = DEFAULT_SHOW_FULL_GAMES;
-    showGamesThatStarted = DEFAULT_SHOW_GAMES_THAT_STARTED;
-    showPasswordProtectedGames = DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES;
-    showBuddiesOnlyGames = DEFAULT_SHOW_BUDDIES_ONLY_GAMES;
-    hideIgnoredUserGames = DEFAULT_HIDE_IGNORED_USER_GAMES;
+    hideFullGames = false;
+    hideGamesThatStarted = false;
+    hidePasswordProtectedGames = false;
+    hideBuddiesOnlyGames = false;
+    hideIgnoredUserGames = false;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
     maxPlayersFilterMin = DEFAULT_MAX_PLAYERS_MIN;
     maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;
     maxGameAge = DEFAULT_MAX_GAME_AGE;
-    showOnlyIfSpectatorsCanWatch = DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_WATCH;
-    showSpectatorPasswordProtected = DEFAULT_SHOW_SPECTATOR_PASSWORD_PROTECTED;
-    showOnlyIfSpectatorsCanChat = DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_CHAT;
-    showOnlyIfSpectatorsCanSeeHands = DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_SEE_HANDS;
+    showOnlyIfSpectatorsCanWatch = false;
+    showSpectatorPasswordProtected = false;
+    showOnlyIfSpectatorsCanChat = false;
+    showOnlyIfSpectatorsCanSeeHands = false;
 
     invalidateFilter();
 }
 
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
 {
-    return showFullGames == DEFAULT_SHOW_FULL_GAMES && showGamesThatStarted == DEFAULT_SHOW_GAMES_THAT_STARTED &&
-           showPasswordProtectedGames == DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES &&
-           showBuddiesOnlyGames == DEFAULT_SHOW_BUDDIES_ONLY_GAMES &&
-           hideIgnoredUserGames == DEFAULT_HIDE_IGNORED_USER_GAMES && gameNameFilter.isEmpty() &&
-           creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
+    return !hideFullGames && !hideGamesThatStarted && !hidePasswordProtectedGames && !hideBuddiesOnlyGames &&
+           !hideIgnoredUserGames && gameNameFilter.isEmpty() && creatorNameFilter.isEmpty() &&
+           gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
            maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX && maxGameAge == DEFAULT_MAX_GAME_AGE &&
-           showOnlyIfSpectatorsCanWatch == DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_WATCH &&
-           showSpectatorPasswordProtected == DEFAULT_SHOW_SPECTATOR_PASSWORD_PROTECTED &&
-           showOnlyIfSpectatorsCanChat == DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_CHAT &&
-           showOnlyIfSpectatorsCanSeeHands == DEFAULT_SHOW_ONLY_IF_SPECTATORS_CAN_SEE_HANDS;
+           !showOnlyIfSpectatorsCanWatch && !showSpectatorPasswordProtected && !showOnlyIfSpectatorsCanChat &&
+           !showOnlyIfSpectatorsCanSeeHands;
 }
 
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
 {
     GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
-    showFullGames = gameFilters.isShowFullGames();
-    showGamesThatStarted = gameFilters.isShowGamesThatStarted();
-    showPasswordProtectedGames = gameFilters.isShowPasswordProtectedGames();
+    hideFullGames = gameFilters.isHideFullGames();
+    hideGamesThatStarted = gameFilters.isHideGamesThatStarted();
+    hidePasswordProtectedGames = gameFilters.isHidePasswordProtectedGames();
     hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
-    showBuddiesOnlyGames = gameFilters.isShowBuddiesOnlyGames();
+    hideBuddiesOnlyGames = gameFilters.isHideBuddiesOnlyGames();
     gameNameFilter = gameFilters.getGameNameFilter();
     creatorNameFilter = gameFilters.getCreatorNameFilter();
     maxPlayersFilterMin = gameFilters.getMinPlayers();
@@ -460,10 +447,10 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
 void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
 {
     GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
-    gameFilters.setShowBuddiesOnlyGames(showBuddiesOnlyGames);
-    gameFilters.setShowFullGames(showFullGames);
-    gameFilters.setShowGamesThatStarted(showGamesThatStarted);
-    gameFilters.setShowPasswordProtectedGames(showPasswordProtectedGames);
+    gameFilters.setHideBuddiesOnlyGames(hideBuddiesOnlyGames);
+    gameFilters.setHideFullGames(hideFullGames);
+    gameFilters.setHideGamesThatStarted(hideGamesThatStarted);
+    gameFilters.setHidePasswordProtectedGames(hidePasswordProtectedGames);
     gameFilters.setHideIgnoredUserGames(hideIgnoredUserGames);
     gameFilters.setGameNameFilter(gameNameFilter);
     gameFilters.setCreatorNameFilter(creatorNameFilter);
@@ -505,20 +492,20 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 
     const ServerInfo_Game &game = model->getGame(sourceRow);
 
-    if (!showBuddiesOnlyGames && game.only_buddies()) {
+    if (hideBuddiesOnlyGames && game.only_buddies()) {
         return false;
     }
     if (hideIgnoredUserGames && userListProxy->isUserIgnored(QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
-    if (!showFullGames && game.player_count() == game.max_players())
+    if (hideFullGames && game.player_count() == game.max_players())
         return false;
-    if (!showGamesThatStarted && game.started())
+    if (hideGamesThatStarted && game.started())
         return false;
     if (!userListProxy->isOwnUserRegistered())
         if (game.only_registered())
             return false;
-    if (!showPasswordProtectedGames && game.with_password())
+    if (hidePasswordProtectedGames && game.with_password())
         return false;
     if (!gameNameFilter.isEmpty())
         if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))
