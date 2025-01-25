@@ -280,6 +280,7 @@ void TabSupervisor::initStartupTabs()
 
     checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
     checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
+    checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
 }
 
 /**
@@ -336,6 +337,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
     tabsMenu->addAction(aTabDeckStorage);
+    tabsMenu->addAction(aTabReplays);
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -356,12 +358,6 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
     updatePingTime(0, -1);
 
-    if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
-        tabsMenu->addAction(aTabReplays);
-
-        checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
-    }
-
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
         tabsMenu->addSeparator();
         tabsMenu->addAction(aTabAdmin);
@@ -379,7 +375,6 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     resetTabsMenu();
 
     tabAccount = nullptr;
-    tabReplays = nullptr;
     tabAdmin = nullptr;
     tabLog = nullptr;
     isLocalGame = true;
@@ -414,9 +409,6 @@ void TabSupervisor::stop()
         }
         if (tabServer) {
             tabServer->closeRequest(true);
-        }
-        if (tabReplays) {
-            tabReplays->closeRequest(true);
         }
         if (tabAdmin) {
             tabAdmin->closeRequest(true);
@@ -520,7 +512,7 @@ void TabSupervisor::actTabReplays(bool checked)
 {
     SettingsCache::instance().setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
-        tabReplays = new TabReplays(this, client);
+        tabReplays = new TabReplays(this, client, userInfo);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
         myAddTab(tabReplays, aTabReplays);
         connect(tabReplays, &Tab::closed, this, [this] {
