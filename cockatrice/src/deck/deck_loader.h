@@ -29,8 +29,8 @@ private:
 
 public:
     DeckLoader();
-    DeckLoader(const QString &nativeString);
-    DeckLoader(const DeckList &other);
+    explicit DeckLoader(const QString &nativeString);
+    explicit DeckLoader(const DeckList &other);
     DeckLoader(const DeckLoader &other);
     const QString &getLastFileName() const
     {
