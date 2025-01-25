@@ -293,9 +293,11 @@ void GameSelector::joinGame(const bool isSpectator)
         return;
     }
 
+    bool spectator = isSpectator || game.player_count() == game.max_players();
+
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
-    if (game.with_password() && !(isSpectator && !game.spectators_need_password()) && !overrideRestrictions) {
+    if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
         password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
         if (!ok) {
@@ -306,7 +308,7 @@ void GameSelector::joinGame(const bool isSpectator)
     Command_JoinGame cmd;
     cmd.set_game_id(game.game_id());
     cmd.set_password(password.toStdString());
-    cmd.set_spectator(isSpectator || game.player_count() == game.max_players());
+    cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
     cmd.set_join_as_judge((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
 
