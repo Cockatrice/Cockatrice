@@ -26,14 +26,14 @@ protected:
     Server *server;
 
 public:
-    Server_AbstractUserInterface(Server *_server) : server(_server)
+    explicit Server_AbstractUserInterface(Server *_server) : server(_server)
     {
     }
     Server_AbstractUserInterface(Server *_server, const ServerInfo_User_Container &other)
         : ServerInfo_User_Container(other), server(_server)
     {
     }
-    virtual ~Server_AbstractUserInterface()
+    ~Server_AbstractUserInterface() override
     {
     }
 

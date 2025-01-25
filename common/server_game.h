@@ -108,7 +108,7 @@ public:
                 bool _spectatorsSeeEverything,
                 int startingLifeTotal,
                 Server_Room *parent);
-    ~Server_Game();
+    ~Server_Game() override;
     Server_Room *getRoom() const
     {
         return room;

@@ -8,7 +8,7 @@ class RNG_Abstract : public QObject
 {
     Q_OBJECT
 public:
-    RNG_Abstract(QObject *parent = 0) : QObject(parent)
+    explicit RNG_Abstract(QObject *parent = nullptr) : QObject(parent)
     {
     }
     virtual unsigned int rand(int min, int max) = 0;
