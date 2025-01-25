@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(32);
+INSERT INTO cockatrice_schema_version VALUES(33);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -258,6 +258,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_user_analytics` (
   `last_login` datetime NOT NULL,
   `notes` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
+  INDEX `idx_last_login` (`last_login`),
   FOREIGN KEY(`id`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
