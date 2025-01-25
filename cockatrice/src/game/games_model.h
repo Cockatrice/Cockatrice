@@ -75,11 +75,11 @@ private:
     // - loadFilterParameters()
     // - saveFilterParameters()
     // - filterAcceptsRow()
-    bool showBuddiesOnlyGames;
+    bool hideBuddiesOnlyGames;
     bool hideIgnoredUserGames;
-    bool showFullGames;
-    bool showGamesThatStarted;
-    bool showPasswordProtectedGames;
+    bool hideFullGames;
+    bool hideGamesThatStarted;
+    bool hidePasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
@@ -92,7 +92,7 @@ public:
 
     bool getShowBuddiesOnlyGames() const
     {
-        return showBuddiesOnlyGames;
+        return hideBuddiesOnlyGames;
     }
     void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     bool getHideIgnoredUserGames() const
@@ -102,17 +102,17 @@ public:
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
     bool getShowFullGames() const
     {
-        return showFullGames;
+        return hideFullGames;
     }
     void setShowFullGames(bool _showFullGames);
     bool getShowGamesThatStarted() const
     {
-        return showGamesThatStarted;
+        return hideGamesThatStarted;
     }
     void setShowGamesThatStarted(bool _showGamesThatStarted);
     bool getShowPasswordProtectedGames() const
     {
-        return showPasswordProtectedGames;
+        return hidePasswordProtectedGames;
     }
     void setShowPasswordProtectedGames(bool _showPasswordProtectedGames);
     QString getGameNameFilter() const

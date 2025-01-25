@@ -24,19 +24,19 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                   {QTime(1, 0), tr("1 hour")},
                   {QTime(2, 0), tr("2 hours")}})
 {
-    showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
+    showBuddiesOnlyGames = new QCheckBox(tr("Hide 'buddies only' games"));
     showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
 
-    showFullGames = new QCheckBox(tr("Show &full games"));
+    showFullGames = new QCheckBox(tr("Hide full games"));
     showFullGames->setChecked(gamesProxyModel->getShowFullGames());
 
-    showGamesThatStarted = new QCheckBox(tr("Show games &that have started"));
+    showGamesThatStarted = new QCheckBox(tr("Hide games that have started"));
     showGamesThatStarted->setChecked(gamesProxyModel->getShowGamesThatStarted());
 
-    showPasswordProtectedGames = new QCheckBox(tr("Show &password protected games"));
+    showPasswordProtectedGames = new QCheckBox(tr("Hide password protected games"));
     showPasswordProtectedGames->setChecked(gamesProxyModel->getShowPasswordProtectedGames());
 
-    hideIgnoredUserGames = new QCheckBox(tr("Hide '&ignored user' games"));
+    hideIgnoredUserGames = new QCheckBox(tr("Hide 'ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
     maxGameAgeComboBox = new QComboBox();
