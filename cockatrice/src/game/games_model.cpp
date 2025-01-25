@@ -284,7 +284,7 @@ GamesProxyModel::GamesProxyModel(QObject *parent, const UserListProxy *_userList
     setDynamicSortFilter(true);
 }
 
-void GamesProxyModel::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
+void GamesProxyModel::setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames)
 {
     hideBuddiesOnlyGames = _showBuddiesOnlyGames;
     invalidateFilter();
@@ -296,19 +296,19 @@ void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
     invalidateFilter();
 }
 
-void GamesProxyModel::setShowFullGames(bool _showFullGames)
+void GamesProxyModel::setHideFullGames(bool _showFullGames)
 {
     hideFullGames = _showFullGames;
     invalidateFilter();
 }
 
-void GamesProxyModel::setShowGamesThatStarted(bool _showGamesThatStarted)
+void GamesProxyModel::setHideGamesThatStarted(bool _showGamesThatStarted)
 {
     hideGamesThatStarted = _showGamesThatStarted;
     invalidateFilter();
 }
 
-void GamesProxyModel::setShowPasswordProtectedGames(bool _showPasswordProtectedGames)
+void GamesProxyModel::setHidePasswordProtectedGames(bool _showPasswordProtectedGames)
 {
     hidePasswordProtectedGames = _showPasswordProtectedGames;
     invalidateFilter();

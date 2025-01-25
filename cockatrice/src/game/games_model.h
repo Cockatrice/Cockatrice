@@ -90,31 +90,31 @@ private:
 public:
     explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
-    bool getShowBuddiesOnlyGames() const
+    bool getHideBuddiesOnlyGames() const
     {
         return hideBuddiesOnlyGames;
     }
-    void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
+    void setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     bool getHideIgnoredUserGames() const
     {
         return hideIgnoredUserGames;
     }
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
-    bool getShowFullGames() const
+    bool getHideFullGames() const
     {
         return hideFullGames;
     }
-    void setShowFullGames(bool _showFullGames);
-    bool getShowGamesThatStarted() const
+    void setHideFullGames(bool _showFullGames);
+    bool getHideGamesThatStarted() const
     {
         return hideGamesThatStarted;
     }
-    void setShowGamesThatStarted(bool _showGamesThatStarted);
-    bool getShowPasswordProtectedGames() const
+    void setHideGamesThatStarted(bool _showGamesThatStarted);
+    bool getHidePasswordProtectedGames() const
     {
         return hidePasswordProtectedGames;
     }
-    void setShowPasswordProtectedGames(bool _showPasswordProtectedGames);
+    void setHidePasswordProtectedGames(bool _showPasswordProtectedGames);
     QString getGameNameFilter() const
     {
         return gameNameFilter;
