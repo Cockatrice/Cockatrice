@@ -20,7 +20,7 @@ VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckSto
 
     setFixedHeight(100);
 
-    auto *flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    auto *flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     layout->addWidget(flowWidget);
 }

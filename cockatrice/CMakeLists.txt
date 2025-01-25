@@ -63,8 +63,6 @@ set(cockatrice_SOURCES
     src/game/filters/filter_tree.cpp
     src/game/filters/filter_tree_model.cpp
     src/client/ui/layouts/flow_layout.cpp
-    src/client/ui/layouts/horizontal_flow_layout.cpp
-    src/client/ui/layouts/vertical_flow_layout.cpp
     src/client/ui/widgets/general/layout_containers/flow_widget.cpp
     src/game/game_scene.cpp
     src/game/game_selector.cpp
