@@ -1,5 +1,7 @@
 #include "deck_preview_tag_addition_widget.h"
 
+#include "../../../../../dialogs/dlg_convert_deck_to_cod_format.h"
+#include "../../../../../settings/cache_settings.h"
 #include "deck_preview_tag_dialog.h"
 
 #include <QFontMetrics>
@@ -40,11 +42,50 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
     QStringList knownTags = parent->parent->parent->gatherAllTagsFromFlowWidget();
     QStringList activeTags = parent->deckLoader->getTags();
 
-    DeckPreviewTagDialog dialog(knownTags, activeTags);
-    if (dialog.exec() == QDialog::Accepted) {
-        QStringList updatedTags = dialog.getActiveTags();
-        parent->deckLoader->setTags(updatedTags);
-        parent->deckLoader->saveToFile(parent->parent->filePath, DeckLoader::CockatriceFormat);
+    bool canAddTags = true;
+
+    if (parent->deckLoader->getLastFileFormat() != DeckLoader::CockatriceFormat) {
+        canAddTags = false;
+        // Retrieve saved preference if the prompt is disabled
+        if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+            if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+                parent->deckLoader->convertToCockatriceFormat(parent->parent->filePath);
+                parent->parent->filePath = parent->deckLoader->getLastFileName();
+                parent->parent->refreshBannerCardText();
+                canAddTags = true;
+            }
+        } else {
+            // Show the dialog to the user
+            DialogConvertDeckToCodFormat conversionDialog(parent);
+            if (conversionDialog.exec() == QDialog::Accepted) {
+                parent->deckLoader->convertToCockatriceFormat(parent->parent->filePath);
+                parent->parent->filePath = parent->deckLoader->getLastFileName();
+                parent->parent->refreshBannerCardText();
+                canAddTags = true;
+
+                if (conversionDialog.dontAskAgain()) {
+                    SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
+                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Checked);
+                }
+            } else {
+                SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Unchecked);
+
+                if (conversionDialog.dontAskAgain()) {
+                    SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
+                } else {
+                    SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Checked);
+                }
+            }
+        }
+    }
+
+    if (canAddTags) {
+        DeckPreviewTagDialog dialog(knownTags, activeTags);
+        if (dialog.exec() == QDialog::Accepted) {
+            QStringList updatedTags = dialog.getActiveTags();
+            parent->deckLoader->setTags(updatedTags);
+            parent->deckLoader->saveToFile(parent->parent->filePath, DeckLoader::CockatriceFormat);
+        }
     }
 }
 

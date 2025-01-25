@@ -33,6 +33,7 @@ signals:
 
 public slots:
     void setFilePath(const QString &filePath);
+    void refreshBannerCardText();
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
