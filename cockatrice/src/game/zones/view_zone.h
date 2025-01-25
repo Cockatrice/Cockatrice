@@ -71,7 +71,7 @@ public:
     void reorganizeCards() override;
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
     bool prepareAddCard(int x);
-    void removeCard(int position);
+    void removeCard(int position, bool toNewZone);
     int getNumberCards() const
     {
         return numberCards;
