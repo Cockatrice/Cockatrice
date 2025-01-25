@@ -13,7 +13,7 @@ class DlgForgotPasswordChallenge : public QDialog
 {
     Q_OBJECT
 public:
-    DlgForgotPasswordChallenge(QWidget *parent = nullptr);
+    explicit DlgForgotPasswordChallenge(QWidget *parent = nullptr);
     QString getHost() const
     {
         return hostEdit->text();
