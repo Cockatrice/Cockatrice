@@ -151,6 +151,9 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
         disconnect(info.data(), nullptr, this, nullptr);
     }
 
+    if (viewTransformationButton) {
+        viewTransformationButton->setVisible(false);
+    }
     info = std::move(card);
 
     if (info) {

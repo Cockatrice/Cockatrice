@@ -81,6 +81,7 @@ set(cockatrice_SOURCES
     src/utility/logger.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
+    src/client/ui/widgets/general/display/banner_widget.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
@@ -149,6 +150,19 @@ set(cockatrice_SOURCES
     src/client/tabs/tab_room.cpp
     src/client/tabs/tab_server.cpp
     src/client/tabs/tab_supervisor.cpp
+    src/client/tabs/api/edhrec/tab_edhrec.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_card_details_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_card_list_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_commander_details_display_widget.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_archidekt_links.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_average_deck_statistics.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_details.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_list.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_container.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_prices.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_commander_details.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response.cpp
     src/game/zones/table_zone.cpp
     src/client/tapped_out_interface.cpp
     src/client/ui/theme_manager.cpp

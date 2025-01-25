@@ -3,6 +3,7 @@
 
 #include "../../deck/deck_loader.h"
 #include "../../server/user/user_list_proxy.h"
+#include "api/edhrec/tab_edhrec.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
@@ -131,6 +132,10 @@ public:
     {
         return roomTabs;
     }
+    QList<TabDeckEditor *> getDeckEditorTabs() const
+    {
+        return deckEditorTabs;
+    }
     bool getAdminLocked() const;
     bool closeRequest();
     bool switchToGameTabIfAlreadyExists(const int gameId);
@@ -143,6 +148,7 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:

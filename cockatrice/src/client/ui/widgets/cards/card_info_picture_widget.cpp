@@ -3,7 +3,10 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
+#include "../../../tabs/tab_deck_editor.h"
+#include "../../../tabs/tab_supervisor.h"
 #include "../../picture_loader/picture_loader.h"
+#include "../../window_main.h"
 
 #include <QMenu>
 #include <QMouseEvent>
@@ -254,7 +257,31 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
     }
 
     auto viewRelatedCards = new QMenu(tr("View related cards"));
+    auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
     cardMenu->addMenu(viewRelatedCards);
+    cardMenu->addMenu(addToOpenDeckMenu);
+
+    auto *mainWindow = qobject_cast<MainWindow *>(window());
+    QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
+
+    for (auto &deckEditorTab : deckEditorTabs) {
+        auto *addCardMenu = new QMenu(tr("Add card to") + " " + deckEditorTab->getTabText());
+        QAction *addCard = new QAction(this);
+        addCard->setText(tr("Mainboard"));
+        connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
+            deckEditorTab->updateCardInfo(info);
+            deckEditorTab->addCardHelper(info, DECK_ZONE_MAIN);
+        });
+        QAction *addCardSideboard = new QAction(this);
+        addCardSideboard->setText(tr("Sideboard"));
+        connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
+            deckEditorTab->updateCardInfo(info);
+            deckEditorTab->addCardHelper(info, DECK_ZONE_SIDE);
+        });
+        addCardMenu->addAction(addCard);
+        addCardMenu->addAction(addCardSideboard);
+        addToOpenDeckMenu->addMenu(addCardMenu);
+    }
 
     bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = info->getAllRelatedCards();

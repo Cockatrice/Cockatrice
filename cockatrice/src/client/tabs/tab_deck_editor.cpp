@@ -51,6 +51,13 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+static bool canBeCommander(const CardInfoPtr &cardInfo)
+{
+    return ((cardInfo->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
+             cardInfo->getCardType().contains("Creature", Qt::CaseInsensitive))) ||
+           cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
+}
+
 void TabDeckEditor::createDeckDock()
 {
     deckModel = new DeckListModel(this);
@@ -540,31 +547,40 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     QMenu menu;
     const CardInfoPtr info = currentCardInfo();
 
-    // add to deck and sideboard options
-    QAction *addToDeck, *addToSideboard, *selectPrinting;
-    addToDeck = menu.addAction(tr("Add to Deck"));
-    addToSideboard = menu.addAction(tr("Add to Sideboard"));
-    selectPrinting = menu.addAction(tr("Select Printing"));
-
-    connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
-    connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-    connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
-
-    // filling out the related cards submenu
-    auto *relatedMenu = new QMenu(tr("Show Related cards"));
-    menu.addMenu(relatedMenu);
-    auto relatedCards = info->getAllRelatedCards();
-    if (relatedCards.isEmpty()) {
-        relatedMenu->setDisabled(true);
-    } else {
-        for (const CardRelation *rel : relatedCards) {
-            const QString &relatedCardName = rel->getName();
-            QAction *relatedCard = relatedMenu->addAction(relatedCardName);
-            connect(relatedCard, &QAction::triggered, cardInfo,
-                    [this, relatedCardName] { cardInfo->setCard(relatedCardName); });
+    if (info) {
+        // add to deck and sideboard options
+        QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
+        addToDeck = menu.addAction(tr("Add to Deck"));
+        addToSideboard = menu.addAction(tr("Add to Sideboard"));
+        selectPrinting = menu.addAction(tr("Select Printing"));
+        if (canBeCommander(info)) {
+            edhRecCommander = menu.addAction(tr("Show on EDHREC (Commander)"));
+            connect(edhRecCommander, &QAction::triggered, this,
+                    [this, info] { this->tabSupervisor->addEdhrecTab(info, true); });
         }
+        edhRecCard = menu.addAction(tr("Show on EDHREC (Card)"));
+
+        connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
+        connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
+        connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
+        connect(edhRecCard, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
+
+        // filling out the related cards submenu
+        auto *relatedMenu = new QMenu(tr("Show Related cards"));
+        menu.addMenu(relatedMenu);
+        auto relatedCards = info->getAllRelatedCards();
+        if (relatedCards.isEmpty()) {
+            relatedMenu->setDisabled(true);
+        } else {
+            for (const CardRelation *rel : relatedCards) {
+                const QString &relatedCardName = rel->getName();
+                QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+                connect(relatedCard, &QAction::triggered, cardInfo,
+                        [this, relatedCardName] { cardInfo->setCard(relatedCardName); });
+            }
+        }
+        menu.exec(databaseView->mapToGlobal(point));
     }
-    menu.exec(databaseView->mapToGlobal(point));
 }
 
 void TabDeckEditor::decklistCustomMenu(QPoint point)
@@ -1383,9 +1399,8 @@ QModelIndexList TabDeckEditor::getSelectedCardNodes() const
     return selectedRows;
 }
 
-void TabDeckEditor::addCardHelper(QString zoneName)
+void TabDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
 {
-    const CardInfoPtr info = currentCardInfo();
     if (!info)
         return;
     if (info->getIsToken())
@@ -1461,13 +1476,13 @@ void TabDeckEditor::actAddCard()
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard();
     else
-        addCardHelper(DECK_ZONE_MAIN);
+        addCardHelper(currentCardInfo(), DECK_ZONE_MAIN);
     setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
 {
-    addCardHelper(DECK_ZONE_SIDE);
+    addCardHelper(currentCardInfo(), DECK_ZONE_SIDE);
     setSaveStatus(true);
 }
 

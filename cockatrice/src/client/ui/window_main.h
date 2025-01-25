@@ -163,6 +163,11 @@ public:
     }
     ~MainWindow() override;
 
+    TabSupervisor *getTabSupervisor() const
+    {
+        return tabSupervisor;
+    }
+
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent *event) override;

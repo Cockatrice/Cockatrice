@@ -123,6 +123,8 @@ void FlowWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
+    qCDebug(FlowWidgetSizeLog) << event->size();
+
     // Trigger the layout to recalculate
     if (flowLayout != nullptr) {
         flowLayout->invalidate(); // Marks the layout as dirty and requires recalculation
@@ -131,6 +133,7 @@ void FlowWidget::resizeEvent(QResizeEvent *event)
 
     // Ensure the scroll area and its content adjust correctly
     if (scrollArea != nullptr && scrollArea->widget() != nullptr) {
+        qCDebug(FlowWidgetSizeLog) << "Got a scrollarea: " << scrollArea->widget()->size();
         scrollArea->widget()->adjustSize();
     } else {
         container->adjustSize();
