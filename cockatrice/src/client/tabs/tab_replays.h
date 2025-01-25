@@ -69,7 +69,7 @@ public:
     void retranslateUi() override;
     QString getTabText() const override
     {
-        return tr("Game replays");
+        return tr("Game Replays");
     }
 };
 
