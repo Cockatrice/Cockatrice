@@ -36,8 +36,8 @@ private:
     unsigned int cdf(unsigned int min, unsigned int max);
 
 public:
-    RNG_SFMT(QObject *parent = 0);
-    unsigned int rand(int min, int max);
+    explicit RNG_SFMT(QObject *parent = nullptr);
+    unsigned int rand(int min, int max) override;
 };
 
 #endif
