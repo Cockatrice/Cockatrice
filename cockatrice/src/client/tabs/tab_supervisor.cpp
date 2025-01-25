@@ -512,7 +512,7 @@ void TabSupervisor::actTabReplays(bool checked)
 {
     SettingsCache::instance().setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
-        tabReplays = new TabReplays(this, client);
+        tabReplays = new TabReplays(this, client, userInfo);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
         myAddTab(tabReplays, aTabReplays);
         connect(tabReplays, &Tab::closed, this, [this] {

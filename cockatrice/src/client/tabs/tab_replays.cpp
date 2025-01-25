@@ -27,7 +27,8 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
+TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
+    : Tab(_tabSupervisor), client(_client)
 {
     localDirModel = new QFileSystemModel(this);
     localDirModel->setRootPath(SettingsCache::instance().getReplaysPath());
@@ -147,6 +148,10 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
 
     connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this,
             SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
+
+    connect(client, &AbstractClient::userInfoChanged, this, &TabReplays::handleConnected);
+    connect(client, &AbstractClient::statusChanged, this, &TabReplays::handleConnectionChanged);
+    setRemoteEnabled(currentUserInfo && currentUserInfo->user_level() & ServerInfo_User::IsRegistered);
 }
 
 void TabReplays::retranslateUi()
@@ -163,6 +168,35 @@ void TabReplays::retranslateUi()
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
     aDeleteRemoteReplay->setText(tr("Delete"));
+}
+
+void TabReplays::handleConnected(const ServerInfo_User &userInfo)
+{
+    setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
+}
+
+/**
+ * This is only responsible for handling the disconnect. The connect is already handled elsewhere
+ */
+void TabReplays::handleConnectionChanged(ClientStatus status)
+{
+    if (status == StatusDisconnected) {
+        setRemoteEnabled(false);
+    }
+}
+
+void TabReplays::setRemoteEnabled(bool enabled)
+{
+    aOpenRemoteReplay->setEnabled(enabled);
+    aDownload->setEnabled(enabled);
+    aKeep->setEnabled(enabled);
+    aDeleteRemoteReplay->setEnabled(enabled);
+
+    if (enabled) {
+        serverDirView->refreshTree();
+    } else {
+        serverDirView->clearTree();
+    }
 }
 
 void TabReplays::actLocalDoubleClick(const QModelIndex &curLeft)
