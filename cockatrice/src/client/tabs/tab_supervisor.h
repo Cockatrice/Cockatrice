@@ -148,7 +148,7 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
-    TabEdhRec *addEdhrecTab(const CardInfoPtr& cardToQuery, bool isCommander = false);
+    TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
