@@ -13,7 +13,7 @@ class DlgForgotPasswordReset : public QDialog
 {
     Q_OBJECT
 public:
-    DlgForgotPasswordReset(QWidget *parent = nullptr);
+    explicit DlgForgotPasswordReset(QWidget *parent = nullptr);
     QString getHost() const
     {
         return hostEdit->text();

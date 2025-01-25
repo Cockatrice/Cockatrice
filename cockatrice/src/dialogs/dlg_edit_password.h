@@ -13,7 +13,7 @@ class DlgEditPassword : public QDialog
 {
     Q_OBJECT
 public:
-    DlgEditPassword(QWidget *parent = nullptr);
+    explicit DlgEditPassword(QWidget *parent = nullptr);
     QString getOldPassword() const
     {
         return oldPasswordEdit->text();

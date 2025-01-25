@@ -51,8 +51,8 @@ private:
     };
 
 public:
-    WndSets(QWidget *parent = nullptr);
-    ~WndSets();
+    explicit WndSets(QWidget *parent = nullptr);
+    ~WndSets() override;
 
 protected:
     void selectRows(QSet<int> rows);

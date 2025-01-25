@@ -16,7 +16,7 @@ class DlgUpdate : public QDialog
 {
     Q_OBJECT
 public:
-    DlgUpdate(QWidget *parent);
+    explicit DlgUpdate(QWidget *parent);
 
 private slots:
     void finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release);
