@@ -106,6 +106,7 @@ public:
     DirectoryNode *addNamedFolderToTree(const QString &name, DirectoryNode *parent);
     void removeNode(Node *node);
     void refreshTree();
+    void clearTree();
 };
 
 class RemoteDeckList_TreeWidget : public QTreeView
@@ -127,6 +128,7 @@ public:
     void addFolderToTree(const QString &name, RemoteDeckList_TreeModel::DirectoryNode *parent);
     void removeNode(RemoteDeckList_TreeModel::Node *node);
     void refreshTree();
+    void clearTree();
 };
 
 #endif

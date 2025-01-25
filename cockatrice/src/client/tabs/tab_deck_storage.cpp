@@ -4,7 +4,6 @@
 #include "../../server/pending_command.h"
 #include "../../server/remote/remote_decklist_tree_widget.h"
 #include "../../settings/cache_settings.h"
-#include "../game_logic/abstract_client.h"
 #include "../get_text_with_max.h"
 #include "decklist.h"
 #include "pb/command_deck_del.pb.h"
@@ -31,7 +30,9 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client)
+TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
+                               AbstractClient *_client,
+                               const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)
 {
     localDirModel = new QFileSystemModel(this);
@@ -151,6 +152,10 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
+
+    connect(client, &AbstractClient::userInfoChanged, this, &TabDeckStorage::handleConnected);
+    connect(client, &AbstractClient::statusChanged, this, &TabDeckStorage::handleConnectionChanged);
+    setRemoteEnabled(currentUserInfo && currentUserInfo->user_level() & ServerInfo_User::IsRegistered);
 }
 
 void TabDeckStorage::retranslateUi()
@@ -184,6 +189,36 @@ QString TabDeckStorage::getTargetPath() const
         }
     } else {
         return dir->getPath();
+    }
+}
+
+void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
+{
+    setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
+}
+
+/**
+ * This is only responsible for handling the disconnect. The connect is already handled elsewhere
+ */
+void TabDeckStorage::handleConnectionChanged(ClientStatus status)
+{
+    if (status == StatusDisconnected) {
+        setRemoteEnabled(false);
+    }
+}
+
+void TabDeckStorage::setRemoteEnabled(bool enabled)
+{
+    aUpload->setEnabled(enabled);
+    aOpenRemoteDeck->setEnabled(enabled);
+    aDownload->setEnabled(enabled);
+    aNewFolder->setEnabled(enabled);
+    aDeleteRemoteDeck->setEnabled(enabled);
+
+    if (enabled) {
+        serverDirView->refreshTree();
+    } else {
+        serverDirView->clearTree();
     }
 }
 
