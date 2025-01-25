@@ -18,7 +18,7 @@ private:
     int ticks;
 
 public:
-    PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
+    explicit PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
     CommandContainer &getCommandContainer();
     void setExtraData(const QVariant &_extraData);
     QVariant getExtraData() const;

@@ -10,17 +10,17 @@ class LocalServerInterface : public Server_ProtocolHandler
     Q_OBJECT
 public:
     LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface);
-    ~LocalServerInterface();
+    ~LocalServerInterface() override;
 
-    QString getAddress() const
+    QString getAddress() const override
     {
         return QString();
     }
-    QString getConnectionType() const
+    QString getConnectionType() const override
     {
         return "local";
     };
-    void transmitProtocolItem(const ServerMessage &item);
+    void transmitProtocolItem(const ServerMessage &item) override;
 signals:
     void itemToClient(const ServerMessage &item);
 public slots:

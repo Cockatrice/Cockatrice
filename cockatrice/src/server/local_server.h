@@ -10,8 +10,8 @@ class LocalServer : public Server
 {
     Q_OBJECT
 public:
-    LocalServer(QObject *parent = nullptr);
-    ~LocalServer();
+    explicit LocalServer(QObject *parent = nullptr);
+    ~LocalServer() override;
 
     LocalServerInterface *newConnection();
 };
@@ -23,27 +23,27 @@ private:
     LocalServer *localServer;
 
 protected:
-    ServerInfo_User getUserData(const QString &name, bool withId = false);
+    ServerInfo_User getUserData(const QString &name, bool withId = false) override;
 
 public:
-    LocalServer_DatabaseInterface(LocalServer *_localServer);
-    ~LocalServer_DatabaseInterface() = default;
+    explicit LocalServer_DatabaseInterface(LocalServer *_localServer);
+    ~LocalServer_DatabaseInterface() override = default;
     AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler,
                                            const QString &user,
                                            const QString &password,
                                            const QString &clientId,
                                            QString &reasonStr,
                                            int &secondsLeft,
-                                           bool passwordNeedsHash);
-    int getNextGameId()
+                                           bool passwordNeedsHash) override;
+    int getNextGameId() override
     {
         return localServer->getNextLocalGameId();
     }
-    int getNextReplayId()
+    int getNextReplayId() override
     {
         return -1;
     }
-    int getActiveUserCount(QString /* connectionType */)
+    int getActiveUserCount(QString /* connectionType */) override
     {
         return 0;
     }
