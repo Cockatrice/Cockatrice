@@ -26,8 +26,8 @@ enum GameListColumn
     SPECTATORS
 };
 
-const bool DEFAULT_SHOW_FULL_GAMES = false;
-const bool DEFAULT_SHOW_GAMES_THAT_STARTED = false;
+const bool DEFAULT_SHOW_FULL_GAMES = true;
+const bool DEFAULT_SHOW_GAMES_THAT_STARTED = true;
 const bool DEFAULT_SHOW_PASSWORD_PROTECTED_GAMES = true;
 const bool DEFAULT_SHOW_BUDDIES_ONLY_GAMES = true;
 const bool DEFAULT_HIDE_IGNORED_USER_GAMES = false;
