@@ -73,7 +73,7 @@ private:
     QList<MatchNode *> replayMatches;
 
     QIcon dirIcon, fileIcon, lockIcon;
-    void clearTree();
+    void clearAll();
 
     static const int numberOfColumns;
 signals:
@@ -94,6 +94,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &index) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
+    void clearTree();
     void refreshTree();
     ServerInfo_Replay const *getReplay(const QModelIndex &index) const;
     ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &index) const;
@@ -115,6 +116,10 @@ public:
     ServerInfo_ReplayMatch const *getReplayMatch(const QModelIndex &ind) const;
     QList<ServerInfo_Replay const *> getSelectedReplays() const;
     QSet<ServerInfo_ReplayMatch const *> getSelectedReplayMatches() const;
+    void clearTree()
+    {
+        treeModel->clearTree();
+    }
     void refreshTree()
     {
         treeModel->refreshTree();
