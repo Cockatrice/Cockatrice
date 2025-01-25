@@ -38,7 +38,7 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
 
     // Add card list widgets
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();
-    foreach (EdhrecCommanderApiResponseCardList card_list, edhrec_commander_api_response_card_lists) {
+    for (const EdhrecCommanderApiResponseCardList &card_list : edhrec_commander_api_response_card_lists) {
         auto cardListDisplayWidget = new EdhrecCommanderApiResponseCardListDisplayWidget(this, card_list);
         cardDisplayLayout->addWidget(cardListDisplayWidget);
         widgetNames.append(cardListDisplayWidget->getBannerText());
@@ -96,9 +96,7 @@ void EdhrecCommanderApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
     layout->invalidate();
     layout->activate();
     layout->update();
-    if (scrollArea) {
-        if (scrollArea->widget()) {
-            scrollArea->widget()->resize(event->size());
-        }
+    if (scrollArea && scrollArea->widget()) {
+        scrollArea->widget()->resize(event->size());
     }
 }

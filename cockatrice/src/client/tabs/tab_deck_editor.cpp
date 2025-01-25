@@ -51,6 +51,13 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+static bool canBeCommander(const CardInfoPtr &cardInfo)
+{
+    return ((cardInfo->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
+             cardInfo->getCardType().contains("Creature", Qt::CaseInsensitive))) ||
+           cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
+}
+
 void TabDeckEditor::createDeckDock()
 {
     deckModel = new DeckListModel(this);
@@ -546,9 +553,7 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
         selectPrinting = menu.addAction(tr("Select Printing"));
-        if ((info->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
-             info->getCardType().contains("Creature", Qt::CaseInsensitive)) ||
-            info->getText().contains("can be your commander", Qt::CaseInsensitive)) {
+        if (canBeCommander(info)) {
             edhRecCommander = menu.addAction(tr("Show on EDHREC (Commander)"));
             connect(edhRecCommander, &QAction::triggered, this,
                     [this, info] { this->tabSupervisor->addEdhrecTab(info, true); });

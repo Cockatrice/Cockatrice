@@ -261,12 +261,11 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
     cardMenu->addMenu(viewRelatedCards);
     cardMenu->addMenu(addToOpenDeckMenu);
 
-    QWidget *topLevel = window();
-    auto *mainWindow = qobject_cast<MainWindow *>(topLevel);
+    auto *mainWindow = qobject_cast<MainWindow *>(window());
     QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
     for (auto &deckEditorTab : deckEditorTabs) {
-        auto *addCardMenu = new QMenu("Add card to " + deckEditorTab->getTabText());
+        auto *addCardMenu = new QMenu(tr("Add card to") + " " + deckEditorTab->getTabText());
         QAction *addCard = new QAction(this);
         addCard->setText(tr("Mainboard"));
         connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
