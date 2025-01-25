@@ -2,56 +2,30 @@
 
 #include "../../../game/cards/card_database_manager.h"
 #include "../../../settings/cache_settings.h"
-#include "picture_loader_worker_work.h"
+#include "picture_loader_orchestrator.h"
 
+#include <QBuffer>
 #include <QDirIterator>
-#include <QJsonDocument>
+#include <QLoggingCategory>
 #include <QMovie>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
-#include <utility>
 
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
-PictureLoaderWorker::PictureLoaderWorker()
-    : QObject(nullptr), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath()),
-      picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false)
+PictureLoaderWorker::PictureLoaderWorker(PictureLoaderOrchestrator *_orchestrator, const CardInfoPtr &toLoad)
+    : QThread(nullptr), orchestrator(_orchestrator), cardToDownload(toLoad)
 {
-    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
-
-    networkManager = new QNetworkAccessManager(this);
-    // We need a timeout to ensure requests don't hang indefinitely in case of
-    // cache corruption, see related Qt bug: https://bugreports.qt.io/browse/QTBUG-111397
-    // Use Qt's default timeout (30s, as of 2023-02-22)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
-    networkManager->setTransferTimeout();
-#endif
-    auto cache = new QNetworkDiskCache(this);
-    cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
-    cache->setMaximumCacheSize(1024L * 1024L *
-                               static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
-    // Note: the settings is in MB, but QNetworkDiskCache uses bytes
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache,
-            [cache](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
-    networkManager->setCache(cache);
-    // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
-    // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
-    networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-
-    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
-    loadRedirectCache();
-    cleanStaleEntries();
-
-    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,
-            &PictureLoaderWorker::saveRedirectCache);
-
+    connect(this, &PictureLoaderWorker::requestImageDownload, orchestrator, &PictureLoaderOrchestrator::makeRequest,
+            Qt::QueuedConnection);
+    connect(this, &PictureLoaderWorker::imageLoaded, orchestrator, &PictureLoaderOrchestrator::imageLoadedSuccessfully,
+            Qt::QueuedConnection);
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
+    startNextPicDownload();
 }
 
 PictureLoaderWorker::~PictureLoaderWorker()
@@ -59,175 +33,208 @@ PictureLoaderWorker::~PictureLoaderWorker()
     pictureLoaderThread->deleteLater();
 }
 
-QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWorkerWork *worker)
+bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &correctedCardname)
 {
-    if (rateLimited) {
-        // Queue the request if currently rate-limited
-        requestQueue.append(qMakePair(url, worker));
-        return nullptr; // No immediate request
-    }
+    QImage image;
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+    QList<QString> picsPaths = QList<QString>();
+    QDirIterator it(SettingsCache::instance().getCustomPicsPath(),
+                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
-    QUrl cachedRedirect = getCachedRedirect(url);
-    if (!cachedRedirect.isEmpty()) {
-        return makeRequest(cachedRedirect, worker);
-    }
+    // Recursively check all subdirectories of the CUSTOM folder
+    while (it.hasNext()) {
+        QString thisPath(it.next());
+        QFileInfo thisFileInfo(thisPath);
 
-    QNetworkRequest req(url);
-    if (!picDownload) {
-        req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
-    }
-
-    QNetworkReply *reply = networkManager->get(req);
-
-    connect(reply, &QNetworkReply::finished, this, [this, reply, url, worker]() {
-        QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-        if (redirectTarget.isValid()) {
-            QUrl redirectUrl = redirectTarget.toUrl();
-            if (redirectUrl.isRelative()) {
-                redirectUrl = url.resolved(redirectUrl);
-            }
-            cacheRedirect(url, redirectUrl);
+        if (thisFileInfo.isFile() &&
+            (thisFileInfo.fileName() == correctedCardname || thisFileInfo.completeBaseName() == correctedCardname ||
+             thisFileInfo.baseName() == correctedCardname)) {
+            picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
         }
+    }
 
-        if (reply->error() == QNetworkReply::NoError) {
-            worker->picDownloadFinished(reply);
-        } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
-            handleRateLimit(reply, url, worker);
+    if (!setName.isEmpty()) {
+        picsPaths << SettingsCache::instance().getPicsPath() + "/" + setName + "/" + correctedCardname
+                  // We no longer store downloaded images there, but don't just ignore
+                  // stuff that old versions have put there.
+                  << SettingsCache::instance().getPicsPath() + "/downloadedPics/" + setName + "/" + correctedCardname;
+    }
+
+    // Iterates through the list of paths, searching for images with the desired
+    // name with any QImageReader-supported
+    // extension
+    for (const auto &_picsPath : picsPaths) {
+        imgReader.setFileName(_picsPath);
+        if (imgReader.read(&image)) {
+            qCDebug(PictureLoaderWorkerWorkLog).nospace()
+                << "PictureLoader: [card: " << correctedCardname << " set: " << setName << "]: Picture found on disk.";
+            imageLoaded(cardToDownload.getCard(), image);
+            return true;
+        }
+        imgReader.setFileName(_picsPath + ".full");
+        if (imgReader.read(&image)) {
+            qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << correctedCardname
+                                                          << " set: " << setName << "]: Picture.full found on disk.";
+            imageLoaded(cardToDownload.getCard(), image);
+            return true;
+        }
+        imgReader.setFileName(_picsPath + ".xlhq");
+        if (imgReader.read(&image)) {
+            qCDebug(PictureLoaderWorkerWorkLog).nospace() << "PictureLoader: [card: " << correctedCardname
+                                                          << " set: " << setName << "]: Picture.xlhq found on disk.";
+            imageLoaded(cardToDownload.getCard(), image);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void PictureLoaderWorker::startNextPicDownload()
+{
+    QString picUrl = cardToDownload.getCurrentUrl();
+
+    if (picUrl.isEmpty()) {
+        downloadRunning = false;
+        picDownloadFailed();
+    } else {
+        QUrl url(picUrl);
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getCorrectedName()
+            << " set: " << cardToDownload.getSetName() << "]: Trying to fetch picture from url "
+            << url.toDisplayString();
+        emit requestImageDownload(url, this);
+    }
+}
+
+void PictureLoaderWorker::picDownloadFailed()
+{
+    /* Take advantage of short-circuiting here to call the nextUrl until one
+       is not available.  Only once nextUrl evaluates to false will this move
+       on to nextSet.  If the Urls for a particular card are empty, this will
+       effectively go through the sets for that card. */
+    if (cardToDownload.nextUrl() || cardToDownload.nextSet()) {
+        startNextPicDownload();
+    } else {
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getCorrectedName()
+            << " set: " << cardToDownload.getSetName() << "]: Picture NOT found, "
+            << (picDownload ? "download failed" : "downloads disabled")
+            << ", no more url combinations to try: BAILING OUT";
+        imageLoaded(cardToDownload.getCard(), QImage());
+    }
+    emit startLoadQueue();
+}
+
+void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
+{
+    bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+
+    if (reply->error()) {
+        if (isFromCache) {
+            qCDebug(PictureLoaderWorkerWorkLog).nospace()
+                << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+                << " set: " << cardToDownload.getSetName() << "]: Removing corrupted cache file for url "
+                << reply->url().toDisplayString() << " and retrying (" << reply->errorString() << ")";
+
+            networkManager->cache()->remove(reply->url());
+
+            requestImageDownload(reply->url(), this);
         } else {
-            worker->picDownloadFinished(reply);
+            qCDebug(PictureLoaderWorkerWorkLog).nospace()
+                << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+                << " set: " << cardToDownload.getSetName() << "]: " << (picDownload ? "Download" : "Cache search")
+                << " failed for url " << reply->url().toDisplayString() << " (" << reply->errorString() << ")";
+
+            picDownloadFailed();
+            startNextPicDownload();
         }
+
         reply->deleteLater();
-    });
-
-    return reply;
-}
-
-void PictureLoaderWorker::handleRateLimit(QNetworkReply *reply, const QUrl &url, PictureLoaderWorkerWork *worker)
-{
-    QByteArray responseData = reply->readAll();
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-
-    if (jsonDoc.isObject()) {
-        QJsonObject jsonObj = jsonDoc.object();
-        if (jsonObj.value("object").toString() == "error" && jsonObj.value("code").toString() == "rate_limited") {
-            int retryAfter = 70; // Default retry delay
-
-            // Prevent multiple rate-limit handling
-            if (!rateLimited) {
-                rateLimited = true;
-                qWarning() << "Scryfall rate limit hit! Queuing requests for" << retryAfter << "seconds.";
-
-                // Start a timer to reset the rate-limited state
-                rateLimitTimer.singleShot(retryAfter * 1000, this, [this]() {
-                    qWarning() << "Rate limit expired. Resuming queued requests.";
-                    processQueuedRequests();
-                });
-            }
-
-            // Always queue the request even if already rate-limited
-            requestQueue.append(qMakePair(url, worker));
-        }
+        return;
     }
-}
 
-void PictureLoaderWorker::processQueuedRequests()
-{
-    qWarning() << "Resuming queued requests";
-    rateLimited = false;
-
-    while (!requestQueue.isEmpty()) {
-        QPair<QUrl, PictureLoaderWorkerWork *> request = requestQueue.takeFirst();
-        makeRequest(request.first, request.second);
+    // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
+        statusCode == 308) {
+        QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName() << "]: following "
+            << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
+        requestImageDownload(redirectUrl, this);
+        reply->deleteLater();
+        return;
     }
-}
 
-void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
-{
-    auto worker = new PictureLoaderWorkerWork(this, card);
-    Q_UNUSED(worker);
-}
-
-void PictureLoaderWorker::imageLoadedSuccessfully(CardInfoPtr card, const QImage &image)
-{
-    emit imageLoaded(std::move(card), image);
-}
-
-void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)
-{
-    redirectCache[originalUrl] = qMakePair(redirectUrl, QDateTime::currentDateTimeUtc());
-    // saveRedirectCache();
-}
-
-QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
-{
-    if (redirectCache.contains(originalUrl)) {
-        return redirectCache[originalUrl].first;
+    if (statusCode == 429) {
+        qWarning() << "Scryfall API limit reached!";
     }
-    return {};
-}
 
-void PictureLoaderWorker::loadRedirectCache()
-{
-    QSettings settings(cacheFilePath, QSettings::IniFormat);
+    // peek is used to keep the data in the buffer for use by QImageReader
+    const QByteArray &picData = reply->peek(reply->size());
 
-    redirectCache.clear();
-    int size = settings.beginReadArray(REDIRECT_HEADER_NAME);
-    for (int i = 0; i < size; ++i) {
-        settings.setArrayIndex(i);
-        QUrl originalUrl = settings.value(REDIRECT_ORIGINAL_URL).toUrl();
-        QUrl redirectUrl = settings.value(REDIRECT_URL).toUrl();
-        QDateTime timestamp = settings.value(REDIRECT_TIMESTAMP).toDateTime();
+    if (imageIsBlackListed(picData)) {
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName()
+            << "]: Picture found, but blacklisted, will consider it as not found";
 
-        if (originalUrl.isValid() && redirectUrl.isValid()) {
-            redirectCache[originalUrl] = qMakePair(redirectUrl, timestamp);
-        }
+        picDownloadFailed();
+        reply->deleteLater();
+        startNextPicDownload();
+        return;
     }
-    settings.endArray();
-}
 
-void PictureLoaderWorker::saveRedirectCache() const
-{
-    QSettings settings(cacheFilePath, QSettings::IniFormat);
+    QImage testImage;
 
-    settings.beginWriteArray(REDIRECT_HEADER_NAME, static_cast<int>(redirectCache.size()));
-    int index = 0;
-    for (auto it = redirectCache.cbegin(); it != redirectCache.cend(); ++it) {
-        settings.setArrayIndex(index++);
-        settings.setValue(REDIRECT_ORIGINAL_URL, it.key());
-        settings.setValue(REDIRECT_URL, it.value().first);
-        settings.setValue(REDIRECT_TIMESTAMP, it.value().second);
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+    imgReader.setDevice(reply);
+
+    bool logSuccessMessage = false;
+
+    static const int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
+    auto replyHeader = reply->peek(riffHeaderSize);
+
+    if (replyHeader.startsWith("RIFF") && replyHeader.endsWith("WEBP")) {
+        auto imgBuf = QBuffer(this);
+        imgBuf.setData(reply->readAll());
+
+        auto movie = QMovie(&imgBuf);
+        movie.start();
+        movie.stop();
+
+        imageLoaded(cardToDownload.getCard(), movie.currentImage());
+        logSuccessMessage = true;
+    } else if (imgReader.read(&testImage)) {
+        imageLoaded(cardToDownload.getCard(), testImage);
+        logSuccessMessage = true;
+    } else {
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName() << "]: Possible " << (isFromCache ? "cached" : "downloaded")
+            << " picture at " << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
+
+        picDownloadFailed();
     }
-    settings.endArray();
-}
 
-void PictureLoaderWorker::cleanStaleEntries()
-{
-    QDateTime now = QDateTime::currentDateTimeUtc();
-
-    auto it = redirectCache.begin();
-    while (it != redirectCache.end()) {
-        if (it.value().second.addDays(SettingsCache::instance().getRedirectCacheTtl()) < now) {
-            it = redirectCache.erase(it); // Remove stale entry
-        } else {
-            ++it;
-        }
+    if (logSuccessMessage) {
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName() << "]: Image successfully "
+            << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
+    } else {
+        startNextPicDownload();
     }
+
+    reply->deleteLater();
 }
 
-void PictureLoaderWorker::picDownloadChanged()
+bool PictureLoaderWorker::imageIsBlackListed(const QByteArray &picData)
 {
-    QMutexLocker locker(&mutex);
-    picDownload = SettingsCache::instance().getPicDownload();
-}
-
-void PictureLoaderWorker::picsPathChanged()
-{
-    QMutexLocker locker(&mutex);
-    picsPath = SettingsCache::instance().getPicsPath();
-    customPicsPath = SettingsCache::instance().getCustomPicsPath();
-}
-
-void PictureLoaderWorker::clearNetworkCache()
-{
-    networkManager->cache()->clear();
+    QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
+    return md5Blacklist.contains(md5sum);
 }

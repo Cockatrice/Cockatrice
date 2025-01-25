@@ -2,7 +2,7 @@
 #define PICTURELOADER_H
 
 #include "../../../game/cards/card_database.h"
-#include "picture_loader_worker.h"
+#include "new_picture_loader_orchestrator.h"
 
 #include <QLoggingCategory>
 
@@ -26,7 +26,7 @@ private:
     PictureLoader(PictureLoader const &);
     void operator=(PictureLoader const &);
 
-    PictureLoaderWorker *worker;
+    NewPictureLoaderOrchestrator *orchestrator;
 
 public:
     static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
@@ -45,6 +45,6 @@ private slots:
     void picsPathChanged();
 
 public slots:
-    void imageLoaded(CardInfoPtr card, const QImage &image);
+    void imageLoaded(CardInfoPtr card, QImage *image);
 };
 #endif

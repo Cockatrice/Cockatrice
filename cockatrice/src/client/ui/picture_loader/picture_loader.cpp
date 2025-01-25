@@ -1,6 +1,7 @@
 #include "picture_loader.h"
 
 #include "../../../settings/cache_settings.h"
+#include "new_picture_loader_orchestrator.h"
 
 #include <QApplication>
 #include <QBuffer>
@@ -22,17 +23,16 @@
 
 PictureLoader::PictureLoader() : QObject(nullptr)
 {
-    worker = new PictureLoaderWorker;
     connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
-    connect(worker, SIGNAL(imageLoaded(CardInfoPtr, const QImage &)), this,
-            SLOT(imageLoaded(CardInfoPtr, const QImage &)));
+    orchestrator = new NewPictureLoaderOrchestrator(10, this);
+    connect(orchestrator, &NewPictureLoaderOrchestrator::loadImage, this, &PictureLoader::imageLoaded);
 }
 
 PictureLoader::~PictureLoader()
 {
-    worker->deleteLater();
+    orchestrator->deleteLater();
 }
 
 void PictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
@@ -89,23 +89,24 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     }
 
     // add the card to the load queue
-    qCDebug(PictureLoaderLog) << "Enqueuing " << card->getName() << " for " << card->getPixmapCacheKey();
-    getInstance().worker->enqueueImageLoad(card);
+    qCDebug(PictureLoaderLog) << "Enqueuing" << card->getName() << "for" << card->getPixmapCacheKey();
+    getInstance().orchestrator->enqueueImageLoad(card);
 }
 
-void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
+void PictureLoader::imageLoaded(CardInfoPtr card, QImage *image)
 {
-    if (image.isNull()) {
+    if (image->isNull()) {
         QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap());
     } else {
         if (card->getUpsideDownArt()) {
-            QImage mirrorImage = image.mirrored(true, true);
+            QImage mirrorImage = image->mirrored(true, true);
             QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(mirrorImage));
         } else {
-            QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(image));
+            QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(*image));
         }
     }
 
+    delete image;
     card->emitPixmapUpdated();
 }
 
@@ -123,7 +124,7 @@ void PictureLoader::clearPixmapCache()
 
 void PictureLoader::clearNetworkCache()
 {
-    getInstance().worker->clearNetworkCache();
+//    getInstance().orchestrator->clearNetworkCache();
 }
 
 void PictureLoader::cacheCardPixmaps(QList<CardInfoPtr> cards)
@@ -141,7 +142,7 @@ void PictureLoader::cacheCardPixmaps(QList<CardInfoPtr> cards)
             continue;
         }
 
-        getInstance().worker->enqueueImageLoad(card);
+        getInstance().orchestrator->enqueueImageLoad(card);
     }
 }
 

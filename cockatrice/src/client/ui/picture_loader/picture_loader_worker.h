@@ -1,15 +1,15 @@
-#ifndef PICTURE_LOADER_WORKER_H
-#define PICTURE_LOADER_WORKER_H
+#ifndef PICTURE_LOADER_WORKER_WORK_H
+#define PICTURE_LOADER_WORKER_WORK_H
 
 #include "../../../game/cards/card_database.h"
-#include "picture_loader_worker_work.h"
+#include "picture_loader_orchestrator.h"
 #include "picture_to_load.h"
 
 #include <QLoggingCategory>
 #include <QMutex>
 #include <QNetworkAccessManager>
 #include <QObject>
-#include <QTimer>
+#include <QThread>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"
@@ -17,57 +17,34 @@
 #define REDIRECT_TIMESTAMP "timestamp"
 #define REDIRECT_CACHE_FILENAME "cache.ini"
 
-inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
+inline Q_LOGGING_CATEGORY(PictureLoaderWorkerWorkLog, "picture_loader.orchestrator");
 
-class PictureLoaderWorkerWork;
-class PictureLoaderWorker : public QObject
+class PictureLoaderOrchestrator;
+class PictureLoaderWorker : public QThread
 {
     Q_OBJECT
 public:
-    explicit PictureLoaderWorker();
+    explicit PictureLoaderWorker(PictureLoaderOrchestrator *_orchestrator, const CardInfoPtr &toLoad);
     ~PictureLoaderWorker() override;
-
-    void enqueueImageLoad(const CardInfoPtr &card);
-    void clearNetworkCache();
-
+    PictureLoaderOrchestrator *orchestrator;
+    PictureToLoad cardToDownload;
 public slots:
-    QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
-    void handleRateLimit(QNetworkReply *reply, const QUrl &url, PictureLoaderWorkerWork *worker);
-    void processQueuedRequests();
-    void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
+    void picDownloadFinished(QNetworkReply *reply);
+    void picDownloadFailed();
 
 private:
     static QStringList md5Blacklist;
-
     QThread *pictureLoaderThread;
-    QString picsPath, customPicsPath;
-    QList<PictureToLoad> loadQueue;
-    QMutex mutex;
     QNetworkAccessManager *networkManager;
-    QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
-    QString cacheFilePath;                             // Path to persistent storage
-    static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
-    QList<PictureToLoad> cardsToDownload;
-    PictureToLoad cardBeingLoaded;
-    PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
-    bool rateLimited = false;
-    QTimer rateLimitTimer;
-    QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
-
-    void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
-    QUrl getCachedRedirect(const QUrl &originalUrl) const;
-    void loadRedirectCache();
-    void saveRedirectCache() const;
-    void cleanStaleEntries();
-
-private slots:
-    void picDownloadChanged();
-    void picsPathChanged();
+    void startNextPicDownload();
+    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
+    bool imageIsBlackListed(const QByteArray &);
 
 signals:
     void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
+    void requestImageDownload(const QUrl &url, PictureLoaderWorker *instance);
 };
 
-#endif // PICTURE_LOADER_WORKER_H
+#endif // PICTURE_LOADER_WORKER_WORK_H
