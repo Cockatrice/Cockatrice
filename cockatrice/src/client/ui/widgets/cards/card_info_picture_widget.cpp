@@ -353,7 +353,7 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
             deckEditorTab->addCardHelper(info, DECK_ZONE_SIDE);
         });
     }
-  
+
     return addToOpenDeckMenu;
 }
 
