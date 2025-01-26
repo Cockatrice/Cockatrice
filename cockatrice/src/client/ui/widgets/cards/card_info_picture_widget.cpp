@@ -299,22 +299,19 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
     QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
     for (auto &deckEditorTab : deckEditorTabs) {
-        auto *addCardMenu = new QMenu(deckEditorTab->getTabText());
-        QAction *addCard = new QAction(this);
-        addCard->setText(tr("Mainboard"));
+        auto *addCardMenu = addToOpenDeckMenu->addMenu(deckEditorTab->getTabText());
+
+        QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
         connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
             deckEditorTab->updateCardInfo(info);
             deckEditorTab->addCardHelper(info, DECK_ZONE_MAIN);
         });
-        QAction *addCardSideboard = new QAction(this);
-        addCardSideboard->setText(tr("Sideboard"));
+
+        QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
         connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
             deckEditorTab->updateCardInfo(info);
             deckEditorTab->addCardHelper(info, DECK_ZONE_SIDE);
         });
-        addCardMenu->addAction(addCard);
-        addCardMenu->addAction(addCardSideboard);
-        addToOpenDeckMenu->addMenu(addCardMenu);
     }
 
     return addToOpenDeckMenu;
