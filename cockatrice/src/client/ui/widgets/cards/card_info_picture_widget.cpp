@@ -298,6 +298,11 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
     auto *mainWindow = qobject_cast<MainWindow *>(window());
     QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
+    if (deckEditorTabs.isEmpty()) {
+        addToOpenDeckMenu->setEnabled(false);
+        return addToOpenDeckMenu;
+    }
+
     for (auto &deckEditorTab : deckEditorTabs) {
         auto *addCardMenu = addToOpenDeckMenu->addMenu(deckEditorTab->getTabText());
 
