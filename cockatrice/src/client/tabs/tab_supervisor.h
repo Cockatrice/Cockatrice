@@ -2,10 +2,10 @@
 #define TAB_SUPERVISOR_H
 
 #include "../../deck/deck_loader.h"
-#include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "../../server/user/user_list_proxy.h"
 #include "api/edhrec/tab_edhrec.h"
+#include "visual_deck_editor/tab_deck_editor_visual.h"
+#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "tab_generic_deck_editor.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
