@@ -299,7 +299,7 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
     QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
     for (auto &deckEditorTab : deckEditorTabs) {
-        auto *addCardMenu = new QMenu(tr("Add card to") + " " + deckEditorTab->getTabText());
+        auto *addCardMenu = new QMenu(deckEditorTab->getTabText());
         QAction *addCard = new QAction(this);
         addCard->setText(tr("Mainboard"));
         connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
