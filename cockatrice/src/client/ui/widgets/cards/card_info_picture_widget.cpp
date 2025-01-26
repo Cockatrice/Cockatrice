@@ -266,15 +266,13 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
 {
     auto viewRelatedCards = new QMenu(tr("View related cards"));
 
-    bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = info->getAllRelatedCards();
-    for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
-        if (relatedCard != nullptr) {
-            atLeastOneGoodRelationFound = true;
-            break;
-        }
-    }
+
+    auto relatedCardExists = [](const CardRelation *cardRelation) {
+        return CardDatabaseManager::getInstance()->getCard(cardRelation->getName()) != nullptr;
+    };
+
+    bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
 
     if (!atLeastOneGoodRelationFound) {
         viewRelatedCards->setEnabled(false);
