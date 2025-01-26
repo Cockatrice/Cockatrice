@@ -59,7 +59,7 @@ private:
     QTimer *debounce_timer;
 
     int debounce_time = 300;
-    int currentPage = 0;  // Current page index
+    int currentPage = 0;    // Current page index
     int cardsPerPage = 200; // Number of cards per page
 
 protected:

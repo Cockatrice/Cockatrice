@@ -1,5 +1,6 @@
 #include "overlap_layout.h"
 
+#include <QDebug>
 #include <QtMath>
 
 /**

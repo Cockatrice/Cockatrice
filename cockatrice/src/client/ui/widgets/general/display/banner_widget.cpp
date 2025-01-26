@@ -1,4 +1,5 @@
 #include "banner_widget.h"
+
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
