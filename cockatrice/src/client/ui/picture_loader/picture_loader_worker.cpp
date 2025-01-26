@@ -169,7 +169,6 @@ void PictureLoaderWorker::processQueuedRequests()
     }
 }
 
-
 void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
 {
     auto worker = new PictureLoaderWorkerWork(this, card);
