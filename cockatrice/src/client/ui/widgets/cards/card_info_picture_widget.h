@@ -68,6 +68,8 @@ private:
     QTimer *hoverTimer;
 
     QMenu *createRightClickMenu();
+    QMenu *createViewRelatedCardsMenu();
+    QMenu *createAddToOpenDeckMenu();
 };
 
 #endif

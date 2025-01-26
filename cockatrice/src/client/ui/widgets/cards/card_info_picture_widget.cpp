@@ -256,10 +256,44 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
         return cardMenu;
     }
 
+    cardMenu->addMenu(createViewRelatedCardsMenu());
+    cardMenu->addMenu(createAddToOpenDeckMenu());
+
+    return cardMenu;
+}
+
+QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
+{
     auto viewRelatedCards = new QMenu(tr("View related cards"));
+
+    QList<CardRelation *> relatedCards = info->getAllRelatedCards();
+
+    auto relatedCardExists = [](const CardRelation *cardRelation) {
+        return CardDatabaseManager::getInstance()->getCard(cardRelation->getName()) != nullptr;
+    };
+
+    bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
+
+    if (!atLeastOneGoodRelationFound) {
+        viewRelatedCards->setEnabled(false);
+        return viewRelatedCards;
+    }
+
+    for (const auto &relatedCard : relatedCards) {
+        const auto &relatedCardName = relatedCard->getName();
+        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
+            emit cardChanged(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+        });
+        viewRelatedCards->addAction(viewCard);
+    }
+
+    return viewRelatedCards;
+}
+
+QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
+{
     auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
-    cardMenu->addMenu(viewRelatedCards);
-    cardMenu->addMenu(addToOpenDeckMenu);
 
     auto *mainWindow = qobject_cast<MainWindow *>(window());
     QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
@@ -283,31 +317,7 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
         addToOpenDeckMenu->addMenu(addCardMenu);
     }
 
-    bool atLeastOneGoodRelationFound = false;
-    QList<CardRelation *> relatedCards = info->getAllRelatedCards();
-    for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
-        if (relatedCard != nullptr) {
-            atLeastOneGoodRelationFound = true;
-            break;
-        }
-    }
-
-    if (!atLeastOneGoodRelationFound) {
-        viewRelatedCards->setEnabled(false);
-        return cardMenu;
-    }
-
-    for (const auto &relatedCard : relatedCards) {
-        const auto &relatedCardName = relatedCard->getName();
-        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
-            emit cardChanged(CardDatabaseManager::getInstance()->getCard(relatedCardName));
-        });
-        viewRelatedCards->addAction(viewCard);
-    }
-
-    return cardMenu;
+    return addToOpenDeckMenu;
 }
 
 /**
