@@ -94,6 +94,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     spectateButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->setSpacing(7);
     if (showFilters) {
         buttonLayout->addWidget(filterButton);
         buttonLayout->addWidget(clearFilterButton);
@@ -106,6 +107,8 @@ GameSelector::GameSelector(AbstractClient *_client,
     buttonLayout->setAlignment(Qt::AlignTop);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(2);
+    mainLayout->setContentsMargins(11, 11, 11, 0);
     mainLayout->addWidget(gameListView);
     mainLayout->addLayout(buttonLayout);
 
