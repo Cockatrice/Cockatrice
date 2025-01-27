@@ -86,7 +86,6 @@ RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(AbstractClient *_client, QObj
     fileIcon = fip.icon(QFileIconProvider::File);
 
     root = new DirectoryNode;
-    refreshTree();
 }
 
 RemoteDeckList_TreeModel::~RemoteDeckList_TreeModel()
