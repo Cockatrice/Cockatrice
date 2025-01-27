@@ -44,7 +44,7 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
 
     bool canAddTags = true;
 
-    if (parent->deckLoader->getLastFileFormat() != DeckLoader::CockatriceFormat) {
+    if (DeckLoader::getFormatFromName(parent->parent->filePath) != DeckLoader::CockatriceFormat) {
         canAddTags = false;
         // Retrieve saved preference if the prompt is disabled
         if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {

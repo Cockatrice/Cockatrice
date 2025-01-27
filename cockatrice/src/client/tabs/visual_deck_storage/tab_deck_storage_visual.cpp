@@ -25,7 +25,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
 void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent * /*event*/, DeckPreviewWidget *instance)
 {
     DeckLoader deckLoader;
-    if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::CockatriceFormat, true)) {
+    if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::getFormatFromName(instance->filePath), true)) {
         return;
     }
 
