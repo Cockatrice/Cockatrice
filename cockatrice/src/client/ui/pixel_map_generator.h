@@ -62,14 +62,22 @@ public:
 class UserLevelPixmapGenerator
 {
 private:
-    static QMap<QString, QPixmap> pmCache;
+    static QMap<QString, QIcon> iconCache;
 
 public:
-    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
-    static QIcon generateIcon(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
+    static QPixmap generatePixmap(int height,
+                                  UserLevelFlags userLevel,
+                                  ServerInfo_User::PawnColorsOverride pawnColors,
+                                  bool isBuddy,
+                                  QString privLevel = "NONE");
+    static QIcon generateIcon(int height,
+                              UserLevelFlags userLevel,
+                              ServerInfo_User::PawnColorsOverride pawnColors,
+                              bool isBuddy,
+                              QString privLevel = "NONE");
     static void clear()
     {
-        pmCache.clear();
+        iconCache.clear();
     }
 };
 

@@ -100,90 +100,153 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
-void SetAttrRecur(QDomElement &elem, QString tagName, QString attrName, QString attrValue)
+void SetAttrRecur(QDomElement &elem,
+                  const QString &tagName,
+                  const QString &attrName,
+                  const QString &idName,
+                  const QString &attrValue)
 {
-    // if it has the tagname then overwritte desired attribute
     if (elem.tagName().compare(tagName) == 0) {
-        elem.setAttribute(attrName, attrValue);
+        if (elem.attribute("id").compare(idName) == 0) {
+            elem.setAttribute(attrName, attrValue);
+        }
     }
-    // loop all children
+
     for (int i = 0; i < elem.childNodes().count(); i++) {
         if (!elem.childNodes().at(i).isElement()) {
             continue;
         }
-        QDomElement docElem = elem.childNodes().at(i).toElement(); //<-- make const "variable"
-        SetAttrRecur(docElem, tagName, attrName, attrValue);
+        auto docElem = elem.childNodes().at(i).toElement();
+        SetAttrRecur(docElem, tagName, attrName, idName, attrValue);
     }
 }
 
-QIcon changeSVGColor(const QString &iconPath, const QString &color)
+QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const std::optional<QString> &colorRight)
 {
-    // open svg resource load contents to qbytearray
     QFile file(iconPath);
-    if (!file.open(QIODevice::ReadOnly))
+    if (!file.open(QIODevice::ReadOnly)) {
         return {};
-    QByteArray baData = file.readAll();
-    // load svg contents to xml document and edit contents
+    }
+
+    const auto &baData = file.readAll();
     QDomDocument doc;
     doc.setContent(baData);
-    // recurivelly change color
-    QDomElement docElem = doc.documentElement(); //<-- make const "variable"
-    qDebug() << docElem.text();
-    SetAttrRecur(docElem, "path", "fill", color);
-    // create svg renderer with edited contents
+
+    auto docElem = doc.documentElement();
+
+    SetAttrRecur(docElem, "path", "fill", "left", colorLeft);
+    if (colorRight.has_value()) {
+        SetAttrRecur(docElem, "path", "fill", "right", colorRight.value());
+    }
+
+    qDebug() << "ZACH" << doc.toString();
+
     QSvgRenderer svgRenderer(doc.toByteArray());
-    // create pixmap target (could be a QImage)
+
     QPixmap pix(svgRenderer.defaultSize());
     pix.fill(Qt::transparent);
-    // create painter to act over pixmap
+
     QPainter pixPainter(&pix);
-    // use renderer to render over painter which paints on pixmap
     svgRenderer.render(&pixPainter);
     QIcon myicon(pix);
+
     return myicon;
 }
 
-QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
+QPixmap UserLevelPixmapGenerator::generatePixmap(int height,
+                                                 UserLevelFlags userLevel,
+                                                 ServerInfo_User::PawnColorsOverride pawnColorsOverride,
+                                                 bool isBuddy,
+                                                 QString privLevel)
 {
-    return generateIcon(height, userLevel, isBuddy, privLevel).pixmap(QSize());
+    return generateIcon(height, userLevel, pawnColorsOverride, isBuddy, privLevel).pixmap(height, height);
 }
 
-QIcon UserLevelPixmapGenerator::generateIcon(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
+QIcon UserLevelPixmapGenerator::generateIcon(int height,
+                                             UserLevelFlags userLevel,
+                                             ServerInfo_User::PawnColorsOverride pawnColorsOverride,
+                                             bool isBuddy,
+                                             QString privLevel)
 {
+    QString singlePawnPath =
+        "C:\\Users\\ZaHal\\Documents\\Development\\cockatrice\\cockatrice\\resources\\usericons\\pawn_single.svg";
+    QString doublePawnPath =
+        "C:\\Users\\ZaHal\\Documents\\Development\\cockatrice\\cockatrice\\resources\\usericons\\pawn_double.svg";
 
+    const auto &r = rand() > (RAND_MAX / 2);
+
+    pawnColorsOverride.set_left_side("#ff0000");
+
+    if (r == 0) {
+        pawnColorsOverride.set_right_side("#00ff00");
+    }
+
+    std::optional<QString> colorLeft = std::nullopt;
+    if (pawnColorsOverride.has_left_side()) {
+        colorLeft = QString::fromStdString(pawnColorsOverride.left_side());
+    }
+
+    std::optional<QString> colorRight = std::nullopt;
+    if (pawnColorsOverride.has_right_side()) {
+        colorRight = QString::fromStdString(pawnColorsOverride.right_side());
+    }
+
+    // Has Color Override
+    if (colorLeft.has_value() || colorRight.has_value()) {
+        QString key = QString::number(height * 10000) + ":" + colorLeft.value_or("") + ":" + colorRight.value_or("");
+        if (iconCache.contains(key)) {
+            return iconCache.value(key);
+        }
+
+        QIcon icon;
+        if (colorRight.has_value()) {
+            icon = changeSVGColor(doublePawnPath, colorLeft.value(), colorRight);
+        } else {
+            icon = changeSVGColor(singlePawnPath, colorLeft.value(), std::nullopt);
+        }
+
+        iconCache.insert(key, icon);
+        return icon;
+    }
+
+    // Has No Color Override
     QString key = QString::number(height * 10000) + ":" + (short)userLevel + ":" + (short)isBuddy + ":" + privLevel;
-    /*if (pmCache.contains(key))
-        return pmCache.value(key);
-        */
+    if (iconCache.contains(key)) {
+        return iconCache.value(key);
+    }
 
     QString levelString;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         levelString = "admin";
-        if (privLevel.toLower() == "vip")
+        if (privLevel.toLower() == "vip") {
             levelString.append("_" + privLevel.toLower());
+        }
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         levelString = "moderator";
-        if (privLevel.toLower() == "vip")
+        if (privLevel.toLower() == "vip") {
             levelString.append("_" + privLevel.toLower());
+        }
     } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         levelString = "registered";
-        if (privLevel.toLower() != "none")
+        if (privLevel.toLower() != "none") {
             levelString.append("_" + privLevel.toLower());
-    } else
+        }
+    } else {
         levelString = "normal";
+    }
 
-    if (isBuddy)
+    if (isBuddy) {
         levelString.append("_buddy");
+    }
 
-    QString color = "#FF3399";
-
-    QIcon icon =
-        changeSVGColor("/Users/Ricky/Documents/GitHub/Cockatrice/cockatrice/resources/userlevels/base.svg", color);
-
+    auto pixmap = QPixmap("theme:userlevels/" + levelString)
+                      .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QIcon icon(pixmap);
+    iconCache.insert(key, icon);
     return icon;
 }
 
-QMap<QString, QPixmap> UserLevelPixmapGenerator::pmCache;
+QMap<QString, QIcon> UserLevelPixmapGenerator::iconCache;
 
 QPixmap LockPixmapGenerator::generatePixmap(int height)
 {

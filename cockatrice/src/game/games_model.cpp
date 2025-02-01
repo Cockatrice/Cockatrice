@@ -119,7 +119,8 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     return QString::fromStdString(gameentry.creator_info().name());
                 case Qt::DecorationRole: {
                     QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(
-                        13, (UserLevelFlags)gameentry.creator_info().user_level(), false,
+                        13, (UserLevelFlags)gameentry.creator_info().user_level(),
+                        gameentry.creator_info().pawn_colors(), false,
                         QString::fromStdString(gameentry.creator_info().privlevel()));
                     return QIcon(avatarPixmap);
                 }

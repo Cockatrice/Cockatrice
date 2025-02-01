@@ -191,8 +191,9 @@ void ChatView::appendMessage(QString message,
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
             bool isBuddy = userListProxy->isUserBuddy(userName);
             const QString privLevel = userInfo.has_privlevel() ? QString::fromStdString(userInfo.privlevel()) : "NONE";
-            cursor.insertImage(
-                UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, privLevel).toImage());
+            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, userInfo.pawn_colors(),
+                                                                        isBuddy, privLevel)
+                                   .toImage());
             cursor.insertText(" ");
             cursor.setCharFormat(senderFormat);
             cursor.insertText(userName);

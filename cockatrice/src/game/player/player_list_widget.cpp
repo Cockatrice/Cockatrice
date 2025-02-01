@@ -140,9 +140,9 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     }
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
-        player->setIcon(
-            3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false,
-                                                              QString::fromStdString(prop.user_info().privlevel()))));
+        player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(
+                               12, UserLevelFlags(prop.user_info().user_level()), prop.user_info().pawn_colors(), false,
+                               QString::fromStdString(prop.user_info().privlevel()))));
         player->setText(4, QString::fromStdString(prop.user_info().name()));
         const QString country = QString::fromStdString(prop.user_info().country());
         if (!country.isEmpty())
