@@ -281,7 +281,7 @@ static void setupParserRules()
         for (const auto &i : sv) {
             parts += std::any_cast<char>(i);
         }
-        const bool identity = sv.tokens[0][0] != 'i';
+        const bool identity = sv.tokens[0].empty() || sv.tokens[0][0] != 'i';
         if (sv.tokens[1][0] == ':') {
             return [=](const CardData &x) {
                 QString match = identity ? x->getColors() : x->getProperty("coloridentity");
