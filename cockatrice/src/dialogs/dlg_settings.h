@@ -142,10 +142,10 @@ private:
     QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
-    QCheckBox visualDeckStoragePromptForConversionCheckBox;
-    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
+    QCheckBox visualDeckStoragePromptForConversionCheckBox;
+    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;
