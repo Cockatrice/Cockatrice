@@ -607,6 +607,15 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
 
     result.set_user_level(userLevel);
 
+    const auto &pawn_left_override = query->value(10).toString();
+    const auto &pawn_right_override = query->value(11).toString();
+    if (!pawn_left_override.isEmpty()) {
+        result.mutable_pawn_colors()->set_left_side(pawn_left_override.toStdString());
+    }
+    if (!pawn_right_override.isEmpty()) {
+        result.mutable_pawn_colors()->set_right_side(pawn_right_override.toStdString());
+    }
+
     const QString country = query->value(3).toString();
     if (!country.isEmpty())
         result.set_country(country.toStdString());
@@ -654,7 +663,8 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
 
         QSqlQuery *query =
             prepareQuery("select id, name, admin, country, privlevel, realname, avatar_bmp, registrationDate, "
-                         "email, clientid from {prefix}_users where name = :name and active = 1");
+                         "email, clientid, leftPawnColorOverride, rightPawnColorOverride from {prefix}_users where "
+                         "name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
