@@ -4,8 +4,12 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDomDocument>
+#include <QFile>
 #include <QPainter>
 #include <QPalette>
+#include <QSvgRenderer>
+#include <QtGui/qicon.h>
 
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
 
@@ -96,12 +100,61 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
+void SetAttrRecur(QDomElement &elem, QString tagName, QString attrName, QString attrValue)
+{
+    // if it has the tagname then overwritte desired attribute
+    if (elem.tagName().compare(tagName) == 0) {
+        elem.setAttribute(attrName, attrValue);
+    }
+    // loop all children
+    for (int i = 0; i < elem.childNodes().count(); i++) {
+        if (!elem.childNodes().at(i).isElement()) {
+            continue;
+        }
+        QDomElement docElem = elem.childNodes().at(i).toElement(); //<-- make const "variable"
+        SetAttrRecur(docElem, tagName, attrName, attrValue);
+    }
+}
+
+QIcon changeSVGColor(const QString &iconPath, const QString &color)
+{
+    // open svg resource load contents to qbytearray
+    QFile file(iconPath);
+    if (!file.open(QIODevice::ReadOnly))
+        return {};
+    QByteArray baData = file.readAll();
+    // load svg contents to xml document and edit contents
+    QDomDocument doc;
+    doc.setContent(baData);
+    // recurivelly change color
+    QDomElement docElem = doc.documentElement(); //<-- make const "variable"
+    qDebug() << docElem.text();
+    SetAttrRecur(docElem, "path", "fill", color);
+    // create svg renderer with edited contents
+    QSvgRenderer svgRenderer(doc.toByteArray());
+    // create pixmap target (could be a QImage)
+    QPixmap pix(svgRenderer.defaultSize());
+    pix.fill(Qt::transparent);
+    // create painter to act over pixmap
+    QPainter pixPainter(&pix);
+    // use renderer to render over painter which paints on pixmap
+    svgRenderer.render(&pixPainter);
+    QIcon myicon(pix);
+    return myicon;
+}
+
 QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
+{
+    return generateIcon(height, userLevel, isBuddy, privLevel).pixmap(QSize());
+}
+
+QIcon UserLevelPixmapGenerator::generateIcon(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
 {
 
     QString key = QString::number(height * 10000) + ":" + (short)userLevel + ":" + (short)isBuddy + ":" + privLevel;
-    if (pmCache.contains(key))
+    /*if (pmCache.contains(key))
         return pmCache.value(key);
+        */
 
     QString levelString;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
@@ -122,11 +175,12 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
     if (isBuddy)
         levelString.append("_buddy");
 
-    QPixmap pixmap = QPixmap("theme:userlevels/" + levelString)
-                         .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QString color = "#FF3399";
 
-    pmCache.insert(key, pixmap);
-    return pixmap;
+    QIcon icon =
+        changeSVGColor("/Users/Ricky/Documents/GitHub/Cockatrice/cockatrice/resources/userlevels/base.svg", color);
+
+    return icon;
 }
 
 QMap<QString, QPixmap> UserLevelPixmapGenerator::pmCache;

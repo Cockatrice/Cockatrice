@@ -5,6 +5,7 @@
 
 #include <QMap>
 #include <QPixmap>
+#include <QtGui/qicon.h>
 
 class PhasePixmapGenerator
 {
@@ -65,6 +66,7 @@ private:
 
 public:
     static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
+    static QIcon generateIcon(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
     static void clear()
     {
         pmCache.clear();
