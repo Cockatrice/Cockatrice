@@ -2,6 +2,7 @@
 #define BANNER_WIDGET_H
 
 #include <QLabel>
+#include <QVBoxLayout>
 #include <QWidget>
 
 class BannerWidget : public QWidget
@@ -14,6 +15,7 @@ public:
                           Qt::Orientation orientation = Qt::Vertical,
                           int transparency = 80);
     void mousePressEvent(QMouseEvent *event) override;
+    void setText(const QString &text) const;
     void setBuddy(QWidget *_buddy)
     {
         buddy = _buddy;
@@ -22,15 +24,21 @@ public:
     {
         return bannerLabel->text();
     }
+    void setClickable(bool _clickable)
+    {
+        clickable = _clickable;
+    }
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
+    QVBoxLayout *layout;
     QLabel *bannerLabel;
     Qt::Orientation gradientOrientation;
     int transparency; // Transparency percentage for the gradient
     QWidget *buddy;
+    bool clickable = true;
 signals:
     void buddyVisibilityChanged();
 private slots:

@@ -14,20 +14,26 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
 
     // Layout to center the banner label
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout = new QVBoxLayout(this);
     layout->addWidget(bannerLabel);
-    layout->setContentsMargins(0, 20, 0, 20); // Space for the gradient
     setLayout(layout);
 
     // Set minimum height for the widget
-    setMinimumHeight(100);
+    setMinimumHeight(50);
     connect(this, &BannerWidget::buddyVisibilityChanged, this, &BannerWidget::toggleBuddyVisibility);
 }
 
 void BannerWidget::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    emit buddyVisibilityChanged();
+    if (clickable) {
+        emit buddyVisibilityChanged();
+    }
+}
+
+void BannerWidget::setText(const QString &text) const
+{
+    bannerLabel->setText(text);
 }
 
 void BannerWidget::toggleBuddyVisibility() const

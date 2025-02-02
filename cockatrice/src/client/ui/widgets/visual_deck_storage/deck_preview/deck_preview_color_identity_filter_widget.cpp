@@ -112,9 +112,9 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
     // Connect the button's toggled signal
     connect(toggleButton, &QPushButton::toggled, this, &DeckPreviewColorIdentityFilterWidget::updateFilterMode);
     connect(this, &DeckPreviewColorIdentityFilterWidget::activeColorsChanged, parent,
-            &VisualDeckStorageWidget::refreshBannerCards);
+            &VisualDeckStorageWidget::updateColorFilter);
     connect(this, &DeckPreviewColorIdentityFilterWidget::filterModeChanged, parent,
-            &VisualDeckStorageWidget::refreshBannerCards);
+            &VisualDeckStorageWidget::updateColorFilter);
 
     // Call retranslateUi to set the initial text
     retranslateUi();
@@ -139,10 +139,8 @@ void DeckPreviewColorIdentityFilterWidget::updateFilterMode(bool checked)
     emit filterModeChanged(exactMatchMode);
 }
 
-QList<DeckPreviewWidget *> DeckPreviewColorIdentityFilterWidget::filterWidgets(QList<DeckPreviewWidget *> &widgets)
+void DeckPreviewColorIdentityFilterWidget::filterWidgets(QList<DeckPreviewWidget *> widgets)
 {
-    QList<DeckPreviewWidget *> filteredWidgets;
-
     // Check if no colors are active
     bool noColorsActive = true;
     for (auto it = activeColors.constBegin(); it != activeColors.constEnd(); ++it) {
@@ -154,7 +152,9 @@ QList<DeckPreviewWidget *> DeckPreviewColorIdentityFilterWidget::filterWidgets(Q
 
     // If no colors are active, return the unfiltered list of widgets
     if (noColorsActive) {
-        return widgets;
+        for (DeckPreviewWidget *previewWidget : widgets) {
+            previewWidget->filteredByColor = false;
+        }
     }
 
     for (const auto &widget : widgets) {
@@ -192,10 +192,6 @@ QList<DeckPreviewWidget *> DeckPreviewColorIdentityFilterWidget::filterWidgets(Q
             }
         }
 
-        if (matchesFilter) {
-            filteredWidgets << widget;
-        }
+        widget->filteredByColor = !matchesFilter;
     }
-
-    return filteredWidgets;
 }
