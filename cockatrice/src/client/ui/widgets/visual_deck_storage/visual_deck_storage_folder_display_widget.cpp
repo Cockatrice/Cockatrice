@@ -67,7 +67,7 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
 {
     QList<DeckPreviewWidget *> allDecks;
     for (const QString &file : getAllFiles()) {
-        auto *display = new DeckPreviewWidget(visualDeckStorageWidget, file);
+        auto *display = new DeckPreviewWidget(flowWidget, visualDeckStorageWidget, file);
 
         connect(display, &DeckPreviewWidget::deckPreviewClicked, visualDeckStorageWidget,
                 &VisualDeckStorageWidget::deckPreviewClickedEvent);
@@ -108,7 +108,6 @@ bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
     if (flowWidget) {
         // Iterate through all DeckPreviewWidgets
         for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
-            // Get tags from each DeckPreviewWidget
             if (display->checkVisibility()) {
                 atLeastOneWidgetVisible = true;
             }

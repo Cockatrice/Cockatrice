@@ -22,6 +22,10 @@ public:
     QStringList gatherAllTagsFromFlowWidget() const;
     [[nodiscard]] QStringList getAllFiles() const;
     [[nodiscard]] QStringList getAllSubFolders() const;
+    FlowWidget *getFlowWidget() const
+    {
+        return flowWidget;
+    };
 
 public slots:
     void updateVisibility();

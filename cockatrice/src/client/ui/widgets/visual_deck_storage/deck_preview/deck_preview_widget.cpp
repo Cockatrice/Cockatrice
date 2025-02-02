@@ -9,15 +9,17 @@
 #include <QSet>
 #include <QVBoxLayout>
 
-DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QString &_filePath)
-    : QWidget(_parent), parent(_parent), filePath(_filePath)
+DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
+                                     VisualDeckStorageWidget *_visualDeckStorageWidget,
+                                     const QString &_filePath)
+    : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
     deckLoader = new DeckLoader();
     connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
-    connect(deckLoader, &DeckLoader::loadFinished, parent->tagFilterWidget,
+    connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
             &VisualDeckStorageTagFilterWidget::refreshTags);
     deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
 

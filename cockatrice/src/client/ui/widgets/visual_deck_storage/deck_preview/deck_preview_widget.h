@@ -16,10 +16,12 @@ class DeckPreviewWidget final : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QString &_filePath);
+    explicit DeckPreviewWidget(QWidget *_parent,
+                               VisualDeckStorageWidget *_visualDeckStorageWidget,
+                               const QString &_filePath);
     QString getColorIdentity();
 
-    VisualDeckStorageWidget *parent;
+    VisualDeckStorageWidget *visualDeckStorageWidget;
     QVBoxLayout *layout;
     QString filePath;
     DeckLoader *deckLoader;

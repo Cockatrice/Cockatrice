@@ -63,7 +63,23 @@ void VisualDeckStorageSortWidget::updateSortOrder()
     emit sortOrderChanged();
 }
 
-QList<DeckPreviewWidget *> &VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> &widgets)
+void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget)
+{
+    auto children = folderWidget->getFlowWidget()->findChildren<QWidget *>(Qt::FindChildOption::FindDirectChildrenOnly);
+    for (auto widget : children) {
+        auto deckPreviewWidgets =
+            widget->findChildren<DeckPreviewWidget *>(Qt::FindChildOption::FindDirectChildrenOnly);
+        auto newOrder = filterFiles(deckPreviewWidgets);
+        for (DeckPreviewWidget *previewWidget : newOrder) {
+            folderWidget->getFlowWidget()->removeWidget(previewWidget);
+        }
+        for (DeckPreviewWidget *previewWidget : newOrder) {
+            folderWidget->getFlowWidget()->addWidget(previewWidget);
+        }
+    }
+}
+
+QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> widgets)
 {
     // Sort the widgets list based on the current sort order
     std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {

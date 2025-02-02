@@ -39,7 +39,7 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
         emit tagClicked();
     }
     QWidget::mousePressEvent(event);
-    QStringList knownTags = parent->parent->parent->tagFilterWidget->getAllKnownTags();
+    QStringList knownTags = parent->parent->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
     QStringList activeTags = parent->deckLoader->getTags();
 
     bool canAddTags = true;

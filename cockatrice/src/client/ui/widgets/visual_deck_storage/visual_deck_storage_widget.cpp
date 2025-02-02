@@ -74,11 +74,6 @@ void VisualDeckStorageWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 }
 
-void VisualDeckStorageWidget::updateSortOrder()
-{
-    refreshBannerCards(); // Refresh the banner cards with the new sort order
-}
-
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
 {
     emit deckPreviewClicked(event, instance);
@@ -94,6 +89,18 @@ void VisualDeckStorageWidget::refreshBannerCards()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
     scrollArea->setWidget(folderWidget);
+}
+
+void VisualDeckStorageWidget::updateSortOrder()
+{
+    if (folderWidget) {
+        qDebug() << "Updating sort order";
+        sortWidget->sortFolder(folderWidget);
+        for (VisualDeckStorageFolderDisplayWidget *subFolderWidget :
+             folderWidget->findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+            sortWidget->sortFolder(subFolderWidget);
+        }
+    }
 }
 
 void VisualDeckStorageWidget::updateTagFilter()
