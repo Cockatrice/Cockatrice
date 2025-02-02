@@ -149,11 +149,12 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
 void ChatView::appendMessage(QString message,
                              RoomMessageTypeFlags messageType,
-                             const QString &userName,
-                             UserLevelFlags userLevel,
-                             QString UserPrivLevel,
+                             const ServerInfo_User &userInfo,
                              bool playerBold)
 {
+    const QString userName = QString::fromStdString(userInfo.name());
+    const UserLevelFlags userLevel = UserLevelFlags(userInfo.user_level());
+
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     // messageType should be Event_RoomSay::UserMessage though we don't actually check
     bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
@@ -189,8 +190,9 @@ void ChatView::appendMessage(QString message,
         } else {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
             bool isBuddy = userListProxy->isUserBuddy(userName);
+            const QString privLevel = userInfo.has_privlevel() ? QString::fromStdString(userInfo.privlevel()) : "NONE";
             cursor.insertImage(
-                UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, UserPrivLevel).toImage());
+                UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, privLevel).toImage());
             cursor.insertText(" ");
             cursor.setCharFormat(senderFormat);
             cursor.insertText(userName);
