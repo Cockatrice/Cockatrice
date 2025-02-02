@@ -57,7 +57,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 void DeckPreviewWidget::updateVisibility()
 {
     if (isVisible() != checkVisibility()) {
-        setVisible(checkVisibility());
+        setHidden(!checkVisibility());
         emit visibilityUpdated();
     }
 }

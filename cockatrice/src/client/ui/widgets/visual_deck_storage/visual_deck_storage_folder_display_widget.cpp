@@ -153,8 +153,8 @@ QStringList VisualDeckStorageFolderDisplayWidget::getAllFiles() const
 {
     QStringList allFiles;
 
-    // QDirIterator with QDir::Files and QDir::NoSymLinks ensures only files are listed (no directories or symlinks)
-    QDirIterator it(filePath, QDir::Files | QDir::NoSymLinks);
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    QDirIterator it(filePath, QDir::Files);
 
     while (it.hasNext()) {
         allFiles << it.next(); // Add each file path to the list
@@ -167,8 +167,8 @@ QStringList VisualDeckStorageFolderDisplayWidget::getAllSubFolders() const
 {
     QStringList allFolders;
 
-    // QDirIterator with QDir::Files and QDir::NoSymLinks ensures only files are listed (no directories or symlinks)
-    QDirIterator it(filePath, QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    QDirIterator it(filePath, QDir::Dirs | QDir::NoDotAndDotDot);
 
     while (it.hasNext()) {
         allFolders << it.next(); // Add each file path to the list
