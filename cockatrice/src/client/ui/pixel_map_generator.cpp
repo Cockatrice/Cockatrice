@@ -252,24 +252,18 @@ QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
         return iconCache.value(key);
     }
 
-    QString iconPath;
-    if (colorRight.has_value()) {
-        if (isBuddy) {
-            iconPath = "theme:usericons/star_double.svg";
-        } else if (privLevel.toLower() == "vip") {
-            iconPath = "theme:usericons/pawn_vip_double.svg";
-        } else {
-            iconPath = "theme:usericons/pawn_double.svg";
-        }
+    QString iconType;
+    if (isBuddy) {
+        iconType = "star";
+    } else if (privLevel.toLower() == "vip") {
+        iconType = "pawn_vip";
     } else {
-        if (isBuddy) {
-            iconPath = "theme:usericons/star_single.svg";
-        } else if (privLevel.toLower() == "vip") {
-            iconPath = "theme:usericons/pawn_vip_single.svg";
-        } else {
-            iconPath = "theme:usericons/pawn_single.svg";
-        }
+        iconType = "pawn";
     }
+
+    QString arity = colorRight.has_value() ? "double" : "single";
+
+    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType).arg(arity);
 
     QIcon icon(changeSVGColor(iconPath, colorLeft.value(), colorRight));
     iconCache.insert(key, icon);
