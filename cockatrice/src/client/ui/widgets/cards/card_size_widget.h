@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSlider>
+#include <QTimer>
 #include <QWidget>
 
 class CardSizeWidget : public QWidget
@@ -15,15 +16,18 @@ class CardSizeWidget : public QWidget
 public:
     explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr, int defaultValue = 100);
     [[nodiscard]] QSlider *getSlider() const;
-    QWidget *parent;
+
 public slots:
     void updateCardSizeSetting(int newValue);
 
 private:
+    QWidget *parent;
     FlowWidget *flowWidget;
     QHBoxLayout *cardSizeLayout;
     QLabel *cardSizeLabel;
     QSlider *cardSizeSlider;
+    QTimer debounceTimer; // Debounce timer
+    int pendingValue;     // Stores the latest slider value
 };
 
 #endif // CARD_SIZE_WIDGET_H
