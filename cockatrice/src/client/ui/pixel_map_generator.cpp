@@ -129,9 +129,18 @@ void setAttrRecur(QDomElement &elem,
 }
 
 /**
- * Returns an icon of the svg that has its color filled in
+ * Loads the usericon svg and fills in its colors.
+ * The image is kept as a QIcon to preserve the image quality.
+ *
+ * Call icon.pixmap(w, h) in order to convert this icon into a pixmap with the given dimensions.
+ * Avoid scaling the pixmap in other ways, as that destroys image quality.
+ *
+ * @param minSize If the dimensions of the source svg is smaller than this, then it will be scaled up to this size
  */
-QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const std::optional<QString> &colorRight)
+static QIcon loadAndColorSvg(const QString &iconPath,
+                             const QString &colorLeft,
+                             const std::optional<QString> &colorRight,
+                             const int minSize)
 {
     QFile file(iconPath);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -152,7 +161,7 @@ QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const st
 
     QSvgRenderer svgRenderer(doc.toByteArray());
 
-    QPixmap pix(svgRenderer.defaultSize());
+    QPixmap pix(svgRenderer.defaultSize().expandedTo(QSize(minSize, minSize)));
     pix.fill(Qt::transparent);
 
     QPainter pixPainter(&pix);
@@ -171,7 +180,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height,
     return generateIcon(height, userLevel, pawnColorsOverride, isBuddy, privLevel).pixmap(height, height);
 }
 
-QIcon UserLevelPixmapGenerator::generateIcon(int height,
+QIcon UserLevelPixmapGenerator::generateIcon(int minHeight,
                                              UserLevelFlags userLevel,
                                              ServerInfo_User::PawnColorsOverride pawnColorsOverride,
                                              bool isBuddy,
@@ -189,11 +198,11 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
 
     // Has Color Override
     if (colorLeft.has_value()) {
-        return generateIconWithColorOverride(height, isBuddy, privLevel, colorLeft, colorRight);
+        return generateIconWithColorOverride(minHeight, isBuddy, privLevel, colorLeft, colorRight);
     }
 
     // Has No Color Override
-    return generateIconDefault(height, userLevel, isBuddy, privLevel);
+    return generateIconDefault(minHeight, userLevel, isBuddy, privLevel);
 }
 
 QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
@@ -263,7 +272,7 @@ QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
 
     QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType).arg(arity);
 
-    QIcon icon(changeSVGColor(iconPath, colorLeft.value(), colorRight));
+    QIcon icon = loadAndColorSvg(iconPath, colorLeft.value(), colorRight, height);
     iconCache.insert(key, icon);
     return icon;
 }

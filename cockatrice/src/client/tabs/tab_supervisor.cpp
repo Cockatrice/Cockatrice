@@ -809,10 +809,10 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
         if (auto *tab = getTabAccount()) {
             if (tab != currentWidget()) {
                 tab->setContentsChanged(true);
-                QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(
+                QIcon avatarIcon = UserLevelPixmapGenerator::generateIcon(
                     13, (UserLevelFlags)userInfoJoined.user_level(), userInfoJoined.pawn_colors(), true,
                     QString::fromStdString(userInfoJoined.privlevel()));
-                setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+                setTabIcon(indexOf(tab), avatarIcon);
             }
         }
 
