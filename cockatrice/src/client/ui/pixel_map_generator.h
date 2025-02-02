@@ -81,7 +81,7 @@ public:
                                   bool isBuddy,
                                   const QString &privLevel);
 
-    static QIcon generateIcon(int height,
+    static QIcon generateIcon(int minHeight,
                               UserLevelFlags userLevel,
                               ServerInfo_User::PawnColorsOverride pawnColors,
                               bool isBuddy,
