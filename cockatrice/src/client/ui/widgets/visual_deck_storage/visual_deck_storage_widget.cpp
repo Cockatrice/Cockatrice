@@ -103,3 +103,19 @@ void VisualDeckStorageWidget::updateTagFilter()
     }
     emit tagFilterUpdated();
 }
+
+void VisualDeckStorageWidget::updateColorFilter()
+{
+    if (folderWidget) {
+        deckPreviewColorIdentityFilterWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>());
+    }
+    emit colorFilterUpdated();
+}
+
+void VisualDeckStorageWidget::updateSearchFilter()
+{
+    if (folderWidget) {
+        searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText());
+    }
+    emit searchFilterUpdated();
+}

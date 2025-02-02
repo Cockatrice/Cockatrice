@@ -32,6 +32,8 @@ public slots:
     void deckPreviewDoubleClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance);
     void refreshBannerCards(); // Refresh the display of cards based on the current sorting option
     void updateTagFilter();
+    void updateColorFilter();
+    void updateSearchFilter();
     void updateSortOrder();
 
 signals:
@@ -40,6 +42,8 @@ signals:
     void deckPreviewDoubleClicked(QMouseEvent *event, DeckPreviewWidget *instance);
     void deckLoadRequested(QString &filePath);
     void tagFilterUpdated();
+    void colorFilterUpdated();
+    void searchFilterUpdated();
 
 private:
     QVBoxLayout *layout;

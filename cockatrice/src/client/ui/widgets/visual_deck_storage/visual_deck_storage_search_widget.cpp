@@ -25,7 +25,7 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWi
         searchDebounceTimer->start(300); // 300ms debounce
     });
 
-    connect(searchDebounceTimer, &QTimer::timeout, parent, &VisualDeckStorageWidget::refreshBannerCards);
+    connect(searchDebounceTimer, &QTimer::timeout, parent, &VisualDeckStorageWidget::updateSearchFilter);
 }
 
 /**
@@ -38,23 +38,18 @@ QString VisualDeckStorageSearchWidget::getSearchText()
     return searchBar->text();
 }
 
-QList<DeckPreviewWidget *> VisualDeckStorageSearchWidget::filterFiles(QList<DeckPreviewWidget *> &widgets,
-                                                                      const QString &searchText)
+void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText)
 {
     if (searchText.isEmpty() || searchText.isNull()) {
-        return widgets;
-    }
-
-    QList<DeckPreviewWidget *> filteredWidgets;
-
-    for (const auto &file : widgets) {
-        QFileInfo fileInfo(file->filePath);
-        QString fileName = fileInfo.fileName().toLower();
-
-        if (fileName.contains(searchText.toLower())) {
-            filteredWidgets << file;
+        for (auto widget : widgets) {
+            widget->filteredBySearch = false;
         }
     }
 
-    return filteredWidgets;
+    for (auto file : widgets) {
+        QFileInfo fileInfo(file->filePath);
+        QString fileName = fileInfo.fileName().toLower();
+
+        file->filteredBySearch = !fileName.contains(searchText.toLower());
+    }
 }

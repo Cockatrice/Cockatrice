@@ -46,6 +46,10 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::tagFilterUpdated, this,
             &VisualDeckStorageFolderDisplayWidget::updateVisibility);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::colorFilterUpdated, this,
+            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::searchFilterUpdated, this,
+            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
 
     createWidgetsForFiles();
     createWidgetsForFolders();
