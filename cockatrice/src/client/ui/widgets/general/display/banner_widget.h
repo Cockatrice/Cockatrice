@@ -23,6 +23,10 @@ public:
     {
         return bannerLabel->text();
     }
+    void setClickable(bool _clickable)
+    {
+        clickable = _clickable;
+    }
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -32,6 +36,7 @@ private:
     Qt::Orientation gradientOrientation;
     int transparency; // Transparency percentage for the gradient
     QWidget *buddy;
+    bool clickable = true;
 signals:
     void buddyVisibilityChanged();
 private slots:

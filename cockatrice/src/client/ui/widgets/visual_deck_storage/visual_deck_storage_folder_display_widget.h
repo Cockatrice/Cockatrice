@@ -14,7 +14,8 @@ class VisualDeckStorageFolderDisplayWidget : public QWidget
 public:
     VisualDeckStorageFolderDisplayWidget(QWidget *parent,
                                          VisualDeckStorageWidget *_visualDeckStorageWidget,
-                                         QString _filePath);
+                                         QString _filePath,
+                                         bool canBeHidden);
     void refreshUi();
     void createWidgetsForFiles();
     void createWidgetsForFolders();

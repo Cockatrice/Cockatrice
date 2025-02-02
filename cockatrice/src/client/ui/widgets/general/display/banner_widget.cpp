@@ -27,7 +27,9 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
 void BannerWidget::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    emit buddyVisibilityChanged();
+    if (clickable) {
+        emit buddyVisibilityChanged();
+    }
 }
 
 void BannerWidget::setText(const QString &text) const

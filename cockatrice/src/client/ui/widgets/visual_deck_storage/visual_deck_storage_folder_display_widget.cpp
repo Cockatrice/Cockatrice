@@ -9,13 +9,15 @@
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,
     VisualDeckStorageWidget *_visualDeckStorageWidget,
-    QString _filePath)
+    QString _filePath,
+    bool canBeHidden)
     : QWidget(parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
     header = new BannerWidget(this, "");
+    header->setClickable(canBeHidden);
     layout->addWidget(header);
 
     container = new QWidget(this);
@@ -123,7 +125,7 @@ bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFolders()
 {
     for (const QString &dir : getAllSubFolders()) {
-        auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir);
+        auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir, true);
         containerLayout->addWidget(display);
     }
 }
