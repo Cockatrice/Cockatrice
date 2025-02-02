@@ -23,6 +23,7 @@ class VisualDeckStorageWidget final : public QWidget
     Q_OBJECT
 public:
     explicit VisualDeckStorageWidget(QWidget *parent);
+
     void retranslateUi();
     CardSizeWidget *cardSizeWidget;
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
@@ -35,6 +36,7 @@ public slots:
     void updateColorFilter();
     void updateSearchFilter();
     void updateSortOrder();
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void bannerCardsRefreshed();

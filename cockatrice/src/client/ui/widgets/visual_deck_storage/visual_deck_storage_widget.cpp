@@ -44,6 +44,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
+    folderWidget->setFixedWidth(scrollArea->viewport()->width());
 
     scrollArea->setWidget(folderWidget);
     scrollArea->setWidgetResizable(true);
@@ -69,6 +70,14 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     }
 }
 
+void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    if (scrollArea->widget() == folderWidget) {
+        folderWidget->setFixedWidth(scrollArea->viewport()->width());
+    }
+}
+
 void VisualDeckStorageWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
@@ -88,6 +97,7 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 void VisualDeckStorageWidget::refreshBannerCards()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
+    folderWidget->setFixedWidth(scrollArea->viewport()->width());
     scrollArea->setWidget(folderWidget);
 }
 

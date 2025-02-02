@@ -16,11 +16,10 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     // Layout to center the banner label
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(bannerLabel);
-    layout->setContentsMargins(0, 20, 0, 20); // Space for the gradient
     setLayout(layout);
 
     // Set minimum height for the widget
-    setMinimumHeight(100);
+    setMinimumHeight(50);
     connect(this, &BannerWidget::buddyVisibilityChanged, this, &BannerWidget::toggleBuddyVisibility);
 }
 
