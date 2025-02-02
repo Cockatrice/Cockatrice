@@ -29,6 +29,7 @@ public:
     bool filteredBySearch = false;
     bool filteredByColor = false;
     bool filteredByTags = false;
+    bool checkVisibility() const;
 
 signals:
     void deckPreviewClicked(QMouseEvent *event, DeckPreviewWidget *instance);
@@ -41,7 +42,7 @@ public slots:
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
-    void checkVisibility();
+    void updateVisibility();
 };
 
 #endif // DECK_PREVIEW_WIDGET_H

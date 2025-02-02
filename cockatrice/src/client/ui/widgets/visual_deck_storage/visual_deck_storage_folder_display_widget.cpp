@@ -4,6 +4,7 @@
 #include "deck_preview/deck_preview_widget.h"
 
 #include <QDirIterator>
+#include <QMouseEvent>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,
@@ -43,6 +44,9 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     containerLayout->addWidget(flowWidget);
 
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::tagFilterUpdated, this,
+            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
+
     createWidgetsForFiles();
     createWidgetsForFolders();
 }
@@ -59,8 +63,6 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
                 &VisualDeckStorageWidget::deckPreviewDoubleClickedEvent);
         connect(visualDeckStorageWidget->cardSizeWidget->getSlider(), &QSlider::valueChanged,
                 display->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
-        connect(display, &DeckPreviewWidget::visibilityUpdated, this,
-                &VisualDeckStorageFolderDisplayWidget::updateVisibility);
         display->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->cardSizeWidget->getSlider()->value());
         allDecks.append(display);
     }
@@ -82,21 +84,38 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
 
 void VisualDeckStorageFolderDisplayWidget::updateVisibility()
 {
+    bool atLeastOneWidgetVisible = checkVisibility();
+    if (atLeastOneWidgetVisible) {
+        setVisible(true);
+        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
+            display->updateVisibility();
+        }
+        for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+            subFolder->updateVisibility();
+        }
+    } else {
+        setVisible(false);
+    }
+}
+
+bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
+{
     bool atLeastOneWidgetVisible = false;
     if (flowWidget) {
         // Iterate through all DeckPreviewWidgets
         for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             // Get tags from each DeckPreviewWidget
-            if (display->isVisible()) {
+            if (display->checkVisibility()) {
                 atLeastOneWidgetVisible = true;
             }
         }
     }
-    if (atLeastOneWidgetVisible) {
-        // setVisible(true);
-    } else {
-        // setVisible(false);
+    for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+        if (subFolder->checkVisibility()) {
+            atLeastOneWidgetVisible = true;
+        }
     }
+    return atLeastOneWidgetVisible;
 }
 
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFolders()

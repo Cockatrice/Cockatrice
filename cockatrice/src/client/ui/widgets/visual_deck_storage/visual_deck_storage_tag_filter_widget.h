@@ -22,6 +22,7 @@ public:
 
 public slots:
     void refreshTags();
+    void showEvent(QShowEvent *event) override;
 };
 
 #endif // VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H

@@ -28,8 +28,6 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
 
-    connect(parent, &VisualDeckStorageWidget::tagFilterUpdated, this, &DeckPreviewWidget::checkVisibility);
-
     layout->addWidget(bannerCardDisplayWidget);
 }
 
@@ -56,14 +54,20 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     layout->addWidget(deckTagsDisplayWidget);
 }
 
-void DeckPreviewWidget::checkVisibility()
+void DeckPreviewWidget::updateVisibility()
+{
+    if (isVisible() != checkVisibility()) {
+        setVisible(checkVisibility());
+        emit visibilityUpdated();
+    }
+}
+
+bool DeckPreviewWidget::checkVisibility() const
 {
     if (filteredBySearch || filteredByColor || filteredByTags) {
-        setVisible(false);
-    } else {
-        setVisible(true);
+        return false;
     }
-    emit visibilityUpdated();
+    return true;
 }
 
 QString DeckPreviewWidget::getColorIdentity()

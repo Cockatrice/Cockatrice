@@ -23,6 +23,7 @@ public:
 
 public slots:
     void updateVisibility();
+    bool checkVisibility();
 
 private:
     QVBoxLayout *layout;

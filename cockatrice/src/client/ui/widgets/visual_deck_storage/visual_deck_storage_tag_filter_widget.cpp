@@ -25,6 +25,12 @@ VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckSto
     layout->addWidget(flowWidget);
 }
 
+void VisualDeckStorageTagFilterWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    refreshTags();
+}
+
 void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPreviewWidget *> &deckPreviews) const
 {
     // Collect selected tags from DeckPreviewTagDisplayWidget
@@ -59,6 +65,7 @@ void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<Dec
 void VisualDeckStorageTagFilterWidget::refreshTags()
 {
     QStringList allTags = gatherAllTags();
+    qDebug() << "Refreshed tags: " << allTags;
     removeTagsNotInList(gatherAllTags());
     addTagsIfNotPresent(gatherAllTags());
 }
@@ -112,7 +119,7 @@ QStringList VisualDeckStorageTagFilterWidget::gatherAllTags()
     QList<DeckPreviewWidget *> deckWidgets = parent->findChildren<DeckPreviewWidget *>();
 
     for (DeckPreviewWidget *widget : deckWidgets) {
-        if (widget->isVisible()) {
+        if (widget->checkVisibility()) {
             allTags << widget->deckLoader->getTags();
         }
     }
