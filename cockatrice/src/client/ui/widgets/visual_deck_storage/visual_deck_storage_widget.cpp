@@ -69,6 +69,15 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     }
 }
 
+void VisualDeckStorageWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (scrollArea->widget() == folderWidget) {
+        scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
+        scrollArea->widget()->adjustSize();
+    }
+}
+
 void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
