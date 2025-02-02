@@ -3,13 +3,11 @@
 #include "pb/serverinfo_user.pb.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QDomDocument>
 #include <QFile>
 #include <QPainter>
 #include <QPalette>
 #include <QSvgRenderer>
-#include <QtGui/qicon.h>
 
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
 
