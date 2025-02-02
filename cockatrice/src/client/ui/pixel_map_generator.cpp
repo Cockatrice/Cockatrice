@@ -147,9 +147,9 @@ QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const st
 
     auto docElem = doc.documentElement();
 
-    SetAttrRecur(docElem, "path", "fill", "left", colorLeft);
+    setAttrRecur(docElem, "path", "fill", "left", colorLeft);
     if (colorRight.has_value()) {
-        SetAttrRecur(docElem, "path", "fill", "right", colorRight.value());
+        setAttrRecur(docElem, "path", "fill", "right", colorRight.value());
     }
 
     QSvgRenderer svgRenderer(doc.toByteArray());
@@ -168,7 +168,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height,
                                                  UserLevelFlags userLevel,
                                                  ServerInfo_User::PawnColorsOverride pawnColorsOverride,
                                                  bool isBuddy,
-                                                 QString privLevel)
+                                                 const QString &privLevel)
 {
     return generateIcon(height, userLevel, pawnColorsOverride, isBuddy, privLevel).pixmap(height, height);
 }
@@ -177,7 +177,7 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
                                              UserLevelFlags userLevel,
                                              ServerInfo_User::PawnColorsOverride pawnColorsOverride,
                                              bool isBuddy,
-                                             QString privLevel)
+                                             const QString &privLevel)
 {
     std::optional<QString> colorLeft = std::nullopt;
     if (pawnColorsOverride.has_left_side()) {
@@ -191,23 +191,18 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
 
     // Has Color Override
     if (colorLeft.has_value()) {
-        QString key = QString::number(height * 10000) + ":" + colorLeft.value_or("") + ":" + colorRight.value_or("");
-        if (iconCache.contains(key)) {
-            return iconCache.value(key);
-        }
-
-        QIcon icon;
-        if (colorRight.has_value()) {
-            icon = changeSVGColor("theme:usericons/pawn_double.svg", colorLeft.value(), colorRight);
-        } else {
-            icon = changeSVGColor("theme:usericons/pawn_single.svg", colorLeft.value(), colorRight);
-        }
-
-        iconCache.insert(key, icon);
-        return icon;
+        return generateIconWithColorOverride(height, colorLeft, colorRight);
     }
 
     // Has No Color Override
+    return generateIconDefault(height, userLevel, isBuddy, privLevel);
+}
+
+QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
+                                                    UserLevelFlags userLevel,
+                                                    bool isBuddy,
+                                                    const QString &privLevel)
+{
     QString key = QString::number(height * 10000) + ":" + (short)userLevel + ":" + (short)isBuddy + ":" + privLevel;
     if (iconCache.contains(key)) {
         return iconCache.value(key);
@@ -240,6 +235,26 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
     auto pixmap = QPixmap("theme:userlevels/" + levelString)
                       .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     QIcon icon(pixmap);
+    iconCache.insert(key, icon);
+    return icon;
+}
+
+QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
+                                                              std::optional<QString> colorLeft,
+                                                              std::optional<QString> colorRight)
+{
+    QString key = QString::number(height * 10000) + ":" + colorLeft.value_or("") + ":" + colorRight.value_or("");
+    if (iconCache.contains(key)) {
+        return iconCache.value(key);
+    }
+
+    QIcon icon;
+    if (colorRight.has_value()) {
+        icon = changeSVGColor("theme:usericons/pawn_double.svg", colorLeft.value(), colorRight);
+    } else {
+        icon = changeSVGColor("theme:usericons/pawn_single.svg", colorLeft.value(), colorRight);
+    }
+
     iconCache.insert(key, icon);
     return icon;
 }
