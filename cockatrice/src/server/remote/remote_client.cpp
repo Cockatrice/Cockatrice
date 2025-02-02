@@ -393,9 +393,9 @@ void RemoteClient::readData()
 
         ServerMessage newServerMessage;
         newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
-#ifdef QT_DEBUG
+
         qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
-#endif
+
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
@@ -411,9 +411,9 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
     lastDataReceived = timeRunning;
     ServerMessage newServerMessage;
     newServerMessage.ParseFromArray(message.data(), message.length());
-#ifdef QT_DEBUG
+
     qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
-#endif
+
     processProtocolItem(newServerMessage);
 }
 
@@ -424,9 +424,8 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 #else
     auto size = static_cast<unsigned int>(cont.ByteSize());
 #endif
-#ifdef QT_DEBUG
+
     qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
-#endif
 
     QByteArray buf;
     if (usingWebSocket) {
