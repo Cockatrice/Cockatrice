@@ -65,7 +65,6 @@ void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<Dec
 void VisualDeckStorageTagFilterWidget::refreshTags()
 {
     QStringList allTags = gatherAllTags();
-    qDebug() << "Refreshed tags: " << allTags;
     removeTagsNotInList(gatherAllTags());
     addTagsIfNotPresent(gatherAllTags());
 }

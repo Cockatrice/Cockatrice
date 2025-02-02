@@ -77,19 +77,11 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
         allDecks.append(display);
     }
 
-    /*auto filteredByColorIdentity =
-        deckPreviewColorIdentityFilterWidget->filterWidgets(sortWidget->filterFiles(allDecks));
-    auto filteredByTags = tagFilterWidget->filterDecksBySelectedTags(filteredByColorIdentity);
-    auto filteredFiles = searchWidget->filterFiles(filteredByTags, searchWidget->getSearchText());
-    */
-
     flowWidget->clearLayout(); // Clear existing widgets in the flow layout
 
     for (DeckPreviewWidget *deck : allDecks) {
         flowWidget->addWidget(deck);
     }
-
-    // emit bannerCardsRefreshed();
 }
 
 void VisualDeckStorageFolderDisplayWidget::updateVisibility()
