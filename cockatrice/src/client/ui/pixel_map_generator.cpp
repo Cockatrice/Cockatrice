@@ -9,6 +9,14 @@
 #include <QPalette>
 #include <QSvgRenderer>
 
+#define DEFAULT_COLOR_UNREGISTERED "#32c8ec";
+#define DEFAULT_COLOR_REGISTERED "#5ed900";
+#define DEFAULT_COLOR_DONATOR "#8c5fd3";
+#define DEFAULT_COLOR_VIP "#ecbb00";
+#define DEFAULT_COLOR_MODERATOR_LEFT "#ffffff";
+#define DEFAULT_COLOR_MODERATOR_RIGHT "#000000";
+#define DEFAULT_COLOR_ADMIN "#ff2701";
+
 /**
  * Loads in an svg from file and scales it without affecting image quality.
  *
@@ -204,9 +212,8 @@ static QIcon loadAndColorSvg(const QString &iconPath,
 
     QPainter pixPainter(&pix);
     svgRenderer.render(&pixPainter);
-    QIcon myicon(pix);
 
-    return myicon;
+    return QIcon(pix);
 }
 
 QPixmap UserLevelPixmapGenerator::generatePixmap(int height,
@@ -253,32 +260,37 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
         return iconCache.value(key);
     }
 
-    QString levelString;
-    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
-        levelString = "admin";
-        if (privLevel.toLower() == "vip") {
-            levelString.append("_" + privLevel.toLower());
-        }
-    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
-        levelString = "moderator";
-        if (privLevel.toLower() == "vip") {
-            levelString.append("_" + privLevel.toLower());
-        }
-    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
-        levelString = "registered";
-        if (privLevel.toLower() != "none") {
-            levelString.append("_" + privLevel.toLower());
-        }
-    } else {
-        levelString = "normal";
-    }
-
+    QString iconType;
     if (isBuddy) {
-        levelString.append("_buddy");
+        iconType = "star";
+    } else if (privLevel.toLower() == "vip") {
+        iconType = "pawn_vip";
+    } else {
+        iconType = "pawn";
     }
 
-    auto pixmap = loadSvg("theme:userlevels/" + levelString, QSize(height, height));
-    QIcon icon(pixmap);
+    QString arity = "single";
+    QString colorLeft;
+    std::optional<QString> colorRight = std::nullopt;
+
+    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+        colorLeft = DEFAULT_COLOR_ADMIN;
+    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
+        colorLeft = DEFAULT_COLOR_MODERATOR_LEFT;
+        colorRight = DEFAULT_COLOR_MODERATOR_RIGHT;
+        arity = "double";
+    } else if (privLevel.toLower() == "donator") {
+        colorLeft = DEFAULT_COLOR_DONATOR;
+    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
+        colorLeft = DEFAULT_COLOR_REGISTERED;
+    } else {
+        colorLeft = DEFAULT_COLOR_UNREGISTERED;
+    }
+
+    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
+
+    QIcon icon = loadAndColorSvg(iconPath, colorLeft, colorRight, height);
+
     iconCache.insert(key, icon);
     return icon;
 }
