@@ -1,4 +1,5 @@
 #include "card_size_widget.h"
+
 #include "../../../../settings/cache_settings.h"
 #include "../printing_selector/printing_selector.h"
 #include "../visual_deck_storage/visual_deck_storage_widget.h"
