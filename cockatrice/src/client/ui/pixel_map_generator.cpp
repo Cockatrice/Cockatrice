@@ -125,6 +125,7 @@ QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const st
 {
     QFile file(iconPath);
     if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Unable to open" << iconPath;
         return {};
     }
 
@@ -138,8 +139,6 @@ QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const st
     if (colorRight.has_value()) {
         SetAttrRecur(docElem, "path", "fill", "right", colorRight.value());
     }
-
-    qDebug() << "ZACH" << doc.toString();
 
     QSvgRenderer svgRenderer(doc.toByteArray());
 
@@ -168,19 +167,6 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
                                              bool isBuddy,
                                              QString privLevel)
 {
-    QString singlePawnPath =
-        "C:\\Users\\ZaHal\\Documents\\Development\\cockatrice\\cockatrice\\resources\\usericons\\pawn_single.svg";
-    QString doublePawnPath =
-        "C:\\Users\\ZaHal\\Documents\\Development\\cockatrice\\cockatrice\\resources\\usericons\\pawn_double.svg";
-
-    const auto &r = rand() > (RAND_MAX / 2);
-
-    pawnColorsOverride.set_left_side("#ff0000");
-
-    if (r == 0) {
-        pawnColorsOverride.set_right_side("#00ff00");
-    }
-
     std::optional<QString> colorLeft = std::nullopt;
     if (pawnColorsOverride.has_left_side()) {
         colorLeft = QString::fromStdString(pawnColorsOverride.left_side());
@@ -192,7 +178,7 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
     }
 
     // Has Color Override
-    if (colorLeft.has_value() || colorRight.has_value()) {
+    if (colorLeft.has_value()) {
         QString key = QString::number(height * 10000) + ":" + colorLeft.value_or("") + ":" + colorRight.value_or("");
         if (iconCache.contains(key)) {
             return iconCache.value(key);
@@ -200,9 +186,9 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
 
         QIcon icon;
         if (colorRight.has_value()) {
-            icon = changeSVGColor(doublePawnPath, colorLeft.value(), colorRight);
+            icon = changeSVGColor("theme:usericons/pawn_double.svg", colorLeft.value(), colorRight);
         } else {
-            icon = changeSVGColor(singlePawnPath, colorLeft.value(), std::nullopt);
+            icon = changeSVGColor("theme:usericons/pawn_single.svg", colorLeft.value(), colorRight);
         }
 
         iconCache.insert(key, icon);

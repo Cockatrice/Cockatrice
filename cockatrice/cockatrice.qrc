@@ -329,6 +329,9 @@
         <file>resources/replay/fastforward.svg</file>
         <file>resources/replay/pause.svg</file>
 
+        <file>resources/usericons/pawn_single.svg</file>
+        <file>resources/usericons/pawn_double.svg</file>
+
         <file>resources/userlevels/normal.svg</file>
         <file>resources/userlevels/registered.svg</file>
         <file>resources/userlevels/registered_buddy.svg</file>
