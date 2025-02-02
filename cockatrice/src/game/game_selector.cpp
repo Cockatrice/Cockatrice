@@ -50,6 +50,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     } else {
         gameListView->setModel(gameListModel);
     }
+    gameListView->setIconSize(QSize(13, 13));
     gameListView->setSortingEnabled(true);
     gameListView->sortByColumn(gameListModel->startTimeColIndex(), Qt::AscendingOrder);
     gameListView->setAlternatingRowColors(true);
