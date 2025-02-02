@@ -882,8 +882,7 @@ void TabGame::closeGame()
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     const ServerInfo_User &userInfo = spectators.value(eventPlayerId);
-    messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()),
-                                QString::fromStdString(userInfo.privlevel()), QString::fromStdString(event.message()));
+    messageLog->logSpectatorSay(userInfo, QString::fromStdString(event.message()));
 }
 
 void TabGame::eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext & /*context*/)

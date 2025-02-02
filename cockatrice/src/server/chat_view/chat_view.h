@@ -91,9 +91,7 @@ public:
                                          QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
-                       const QString &userName = QString(),
-                       UserLevelFlags userLevel = UserLevelFlags(),
-                       QString UserPrivLevel = "NONE",
+                       const ServerInfo_User &userInfo = {},
                        bool playerBold = false);
     void clearChat();
     void redactMessages(const QString &userName, int amount);

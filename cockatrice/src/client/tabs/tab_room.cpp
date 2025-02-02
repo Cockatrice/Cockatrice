@@ -287,13 +287,11 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
         return;
 
     UserListTWI *twi = userList->getUsers().value(senderName);
-    UserLevelFlags userLevel;
-    QString userPrivLevel;
+    ServerInfo_User userInfo = {};
     if (twi) {
-        userLevel = UserLevelFlags(twi->getUserInfo().user_level());
-        userPrivLevel = QString::fromStdString(twi->getUserInfo().privlevel());
+        userInfo = twi->getUserInfo();
         if (SettingsCache::instance().getIgnoreUnregisteredUsers() &&
-            !userLevel.testFlag(ServerInfo_User::IsRegistered))
+            !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered))
             return;
     }
 
@@ -306,7 +304,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
             QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString("d MMM yyyy HH:mm:ss")) +
             "] " + message;
 
-    chatView->appendMessage(message, event.message_type(), senderName, userLevel, userPrivLevel, true);
+    chatView->appendMessage(message, event.message_type(), userInfo, true);
     emit userEvent(false);
 }
 
