@@ -179,19 +179,19 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_APPLE
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
-    const QString configPath = "../../../qtlogging.ini";
+    std::string configPath = "../../../qtlogging.ini";
 #elif defined(Q_OS_UNIX)
     // <build>/cockatrice/cockatrice
-    const QString configPath = "./qtlogging.ini";
+    std::string configPath = "./qtlogging.ini";
 #elif defined(Q_OS_WIN)
     // <build>/cockatrice/Debug/cockatrice.exe
-    const QString configPath = "../qtlogging.ini";
+    std::string configPath = "../qtlogging.ini";
 #else
-    const QString configPath = "";
+    std::string configPath = "";
 #endif
 
     // Set the QT_LOGGING_CONF environment variable
-    qputenv("QT_LOGGING_CONF", configPath.toStdString());
+    qputenv("QT_LOGGING_CONF", configPath);
     qSetMessagePattern(
         "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
