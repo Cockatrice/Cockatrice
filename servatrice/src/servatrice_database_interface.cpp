@@ -146,6 +146,7 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
         return true;
     const QString poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
     qCritical() << QString("[%1] Error executing query: %2").arg(poolStr).arg(query->lastError().text());
+    checkSql();
     return false;
 }
 
