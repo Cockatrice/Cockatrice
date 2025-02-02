@@ -100,7 +100,16 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
-void SetAttrRecur(QDomElement &elem,
+/**
+ * Updates tags in the svg
+ *
+ * @param elem The svg
+ * @param tagName tag with attribute to update
+ * @param attrName attribute to be updated
+ * @param idName id that the tag has to match
+ * @param attrValue the value to update the attribute to
+ */
+void setAttrRecur(QDomElement &elem,
                   const QString &tagName,
                   const QString &attrName,
                   const QString &idName,
@@ -117,10 +126,13 @@ void SetAttrRecur(QDomElement &elem,
             continue;
         }
         auto docElem = elem.childNodes().at(i).toElement();
-        SetAttrRecur(docElem, tagName, attrName, idName, attrValue);
+        setAttrRecur(docElem, tagName, attrName, idName, attrValue);
     }
 }
 
+/**
+ * Returns an icon of the svg that has its color filled in
+ */
 QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const std::optional<QString> &colorRight)
 {
     QFile file(iconPath);
