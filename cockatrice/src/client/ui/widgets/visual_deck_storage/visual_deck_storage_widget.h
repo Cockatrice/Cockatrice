@@ -31,7 +31,7 @@ public:
 public slots:
     void deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance);
     void deckPreviewDoubleClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance);
-    void refreshBannerCards(); // Refresh the display of cards based on the current sorting option
+    void createRootFolderWidget(); // Refresh the display of cards based on the current sorting option
     void updateTagFilter();
     void updateColorFilter();
     void updateSearchFilter();
