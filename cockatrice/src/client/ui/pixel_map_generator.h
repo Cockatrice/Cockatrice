@@ -3,9 +3,12 @@
 
 #include "user_level.h"
 
+#include <QLoggingCategory>
 #include <QMap>
 #include <QPixmap>
 #include <QtGui/qicon.h>
+
+inline Q_LOGGING_CATEGORY(PixelMapGeneratorLog, "pixel_map_generator");
 
 class PhasePixmapGenerator
 {

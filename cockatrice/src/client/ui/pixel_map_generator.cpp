@@ -137,7 +137,7 @@ QIcon changeSVGColor(const QString &iconPath, const QString &colorLeft, const st
 {
     QFile file(iconPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Unable to open" << iconPath;
+        qCWarning(PixelMapGeneratorLog) << "Unable to open" << iconPath;
         return {};
     }
 
