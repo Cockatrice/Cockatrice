@@ -18,12 +18,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     deckListModel = new DeckListModel(this);
     deckListModel->setObjectName("visualDeckModel");
 
-    layout = new QVBoxLayout();
+    layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(9, 0, 9, 5);
     setLayout(layout);
 
-    searchAndSortLayout = new QHBoxLayout();
+    searchAndSortLayout = new QHBoxLayout(this);
     searchAndSortLayout->setSpacing(3);
     searchAndSortLayout->setContentsMargins(9, 0, 9, 0);
 
@@ -44,7 +44,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
-    folderWidget->setFixedWidth(scrollArea->viewport()->width());
 
     scrollArea->setWidget(folderWidget);
     scrollArea->setWidgetResizable(true);
@@ -70,14 +69,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     }
 }
 
-void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    if (scrollArea->widget() == folderWidget) {
-        folderWidget->setFixedWidth(scrollArea->viewport()->width());
-    }
-}
-
 void VisualDeckStorageWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
@@ -97,7 +88,6 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 void VisualDeckStorageWidget::refreshBannerCards()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
-    folderWidget->setFixedWidth(scrollArea->viewport()->width());
     scrollArea->setWidget(folderWidget);
 }
 

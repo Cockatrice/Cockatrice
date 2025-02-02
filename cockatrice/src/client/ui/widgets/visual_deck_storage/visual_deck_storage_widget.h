@@ -36,7 +36,6 @@ public slots:
     void updateColorFilter();
     void updateSearchFilter();
     void updateSortOrder();
-    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void bannerCardsRefreshed();

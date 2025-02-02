@@ -14,7 +14,7 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
 
     // Layout to center the banner label
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout = new QVBoxLayout(this);
     layout->addWidget(bannerLabel);
     setLayout(layout);
 

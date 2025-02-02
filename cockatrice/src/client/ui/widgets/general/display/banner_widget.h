@@ -2,6 +2,7 @@
 #define BANNER_WIDGET_H
 
 #include <QLabel>
+#include <QVBoxLayout>
 #include <QWidget>
 
 class BannerWidget : public QWidget
@@ -32,6 +33,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
+    QVBoxLayout *layout;
     QLabel *bannerLabel;
     Qt::Orientation gradientOrientation;
     int transparency; // Transparency percentage for the gradient
