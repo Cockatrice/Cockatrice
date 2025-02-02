@@ -65,10 +65,11 @@ void VisualDeckStorageSortWidget::updateSortOrder()
 
 void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget)
 {
-    auto children = folderWidget->getFlowWidget()->findChildren<QWidget *>(Qt::FindChildOption::FindDirectChildrenOnly);
+    auto children =
+        folderWidget->getFlowWidget()->findChildren<QWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
     for (auto widget : children) {
         auto deckPreviewWidgets =
-            widget->findChildren<DeckPreviewWidget *>(Qt::FindChildOption::FindDirectChildrenOnly);
+            widget->findChildren<DeckPreviewWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
         auto newOrder = filterFiles(deckPreviewWidgets);
         for (DeckPreviewWidget *previewWidget : newOrder) {
             folderWidget->getFlowWidget()->removeWidget(previewWidget);
