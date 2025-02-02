@@ -191,7 +191,7 @@ QIcon UserLevelPixmapGenerator::generateIcon(int height,
 
     // Has Color Override
     if (colorLeft.has_value()) {
-        return generateIconWithColorOverride(height, colorLeft, colorRight);
+        return generateIconWithColorOverride(height, isBuddy, privLevel, colorLeft, colorRight);
     }
 
     // Has No Color Override
@@ -240,21 +240,38 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
 }
 
 QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
+                                                              bool isBuddy,
+                                                              const QString &privLevel,
                                                               std::optional<QString> colorLeft,
                                                               std::optional<QString> colorRight)
 {
-    QString key = QString::number(height * 10000) + ":" + colorLeft.value_or("") + ":" + colorRight.value_or("");
+    QString key = QString::number(height * 10000) + ":" + (short)isBuddy + ":" + privLevel.toLower() + ":" +
+                  colorLeft.value_or("") + ":" + colorRight.value_or("");
+
     if (iconCache.contains(key)) {
         return iconCache.value(key);
     }
 
-    QIcon icon;
+    QString iconPath;
     if (colorRight.has_value()) {
-        icon = changeSVGColor("theme:usericons/pawn_double.svg", colorLeft.value(), colorRight);
+        if (isBuddy) {
+            iconPath = "theme:usericons/star_double.svg";
+        } else if (privLevel.toLower() == "vip") {
+            iconPath = "theme:usericons/pawn_vip_double.svg";
+        } else {
+            iconPath = "theme:usericons/pawn_double.svg";
+        }
     } else {
-        icon = changeSVGColor("theme:usericons/pawn_single.svg", colorLeft.value(), colorRight);
+        if (isBuddy) {
+            iconPath = "theme:usericons/star_single.svg";
+        } else if (privLevel.toLower() == "vip") {
+            iconPath = "theme:usericons/pawn_vip_single.svg";
+        } else {
+            iconPath = "theme:usericons/pawn_single.svg";
+        }
     }
 
+    QIcon icon(changeSVGColor(iconPath, colorLeft.value(), colorRight));
     iconCache.insert(key, icon);
     return icon;
 }

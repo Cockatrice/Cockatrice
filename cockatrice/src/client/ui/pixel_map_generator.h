@@ -65,21 +65,24 @@ private:
     static QMap<QString, QIcon> iconCache;
 
     static QIcon generateIconDefault(int height, UserLevelFlags userLevel, bool isBuddy, const QString &privLevel);
-    static QIcon
-    generateIconWithColorOverride(int height, std::optional<QString> colorLeft, std::optional<QString> colorRight);
+    static QIcon generateIconWithColorOverride(int height,
+                                               bool isBuddy,
+                                               const QString &privLevel,
+                                               std::optional<QString> colorLeft,
+                                               std::optional<QString> colorRight);
 
 public:
     static QPixmap generatePixmap(int height,
                                   UserLevelFlags userLevel,
                                   ServerInfo_User::PawnColorsOverride pawnColors,
                                   bool isBuddy,
-                                  const QString &privLevel = "NONE");
+                                  const QString &privLevel);
 
     static QIcon generateIcon(int height,
                               UserLevelFlags userLevel,
                               ServerInfo_User::PawnColorsOverride pawnColors,
                               bool isBuddy,
-                              const QString &privLevel = "NONE");
+                              const QString &privLevel);
     static void clear()
     {
         iconCache.clear();
