@@ -140,7 +140,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
         } else if (!password.isEmpty()) {
-            qWarning() << "using plain text password to reset password";
+            qCWarning(RemoteClientLog) << "using plain text password to reset password";
             cmdForgotPasswordReset.set_new_password(password.toStdString());
         }
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
@@ -170,7 +170,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdRegister.set_hashed_password(hashedPassword.toStdString());
         } else if (!password.isEmpty()) {
-            qWarning() << "using plain text password to register";
+            qCWarning(RemoteClientLog) << "using plain text password to register";
             cmdRegister.set_password(password.toStdString());
         }
         cmdRegister.set_email(email.toStdString());
@@ -241,7 +241,7 @@ void RemoteClient::doLogin()
         setStatus(StatusLoggingIn);
         Command_Login cmdLogin = generateCommandLogin();
         if (!password.isEmpty()) {
-            qWarning() << "using plain text password to log in";
+            qCWarning(RemoteClientLog) << "using plain text password to log in";
             cmdLogin.set_password(password.toStdString());
         }
 
@@ -394,7 +394,7 @@ void RemoteClient::readData()
         ServerMessage newServerMessage;
         newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
 #ifdef QT_DEBUG
-        qDebug().noquote() << "IN" << getSafeDebugString(newServerMessage);
+        qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
 #endif
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
@@ -412,7 +412,7 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
     ServerMessage newServerMessage;
     newServerMessage.ParseFromArray(message.data(), message.length());
 #ifdef QT_DEBUG
-    qDebug().noquote() << "IN" << getSafeDebugString(newServerMessage);
+    qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
 #endif
     processProtocolItem(newServerMessage);
 }
@@ -425,7 +425,7 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     auto size = static_cast<unsigned int>(cont.ByteSize());
 #endif
 #ifdef QT_DEBUG
-    qDebug().noquote() << "OUT" << getSafeDebugString(cont);
+    qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
 #endif
 
     QByteArray buf;
@@ -590,7 +590,7 @@ QString RemoteClient::getSrvClientID(const QString &_hostname)
         QHostAddress hostAddress = hostInfo.addresses().first();
         srvClientID += hostAddress.toString();
     } else {
-        qWarning() << "ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
+        qCWarning(RemoteClientLog) << "ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
         srvClientID += _hostname;
     }
     QString uniqueServerClientID =
