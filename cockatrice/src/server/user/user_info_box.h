@@ -20,6 +20,8 @@ private:
         countryLabel3, userLevelLabel1, userLevelLabel2, accountAgeLabel1, accountAgeLabel2;
     QPushButton editButton, passwordButton, avatarButton;
     QPixmap avatarPixmap;
+    bool hasAvatar;
+    const ServerInfo_User *currentUserInfo;
 
     static QString getAgeString(int ageSeconds);
 
