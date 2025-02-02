@@ -57,9 +57,10 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
                 &VisualDeckStorageWidget::deckPreviewClickedEvent);
         connect(display, &DeckPreviewWidget::deckPreviewDoubleClicked, visualDeckStorageWidget,
                 &VisualDeckStorageWidget::deckPreviewDoubleClickedEvent);
-        connect(visualDeckStorageWidget->cardSizeWidget->getSlider(), &QSlider::valueChanged, display->bannerCardDisplayWidget,
-                &CardInfoPictureWidget::setScaleFactor);
-        connect(display, &DeckPreviewWidget::visibilityUpdated, this, &VisualDeckStorageFolderDisplayWidget::updateVisibility);
+        connect(visualDeckStorageWidget->cardSizeWidget->getSlider(), &QSlider::valueChanged,
+                display->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
+        connect(display, &DeckPreviewWidget::visibilityUpdated, this,
+                &VisualDeckStorageFolderDisplayWidget::updateVisibility);
         display->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->cardSizeWidget->getSlider()->value());
         allDecks.append(display);
     }
@@ -76,7 +77,7 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
         flowWidget->addWidget(deck);
     }
 
-    //emit bannerCardsRefreshed();
+    // emit bannerCardsRefreshed();
 }
 
 void VisualDeckStorageFolderDisplayWidget::updateVisibility()
@@ -92,9 +93,9 @@ void VisualDeckStorageFolderDisplayWidget::updateVisibility()
         }
     }
     if (atLeastOneWidgetVisible) {
-        //setVisible(true);
+        // setVisible(true);
     } else {
-        //setVisible(false);
+        // setVisible(false);
     }
 }
 
