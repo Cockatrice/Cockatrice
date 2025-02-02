@@ -15,22 +15,7 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    QString bannerText = "Deck Storage";
-    QString deckPath = SettingsCache::instance().getDeckPath();
-    if (filePath != deckPath) {
-        QString relativePath = filePath;
-
-        if (filePath.startsWith(deckPath)) {
-            relativePath = filePath.mid(deckPath.length()); // Remove the deckPath prefix
-            if (relativePath.startsWith('/')) {
-                relativePath.remove(0, 1); // Remove leading '/' if it exists
-            }
-        }
-
-        bannerText = relativePath;
-    }
-
-    header = new BannerWidget(this, bannerText);
+    header = new BannerWidget(this, "");
     layout->addWidget(header);
 
     container = new QWidget(this);
@@ -53,6 +38,27 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 
     createWidgetsForFiles();
     createWidgetsForFolders();
+
+    refreshUi();
+}
+
+void VisualDeckStorageFolderDisplayWidget::refreshUi()
+{
+    QString bannerText = tr("Deck Storage");
+    QString deckPath = SettingsCache::instance().getDeckPath();
+    if (filePath != deckPath) {
+        QString relativePath = filePath;
+
+        if (filePath.startsWith(deckPath)) {
+            relativePath = filePath.mid(deckPath.length()); // Remove the deckPath prefix
+            if (relativePath.startsWith('/')) {
+                relativePath.remove(0, 1); // Remove leading '/' if it exists
+            }
+        }
+
+        bannerText = relativePath;
+    }
+    header->setText(bannerText);
 }
 
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()

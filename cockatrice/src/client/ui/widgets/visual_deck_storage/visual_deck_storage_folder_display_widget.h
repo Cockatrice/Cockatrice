@@ -15,6 +15,7 @@ public:
     VisualDeckStorageFolderDisplayWidget(QWidget *parent,
                                          VisualDeckStorageWidget *_visualDeckStorageWidget,
                                          QString _filePath);
+    void refreshUi();
     void createWidgetsForFiles();
     void createWidgetsForFolders();
     QStringList gatherAllTagsFromFlowWidget() const;

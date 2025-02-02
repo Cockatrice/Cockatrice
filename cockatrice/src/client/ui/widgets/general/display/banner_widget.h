@@ -14,6 +14,7 @@ public:
                           Qt::Orientation orientation = Qt::Vertical,
                           int transparency = 80);
     void mousePressEvent(QMouseEvent *event) override;
+    void setText(const QString &text) const;
     void setBuddy(QWidget *_buddy)
     {
         buddy = _buddy;

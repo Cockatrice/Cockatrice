@@ -30,6 +30,11 @@ void BannerWidget::mousePressEvent(QMouseEvent *event)
     emit buddyVisibilityChanged();
 }
 
+void BannerWidget::setText(const QString &text) const
+{
+    bannerLabel->setText(text);
+}
+
 void BannerWidget::toggleBuddyVisibility() const
 {
     if (buddy) {
