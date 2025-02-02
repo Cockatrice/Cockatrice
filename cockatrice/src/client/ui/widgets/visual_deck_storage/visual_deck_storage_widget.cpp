@@ -53,7 +53,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->addWidget(cardSizeWidget);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-            &VisualDeckStorageWidget::refreshBannerCards);
+            &VisualDeckStorageWidget::createRootFolderWidget);
 
     databaseLoadIndicator = new QLabel(this);
     databaseLoadIndicator->setAlignment(Qt::AlignCenter);
@@ -62,7 +62,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // Don't waste time processing the cards if they're going to get refreshed anyway once the db finishes loading
     if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
-        refreshBannerCards();
+        createRootFolderWidget();
         databaseLoadIndicator->setVisible(false);
     } else {
         scrollArea->setWidget(databaseLoadIndicator);
@@ -103,18 +103,18 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
     emit deckLoadRequested(instance->filePath);
 }
 
-void VisualDeckStorageWidget::refreshBannerCards()
+void VisualDeckStorageWidget::createRootFolderWidget()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
     scrollArea->setWidget(folderWidget);
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
+    updateSortOrder();
 }
 
 void VisualDeckStorageWidget::updateSortOrder()
 {
     if (folderWidget) {
-        qDebug() << "Updating sort order";
         sortWidget->sortFolder(folderWidget);
         for (VisualDeckStorageFolderDisplayWidget *subFolderWidget :
              folderWidget->findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
