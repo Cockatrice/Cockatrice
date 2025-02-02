@@ -9,6 +9,33 @@
 #include <QPalette>
 #include <QSvgRenderer>
 
+/**
+ * Loads in an svg from file and scales it without affecting image quality.
+ *
+ * @param svgPath The path to the svg file. Automatically appends ".svg" to the end if not present
+ * @param size The desired size of the pixmap
+ */
+static QPixmap loadSvg(const QString &svgPath, const QSize &size)
+{
+    QString path = svgPath;
+    if (!path.endsWith(".svg")) {
+        path += ".svg";
+    }
+
+    QSvgRenderer svgRenderer(path);
+
+    // Makes sure the pixmap is at least as large as the svg, so that we don't lose any detail.
+    // QIcon.pixmap(size) will automatically scale down the image, but it won't scale it up.
+    QPixmap pix(svgRenderer.defaultSize().expandedTo(size));
+    pix.fill(Qt::transparent);
+
+    QPainter pixPainter(&pix);
+    svgRenderer.render(&pixPainter);
+
+    // Converting the pixmap to a QIcon and back is the easiest way to scale down a svg without affecting image quality
+    return QIcon(pix).pixmap(size);
+}
+
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
 
 QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
@@ -17,8 +44,7 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap =
-        QPixmap("theme:phases/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap = loadSvg("theme:phases/" + name, QSize(height, height));
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -34,14 +60,12 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap =
-        QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap = loadSvg("theme:counters/" + name, QSize(height, height));
     if (pixmap.isNull()) {
         name = "general";
         if (highlight)
             name.append("_highlight");
-        pixmap =
-            QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        pixmap = loadSvg("theme:counters/" + name, QSize(height, height));
     }
 
     pmCache.insert(key, pixmap);
@@ -85,12 +109,12 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
         return pmCache.value(key);
 
     int width = height * 2;
-    QPixmap pixmap = QPixmap("theme:countries/" + countryCode.toLower())
-                         .scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap = loadSvg("theme:countries/" + countryCode.toLower(), QSize(width, height));
 
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
-    painter.drawRect(0, 0, pixmap.width() - 1, pixmap.height() - 1);
+    // determined through trial-and-error that /2 maps the pixmap coords to the painter coords
+    painter.drawRect(0, 0, pixmap.width() / 2, pixmap.height() / 2);
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -239,8 +263,7 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
         levelString.append("_buddy");
     }
 
-    auto pixmap = QPixmap("theme:userlevels/" + levelString)
-                      .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    auto pixmap = loadSvg("theme:userlevels/" + levelString, QSize(height, height));
     QIcon icon(pixmap);
     iconCache.insert(key, icon);
     return icon;
@@ -286,7 +309,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = QPixmap("theme:icons/lock").scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap pixmap = loadSvg("theme:icons/lock", QSize(height, height));
     pmCache.insert(key, pixmap);
     return pixmap;
 }
