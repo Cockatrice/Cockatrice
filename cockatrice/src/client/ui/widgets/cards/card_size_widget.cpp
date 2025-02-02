@@ -1,5 +1,4 @@
 #include "card_size_widget.h"
-
 #include "../../../../settings/cache_settings.h"
 #include "../printing_selector/printing_selector.h"
 #include "../visual_deck_storage/visual_deck_storage_widget.h"
@@ -32,6 +31,17 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defa
         connect(cardSizeSlider, &QSlider::valueChanged, flowWidget, &FlowWidget::setMinimumSizeToMaxSizeHint);
     }
 
+    // Debounce setup
+    debounceTimer.setSingleShot(true);
+    connect(&debounceTimer, &QTimer::timeout, this, [this]() {
+        // Check the type of the parent widget
+        if (qobject_cast<PrintingSelector *>(parentWidget())) {
+            SettingsCache::instance().setPrintingSelectorCardSize(pendingValue);
+        } else if (qobject_cast<VisualDeckStorageWidget *>(parentWidget())) {
+            SettingsCache::instance().setVisualDeckStorageCardSize(pendingValue);
+        }
+    });
+
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardSizeWidget::updateCardSizeSetting);
 }
 
@@ -42,12 +52,8 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defa
  */
 void CardSizeWidget::updateCardSizeSetting(int newValue)
 {
-    // Check the type of the parent widget
-    if ((parent = qobject_cast<PrintingSelector *>(parentWidget()))) {
-        SettingsCache::instance().setPrintingSelectorCardSize(newValue);
-    } else if ((parent = qobject_cast<VisualDeckStorageWidget *>(parentWidget()))) {
-        SettingsCache::instance().setVisualDeckStorageCardSize(newValue);
-    }
+    pendingValue = newValue;
+    debounceTimer.start(300); // 300ms debounce time
 }
 
 /**
