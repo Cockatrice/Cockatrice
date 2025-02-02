@@ -179,15 +179,15 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_APPLE
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
-    std::string configPath = "../../../qtlogging.ini";
+    const QByteArray configPath = "../../../qtlogging.ini";
 #elif defined(Q_OS_UNIX)
     // <build>/cockatrice/cockatrice
-    std::string configPath = "./qtlogging.ini";
+    const QByteArray configPath = "./qtlogging.ini";
 #elif defined(Q_OS_WIN)
     // <build>/cockatrice/Debug/cockatrice.exe
-    std::string configPath = "../qtlogging.ini";
+    const QByteArray configPath = "../qtlogging.ini";
 #else
-    std::string configPath = "";
+    const QByteArray configPath = "";
 #endif
 
     // Set the QT_LOGGING_CONF environment variable
