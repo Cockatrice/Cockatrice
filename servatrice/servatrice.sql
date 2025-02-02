@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(33);
+INSERT INTO cockatrice_schema_version VALUES(34);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `privlevelStartDate` datetime NOT NULL,
   `privlevelEndDate` datetime NOT NULL,
   `passwordLastChangedDate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `leftPawnColorOverride` varchar(255),
+  `rightPawnColorOverride` varchar(255),
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
@@ -48,7 +50,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   INDEX `idx_admin` (`admin`),
   INDEX `idx_active` (`active`),
   INDEX `idx_privlevel` (`privlevel`),
-  INDEX `idx_clientid` (`clientid`)
+  INDEX `idx_clientid` (`clientid`),
+  INDEX `idx_pawnColorOverrides` (`leftPawnColorOverride`, `rightPawnColorOverride`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (

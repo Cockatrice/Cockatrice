@@ -90,8 +90,8 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     const std::string &bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
-        avatarPixmap =
-            UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
+        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, user.pawn_colors(), false,
+                                                                QString::fromStdString(user.privlevel()));
     }
 
     nameLabel.setText(QString::fromStdString(user.name()));
@@ -106,8 +106,8 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         countryLabel3.setText("");
     }
 
-    userLevelIcon.setPixmap(
-        UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
+    userLevelIcon.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, user.pawn_colors(), false,
+                                                                     QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
