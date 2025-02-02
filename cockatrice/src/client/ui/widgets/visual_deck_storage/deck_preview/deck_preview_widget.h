@@ -26,10 +26,14 @@ public:
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
     DeckPreviewColorIdentityWidget *colorIdentityWidget;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
+    bool filteredBySearch = false;
+    bool filteredByColor = false;
+    bool filteredByTags = false;
 
 signals:
     void deckPreviewClicked(QMouseEvent *event, DeckPreviewWidget *instance);
     void deckPreviewDoubleClicked(QMouseEvent *event, DeckPreviewWidget *instance);
+    void visibilityUpdated();
 
 public slots:
     void setFilePath(const QString &filePath);
@@ -37,6 +41,7 @@ public slots:
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
+    void checkVisibility();
 };
 
 #endif // DECK_PREVIEW_WIDGET_H

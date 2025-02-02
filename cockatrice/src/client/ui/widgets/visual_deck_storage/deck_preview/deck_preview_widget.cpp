@@ -17,6 +17,8 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
 
     deckLoader = new DeckLoader();
     connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
+    connect(deckLoader, &DeckLoader::loadFinished, parent->tagFilterWidget,
+            &VisualDeckStorageTagFilterWidget::refreshTags);
     deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
 
     bannerCardDisplayWidget = new DeckPreviewCardPictureWidget(this);
@@ -25,6 +27,8 @@ DeckPreviewWidget::DeckPreviewWidget(VisualDeckStorageWidget *_parent, const QSt
             &DeckPreviewWidget::imageClickedEvent);
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
+
+    connect(parent, &VisualDeckStorageWidget::tagFilterUpdated, this, &DeckPreviewWidget::checkVisibility);
 
     layout->addWidget(bannerCardDisplayWidget);
 }
@@ -50,6 +54,16 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);
+}
+
+void DeckPreviewWidget::checkVisibility()
+{
+    if (filteredBySearch || filteredByColor || filteredByTags) {
+        setVisible(false);
+    } else {
+        setVisible(true);
+    }
+    emit visibilityUpdated();
 }
 
 QString DeckPreviewWidget::getColorIdentity()

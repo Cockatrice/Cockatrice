@@ -3,6 +3,7 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 #include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_folder_display_widget.h"
 #include "visual_deck_storage_search_widget.h"
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
@@ -36,11 +37,19 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     searchAndSortLayout->addWidget(searchWidget);
     layout->addLayout(searchAndSortLayout);
     layout->addWidget(tagFilterWidget);
+    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
-    layout->addWidget(flowWidget);
+    scrollArea = new QScrollArea(this);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getVisualDeckStorageCardSize());
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath());
+
+    scrollArea->setWidget(folderWidget);
+    scrollArea->setWidgetResizable(true);
+
+    layout->addWidget(scrollArea);
+
     layout->addWidget(cardSizeWidget);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
@@ -56,7 +65,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
         refreshBannerCards();
         databaseLoadIndicator->setVisible(false);
     } else {
-        flowWidget->addWidget(databaseLoadIndicator);
+        scrollArea->setWidget(databaseLoadIndicator);
     }
 }
 
@@ -83,82 +92,14 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 
 void VisualDeckStorageWidget::refreshBannerCards()
 {
-    QStringList allFiles;
-    QList<DeckPreviewWidget *> allDecks;
-
-    // QDirIterator with QDir::Files and QDir::NoSymLinks ensures only files are listed (no directories or symlinks)
-    QDirIterator it(SettingsCache::instance().getDeckPath(), QDir::Files | QDir::NoSymLinks,
-                    QDirIterator::Subdirectories);
-
-    while (it.hasNext()) {
-        allFiles << it.next(); // Add each file path to the list
-    }
-
-    for (const QString &file : allFiles) {
-        auto *display = new DeckPreviewWidget(this, file);
-
-        connect(display, &DeckPreviewWidget::deckPreviewClicked, this,
-                &VisualDeckStorageWidget::deckPreviewClickedEvent);
-        connect(display, &DeckPreviewWidget::deckPreviewDoubleClicked, this,
-                &VisualDeckStorageWidget::deckPreviewDoubleClickedEvent);
-        connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display->bannerCardDisplayWidget,
-                &CardInfoPictureWidget::setScaleFactor);
-        display->bannerCardDisplayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
-        allDecks.append(display);
-    }
-
-    auto filteredByColorIdentity =
-        deckPreviewColorIdentityFilterWidget->filterWidgets(sortWidget->filterFiles(allDecks));
-    auto filteredByTags = tagFilterWidget->filterDecksBySelectedTags(filteredByColorIdentity);
-    auto filteredFiles = searchWidget->filterFiles(filteredByTags, searchWidget->getSearchText());
-
-    tagFilterWidget->removeTagsNotInList(gatherAllTags(filteredFiles));
-    tagFilterWidget->addTagsIfNotPresent(gatherAllTags(filteredFiles));
-
-    flowWidget->clearLayout(); // Clear existing widgets in the flow layout
-
-    for (DeckPreviewWidget *deck : filteredFiles) {
-        flowWidget->addWidget(deck);
-    }
-
-    emit bannerCardsRefreshed();
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath());
+    scrollArea->setWidget(folderWidget);
 }
 
-QStringList VisualDeckStorageWidget::gatherAllTagsFromFlowWidget() const
+void VisualDeckStorageWidget::updateTagFilter()
 {
-    QStringList allTags;
-
-    if (flowWidget) {
-        // Iterate through all DeckPreviewWidgets
-        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
-            // Get tags from each DeckPreviewWidget
-            QStringList tags = display->deckLoader->getTags();
-
-            // Add tags to the list while avoiding duplicates
-            allTags.append(tags);
-        }
+    if (folderWidget) {
+        tagFilterWidget->filterDecksBySelectedTags(folderWidget->findChildren<DeckPreviewWidget *>());
     }
-
-    // Remove duplicates by calling 'removeDuplicates'
-    allTags.removeDuplicates();
-
-    return allTags;
-}
-
-QStringList VisualDeckStorageWidget::gatherAllTags(const QList<DeckPreviewWidget *> &allDecks)
-{
-    QStringList allTags;
-
-    // Iterate through all decks provided as input
-    for (DeckPreviewWidget *deck : allDecks) {
-        QStringList tags = deck->deckLoader->getTags();
-
-        // Add tags to the list while avoiding duplicates
-        allTags.append(tags);
-    }
-
-    // Remove duplicates
-    allTags.removeDuplicates();
-
-    return allTags;
+    emit tagFilterUpdated();
 }
