@@ -69,6 +69,13 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     }
 }
 
+void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
+    scrollArea->widget()->adjustSize();
+}
+
 void VisualDeckStorageWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
@@ -89,6 +96,8 @@ void VisualDeckStorageWidget::refreshBannerCards()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
     scrollArea->setWidget(folderWidget);
+    scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
+    scrollArea->widget()->adjustSize();
 }
 
 void VisualDeckStorageWidget::updateSortOrder()
