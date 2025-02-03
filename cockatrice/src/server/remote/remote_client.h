@@ -4,8 +4,11 @@
 #include "../../client/game_logic/abstract_client.h"
 #include "pb/commands.pb.h"
 
+#include <QLoggingCategory>
 #include <QTcpSocket>
 #include <QWebSocket>
+
+inline Q_LOGGING_CATEGORY(RemoteClientLog, "remote_client");
 
 class QTimer;
 
