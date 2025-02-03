@@ -14,6 +14,8 @@
  *
  * @param svgPath The path to the svg file. Automatically appends ".svg" to the end if not present
  * @param size The desired size of the pixmap
+ *
+ * @return The svg loaded into a Pixmap with the given size, or an empty Pixmap if the loading failed.
  */
 static QPixmap loadSvg(const QString &svgPath, const QSize &size)
 {
@@ -23,6 +25,11 @@ static QPixmap loadSvg(const QString &svgPath, const QSize &size)
     }
 
     QSvgRenderer svgRenderer(path);
+
+    if (!svgRenderer.isValid()) {
+        qCWarning(PixelMapGeneratorLog) << "Failed to load" << path;
+        return {};
+    }
 
     // Makes sure the pixmap is at least as large as the svg, so that we don't lose any detail.
     // QIcon.pixmap(size) will automatically scale down the image, but it won't scale it up.
