@@ -19,8 +19,8 @@ public:
                   int _value,
                   QGraphicsItem *parent = nullptr,
                   QWidget *game = nullptr);
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
 
 class PlayerTarget : public ArrowTarget
@@ -38,15 +38,15 @@ public:
     {
         Type = typePlayerTarget
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
 
-    PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr, QWidget *_game = nullptr);
-    ~PlayerTarget();
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    explicit PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr, QWidget *_game = nullptr);
+    ~PlayerTarget() override;
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     AbstractCounter *addCounter(int _counterId, const QString &_name, int _value);
 };

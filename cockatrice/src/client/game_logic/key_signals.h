@@ -23,7 +23,7 @@ signals:
     void onCtrlC();
 
 protected:
-    virtual bool eventFilter(QObject *, QEvent *event);
+    bool eventFilter(QObject *, QEvent *event) override;
 };
 
 #endif

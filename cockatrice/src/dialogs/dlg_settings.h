@@ -139,10 +139,13 @@ private:
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox clickPlaysAllSelectedCheckBox;
     QCheckBox playToStackCheckBox;
+    QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
+    QCheckBox visualDeckStoragePromptForConversionCheckBox;
+    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;
@@ -320,7 +323,6 @@ private:
     void retranslateUi();
 
 protected:
-    void changeEvent(QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 

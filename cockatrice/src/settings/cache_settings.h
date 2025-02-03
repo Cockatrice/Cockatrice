@@ -133,6 +133,8 @@ private:
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
+    bool visualDeckStoragePromptForConversion;
+    bool visualDeckStorageAlwaysConvert;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -159,6 +161,7 @@ private:
     QString knownMissingFeatures;
     bool useTearOffMenus;
     int cardViewInitialRowsMax;
+    bool closeEmptyCardView;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -423,6 +426,14 @@ public:
     {
         return visualDeckStorageUnusedColorIdentitiesOpacity;
     }
+    bool getVisualDeckStoragePromptForConversion() const
+    {
+        return visualDeckStoragePromptForConversion;
+    }
+    bool getVisualDeckStorageAlwaysConvert() const
+    {
+        return visualDeckStorageAlwaysConvert;
+    }
     bool getHorizontalHand() const
     {
         return horizontalHand;
@@ -619,6 +630,7 @@ public:
     void setKnownMissingFeatures(const QString &_knownMissingFeatures);
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
+    void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     QString getClientID()
     {
         return clientID;
@@ -638,6 +650,10 @@ public:
     int getCardViewInitialRowsMax() const
     {
         return cardViewInitialRowsMax;
+    }
+    bool getCloseEmptyCardView() const
+    {
+        return closeEmptyCardView;
     }
     ShortcutsSettings &shortcuts() const
     {
@@ -742,6 +758,8 @@ public slots:
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
+    void setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion);
+    void setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

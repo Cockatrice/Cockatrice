@@ -63,7 +63,24 @@ void VisualDeckStorageSortWidget::updateSortOrder()
     emit sortOrderChanged();
 }
 
-QList<DeckPreviewWidget *> &VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> &widgets)
+void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget)
+{
+    auto children =
+        folderWidget->getFlowWidget()->findChildren<QWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
+    for (auto widget : children) {
+        auto deckPreviewWidgets =
+            widget->findChildren<DeckPreviewWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
+        auto newOrder = filterFiles(deckPreviewWidgets);
+        for (DeckPreviewWidget *previewWidget : newOrder) {
+            folderWidget->getFlowWidget()->removeWidget(previewWidget);
+        }
+        for (DeckPreviewWidget *previewWidget : newOrder) {
+            folderWidget->getFlowWidget()->addWidget(previewWidget);
+        }
+    }
+}
+
+QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> widgets)
 {
     // Sort the widgets list based on the current sort order
     std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
@@ -81,8 +98,11 @@ QList<DeckPreviewWidget *> &VisualDeckStorageSortWidget::filterFiles(QList<DeckP
                 return info1.fileName().toLower() < info2.fileName().toLower();
             case ByLastModified:
                 return info1.lastModified() > info2.lastModified();
-            case ByLastLoaded:
-                return widget1->deckLoader->getLastLoadedTimestamp() > widget2->deckLoader->getLastLoadedTimestamp();
+            case ByLastLoaded: {
+                QDateTime time1 = QDateTime::fromString(widget1->deckLoader->getLastLoadedTimestamp());
+                QDateTime time2 = QDateTime::fromString(widget2->deckLoader->getLastLoadedTimestamp());
+                return time1 > time2;
+            }
         }
 
         return false; // Default case, no sorting applied

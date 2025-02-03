@@ -38,16 +38,9 @@ CardItem::CardItem(Player *_owner,
 
 CardItem::~CardItem()
 {
-    prepareDelete();
-
-    if (scene())
-        static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
-
     delete cardMenu;
     delete ptMenu;
     delete moveMenu;
-
-    deleteDragItem();
 }
 
 void CardItem::prepareDelete()
@@ -74,6 +67,8 @@ void CardItem::prepareDelete()
 void CardItem::deleteLater()
 {
     prepareDelete();
+    if (scene())
+        static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
     AbstractCardItem::deleteLater();
 }
 

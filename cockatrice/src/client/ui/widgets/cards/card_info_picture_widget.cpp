@@ -3,7 +3,10 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
+#include "../../../tabs/tab_deck_editor.h"
+#include "../../../tabs/tab_supervisor.h"
 #include "../../picture_loader/picture_loader.h"
+#include "../../window_main.h"
 
 #include <QMenu>
 #include <QMouseEvent>
@@ -253,22 +256,27 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
         return cardMenu;
     }
 
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
-    cardMenu->addMenu(viewRelatedCards);
+    cardMenu->addMenu(createViewRelatedCardsMenu());
+    cardMenu->addMenu(createAddToOpenDeckMenu());
 
-    bool atLeastOneGoodRelationFound = false;
+    return cardMenu;
+}
+
+QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
+{
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
+
     QList<CardRelation *> relatedCards = info->getAllRelatedCards();
-    for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
-        if (relatedCard != nullptr) {
-            atLeastOneGoodRelationFound = true;
-            break;
-        }
-    }
+
+    auto relatedCardExists = [](const CardRelation *cardRelation) {
+        return CardDatabaseManager::getInstance()->getCard(cardRelation->getName()) != nullptr;
+    };
+
+    bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
 
     if (!atLeastOneGoodRelationFound) {
         viewRelatedCards->setEnabled(false);
-        return cardMenu;
+        return viewRelatedCards;
     }
 
     for (const auto &relatedCard : relatedCards) {
@@ -280,7 +288,38 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
         viewRelatedCards->addAction(viewCard);
     }
 
-    return cardMenu;
+    return viewRelatedCards;
+}
+
+QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
+{
+    auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
+
+    auto *mainWindow = qobject_cast<MainWindow *>(window());
+    QList<TabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
+
+    if (deckEditorTabs.isEmpty()) {
+        addToOpenDeckMenu->setEnabled(false);
+        return addToOpenDeckMenu;
+    }
+
+    for (auto &deckEditorTab : deckEditorTabs) {
+        auto *addCardMenu = addToOpenDeckMenu->addMenu(deckEditorTab->getTabText());
+
+        QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
+        connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
+            deckEditorTab->updateCardInfo(info);
+            deckEditorTab->addCardHelper(info, DECK_ZONE_MAIN);
+        });
+
+        QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
+        connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
+            deckEditorTab->updateCardInfo(info);
+            deckEditorTab->addCardHelper(info, DECK_ZONE_SIDE);
+        });
+    }
+
+    return addToOpenDeckMenu;
 }
 
 /**

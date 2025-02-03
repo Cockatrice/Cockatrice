@@ -57,28 +57,29 @@ public:
         SortRole = Qt::UserRole
     };
 
-    SetsModel(CardDatabase *_db, QObject *parent = nullptr);
-    ~SetsModel();
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const
+    explicit SetsModel(CardDatabase *_db, QObject *parent = nullptr);
+    ~SetsModel() override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override
     {
         Q_UNUSED(parent);
         return NUM_COLS;
     }
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    Qt::DropActions supportedDropActions() const;
+    QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::DropActions supportedDropActions() const override;
 
-    QMimeData *mimeData(const QModelIndexList &indexes) const;
-    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
-    QStringList mimeTypes() const;
+    QMimeData *mimeData(const QModelIndexList &indexes) const override;
+    bool
+    dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
+    QStringList mimeTypes() const override;
     void swapRows(int oldRow, int newRow);
     void toggleRow(int row, bool enable);
     void toggleRow(int row);
     void toggleAll(bool);
-    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
     void restoreOriginalOrder();
@@ -88,7 +89,7 @@ class SetsDisplayModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    SetsDisplayModel(QObject *parent = NULL);
+    explicit SetsDisplayModel(QObject *parent = nullptr);
 
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;

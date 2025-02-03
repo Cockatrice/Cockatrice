@@ -329,23 +329,12 @@
         <file>resources/replay/fastforward.svg</file>
         <file>resources/replay/pause.svg</file>
 
-        <file>resources/userlevels/normal.svg</file>
-        <file>resources/userlevels/registered.svg</file>
-        <file>resources/userlevels/registered_buddy.svg</file>
-        <file>resources/userlevels/registered_vip.svg</file>
-        <file>resources/userlevels/registered_vip_buddy.svg</file>
-        <file>resources/userlevels/registered_donator.svg</file>
-        <file>resources/userlevels/registered_donator_buddy.svg</file>
-
-        <file>resources/userlevels/moderator.svg</file>
-        <file>resources/userlevels/moderator_buddy.svg</file>
-        <file>resources/userlevels/moderator_vip.svg</file>
-        <file>resources/userlevels/moderator_vip_buddy.svg</file>
-
-        <file>resources/userlevels/admin.svg</file>
-        <file>resources/userlevels/admin_buddy.svg</file>
-        <file>resources/userlevels/admin_vip.svg</file>
-        <file>resources/userlevels/admin_vip_buddy.svg</file>
+        <file>resources/usericons/pawn_single.svg</file>
+        <file>resources/usericons/pawn_double.svg</file>
+        <file>resources/usericons/pawn_vip_single.svg</file>
+        <file>resources/usericons/pawn_vip_double.svg</file>
+        <file>resources/usericons/star_single.svg</file>
+        <file>resources/usericons/star_double.svg</file>
 
         <!-- ADD TIP OF THE DAY IMAGES HERE -->
         <file>resources/tips/images/accounts_tab.png</file>

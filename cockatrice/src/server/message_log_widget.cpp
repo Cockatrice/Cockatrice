@@ -606,8 +606,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, const QList<uint> &
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(std::move(message), {}, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
-                  QString::fromStdString(player->getUserInfo()->privlevel()), true);
+    appendMessage(std::move(message), {}, *player->getUserInfo(), true);
 }
 
 void MessageLogWidget::logSetActivePhase(int phaseNumber)
@@ -783,12 +782,9 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int
     }
 }
 
-void MessageLogWidget::logSpectatorSay(QString spectatorName,
-                                       UserLevelFlags spectatorUserLevel,
-                                       QString userPrivLevel,
-                                       QString message)
+void MessageLogWidget::logSpectatorSay(const ServerInfo_User &spectator, QString message)
 {
-    appendMessage(std::move(message), {}, spectatorName, spectatorUserLevel, userPrivLevel, false);
+    appendMessage(std::move(message), {}, spectator, false);
 }
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)

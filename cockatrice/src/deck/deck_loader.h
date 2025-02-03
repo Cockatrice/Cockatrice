@@ -29,8 +29,8 @@ private:
 
 public:
     DeckLoader();
-    DeckLoader(const QString &nativeString);
-    DeckLoader(const DeckList &other);
+    explicit DeckLoader(const QString &nativeString);
+    explicit DeckLoader(const DeckList &other);
     DeckLoader(const DeckLoader &other);
     const QString &getLastFileName() const
     {
@@ -59,6 +59,7 @@ public:
 
     // overload
     bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true);
+    bool convertToCockatriceFormat(QString fileName);
 
 protected:
     void saveToStream_DeckHeader(QTextStream &out);

@@ -92,8 +92,7 @@ public slots:
     void logSetSideboardLock(Player *player, bool locked);
     void logSetTapped(Player *player, CardItem *card, bool tapped);
     void logShuffle(Player *player, CardZone *zone, int start, int end);
-    void
-    logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
+    void logSpectatorSay(const ServerInfo_User &spectator, QString message);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
     void setContextJudgeName(QString player);

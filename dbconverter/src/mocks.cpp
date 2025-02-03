@@ -58,6 +58,9 @@ void SettingsCache::setUseTearOffMenus(bool /* _useTearOffMenus */)
 void SettingsCache::setCardViewInitialRowsMax(int /* _cardViewInitialRowsMax */)
 {
 }
+void SettingsCache::setCloseEmptyCardView(const QT_STATE_CHANGED_T /* value */)
+{
+}
 void SettingsCache::setKnownMissingFeatures(const QString & /* _knownMissingFeatures */)
 {
 }
@@ -217,6 +220,13 @@ void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
 }
 void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(
     int /* _visualDeckStorageUnusedColorIdentitiesOpacity */)
+{
+}
+void SettingsCache::setVisualDeckStoragePromptForConversion(
+    QT_STATE_CHANGED_T /* _visualDeckStoragePromptForConversion */)
+{
+}
+void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T /* _visualDeckStorageAlwaysConvert */)
 {
 }
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)

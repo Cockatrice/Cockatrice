@@ -104,11 +104,7 @@ void SettingsCache::translateLegacySettings()
 
     // Game filters
     legacySetting.beginGroup("filter_games");
-    gameFilters().setShowFullGames(legacySetting.value("unavailable_games_visible").toBool());
-    gameFilters().setShowGamesThatStarted(legacySetting.value("unavailable_games_visible").toBool());
-    gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
-    gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
     gameFilters().setHideIgnoredUserGames(legacySetting.value("hide_ignored_user_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
@@ -253,6 +249,7 @@ SettingsCache::SettingsCache()
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
+    closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -273,6 +270,9 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
         settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
+    visualDeckStoragePromptForConversion =
+        settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
+    visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -339,6 +339,12 @@ void SettingsCache::setCardViewInitialRowsMax(int _cardViewInitialRowsMax)
 {
     cardViewInitialRowsMax = _cardViewInitialRowsMax;
     settings->setValue("interface/cardViewInitialRowsMax", cardViewInitialRowsMax);
+}
+
+void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T value)
+{
+    closeEmptyCardView = value;
+    settings->setValue("interface/closeEmptyCardView", closeEmptyCardView);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
@@ -690,6 +696,18 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
     settings->setValue("cards/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
+}
+
+void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)
+{
+    visualDeckStoragePromptForConversion = _visualDeckStoragePromptForConversion;
+    settings->setValue("interface/visualdeckstoragepromptforconversion", visualDeckStoragePromptForConversion);
+}
+
+void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert)
+{
+    visualDeckStorageAlwaysConvert = _visualDeckStorageAlwaysConvert;
+    settings->setValue("interface/visualdeckstoragealwaysconvert", visualDeckStorageAlwaysConvert);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

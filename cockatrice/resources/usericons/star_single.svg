@@ -12,10 +12,10 @@
    enable-background="new 0 0 64 64"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.48.5 r10040"
    width="100%"
    height="100%"
-   sodipodi:docname="registered_vip_buddy.svg">
+   sodipodi:docname="registered_buddy.svg">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -24,23 +24,11 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <defs
      id="defs10">
-    <linearGradient
-       id="linearGradient4153">
-      <stop
-         style="stop-color:#ffec79;stop-opacity:1"
-         offset="0"
-         id="stop4155" />
-      <stop
-         style="stop-color:#f2c15b;stop-opacity:1"
-         offset="1"
-         id="stop4157" />
-    </linearGradient>
     <linearGradient
        id="linearGradient3758">
       <stop
@@ -65,12 +53,12 @@
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3758-7"
+       xlink:href="#linearGradient3758"
        id="linearGradient3756"
-       x1="31.290251"
-       y1="-19.003599"
-       x2="31.135509"
-       y2="67.496323"
+       x1="1.960216"
+       y1="31.261461"
+       x2="60.456024"
+       y2="31.261461"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.87626222,0,0,0.87626222,4.174756,4.8555263)" />
     <linearGradient
@@ -103,14 +91,14 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1152"
-     inkscape:window-height="811"
+     inkscape:window-width="1600"
+     inkscape:window-height="1178"
      id="namedview8"
      showgrid="false"
      inkscape:zoom="7.375"
-     inkscape:cx="29.258475"
-     inkscape:cy="35.341768"
-     inkscape:window-x="-8"
+     inkscape:cx="-11.596718"
+     inkscape:cy="34.975297"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
@@ -121,7 +109,7 @@
      inkscape:connector-curvature="0" />
   <path
      d="M 57.150089,25.064396 37.504323,24.973324 31.522122,5.092503 25.539054,24.973324 5.8924192,25.064399 21.842354,37.75565 13.778482,59.405024 31.522122,45.64865 49.274434,59.405024 41.201022,37.75565 z"
-     id="path4"
-     style="fill:url(#linearGradient3756);fill-opacity:1"
+     id="left"
+     style="fill-opacity:1"
      inkscape:connector-curvature="0" />
 </svg>

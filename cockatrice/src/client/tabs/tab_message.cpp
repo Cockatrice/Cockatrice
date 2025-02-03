@@ -118,11 +118,8 @@ void TabMessage::messageSent(const Response &response)
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
     auto userInfo = event.sender_name() == otherUserInfo->name() ? otherUserInfo : ownUserInfo;
-    const UserLevelFlags userLevel(userInfo->user_level());
-    const QString userPriv = QString::fromStdString(userInfo->privlevel());
 
-    chatView->appendMessage(QString::fromStdString(event.message()), {}, QString::fromStdString(event.sender_name()),
-                            userLevel, userPriv, true);
+    chatView->appendMessage(QString::fromStdString(event.message()), {}, *userInfo, true);
     if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this))
         soundEngine->playSound("private_message");
     if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event))

@@ -3,8 +3,12 @@
 
 #include "user_level.h"
 
+#include <QIcon>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QPixmap>
+
+inline Q_LOGGING_CATEGORY(PixelMapGeneratorLog, "pixel_map_generator");
 
 class PhasePixmapGenerator
 {
@@ -61,13 +65,30 @@ public:
 class UserLevelPixmapGenerator
 {
 private:
-    static QMap<QString, QPixmap> pmCache;
+    static QMap<QString, QIcon> iconCache;
+
+    static QIcon generateIconDefault(int height, UserLevelFlags userLevel, bool isBuddy, const QString &privLevel);
+    static QIcon generateIconWithColorOverride(int height,
+                                               bool isBuddy,
+                                               const QString &privLevel,
+                                               std::optional<QString> colorLeft,
+                                               std::optional<QString> colorRight);
 
 public:
-    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
+    static QPixmap generatePixmap(int height,
+                                  UserLevelFlags userLevel,
+                                  ServerInfo_User::PawnColorsOverride pawnColors,
+                                  bool isBuddy,
+                                  const QString &privLevel);
+
+    static QIcon generateIcon(int minHeight,
+                              UserLevelFlags userLevel,
+                              ServerInfo_User::PawnColorsOverride pawnColors,
+                              bool isBuddy,
+                              const QString &privLevel);
     static void clear()
     {
-        pmCache.clear();
+        iconCache.clear();
     }
 };
 

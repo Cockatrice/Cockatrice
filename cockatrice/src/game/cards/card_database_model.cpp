@@ -179,7 +179,8 @@ void CardDatabaseDisplayModel::fetchMore(const QModelIndex &index)
         return;
     }
 
-    beginInsertRows(QModelIndex(), loadedRowCount, loadedRowCount + itemsToFetch - 1);
+    const auto startIndex = qMin(rowCount(QModelIndex()), loadedRowCount);
+    beginInsertRows(QModelIndex(), startIndex, startIndex + itemsToFetch - 1);
 
     loadedRowCount += itemsToFetch;
     endInsertRows();

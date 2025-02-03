@@ -189,14 +189,7 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    scene->clearViews();
-
     delete replay;
-
-    QMapIterator<int, Player *> i(players);
-    while (i.hasNext()) {
-        delete i.next().value();
-    }
 }
 
 void TabGame::updatePlayerListDockTitle()
@@ -889,8 +882,7 @@ void TabGame::closeGame()
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     const ServerInfo_User &userInfo = spectators.value(eventPlayerId);
-    messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()),
-                                QString::fromStdString(userInfo.privlevel()), QString::fromStdString(event.message()));
+    messageLog->logSpectatorSay(userInfo, QString::fromStdString(event.message()));
 }
 
 void TabGame::eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1097,6 +1089,7 @@ void TabGame::eventLeave(const Event_Leave &event, int eventPlayerId, const Game
     players.remove(eventPlayerId);
     emit playerRemoved(player);
     player->clear();
+    scene->removePlayer(player);
     player->deleteLater();
 
     // Rearrange all remaining zones so that attachment relationship updates take place

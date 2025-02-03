@@ -35,6 +35,7 @@ set(cockatrice_SOURCES
     src/deck/deck_list_model.cpp
     src/deck/deck_stats_interface.cpp
     src/dialogs/dlg_connect.cpp
+    src/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/dialogs/dlg_create_token.cpp
     src/dialogs/dlg_create_game.cpp
     src/dialogs/dlg_edit_avatar.cpp
@@ -63,8 +64,6 @@ set(cockatrice_SOURCES
     src/game/filters/filter_tree.cpp
     src/game/filters/filter_tree_model.cpp
     src/client/ui/layouts/flow_layout.cpp
-    src/client/ui/layouts/horizontal_flow_layout.cpp
-    src/client/ui/layouts/vertical_flow_layout.cpp
     src/client/ui/widgets/general/layout_containers/flow_widget.cpp
     src/game/game_scene.cpp
     src/game/game_selector.cpp
@@ -82,6 +81,7 @@ set(cockatrice_SOURCES
     src/utility/logger.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
+    src/client/ui/widgets/general/display/banner_widget.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
@@ -150,6 +150,19 @@ set(cockatrice_SOURCES
     src/client/tabs/tab_room.cpp
     src/client/tabs/tab_server.cpp
     src/client/tabs/tab_supervisor.cpp
+    src/client/tabs/api/edhrec/tab_edhrec.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_card_details_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_card_list_display_widget.cpp
+    src/client/tabs/api/edhrec/edhrec_commander_api_response_commander_details_display_widget.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_archidekt_links.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_average_deck_statistics.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_details.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_list.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_container.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_card_prices.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response_commander_details.cpp
+    src/client/tabs/api/edhrec/api_response/edhrec_commander_api_response.cpp
     src/game/zones/table_zone.cpp
     src/client/tapped_out_interface.cpp
     src/client/ui/theme_manager.cpp
@@ -175,6 +188,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp

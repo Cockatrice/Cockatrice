@@ -2,8 +2,10 @@
 #define TAB_DECK_STORAGE_H
 
 #include "../../server/remote/remote_decklist_tree_widget.h"
+#include "../game_logic/abstract_client.h"
 #include "tab.h"
 
+class ServerInfo_User;
 class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
@@ -31,12 +33,17 @@ private:
     QAction *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
     QString getTargetPath() const;
 
+    void setRemoteEnabled(bool enabled);
+
     void uploadDeck(const QString &filePath, const QString &targetPath);
     void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
 
     void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
 
 private slots:
+    void handleConnected(const ServerInfo_User &userInfo);
+    void handleConnectionChanged(ClientStatus status);
+
     void actLocalDoubleClick(const QModelIndex &curLeft);
     void actOpenLocalDeck();
 
@@ -63,11 +70,11 @@ private slots:
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 
 public:
-    TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);
     void retranslateUi() override;
     QString getTabText() const override
     {
-        return tr("Deck storage");
+        return tr("Deck Storage");
     }
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);

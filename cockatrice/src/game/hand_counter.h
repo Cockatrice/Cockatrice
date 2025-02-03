@@ -15,7 +15,7 @@ private:
     int number;
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 public slots:
     void updateNumber();
 signals:
@@ -26,14 +26,14 @@ public:
     {
         Type = typeOther
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
-    HandCounter(QGraphicsItem *parent = nullptr);
-    ~HandCounter();
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    explicit HandCounter(QGraphicsItem *parent = nullptr);
+    ~HandCounter() override;
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
 
 #endif

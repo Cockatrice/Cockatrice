@@ -20,13 +20,18 @@ VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckSto
 
     setFixedHeight(100);
 
-    auto *flowWidget = new FlowWidget(this, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    auto *flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     layout->addWidget(flowWidget);
 }
 
-QList<DeckPreviewWidget *>
-VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPreviewWidget *> &deckPreviews) const
+void VisualDeckStorageTagFilterWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    refreshTags();
+}
+
+void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPreviewWidget *> &deckPreviews) const
 {
     // Collect selected tags from DeckPreviewTagDisplayWidget
     QStringList selectedTags;
@@ -36,9 +41,12 @@ VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPrev
         }
     }
 
-    // If no tags are selected, return all decks
+    // If no tags are selected, set all decks as visible
     if (selectedTags.isEmpty()) {
-        return deckPreviews;
+        for (DeckPreviewWidget *deckPreview : deckPreviews) {
+            deckPreview->filteredByTags = false;
+        }
+        return;
     }
 
     // Filter DeckPreviewWidgets that contain all of the selected tags
@@ -50,12 +58,15 @@ VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPrev
         bool allTagsPresent = std::all_of(selectedTags.begin(), selectedTags.end(),
                                           [&deckTags](const QString &tag) { return deckTags.contains(tag); });
 
-        if (allTagsPresent) {
-            filteredDecks.append(deckPreview);
-        }
+        deckPreview->filteredByTags = !allTagsPresent;
     }
+}
 
-    return filteredDecks;
+void VisualDeckStorageTagFilterWidget::refreshTags()
+{
+    QStringList allTags = gatherAllTags();
+    removeTagsNotInList(gatherAllTags());
+    addTagsIfNotPresent(gatherAllTags());
 }
 
 void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QStringList &tags)
@@ -93,8 +104,37 @@ void VisualDeckStorageTagFilterWidget::addTagIfNotPresent(const QString &tag)
     if (!tagExists) {
         auto *newTagWidget = new DeckPreviewTagDisplayWidget(this, tag);
         connect(newTagWidget, &DeckPreviewTagDisplayWidget::tagClicked, parent,
-                &VisualDeckStorageWidget::refreshBannerCards);
+                &VisualDeckStorageWidget::updateTagFilter);
+        connect(newTagWidget, &DeckPreviewTagDisplayWidget::tagClicked, this,
+                &VisualDeckStorageTagFilterWidget::refreshTags);
         auto *flowWidget = findChild<FlowWidget *>();
         flowWidget->addWidget(newTagWidget);
     }
+}
+
+QStringList VisualDeckStorageTagFilterWidget::gatherAllTags()
+{
+    QStringList allTags;
+    QList<DeckPreviewWidget *> deckWidgets = parent->findChildren<DeckPreviewWidget *>();
+
+    for (DeckPreviewWidget *widget : deckWidgets) {
+        if (widget->checkVisibility()) {
+            allTags << widget->deckLoader->getTags();
+        }
+    }
+    return allTags;
+}
+
+QStringList VisualDeckStorageTagFilterWidget::getAllKnownTags()
+{
+    QStringList allTags;
+
+    for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
+        allTags.append(tagWidget->getTagName());
+    }
+
+    // Remove duplicates by calling 'removeDuplicates'
+    allTags.removeDuplicates();
+
+    return allTags;
 }

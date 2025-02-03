@@ -26,7 +26,7 @@ public:
         return Type;
     }
     AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
-    ~AbstractCardDragItem();
+    ~AbstractCardDragItem() override;
     QRectF boundingRect() const override
     {
         return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);

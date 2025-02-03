@@ -21,7 +21,7 @@ class DlgCreateToken : public QDialog
 {
     Q_OBJECT
 public:
-    DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
+    explicit DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
     QString getName() const;
     QString getColor() const;
     QString getPT() const;

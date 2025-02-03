@@ -35,7 +35,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 public:
-    SearchLineEdit() : LineEditUnfocusable(), treeView(nullptr)
+    SearchLineEdit() : treeView(nullptr)
     {
     }
     void setTreeView(QTreeView *_treeView)

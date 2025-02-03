@@ -19,8 +19,8 @@ private:
     QList<ArrowItem *> arrowsFrom, arrowsTo;
 
 public:
-    ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
-    ~ArrowTarget();
+    explicit ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
+    ~ArrowTarget() override;
 
     Player *getOwner() const
     {

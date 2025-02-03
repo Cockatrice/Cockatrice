@@ -21,8 +21,8 @@ private:
     void destroyFilter();
 
 public:
-    FilterBuilder(QWidget *parent = nullptr);
-    ~FilterBuilder();
+    explicit FilterBuilder(QWidget *parent = nullptr);
+    ~FilterBuilder() override;
 
 signals:
     void add(const CardFilter *f);

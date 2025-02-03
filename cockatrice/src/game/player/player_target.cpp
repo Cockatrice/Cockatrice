@@ -103,9 +103,9 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
         QPixmap tempPixmap;
         if (fullPixmap.isNull())
-            tempPixmap =
-                UserLevelPixmapGenerator::generatePixmap(translatedSize.height(), UserLevelFlags(info->user_level()),
-                                                         false, QString::fromStdString(info->privlevel()));
+            tempPixmap = UserLevelPixmapGenerator::generatePixmap(
+                translatedSize.height(), UserLevelFlags(info->user_level()), info->pawn_colors(), false,
+                QString::fromStdString(info->privlevel()));
         else
             tempPixmap = fullPixmap.scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 

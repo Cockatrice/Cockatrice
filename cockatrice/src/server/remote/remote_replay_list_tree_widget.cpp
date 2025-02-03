@@ -37,13 +37,11 @@ RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, 
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
     lockIcon = QPixmap("theme:icons/lock");
-
-    refreshTree();
 }
 
 RemoteReplayList_TreeModel::~RemoteReplayList_TreeModel()
 {
-    clearTree();
+    clearAll();
 }
 
 int RemoteReplayList_TreeModel::rowCount(const QModelIndex &parent) const
@@ -242,7 +240,10 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatc
     return &node->getMatchInfo();
 }
 
-void RemoteReplayList_TreeModel::clearTree()
+/**
+ * Deletes all items in the model
+ */
+void RemoteReplayList_TreeModel::clearAll()
 {
     for (int i = 0; i < replayMatches.size(); ++i)
         delete replayMatches[i];
@@ -256,6 +257,13 @@ void RemoteReplayList_TreeModel::refreshTree()
             SLOT(replayListFinished(const Response &)));
 
     client->sendCommand(pend);
+}
+
+void RemoteReplayList_TreeModel::clearTree()
+{
+    beginResetModel();
+    clearAll();
+    endResetModel();
 }
 
 void RemoteReplayList_TreeModel::addMatchInfo(const ServerInfo_ReplayMatch &matchInfo)
@@ -294,7 +302,7 @@ void RemoteReplayList_TreeModel::replayListFinished(const Response &r)
     const Response_ReplayList &resp = r.GetExtension(Response_ReplayList::ext);
 
     beginResetModel();
-    clearTree();
+    clearAll();
 
     for (int i = 0; i < resp.match_list_size(); ++i)
         replayMatches.append(new MatchNode(resp.match_list(i)));

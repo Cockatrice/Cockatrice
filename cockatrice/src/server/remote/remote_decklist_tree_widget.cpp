@@ -86,7 +86,6 @@ RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(AbstractClient *_client, QObj
     fileIcon = fip.icon(QFileIconProvider::File);
 
     root = new DirectoryNode;
-    refreshTree();
 }
 
 RemoteDeckList_TreeModel::~RemoteDeckList_TreeModel()
@@ -270,15 +269,18 @@ void RemoteDeckList_TreeModel::refreshTree()
     client->sendCommand(pend);
 }
 
+void RemoteDeckList_TreeModel::clearTree()
+{
+    beginResetModel();
+    root->clearTree();
+    endResetModel();
+}
+
 void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
 {
     const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
 
-    beginResetModel();
-
-    root->clearTree();
-
-    endResetModel();
+    clearTree();
 
     ServerInfo_DeckStorage_TreeItem tempRoot;
     tempRoot.set_id(0);
@@ -360,4 +362,9 @@ void RemoteDeckList_TreeWidget::removeNode(RemoteDeckList_TreeModel::Node *node)
 void RemoteDeckList_TreeWidget::refreshTree()
 {
     treeModel->refreshTree();
+}
+
+void RemoteDeckList_TreeWidget::clearTree()
+{
+    treeModel->clearTree();
 }

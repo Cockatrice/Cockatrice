@@ -6,12 +6,10 @@
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QVBoxLayout>
 
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                                const GamesProxyModel *_gamesProxyModel,
@@ -24,19 +22,19 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                   {QTime(1, 0), tr("1 hour")},
                   {QTime(2, 0), tr("2 hours")}})
 {
-    showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
-    showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
+    hideBuddiesOnlyGames = new QCheckBox(tr("Hide 'buddies only' games"));
+    hideBuddiesOnlyGames->setChecked(gamesProxyModel->getHideBuddiesOnlyGames());
 
-    showFullGames = new QCheckBox(tr("Show &full games"));
-    showFullGames->setChecked(gamesProxyModel->getShowFullGames());
+    hideFullGames = new QCheckBox(tr("Hide full games"));
+    hideFullGames->setChecked(gamesProxyModel->getHideFullGames());
 
-    showGamesThatStarted = new QCheckBox(tr("Show games &that have started"));
-    showGamesThatStarted->setChecked(gamesProxyModel->getShowGamesThatStarted());
+    hideGamesThatStarted = new QCheckBox(tr("Hide games that have started"));
+    hideGamesThatStarted->setChecked(gamesProxyModel->getHideGamesThatStarted());
 
-    showPasswordProtectedGames = new QCheckBox(tr("Show &password protected games"));
-    showPasswordProtectedGames->setChecked(gamesProxyModel->getShowPasswordProtectedGames());
+    hidePasswordProtectedGames = new QCheckBox(tr("Hide password protected games"));
+    hidePasswordProtectedGames->setChecked(gamesProxyModel->getHidePasswordProtectedGames());
 
-    hideIgnoredUserGames = new QCheckBox(tr("Hide '&ignored user' games"));
+    hideIgnoredUserGames = new QCheckBox(tr("Hide 'ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
     maxGameAgeComboBox = new QComboBox();
@@ -108,10 +106,10 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     maxPlayersGroupBox->setLayout(maxPlayersFilterLayout);
 
     auto *restrictionsLayout = new QGridLayout;
-    restrictionsLayout->addWidget(showFullGames, 0, 0);
-    restrictionsLayout->addWidget(showGamesThatStarted, 1, 0);
-    restrictionsLayout->addWidget(showPasswordProtectedGames, 2, 0);
-    restrictionsLayout->addWidget(showBuddiesOnlyGames, 3, 0);
+    restrictionsLayout->addWidget(hideFullGames, 0, 0);
+    restrictionsLayout->addWidget(hideGamesThatStarted, 1, 0);
+    restrictionsLayout->addWidget(hidePasswordProtectedGames, 2, 0);
+    restrictionsLayout->addWidget(hideBuddiesOnlyGames, 3, 0);
     restrictionsLayout->addWidget(hideIgnoredUserGames, 4, 0);
 
     auto *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
@@ -185,34 +183,24 @@ void DlgFilterGames::toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled)
     showOnlyIfSpectatorsCanSeeHands->setDisabled(!spectatorsEnabled);
 }
 
-bool DlgFilterGames::getShowFullGames() const
+bool DlgFilterGames::getHideFullGames() const
 {
-    return showFullGames->isChecked();
+    return hideFullGames->isChecked();
 }
 
-bool DlgFilterGames::getShowGamesThatStarted() const
+bool DlgFilterGames::getHideGamesThatStarted() const
 {
-    return showGamesThatStarted->isChecked();
+    return hideGamesThatStarted->isChecked();
 }
 
-bool DlgFilterGames::getShowBuddiesOnlyGames() const
+bool DlgFilterGames::getHideBuddiesOnlyGames() const
 {
-    return showBuddiesOnlyGames->isChecked();
+    return hideBuddiesOnlyGames->isChecked();
 }
 
-void DlgFilterGames::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
+bool DlgFilterGames::getHidePasswordProtectedGames() const
 {
-    showBuddiesOnlyGames->setChecked(_showBuddiesOnlyGames);
-}
-
-bool DlgFilterGames::getShowPasswordProtectedGames() const
-{
-    return showPasswordProtectedGames->isChecked();
-}
-
-void DlgFilterGames::setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden)
-{
-    showPasswordProtectedGames->setChecked(_passwordProtectedGamesHidden);
+    return hidePasswordProtectedGames->isChecked();
 }
 
 bool DlgFilterGames::getHideIgnoredUserGames() const
@@ -220,29 +208,14 @@ bool DlgFilterGames::getHideIgnoredUserGames() const
     return hideIgnoredUserGames->isChecked();
 }
 
-void DlgFilterGames::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
-{
-    hideIgnoredUserGames->setChecked(_hideIgnoredUserGames);
-}
-
 QString DlgFilterGames::getGameNameFilter() const
 {
     return gameNameFilterEdit->text();
 }
 
-void DlgFilterGames::setGameNameFilter(const QString &_gameNameFilter)
-{
-    gameNameFilterEdit->setText(_gameNameFilter);
-}
-
 QString DlgFilterGames::getCreatorNameFilter() const
 {
     return creatorNameFilterEdit->text();
-}
-
-void DlgFilterGames::setCreatorNameFilter(const QString &_creatorNameFilter)
-{
-    creatorNameFilterEdit->setText(_creatorNameFilter);
 }
 
 QSet<int> DlgFilterGames::getGameTypeFilter() const
@@ -255,15 +228,6 @@ QSet<int> DlgFilterGames::getGameTypeFilter() const
             result.insert(i.key());
     }
     return result;
-}
-
-void DlgFilterGames::setGameTypeFilter(const QSet<int> &_gameTypeFilter)
-{
-    QMapIterator<int, QCheckBox *> i(gameTypeFilterCheckBoxes);
-    while (i.hasNext()) {
-        i.next();
-        i.value()->setChecked(_gameTypeFilter.contains(i.key()));
-    }
 }
 
 int DlgFilterGames::getMaxPlayersFilterMin() const
@@ -283,13 +247,6 @@ QTime DlgFilterGames::getMaxGameAge() const
         return gamesProxyModel->getMaxGameAge();   // leave the setting unchanged
     }
     return gameAgeMap.keys().at(index);
-}
-
-void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
-{
-    maxPlayersFilterMinSpinBox->setValue(_maxPlayersFilterMin);
-    maxPlayersFilterMaxSpinBox->setValue(_maxPlayersFilterMax == -1 ? maxPlayersFilterMaxSpinBox->maximum()
-                                                                    : _maxPlayersFilterMax);
 }
 
 bool DlgFilterGames::getShowOnlyIfSpectatorsCanWatch() const

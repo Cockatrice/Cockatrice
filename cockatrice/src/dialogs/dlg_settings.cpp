@@ -34,6 +34,8 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QSlider>
 #include <QSpinBox>
 #include <QStackedWidget>
@@ -181,6 +183,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &GeneralSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 QStringList GeneralSettingsPage::findQmFiles()
@@ -464,6 +469,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addStretch();
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &AppearanceSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void AppearanceSettingsPage::themeBoxChanged(int index)
@@ -561,6 +569,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPlayToStack);
 
+    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().getCloseEmptyCardView());
+    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setCloseEmptyCardView);
+
     annotateTokensCheckBox.setChecked(SettingsCache::instance().getAnnotateTokens());
     connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setAnnotateTokens);
@@ -573,8 +585,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
     generalGrid->addWidget(&playToStackCheckBox, 2, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 3, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 4, 0);
+    generalGrid->addWidget(&closeEmptyCardViewCheckBox, 3, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 5, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -603,8 +616,19 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setOpenDeckInNewTab);
 
+    visualDeckStoragePromptForConversionCheckBox.setChecked(
+        SettingsCache::instance().getVisualDeckStoragePromptForConversion());
+    connect(&visualDeckStoragePromptForConversionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStoragePromptForConversion);
+
+    visualDeckStorageAlwaysConvertCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageAlwaysConvert());
+    connect(&visualDeckStorageAlwaysConvertCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageAlwaysConvert);
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionCheckBox, 1, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageAlwaysConvertCheckBox, 2, 0);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -632,6 +656,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     mainLayout->addStretch();
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &UserInterfaceSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
@@ -650,6 +677,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     clickPlaysAllSelectedCheckBox.setText(tr("&Clicking plays all selected cards (instead of just the clicked card)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
+    closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
@@ -658,8 +686,10 @@ void UserInterfaceSettingsPage::retranslateUi()
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
-    deckEditorGroupBox->setTitle(tr("Deck editor settings"));
+    deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
+    visualDeckStoragePromptForConversionCheckBox.setText(tr("Prompt before converting .txt decks to .cod format"));
+    visualDeckStorageAlwaysConvertCheckBox.setText(tr("Always convert if not prompted"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");
@@ -801,6 +831,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpMainLayout->addWidget(mpSpoilerGroupBox);
 
     setLayout(lpMainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DeckEditorSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
@@ -1103,6 +1136,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     setLayout(mainLayout);
 
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &MessagesSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -1277,6 +1311,9 @@ SoundSettingsPage::SoundSettingsPage()
     mainLayout->addStretch();
 
     setLayout(mainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &SoundSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void SoundSettingsPage::themeBoxChanged(int index)
@@ -1369,6 +1406,9 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
 
     connect(shortcutsTable, &ShortcutTreeView::currentItemChanged, this, &ShortcutSettingsPage::currentItemChanged);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ShortcutSettingsPage::retranslateUi);
+    retranslateUi();
 }
 
 void ShortcutSettingsPage::currentItemChanged(const QString &key)
@@ -1416,10 +1456,23 @@ void ShortcutSettingsPage::retranslateUi()
     searchEdit->setPlaceholderText(tr("Search by shortcut name"));
 }
 
+static QScrollArea *makeScrollable(QWidget *widget)
+{
+    widget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+
+    auto *scrollArea = new QScrollArea;
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setContentsMargins(0, 0, 0, 0);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->horizontalScrollBar()->setEnabled(false);
+    scrollArea->setWidget(widget);
+    return scrollArea;
+}
+
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
     auto rec = QGuiApplication::primaryScreen()->availableGeometry();
-    this->setBaseSize(qMin(700, rec.width()), qMin(700, rec.height()));
+    this->setMinimumSize(qMin(700, rec.width()), qMin(700, rec.height()));
 
     connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
@@ -1433,8 +1486,8 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(new GeneralSettingsPage);
-    pagesWidget->addWidget(new AppearanceSettingsPage);
-    pagesWidget->addWidget(new UserInterfaceSettingsPage);
+    pagesWidget->addWidget(makeScrollable(new AppearanceSettingsPage));
+    pagesWidget->addWidget(makeScrollable(new UserInterfaceSettingsPage));
     pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
@@ -1456,6 +1509,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DlgSettings::retranslateUi);
     retranslateUi();
 
     adjustSize();
@@ -1522,13 +1576,6 @@ void DlgSettings::updateLanguage()
 {
     qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     installNewTranslator();
-}
-
-void DlgSettings::changeEvent(QEvent *event)
-{
-    if (event->type() == QEvent::LanguageChange)
-        retranslateUi();
-    QDialog::changeEvent(event);
 }
 
 void DlgSettings::closeEvent(QCloseEvent *event)
@@ -1618,9 +1665,6 @@ void DlgSettings::retranslateUi()
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
     shortcutsButton->setText(tr("Shortcuts"));
-
-    for (int i = 0; i < pagesWidget->count(); i++)
-        dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
 
     contentsWidget->reset();
 }

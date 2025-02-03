@@ -8,6 +8,11 @@ message ServerInfo_User {
         IsAdmin = 8;
         IsJudge = 16;
     };
+    message PawnColorsOverride {
+        optional string left_side = 1;
+        optional string right_side = 2;
+    };
+
     optional string name = 1;
     optional uint32 user_level = 2;
     optional string address = 3;
@@ -22,4 +27,5 @@ message ServerInfo_User {
     optional string email = 12;
     optional string clientid = 13;
     optional string privlevel = 14;
+    optional PawnColorsOverride pawn_colors = 15;
 }

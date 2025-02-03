@@ -1,8 +1,10 @@
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H
 
+#include "../game_logic/abstract_client.h"
 #include "tab.h"
 
+class ServerInfo_User;
 class Response;
 class AbstractClient;
 class QTreeView;
@@ -29,9 +31,14 @@ private:
     QAction *aOpenReplaysFolder;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
 
+    void setRemoteEnabled(bool enabled);
+
     void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
 
 private slots:
+    void handleConnected(const ServerInfo_User &userInfo);
+    void handleConnectionChanged(ClientStatus status);
+
     void actLocalDoubleClick(const QModelIndex &curLeft);
     void actRenameLocal();
     void actOpenLocalReplay();
@@ -58,11 +65,11 @@ signals:
     void openReplay(GameReplay *replay);
 
 public:
-    TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);
     void retranslateUi() override;
     QString getTabText() const override
     {
-        return tr("Game replays");
+        return tr("Game Replays");
     }
 };
 

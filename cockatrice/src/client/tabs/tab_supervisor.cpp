@@ -176,11 +176,11 @@ void TabSupervisor::retranslateUi()
 {
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
-    aTabVisualDeckStorage->setText(tr("&Visual Deck storage"));
+    aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabServer->setText(tr("Server"));
     aTabAccount->setText(tr("Account"));
-    aTabDeckStorage->setText(tr("Deck storage"));
-    aTabReplays->setText(tr("Game replays"));
+    aTabDeckStorage->setText(tr("Deck Storage"));
+    aTabReplays->setText(tr("Game Replays"));
     aTabAdmin->setText(tr("Administration"));
     aTabLog->setText(tr("Logs"));
 
@@ -279,6 +279,8 @@ void TabSupervisor::initStartupTabs()
     addDeckEditorTab(nullptr);
 
     checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
+    checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
+    checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
 }
 
 /**
@@ -334,6 +336,8 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
+    tabsMenu->addAction(aTabDeckStorage);
+    tabsMenu->addAction(aTabReplays);
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -354,14 +358,6 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
     updatePingTime(0, -1);
 
-    if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
-        tabsMenu->addAction(aTabDeckStorage);
-        tabsMenu->addAction(aTabReplays);
-
-        checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
-        checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
-    }
-
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
         tabsMenu->addSeparator();
         tabsMenu->addAction(aTabAdmin);
@@ -379,8 +375,6 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     resetTabsMenu();
 
     tabAccount = nullptr;
-    tabDeckStorage = nullptr;
-    tabReplays = nullptr;
     tabAdmin = nullptr;
     tabLog = nullptr;
     isLocalGame = true;
@@ -415,12 +409,6 @@ void TabSupervisor::stop()
         }
         if (tabServer) {
             tabServer->closeRequest(true);
-        }
-        if (tabDeckStorage) {
-            tabDeckStorage->closeRequest(true);
-        }
-        if (tabReplays) {
-            tabReplays->closeRequest(true);
         }
         if (tabAdmin) {
             tabAdmin->closeRequest(true);
@@ -460,7 +448,6 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
     if (checked && !tabVisualDeckStorage) {
         tabVisualDeckStorage = new TabDeckStorageVisual(this);
         myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
-        setCurrentWidget(tabVisualDeckStorage);
         connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
             tabVisualDeckStorage = nullptr;
             aTabVisualDeckStorage->setChecked(false);
@@ -508,7 +495,7 @@ void TabSupervisor::actTabDeckStorage(bool checked)
 {
     SettingsCache::instance().setTabDeckStorageOpen(checked);
     if (checked && !tabDeckStorage) {
-        tabDeckStorage = new TabDeckStorage(this, client);
+        tabDeckStorage = new TabDeckStorage(this, client, userInfo);
         connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
         myAddTab(tabDeckStorage, aTabDeckStorage);
         connect(tabDeckStorage, &Tab::closed, this, [this] {
@@ -524,7 +511,7 @@ void TabSupervisor::actTabReplays(bool checked)
 {
     SettingsCache::instance().setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
-        tabReplays = new TabReplays(this, client);
+        tabReplays = new TabReplays(this, client, userInfo);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
         myAddTab(tabReplays, aTabReplays);
         connect(tabReplays, &Tab::closed, this, [this] {
@@ -720,6 +707,18 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     return tab;
 }
 
+TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander)
+{
+    auto *tab = new TabEdhRec(this);
+    if (cardToQuery) {
+        tab->setCard(cardToQuery, isCommander);
+    }
+
+    myAddTab(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
 void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
 {
     if (tab == currentWidget())
@@ -810,10 +809,10 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
         if (auto *tab = getTabAccount()) {
             if (tab != currentWidget()) {
                 tab->setContentsChanged(true);
-                QPixmap avatarPixmap =
-                    UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)userInfoJoined.user_level(), true,
-                                                             QString::fromStdString(userInfoJoined.privlevel()));
-                setTabIcon(indexOf(tab), QPixmap(avatarPixmap));
+                QIcon avatarIcon = UserLevelPixmapGenerator::generateIcon(
+                    13, (UserLevelFlags)userInfoJoined.user_level(), userInfoJoined.pawn_colors(), true,
+                    QString::fromStdString(userInfoJoined.privlevel()));
+                setTabIcon(indexOf(tab), avatarIcon);
             }
         }
 

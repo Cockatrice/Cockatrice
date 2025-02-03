@@ -146,6 +146,8 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
         return true;
     const QString poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
     qCritical() << QString("[%1] Error executing query: %2").arg(poolStr).arg(query->lastError().text());
+    sqlDatabase.close();
+    openDatabase();
     return false;
 }
 
@@ -615,27 +617,36 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
     if (!privlevel.isEmpty())
         result.set_privlevel(privlevel.toStdString());
 
+    const auto &pawn_left_override = query->value(5).toString();
+    const auto &pawn_right_override = query->value(6).toString();
+    if (!pawn_left_override.isEmpty()) {
+        result.mutable_pawn_colors()->set_left_side(pawn_left_override.toStdString());
+    }
+    if (!pawn_right_override.isEmpty()) {
+        result.mutable_pawn_colors()->set_right_side(pawn_right_override.toStdString());
+    }
+
     if (complete) {
-        const QString realName = query->value(5).toString();
+        const QString realName = query->value(7).toString();
         if (!realName.isEmpty())
             result.set_real_name(realName.toStdString());
 
-        const QByteArray avatarBmp = query->value(6).toByteArray();
+        const QByteArray avatarBmp = query->value(8).toByteArray();
         if (avatarBmp.size())
             result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
 
-        const QDateTime regDate = query->value(7).toDateTime();
+        const QDateTime regDate = query->value(9).toDateTime();
         if (!regDate.toString(Qt::ISODate).isEmpty()) {
             // the registration date is in utc
             qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTimeUtc());
             result.set_accountage_secs(accountAgeInSeconds);
         }
 
-        const QString email = query->value(8).toString();
+        const QString email = query->value(10).toString();
         if (!email.isEmpty())
             result.set_email(email.toStdString());
 
-        const QString clientid = query->value(9).toString();
+        const QString clientid = query->value(11).toString();
         if (!clientid.isEmpty())
             result.set_clientid(clientid.toStdString());
     }
@@ -652,9 +663,10 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
         if (!checkSql())
             return result;
 
-        QSqlQuery *query =
-            prepareQuery("select id, name, admin, country, privlevel, realname, avatar_bmp, registrationDate, "
-                         "email, clientid from {prefix}_users where name = :name and active = 1");
+        QSqlQuery *query = prepareQuery("select id, name, admin, country, privlevel, leftPawnColorOverride, "
+                                        "rightPawnColorOverride, realname, avatar_bmp, registrationDate, "
+                                        "email, clientid from {prefix}_users where "
+                                        "name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
@@ -751,7 +763,8 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getBuddyList(const 
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
-        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel from {prefix}_users a "
+        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel, "
+                                        "a.leftPawnColorOverride, a.rightPawnColorOverride from {prefix}_users a "
                                         "left join {prefix}_buddylist b on a.id = b.id_user2 left join {prefix}_users "
                                         "c on b.id_user1 = c.id where c.name = :name");
         query->bindValue(":name", name);
@@ -773,7 +786,8 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getIgnoreList(const
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
-        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel from {prefix}_users a "
+        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel, "
+                                        "a.leftPawnColorOverride, a.rightPawnColorOverride from {prefix}_users a "
                                         "left join {prefix}_ignorelist b on a.id = b.id_user2 left join {prefix}_users "
                                         "c on b.id_user1 = c.id where c.name = :name");
         query->bindValue(":name", name);

@@ -9,7 +9,7 @@ class Server_DatabaseInterface : public QObject
 {
     Q_OBJECT
 public:
-    Server_DatabaseInterface(QObject *parent = 0) : QObject(parent)
+    explicit Server_DatabaseInterface(QObject *parent = nullptr) : QObject(parent)
     {
     }
 

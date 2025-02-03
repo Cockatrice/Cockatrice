@@ -13,7 +13,7 @@ class DlgRegister : public QDialog
 {
     Q_OBJECT
 public:
-    DlgRegister(QWidget *parent = nullptr);
+    explicit DlgRegister(QWidget *parent = nullptr);
     QString getHost() const
     {
         return hostEdit->text();

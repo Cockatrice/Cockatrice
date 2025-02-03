@@ -8,6 +8,7 @@
 #include <QWidget>
 
 class VisualDeckStorageWidget;
+class VisualDeckStorageFolderDisplayWidget;
 class VisualDeckStorageSortWidget : public QWidget
 {
     Q_OBJECT
@@ -16,8 +17,9 @@ public:
     explicit VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent);
     void retranslateUi();
     void updateSortOrder();
+    void sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget);
     QString getSearchText();
-    QList<DeckPreviewWidget *> &filterFiles(QList<DeckPreviewWidget *> &widgets);
+    QList<DeckPreviewWidget *> filterFiles(QList<DeckPreviewWidget *> widgets);
 
 signals:
     void sortOrderChanged();
