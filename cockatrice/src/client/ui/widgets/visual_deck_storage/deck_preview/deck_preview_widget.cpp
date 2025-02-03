@@ -15,6 +15,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
 {
     layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
     setLayout(layout);
 
     deckLoader = new DeckLoader();

@@ -121,7 +121,7 @@ DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(QWidget *parent, 
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(5);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 3, 0, 0);
     setLayout(layout);
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);

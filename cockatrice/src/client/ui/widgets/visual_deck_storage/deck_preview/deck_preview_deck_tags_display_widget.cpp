@@ -16,7 +16,7 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(DeckPreviewWi
 
     // Create layout
     auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(5, 5, 5, 5);
+    layout->setContentsMargins(5, 0, 5, 0);
     layout->setSpacing(5);
 
     setFixedHeight(100);
