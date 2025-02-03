@@ -127,8 +127,13 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
+
+#ifdef Q_OS_WIN
+    painter.drawRect(0, 0, pixmap.width(), pixmap.height());
+#else
     // determined through trial-and-error that /2 maps the pixmap coords to the painter coords
     painter.drawRect(0, 0, pixmap.width() / 2, pixmap.height() / 2);
+#endif
 
     pmCache.insert(key, pixmap);
     return pixmap;
