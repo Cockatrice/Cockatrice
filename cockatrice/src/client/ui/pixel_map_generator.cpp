@@ -9,6 +9,13 @@
 #include <QPalette>
 #include <QSvgRenderer>
 
+#define DEFAULT_COLOR_UNREGISTERED "#32c8ec";
+#define DEFAULT_COLOR_REGISTERED "#5ed900";
+#define DEFAULT_COLOR_DONATOR "#8c5fd3";
+#define DEFAULT_COLOR_MODERATOR_LEFT "#ffffff";
+#define DEFAULT_COLOR_MODERATOR_RIGHT "#000000";
+#define DEFAULT_COLOR_ADMIN "#ff2701";
+
 /**
  * Loads in an svg from file and scales it without affecting image quality.
  *
@@ -204,9 +211,8 @@ static QIcon loadAndColorSvg(const QString &iconPath,
 
     QPainter pixPainter(&pix);
     svgRenderer.render(&pixPainter);
-    QIcon myicon(pix);
 
-    return myicon;
+    return QIcon(pix);
 }
 
 QPixmap UserLevelPixmapGenerator::generatePixmap(int height,
@@ -234,13 +240,20 @@ QIcon UserLevelPixmapGenerator::generateIcon(int minHeight,
         colorRight = QString::fromStdString(pawnColorsOverride.right_side());
     }
 
-    // Has Color Override
-    if (colorLeft.has_value()) {
-        return generateIconWithColorOverride(minHeight, isBuddy, privLevel, colorLeft, colorRight);
+    QString key = QString::number(minHeight * 10000) + ":" + static_cast<short>(userLevel) + ":" +
+                  static_cast<short>(isBuddy) + ":" + privLevel.toLower() + ":" + colorLeft.value_or("") + ":" +
+                  colorRight.value_or("");
+
+    if (iconCache.contains(key)) {
+        return iconCache.value(key);
     }
 
-    // Has No Color Override
-    return generateIconDefault(minHeight, userLevel, isBuddy, privLevel);
+    QIcon icon = colorLeft.has_value()
+                     ? generateIconWithColorOverride(minHeight, isBuddy, privLevel, colorLeft, colorRight)
+                     : generateIconDefault(minHeight, userLevel, isBuddy, privLevel);
+
+    iconCache.insert(key, icon);
+    return icon;
 }
 
 QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
@@ -248,39 +261,36 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
                                                     bool isBuddy,
                                                     const QString &privLevel)
 {
-    QString key = QString::number(height * 10000) + ":" + (short)userLevel + ":" + (short)isBuddy + ":" + privLevel;
-    if (iconCache.contains(key)) {
-        return iconCache.value(key);
-    }
-
-    QString levelString;
-    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
-        levelString = "admin";
-        if (privLevel.toLower() == "vip") {
-            levelString.append("_" + privLevel.toLower());
-        }
-    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
-        levelString = "moderator";
-        if (privLevel.toLower() == "vip") {
-            levelString.append("_" + privLevel.toLower());
-        }
-    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
-        levelString = "registered";
-        if (privLevel.toLower() != "none") {
-            levelString.append("_" + privLevel.toLower());
-        }
-    } else {
-        levelString = "normal";
-    }
-
+    QString iconType;
     if (isBuddy) {
-        levelString.append("_buddy");
+        iconType = "star";
+    } else if (privLevel.toLower() == "vip") {
+        iconType = "pawn_vip";
+    } else {
+        iconType = "pawn";
     }
 
-    auto pixmap = loadSvg("theme:userlevels/" + levelString, QSize(height, height));
-    QIcon icon(pixmap);
-    iconCache.insert(key, icon);
-    return icon;
+    QString arity = "single";
+    QString colorLeft;
+    std::optional<QString> colorRight = std::nullopt;
+
+    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+        colorLeft = DEFAULT_COLOR_ADMIN;
+    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
+        colorLeft = DEFAULT_COLOR_MODERATOR_LEFT;
+        colorRight = DEFAULT_COLOR_MODERATOR_RIGHT;
+        arity = "double";
+    } else if (privLevel.toLower() == "donator") {
+        colorLeft = DEFAULT_COLOR_DONATOR;
+    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
+        colorLeft = DEFAULT_COLOR_REGISTERED;
+    } else {
+        colorLeft = DEFAULT_COLOR_UNREGISTERED;
+    }
+
+    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
+
+    return loadAndColorSvg(iconPath, colorLeft, colorRight, height);
 }
 
 QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
@@ -289,13 +299,6 @@ QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
                                                               std::optional<QString> colorLeft,
                                                               std::optional<QString> colorRight)
 {
-    QString key = QString::number(height * 10000) + ":" + (short)isBuddy + ":" + privLevel.toLower() + ":" +
-                  colorLeft.value_or("") + ":" + colorRight.value_or("");
-
-    if (iconCache.contains(key)) {
-        return iconCache.value(key);
-    }
-
     QString iconType;
     if (isBuddy) {
         iconType = "star";
@@ -307,11 +310,9 @@ QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
 
     QString arity = colorRight.has_value() ? "double" : "single";
 
-    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType).arg(arity);
+    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
 
-    QIcon icon = loadAndColorSvg(iconPath, colorLeft.value(), colorRight, height);
-    iconCache.insert(key, icon);
-    return icon;
+    return loadAndColorSvg(iconPath, colorLeft.value(), colorRight, height);
 }
 
 QMap<QString, QIcon> UserLevelPixmapGenerator::iconCache;
