@@ -128,10 +128,10 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
 
+    // width/height offset was determined through trial-and-error
 #ifdef Q_OS_WIN
-    painter.drawRect(0, 0, pixmap.width(), pixmap.height());
+    painter.drawRect(0, 0, pixmap.width() - 1, pixmap.height() - 1);
 #else
-    // determined through trial-and-error that /2 maps the pixmap coords to the painter coords
     painter.drawRect(0, 0, pixmap.width() / 2, pixmap.height() / 2);
 #endif
 
