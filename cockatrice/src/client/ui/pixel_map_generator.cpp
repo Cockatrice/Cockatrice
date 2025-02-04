@@ -11,7 +11,6 @@
 
 #define DEFAULT_COLOR_UNREGISTERED "#32c8ec";
 #define DEFAULT_COLOR_REGISTERED "#5ed900";
-#define DEFAULT_COLOR_DONATOR "#8c5fd3";
 #define DEFAULT_COLOR_MODERATOR_LEFT "#ffffff";
 #define DEFAULT_COLOR_MODERATOR_RIGHT "#000000";
 #define DEFAULT_COLOR_ADMIN "#ff2701";
@@ -261,19 +260,23 @@ QIcon UserLevelPixmapGenerator::generateIcon(int minHeight,
     return icon;
 }
 
+static QString getIconType(const bool isBuddy, const QString &privLevel)
+{
+    if (isBuddy) {
+        return "star";
+    } else if (privLevel.toLower() != "none") {
+        return QString("pawn_%1").arg(privLevel.toLower());
+    } else {
+        return "pawn";
+    }
+}
+
 QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
                                                     UserLevelFlags userLevel,
                                                     bool isBuddy,
                                                     const QString &privLevel)
 {
-    QString iconType;
-    if (isBuddy) {
-        iconType = "star";
-    } else if (privLevel.toLower() == "vip") {
-        iconType = "pawn_vip";
-    } else {
-        iconType = "pawn";
-    }
+    const auto &iconType = getIconType(isBuddy, privLevel);
 
     QString arity = "single";
     QString colorLeft;
@@ -285,38 +288,25 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
         colorLeft = DEFAULT_COLOR_MODERATOR_LEFT;
         colorRight = DEFAULT_COLOR_MODERATOR_RIGHT;
         arity = "double";
-    } else if (privLevel.toLower() == "donator") {
-        colorLeft = DEFAULT_COLOR_DONATOR;
     } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         colorLeft = DEFAULT_COLOR_REGISTERED;
     } else {
         colorLeft = DEFAULT_COLOR_UNREGISTERED;
     }
 
-    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
-
+    const auto &iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
     return loadAndColorSvg(iconPath, colorLeft, colorRight, height);
 }
 
 QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
                                                               bool isBuddy,
                                                               const QString &privLevel,
-                                                              std::optional<QString> colorLeft,
-                                                              std::optional<QString> colorRight)
+                                                              const std::optional<QString> &colorLeft,
+                                                              const std::optional<QString> &colorRight)
 {
-    QString iconType;
-    if (isBuddy) {
-        iconType = "star";
-    } else if (privLevel.toLower() == "vip") {
-        iconType = "pawn_vip";
-    } else {
-        iconType = "pawn";
-    }
-
-    QString arity = colorRight.has_value() ? "double" : "single";
-
-    QString iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
-
+    const auto &iconType = getIconType(isBuddy, privLevel);
+    const QString &arity = colorRight.has_value() ? "double" : "single";
+    const auto &iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
     return loadAndColorSvg(iconPath, colorLeft.value(), colorRight, height);
 }
 
@@ -336,7 +326,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
 
 QMap<int, QPixmap> LockPixmapGenerator::pmCache;
 
-const QPixmap loadColorAdjustedPixmap(QString name)
+QPixmap loadColorAdjustedPixmap(const QString &name)
 {
     if (qApp->palette().windowText().color().lightness() > 200) {
         QImage img(name);

@@ -71,8 +71,8 @@ private:
     static QIcon generateIconWithColorOverride(int height,
                                                bool isBuddy,
                                                const QString &privLevel,
-                                               std::optional<QString> colorLeft,
-                                               std::optional<QString> colorRight);
+                                               const std::optional<QString> &colorLeft,
+                                               const std::optional<QString> &colorRight);
 
 public:
     static QPixmap generatePixmap(int height,
@@ -105,6 +105,6 @@ public:
     }
 };
 
-const QPixmap loadColorAdjustedPixmap(QString name);
+QPixmap loadColorAdjustedPixmap(const QString &name);
 
 #endif
