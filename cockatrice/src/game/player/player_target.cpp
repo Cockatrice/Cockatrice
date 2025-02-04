@@ -88,6 +88,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" +
                              QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
     if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
+        qDebug() << "TRACK cache miss" << cacheKey;
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
 
         QPainter tempPainter(&cachedPixmap);
@@ -101,16 +102,21 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         grad.setColorAt(0, QColor(180, 180, 180));
         tempPainter.fillRect(QRectF(0, 0, translatedSize.width(), translatedSize.height()), grad);
 
-        QPixmap tempPixmap;
-        if (fullPixmap.isNull())
-            tempPixmap = UserLevelPixmapGenerator::generatePixmap(
-                translatedSize.height(), UserLevelFlags(info->user_level()), info->pawn_colors(), false,
+        if (fullPixmap.isNull()) {
+            int sideLength = translatedSize.height();
+            QPixmap tempPixmap = UserLevelPixmapGenerator::generatePixmap(
+                sideLength, UserLevelFlags(info->user_level()), info->pawn_colors(), false,
                 QString::fromStdString(info->privlevel()));
-        else
-            tempPixmap = fullPixmap.scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            int x = (translatedSize.width() - sideLength) / 2;
+            int y = 0;
+            tempPainter.drawPixmap(x, y, tempPixmap);
+        } else {
+            QPixmap tempPixmap = fullPixmap.scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            int x = (translatedSize.width() - tempPixmap.width()) / 2;
+            int y = (translatedSize.height() - tempPixmap.height()) / 2;
+            tempPainter.drawPixmap(x, y, tempPixmap);
+        }
 
-        tempPainter.drawPixmap((translatedSize.width() - tempPixmap.width()) / 2,
-                               (translatedSize.height() - tempPixmap.height()) / 2, tempPixmap);
         QPixmapCache::insert(cacheKey, cachedPixmap);
     }
 
