@@ -19,11 +19,12 @@
  * Loads in an svg from file and scales it without affecting image quality.
  *
  * @param svgPath The path to the svg file. Automatically appends ".svg" to the end if not present
- * @param size The desired size of the pixmap
+ * @param size The desired size of the pixmap.
+ * @param expandOnly If true, then keep the size of the initial pixmap to at least the svg size.
  *
  * @return The svg loaded into a Pixmap with the given size, or an empty Pixmap if the loading failed.
  */
-static QPixmap loadSvg(const QString &svgPath, const QSize &size)
+static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnly = false)
 {
     QString path = svgPath;
     if (!path.endsWith(".svg")) {
@@ -37,16 +38,21 @@ static QPixmap loadSvg(const QString &svgPath, const QSize &size)
         return {};
     }
 
-    // Makes sure the pixmap is at least as large as the svg, so that we don't lose any detail.
+    // If expandOnly, make sure the pixmap is at least as large as the svg, so that we don't lose any detail.
     // QIcon.pixmap(size) will automatically scale down the image, but it won't scale it up.
-    QPixmap pix(svgRenderer.defaultSize().expandedTo(size));
+    QSize pixmapSize = expandOnly ? svgRenderer.defaultSize().expandedTo(size) : size;
+    QPixmap pix(pixmapSize);
     pix.fill(Qt::transparent);
 
     QPainter pixPainter(&pix);
     svgRenderer.render(&pixPainter);
 
     // Converting the pixmap to a QIcon and back is the easiest way to scale down a svg without affecting image quality
-    return QIcon(pix).pixmap(size);
+    if (expandOnly) {
+        return QIcon(pix).pixmap(size);
+    }
+
+    return pix;
 }
 
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
@@ -129,7 +135,7 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
         return pmCache.value(key);
 
     int width = height * 2;
-    QPixmap pixmap = loadSvg("theme:countries/" + countryCode.toLower(), QSize(width, height));
+    QPixmap pixmap = loadSvg("theme:countries/" + countryCode.toLower(), QSize(width, height), true);
 
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
@@ -321,7 +327,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = loadSvg("theme:icons/lock", QSize(height, height));
+    QPixmap pixmap = loadSvg("theme:icons/lock", QSize(height, height), true);
     pmCache.insert(key, pixmap);
     return pixmap;
 }
