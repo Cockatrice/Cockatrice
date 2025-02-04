@@ -8,7 +8,7 @@ constexpr int MAX_NAME_LENGTH = 0xff;
 // max size for chat messages and text contents
 constexpr int MAX_TEXT_LENGTH = 0xfff;
 // max size for deck files and pictures
-constexpr int MAX_FILE_LENGTH = 0xffffff; // about 16 mega bytes
+constexpr int MAX_FILE_LENGTH = 0x1fffff; // about 2 megabytes
 
 constexpr uint MINIMUM_DIE_SIDES = 2;
 constexpr uint MAXIMUM_DIE_SIDES = 1000000;
