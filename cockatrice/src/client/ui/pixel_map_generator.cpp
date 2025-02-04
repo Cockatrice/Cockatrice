@@ -264,11 +264,13 @@ static QString getIconType(const bool isBuddy, const QString &privLevel)
 {
     if (isBuddy) {
         return "star";
-    } else if (privLevel.toLower() != "none") {
-        return QString("pawn_%1").arg(privLevel.toLower());
-    } else {
-        return "pawn";
     }
+
+    if (!privLevel.isEmpty() && privLevel.toLower() != "none") {
+        return QString("pawn_%1").arg(privLevel.toLower());
+    }
+
+    return "pawn";
 }
 
 QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
