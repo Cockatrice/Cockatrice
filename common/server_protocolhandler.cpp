@@ -406,7 +406,9 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
 
-    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+    // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
+    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none" ||
+        (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin))) {
         if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();
