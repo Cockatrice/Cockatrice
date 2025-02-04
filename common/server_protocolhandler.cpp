@@ -408,7 +408,8 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
-    const bool isModOrAdmin = (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin));
+    const bool isModOrAdmin =
+        userInfo && (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin));
     if (!hasPrivLevel && !isModOrAdmin) {
         if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
