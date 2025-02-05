@@ -82,6 +82,14 @@ void ShortcutsSettings::migrateShortcuts()
             shortCutsFile.remove("tab_game/aFocusChat");
         }
 
+        // PR #5564 changes "MainWindow/aDeckEditor" to "Tabs/aTabDeckEditor"
+        if (shortCutsFile.contains("MainWindow/aDeckEditor")) {
+            qCDebug(ShortcutsSettingsLog) << "MainWindow/aDeckEditor shortcut found. Migrating to Tabs/aTabDeckEditor.";
+            QString keySequence = shortCutsFile.value("MainWindow/aDeckEditor", "").toString();
+            this->setShortcuts("Tabs/aTabDeckEditor", keySequence);
+            shortCutsFile.remove("MainWindow/aDeckEditor");
+        }
+
         shortCutsFile.endGroup();
     }
 }
