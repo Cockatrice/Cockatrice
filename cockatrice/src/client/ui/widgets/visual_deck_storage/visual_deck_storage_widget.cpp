@@ -36,6 +36,15 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
 
+    // checkbox row
+    QHBoxLayout *checkBoxLayout = new QHBoxLayout(this);
+    checkBoxLayout->setContentsMargins(9, 0, 9, 0);
+
+    showFoldersCheckBox = new QCheckBox(this);
+
+    checkBoxLayout->addWidget(showFoldersCheckBox);
+    checkBoxLayout->addStretch();
+
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
 
@@ -54,6 +63,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // putting everything together
     layout->addLayout(searchAndSortLayout);
+    layout->addLayout(checkBoxLayout);
     layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
     layout->addWidget(cardSizeWidget);
@@ -96,6 +106,8 @@ void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
 void VisualDeckStorageWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
+
+    showFoldersCheckBox->setText(tr("Show Folders"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)

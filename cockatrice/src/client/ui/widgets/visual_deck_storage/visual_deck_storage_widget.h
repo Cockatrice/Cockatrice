@@ -11,6 +11,7 @@
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
 
+#include <QCheckBox>
 #include <QFileSystemModel>
 
 class VisualDeckStorageSearchWidget;
@@ -56,6 +57,9 @@ private:
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
+
+    QCheckBox *showFoldersCheckBox;
+
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
 };
