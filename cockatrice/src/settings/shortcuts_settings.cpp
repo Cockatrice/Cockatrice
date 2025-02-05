@@ -28,6 +28,13 @@ ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *paren
         QMap<QString, QString> invalidItems;
         for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
+
+            // check whether shortcut name exists
+            if (!shortCuts.contains(*it)) {
+                qCWarning(ShortcutsSettingsLog) << "Unknown shortcut name:" << *it;
+                continue;
+            }
+
             // check whether shortcut is forbidden
             if (isKeyAllowed(*it, stringSequence)) {
                 auto shortcut = getShortcut(*it);
