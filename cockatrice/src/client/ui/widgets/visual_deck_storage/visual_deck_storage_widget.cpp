@@ -23,6 +23,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->setContentsMargins(9, 0, 9, 5);
     setLayout(layout);
 
+    // search bar row
     searchAndSortLayout = new QHBoxLayout(this);
     searchAndSortLayout->setSpacing(3);
     searchAndSortLayout->setContentsMargins(9, 0, 9, 0);
@@ -30,15 +31,18 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
-    tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
-    layout->addLayout(searchAndSortLayout);
-    layout->addWidget(tagFilterWidget);
+
+    // tag filter box
+    tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+
+    // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
+    // deck area
     scrollArea = new QScrollArea(this);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -48,8 +52,10 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea->setWidget(folderWidget);
     scrollArea->setWidgetResizable(true);
 
+    // putting everything together
+    layout->addLayout(searchAndSortLayout);
+    layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
-
     layout->addWidget(cardSizeWidget);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
