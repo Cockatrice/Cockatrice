@@ -215,12 +215,11 @@ bool ShortcutsSettings::isValid(const QString &name, const QString &sequences) c
 }
 
 /**
- * Checks if the key or checkKey is a shortcut that is active in all windows
+ * Checks if the shortcut is a shortcut that is active in all windows
  */
-static bool isAlwaysActiveShortcut(const QString &key, const QString &checkKey)
+static bool isAlwaysActiveShortcut(const QString &shortcutName)
 {
-    return key.startsWith("MainWindow") || checkKey.startsWith("MainWindow") || key.startsWith("Tabs") ||
-           checkKey.startsWith("Tabs");
+    return shortcutName.startsWith("MainWindow") || shortcutName.startsWith("Tabs");
 }
 
 QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &sequences) const
@@ -230,7 +229,7 @@ QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &
 
     QStringList overlaps;
     for (const auto &key : shortCuts.keys()) {
-        if (key.startsWith(checkKey) || isAlwaysActiveShortcut(key, checkKey)) {
+        if (key.startsWith(checkKey) || isAlwaysActiveShortcut(key) || isAlwaysActiveShortcut(checkKey)) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
             if (storedSequence.split(sep).contains(checkSequence)) {
                 overlaps.append(getShortcutFriendlyName(key));
