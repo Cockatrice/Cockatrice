@@ -88,7 +88,6 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" +
                              QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
     if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
-        qDebug() << "TRACK cache miss" << cacheKey;
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
 
         QPainter tempPainter(&cachedPixmap);
