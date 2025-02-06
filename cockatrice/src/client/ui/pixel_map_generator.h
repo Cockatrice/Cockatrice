@@ -70,6 +70,7 @@ private:
     static QIcon generateIconDefault(int height, UserLevelFlags userLevel, bool isBuddy, const QString &privLevel);
     static QIcon generateIconWithColorOverride(int height,
                                                bool isBuddy,
+                                               const UserLevelFlags &userLevelFlags,
                                                const QString &privLevel,
                                                const std::optional<QString> &colorLeft,
                                                const std::optional<QString> &colorRight);
