@@ -146,6 +146,7 @@ private:
     QCheckBox openDeckInNewTabCheckBox;
     QCheckBox visualDeckStoragePromptForConversionCheckBox;
     QCheckBox visualDeckStorageAlwaysConvertCheckBox;
+    QCheckBox visualDeckStorageInGameCheckBox;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;
