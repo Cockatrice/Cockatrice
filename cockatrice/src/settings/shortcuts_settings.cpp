@@ -89,6 +89,14 @@ void ShortcutsSettings::migrateShortcuts()
             shortCutsFile.remove("tab_game/aFocusChat");
         }
 
+        // PR #5564 changes "MainWindow/aDeckEditor" to "Tabs/aTabDeckEditor"
+        if (shortCutsFile.contains("MainWindow/aDeckEditor")) {
+            qCDebug(ShortcutsSettingsLog) << "MainWindow/aDeckEditor shortcut found. Migrating to Tabs/aTabDeckEditor.";
+            QString keySequence = shortCutsFile.value("MainWindow/aDeckEditor", "").toString();
+            this->setShortcuts("Tabs/aTabDeckEditor", keySequence);
+            shortCutsFile.remove("MainWindow/aDeckEditor");
+        }
+
         shortCutsFile.endGroup();
     }
 }
@@ -221,6 +229,14 @@ bool ShortcutsSettings::isValid(const QString &name, const QString &sequences) c
     return findOverlaps(name, sequences).isEmpty();
 }
 
+/**
+ * Checks if the shortcut is a shortcut that is active in all windows
+ */
+static bool isAlwaysActiveShortcut(const QString &shortcutName)
+{
+    return shortcutName.startsWith("MainWindow") || shortcutName.startsWith("Tabs");
+}
+
 QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &sequences) const
 {
     QString checkSequence = sequences.split(sep).last();
@@ -228,7 +244,7 @@ QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &
 
     QStringList overlaps;
     for (const auto &key : shortCuts.keys()) {
-        if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow")) {
+        if (key.startsWith(checkKey) || isAlwaysActiveShortcut(key) || isAlwaysActiveShortcut(checkKey)) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
             if (storedSequence.split(sep).contains(checkSequence)) {
                 overlaps.append(getShortcutFriendlyName(key));

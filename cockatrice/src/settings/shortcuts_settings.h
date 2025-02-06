@@ -30,7 +30,8 @@ public:
         Chat_room,
         Game_window,
         Load_deck,
-        Replays
+        Replays,
+        Tabs
     };
 
     static QString getGroupName(ShortcutGroup::Groups group)
@@ -72,6 +73,8 @@ public:
                 return QApplication::translate("shortcutsTab", "Load Deck from Clipboard");
             case Replays:
                 return QApplication::translate("shortcutsTab", "Replays");
+            case Tabs:
+                return QApplication::translate("shortcutsTab", "Tabs");
         }
 
         return {};
@@ -150,9 +153,6 @@ private:
         {"MainWindow/aConnect", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Connect..."),
                                             parseSequenceString("Ctrl+L"),
                                             ShortcutGroup::Main_Window)},
-        {"MainWindow/aDeckEditor", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Editor"),
-                                               parseSequenceString(""),
-                                               ShortcutGroup::Main_Window)},
         {"MainWindow/aDisconnect", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Disconnect"),
                                                parseSequenceString(""),
                                                ShortcutGroup::Main_Window)},
@@ -626,7 +626,26 @@ private:
                                            ShortcutGroup::Replays)},
         {"Replays/fastForwardButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Fast Forward"),
                                                   parseSequenceString("Ctrl+P"),
-                                                  ShortcutGroup::Replays)}};
+                                                  ShortcutGroup::Replays)},
+        {"Tabs/aTabDeckEditor",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Editor"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabVisualDeckStorage", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Visual Deck Storage"),
+                                                   parseSequenceString(""),
+                                                   ShortcutGroup::Tabs)},
+        {"Tabs/aTabDeckStorage",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Storage"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabReplays",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Replays"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabServer",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Server"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabAccount",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Account"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabAdmin", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Administration"),
+                                       parseSequenceString(""),
+                                       ShortcutGroup::Tabs)},
+        {"Tabs/aTabLogs",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Logs"), parseSequenceString(""), ShortcutGroup::Tabs)},
+    };
 };
 
 #endif // SHORTCUTSSETTINGS_H

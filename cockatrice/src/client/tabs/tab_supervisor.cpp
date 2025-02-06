@@ -222,7 +222,14 @@ void TabSupervisor::retranslateUi()
 void TabSupervisor::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-    aTabDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
+    aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
+    aTabVisualDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckStorage"));
+    aTabServer->setShortcuts(shortcuts.getShortcut("Tabs/aTabServer"));
+    aTabAccount->setShortcuts(shortcuts.getShortcut("Tabs/aTabAccount"));
+    aTabDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckStorage"));
+    aTabReplays->setShortcuts(shortcuts.getShortcut("Tabs/aTabReplays"));
+    aTabAdmin->setShortcuts(shortcuts.getShortcut("Tabs/aTabAdmin"));
+    aTabLog->setShortcuts(shortcuts.getShortcut("Tabs/aTabLog"));
 }
 
 bool TabSupervisor::closeRequest()
