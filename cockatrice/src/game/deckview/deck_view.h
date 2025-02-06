@@ -109,7 +109,6 @@ private:
     DeckList *deck;
     QMap<QString, DeckViewCardContainer *> cardContainers;
     qreal optimalAspectRatio;
-    void clearContents();
     void rebuildTree();
 
 public:
@@ -123,6 +122,7 @@ public:
     {
         return locked;
     }
+    void clearContents();
     void setDeck(const DeckList &_deck);
     void setOptimalAspectRatio(qreal _optimalAspectRatio)
     {
@@ -152,6 +152,7 @@ signals:
 public:
     explicit DeckView(QWidget *parent = nullptr);
     void setDeck(const DeckList &_deck);
+    void clearDeck();
     void setLocked(bool _locked)
     {
         deckViewScene->setLocked(_locked);

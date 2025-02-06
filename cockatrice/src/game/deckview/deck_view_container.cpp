@@ -101,6 +101,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageInGameChanged, this,
+            &DeckViewContainer::updateShowVisualDeckStorage);
+
     switchToDeckSelectView();
 }
 
@@ -122,8 +125,8 @@ static void setVisibility(QPushButton *button, bool visible)
 
 void DeckViewContainer::switchToDeckSelectView()
 {
-    deckView->setVisible(false);
-    visualDeckStorageWidget->setVisible(true);
+    deckView->setHidden(SettingsCache::instance().getVisualDeckStorageInGame());
+    visualDeckStorageWidget->setHidden(!SettingsCache::instance().getVisualDeckStorageInGame());
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, true);
@@ -143,8 +146,8 @@ void DeckViewContainer::switchToDeckSelectView()
 
 void DeckViewContainer::switchToDeckLoadedView()
 {
-    deckView->setVisible(true);
-    visualDeckStorageWidget->setVisible(false);
+    deckView->setHidden(false);
+    visualDeckStorageWidget->setHidden(true);
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, false);
@@ -179,8 +182,21 @@ void DeckViewContainer::refreshShortcuts()
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
+/**
+ * Update VDS visibility when settings change
+ */
+void DeckViewContainer::updateShowVisualDeckStorage(bool enabled)
+{
+    // view mode state isn't stored in a field, so we determine state by checking the button
+    if (loadLocalButton->isEnabled()) {
+        deckView->setHidden(enabled);
+        visualDeckStorageWidget->setHidden(!enabled);
+    }
+}
+
 void DeckViewContainer::unloadDeck()
 {
+    deckView->clearDeck();
     switchToDeckSelectView();
 }
 

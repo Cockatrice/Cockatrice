@@ -517,6 +517,11 @@ void DeckView::setDeck(const DeckList &_deck)
     deckViewScene->setDeck(_deck);
 }
 
+void DeckView::clearDeck()
+{
+    deckViewScene->clearContents();
+}
+
 void DeckView::resetSideboardPlan()
 {
     deckViewScene->resetSideboardPlan();

@@ -625,10 +625,15 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&visualDeckStorageAlwaysConvertCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageAlwaysConvert);
 
+    visualDeckStorageInGameCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageInGame());
+    connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageInGame);
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionCheckBox, 1, 0);
     deckEditorGrid->addWidget(&visualDeckStorageAlwaysConvertCheckBox, 2, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 3, 0);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -690,6 +695,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     visualDeckStoragePromptForConversionCheckBox.setText(tr("Prompt before converting .txt decks to .cod format"));
     visualDeckStorageAlwaysConvertCheckBox.setText(tr("Always convert if not prompted"));
+    visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

@@ -63,6 +63,7 @@ signals:
     void printingSelectorCardSizeSliderVisibleChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageCardSizeChanged();
+    void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -135,6 +136,7 @@ private:
     int visualDeckStorageUnusedColorIdentitiesOpacity;
     bool visualDeckStoragePromptForConversion;
     bool visualDeckStorageAlwaysConvert;
+    bool visualDeckStorageInGame;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -433,6 +435,10 @@ public:
     bool getVisualDeckStorageAlwaysConvert() const
     {
         return visualDeckStorageAlwaysConvert;
+    }
+    bool getVisualDeckStorageInGame() const
+    {
+        return visualDeckStorageInGame;
     }
     bool getHorizontalHand() const
     {
@@ -760,6 +766,7 @@ public slots:
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
     void setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion);
     void setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert);
+    void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
