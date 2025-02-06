@@ -65,6 +65,7 @@ private slots:
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
     void refreshShortcuts();
+    void updateShowVisualDeckStorage(bool enabled);
 signals:
     void newCardAdded(AbstractCardItem *card);
     void notIdle();
