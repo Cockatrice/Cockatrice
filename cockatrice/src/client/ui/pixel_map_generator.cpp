@@ -18,20 +18,15 @@
 /**
  * Loads in an svg from file and scales it without affecting image quality.
  *
- * @param svgPath The path to the svg file. Automatically appends ".svg" to the end if not present
+ * @param path The path to the svg file. Automatically appends ".svg" to the end if not present
  * @param size The desired size of the pixmap.
  * @param expandOnly If true, then keep the size of the initial pixmap to at least the svg size.
  *
  * @return The svg loaded into a Pixmap with the given size, or an empty Pixmap if the loading failed.
  */
-static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnly = false)
+static QPixmap loadSvg(const QString &path, const QSize &size, bool expandOnly = false)
 {
-    QString path = svgPath;
-    if (!path.endsWith(".svg")) {
-        path += ".svg";
-    }
-
-    QSvgRenderer svgRenderer(path);
+    QSvgRenderer svgRenderer(path + ".svg");
 
     if (!svgRenderer.isValid()) {
         qCWarning(PixelMapGeneratorLog) << "Failed to load" << path;
@@ -55,6 +50,29 @@ static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnl
     return pix;
 }
 
+/**
+ * Try to load path image from non-SVG formats, otherwise fall back to SVG.
+ * This is to allow custom themes to support non-SVG format type overrides, since SVG requires custom loading.
+ * @param path The path to the file. File formats will be automatically detected.
+ * @param size The desired size of the pixmap.
+ * @param expandOnly If true, then keep the size of the initial pixmap to at least the size (Only relevant if SVG).
+ *
+ * @return The loaded image into a Pixmap with the given size, or an empty Pixmap if the loading failed.
+ */
+static QPixmap tryLoadImage(const QString &path, const QSize &size, bool expandOnly = false)
+{
+    const auto formats = {"png", "jpg"};
+
+    QPixmap returnPixmap;
+    for (const auto &format : formats) {
+        if (returnPixmap.load(path, format)) {
+            return returnPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+    }
+
+    return loadSvg(path, size, expandOnly);
+}
+
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
 
 QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
@@ -63,7 +81,7 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = loadSvg("theme:phases/" + name, QSize(height, height));
+    QPixmap pixmap = tryLoadImage("theme:phases/" + name, QSize(height, height));
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -84,14 +102,14 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = loadSvg("theme:counters/" + name, QSize(height, height));
+    QPixmap pixmap = tryLoadImage("theme:counters/" + name, QSize(height, height));
 
     // fall back to colorless counter if the name can't be found
     if (pixmap.isNull()) {
         name = "general";
         if (highlight)
             name.append("_highlight");
-        pixmap = loadSvg("theme:counters/" + name, QSize(height, height));
+        pixmap = tryLoadImage("theme:counters/" + name, QSize(height, height));
     }
 
     pmCache.insert(key, pixmap);
@@ -135,7 +153,7 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
         return pmCache.value(key);
 
     int width = height * 2;
-    QPixmap pixmap = loadSvg("theme:countries/" + countryCode.toLower(), QSize(width, height), true);
+    QPixmap pixmap = tryLoadImage("theme:countries/" + countryCode.toLower(), QSize(width, height), true);
 
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
@@ -332,7 +350,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QPixmap pixmap = loadSvg("theme:icons/lock", QSize(height, height), true);
+    QPixmap pixmap = tryLoadImage("theme:icons/lock", QSize(height, height), true);
     pmCache.insert(key, pixmap);
     return pixmap;
 }
