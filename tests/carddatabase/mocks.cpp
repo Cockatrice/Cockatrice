@@ -233,6 +233,9 @@ void SettingsCache::setVisualDeckStoragePromptForConversion(
 void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T /* _visualDeckStorageAlwaysConvert */)
 {
 }
+void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }
