@@ -333,6 +333,8 @@
         <file>resources/usericons/pawn_double.svg</file>
         <file>resources/usericons/pawn_donator_single.svg</file>
         <file>resources/usericons/pawn_donator_double.svg</file>
+        <file>resources/usericons/pawn_judge_single.svg</file>
+        <file>resources/usericons/pawn_judge_double.svg</file>
         <file>resources/usericons/pawn_vip_single.svg</file>
         <file>resources/usericons/pawn_vip_double.svg</file>
         <file>resources/usericons/star_single.svg</file>

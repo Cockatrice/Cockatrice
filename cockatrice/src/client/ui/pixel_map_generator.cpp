@@ -259,17 +259,21 @@ QIcon UserLevelPixmapGenerator::generateIcon(int minHeight,
     }
 
     QIcon icon = colorLeft.has_value()
-                     ? generateIconWithColorOverride(minHeight, isBuddy, privLevel, colorLeft, colorRight)
+                     ? generateIconWithColorOverride(minHeight, isBuddy, userLevel, privLevel, colorLeft, colorRight)
                      : generateIconDefault(minHeight, userLevel, isBuddy, privLevel);
 
     iconCache.insert(key, icon);
     return icon;
 }
 
-static QString getIconType(const bool isBuddy, const QString &privLevel)
+static QString getIconType(const bool isBuddy, const UserLevelFlags &userLevelFlags, const QString &privLevel)
 {
     if (isBuddy) {
         return "star";
+    }
+
+    if (userLevelFlags.testFlag(ServerInfo_User_UserLevelFlag_IsJudge)) {
+        return "pawn_judge";
     }
 
     if (!privLevel.isEmpty() && privLevel.toLower() != "none") {
@@ -284,7 +288,7 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
                                                     bool isBuddy,
                                                     const QString &privLevel)
 {
-    const auto &iconType = getIconType(isBuddy, privLevel);
+    const auto &iconType = getIconType(isBuddy, userLevel, privLevel);
 
     QString arity = "single";
     QString colorLeft;
@@ -308,11 +312,12 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
 
 QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
                                                               bool isBuddy,
+                                                              const UserLevelFlags &userLevelFlags,
                                                               const QString &privLevel,
                                                               const std::optional<QString> &colorLeft,
                                                               const std::optional<QString> &colorRight)
 {
-    const auto &iconType = getIconType(isBuddy, privLevel);
+    const auto &iconType = getIconType(isBuddy, userLevelFlags, privLevel);
     const QString &arity = colorRight.has_value() ? "double" : "single";
     const auto &iconPath = QString("theme:usericons/%1_%2.svg").arg(iconType, arity);
     return loadAndColorSvg(iconPath, colorLeft.value(), colorRight, height);
