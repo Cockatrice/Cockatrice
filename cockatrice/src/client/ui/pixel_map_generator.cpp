@@ -18,18 +18,18 @@
 /**
  * Loads in an svg from file and scales it without affecting image quality.
  *
- * @param path The path to the svg file. Automatically appends ".svg" to the end if not present
+ * @param svgPath The path to the svg file, with file extension.
  * @param size The desired size of the pixmap.
  * @param expandOnly If true, then keep the size of the initial pixmap to at least the svg size.
  *
  * @return The svg loaded into a Pixmap with the given size, or an empty Pixmap if the loading failed.
  */
-static QPixmap loadSvg(const QString &path, const QSize &size, bool expandOnly = false)
+static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnly = false)
 {
-    QSvgRenderer svgRenderer(path + ".svg");
+    QSvgRenderer svgRenderer(svgPath);
 
     if (!svgRenderer.isValid()) {
-        qCWarning(PixelMapGeneratorLog) << "Failed to load" << path;
+        qCWarning(PixelMapGeneratorLog) << "Failed to load" << svgPath;
         return {};
     }
 
@@ -53,7 +53,7 @@ static QPixmap loadSvg(const QString &path, const QSize &size, bool expandOnly =
 /**
  * Try to load path image from non-SVG formats, otherwise fall back to SVG.
  * This is to allow custom themes to support non-SVG format type overrides, since SVG requires custom loading.
- * @param path The path to the file. File formats will be automatically detected.
+ * @param path The path to the file, with no file extension. File formats will be automatically detected.
  * @param size The desired size of the pixmap.
  * @param expandOnly If true, then keep the size of the initial pixmap to at least the size (Only relevant if SVG).
  *
@@ -70,7 +70,7 @@ static QPixmap tryLoadImage(const QString &path, const QSize &size, bool expandO
         }
     }
 
-    return loadSvg(path, size, expandOnly);
+    return loadSvg(path + ".svg", size, expandOnly);
 }
 
 QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
