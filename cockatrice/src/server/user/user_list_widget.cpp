@@ -344,9 +344,9 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
     userInfo = _userInfo;
 
     setData(0, Qt::UserRole, userInfo.user_level());
-    setIcon(0, UserLevelPixmapGenerator::generateIcon(12, UserLevelFlags(userInfo.user_level()), userInfo.pawn_colors(),
+    setIcon(0, UserLevelPixmapGenerator::generateIcon(18, UserLevelFlags(userInfo.user_level()), userInfo.pawn_colors(),
                                                       false, QString::fromStdString(userInfo.privlevel())));
-    setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(userInfo.country()))));
+    setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(18, QString::fromStdString(userInfo.country()))));
     setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
     setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
 }
@@ -384,9 +384,10 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree = new QTreeWidget;
     userTree->setColumnCount(3);
     userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    userTree->header()->setMinimumSectionSize(0);
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
-    userTree->setIconSize(QSize(20, 12));
+    userTree->setIconSize(QSize(20, 18));
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
     connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
