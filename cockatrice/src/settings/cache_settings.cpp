@@ -715,6 +715,7 @@ void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T value)
 {
     visualDeckStorageInGame = value;
     settings->setValue("interface/visualdeckstorageingame", visualDeckStorageInGame);
+    emit visualDeckStorageInGameChanged(visualDeckStorageInGame);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

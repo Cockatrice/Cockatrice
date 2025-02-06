@@ -63,6 +63,7 @@ signals:
     void printingSelectorCardSizeSliderVisibleChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageCardSizeChanged();
+    void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
