@@ -9,6 +9,7 @@
 
 #include <QCheckBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -36,6 +37,7 @@ public slots:
     void selectPreviousCard();
     void selectNextCard();
     void toggleVisibilityNavigationButtons(bool _state);
+    void selectSetForCards();
 
 private slots:
     void printingsInDeckChanged();
@@ -48,7 +50,9 @@ private:
     QCheckBox *navigationCheckBox;
     QLabel *warningLabel;
     PrintingSelectorCardSortingWidget *sortToolBar;
+    QHBoxLayout *searchAndSetLayout;
     PrintingSelectorCardSearchWidget *searchBar;
+    QPushButton *selectSetForCardsButton;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
