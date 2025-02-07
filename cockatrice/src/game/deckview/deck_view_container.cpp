@@ -48,7 +48,7 @@ void ToggleButton::setState(bool _state)
 }
 
 DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
-    : QWidget(nullptr), parentGame(parent), playerId(_playerId)
+    : QWidget(nullptr), visualDeckStorageWidget(nullptr), parentGame(parent), playerId(_playerId)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
@@ -86,14 +86,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
 
-    visualDeckStorageWidget = new VisualDeckStorageWidget(this);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
-            &DeckViewContainer::loadDeckFromFile);
-
     deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->addWidget(deckView);
-    deckViewLayout->addWidget(visualDeckStorageWidget);
     deckViewLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(deckViewLayout);
 
@@ -105,6 +100,22 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
             &DeckViewContainer::updateShowVisualDeckStorage);
 
     switchToDeckSelectView();
+}
+
+/**
+ * Creates the VDS widget and inserts it into the layout. No-ops if the widget already exists
+ */
+void DeckViewContainer::tryCreateVisualDeckStorageWidget()
+{
+    if (visualDeckStorageWidget) {
+        return;
+    }
+
+    visualDeckStorageWidget = new VisualDeckStorageWidget(this);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
+            &DeckViewContainer::loadDeckFromFile);
+
+    deckViewLayout->addWidget(visualDeckStorageWidget);
 }
 
 void DeckViewContainer::retranslateUi()
@@ -125,8 +136,18 @@ static void setVisibility(QPushButton *button, bool visible)
 
 void DeckViewContainer::switchToDeckSelectView()
 {
-    deckView->setHidden(SettingsCache::instance().getVisualDeckStorageInGame());
-    visualDeckStorageWidget->setHidden(!SettingsCache::instance().getVisualDeckStorageInGame());
+    if (SettingsCache::instance().getVisualDeckStorageInGame()) {
+        deckView->setHidden(true);
+
+        tryCreateVisualDeckStorageWidget();
+        visualDeckStorageWidget->setHidden(false);
+    } else {
+        deckView->setHidden(false);
+        if (visualDeckStorageWidget) {
+            visualDeckStorageWidget->setHidden(true);
+        }
+    }
+
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, true);
@@ -147,7 +168,10 @@ void DeckViewContainer::switchToDeckSelectView()
 void DeckViewContainer::switchToDeckLoadedView()
 {
     deckView->setHidden(false);
-    visualDeckStorageWidget->setHidden(true);
+    if (visualDeckStorageWidget) {
+        visualDeckStorageWidget->setHidden(true);
+    }
+
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, false);
@@ -183,15 +207,25 @@ void DeckViewContainer::refreshShortcuts()
 }
 
 /**
- * Update VDS visibility when settings change
+ * Update VDS existence when settings change
  */
 void DeckViewContainer::updateShowVisualDeckStorage(bool enabled)
 {
-    // view mode state isn't stored in a field, so we determine state by checking the button
-    if (loadLocalButton->isEnabled()) {
-        deckView->setHidden(enabled);
-        visualDeckStorageWidget->setHidden(!enabled);
+    if (enabled) {
+        tryCreateVisualDeckStorageWidget();
+        // view mode state isn't stored in a field, so we determine state by checking the button
+        bool isDeckSelectView = loadLocalButton->isEnabled();
+        visualDeckStorageWidget->setHidden(!isDeckSelectView);
+        deckView->setHidden(isDeckSelectView);
+    } else {
+        if (visualDeckStorageWidget) {
+            visualDeckStorageWidget->deleteLater();
+            visualDeckStorageWidget = nullptr;
+        }
+        deckView->setHidden(false);
     }
+
+    deckViewLayout->update();
 }
 
 void DeckViewContainer::unloadDeck()
