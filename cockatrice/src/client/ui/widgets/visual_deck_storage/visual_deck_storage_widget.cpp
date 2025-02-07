@@ -13,7 +13,7 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
-VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent)
+VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {
     deckListModel = new DeckListModel(this);
     deckListModel->setObjectName("visualDeckModel");
@@ -58,8 +58,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea = new QScrollArea(this);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    scrollArea->setWidget(folderWidget);
     scrollArea->setWidgetResizable(true);
 
     // putting everything together
