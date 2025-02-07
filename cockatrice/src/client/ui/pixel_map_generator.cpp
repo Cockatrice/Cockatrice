@@ -159,7 +159,7 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
     painter.setPen(Qt::black);
 
     // width/height offset was determined through trial-and-error
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     painter.drawRect(0, 0, pixmap.width() / 2, pixmap.height() / 2);
 #else
     painter.drawRect(0, 0, pixmap.width() - 1, pixmap.height() - 1);
