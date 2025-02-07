@@ -7,6 +7,7 @@
 #include "../general/layout_containers/flow_widget.h"
 
 #include <QLabel>
+#include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -35,6 +36,7 @@ public slots:
     void toggleVisibilitySearchBar(bool _state);
     void toggleVisibilityCardSizeSlider(bool _state);
     void toggleVisibilityNavigationButtons(bool _state);
+    void selectSetForCards();
 
 private slots:
     void printingsInDeckChanged();
@@ -43,7 +45,9 @@ private:
     QVBoxLayout *layout;
     PrintingSelectorViewOptionsToolbarWidget *viewOptionsToolbar;
     PrintingSelectorCardSortingWidget *sortToolBar;
+    QHBoxLayout *searchAndSetLayout;
     PrintingSelectorCardSearchWidget *searchBar;
+    QPushButton *selectSetForCardsButton;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
