@@ -56,8 +56,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
-
     scrollArea->setWidget(folderWidget);
     scrollArea->setWidgetResizable(true);
 
@@ -123,7 +121,12 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
+    folderWidget =
+        new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false, false);
+
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, folderWidget,
+            &VisualDeckStorageFolderDisplayWidget::updateShowFolders);
+
     scrollArea->setWidget(folderWidget);
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
