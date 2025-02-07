@@ -41,6 +41,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     checkBoxLayout->setContentsMargins(9, 0, 9, 0);
 
     showFoldersCheckBox = new QCheckBox(this);
+    showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowFolders);
 
     checkBoxLayout->addWidget(showFoldersCheckBox);
     checkBoxLayout->addStretch();
@@ -121,8 +124,8 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget =
-        new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false, false);
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
+                                                            showFoldersCheckBox->isChecked());
 
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, folderWidget,
             &VisualDeckStorageFolderDisplayWidget::updateShowFolders);

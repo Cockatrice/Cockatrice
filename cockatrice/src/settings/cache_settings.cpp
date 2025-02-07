@@ -266,6 +266,7 @@ SettingsCache::SettingsCache()
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("cards/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
+    visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
     visualDeckStorageDrawUnusedColorIdentities =
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
@@ -676,6 +677,12 @@ void SettingsCache::setVisualDeckStorageSortingOrder(int _visualDeckStorageSorti
 {
     visualDeckStorageSortingOrder = _visualDeckStorageSortingOrder;
     settings->setValue("interface/visualdeckstoragesortingorder", visualDeckStorageSortingOrder);
+}
+
+void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageShowFolders = value;
+    settings->setValue("interface/visualdeckstorageshowfolders", visualDeckStorageShowFolders);
 }
 
 void SettingsCache::setVisualDeckStorageCardSize(int _visualDeckStorageCardSize)
