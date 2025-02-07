@@ -19,6 +19,7 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 
     header = new BannerWidget(this, "");
     header->setClickable(canBeHidden);
+    header->setHidden(!showFolders);
     layout->addWidget(header);
 
     container = new QWidget(this);
@@ -175,6 +176,8 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
         createWidgetsForFiles();
         createWidgetsForFolders();
     }
+
+    header->setHidden(!showFolders);
 }
 
 /**
