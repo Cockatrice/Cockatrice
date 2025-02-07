@@ -506,6 +506,8 @@ void SetEntryWidget::populateCardList()
         unusedCards.removeAll(cardName);
     }
     checkVisibility();
+    countLabel->setText(QString::number(possibleCards.size()) + " (" +
+                        QString::number(possibleCards.size() + unusedCards.size()) + ")");
 }
 
 void SetEntryWidget::updateCardDisplayWidgets()
