@@ -251,5 +251,7 @@ void PrintingSelector::toggleVisibilityNavigationButtons(bool _state)
 void PrintingSelector::selectSetForCards()
 {
     DlgSelectSetForCards *setSelectionDialog = new DlgSelectSetForCards(nullptr, deckModel);
-    setSelectionDialog->show();
+    if (!setSelectionDialog->exec()) {
+        return;
+    }
 }
