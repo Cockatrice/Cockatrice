@@ -22,12 +22,14 @@ public:
     explicit DlgSelectSetForCards(QWidget *parent, DeckListModel *_model);
     void sortSetsByCount();
     QMap<QString, QStringList> getCardsForSets();
+    QMap<QString, QStringList> getModifiedCards();
     QVBoxLayout *listLayout;
 
 public slots:
     void updateCardLists();
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+    void actOK();
 
 private:
     QVBoxLayout *layout;
