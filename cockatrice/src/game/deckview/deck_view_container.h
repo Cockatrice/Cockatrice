@@ -51,6 +51,7 @@ private:
     TabGame *parentGame;
     int playerId;
 
+    void tryCreateVisualDeckStorageWidget();
     void sendReadyStartCommand(bool ready);
 private slots:
     void switchToDeckSelectView();
