@@ -15,13 +15,13 @@ public:
     VisualDeckStorageFolderDisplayWidget(QWidget *parent,
                                          VisualDeckStorageWidget *_visualDeckStorageWidget,
                                          QString _filePath,
-                                         bool canBeHidden);
+                                         bool canBeHidden,
+                                         bool _showFolders);
     void refreshUi();
     void createWidgetsForFiles();
     void createWidgetsForFolders();
+    void flattenFolderStructure();
     QStringList gatherAllTagsFromFlowWidget() const;
-    [[nodiscard]] QStringList getAllFiles() const;
-    [[nodiscard]] QStringList getAllSubFolders() const;
     FlowWidget *getFlowWidget() const
     {
         return flowWidget;
@@ -30,8 +30,10 @@ public:
 public slots:
     void updateVisibility();
     bool checkVisibility();
+    void updateShowFolders(bool enabled);
 
 private:
+    bool showFolders;
     QVBoxLayout *layout;
     VisualDeckStorageWidget *visualDeckStorageWidget;
     QString filePath;

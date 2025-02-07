@@ -131,6 +131,7 @@ private:
     bool printingSelectorCardSizeSliderVisible;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
+    bool visualDeckStorageShowFolders;
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
@@ -415,6 +416,10 @@ public:
     int getVisualDeckStorageSortingOrder() const
     {
         return visualDeckStorageSortingOrder;
+    }
+    bool getVisualDeckStorageShowFolders() const
+    {
+        return visualDeckStorageShowFolders;
     }
     int getVisualDeckStorageCardSize() const
     {
@@ -761,6 +766,7 @@ public slots:
     void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
+    void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);

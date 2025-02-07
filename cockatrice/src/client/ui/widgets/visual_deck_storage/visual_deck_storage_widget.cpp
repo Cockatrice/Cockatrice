@@ -23,6 +23,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->setContentsMargins(9, 0, 9, 5);
     setLayout(layout);
 
+    // search bar row
     searchAndSortLayout = new QHBoxLayout(this);
     searchAndSortLayout->setSpacing(3);
     searchAndSortLayout->setContentsMargins(9, 0, 9, 0);
@@ -30,26 +31,42 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
-    tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
-    layout->addLayout(searchAndSortLayout);
-    layout->addWidget(tagFilterWidget);
+
+    // checkbox row
+    QHBoxLayout *checkBoxLayout = new QHBoxLayout(this);
+    checkBoxLayout->setContentsMargins(9, 0, 9, 0);
+
+    showFoldersCheckBox = new QCheckBox(this);
+    showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowFolders);
+
+    checkBoxLayout->addWidget(showFoldersCheckBox);
+    checkBoxLayout->addStretch();
+
+    // tag filter box
+    tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+
+    // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
+    // deck area
     scrollArea = new QScrollArea(this);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
-
     scrollArea->setWidget(folderWidget);
     scrollArea->setWidgetResizable(true);
 
+    // putting everything together
+    layout->addLayout(searchAndSortLayout);
+    layout->addLayout(checkBoxLayout);
+    layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
-
     layout->addWidget(cardSizeWidget);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
@@ -90,6 +107,8 @@ void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
 void VisualDeckStorageWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
+
+    showFoldersCheckBox->setText(tr("Show Folders"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
@@ -105,7 +124,12 @@ void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, 
 
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false);
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
+                                                            showFoldersCheckBox->isChecked());
+
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, folderWidget,
+            &VisualDeckStorageFolderDisplayWidget::updateShowFolders);
+
     scrollArea->setWidget(folderWidget);
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();

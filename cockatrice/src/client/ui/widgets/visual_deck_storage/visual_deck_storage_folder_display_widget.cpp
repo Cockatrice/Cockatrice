@@ -10,14 +10,16 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,
     VisualDeckStorageWidget *_visualDeckStorageWidget,
     QString _filePath,
-    bool canBeHidden)
-    : QWidget(parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
+    bool canBeHidden,
+    bool _showFolders)
+    : QWidget(parent), showFolders(_showFolders), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
     header = new BannerWidget(this, "");
     header->setClickable(canBeHidden);
+    header->setHidden(!showFolders);
     layout->addWidget(header);
 
     container = new QWidget(this);
@@ -63,10 +65,26 @@ void VisualDeckStorageFolderDisplayWidget::refreshUi()
     header->setText(bannerText);
 }
 
+static QStringList getAllFiles(const QString &filePath, bool recursive)
+{
+    QStringList allFiles;
+
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    auto flags =
+        recursive ? QDirIterator::Subdirectories | QDirIterator::FollowSymlinks : QDirIterator::NoIteratorFlags;
+    QDirIterator it(filePath, QDir::Files, flags);
+
+    while (it.hasNext()) {
+        allFiles << it.next(); // Add each file path to the list
+    }
+
+    return allFiles;
+}
+
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
 {
     QList<DeckPreviewWidget *> allDecks;
-    for (const QString &file : getAllFiles()) {
+    for (const QString &file : getAllFiles(filePath, !showFolders)) {
         auto *display = new DeckPreviewWidget(flowWidget, visualDeckStorageWidget, file);
 
         connect(display, &DeckPreviewWidget::deckPreviewClicked, visualDeckStorageWidget,
@@ -121,11 +139,79 @@ bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
     return atLeastOneWidgetVisible;
 }
 
+static QStringList getAllSubFolders(const QString &filePath)
+{
+    QStringList allFolders;
+
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    QDirIterator it(filePath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    while (it.hasNext()) {
+        allFolders << it.next(); // Add each file path to the list
+    }
+
+    return allFolders;
+}
+
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFolders()
 {
-    for (const QString &dir : getAllSubFolders()) {
-        auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir, true);
+    if (!showFolders) {
+        return;
+    }
+
+    for (const QString &dir : getAllSubFolders(filePath)) {
+        auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir, true, showFolders);
         containerLayout->addWidget(display);
+    }
+}
+
+void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
+{
+    showFolders = enabled;
+
+    if (!showFolders) {
+        flattenFolderStructure();
+    } else {
+        // if setting was switched from disabled to enabled, we assume that there isn't any existing subfolders
+        createWidgetsForFiles();
+        createWidgetsForFolders();
+    }
+
+    header->setHidden(!showFolders);
+}
+
+/**
+ * Recursively gets all DeckPreviewWidgets in this folder and its subfolders
+ */
+static QList<DeckPreviewWidget *> getAllDecksRecursive(VisualDeckStorageFolderDisplayWidget *folder)
+{
+    QList<DeckPreviewWidget *> allDecks;
+
+    if (auto *flowWidget = folder->getFlowWidget()) {
+        // Iterate through all DeckPreviewWidgets in this folder
+        allDecks << flowWidget->findChildren<DeckPreviewWidget *>();
+    }
+
+    for (auto *subFolder : folder->findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+        allDecks << getAllDecksRecursive(subFolder);
+    }
+
+    return allDecks;
+}
+
+/**
+ * Recursively steals all DeckPreviewWidgets from this widget's subfolders, and deletes all subfolders
+ */
+void VisualDeckStorageFolderDisplayWidget::flattenFolderStructure()
+{
+    for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+        // steal all DeckPreviewWidgets from the subfolder and all its subfolders
+        for (auto *deck : getAllDecksRecursive(subFolder)) {
+            flowWidget->addWidget(deck);
+        }
+
+        // delete the subfolder
+        subFolder->deleteLater();
     }
 }
 
@@ -148,32 +234,4 @@ QStringList VisualDeckStorageFolderDisplayWidget::gatherAllTagsFromFlowWidget() 
     allTags.removeDuplicates();
 
     return allTags;
-}
-
-QStringList VisualDeckStorageFolderDisplayWidget::getAllFiles() const
-{
-    QStringList allFiles;
-
-    // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    QDirIterator it(filePath, QDir::Files);
-
-    while (it.hasNext()) {
-        allFiles << it.next(); // Add each file path to the list
-    }
-
-    return allFiles;
-}
-
-QStringList VisualDeckStorageFolderDisplayWidget::getAllSubFolders() const
-{
-    QStringList allFolders;
-
-    // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    QDirIterator it(filePath, QDir::Dirs | QDir::NoDotAndDotDot);
-
-    while (it.hasNext()) {
-        allFolders << it.next(); // Add each file path to the list
-    }
-
-    return allFolders;
 }

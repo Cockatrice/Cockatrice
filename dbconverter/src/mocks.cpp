@@ -211,6 +211,9 @@ void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED
 void SettingsCache::setVisualDeckStorageSortingOrder(int /* _visualDeckStorageSortingOrder */)
 {
 }
+void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T /* value */)
+{
+}
 void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
 {
 }
