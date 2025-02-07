@@ -20,8 +20,6 @@ public:
     void createWidgetsForFiles();
     void createWidgetsForFolders();
     QStringList gatherAllTagsFromFlowWidget() const;
-    [[nodiscard]] QStringList getAllFiles() const;
-    [[nodiscard]] QStringList getAllSubFolders() const;
     FlowWidget *getFlowWidget() const
     {
         return flowWidget;

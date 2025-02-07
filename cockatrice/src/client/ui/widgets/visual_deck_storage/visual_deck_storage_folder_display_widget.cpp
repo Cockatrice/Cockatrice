@@ -63,10 +63,24 @@ void VisualDeckStorageFolderDisplayWidget::refreshUi()
     header->setText(bannerText);
 }
 
+static QStringList getAllFiles(const QString &filePath)
+{
+    QStringList allFiles;
+
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    QDirIterator it(filePath, QDir::Files);
+
+    while (it.hasNext()) {
+        allFiles << it.next(); // Add each file path to the list
+    }
+
+    return allFiles;
+}
+
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
 {
     QList<DeckPreviewWidget *> allDecks;
-    for (const QString &file : getAllFiles()) {
+    for (const QString &file : getAllFiles(filePath)) {
         auto *display = new DeckPreviewWidget(flowWidget, visualDeckStorageWidget, file);
 
         connect(display, &DeckPreviewWidget::deckPreviewClicked, visualDeckStorageWidget,
@@ -121,9 +135,23 @@ bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
     return atLeastOneWidgetVisible;
 }
 
+static QStringList getAllSubFolders(const QString &filePath)
+{
+    QStringList allFolders;
+
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    QDirIterator it(filePath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    while (it.hasNext()) {
+        allFolders << it.next(); // Add each file path to the list
+    }
+
+    return allFolders;
+}
+
 void VisualDeckStorageFolderDisplayWidget::createWidgetsForFolders()
 {
-    for (const QString &dir : getAllSubFolders()) {
+    for (const QString &dir : getAllSubFolders(filePath)) {
         auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir, true);
         containerLayout->addWidget(display);
     }
@@ -148,32 +176,4 @@ QStringList VisualDeckStorageFolderDisplayWidget::gatherAllTagsFromFlowWidget() 
     allTags.removeDuplicates();
 
     return allTags;
-}
-
-QStringList VisualDeckStorageFolderDisplayWidget::getAllFiles() const
-{
-    QStringList allFiles;
-
-    // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    QDirIterator it(filePath, QDir::Files);
-
-    while (it.hasNext()) {
-        allFiles << it.next(); // Add each file path to the list
-    }
-
-    return allFiles;
-}
-
-QStringList VisualDeckStorageFolderDisplayWidget::getAllSubFolders() const
-{
-    QStringList allFolders;
-
-    // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    QDirIterator it(filePath, QDir::Dirs | QDir::NoDotAndDotDot);
-
-    while (it.hasNext()) {
-        allFolders << it.next(); // Add each file path to the list
-    }
-
-    return allFolders;
 }
