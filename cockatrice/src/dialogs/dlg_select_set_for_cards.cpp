@@ -64,6 +64,8 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     splitter->addWidget(scrollArea);
     splitter->addWidget(bottomContainer);
 
+    cardsForSets = getCardsForSets();
+
     sortSetsByCount();
     updateCardLists();
 
@@ -160,17 +162,13 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
 
 void DlgSelectSetForCards::updateCardLists()
 {
-    QList<SetEntryWidget *> entry_widgets;
-    for (int i = 0; i < listLayout->count(); ++i) {
-        QWidget *widget = listLayout->itemAt(i)->widget();
-        if (auto entry = qobject_cast<SetEntryWidget *>(widget)) {
-            entry_widgets.append(entry);
-        }
-    }
+    updateLayoutOrder();
     for (SetEntryWidget *entryWidget : entry_widgets) {
+        entryWidget->populateCardList();
         if (entryWidget->expanded) {
-            entryWidget->populateCardList();
+            entryWidget->updateCardDisplayWidgets();
         }
+        entryWidget->checkVisibility();
     }
 
     uneditedCardsFlowWidget->clearLayout();
@@ -217,7 +215,10 @@ void DlgSelectSetForCards::updateCardLists()
 void DlgSelectSetForCards::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasFormat("application/x-setentrywidget")) {
+        // Highlight the drop target area
         event->acceptProposedAction();
+        // Optionally, change cursor to indicate a valid drop area
+        setCursor(Qt::OpenHandCursor);
     }
 }
 
@@ -236,7 +237,7 @@ void DlgSelectSetForCards::dropEvent(QDropEvent *event)
     }
 
     if (dropIndex != -1) {
-        // Find the dragged widget
+        // Find the dragged widget and move it to the new position
         SetEntryWidget *draggedWidget = setEntries.value(draggedSetName, nullptr);
         if (draggedWidget) {
             listLayout->removeWidget(draggedWidget);
@@ -245,6 +246,8 @@ void DlgSelectSetForCards::dropEvent(QDropEvent *event)
     }
 
     event->acceptProposedAction();
+    // Reset cursor after drop
+    unsetCursor();
 }
 
 QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
@@ -310,6 +313,17 @@ QMap<QString, QStringList> DlgSelectSetForCards::getModifiedCards()
     return modifiedCards;
 }
 
+void DlgSelectSetForCards::updateLayoutOrder()
+{
+    entry_widgets.clear();
+    for (int i = 0; i < listLayout->count(); ++i) {
+        QWidget *widget = listLayout->itemAt(i)->widget();
+        if (auto entry = qobject_cast<SetEntryWidget *>(widget)) {
+            entry_widgets.append(entry);
+        }
+    }
+}
+
 SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_setName, int count)
     : QWidget(_parent), parent(_parent), setName(_setName), expanded(false)
 {
@@ -349,63 +363,86 @@ SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_se
     layout->addWidget(alreadySelectedCardsLabel);
     layout->addWidget(alreadySelectedCardListContainer);
     setAttribute(Qt::WA_DeleteOnClose, false);
+    setAttribute(Qt::WA_StyledBackground, true);
 }
 
 void SetEntryWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
+        // Create a drag object and set up mime data
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
 
+        // Set the mime data to store the dragged set's name
         mimeData->setData("application/x-setentrywidget", setName.toUtf8());
         drag->setMimeData(mimeData);
 
-        // Create a drag preview (snapshot of the widget)
-        QPixmap pixmap(size());
-        pixmap.fill(Qt::transparent); // Ensure transparency
+        // Create a "ghost" pixmap to represent the widget during dragging
+        QPixmap pixmap = this->grab();
 
-        QPainter painter(&pixmap);
-        this->render(&painter);
-        painter.end();
+        // Ensure pixmap has a transparent background
+        QImage image = pixmap.toImage();
+        for (int y = 0; y < image.height(); ++y) {
+            for (int x = 0; x < image.width(); ++x) {
+                if (image.pixel(x, y) == Qt::transparent) {
+                    image.setPixel(x, y, QColor(0, 0, 0, 0).rgba()); // Set transparency where needed
+                }
+            }
+        }
 
+        pixmap = QPixmap::fromImage(image); // Convert back to pixmap after transparency manipulation
+
+        // Set the pixmap for the drag object
         drag->setPixmap(pixmap);
-        drag->setHotSpot(event->position().toPoint()); // Keeps the cursor aligned
+
+        // Optionally adjust the pixmap position offset to align with the cursor
+        drag->setHotSpot(event->pos());
 
         drag->exec(Qt::MoveAction);
     }
 }
 
-void SetEntryWidget::mouseMoveEvent(QMouseEvent *event)
+void SetEntryWidget::enterEvent(QEnterEvent *event)
 {
-    if (!(event->buttons() & Qt::LeftButton))
-        return;
+    QWidget::enterEvent(event); // Call the base class handler
+    // Highlight the widget by changing the background color only for the widget itself
+    setStyleSheet("SetEntryWidget { background: gray; }");
 
-    // Start a drag operation
-    QDrag *drag = new QDrag(this);
-    QMimeData *mimeData = new QMimeData();
-    mimeData->setText("SetEntryWidget Data"); // Customize with relevant data
-    drag->setMimeData(mimeData);
+    // Change cursor to open hand
+    setCursor(Qt::OpenHandCursor);
+    repaint();
+}
 
-    // Create a drag preview of the widget
-    QPixmap pixmap(size());
-    pixmap.fill(Qt::transparent);
+void SetEntryWidget::leaveEvent(QEvent *event)
+{
+    QWidget::leaveEvent(event); // Call the base class handler
+    // Reset the background color only for the widget itself
+    setStyleSheet("SetEntryWidget { background: none; }");
 
-    // Render the widget onto the pixmap
-    render(&pixmap);
+    // Reset cursor to default
+    setCursor(Qt::ArrowCursor);
+    repaint();
+}
 
-    // Optionally, apply transparency to make it look like a drag effect
-    QPixmap transparentPixmap = pixmap;
-    QPainter painter(&transparentPixmap);
-    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    painter.fillRect(transparentPixmap.rect(), QColor(0, 0, 0, 128)); // Semi-transparent effect
-    painter.end();
+void SetEntryWidget::dragMoveEvent(QDragMoveEvent *event)
+{
+    // Check if the mime data is of the correct type
+    if (event->mimeData()->hasFormat("application/x-setentrywidget")) {
+        setCursor(Qt::ClosedHandCursor); // Hand cursor to indicate move
+        // Get the current position of the widget being dragged
 
-    // Set the drag pixmap
-    drag->setPixmap(transparentPixmap);
-    drag->setHotSpot(event->pos()); // Ensure the drag starts from where the user clicked
+        // For now, we will just highlight the widget when dragged.
+        QPainter painter(this);
+        QColor highlightColor(255, 255, 255, 128); // Semi-transparent white
+        painter.setBrush(QBrush(highlightColor));
+        painter.setPen(Qt::NoPen);
+        painter.drawRect(this->rect()); // Highlight the widget area
 
-    // Start the drag operation
-    drag->exec(Qt::MoveAction);
+        // Allow the widget to be moved to the new position
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
 }
 
 bool SetEntryWidget::isChecked() const
@@ -422,13 +459,25 @@ void SetEntryWidget::toggleExpansion()
     alreadySelectedCardListContainer->setVisible(expanded);
     expandButton->setText(expanded ? "-" : "+");
 
+    populateCardList();
+    updateCardDisplayWidgets();
+
     parent->updateCardLists();
+}
+
+void SetEntryWidget::checkVisibility()
+{
+    if (possibleCards.empty()) {
+        setHidden(true);
+    } else {
+        setVisible(true);
+    }
 }
 
 QStringList SetEntryWidget::getAllCardsForSet()
 {
     QStringList list;
-    QMap<QString, QStringList> setCards = parent->getCardsForSets();
+    QMap<QString, QStringList> setCards = parent->cardsForSets;
     if (setCards.contains(setName)) {
         for (const QString &cardName : setCards[setName]) {
             list << cardName;
@@ -439,29 +488,30 @@ QStringList SetEntryWidget::getAllCardsForSet()
 
 void SetEntryWidget::populateCardList()
 {
-    cardListContainer->clearLayout();
-    alreadySelectedCardListContainer->clearLayout();
+    possibleCards = getAllCardsForSet();
 
-    QStringList possibleCards = getAllCardsForSet();
-    QList<SetEntryWidget *> entry_widgets;
-    for (int i = 0; i < parent->listLayout->count(); ++i) {
-        QWidget *widget = parent->listLayout->itemAt(i)->widget();
-        if (auto entry = qobject_cast<SetEntryWidget *>(widget)) {
-            entry_widgets.append(entry);
-        }
-    }
-
-    for (SetEntryWidget *entryWidget : entry_widgets) {
+    for (SetEntryWidget *entryWidget : parent->entry_widgets) {
         if (entryWidget == this) {
             break;
         }
         if (entryWidget->isChecked()) {
-            QStringList alreadyDoneCards = entryWidget->getAllCardsForSet();
-            for (const QString &cardName : alreadyDoneCards) {
+            for (const QString &cardName : entryWidget->possibleCards) {
                 possibleCards.removeAll(cardName);
             }
         }
     }
+
+    unusedCards = getAllCardsForSet();
+    for (const QString &cardName : possibleCards) {
+        unusedCards.removeAll(cardName);
+    }
+    checkVisibility();
+}
+
+void SetEntryWidget::updateCardDisplayWidgets()
+{
+    cardListContainer->clearLayout();
+    alreadySelectedCardListContainer->clearLayout();
 
     for (const QString &cardName : possibleCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
@@ -469,11 +519,6 @@ void SetEntryWidget::populateCardList()
             cardName,
             CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, setName, nullptr).getProperty("uuid")));
         cardListContainer->addWidget(picture_widget);
-    }
-
-    QStringList unusedCards = getAllCardsForSet();
-    for (const QString &cardName : possibleCards) {
-        unusedCards.removeAll(cardName);
     }
 
     for (const QString &cardName : unusedCards) {
