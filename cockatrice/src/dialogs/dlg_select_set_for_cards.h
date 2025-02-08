@@ -20,7 +20,6 @@ class DlgSelectSetForCards : public QDialog
 
 public:
     explicit DlgSelectSetForCards(QWidget *parent, DeckListModel *_model);
-    void actOK();
     void sortSetsByCount();
     QMap<QString, QStringList> getCardsForSets();
     QMap<QString, QStringList> getModifiedCards();
@@ -30,6 +29,7 @@ public:
     QMap<QString, QStringList> cardsForSets;
 
 public slots:
+    void actOK();
     void updateCardLists();
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
@@ -40,6 +40,9 @@ private:
     QScrollArea *uneditedCardsArea;
     FlowWidget *uneditedCardsFlowWidget;
     QLabel *uneditedCardsLabel;
+    QScrollArea *modifiedCardsArea;
+    FlowWidget *modifiedCardsFlowWidget;
+    QLabel *modifiedCardsLabel;
     QWidget *listContainer;
     QListWidget *listWidget;
     DeckListModel *model;
