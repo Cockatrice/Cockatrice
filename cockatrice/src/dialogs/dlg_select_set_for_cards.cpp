@@ -27,6 +27,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
 
+    // Main vertical splitter
     QSplitter *splitter = new QSplitter(Qt::Vertical, this);
     mainLayout->addWidget(splitter);
 
@@ -41,10 +42,13 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     listContainer->setLayout(listLayout);
     scrollArea->setWidget(listContainer);
 
-    // Bottom section container
-    QWidget *bottomContainer = new QWidget(this);
-    QVBoxLayout *bottomLayout = new QVBoxLayout(bottomContainer);
-    bottomLayout->setContentsMargins(0, 0, 0, 0);
+    // Bottom horizontal splitter
+    QSplitter *bottomSplitter = new QSplitter(Qt::Horizontal, this);
+
+    // Left container
+    QWidget *leftContainer = new QWidget(this);
+    QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
+    leftLayout->setContentsMargins(0, 0, 0, 0);
 
     uneditedCardsLabel = new QLabel("Unmodified Cards:", this);
     uneditedCardsArea = new QScrollArea(this);
@@ -56,13 +60,36 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
         new FlowWidget(uneditedCardsArea, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     uneditedCardsArea->setWidget(uneditedCardsFlowWidget);
 
-    bottomLayout->addWidget(uneditedCardsLabel);
-    bottomLayout->addWidget(uneditedCardsArea);
-    bottomContainer->setLayout(bottomLayout);
+    leftLayout->addWidget(uneditedCardsLabel);
+    leftLayout->addWidget(uneditedCardsArea);
+    leftContainer->setLayout(leftLayout);
 
-    // Add widgets to the splitter
+    // Right container
+    QWidget *rightContainer = new QWidget(this);
+    QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
+    rightLayout->setContentsMargins(0, 0, 0, 0);
+
+    modifiedCardsLabel = new QLabel("Modified Cards:", this);
+    modifiedCardsArea = new QScrollArea(this);
+    modifiedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    modifiedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    modifiedCardsArea->setWidgetResizable(true);
+
+    modifiedCardsFlowWidget =
+        new FlowWidget(modifiedCardsArea, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    modifiedCardsArea->setWidget(modifiedCardsFlowWidget);
+
+    rightLayout->addWidget(modifiedCardsLabel);
+    rightLayout->addWidget(modifiedCardsArea);
+    rightContainer->setLayout(rightLayout);
+
+    // Add left and right containers to the bottom splitter
+    bottomSplitter->addWidget(leftContainer);
+    bottomSplitter->addWidget(rightContainer);
+
+    // Add widgets to the main splitter
     splitter->addWidget(scrollArea);
-    splitter->addWidget(bottomContainer);
+    splitter->addWidget(bottomSplitter);
 
     cardsForSets = getCardsForSets();
 
@@ -74,11 +101,15 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     splitter->addWidget(buttonBox);
 
-    // Set stretch factors: top (2:3), bottom (1:3)
-    splitter->setStretchFactor(0, 6);
-    splitter->setStretchFactor(1, 2);
-    splitter->setStretchFactor(2, 1);
+    // Set stretch factors
+    splitter->setStretchFactor(0, 6); // Scroll area gets more space
+    splitter->setStretchFactor(1, 2); // Bottom part gets less space
+    splitter->setStretchFactor(2, 1); // Buttons take minimal space
+
+    bottomSplitter->setStretchFactor(0, 1); // Left and right equally split
+    bottomSplitter->setStretchFactor(1, 1);
 }
+
 
 void DlgSelectSetForCards::actOK()
 {
@@ -172,17 +203,17 @@ void DlgSelectSetForCards::updateCardLists()
     }
 
     uneditedCardsFlowWidget->clearLayout();
+    modifiedCardsFlowWidget->clearLayout();
 
-    QStringList selectedCards;
+    // Map from set name to a set of selected cards in that set
+    QMap<QString, QSet<QString>> selectedCardsBySet;
     for (SetEntryWidget *entryWidget : entry_widgets) {
         if (entryWidget->isChecked()) {
             QStringList cardsInSet = entryWidget->getAllCardsForSet();
-            for (QString cardInSet : cardsInSet) {
-                selectedCards.append(cardInSet);
-            }
+            QSet<QString> cardSet = QSet<QString>(cardsInSet.begin(), cardsInSet.end()); // Convert list to set
+            selectedCardsBySet.insert(entryWidget->setName, cardSet);
         }
     }
-    selectedCards.removeDuplicates();
 
     DeckList *decklist = model->getDeckList();
     if (!decklist)
@@ -202,15 +233,37 @@ void DlgSelectSetForCards::updateCardLists()
             if (!currentCard)
                 continue;
 
-            if (!selectedCards.contains(currentCard->getName())) {
+            bool found = false;
+            QString foundSetName;
+
+            // Check across all sets if the card is present
+            for (auto it = selectedCardsBySet.begin(); it != selectedCardsBySet.end(); ++it) {
+                if (it.value().contains(currentCard->getName())) {
+                    found = true;
+                    foundSetName = it.key(); // Store the set name where it was found
+                    break;                   // Stop at the first match
+                }
+            }
+
+            if (!found) {
+                // The card was not in any selected set
                 CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
                 picture_widget->setCard(infoPtr);
                 uneditedCardsFlowWidget->addWidget(picture_widget);
-            }
+            } else {
+                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                    currentCard->getName(), CardDatabaseManager::getInstance()
+                                                ->getSpecificSetForCard(currentCard->getName(), foundSetName, "")
+                                                .getProperty("uuid"));
+                CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
+                picture_widget->setCard(infoPtr);
+                modifiedCardsFlowWidget->addWidget(picture_widget);}
         }
     }
 }
+
+
 
 void DlgSelectSetForCards::dragEnterEvent(QDragEnterEvent *event)
 {
