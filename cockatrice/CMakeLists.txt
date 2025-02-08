@@ -372,6 +372,13 @@ if(WIN32)
     PATTERN "*.dll"
   )
 
+  install(
+    DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
+    DESTINATION ./
+    FILES_MATCHING
+    PATTERN "*.ini"
+  )
+
   # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6) platforms, printsupport (Qt5), styles, tls (Qt6)
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
