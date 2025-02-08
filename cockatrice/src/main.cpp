@@ -190,8 +190,10 @@ int main(int argc, char *argv[])
     const QByteArray configPath = "";
 #endif
 
-    // Set the QT_LOGGING_CONF environment variable
-    qputenv("QT_LOGGING_CONF", configPath);
+    if (!qEnvironmentVariableIsSet(("QT_LOGGING_CONF"))) {
+        // Set the QT_LOGGING_CONF environment variable
+        qputenv("QT_LOGGING_CONF", configPath);
+    }
     qSetMessagePattern(
         "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
