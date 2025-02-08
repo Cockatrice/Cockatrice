@@ -384,7 +384,8 @@ SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_se
     setLayout(layout);
 
     QHBoxLayout *headerLayout = new QHBoxLayout();
-    checkBox = new QCheckBox(setName, this);
+    CardSetPtr set = CardDatabaseManager::getInstance()->getSet(setName);
+    checkBox = new QCheckBox("(" + set->getShortName() + ") - " + set->getLongName(), this);
     connect(checkBox, &QCheckBox::checkStateChanged, parent, &DlgSelectSetForCards::updateCardLists);
     expandButton = new QPushButton("+", this);
     countLabel = new QLabel(QString::number(count), this);
