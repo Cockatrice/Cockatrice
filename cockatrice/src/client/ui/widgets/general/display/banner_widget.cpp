@@ -1,5 +1,7 @@
 #include "banner_widget.h"
 
+#include "../../../../../client/ui/pixel_map_generator.h"
+
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
@@ -8,14 +10,20 @@
 BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency, 100))
 {
+    auto layout = new QHBoxLayout(this);
+
+    iconLabel = new QLabel(this);
+    iconLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    setExpandIconState(true);
+
     // Create the banner label and set properties
     bannerLabel = new QLabel(text, this);
     bannerLabel->setAlignment(Qt::AlignCenter);
     bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
 
-    // Layout to center the banner label
-    layout = new QVBoxLayout(this);
+    layout->addWidget(iconLabel);
     layout->addWidget(bannerLabel);
+    layout->addWidget(new QLabel(this)); // add dummy label to force text label to be centered
     setLayout(layout);
 
     // Set minimum height for the widget
@@ -40,7 +48,15 @@ void BannerWidget::toggleBuddyVisibility() const
 {
     if (buddy) {
         buddy->setVisible(!buddy->isVisible());
+        setExpandIconState(buddy->isVisible());
+    } else {
+        setExpandIconState(false);
     }
+}
+
+void BannerWidget::setExpandIconState(bool expanded) const
+{
+    iconLabel->setPixmap(ExpandIconPixmapGenerator::generatePixmap(24, expanded));
 }
 
 void BannerWidget::paintEvent(QPaintEvent *event)

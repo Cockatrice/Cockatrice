@@ -33,7 +33,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    QVBoxLayout *layout;
+    QLabel *iconLabel;
     QLabel *bannerLabel;
     Qt::Orientation gradientOrientation;
     int transparency; // Transparency percentage for the gradient
@@ -43,6 +43,7 @@ signals:
     void buddyVisibilityChanged();
 private slots:
     void toggleBuddyVisibility() const;
+    void setExpandIconState(bool expanded) const;
 };
 
 #endif // BANNER_WIDGET_H
