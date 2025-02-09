@@ -42,7 +42,7 @@ void ReleaseChannel::checkForUpdates()
 #if defined(Q_OS_MACOS)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-    static QRegularExpression version_regex("macOS-(\\d+)\\.(\\d+)");
+    static QRegularExpression version_regex("macOS(\\d+)");
     auto match = version_regex.match(fileName);
     if (!match.hasMatch()) {
         return false;
@@ -50,10 +50,8 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 
     // older(smaller) releases are compatible with a newer or the same system version
     int sys_maj = QSysInfo::productVersion().split(".")[0].toInt();
-    int sys_min = QSysInfo::productVersion().split(".")[1].toInt();
     int rel_maj = match.captured(1).toInt();
-    int rel_min = match.captured(2).toInt();
-    return rel_maj < sys_maj || (rel_maj == sys_maj && rel_min <= sys_min);
+    return rel_maj == sys_maj;
 }
 #elif defined(Q_OS_WIN)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
