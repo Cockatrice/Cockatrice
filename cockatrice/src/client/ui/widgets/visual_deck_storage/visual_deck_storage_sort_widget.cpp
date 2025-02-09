@@ -63,32 +63,13 @@ void VisualDeckStorageSortWidget::updateSortOrder()
     emit sortOrderChanged();
 }
 
-void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget)
-{
-    auto children =
-        folderWidget->getFlowWidget()->findChildren<QWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
-    for (auto widget : children) {
-        auto deckPreviewWidgets =
-            widget->findChildren<DeckPreviewWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
-        sortDecks(deckPreviewWidgets);
-        for (DeckPreviewWidget *previewWidget : deckPreviewWidgets) {
-            folderWidget->getFlowWidget()->removeWidget(previewWidget);
-        }
-        for (DeckPreviewWidget *previewWidget : deckPreviewWidgets) {
-            folderWidget->getFlowWidget()->addWidget(previewWidget);
-        }
-    }
-}
-
 /**
- * Sorts the DeckPreviewWidget list in-place, using the currently selected sortOrder
- *
- * @param widgets The list of widgets to sort
+ * Gets the comparator that is used for the current sortOrder
  */
-void VisualDeckStorageSortWidget::sortDecks(QList<DeckPreviewWidget *> widgets)
+std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> VisualDeckStorageSortWidget::getComparator() const
 {
     // Sort the widgets list based on the current sort order
-    std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
+    return [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
         if (!widget1 || !widget2) {
             return false; // Handle null pointers gracefully
         }
@@ -111,5 +92,5 @@ void VisualDeckStorageSortWidget::sortDecks(QList<DeckPreviewWidget *> widgets)
         }
 
         return false; // Default case, no sorting applied
-    });
+    };
 }
