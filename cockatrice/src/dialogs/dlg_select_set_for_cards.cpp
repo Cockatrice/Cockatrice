@@ -13,6 +13,7 @@
 #include <QMimeData>
 #include <QPainter>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <algorithm>
@@ -279,11 +280,11 @@ void DlgSelectSetForCards::dropEvent(QDropEvent *event)
 {
     QByteArray itemData = event->mimeData()->data("application/x-setentrywidget");
     QString draggedSetName = QString::fromUtf8(itemData);
-
+    QPoint adjustedPos = event->position().toPoint() + QPoint(0, scrollArea->verticalScrollBar()->value());
     int dropIndex = -1;
     for (int i = 0; i < listLayout->count(); ++i) {
         QWidget *widget = listLayout->itemAt(i)->widget();
-        if (widget && widget->geometry().contains(event->position().toPoint())) {
+        if (widget && widget->geometry().contains(adjustedPos)) {
             dropIndex = i;
             break;
         }
