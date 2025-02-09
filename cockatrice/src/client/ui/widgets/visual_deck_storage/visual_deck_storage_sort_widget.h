@@ -19,7 +19,7 @@ public:
     void updateSortOrder();
     void sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget);
     QString getSearchText();
-    QList<DeckPreviewWidget *> filterFiles(QList<DeckPreviewWidget *> widgets);
+    void sortDecks(QList<DeckPreviewWidget *> widgets);
 
 signals:
     void sortOrderChanged();
