@@ -16,18 +16,18 @@ Available pre-compiled binaries for installation:
    • <kbd>Windows 7+</kbd>
 
  • <b>macOS</b>
-   ◦ <kbd>macOS 12+</kbd> <sub><i>Monterey</i></sub>
-   ◦ <kbd>macOS 10.15+</kbd> <sub><i>Catalina</i></sub>
+   ◦ <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub>
+   ◦ <kbd>macOS 14+</kbd> <sub><i>Sonoma</i></sub>
+   ◦ <kbd>macOS 13+</kbd> <sub><i>Ventura</i></sub>
 
  • <b>Linux</b>
-   - <kbd>Ubuntu 23.04</kbd> <sub><i>Lunar Lobster</i></sub>
+   - <kbd>Ubuntu 24.04 LTS</kbd> <sub><i>Noble Numbat</i></sub>
    - <kbd>Ubuntu 22.04 LTS</kbd> <sub><i>Jammy Jellyfish</i></sub>
    - <kbd>Ubuntu 20.04 LTS</kbd> <sub><i>Focal Fossa</i></sub>
-   - <kbd>Ubuntu 18.04 LTS</kbd> <sub><i>Bionic Beaver</i></sub>
    - <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
    - <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
-   - <kbd>Fedora 38</kbd>
-   - <kbd>Fedora 37</kbd>
+   - <kbd>Fedora 41</kbd>
+   - <kbd>Fedora 40</kbd>
 
 <sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
 <sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
@@ -43,18 +43,18 @@ Available pre-compiled binaries for installation:
    • <b>Windows 7+</b>
 
  • macOS
-   ◦ macOS 12+ <kbd><i>Monterey</i></kbd>
-   ◦ macOS 10.15+ <kbd><i>Catalina</i></kbd>
+ ◦ macOS 15+ <kbd><i>Sequoia</i></kbd>
+ ◦ macOS 14+ <kbd><i>Sonoma</i></kbd>
+ ◦ macOS 13+ <kbd><i>Ventura</i></kbd>
 
  • <b>Linux</b>
-   - <b>Ubuntu 23.04</b> <kbd>Lunar Lobster</kbd>
+   - <b>Ubuntu 24.04 LTS</b> <kbd>Noble Numbat</kbd>
    - <b>Ubuntu 22.04 LTS</b> <kbd><i>Jammy Jellyfish</i></kbd>
    - <b>Ubuntu 20.04 LTS</b> <sub><i>Focal Fossa</i></sub>
-   - <b>Ubuntu 18.04 LTS</b> <sub><i>Bionic Beaver</i></sub>
    - <b>Debian 12</b> <sub><i>Bookworm</i></sub>
    - <b>Debian 11</b> <sub><i>Bullseye</i></sub>
-   - <b>Fedora 38</b>
-   - <b>Fedora 37</b>
+   - <b>Fedora 41</b>
+   - <b>Fedora 40</b>
 
 <sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
 <sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
