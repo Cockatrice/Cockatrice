@@ -95,7 +95,7 @@ QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPr
             case ByName:
                 return widget1->deckLoader->getName() < widget2->deckLoader->getName();
             case Alphabetical:
-                return info1.fileName().toLower() < info2.fileName().toLower();
+                return QString::localeAwareCompare(info1.fileName(), info2.fileName()) <= 0;
             case ByLastModified:
                 return info1.lastModified() > info2.lastModified();
             case ByLastLoaded: {
