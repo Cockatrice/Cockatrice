@@ -49,8 +49,10 @@ For support regarding specific servers, please contact that server's admin or fo
 
 To contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
 We maintain two tags for contributors to find issues to work on:
-- [Good first issue](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20): issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
-- [Help wanted](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Help%20Wanted%22%20): This tag is used for issues that we are looking for a contributor to work on. Often this is for feature suggestions we are willing to accept, but don't have the time to work on ourselves.
+- [![Good first issue](https://img.shields.io/github/issues/cockatrice/cockatrice/Good%20First%20Issue)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20)<br>
+Issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
+- [![Help wanted](https://img.shields.io/github/issues/cockatrice/cockatrice/Help%20Wanted)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Help%20Wanted%22%20)<br>
+This tag is used for issues that we are looking for a contributor to work on. Often this is for feature suggestions we are willing to accept, but don't have the time to work on ourselves.
 
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.
 
@@ -71,10 +73,12 @@ x
 
 # Related Projects
 
-- Magic-Cards: Script to generate MtG card data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+<!-- TODO
+- [Magic-Cards](): Script to generate MtG card data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+-->
 - [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
 - [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
-- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Project webpage
+- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Webpage of the Cockatrice project
 
 
 # Community Resources
