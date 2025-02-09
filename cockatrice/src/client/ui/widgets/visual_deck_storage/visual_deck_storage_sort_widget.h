@@ -17,9 +17,9 @@ public:
     explicit VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent);
     void retranslateUi();
     void updateSortOrder();
-    void sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget);
+    std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> getComparator() const;
+
     QString getSearchText();
-    void sortDecks(QList<DeckPreviewWidget *> widgets);
 
 signals:
     void sortOrderChanged();
