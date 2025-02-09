@@ -790,9 +790,6 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 {
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
-    const int gameId = databaseInterface->getNextGameId();
-    if (gameId == -1)
-        return Response::RespInternalError;
     if (cmd.password().length() > MAX_NAME_LENGTH)
         return Response::RespContextError;
 
@@ -820,6 +817,11 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     QString description = nameFromStdString(cmd.description());
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
+
+    const int gameId = databaseInterface->getNextGameId();
+    if (gameId == -1) {
+        return Response::RespInternalError;
+    }
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
