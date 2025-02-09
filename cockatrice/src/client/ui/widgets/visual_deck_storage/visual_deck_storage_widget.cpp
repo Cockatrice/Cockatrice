@@ -42,6 +42,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     showFoldersCheckBox = new QCheckBox(this);
     showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &VisualDeckStorageWidget::updateShowFolders);
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowFolders);
 
@@ -125,13 +126,18 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
                                                             showFoldersCheckBox->isChecked());
 
-    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, folderWidget,
-            &VisualDeckStorageFolderDisplayWidget::updateShowFolders);
-
     scrollArea->setWidget(folderWidget);
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
     updateSortOrder();
+}
+
+void VisualDeckStorageWidget::updateShowFolders(bool enabled)
+{
+    if (folderWidget) {
+        folderWidget->updateShowFolders(enabled);
+        updateSortOrder();
+    }
 }
 
 void VisualDeckStorageWidget::updateSortOrder()
