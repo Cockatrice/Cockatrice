@@ -86,12 +86,12 @@
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="512"/>
         <source>Draw missing color identities in visual deck storage without color label</source>
-        <translation>Ziehe fehlende Farbidentitäten in visueller Deckablage ohne Farblabel</translation>
+        <translation>Zeichne fehlende Farbidentitäten in visueller Deckablage ohne Farblabel</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="513"/>
         <source>Missing color identity opacity</source>
-        <translation>Fehlende Farbidentitätendeckkraft</translation>
+        <translation>Deckkraft fehlender Farbidentitäten</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="516"/>
@@ -468,12 +468,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="309"/>
         <source>Mainboard</source>
-        <translation>Hauptdeck</translation>
+        <translation>Mainboard</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="315"/>
         <source>Sideboard</source>
-        <translation>Nebendeck</translation>
+        <translation>Sideboard</translation>
     </message>
 </context>
 <context>
@@ -860,12 +860,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="156"/>
         <source>Deck Tags Manager</source>
-        <translation>Decktagmanager</translation>
+        <translation>Decktagsmanager</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="157"/>
         <source>Manage your deck tags. Check or uncheck tags as needed, or add new ones:</source>
-        <translation>Verwalte die Decktags. Wähle benötigte Tags oder füge neue hinzu:</translation>
+        <translation>Verwalte Decktags. Wähle Tags nach Bedarf aus oder füge neue hinzu:</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="158"/>
@@ -943,7 +943,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
         <location filename="src/game/deckview/deck_view_container.cpp" line="114"/>
         <source>Unload deck</source>
         <oldsource>Unload deck...</oldsource>
-        <translation>Deck entladen</translation>
+        <translation>Deck entnehmen</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="115"/>
@@ -988,8 +988,8 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
         <source>You tried to add a tag to a .txt format deck.
  Tags can only be added to .cod format decks.
  Do you want to convert the deck to the .cod format?</source>
-        <translation>Sie versuchten einen Tag zu einem .txt-formatierten Deck hinzuzufügen.
-Tags können nur zu .cod-formatierten Decks hinzugefügt werden.
+        <translation>Sie haben versucht einen Tag zu einem Deck im .txt Format hinzuzufügen.
+Tags können nur zu Decks im .cod Format hinzugefügt werden.
 Möchten sie das Deck ins .cod Format konvertieren?</translation>
     </message>
     <message>
@@ -1592,12 +1592,12 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="25"/>
         <source>Hide &apos;buddies only&apos; games</source>
-        <translation>Verstecke „Nur Freunde“ Spiele</translation>
+        <translation>„Nur Freunde“ Spiele ausblenden</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="28"/>
         <source>Hide full games</source>
-        <translation>Verstecke volle Spiele</translation>
+        <translation>Volle Spiele ausblenden</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="31"/>
@@ -1612,7 +1612,7 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="37"/>
         <source>Hide &apos;ignored user&apos; games</source>
-        <translation>„Ignorierter Benutzer“ Spiele ausblenden</translation>
+        <translation>Spiele von „Ignorierten Benutzern“ ausblenden</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="45"/>
@@ -1886,7 +1886,7 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="28"/>
         <source>Parse Set Name and Number (if available)</source>
-        <translation>Setnamen und -Nummer (falls verfügbar) parsen</translation>
+        <translation>Setnamen und -Nummer parsen (falls verfügbar)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="41"/>
@@ -2483,7 +2483,7 @@ Eventuell müssen Sie die Quellen selbst kompilieren.</translation>
     <message>
         <location filename="src/game/game_selector.cpp" line="266"/>
         <source>Spectate Game</source>
-        <translation>Spiel zuschauen</translation>
+        <translation>Spiel beobachten</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="269"/>
@@ -5874,12 +5874,12 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="557"/>
         <source>Show on EDHREC (Commander)</source>
-        <translation>Auf EDHREC (Commander) anzeigen</translation>
+        <translation>Auf EDHREC anzeigen (Commander)</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="561"/>
         <source>Show on EDHREC (Card)</source>
-        <translation>Auf EDHREC (Karte) anzeigen</translation>
+        <translation>Auf EDHREC anzeigen (Karte)</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="569"/>
@@ -5959,7 +5959,7 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="768"/>
         <source>Annotated (No set name or number)</source>
-        <translation>Kommentiert (kein Setname oder -Nummer)</translation>
+        <translation>Kommentiert (kein Setname oder -nummer)</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="769"/>
@@ -5969,7 +5969,7 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="770"/>
         <source>Not Annotated (No set name or number)</source>
-        <translation>Nicht kommentiert (kein Setname oder -Nummer)</translation>
+        <translation>Nicht kommentiert (kein Setname oder -nummer)</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="772"/>
@@ -6029,7 +6029,7 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="787"/>
         <source>Swap card to/from sideboard</source>
-        <translation>Karte ins/aus dem Nebendeck tauschen</translation>
+        <translation>Karte ins/aus dem Sideboard tauschen</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_editor.cpp" line="789"/>
@@ -7524,7 +7524,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="694"/>
         <source>Deck editor/storage settings</source>
-        <translation>Einstellungen Deckeditor/-ablage</translation>
+        <translation>Deckeditor/-ablage Einstellungen</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="695"/>
