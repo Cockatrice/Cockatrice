@@ -70,17 +70,22 @@ void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidge
     for (auto widget : children) {
         auto deckPreviewWidgets =
             widget->findChildren<DeckPreviewWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
-        auto newOrder = filterFiles(deckPreviewWidgets);
-        for (DeckPreviewWidget *previewWidget : newOrder) {
+        sortDecks(deckPreviewWidgets);
+        for (DeckPreviewWidget *previewWidget : deckPreviewWidgets) {
             folderWidget->getFlowWidget()->removeWidget(previewWidget);
         }
-        for (DeckPreviewWidget *previewWidget : newOrder) {
+        for (DeckPreviewWidget *previewWidget : deckPreviewWidgets) {
             folderWidget->getFlowWidget()->addWidget(previewWidget);
         }
     }
 }
 
-QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> widgets)
+/**
+ * Sorts the DeckPreviewWidget list in-place, using the currently selected sortOrder
+ *
+ * @param widgets The list of widgets to sort
+ */
+void VisualDeckStorageSortWidget::sortDecks(QList<DeckPreviewWidget *> widgets)
 {
     // Sort the widgets list based on the current sort order
     std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
@@ -107,6 +112,4 @@ QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPr
 
         return false; // Default case, no sorting applied
     });
-
-    return widgets;
 }
