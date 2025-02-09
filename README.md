@@ -5,9 +5,9 @@
 <p align='center'>
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
+   <a href="#contribute-">Contribute</a> <b>|</b>
    <a href="#related-projects">Related</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
-   <a href="#contribute-">Contribute</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
