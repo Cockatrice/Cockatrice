@@ -41,7 +41,6 @@ OverlapWidget::OverlapWidget(QWidget *parent,
     : QWidget(parent), overlapPercentage(overlapPercentage), maxColumns(maxColumns), maxRows(maxRows),
       direction(direction), adjustOnResize(adjustOnResize)
 {
-    this->setMinimumSize(0, 0);
     overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
     this->setLayout(overlapLayout);
 }

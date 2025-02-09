@@ -1,5 +1,6 @@
 #include "printing_selector.h"
 
+#include "../../../../dialogs/dlg_select_set_for_cards.h"
 #include "../../../../settings/cache_settings.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
@@ -41,9 +42,17 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     sortToolBar->setVisible(SettingsCache::instance().getPrintingSelectorSortOptionsVisible());
     layout->addWidget(sortToolBar);
 
+    searchAndSetLayout = new QHBoxLayout(this);
+
     searchBar = new PrintingSelectorCardSearchWidget(this);
     searchBar->setVisible(SettingsCache::instance().getPrintingSelectorSearchBarVisible());
-    layout->addWidget(searchBar);
+    searchAndSetLayout->addWidget(searchBar);
+
+    selectSetForCardsButton = new QPushButton(this);
+    connect(selectSetForCardsButton, &QPushButton::clicked, this, &PrintingSelector::selectSetForCards);
+    searchAndSetLayout->addWidget(selectSetForCardsButton);
+
+    layout->addLayout(searchAndSetLayout);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
@@ -244,4 +253,12 @@ void PrintingSelector::toggleVisibilityCardSizeSlider(bool _state)
 void PrintingSelector::toggleVisibilityNavigationButtons(bool _state)
 {
     cardSelectionBar->setVisible(_state);
+}
+
+void PrintingSelector::selectSetForCards()
+{
+    DlgSelectSetForCards *setSelectionDialog = new DlgSelectSetForCards(nullptr, deckModel);
+    if (!setSelectionDialog->exec()) {
+        return;
+    }
 }
