@@ -181,6 +181,32 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
 }
 
 /**
+ * Sorts the DeckPreviewWidgets in this folder and all subfolders
+ *
+ * @param comparator The comparator to use for sorting
+ */
+void VisualDeckStorageFolderDisplayWidget::sortBy(
+    const std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> &comparator)
+{
+    auto deckPreviewWidgets = flowWidget->findChildren<DeckPreviewWidget *>();
+
+    std::sort(deckPreviewWidgets.begin(), deckPreviewWidgets.end(), comparator);
+
+    // manually removing and re-adding is the only way to reorder widgets in a flowWidget
+    for (DeckPreviewWidget *previewWidget : deckPreviewWidgets) {
+        flowWidget->removeWidget(previewWidget);
+    }
+    for (DeckPreviewWidget *previewWidget : deckPreviewWidgets) {
+        flowWidget->addWidget(previewWidget);
+    }
+
+    // also sort all subfolders
+    for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+        subFolder->sortBy(comparator);
+    }
+}
+
+/**
  * Steals all DeckPreviewWidgets from this widget's nested subfolders, and deletes those subfolders
  */
 void VisualDeckStorageFolderDisplayWidget::flattenFolderStructure()
