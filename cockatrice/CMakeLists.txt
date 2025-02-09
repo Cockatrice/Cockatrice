@@ -339,6 +339,13 @@ if(APPLE)
   )
 
   install(
+      DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
+      DESTINATION ${qtconf_dest_dir}/
+      FILES_MATCHING
+      PATTERN "*.ini"
+  )
+
+  install(
     CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
