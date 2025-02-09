@@ -5,9 +5,9 @@
 <p align='center'>
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
-   <a href="#contribute-">Contribute</a> <b>|</b>
-   <a href="#related-projects">Related</a> <b>|</b>
+   <a href="#related-repositories">Related</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
+   <a href="#contribute-">Contribute</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
@@ -38,6 +38,27 @@ Downloads are available for full releases and the current beta version in develo
 - Latest `beta` release: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) [![DL Count on Latest Pre-Release](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=downloads)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
    - Beta versions include the most recently added features and bugfixes, but can be unstable.
    - To be a Cockatrice Beta Tester, use this version. Find more information [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)!
+
+
+# Related Repositories
+
+<!-- TODO
+- [Magic-Cards](): Script to generate MtG card data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+-->
+- [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
+- [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official webpage of the Cockatrice project
+<!-- TODO
+- [flathub/io.github.Cockatrice.cockatrice](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration to enable *flatpak* package of the app at [Flathub](https://flathub.org/apps/io.github.Cockatrice.cockatrice)
+-->
+
+
+# Community Resources
+
+- [Cockatrice Official Site](https://cockatrice.github.io)
+- [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
+- [Cockatrice Official Discord](https://discord.gg/3Z9yzmA)
+- [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
 # Contribute [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
@@ -71,24 +92,6 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 
 x
 -->
-
-
-# Related Projects
-
-<!-- TODO
-- [Magic-Cards](): Script to generate MtG card data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
--->
-- [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
-- [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
-- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Webpage of the Cockatrice project
-
-
-# Community Resources
-
-- [Cockatrice Official Site](https://cockatrice.github.io)
-- [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
-- [Cockatrice Official Discord](https://discord.gg/3Z9yzmA)
-- [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
 # Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
