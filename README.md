@@ -66,9 +66,11 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice, Or
 
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
+<!-- TODO?
 ### Sponsor
 
 x
+-->
 
 
 # Related Projects
@@ -125,12 +127,12 @@ The following flags can be passed to `cmake`:
 | Flag | Description | Default Value |
 | --- | --- | --- |
 | `-DWITH_SERVER=1` | Build Servatrice server | 0 (no) |
-| `-DWITH_CLIENT=0` | Build Cockatrice client | 1 (yes) |
-| `-DWITH_ORACLE=0` | Build Oracle card database tool | 1 (yes) |
+| `-DWITH_CLIENT=0` | Don't build Cockatrice client | 1 (yes) |
+| `-DWITH_ORACLE=0` | Don't build Oracle card database tool | 1 (yes) |
 | `-DCMAKE_BUILD_TYPE=Debug` | Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings | Release |
-| `-DWARNING_AS_ERROR=0` | Treat compilation warnings as errors in debug mode | 1 (yes) |
+| `-DWARNING_AS_ERROR=0` | Don't treat compilation warnings as errors in debug mode | 1 (yes) |
 | `-DUPDATE_TRANSLATIONS=1` | Configure `make` to update the translation .ts files for new strings in the source code.<br> **Note:** Running `make clean` will remove the .ts files | 0 (no) |
-| `-DTEST=1` | Enable regression tests.<br> **Note:** needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```. | 0 (no) |
+| `-DTEST=1` | Enable regression tests.<br> **Note:** needs *googletest*, will be downloaded on the fly if unavailable. To run tests: `make test`. | 0 (no) |
 | `-DFORCE_USE_QT5=1` | Skip looking for Qt6 before trying to find Qt5 | 0 (no) |
 
 
