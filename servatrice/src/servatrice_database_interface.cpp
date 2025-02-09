@@ -709,7 +709,9 @@ bool Servatrice_DatabaseInterface::userSessionExists(const QString &userName)
         "select 1 from {prefix}_sessions where user_name = :user_name and id_server = :id_server and end_time is null");
     query->bindValue(":id_server", server->getServerID());
     query->bindValue(":user_name", userName);
-    execSqlQuery(query);
+    if (!execSqlQuery(query)) {
+        return false;
+    };
     return query->next();
 }
 
@@ -745,14 +747,8 @@ void Servatrice_DatabaseInterface::endSession(qint64 sessionId)
     if (!checkSql())
         return;
 
-    QSqlQuery *query = prepareQuery("lock tables {prefix}_sessions write");
-    execSqlQuery(query);
-
-    query = prepareQuery("update {prefix}_sessions set end_time=NOW() where id = :id_session");
+    auto *query = prepareQuery("update {prefix}_sessions set end_time=NOW() where id = :id_session");
     query->bindValue(":id_session", sessionId);
-    execSqlQuery(query);
-
-    query = prepareQuery("unlock tables");
     execSqlQuery(query);
 }
 
@@ -811,7 +807,10 @@ int Servatrice_DatabaseInterface::getNextGameId()
         return -1;
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_games (time_started) values (now())");
-    execSqlQuery(query);
+
+    if (!execSqlQuery(query)) {
+        return -1;
+    }
 
     return query->lastInsertId().toInt();
 }
@@ -822,7 +821,10 @@ int Servatrice_DatabaseInterface::getNextReplayId()
         return -1;
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_replays (id_game) values (NULL)");
-    execSqlQuery(query);
+
+    if (!execSqlQuery(query)) {
+        return -1;
+    }
 
     return query->lastInsertId().toInt();
 }
