@@ -895,9 +895,12 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
             continue;
         }
 
-        const auto &regexResult = ownerRegex.match(card->getAnnotation());
-        if (!regexResult.hasMatch()) {
-            continue;
+        const QString cardAnnotation = card->getAnnotation();
+        if (!cardAnnotation.isEmpty()) {
+            const auto &regexResult = ownerRegex.match(cardAnnotation);
+            if (!regexResult.hasMatch()) {
+                continue;
+            }
         }
 
         CardToMove cardToMove;
