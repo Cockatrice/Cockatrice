@@ -1,6 +1,7 @@
 #include "deck_preview_widget.h"
 
 #include "../../../../../game/cards/card_database_manager.h"
+#include "../../../../../settings/cache_settings.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
@@ -51,6 +52,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 
     colorIdentityWidget = new DeckPreviewColorIdentityWidget(this, getColorIdentity());
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
+    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTags());
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);
@@ -70,6 +72,15 @@ bool DeckPreviewWidget::checkVisibility() const
         return false;
     }
     return true;
+}
+
+void DeckPreviewWidget::updateTagsVisibility(bool visible)
+{
+    if (visible) {
+        deckTagsDisplayWidget->setVisible(true);
+    } else {
+        deckTagsDisplayWidget->setHidden(true);
+    }
 }
 
 QString DeckPreviewWidget::getColorIdentity()

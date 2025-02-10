@@ -2,6 +2,7 @@
 
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
+#include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
 #include "visual_deck_storage_search_widget.h"
@@ -38,13 +39,24 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowFolders);
 
+    tagsVisibilityCheckBox = new QCheckBox(this);
+    tagsVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTags());
+    connect(tagsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &VisualDeckStorageWidget::updateTagsVisibility);
+    connect(tagsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTags);
+
+    quickSettingsWidget = new SettingsButtonWidget(this);
+    quickSettingsWidget->addSettingsWidget(showFoldersCheckBox);
+    quickSettingsWidget->addSettingsWidget(tagsVisibilityCheckBox);
+
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
-    searchAndSortLayout->addWidget(showFoldersCheckBox);
+    searchAndSortLayout->addWidget(quickSettingsWidget);
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTags());
 
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
@@ -101,6 +113,7 @@ void VisualDeckStorageWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 
     showFoldersCheckBox->setText(tr("Show Folders"));
+    tagsVisibilityCheckBox->setText(tr("Show Tags"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
@@ -118,6 +131,8 @@ void VisualDeckStorageWidget::createRootFolderWidget()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
                                                             showFoldersCheckBox->isChecked());
+    connect(this, &VisualDeckStorageWidget::tagsVisibilityChanged, folderWidget,
+            &VisualDeckStorageFolderDisplayWidget::updateTagVisibility);
 
     scrollArea->setWidget(folderWidget);
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
@@ -166,4 +181,15 @@ void VisualDeckStorageWidget::updateSearchFilter()
         searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText());
     }
     emit searchFilterUpdated();
+}
+
+void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
+{
+    if (visible) {
+        tagFilterWidget->setVisible(true);
+
+    } else {
+        tagFilterWidget->setHidden(true);
+    }
+    emit tagsVisibilityChanged(visible);
 }

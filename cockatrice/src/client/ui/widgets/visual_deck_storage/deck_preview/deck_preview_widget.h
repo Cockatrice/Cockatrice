@@ -45,6 +45,7 @@ public slots:
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
     void updateVisibility();
+    void updateTagsVisibility(bool visible);
 };
 
 #endif // DECK_PREVIEW_WIDGET_H
