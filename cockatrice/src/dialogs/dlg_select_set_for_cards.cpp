@@ -109,8 +109,10 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
 
     bottomSplitter->setStretchFactor(0, 1); // Left and right equally split
     bottomSplitter->setStretchFactor(1, 1);
-}
 
+    connect(this, &DlgSelectSetForCards::orderChanged, this, &DlgSelectSetForCards::updateLayoutOrder);
+    connect(this, &DlgSelectSetForCards::widgetOrderChanged, this, &DlgSelectSetForCards::updateCardLists);
+}
 
 void DlgSelectSetForCards::actOK()
 {
@@ -194,7 +196,6 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
 
 void DlgSelectSetForCards::updateCardLists()
 {
-    updateLayoutOrder();
     for (SetEntryWidget *entryWidget : entry_widgets) {
         entryWidget->populateCardList();
         if (entryWidget->expanded) {
@@ -259,12 +260,11 @@ void DlgSelectSetForCards::updateCardLists()
                                                 .getProperty("uuid"));
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
                 picture_widget->setCard(infoPtr);
-                modifiedCardsFlowWidget->addWidget(picture_widget);}
+                modifiedCardsFlowWidget->addWidget(picture_widget);
+            }
         }
     }
 }
-
-
 
 void DlgSelectSetForCards::dragEnterEvent(QDragEnterEvent *event)
 {
@@ -302,6 +302,9 @@ void DlgSelectSetForCards::dropEvent(QDropEvent *event)
     event->acceptProposedAction();
     // Reset cursor after drop
     unsetCursor();
+
+    // We need to execute this AFTER the current event-cycle so we use a timer.
+    QTimer::singleShot(10, this, [this]() { emit orderChanged(); });
 }
 
 QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
@@ -376,6 +379,8 @@ void DlgSelectSetForCards::updateLayoutOrder()
             entry_widgets.append(entry);
         }
     }
+
+    emit widgetOrderChanged();
 }
 
 SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_setName, int count)
@@ -387,7 +392,7 @@ SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_se
     QHBoxLayout *headerLayout = new QHBoxLayout();
     CardSetPtr set = CardDatabaseManager::getInstance()->getSet(setName);
     checkBox = new QCheckBox("(" + set->getShortName() + ") - " + set->getLongName(), this);
-    connect(checkBox, &QCheckBox::checkStateChanged, parent, &DlgSelectSetForCards::updateCardLists);
+    connect(checkBox, &QCheckBox::checkStateChanged, parent, &DlgSelectSetForCards::updateLayoutOrder);
     expandButton = new QPushButton("+", this);
     countLabel = new QLabel(QString::number(count), this);
 
