@@ -119,7 +119,7 @@ QChar DeckPreviewColorCircleWidget::getColorChar() const
 DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(QWidget *parent, const QString &colorIdentity)
     : QWidget(parent)
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout = new QHBoxLayout(this);
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignHCenter);
@@ -147,6 +147,7 @@ DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(QWidget *parent, 
 
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
             &DeckPreviewColorIdentityWidget::toggleUnusedVisibility);
+    toggleUnusedVisibility(SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities());
 }
 
 void DeckPreviewColorIdentityWidget::toggleUnusedVisibility(bool _visible) const

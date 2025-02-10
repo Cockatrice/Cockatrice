@@ -44,6 +44,9 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+
+private:
+    QHBoxLayout *layout;
 };
 
 #endif // DECK_PREVIEW_COLOR_IDENTITY_WIDGET_H
