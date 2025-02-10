@@ -32,22 +32,16 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
 
-    searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
-    searchAndSortLayout->addWidget(sortWidget);
-    searchAndSortLayout->addWidget(searchWidget);
-
-    // checkbox row
-    QHBoxLayout *checkBoxLayout = new QHBoxLayout(this);
-    checkBoxLayout->setContentsMargins(9, 0, 9, 0);
-
     showFoldersCheckBox = new QCheckBox(this);
     showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &VisualDeckStorageWidget::updateShowFolders);
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowFolders);
 
-    checkBoxLayout->addWidget(showFoldersCheckBox);
-    checkBoxLayout->addStretch();
+    searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
+    searchAndSortLayout->addWidget(sortWidget);
+    searchAndSortLayout->addWidget(searchWidget);
+    searchAndSortLayout->addWidget(showFoldersCheckBox);
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
@@ -63,7 +57,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // putting everything together
     layout->addLayout(searchAndSortLayout);
-    layout->addLayout(checkBoxLayout);
     layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
     layout->addWidget(cardSizeWidget);
