@@ -31,9 +31,12 @@ void SettingsButtonWidget::togglePopup()
     if (popup->isVisible()) {
         popup->close();
     } else {
+        // Ensure popup size is known before positioning
+        popup->adjustSize();
+        QSize popupSize = popup->size();
+
         // Get button position
         QPoint buttonGlobalPos = button->mapToGlobal(QPoint(0, button->height()));
-        QSize popupSize = popup->size();
 
         // Get screen geometry
         QScreen *screen = QApplication::screenAt(buttonGlobalPos);
