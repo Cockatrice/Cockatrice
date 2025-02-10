@@ -224,9 +224,6 @@ void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T /* _sho
 void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T /* _showTags */)
 {
 }
-void SettingsCache::setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T /* _showCardSizeSlider */)
-{
-}
 void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
 {
 }

@@ -39,7 +39,6 @@ public slots:
     void updateColorFilter();
     void updateSearchFilter();
     void updateTagsVisibility(bool visible);
-    void updateCardSizeSliderVisibility(bool _visible) const;
     void updateSortOrder();
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
@@ -67,7 +66,6 @@ private:
     QCheckBox *drawUnusedColorIdentitiesCheckBox;
     QCheckBox *tagFilterVisibilityCheckBox;
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
-    QCheckBox *cardSizeSliderVisibilityCheckBox;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
 };
