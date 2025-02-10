@@ -133,6 +133,7 @@ private:
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
     bool visualDeckStorageShowTags;
+    bool visualDeckStorageShowCardSizeSlider;
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
@@ -425,6 +426,10 @@ public:
     bool getVisualDeckStorageShowTags() const
     {
         return visualDeckStorageShowTags;
+    }
+    bool getVisualDeckStorageShowCardSizeSlider() const
+    {
+        return visualDeckStorageShowCardSizeSlider;
     }
     int getVisualDeckStorageCardSize() const
     {
@@ -773,6 +778,7 @@ public slots:
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTags(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T _showCardSizeSlider);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);

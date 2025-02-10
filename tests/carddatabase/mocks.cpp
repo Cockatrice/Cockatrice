@@ -221,6 +221,9 @@ void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T /* value 
 void SettingsCache::setVisualDeckStorageShowTags(QT_STATE_CHANGED_T /* _showTags */)
 {
 }
+void SettingsCache::setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T /* _showCardSizeSlider */)
+{
+}
 void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
 {
 }

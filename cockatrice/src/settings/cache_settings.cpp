@@ -268,6 +268,8 @@ SettingsCache::SettingsCache()
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
     visualDeckStorageShowTags = settings->value("interface/visualdeckstorageshowtags", true).toBool();
+    visualDeckStorageShowCardSizeSlider =
+        settings->value("interface/visualdeckstorageshowcardsizeslider", true).toBool();
     visualDeckStorageDrawUnusedColorIdentities =
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
@@ -690,6 +692,12 @@ void SettingsCache::setVisualDeckStorageShowTags(QT_STATE_CHANGED_T _showTags)
 {
     visualDeckStorageShowTags = _showTags;
     settings->setValue("interface/visualdeckstorageshowtags", visualDeckStorageShowTags);
+}
+
+void SettingsCache::setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T _showCardSizeSlider)
+{
+    visualDeckStorageShowCardSizeSlider = _showCardSizeSlider;
+    settings->setValue("interface/visualdeckstorageshowcardsizeslider", visualDeckStorageShowCardSizeSlider);
 }
 
 void SettingsCache::setVisualDeckStorageCardSize(int _visualDeckStorageCardSize)

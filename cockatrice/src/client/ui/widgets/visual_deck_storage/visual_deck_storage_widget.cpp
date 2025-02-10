@@ -45,9 +45,17 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(tagsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowTags);
 
+    cardSizeSliderVisibilityCheckBox = new QCheckBox(this);
+    cardSizeSliderVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowCardSizeSlider());
+    connect(cardSizeSliderVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageWidget::updateCardSizeSliderVisibility);
+    connect(cardSizeSliderVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowCardSizeSlider);
+
     quickSettingsWidget = new SettingsButtonWidget(this);
     quickSettingsWidget->addSettingsWidget(showFoldersCheckBox);
     quickSettingsWidget->addSettingsWidget(tagsVisibilityCheckBox);
+    quickSettingsWidget->addSettingsWidget(cardSizeSliderVisibilityCheckBox);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
@@ -60,6 +68,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
+    updateCardSizeSliderVisibility(SettingsCache::instance().getVisualDeckStorageShowCardSizeSlider());
 
     // deck area
     scrollArea = new QScrollArea(this);
@@ -114,6 +123,7 @@ void VisualDeckStorageWidget::retranslateUi()
 
     showFoldersCheckBox->setText(tr("Show Folders"));
     tagsVisibilityCheckBox->setText(tr("Show Tags"));
+    cardSizeSliderVisibilityCheckBox->setText(tr("Show Card Size Slider"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
@@ -192,4 +202,13 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
         tagFilterWidget->setHidden(true);
     }
     emit tagsVisibilityChanged(visible);
+}
+
+void VisualDeckStorageWidget::updateCardSizeSliderVisibility(const bool _visible) const
+{
+    if (_visible) {
+        cardSizeWidget->setVisible(true);
+    } else {
+        cardSizeWidget->setHidden(true);
+    }
 }
