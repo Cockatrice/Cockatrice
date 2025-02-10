@@ -2,8 +2,9 @@
 
 #include <QApplication>
 #include <QFocusEvent>
+#include <QPainter>
 
-SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup)
+SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
 {
     layout = new QVBoxLayout(this);
 }
@@ -25,4 +26,12 @@ void SettingsPopupWidget::closeEvent(QCloseEvent *event)
 {
     emit aboutToClose();
     QWidget::closeEvent(event);
+}
+
+void SettingsPopupWidget::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.setPen(Qt::gray);
+    painter.drawRect(rect().adjusted(0, 0, -1, -1));
+    QWidget::paintEvent(event);
 }

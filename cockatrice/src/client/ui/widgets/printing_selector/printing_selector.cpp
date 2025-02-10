@@ -58,6 +58,8 @@ PrintingSelector::PrintingSelector(QWidget *parent,
 
     sortAndOptionsContainer = new QWidget(this);
     sortAndOptionsLayout = new QHBoxLayout(sortAndOptionsContainer);
+    sortAndOptionsLayout->setSpacing(3);
+    sortAndOptionsLayout->setContentsMargins(0, 0, 0, 0);
     sortAndOptionsContainer->setLayout(sortAndOptionsLayout);
 
     searchBar = new PrintingSelectorCardSearchWidget(this);
