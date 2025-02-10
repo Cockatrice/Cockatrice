@@ -2,6 +2,7 @@
 
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
+#include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
 #include "visual_deck_storage_search_widget.h"
@@ -24,21 +25,15 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     setLayout(layout);
 
     // search bar row
-    searchAndSortLayout = new QHBoxLayout(this);
+    searchAndSortContainer = new QWidget(this);
+    searchAndSortLayout = new QHBoxLayout(searchAndSortContainer);
     searchAndSortLayout->setSpacing(3);
     searchAndSortLayout->setContentsMargins(9, 0, 9, 0);
+    searchAndSortContainer->setLayout(searchAndSortLayout);
 
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
-
-    searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
-    searchAndSortLayout->addWidget(sortWidget);
-    searchAndSortLayout->addWidget(searchWidget);
-
-    // checkbox row
-    QHBoxLayout *checkBoxLayout = new QHBoxLayout(this);
-    checkBoxLayout->setContentsMargins(9, 0, 9, 0);
 
     showFoldersCheckBox = new QCheckBox(this);
     showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
@@ -46,14 +41,42 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowFolders);
 
-    checkBoxLayout->addWidget(showFoldersCheckBox);
-    checkBoxLayout->addStretch();
+    tagFilterVisibilityCheckBox = new QCheckBox(this);
+    tagFilterVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
+    connect(tagFilterVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageWidget::updateTagsVisibility);
+    connect(tagFilterVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTagFilter);
 
-    // tag filter box
-    tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+    tagsOnWidgetsVisibilityCheckBox = new QCheckBox(this);
+    tagsOnWidgetsVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
+    connect(tagsOnWidgetsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews);
+
+    drawUnusedColorIdentitiesCheckBox = new QCheckBox(this);
+    drawUnusedColorIdentitiesCheckBox->setChecked(
+        SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities());
+    connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
 
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
+
+    quickSettingsWidget = new SettingsButtonWidget(this);
+    quickSettingsWidget->addSettingsWidget(showFoldersCheckBox);
+    quickSettingsWidget->addSettingsWidget(tagFilterVisibilityCheckBox);
+    quickSettingsWidget->addSettingsWidget(tagsOnWidgetsVisibilityCheckBox);
+    quickSettingsWidget->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
+    quickSettingsWidget->addSettingsWidget(cardSizeWidget);
+
+    searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
+    searchAndSortLayout->addWidget(sortWidget);
+    searchAndSortLayout->addWidget(searchWidget);
+    searchAndSortLayout->addWidget(quickSettingsWidget);
+
+    // tag filter box
+    tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
 
     // deck area
     scrollArea = new QScrollArea(this);
@@ -62,11 +85,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea->setWidgetResizable(true);
 
     // putting everything together
-    layout->addLayout(searchAndSortLayout);
-    layout->addLayout(checkBoxLayout);
+    layout->addWidget(searchAndSortContainer);
     layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
-    layout->addWidget(cardSizeWidget);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
             &VisualDeckStorageWidget::createRootFolderWidget);
@@ -108,6 +129,9 @@ void VisualDeckStorageWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 
     showFoldersCheckBox->setText(tr("Show Folders"));
+    tagFilterVisibilityCheckBox->setText(tr("Show Tag Filter"));
+    tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
+    drawUnusedColorIdentitiesCheckBox->setText(tr("Draw not contained Color Identities"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
@@ -173,4 +197,14 @@ void VisualDeckStorageWidget::updateSearchFilter()
         searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText());
     }
     emit searchFilterUpdated();
+}
+
+void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
+{
+    if (visible) {
+        tagFilterWidget->setVisible(true);
+
+    } else {
+        tagFilterWidget->setHidden(true);
+    }
 }

@@ -5,7 +5,9 @@
 #include "../../../../game/cards/card_database.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../quick_settings/settings_button_widget.h"
 
+#include <QCheckBox>
 #include <QLabel>
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -16,7 +18,7 @@
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
-class PrintingSelectorViewOptionsToolbarWidget;
+class PrintingSelectorViewOptionsWidget;
 class TabDeckEditor;
 class PrintingSelector : public QWidget
 {
@@ -24,16 +26,15 @@ class PrintingSelector : public QWidget
 
 public:
     PrintingSelector(QWidget *parent, TabDeckEditor *deckEditor, DeckListModel *deckModel, QTreeView *deckView);
+
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     void getAllSetsForCurrentCard();
 
 public slots:
+    void retranslateUi();
     void updateDisplay();
     void selectPreviousCard();
     void selectNextCard();
-    void toggleVisibilitySortOptions(bool _state);
-    void toggleVisibilitySearchBar(bool _state);
-    void toggleVisibilityCardSizeSlider(bool _state);
     void toggleVisibilityNavigationButtons(bool _state);
 
 private slots:
@@ -41,7 +42,10 @@ private slots:
 
 private:
     QVBoxLayout *layout;
-    PrintingSelectorViewOptionsToolbarWidget *viewOptionsToolbar;
+    SettingsButtonWidget *displayOptionsWidget;
+    QWidget *sortAndOptionsContainer;
+    QHBoxLayout *sortAndOptionsLayout;
+    QCheckBox *navigationCheckBox;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
     FlowWidget *flowWidget;

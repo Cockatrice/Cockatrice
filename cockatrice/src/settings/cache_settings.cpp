@@ -258,15 +258,14 @@ SettingsCache::SettingsCache()
     bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
     printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
-    printingSelectorSortOptionsVisible = settings->value("cards/printingselectorsortoptionsvisible", true).toBool();
-    printingSelectorSearchBarVisible = settings->value("cards/printingselectorcardsearchbarvisible", true).toBool();
-    printingSelectorCardSizeSliderVisible =
-        settings->value("cards/printingselectorcardsizeslidervisible", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
-    visualDeckStorageCardSize = settings->value("cards/visualdeckstoragecardsize", 100).toInt();
+    visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
+    visualDeckStorageShowTagFilter = settings->value("interface/visualdeckstorageshowtagfilter", true).toBool();
+    visualDeckStorageShowTagsOnDeckPreviews =
+        settings->value("interface/visualdeckstorageshowtagsondeckpreviews", true).toBool();
     visualDeckStorageDrawUnusedColorIdentities =
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
@@ -645,27 +644,6 @@ void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
     emit printingSelectorCardSizeChanged();
 }
 
-void SettingsCache::setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T _sortOptionsVisible)
-{
-    printingSelectorSortOptionsVisible = _sortOptionsVisible;
-    settings->setValue("cards/printingselectorsortoptionsvisible", printingSelectorSortOptionsVisible);
-    emit printingSelectorSortOptionsVisibleChanged();
-}
-
-void SettingsCache::setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible)
-{
-    printingSelectorSearchBarVisible = _searchBarVisible;
-    settings->setValue("cards/printingselectorsearchbarvisible", printingSelectorSearchBarVisible);
-    emit printingSelectorSearchBarVisibleChanged();
-}
-
-void SettingsCache::setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible)
-{
-    printingSelectorCardSizeSliderVisible = _cardSizeSliderVisible;
-    settings->setValue("cards/printingselectorcardsizeslidervisible", printingSelectorCardSizeSliderVisible);
-    emit printingSelectorCardSizeSliderVisibleChanged();
-}
-
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)
 {
     printingSelectorNavigationButtonsVisible = _navigationButtonsVisible;
@@ -685,10 +663,24 @@ void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value)
     settings->setValue("interface/visualdeckstorageshowfolders", visualDeckStorageShowFolders);
 }
 
+void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags)
+{
+    visualDeckStorageShowTagFilter = _showTags;
+    settings->setValue("interface/visualdeckstorageshowtagfilter", visualDeckStorageShowTagFilter);
+    emit visualDeckStorageShowTagFilterChanged(visualDeckStorageShowTagFilter);
+}
+
+void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags)
+{
+    visualDeckStorageShowTagsOnDeckPreviews = _showTags;
+    settings->setValue("interface/visualdeckstorageshowtagsondeckpreviews", visualDeckStorageShowTagsOnDeckPreviews);
+    emit visualDeckStorageShowTagsOnDeckPreviewsChanged(visualDeckStorageShowTagsOnDeckPreviews);
+}
+
 void SettingsCache::setVisualDeckStorageCardSize(int _visualDeckStorageCardSize)
 {
     visualDeckStorageCardSize = _visualDeckStorageCardSize;
-    settings->setValue("cards/visualdeckstoragecardsize", visualDeckStorageCardSize);
+    settings->setValue("interface/visualdeckstoragecardsize", visualDeckStorageCardSize);
     emit visualDeckStorageCardSizeChanged();
 }
 
@@ -696,13 +688,15 @@ void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
     QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities)
 {
     visualDeckStorageDrawUnusedColorIdentities = _visualDeckStorageDrawUnusedColorIdentities;
-    settings->setValue("cards/visualdeckstoragedrawunusedcoloridentities", visualDeckStorageDrawUnusedColorIdentities);
+    settings->setValue("interface/visualdeckstoragedrawunusedcoloridentities",
+                       visualDeckStorageDrawUnusedColorIdentities);
+    emit visualDeckStorageDrawUnusedColorIdentitiesChanged(visualDeckStorageDrawUnusedColorIdentities);
 }
 
 void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity)
 {
     visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
-    settings->setValue("cards/visualdeckstorageunusedcoloridentitiesopacity",
+    settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 

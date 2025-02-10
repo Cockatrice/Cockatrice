@@ -58,11 +58,11 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
-    void printingSelectorSortOptionsVisibleChanged();
-    void printingSelectorSearchBarVisibleChanged();
-    void printingSelectorCardSizeSliderVisibleChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
+    void visualDeckStorageShowTagFilterChanged(bool _visible);
+    void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
+    void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
     void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();
@@ -126,12 +126,11 @@ private:
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
     int printingSelectorCardSize;
-    bool printingSelectorSortOptionsVisible;
-    bool printingSelectorSearchBarVisible;
-    bool printingSelectorCardSizeSliderVisible;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
+    bool visualDeckStorageShowTagsOnDeckPreviews;
+    bool visualDeckStorageShowTagFilter;
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
@@ -397,18 +396,6 @@ public:
     {
         return printingSelectorCardSize;
     }
-    bool getPrintingSelectorSortOptionsVisible() const
-    {
-        return printingSelectorSortOptionsVisible;
-    }
-    bool getPrintingSelectorSearchBarVisible() const
-    {
-        return printingSelectorSearchBarVisible;
-    }
-    bool getPrintingSelectorCardSizeSliderVisible() const
-    {
-        return printingSelectorCardSizeSliderVisible;
-    }
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
         return printingSelectorNavigationButtonsVisible;
@@ -420,6 +407,14 @@ public:
     bool getVisualDeckStorageShowFolders() const
     {
         return visualDeckStorageShowFolders;
+    }
+    bool getVisualDeckStorageShowTagFilter() const
+    {
+        return visualDeckStorageShowTagFilter;
+    }
+    bool getVisualDeckStorageShowTagsOnDeckPreviews() const
+    {
+        return visualDeckStorageShowTagsOnDeckPreviews;
     }
     int getVisualDeckStorageCardSize() const
     {
@@ -761,12 +756,11 @@ public slots:
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
-    void setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T _sortOptionsVisible);
-    void setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible);
-    void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
+    void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);

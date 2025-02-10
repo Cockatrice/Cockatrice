@@ -119,9 +119,10 @@ QChar DeckPreviewColorCircleWidget::getColorChar() const
 DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(QWidget *parent, const QString &colorIdentity)
     : QWidget(parent)
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout = new QHBoxLayout(this);
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(Qt::AlignHCenter);
     setLayout(layout);
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -140,6 +141,25 @@ DeckPreviewColorIdentityWidget::DeckPreviewColorIdentityWidget(QWidget *parent, 
         for (DeckPreviewColorCircleWidget *circle : findChildren<DeckPreviewColorCircleWidget *>()) {
             if (circle->getColorChar() == color) {
                 circle->setColorActive(true); // Mark the color as active
+            }
+        }
+    }
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+            &DeckPreviewColorIdentityWidget::toggleUnusedVisibility);
+    toggleUnusedVisibility(SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities());
+}
+
+void DeckPreviewColorIdentityWidget::toggleUnusedVisibility(bool _visible) const
+{
+    if (_visible) {
+        for (DeckPreviewColorCircleWidget *circle : findChildren<DeckPreviewColorCircleWidget *>()) {
+            circle->setVisible(true);
+        }
+    } else {
+        for (DeckPreviewColorCircleWidget *circle : findChildren<DeckPreviewColorCircleWidget *>()) {
+            if (!circle->getIsActive()) {
+                circle->setHidden(true);
             }
         }
     }

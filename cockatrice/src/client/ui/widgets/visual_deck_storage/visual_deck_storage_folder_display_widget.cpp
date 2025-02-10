@@ -172,7 +172,7 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
     if (!showFolders) {
         flattenFolderStructure();
     } else {
-        // if setting was switched from disabled to enabled, we assume that there isn't any existing subfolders
+        // if setting was switched from disabled to enabled, we assume that there aren't any existing subfolders
         createWidgetsForFiles();
         createWidgetsForFolders();
     }

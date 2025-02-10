@@ -11,8 +11,8 @@
  * This widget allows users to dynamically change the card size in a linked FlowWidget
  * and updates the application's settings accordingly.
  */
-CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *flowWidget, int defaultValue)
-    : parent(parent), flowWidget(flowWidget)
+CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *_flowWidget, int defaultValue)
+    : parent(parent), flowWidget(_flowWidget)
 {
     cardSizeLayout = new QHBoxLayout(this);
     cardSizeLayout->setContentsMargins(9, 0, 9, 0);
