@@ -264,7 +264,7 @@ SettingsCache::SettingsCache()
         settings->value("cards/printingselectorcardsizeslidervisible", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
-    visualDeckStorageCardSize = settings->value("cards/visualdeckstoragecardsize", 100).toInt();
+    visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
     visualDeckStorageShowTags = settings->value("interface/visualdeckstorageshowtags", true).toBool();
@@ -703,7 +703,7 @@ void SettingsCache::setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T _s
 void SettingsCache::setVisualDeckStorageCardSize(int _visualDeckStorageCardSize)
 {
     visualDeckStorageCardSize = _visualDeckStorageCardSize;
-    settings->setValue("cards/visualdeckstoragecardsize", visualDeckStorageCardSize);
+    settings->setValue("interface/visualdeckstoragecardsize", visualDeckStorageCardSize);
     emit visualDeckStorageCardSizeChanged();
 }
 
@@ -711,13 +711,14 @@ void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
     QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities)
 {
     visualDeckStorageDrawUnusedColorIdentities = _visualDeckStorageDrawUnusedColorIdentities;
-    settings->setValue("cards/visualdeckstoragedrawunusedcoloridentities", visualDeckStorageDrawUnusedColorIdentities);
+    settings->setValue("interface/visualdeckstoragedrawunusedcoloridentities",
+                       visualDeckStorageDrawUnusedColorIdentities);
 }
 
 void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity)
 {
     visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
-    settings->setValue("cards/visualdeckstorageunusedcoloridentitiesopacity",
+    settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 
