@@ -69,7 +69,11 @@ void SettingsButtonWidget::onPopupClosed() const
 
 void SettingsButtonWidget::mousePressEvent(QMouseEvent *event)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     if (popup->isVisible() && !popup->geometry().contains(event->globalPosition().toPoint())) {
+#else
+    if (popup->isVisible() && !popup->geometry().contains(event->globalPos())) {
+#endif
         popup->close();
     }
     QWidget::mousePressEvent(event);
