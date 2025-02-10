@@ -1,5 +1,6 @@
 #include "settings_popup_widget.h"
 
+#include <QApplication>
 #include <QFocusEvent>
 
 SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
@@ -14,7 +15,9 @@ void SettingsPopupWidget::addSettingsWidget(QWidget *toAdd) const
 
 void SettingsPopupWidget::focusOutEvent(QFocusEvent *event)
 {
-    close();
+    if (!this->isAncestorOf(QApplication::focusWidget())) {
+        close();
+    }
     QWidget::focusOutEvent(event);
 }
 
