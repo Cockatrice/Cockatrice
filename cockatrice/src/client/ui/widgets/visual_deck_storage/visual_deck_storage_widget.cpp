@@ -25,9 +25,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     setLayout(layout);
 
     // search bar row
-    searchAndSortLayout = new QHBoxLayout(this);
+    searchAndSortContainer = new QWidget(this);
+    searchAndSortLayout = new QHBoxLayout(searchAndSortContainer);
     searchAndSortLayout->setSpacing(3);
     searchAndSortLayout->setContentsMargins(9, 0, 9, 0);
+    searchAndSortContainer->setLayout(searchAndSortLayout);
 
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
@@ -77,7 +79,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     scrollArea->setWidgetResizable(true);
 
     // putting everything together
-    layout->addLayout(searchAndSortLayout);
+    layout->addWidget(searchAndSortContainer);
     layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
     layout->addWidget(cardSizeWidget);

@@ -44,6 +44,8 @@ private slots:
 private:
     QVBoxLayout *layout;
     SettingsButtonWidget *displayOptionsWidget;
+    QWidget *sortAndOptionsContainer;
+    QHBoxLayout *sortAndOptionsLayout;
     PrintingSelectorViewOptionsWidget *viewOptionsToolbar;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;

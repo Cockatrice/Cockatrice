@@ -29,8 +29,9 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout = new QVBoxLayout();
+    layout = new QVBoxLayout(this);
     setLayout(layout);
+
     widgetLoadingBufferTimer = new QTimer(this);
 
     displayOptionsWidget = new SettingsButtonWidget(this);
@@ -43,12 +44,14 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     sortToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     sortToolBar->setVisible(SettingsCache::instance().getPrintingSelectorSortOptionsVisible());
 
-    auto sortAndOptionsLayout = new QHBoxLayout(this);
+    sortAndOptionsContainer = new QWidget(this);
+    sortAndOptionsLayout = new QHBoxLayout(sortAndOptionsContainer);
+    sortAndOptionsContainer->setLayout(sortAndOptionsLayout);
 
     sortAndOptionsLayout->addWidget(sortToolBar);
     sortAndOptionsLayout->addWidget(displayOptionsWidget);
 
-    layout->addLayout(sortAndOptionsLayout);
+    layout->addWidget(sortAndOptionsContainer);
 
     searchBar = new PrintingSelectorCardSearchWidget(this);
     searchBar->setVisible(SettingsCache::instance().getPrintingSelectorSearchBarVisible());

@@ -56,6 +56,7 @@ signals:
 
 private:
     QVBoxLayout *layout;
+    QWidget *searchAndSortContainer;
     QHBoxLayout *searchAndSortLayout;
     DeckListModel *deckListModel;
     QLabel *databaseLoadIndicator;
