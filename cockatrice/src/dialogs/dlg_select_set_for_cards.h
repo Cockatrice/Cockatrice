@@ -23,13 +23,17 @@ public:
     void sortSetsByCount();
     QMap<QString, QStringList> getCardsForSets();
     QMap<QString, QStringList> getModifiedCards();
-    void updateLayoutOrder();
     QVBoxLayout *listLayout;
     QList<SetEntryWidget *> entry_widgets;
     QMap<QString, QStringList> cardsForSets;
 
+signals:
+    void widgetOrderChanged();
+    void orderChanged();
+
 public slots:
     void actOK();
+    void updateLayoutOrder();
     void updateCardLists();
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
