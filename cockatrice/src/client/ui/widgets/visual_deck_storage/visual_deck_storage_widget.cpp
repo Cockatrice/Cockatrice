@@ -41,11 +41,17 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowFolders);
 
-    tagsVisibilityCheckBox = new QCheckBox(this);
-    tagsVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTags());
-    connect(tagsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &VisualDeckStorageWidget::updateTagsVisibility);
-    connect(tagsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageShowTags);
+    tagFilterVisibilityCheckBox = new QCheckBox(this);
+    tagFilterVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
+    connect(tagFilterVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageWidget::updateTagsVisibility);
+    connect(tagFilterVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTagFilter);
+
+    tagsOnWidgetsVisibilityCheckBox = new QCheckBox(this);
+    tagsOnWidgetsVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
+    connect(tagsOnWidgetsVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews);
 
     cardSizeSliderVisibilityCheckBox = new QCheckBox(this);
     cardSizeSliderVisibilityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowCardSizeSlider());
@@ -56,7 +62,8 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     quickSettingsWidget = new SettingsButtonWidget(this);
     quickSettingsWidget->addSettingsWidget(showFoldersCheckBox);
-    quickSettingsWidget->addSettingsWidget(tagsVisibilityCheckBox);
+    quickSettingsWidget->addSettingsWidget(tagFilterVisibilityCheckBox);
+    quickSettingsWidget->addSettingsWidget(tagsOnWidgetsVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(cardSizeSliderVisibilityCheckBox);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
@@ -66,7 +73,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTags());
+    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
 
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
@@ -124,7 +131,8 @@ void VisualDeckStorageWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 
     showFoldersCheckBox->setText(tr("Show Folders"));
-    tagsVisibilityCheckBox->setText(tr("Show Tags"));
+    tagFilterVisibilityCheckBox->setText(tr("Show Tag Filter"));
+    tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
     cardSizeSliderVisibilityCheckBox->setText(tr("Show Card Size Slider"));
 }
 
@@ -143,8 +151,6 @@ void VisualDeckStorageWidget::createRootFolderWidget()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
                                                             showFoldersCheckBox->isChecked());
-    connect(this, &VisualDeckStorageWidget::tagsVisibilityChanged, folderWidget,
-            &VisualDeckStorageFolderDisplayWidget::updateTagVisibility);
 
     scrollArea->setWidget(folderWidget);
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
@@ -203,7 +209,6 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
     } else {
         tagFilterWidget->setHidden(true);
     }
-    emit tagsVisibilityChanged(visible);
 }
 
 void VisualDeckStorageWidget::updateCardSizeSliderVisibility(const bool _visible) const

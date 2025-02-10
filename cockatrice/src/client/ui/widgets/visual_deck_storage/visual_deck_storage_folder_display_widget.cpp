@@ -39,8 +39,6 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
             &VisualDeckStorageFolderDisplayWidget::updateVisibility);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::searchFilterUpdated, this,
             &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::tagsVisibilityChanged, this,
-            &VisualDeckStorageFolderDisplayWidget::updateTagVisibility);
 
     createWidgetsForFiles();
     createWidgetsForFolders();
@@ -95,8 +93,6 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
                 &VisualDeckStorageWidget::deckPreviewDoubleClickedEvent);
         connect(visualDeckStorageWidget->cardSizeWidget->getSlider(), &QSlider::valueChanged,
                 display->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
-        connect(this, &VisualDeckStorageFolderDisplayWidget::tagsVisibilityChanged, display,
-                &DeckPreviewWidget::updateTagsVisibility);
         display->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->cardSizeWidget->getSlider()->value());
         allDecks.append(display);
     }
@@ -165,8 +161,6 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFolders()
 
     for (const QString &dir : getAllSubFolders(filePath)) {
         auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir, true, showFolders);
-        connect(this, &VisualDeckStorageFolderDisplayWidget::tagsVisibilityChanged, display,
-                &VisualDeckStorageFolderDisplayWidget::updateTagVisibility);
         containerLayout->addWidget(display);
     }
 }
@@ -184,11 +178,6 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
     }
 
     header->setHidden(!showFolders);
-}
-
-void VisualDeckStorageFolderDisplayWidget::updateTagVisibility(bool visible)
-{
-    emit tagsVisibilityChanged(visible);
 }
 
 /**

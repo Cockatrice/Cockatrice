@@ -31,6 +31,9 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
 
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
+            &DeckPreviewWidget::updateTagsVisibility);
+
     layout->addWidget(bannerCardDisplayWidget);
 }
 
@@ -52,7 +55,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 
     colorIdentityWidget = new DeckPreviewColorIdentityWidget(this, getColorIdentity());
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTags());
+    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);

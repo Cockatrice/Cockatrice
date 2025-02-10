@@ -218,7 +218,10 @@ void SettingsCache::setVisualDeckStorageSortingOrder(int /* _visualDeckStorageSo
 void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T /* value */)
 {
 }
-void SettingsCache::setVisualDeckStorageShowTags(QT_STATE_CHANGED_T /* _showTags */)
+void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T /* _showTags */)
+{
+}
+void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T /* _showTags */)
 {
 }
 void SettingsCache::setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T /* _showCardSizeSlider */)

@@ -52,7 +52,6 @@ signals:
     void tagFilterUpdated();
     void colorFilterUpdated();
     void searchFilterUpdated();
-    void tagsVisibilityChanged(bool visible);
 
 private:
     QVBoxLayout *layout;
@@ -65,7 +64,8 @@ private:
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     SettingsButtonWidget *quickSettingsWidget;
     QCheckBox *showFoldersCheckBox;
-    QCheckBox *tagsVisibilityCheckBox;
+    QCheckBox *tagFilterVisibilityCheckBox;
+    QCheckBox *tagsOnWidgetsVisibilityCheckBox;
     QCheckBox *cardSizeSliderVisibilityCheckBox;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;

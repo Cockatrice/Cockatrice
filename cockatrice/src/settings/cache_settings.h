@@ -62,6 +62,8 @@ signals:
     void printingSelectorSearchBarVisibleChanged();
     void printingSelectorCardSizeSliderVisibleChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
+    void visualDeckStorageShowTagFilterChanged(bool _visible);
+    void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
     void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
@@ -132,7 +134,8 @@ private:
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
-    bool visualDeckStorageShowTags;
+    bool visualDeckStorageShowTagsOnDeckPreviews;
+    bool visualDeckStorageShowTagFilter;
     bool visualDeckStorageShowCardSizeSlider;
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
@@ -423,9 +426,13 @@ public:
     {
         return visualDeckStorageShowFolders;
     }
-    bool getVisualDeckStorageShowTags() const
+    bool getVisualDeckStorageShowTagFilter() const
     {
-        return visualDeckStorageShowTags;
+        return visualDeckStorageShowTagFilter;
+    }
+    bool getVisualDeckStorageShowTagsOnDeckPreviews() const
+    {
+        return visualDeckStorageShowTagsOnDeckPreviews;
     }
     bool getVisualDeckStorageShowCardSizeSlider() const
     {
@@ -777,7 +784,8 @@ public slots:
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
-    void setVisualDeckStorageShowTags(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T _showCardSizeSlider);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);

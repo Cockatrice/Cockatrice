@@ -267,7 +267,9 @@ SettingsCache::SettingsCache()
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
-    visualDeckStorageShowTags = settings->value("interface/visualdeckstorageshowtags", true).toBool();
+    visualDeckStorageShowTagFilter = settings->value("interface/visualdeckstorageshowtagfilter", true).toBool();
+    visualDeckStorageShowTagsOnDeckPreviews =
+        settings->value("interface/visualdeckstorageshowtagsondeckpreviews", true).toBool();
     visualDeckStorageShowCardSizeSlider =
         settings->value("interface/visualdeckstorageshowcardsizeslider", true).toBool();
     visualDeckStorageDrawUnusedColorIdentities =
@@ -688,10 +690,18 @@ void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value)
     settings->setValue("interface/visualdeckstorageshowfolders", visualDeckStorageShowFolders);
 }
 
-void SettingsCache::setVisualDeckStorageShowTags(QT_STATE_CHANGED_T _showTags)
+void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags)
 {
-    visualDeckStorageShowTags = _showTags;
-    settings->setValue("interface/visualdeckstorageshowtags", visualDeckStorageShowTags);
+    visualDeckStorageShowTagFilter = _showTags;
+    settings->setValue("interface/visualdeckstorageshowtagfilter", visualDeckStorageShowTagFilter);
+    emit visualDeckStorageShowTagFilterChanged(visualDeckStorageShowTagFilter);
+}
+
+void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags)
+{
+    visualDeckStorageShowTagsOnDeckPreviews = _showTags;
+    settings->setValue("interface/visualdeckstorageshowtagsondeckpreviews", visualDeckStorageShowTagsOnDeckPreviews);
+    emit visualDeckStorageShowTagsOnDeckPreviewsChanged(visualDeckStorageShowTagsOnDeckPreviews);
 }
 
 void SettingsCache::setVisualDeckStorageShowCardSizeSlider(QT_STATE_CHANGED_T _showCardSizeSlider)

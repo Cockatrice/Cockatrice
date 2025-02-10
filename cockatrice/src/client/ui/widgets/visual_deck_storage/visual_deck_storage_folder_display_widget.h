@@ -27,14 +27,10 @@ public:
         return flowWidget;
     };
 
-signals:
-    void tagsVisibilityChanged(bool visible);
-
 public slots:
     void updateVisibility();
     bool checkVisibility();
     void updateShowFolders(bool enabled);
-    void updateTagVisibility(bool visible);
 
 private:
     bool showFolders;
