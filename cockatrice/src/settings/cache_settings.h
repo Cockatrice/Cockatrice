@@ -65,6 +65,7 @@ signals:
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
+    void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
     void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();

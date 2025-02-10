@@ -64,6 +64,7 @@ private:
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     SettingsButtonWidget *quickSettingsWidget;
     QCheckBox *showFoldersCheckBox;
+    QCheckBox *drawUnusedColorIdentitiesCheckBox;
     QCheckBox *tagFilterVisibilityCheckBox;
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
     QCheckBox *cardSizeSliderVisibilityCheckBox;

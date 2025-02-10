@@ -723,6 +723,7 @@ void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
     visualDeckStorageDrawUnusedColorIdentities = _visualDeckStorageDrawUnusedColorIdentities;
     settings->setValue("interface/visualdeckstoragedrawunusedcoloridentities",
                        visualDeckStorageDrawUnusedColorIdentities);
+    emit visualDeckStorageDrawUnusedColorIdentitiesChanged(visualDeckStorageDrawUnusedColorIdentities);
 }
 
 void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity)

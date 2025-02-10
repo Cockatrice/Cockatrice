@@ -15,6 +15,10 @@ public:
 
     void setColorActive(bool active);
     QChar getColorChar() const;
+    bool getIsActive() const
+    {
+        return isActive;
+    }
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -34,6 +38,9 @@ class DeckPreviewColorIdentityWidget : public QWidget
 
 public:
     explicit DeckPreviewColorIdentityWidget(QWidget *parent, const QString &colorIdentity);
+
+public slots:
+    void toggleUnusedVisibility(bool _visible) const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
