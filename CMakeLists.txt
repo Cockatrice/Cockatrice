@@ -78,7 +78,7 @@ project("Cockatrice" VERSION 2.10.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Rings of the Wild")
+  set(GIT_TAG_RELEASENAME "Omenpath")
 endif()
 
 # Use c++20 for all targets
