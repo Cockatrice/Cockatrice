@@ -18,6 +18,7 @@ const QStringList PrintingSelectorCardSortingWidget::SORT_OPTIONS = {SORT_OPTION
  */
 PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSelector *parent) : parent(parent)
 {
+    setMinimumWidth(300);
     sortToolBar = new QHBoxLayout(this);
     sortToolBar->setContentsMargins(9, 0, 9, 0);
 

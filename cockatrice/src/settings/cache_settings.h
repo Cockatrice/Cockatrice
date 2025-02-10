@@ -58,9 +58,6 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
-    void printingSelectorSortOptionsVisibleChanged();
-    void printingSelectorSearchBarVisibleChanged();
-    void printingSelectorCardSizeSliderVisibleChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
@@ -129,9 +126,6 @@ private:
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
     int printingSelectorCardSize;
-    bool printingSelectorSortOptionsVisible;
-    bool printingSelectorSearchBarVisible;
-    bool printingSelectorCardSizeSliderVisible;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
@@ -401,18 +395,6 @@ public:
     int getPrintingSelectorCardSize() const
     {
         return printingSelectorCardSize;
-    }
-    bool getPrintingSelectorSortOptionsVisible() const
-    {
-        return printingSelectorSortOptionsVisible;
-    }
-    bool getPrintingSelectorSearchBarVisible() const
-    {
-        return printingSelectorSearchBarVisible;
-    }
-    bool getPrintingSelectorCardSizeSliderVisible() const
-    {
-        return printingSelectorCardSizeSliderVisible;
     }
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
@@ -774,9 +756,6 @@ public slots:
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
-    void setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T _sortOptionsVisible);
-    void setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T _searchBarVisible);
-    void setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T _cardSizeSliderVisible);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);

@@ -5,7 +5,6 @@
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
-#include "printing_selector_view_options_widget.h"
 
 #include <QScrollBar>
 
@@ -34,35 +33,41 @@ PrintingSelector::PrintingSelector(QWidget *parent,
 
     widgetLoadingBufferTimer = new QTimer(this);
 
-    displayOptionsWidget = new SettingsButtonWidget(this);
-    displayOptionsWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    viewOptionsToolbar = new PrintingSelectorViewOptionsWidget(displayOptionsWidget, this);
-
-    displayOptionsWidget->addSettingsWidget(viewOptionsToolbar);
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     sortToolBar = new PrintingSelectorCardSortingWidget(this);
     sortToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    sortToolBar->setVisible(SettingsCache::instance().getPrintingSelectorSortOptionsVisible());
+
+    displayOptionsWidget = new SettingsButtonWidget(this);
+    displayOptionsWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    // Create the checkbox for navigation buttons visibility
+    navigationCheckBox = new QCheckBox(this);
+    navigationCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &PrintingSelector::toggleVisibilityNavigationButtons);
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setPrintingSelectorNavigationButtonsVisible);
+
+    cardSizeWidget =
+        new CardSizeWidget(displayOptionsWidget, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
+
+    displayOptionsWidget->addSettingsWidget(sortToolBar);
+    displayOptionsWidget->addSettingsWidget(navigationCheckBox);
+    displayOptionsWidget->addSettingsWidget(cardSizeWidget);
 
     sortAndOptionsContainer = new QWidget(this);
     sortAndOptionsLayout = new QHBoxLayout(sortAndOptionsContainer);
     sortAndOptionsContainer->setLayout(sortAndOptionsLayout);
 
-    sortAndOptionsLayout->addWidget(sortToolBar);
+    searchBar = new PrintingSelectorCardSearchWidget(this);
+
+    sortAndOptionsLayout->addWidget(searchBar);
     sortAndOptionsLayout->addWidget(displayOptionsWidget);
 
     layout->addWidget(sortAndOptionsContainer);
 
-    searchBar = new PrintingSelectorCardSearchWidget(this);
-    searchBar->setVisible(SettingsCache::instance().getPrintingSelectorSearchBarVisible());
-    layout->addWidget(searchBar);
-
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
-
-    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
-    cardSizeWidget->setVisible(SettingsCache::instance().getPrintingSelectorCardSizeSliderVisible());
-    layout->addWidget(cardSizeWidget);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);
     cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
@@ -71,6 +76,13 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     // Connect deck model data change signal to update display
     connect(deckModel, &DeckListModel::rowsInserted, this, &PrintingSelector::printingsInDeckChanged);
     connect(deckModel, &DeckListModel::rowsRemoved, this, &PrintingSelector::printingsInDeckChanged);
+
+    retranslateUi();
+}
+
+void PrintingSelector::retranslateUi()
+{
+    navigationCheckBox->setText(tr("Display Navigation Buttons"));
 }
 
 void PrintingSelector::printingsInDeckChanged()
@@ -216,36 +228,6 @@ void PrintingSelector::getAllSetsForCurrentCard()
     });
     currentIndex = 0;
     widgetLoadingBufferTimer->start(0); // Process as soon as possible
-}
-
-/**
- * @brief Toggles the visibility of the sorting options toolbar.
- *
- * @param _state The visibility state to set.
- */
-void PrintingSelector::toggleVisibilitySortOptions(bool _state)
-{
-    sortToolBar->setVisible(_state);
-}
-
-/**
- * @brief Toggles the visibility of the search bar.
- *
- * @param _state The visibility state to set.
- */
-void PrintingSelector::toggleVisibilitySearchBar(bool _state)
-{
-    searchBar->setVisible(_state);
-}
-
-/**
- * @brief Toggles the visibility of the card size slider.
- *
- * @param _state The visibility state to set.
- */
-void PrintingSelector::toggleVisibilityCardSizeSlider(bool _state)
-{
-    cardSizeWidget->setVisible(_state);
 }
 
 /**

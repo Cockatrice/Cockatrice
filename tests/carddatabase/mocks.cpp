@@ -200,15 +200,6 @@ void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrd
 void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
 {
 }
-void SettingsCache::setPrintingSelectorSortOptionsVisible(QT_STATE_CHANGED_T /* _sortOptionsVisible */)
-{
-}
-void SettingsCache::setPrintingSelectorSearchBarVisible(QT_STATE_CHANGED_T /* _searchBarVisible */)
-{
-}
-void SettingsCache::setPrintingSelectorCardSizeSliderVisible(QT_STATE_CHANGED_T /* _cardSizeSliderVisible */)
-{
-}
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
 {
 }

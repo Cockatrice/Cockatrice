@@ -6,8 +6,8 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
-#include "printing_selector_view_options_widget.h"
 
+#include <QCheckBox>
 #include <QLabel>
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -26,16 +26,15 @@ class PrintingSelector : public QWidget
 
 public:
     PrintingSelector(QWidget *parent, TabDeckEditor *deckEditor, DeckListModel *deckModel, QTreeView *deckView);
+
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     void getAllSetsForCurrentCard();
 
 public slots:
+    void retranslateUi();
     void updateDisplay();
     void selectPreviousCard();
     void selectNextCard();
-    void toggleVisibilitySortOptions(bool _state);
-    void toggleVisibilitySearchBar(bool _state);
-    void toggleVisibilityCardSizeSlider(bool _state);
     void toggleVisibilityNavigationButtons(bool _state);
 
 private slots:
@@ -46,7 +45,7 @@ private:
     SettingsButtonWidget *displayOptionsWidget;
     QWidget *sortAndOptionsContainer;
     QHBoxLayout *sortAndOptionsLayout;
-    PrintingSelectorViewOptionsWidget *viewOptionsToolbar;
+    QCheckBox *navigationCheckBox;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
     FlowWidget *flowWidget;
