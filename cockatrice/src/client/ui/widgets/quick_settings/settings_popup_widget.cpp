@@ -3,7 +3,7 @@
 #include <QApplication>
 #include <QFocusEvent>
 
-SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
+SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup)
 {
     layout = new QVBoxLayout(this);
 }

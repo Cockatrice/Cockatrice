@@ -5,6 +5,8 @@
 #include "../../../../game/cards/card_database.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "printing_selector_view_options_widget.h"
 
 #include <QLabel>
 #include <QTreeView>
@@ -16,7 +18,7 @@
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
-class PrintingSelectorViewOptionsToolbarWidget;
+class PrintingSelectorViewOptionsWidget;
 class TabDeckEditor;
 class PrintingSelector : public QWidget
 {
@@ -41,7 +43,8 @@ private slots:
 
 private:
     QVBoxLayout *layout;
-    PrintingSelectorViewOptionsToolbarWidget *viewOptionsToolbar;
+    SettingsButtonWidget *displayOptionsWidget;
+    PrintingSelectorViewOptionsWidget *viewOptionsToolbar;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
     FlowWidget *flowWidget;

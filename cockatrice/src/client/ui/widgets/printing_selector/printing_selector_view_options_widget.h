@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QWidget>
 
+class PrintingSelector;
 class PrintingSelectorViewOptionsWidget : public QWidget
 {
     Q_OBJECT

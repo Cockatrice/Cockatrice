@@ -5,7 +5,7 @@
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
-#include "printing_selector_view_options_toolbar_widget.h"
+#include "printing_selector_view_options_widget.h"
 
 #include <QScrollBar>
 
@@ -33,13 +33,22 @@ PrintingSelector::PrintingSelector(QWidget *parent,
     setLayout(layout);
     widgetLoadingBufferTimer = new QTimer(this);
 
-    // Initialize toolbar and widgets
-    viewOptionsToolbar = new PrintingSelectorViewOptionsToolbarWidget(this, this);
-    layout->addWidget(viewOptionsToolbar);
+    displayOptionsWidget = new SettingsButtonWidget(this);
+    displayOptionsWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    viewOptionsToolbar = new PrintingSelectorViewOptionsWidget(displayOptionsWidget, this);
+
+    displayOptionsWidget->addSettingsWidget(viewOptionsToolbar);
 
     sortToolBar = new PrintingSelectorCardSortingWidget(this);
+    sortToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     sortToolBar->setVisible(SettingsCache::instance().getPrintingSelectorSortOptionsVisible());
-    layout->addWidget(sortToolBar);
+
+    auto sortAndOptionsLayout = new QHBoxLayout(this);
+
+    sortAndOptionsLayout->addWidget(sortToolBar);
+    sortAndOptionsLayout->addWidget(displayOptionsWidget);
+
+    layout->addLayout(sortAndOptionsLayout);
 
     searchBar = new PrintingSelectorCardSearchWidget(this);
     searchBar->setVisible(SettingsCache::instance().getPrintingSelectorSearchBarVisible());
