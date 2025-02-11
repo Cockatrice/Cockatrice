@@ -25,9 +25,11 @@ public:
     QVBoxLayout *layout;
     QString filePath;
     DeckLoader *deckLoader;
-    DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
-    DeckPreviewColorIdentityWidget *colorIdentityWidget;
-    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
+    DeckPreviewCardPictureWidget *bannerCardDisplayWidget = nullptr;
+    DeckPreviewColorIdentityWidget *colorIdentityWidget = nullptr;
+    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget = nullptr;
+    QLabel *bannerCardLabel = nullptr;
+    QComboBox *bannerCardComboBox = nullptr;
     bool filteredBySearch = false;
     bool filteredByColor = false;
     bool filteredByTags = false;
@@ -41,11 +43,27 @@ signals:
 public slots:
     void setFilePath(const QString &filePath);
     void refreshBannerCardText();
+    void updateBannerCardComboBox();
+    void setBannerCard(int);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
     void updateVisibility();
     void updateTagsVisibility(bool visible);
+    void resizeEvent(QResizeEvent *event) override;
+};
+
+class NoScrollFilter : public QObject
+{
+    Q_OBJECT
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override
+    {
+        if (event->type() == QEvent::Wheel) {
+            return true; // Blocks the event
+        }
+        return QObject::eventFilter(obj, event);
+    }
 };
 
 #endif // DECK_PREVIEW_WIDGET_H

@@ -38,6 +38,15 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     layout->addWidget(bannerCardDisplayWidget);
 }
 
+void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    if (bannerCardDisplayWidget == nullptr || bannerCardComboBox == nullptr) {
+        return;
+    }
+    bannerCardComboBox->setMaximumWidth(bannerCardDisplayWidget->width());
+}
+
 void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 {
     if (!deckLoadSuccess) {
@@ -56,10 +65,26 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 
     colorIdentityWidget = new DeckPreviewColorIdentityWidget(this, getColorIdentity());
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
+
+    bannerCardLabel = new QLabel();
+    bannerCardLabel->setObjectName("bannerCardLabel");
+    bannerCardLabel->setText(tr("Banner Card"));
+    bannerCardComboBox = new QComboBox(this);
+    bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    bannerCardComboBox->setObjectName("bannerCardComboBox");
+    bannerCardComboBox->setCurrentText(deckLoader->getBannerCard().first);
+    bannerCardComboBox->installEventFilter(new NoScrollFilter());
+    connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &DeckPreviewWidget::setBannerCard);
+
     updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
+
+    updateBannerCardComboBox();
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);
+    layout->addWidget(bannerCardLabel);
+    layout->addWidget(bannerCardComboBox);
 }
 
 void DeckPreviewWidget::updateVisibility()
@@ -131,6 +156,79 @@ void DeckPreviewWidget::refreshBannerCardText()
 {
     bannerCardDisplayWidget->setOverlayText(
         deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
+}
+
+void DeckPreviewWidget::updateBannerCardComboBox()
+{
+    // Store the current text of the combo box
+    QString currentText = bannerCardComboBox->currentText();
+
+    // Block signals temporarily
+    bool wasBlocked = bannerCardComboBox->blockSignals(true);
+
+    // Clear the existing items in the combo box
+    bannerCardComboBox->clear();
+
+    // Prepare the new items with deduplication
+    QSet<QPair<QString, QString>> bannerCardSet;
+    InnerDecklistNode *listRoot = deckLoader->getRoot();
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        for (int j = 0; j < currentZone->size(); j++) {
+            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            if (!currentCard)
+                continue;
+
+            for (int k = 0; k < currentCard->getNumber(); ++k) {
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                    currentCard->getName(), currentCard->getCardProviderId());
+                if (info) {
+                    bannerCardSet.insert(
+                        QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
+                }
+            }
+        }
+    }
+
+    QList<QPair<QString, QString>> pairList = bannerCardSet.values();
+
+    // Sort QList by the first() element of the QPair
+    std::sort(pairList.begin(), pairList.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
+        return a.first.toLower() < b.first.toLower();
+    });
+
+    for (const auto &pair : pairList) {
+        QVariantMap dataMap;
+        dataMap["name"] = pair.first;
+        dataMap["uuid"] = pair.second;
+
+        bannerCardComboBox->addItem(pair.first, dataMap);
+    }
+
+    // Try to restore the previous selection by finding the currentText
+    int restoredIndex = bannerCardComboBox->findText(currentText);
+    if (restoredIndex != -1) {
+        bannerCardComboBox->setCurrentIndex(restoredIndex);
+    } else {
+        // Add a placeholder "-" and set it as the current selection
+        int bannerIndex = bannerCardComboBox->findText(deckLoader->getBannerCard().first);
+        if (bannerIndex != -1) {
+            bannerCardComboBox->setCurrentIndex(bannerIndex);
+        } else {
+            bannerCardComboBox->insertItem(0, "-");
+            bannerCardComboBox->setCurrentIndex(0);
+        }
+    }
+
+    // Restore the previous signal blocking state
+    bannerCardComboBox->blockSignals(wasBlocked);
+}
+
+void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
+{
+    QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
+    deckLoader->setBannerCard(QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
