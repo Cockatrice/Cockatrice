@@ -13,6 +13,7 @@
 #include <QDirIterator>
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <qfilesystemwatcher.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {
@@ -103,6 +104,33 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
         databaseLoadIndicator->setVisible(false);
     } else {
         scrollArea->setWidget(databaseLoadIndicator);
+    }
+
+    addRecursiveWatch(watcher, SettingsCache::instance().getDeckPath());
+
+    // Signals for changes
+    connect(&watcher, &QFileSystemWatcher::fileChanged, [this] {
+        qDebug() << "Modified a file";
+        if (scrollArea->widget() != databaseLoadIndicator) {
+            createRootFolderWidget();
+        }
+    });
+
+    connect(&watcher, &QFileSystemWatcher::directoryChanged, [this] {
+        qDebug() << "Modified a folder";
+        if (scrollArea->widget() != databaseLoadIndicator) {
+            createRootFolderWidget();
+        }
+    });
+}
+
+void VisualDeckStorageWidget::addRecursiveWatch(QFileSystemWatcher &watcher, const QString &dirPath)
+{
+    QDir dir(dirPath);
+    watcher.addPath(dirPath); // Watch the root directory
+
+    for (const QFileInfo &entry : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        addRecursiveWatch(watcher, entry.absoluteFilePath());
     }
 }
 
