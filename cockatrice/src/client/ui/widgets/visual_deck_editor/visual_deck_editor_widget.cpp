@@ -89,6 +89,7 @@ void VisualDeckEditorWidget::updateDisplay()
     // Clear the layout first
     populateCards();
     zoneContainer = new QWidget(scrollArea);
+    zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
 
     DeckCardZoneDisplayWidget *mainBoardWidget =

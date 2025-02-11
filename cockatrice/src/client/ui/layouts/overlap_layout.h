@@ -12,7 +12,8 @@ public:
                   int overlapPercentage = 10,
                   int maxColumns = 2,
                   int maxRows = 2,
-                  Qt::Orientation direction = Qt::Horizontal);
+                  Qt::Orientation overlapDirection = Qt::Vertical,
+                  Qt::Orientation flowDirection = Qt::Horizontal);
     ~OverlapLayout();
 
     void addItem(QLayoutItem *item) override;
@@ -35,7 +36,8 @@ private:
     int overlapPercentage;
     int maxColumns;
     int maxRows;
-    Qt::Orientation direction;
+    Qt::Orientation overlapDirection;
+    Qt::Orientation flowDirection;
 
     // Calculate the preferred size of the layout
     QSize calculatePreferredSize() const;

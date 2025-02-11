@@ -42,7 +42,7 @@ OverlapWidget::OverlapWidget(QWidget *parent,
       direction(direction), adjustOnResize(adjustOnResize)
 {
     this->setMinimumSize(0, 0);
-    overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
+    overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction, Qt::Horizontal);
     this->setLayout(overlapLayout);
 }
 
