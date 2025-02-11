@@ -26,6 +26,7 @@ class VisualDeckStorageWidget final : public QWidget
     Q_OBJECT
 public:
     explicit VisualDeckStorageWidget(QWidget *parent);
+    void refreshIfPossible();
     void addRecursiveWatch(QFileSystemWatcher &watcher, const QString &dirPath);
     void retranslateUi();
 
@@ -63,6 +64,7 @@ private:
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
+    QToolButton *refreshButton;
     SettingsButtonWidget *quickSettingsWidget;
     QCheckBox *showFoldersCheckBox;
     QCheckBox *drawUnusedColorIdentitiesCheckBox;

@@ -36,6 +36,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
 
+    refreshButton = new QToolButton(this);
+    refreshButton->setIcon(QPixmap("theme:icons/reload"));
+    refreshButton->setFixedSize(32, 32);
+    connect(refreshButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::refreshIfPossible);
+
     showFoldersCheckBox = new QCheckBox(this);
     showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &VisualDeckStorageWidget::updateShowFolders);
@@ -73,6 +78,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
+    searchAndSortLayout->addWidget(refreshButton);
     searchAndSortLayout->addWidget(quickSettingsWidget);
 
     // tag filter box
@@ -109,17 +115,15 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     addRecursiveWatch(watcher, SettingsCache::instance().getDeckPath());
 
     // Signals for changes
-    connect(&watcher, &QFileSystemWatcher::fileChanged, [this] {
-        if (scrollArea->widget() != databaseLoadIndicator) {
-            createRootFolderWidget();
-        }
-    });
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &VisualDeckStorageWidget::refreshIfPossible);
+    connect(&watcher, &QFileSystemWatcher::directoryChanged, this, &VisualDeckStorageWidget::refreshIfPossible);
+}
 
-    connect(&watcher, &QFileSystemWatcher::directoryChanged, [this] {
-        if (scrollArea->widget() != databaseLoadIndicator) {
-            createRootFolderWidget();
-        }
-    });
+void VisualDeckStorageWidget::refreshIfPossible()
+{
+    if (scrollArea->widget() != databaseLoadIndicator) {
+        createRootFolderWidget();
+    }
 }
 
 void VisualDeckStorageWidget::addRecursiveWatch(QFileSystemWatcher &watcher, const QString &dirPath)
