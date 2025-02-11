@@ -80,8 +80,14 @@ bool DeckPreviewWidget::checkVisibility() const
 
 void DeckPreviewWidget::updateTagsVisibility(bool visible)
 {
-    if (deckTagsDisplayWidget) {
-        deckTagsDisplayWidget->setHidden(!visible);
+    if (!deckTagsDisplayWidget) {
+        return;
+    }
+
+    if (visible) {
+        deckTagsDisplayWidget->setVisible(true);
+    } else {
+        deckTagsDisplayWidget->setHidden(true);
     }
 }
 
