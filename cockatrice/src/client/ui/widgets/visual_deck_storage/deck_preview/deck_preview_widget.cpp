@@ -34,8 +34,15 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
 
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
             &DeckPreviewWidget::updateTagsVisibility);
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowBannerCardComboBoxChanged, this,
+            &DeckPreviewWidget::updateBannerCardComboBoxVisibility);
 
     layout->addWidget(bannerCardDisplayWidget);
+}
+
+void DeckPreviewWidget::retranslateUi()
+{
+    bannerCardLabel->setText(tr("Banner Card"));
 }
 
 void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
@@ -68,7 +75,6 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
-    bannerCardLabel->setText(tr("Banner Card"));
     bannerCardComboBox = new QComboBox(this);
     bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     bannerCardComboBox->setObjectName("bannerCardComboBox");
@@ -77,14 +83,16 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
 
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
-
     updateBannerCardComboBox();
+    updateBannerCardComboBoxVisibility(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
+    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);
     layout->addWidget(bannerCardLabel);
     layout->addWidget(bannerCardComboBox);
+
+    retranslateUi();
 }
 
 void DeckPreviewWidget::updateVisibility()
@@ -103,9 +111,24 @@ bool DeckPreviewWidget::checkVisibility() const
     return true;
 }
 
+void DeckPreviewWidget::updateBannerCardComboBoxVisibility(bool visible)
+{
+    if (bannerCardComboBox == nullptr) {
+        return;
+    }
+
+    if (visible) {
+        bannerCardComboBox->setVisible(true);
+        bannerCardLabel->setVisible(true);
+    } else {
+        bannerCardComboBox->setHidden(true);
+        bannerCardLabel->setHidden(true);
+    }
+}
+
 void DeckPreviewWidget::updateTagsVisibility(bool visible)
 {
-    if (!deckTagsDisplayWidget) {
+    if (deckTagsDisplayWidget == nullptr) {
         return;
     }
 

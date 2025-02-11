@@ -60,6 +60,7 @@ signals:
     void printingSelectorCardSizeChanged();
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageShowTagFilterChanged(bool _visible);
+    void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
     void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
@@ -129,6 +130,7 @@ private:
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
+    bool visualDeckStorageShowBannerCardComboBox;
     bool visualDeckStorageShowTagsOnDeckPreviews;
     bool visualDeckStorageShowTagFilter;
     int visualDeckStorageCardSize;
@@ -411,6 +413,10 @@ public:
     bool getVisualDeckStorageShowTagFilter() const
     {
         return visualDeckStorageShowTagFilter;
+    }
+    bool getVisualDeckStorageShowBannerCardComboBox() const
+    {
+        return visualDeckStorageShowBannerCardComboBox;
     }
     bool getVisualDeckStorageShowTagsOnDeckPreviews() const
     {
@@ -760,6 +766,7 @@ public slots:
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);

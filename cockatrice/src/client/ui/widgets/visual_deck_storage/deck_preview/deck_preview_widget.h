@@ -19,6 +19,7 @@ public:
     explicit DeckPreviewWidget(QWidget *_parent,
                                VisualDeckStorageWidget *_visualDeckStorageWidget,
                                const QString &_filePath);
+    void retranslateUi();
     QString getColorIdentity();
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
@@ -49,6 +50,7 @@ public slots:
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
     void updateVisibility();
+    void updateBannerCardComboBoxVisibility(bool visible);
     void updateTagsVisibility(bool visible);
     void resizeEvent(QResizeEvent *event) override;
 };

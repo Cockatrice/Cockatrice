@@ -68,6 +68,7 @@ private:
     SettingsButtonWidget *quickSettingsWidget;
     QCheckBox *showFoldersCheckBox;
     QCheckBox *drawUnusedColorIdentitiesCheckBox;
+    QCheckBox *bannerCardComboBoxVisibilityCheckBox;
     QCheckBox *tagFilterVisibilityCheckBox;
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
     QScrollArea *scrollArea;

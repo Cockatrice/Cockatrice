@@ -65,6 +65,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
 
+    bannerCardComboBoxVisibilityCheckBox = new QCheckBox(this);
+    bannerCardComboBoxVisibilityCheckBox->setChecked(
+        SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
+    connect(bannerCardComboBoxVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowBannerCardComboBox);
+
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
@@ -73,6 +79,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     quickSettingsWidget->addSettingsWidget(tagFilterVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(tagsOnWidgetsVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
+    quickSettingsWidget->addSettingsWidget(bannerCardComboBoxVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(cardSizeWidget);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
@@ -162,6 +169,7 @@ void VisualDeckStorageWidget::retranslateUi()
     tagFilterVisibilityCheckBox->setText(tr("Show Tag Filter"));
     tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw not contained Color Identities"));
+    bannerCardComboBoxVisibilityCheckBox->setText(tr("Show Banner Card Selection Option"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
