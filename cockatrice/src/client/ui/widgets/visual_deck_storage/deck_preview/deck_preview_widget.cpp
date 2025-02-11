@@ -13,7 +13,8 @@
 DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
                                      VisualDeckStorageWidget *_visualDeckStorageWidget,
                                      const QString &_filePath)
-    : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
+    : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath),
+      colorIdentityWidget(nullptr), deckTagsDisplayWidget(nullptr)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -79,6 +80,10 @@ bool DeckPreviewWidget::checkVisibility() const
 
 void DeckPreviewWidget::updateTagsVisibility(bool visible)
 {
+    if (!deckTagsDisplayWidget) {
+        return;
+    }
+
     if (visible) {
         deckTagsDisplayWidget->setVisible(true);
     } else {
