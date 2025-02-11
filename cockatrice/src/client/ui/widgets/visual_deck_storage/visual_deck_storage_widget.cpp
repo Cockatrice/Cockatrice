@@ -110,14 +110,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // Signals for changes
     connect(&watcher, &QFileSystemWatcher::fileChanged, [this] {
-        qDebug() << "Modified a file";
         if (scrollArea->widget() != databaseLoadIndicator) {
             createRootFolderWidget();
         }
     });
 
     connect(&watcher, &QFileSystemWatcher::directoryChanged, [this] {
-        qDebug() << "Modified a folder";
         if (scrollArea->widget() != databaseLoadIndicator) {
             createRootFolderWidget();
         }
