@@ -12,7 +12,9 @@ class DeckPreviewTagAdditionWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeckPreviewTagAdditionWidget(DeckPreviewDeckTagsDisplayWidget *_parent, const QString &tagName);
+    explicit DeckPreviewTagAdditionWidget(QWidget *_parent,
+                                          DeckPreviewDeckTagsDisplayWidget *_tagsDisplayWidget,
+                                          const QString &_tagName);
     QSize sizeHint() const override;
 
 signals:
@@ -24,7 +26,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    DeckPreviewDeckTagsDisplayWidget *parent;
+    DeckPreviewDeckTagsDisplayWidget *tagsDisplayWidget;
     QString tagName_;
     QLabel *tagLabel_;
     QPushButton *closeButton_;

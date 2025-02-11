@@ -5,6 +5,7 @@
 #include "../../game/cards/card_database.h"
 #include "../game_logic/key_signals.h"
 #include "../ui/widgets/printing_selector/printing_selector.h"
+#include "../ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "tab.h"
 
 #include <QAbstractItemModel>
@@ -19,6 +20,7 @@ class CardInfoFrameWidget;
 class QTextEdit;
 class QLabel;
 class DeckLoader;
+class DeckPreviewDeckTagsDisplayWidget;
 class Response;
 class FilterTreeModel;
 class FilterBuilder;
@@ -136,6 +138,7 @@ private:
     QTextEdit *commentsEdit;
     QLabel *bannerCardLabel;
     QComboBox *bannerCardComboBox;
+    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *hashLabel1;
     LineEditUnfocusable *hashLabel;
     FilterTreeModel *filterModel;
