@@ -25,7 +25,7 @@ void DeckCardZoneDisplayWidget::resizeEvent(QResizeEvent *event)
     for (QObject *child : layout->children()) {
         QWidget *widget = qobject_cast<QWidget *>(child);
         if (widget) {
-            widget->resize(event->size());
+            widget->setMaximumWidth(width());
         }
     }
 }
