@@ -22,6 +22,7 @@ PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSel
     sortToolBar = new QHBoxLayout(this);
 
     sortOptionsSelector = new QComboBox(this);
+    sortOptionsSelector->setFocusPolicy(Qt::StrongFocus);
     sortOptionsSelector->addItems(SORT_OPTIONS);
     sortOptionsSelector->setCurrentIndex(SettingsCache::instance().getPrintingSelectorSortOrder());
     connect(sortOptionsSelector, &QComboBox::currentTextChanged, this,
