@@ -78,6 +78,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
         const auto &card = cards.at(0);
 
         if (card == nullptr) {
+            qCWarning(StackZoneLog) << "Attempted to move card from" << startZone->getName() << ", but was null";
             return;
         }
 
