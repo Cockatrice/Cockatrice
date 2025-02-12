@@ -11,6 +11,7 @@
 
 #include <QComboBox>
 #include <QDirIterator>
+#include <QFileSystemWatcher>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
@@ -34,6 +35,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     deckPreviewColorIdentityFilterWidget = new DeckPreviewColorIdentityFilterWidget(this);
     sortWidget = new VisualDeckStorageSortWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
+
+    refreshButton = new QToolButton(this);
+    refreshButton->setIcon(QPixmap("theme:icons/reload"));
+    refreshButton->setFixedSize(32, 32);
+    connect(refreshButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::refreshIfPossible);
 
     showFoldersCheckBox = new QCheckBox(this);
     showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
@@ -59,6 +65,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
 
+    bannerCardComboBoxVisibilityCheckBox = new QCheckBox(this);
+    bannerCardComboBoxVisibilityCheckBox->setChecked(
+        SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
+    connect(bannerCardComboBoxVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowBannerCardComboBox);
+
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
@@ -67,11 +79,13 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     quickSettingsWidget->addSettingsWidget(tagFilterVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(tagsOnWidgetsVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
+    quickSettingsWidget->addSettingsWidget(bannerCardComboBoxVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(cardSizeWidget);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
+    searchAndSortLayout->addWidget(refreshButton);
     searchAndSortLayout->addWidget(quickSettingsWidget);
 
     // tag filter box
@@ -104,6 +118,29 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     } else {
         scrollArea->setWidget(databaseLoadIndicator);
     }
+
+    addRecursiveWatch(watcher, SettingsCache::instance().getDeckPath());
+
+    // Signals for changes
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &VisualDeckStorageWidget::refreshIfPossible);
+    connect(&watcher, &QFileSystemWatcher::directoryChanged, this, &VisualDeckStorageWidget::refreshIfPossible);
+}
+
+void VisualDeckStorageWidget::refreshIfPossible()
+{
+    if (scrollArea->widget() != databaseLoadIndicator) {
+        createRootFolderWidget();
+    }
+}
+
+void VisualDeckStorageWidget::addRecursiveWatch(QFileSystemWatcher &watcher, const QString &dirPath)
+{
+    QDir dir(dirPath);
+    watcher.addPath(dirPath); // Watch the root directory
+
+    for (const QFileInfo &entry : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        addRecursiveWatch(watcher, entry.absoluteFilePath());
+    }
 }
 
 void VisualDeckStorageWidget::showEvent(QShowEvent *event)
@@ -132,6 +169,7 @@ void VisualDeckStorageWidget::retranslateUi()
     tagFilterVisibilityCheckBox->setText(tr("Show Tag Filter"));
     tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw not contained Color Identities"));
+    bannerCardComboBoxVisibilityCheckBox->setText(tr("Show Banner Card Selection Option"));
 }
 
 void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)

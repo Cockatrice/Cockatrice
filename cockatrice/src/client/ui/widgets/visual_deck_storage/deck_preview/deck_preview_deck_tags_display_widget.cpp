@@ -1,5 +1,6 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
+#include "../../../../tabs/tab_deck_editor.h"
 #include "../../general/layout_containers/flow_widget.h"
 #include "deck_preview_tag_addition_widget.h"
 #include "deck_preview_tag_display_widget.h"
@@ -8,8 +9,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(DeckPreviewWidget *_parent, DeckLoader *_deckLoader)
-    : QWidget(_parent), parent(_parent), deckLoader(_deckLoader)
+DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
+    : QWidget(_parent), deckList(_deckList)
 {
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -21,21 +22,33 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(DeckPreviewWi
 
     setFixedHeight(100);
 
-    connect(deckLoader, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
-
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
-    for (const QString &tag : this->deckLoader->getTags()) {
+
+    if (deckList) {
+        connectDeckList(deckList);
+    }
+
+    layout->addWidget(flowWidget);
+}
+
+void DeckPreviewDeckTagsDisplayWidget::connectDeckList(DeckList *_deckList)
+{
+    flowWidget->clearLayout();
+    deckList = _deckList;
+    connect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
+
+    for (const QString &tag : deckList->getTags()) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
-    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Edit tags ...")));
-    layout->addWidget(flowWidget);
+    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, this, tr("Edit tags ...")));
 }
 
 void DeckPreviewDeckTagsDisplayWidget::refreshTags()
 {
     flowWidget->clearLayout();
-    for (const QString &tag : this->deckLoader->getTags()) {
+    QStringList tags = deckList->getTags();
+    for (const QString &tag : tags) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
-    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Edit tags ...")));
+    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, this, tr("Edit tags ...")));
 }

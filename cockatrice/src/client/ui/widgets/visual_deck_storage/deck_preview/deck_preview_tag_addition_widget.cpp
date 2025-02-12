@@ -4,14 +4,17 @@
 #include "../../../../../settings/cache_settings.h"
 #include "deck_preview_tag_dialog.h"
 
+#include <QDirIterator>
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <utility>
 
-DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(DeckPreviewDeckTagsDisplayWidget *_parent,
-                                                           const QString &_tagName)
-    : QWidget(_parent), parent(_parent), tagName_(_tagName)
+DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(QWidget *_parent,
+                                                           DeckPreviewDeckTagsDisplayWidget *_tagsDisplayWidget,
+                                                           QString _tagName)
+    : QWidget(_parent), tagsDisplayWidget(_tagsDisplayWidget), tagName_(std::move(_tagName))
 {
     // Create layout
     auto *layout = new QHBoxLayout(this);
@@ -30,7 +33,23 @@ QSize DeckPreviewTagAdditionWidget::sizeHint() const
     int width = textWidth + 50;    // Add extra padding
     int height = fm.height() + 10; // Height based on font size + padding
 
-    return QSize(width, height);
+    return {width, height};
+}
+
+static QStringList getAllFiles(const QString &filePath, bool recursive)
+{
+    QStringList allFiles;
+
+    // QDirIterator with QDir::Files ensures only files are listed (no directories)
+    auto flags =
+        recursive ? QDirIterator::Subdirectories | QDirIterator::FollowSymlinks : QDirIterator::NoIteratorFlags;
+    QDirIterator it(filePath, QDir::Files, flags);
+
+    while (it.hasNext()) {
+        allFiles << it.next(); // Add each file path to the list
+    }
+
+    return allFiles;
 }
 
 void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
@@ -39,52 +58,86 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
         emit tagClicked();
     }
     QWidget::mousePressEvent(event);
-    QStringList knownTags = parent->parent->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
-    QStringList activeTags = parent->deckLoader->getTags();
 
-    bool canAddTags = true;
+    if (qobject_cast<DeckPreviewWidget *>(tagsDisplayWidget->parentWidget())) {
+        auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(tagsDisplayWidget->parentWidget());
+        QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
+        QStringList activeTags = tagsDisplayWidget->deckList->getTags();
 
-    if (DeckLoader::getFormatFromName(parent->parent->filePath) != DeckLoader::CockatriceFormat) {
-        canAddTags = false;
-        // Retrieve saved preference if the prompt is disabled
-        if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
-            if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
-                parent->deckLoader->convertToCockatriceFormat(parent->parent->filePath);
-                parent->parent->filePath = parent->deckLoader->getLastFileName();
-                parent->parent->refreshBannerCardText();
-                canAddTags = true;
-            }
-        } else {
-            // Show the dialog to the user
-            DialogConvertDeckToCodFormat conversionDialog(parent);
-            if (conversionDialog.exec() == QDialog::Accepted) {
-                parent->deckLoader->convertToCockatriceFormat(parent->parent->filePath);
-                parent->parent->filePath = parent->deckLoader->getLastFileName();
-                parent->parent->refreshBannerCardText();
-                canAddTags = true;
+        bool canAddTags = true;
 
-                if (conversionDialog.dontAskAgain()) {
-                    SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
-                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Checked);
+        if (DeckLoader::getFormatFromName(deckPreviewWidget->filePath) != DeckLoader::CockatriceFormat) {
+            canAddTags = false;
+            // Retrieve saved preference if the prompt is disabled
+            if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+                if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+                    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
+                    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastFileName();
+                    deckPreviewWidget->refreshBannerCardText();
+                    canAddTags = true;
                 }
             } else {
-                SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Unchecked);
+                // Show the dialog to the user
+                DialogConvertDeckToCodFormat conversionDialog(parentWidget());
+                if (conversionDialog.exec() == QDialog::Accepted) {
+                    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
+                    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastFileName();
+                    deckPreviewWidget->refreshBannerCardText();
+                    canAddTags = true;
 
-                if (conversionDialog.dontAskAgain()) {
-                    SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
+                    if (conversionDialog.dontAskAgain()) {
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
+                        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Checked);
+                    }
                 } else {
-                    SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Checked);
+                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Unchecked);
+
+                    if (conversionDialog.dontAskAgain()) {
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
+                    } else {
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Checked);
+                    }
                 }
             }
         }
-    }
 
-    if (canAddTags) {
-        DeckPreviewTagDialog dialog(knownTags, activeTags);
-        if (dialog.exec() == QDialog::Accepted) {
-            QStringList updatedTags = dialog.getActiveTags();
-            parent->deckLoader->setTags(updatedTags);
-            parent->deckLoader->saveToFile(parent->parent->filePath, DeckLoader::CockatriceFormat);
+        if (canAddTags) {
+            DeckPreviewTagDialog dialog(knownTags, activeTags);
+            if (dialog.exec() == QDialog::Accepted) {
+                QStringList updatedTags = dialog.getActiveTags();
+                tagsDisplayWidget->deckList->setTags(updatedTags);
+                deckPreviewWidget->deckLoader->saveToFile(deckPreviewWidget->filePath, DeckLoader::CockatriceFormat);
+            }
+        }
+    } else if (tagsDisplayWidget->parentWidget()) {
+        // If we're the child of a TabDeckEditor, we are buried under a ton of childWidgets in the DeckInfoDock.
+        QWidget *currentParent = tagsDisplayWidget->parentWidget();
+        while (currentParent) {
+            if (qobject_cast<TabDeckEditor *>(currentParent)) {
+                break;
+            }
+            currentParent = currentParent->parentWidget();
+        }
+        if (qobject_cast<TabDeckEditor *>(currentParent)) {
+            auto *deckEditor = qobject_cast<TabDeckEditor *>(currentParent);
+            QStringList knownTags;
+            QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath(), true);
+            auto *loader = new DeckLoader();
+            for (const QString &file : allFiles) {
+                loader->loadFromFile(file, DeckLoader::getFormatFromName(file), false);
+                QStringList tags = loader->getTags();
+                knownTags.append(tags);
+                knownTags.removeDuplicates();
+            }
+
+            QStringList activeTags = tagsDisplayWidget->deckList->getTags();
+
+            DeckPreviewTagDialog dialog(knownTags, activeTags);
+            if (dialog.exec() == QDialog::Accepted) {
+                QStringList updatedTags = dialog.getActiveTags();
+                tagsDisplayWidget->deckList->setTags(updatedTags);
+                deckEditor->setModified(true);
+            }
         }
     }
 }

@@ -113,6 +113,8 @@ void TabDeckEditor::createDeckDock()
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &TabDeckEditor::setBannerCard);
 
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
+
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
@@ -147,6 +149,8 @@ void TabDeckEditor::createDeckDock()
 
     upperLayout->addWidget(bannerCardLabel, 2, 0);
     upperLayout->addWidget(bannerCardComboBox, 2, 1);
+
+    upperLayout->addWidget(deckTagsDisplayWidget, 3, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -1607,6 +1611,8 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
         CardDatabaseManager::getInstance()->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
+
+    deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
 
     // If they load a deck, make the deck list appear
     aDeckDockVisible->setChecked(true);

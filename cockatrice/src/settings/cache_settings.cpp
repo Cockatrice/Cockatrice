@@ -264,6 +264,8 @@ SettingsCache::SettingsCache()
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
     visualDeckStorageShowTagFilter = settings->value("interface/visualdeckstorageshowtagfilter", true).toBool();
+    visualDeckStorageShowBannerCardComboBox =
+        settings->value("interface/visualdeckstorageshowbannercardcombobox", true).toBool();
     visualDeckStorageShowTagsOnDeckPreviews =
         settings->value("interface/visualdeckstorageshowtagsondeckpreviews", true).toBool();
     visualDeckStorageDrawUnusedColorIdentities =
@@ -668,6 +670,13 @@ void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTa
     visualDeckStorageShowTagFilter = _showTags;
     settings->setValue("interface/visualdeckstorageshowtagfilter", visualDeckStorageShowTagFilter);
     emit visualDeckStorageShowTagFilterChanged(visualDeckStorageShowTagFilter);
+}
+
+void SettingsCache::setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox)
+{
+    visualDeckStorageShowBannerCardComboBox = _showBannerCardComboBox;
+    settings->setValue("interface/visualdeckstorageshowbannercardcombobox", visualDeckStorageShowBannerCardComboBox);
+    emit visualDeckStorageShowBannerCardComboBoxChanged(visualDeckStorageShowBannerCardComboBox);
 }
 
 void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags)

@@ -14,6 +14,7 @@
 
 #include <QCheckBox>
 #include <QFileSystemModel>
+#include <QFileSystemWatcher>
 
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;
@@ -25,6 +26,8 @@ class VisualDeckStorageWidget final : public QWidget
     Q_OBJECT
 public:
     explicit VisualDeckStorageWidget(QWidget *parent);
+    void refreshIfPossible();
+    void addRecursiveWatch(QFileSystemWatcher &watcher, const QString &dirPath);
     void retranslateUi();
 
     CardSizeWidget *cardSizeWidget;
@@ -61,13 +64,16 @@ private:
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
+    QToolButton *refreshButton;
     SettingsButtonWidget *quickSettingsWidget;
     QCheckBox *showFoldersCheckBox;
     QCheckBox *drawUnusedColorIdentitiesCheckBox;
+    QCheckBox *bannerCardComboBoxVisibilityCheckBox;
     QCheckBox *tagFilterVisibilityCheckBox;
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
+    QFileSystemWatcher watcher;
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H

@@ -162,6 +162,10 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
         lastFileName = fileName;
         lastFileFormat = fmt;
     }
+
+    file.flush();
+    file.close();
+
     return result;
 }
 
