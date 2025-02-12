@@ -11,7 +11,7 @@
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
     : Tab(_tabSupervisor), visualDeckStorageWidget(new VisualDeckStorageWidget(this))
 {
-    connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addDeckEditorTab);
+    connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addVisualDeckEditorTab);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
             &TabDeckStorageVisual::actOpenLocalDeck);
 
