@@ -14,8 +14,8 @@ class DeckPreviewTagAdditionWidget : public QWidget
 public:
     explicit DeckPreviewTagAdditionWidget(QWidget *_parent,
                                           DeckPreviewDeckTagsDisplayWidget *_tagsDisplayWidget,
-                                          const QString &_tagName);
-    QSize sizeHint() const override;
+                                          QString _tagName);
+    [[nodiscard]] QSize sizeHint() const override;
 
 signals:
     void tagClicked(); // Emitted when the tag is clicked
@@ -28,8 +28,6 @@ protected:
 private:
     DeckPreviewDeckTagsDisplayWidget *tagsDisplayWidget;
     QString tagName_;
-    QLabel *tagLabel_;
-    QPushButton *closeButton_;
 };
 
 #endif // DECK_PREVIEW_TAG_ADDITION_WIDGET_H

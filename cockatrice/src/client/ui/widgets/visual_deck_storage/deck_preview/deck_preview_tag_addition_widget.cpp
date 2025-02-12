@@ -9,11 +9,12 @@
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <utility>
 
 DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(QWidget *_parent,
                                                            DeckPreviewDeckTagsDisplayWidget *_tagsDisplayWidget,
-                                                           const QString &_tagName)
-    : QWidget(_parent), tagsDisplayWidget(_tagsDisplayWidget), tagName_(_tagName)
+                                                           QString _tagName)
+    : QWidget(_parent), tagsDisplayWidget(_tagsDisplayWidget), tagName_(std::move(_tagName))
 {
     // Create layout
     auto *layout = new QHBoxLayout(this);
@@ -32,7 +33,7 @@ QSize DeckPreviewTagAdditionWidget::sizeHint() const
     int width = textWidth + 50;    // Add extra padding
     int height = fm.height() + 10; // Height based on font size + padding
 
-    return QSize(width, height);
+    return {width, height};
 }
 
 static QStringList getAllFiles(const QString &filePath, bool recursive)
@@ -59,7 +60,7 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
     QWidget::mousePressEvent(event);
 
     if (qobject_cast<DeckPreviewWidget *>(tagsDisplayWidget->parentWidget())) {
-        DeckPreviewWidget *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(tagsDisplayWidget->parentWidget());
+        auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(tagsDisplayWidget->parentWidget());
         QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
         QStringList activeTags = tagsDisplayWidget->deckList->getTags();
 
@@ -118,11 +119,11 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
             currentParent = currentParent->parentWidget();
         }
         if (qobject_cast<TabDeckEditor *>(currentParent)) {
-            TabDeckEditor *deckEditor = qobject_cast<TabDeckEditor *>(currentParent);
+            auto *deckEditor = qobject_cast<TabDeckEditor *>(currentParent);
             QStringList knownTags;
             QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath(), true);
-            DeckLoader *loader = new DeckLoader();
-            for (QString file : allFiles) {
+            auto *loader = new DeckLoader();
+            for (const QString& file : allFiles) {
                 loader->loadFromFile(file, DeckLoader::getFormatFromName(file), false);
                 QStringList tags = loader->getTags();
                 knownTags.append(tags);

@@ -14,7 +14,7 @@
 
 #include <QCheckBox>
 #include <QFileSystemModel>
-#include <qfilesystemwatcher.h>
+#include <QFileSystemWatcher>
 
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;

@@ -13,7 +13,7 @@
 #include <QDirIterator>
 #include <QMouseEvent>
 #include <QVBoxLayout>
-#include <qfilesystemwatcher.h>
+#include <QFileSystemWatcher>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {

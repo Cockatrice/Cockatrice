@@ -195,10 +195,10 @@ void DeckPreviewWidget::updateBannerCardComboBox()
     // Prepare the new items with deduplication
     QSet<QPair<QString, QString>> bannerCardSet;
     InnerDecklistNode *listRoot = deckLoader->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+    for (auto i : *listRoot) {
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(i);
+        for (auto j : *currentZone) {
+            auto *currentCard = dynamic_cast<DecklistCardNode *>(j);
             if (!currentCard)
                 continue;
 
