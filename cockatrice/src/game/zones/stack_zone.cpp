@@ -28,7 +28,7 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
     // if x is negative set it to add at end
     if (x < 0 || x >= cards.size()) {
-        x = cards.size();
+        x = static_cast<int>(cards.size());
     }
     cards.insert(x, card);
 
@@ -44,7 +44,7 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
 QRectF StackZone::boundingRect() const
 {
-    return QRectF(0, 0, 100, zoneHeight);
+    return {0, 0, 100, zoneHeight};
 }
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -60,7 +60,7 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
-    if (!startZone) {
+    if (startZone == nullptr || startZone->getPlayer() == nullptr) {
         return;
     }
 
@@ -69,19 +69,31 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
     cmd.set_start_zone(startZone->getName().toStdString());
     cmd.set_target_player_id(player->getId());
     cmd.set_target_zone(getName().toStdString());
-    int index;
+
+    int index = 0;
     if (cards.isEmpty()) {
         index = 0;
     } else {
-        const int cardCount = cards.size();
+        const auto cardCount = static_cast<int>(cards.size());
+        const auto &card = cards.at(0);
+
+        if (card == nullptr) {
+            qCWarning(StackZoneLog) << "Attempted to move card from" << startZone->getName() << ", but was null";
+            return;
+        }
+
         index = qRound(divideCardSpaceInZone(dropPoint.y(), cardCount, boundingRect().height(),
-                                             cards.at(0)->boundingRect().height(), true));
+                                             card->boundingRect().height(), true));
     }
+
     if (startZone == this) {
-        if (dragItems.at(0) != nullptr && cards.at(index)->getId() == dragItems.at(0)->getId()) {
+        const auto &dragItem = dragItems.at(0);
+        const auto &card = cards.at(index);
+        if (card != nullptr && dragItem != nullptr && card->getId() == dragItem->getId()) {
             return;
         }
     }
+
     cmd.set_x(index);
     cmd.set_y(0);
 
@@ -99,7 +111,7 @@ void StackZone::reorganizeCards()
     if (!cards.isEmpty()) {
         QSet<ArrowItem *> arrowsToUpdate;
 
-        const int cardCount = cards.size();
+        const auto cardCount = static_cast<int>(cards.size());
         qreal totalWidth = boundingRect().width();
         qreal cardWidth = cards.at(0)->boundingRect().width();
         qreal xspace = 5;
