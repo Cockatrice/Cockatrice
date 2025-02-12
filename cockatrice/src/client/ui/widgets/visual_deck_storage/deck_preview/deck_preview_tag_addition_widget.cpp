@@ -123,7 +123,7 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
             QStringList knownTags;
             QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath(), true);
             auto *loader = new DeckLoader();
-            for (const QString& file : allFiles) {
+            for (const QString &file : allFiles) {
                 loader->loadFromFile(file, DeckLoader::getFormatFromName(file), false);
                 QStringList tags = loader->getTags();
                 knownTags.append(tags);

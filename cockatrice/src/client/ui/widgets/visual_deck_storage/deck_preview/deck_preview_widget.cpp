@@ -252,6 +252,8 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
     deckLoader->setBannerCard(QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
+    bannerCardDisplayWidget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+        itemData["name"].toString(), itemData["uuid"].toString()));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

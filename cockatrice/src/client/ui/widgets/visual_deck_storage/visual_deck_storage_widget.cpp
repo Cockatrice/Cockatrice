@@ -11,9 +11,9 @@
 
 #include <QComboBox>
 #include <QDirIterator>
+#include <QFileSystemWatcher>
 #include <QMouseEvent>
 #include <QVBoxLayout>
-#include <QFileSystemWatcher>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {
