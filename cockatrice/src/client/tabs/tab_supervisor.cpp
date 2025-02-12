@@ -132,6 +132,9 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabDeckEditor = new QAction(this);
     connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(nullptr); });
 
+    aTabVisualDeckEditor = new QAction(this);
+    connect(aTabVisualDeckEditor, &QAction::triggered, this, [this] { addVisualDeckEditorTab(nullptr); });
+
     aTabVisualDeckStorage = new QAction(this);
     aTabVisualDeckStorage->setCheckable(true);
     connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
@@ -178,6 +181,7 @@ void TabSupervisor::retranslateUi()
 {
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
+    aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabServer->setText(tr("Server"));
     aTabAccount->setText(tr("Account"));
@@ -206,6 +210,9 @@ void TabSupervisor::retranslateUi()
     QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
     while (deckEditorIterator.hasNext())
         tabs.append(deckEditorIterator.next());
+    QListIterator<TabDeckEditorVisual *> visualDeckEditorIterator(visualDeckEditorTabs);
+    while (visualDeckEditorIterator.hasNext())
+        tabs.append(visualDeckEditorIterator.next());
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
     while (messageIterator.hasNext())
         tabs.append(messageIterator.next().value());
@@ -225,6 +232,7 @@ void TabSupervisor::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
+    aTabVisualDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckEditor"));
     aTabVisualDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckStorage"));
     aTabServer->setShortcuts(shortcuts.getShortcut("Tabs/aTabServer"));
     aTabAccount->setShortcuts(shortcuts.getShortcut("Tabs/aTabAccount"));
@@ -372,6 +380,7 @@ void TabSupervisor::resetTabsMenu()
 {
     tabsMenu->clear();
     tabsMenu->addAction(aTabDeckEditor);
+    tabsMenu->addAction(aTabVisualDeckEditor);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
     tabsMenu->addAction(aTabDeckStorage);
@@ -806,10 +815,15 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     return tab;
 }
 
-TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab()
+TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *deckToOpen)
 {
     TabDeckEditorVisual *tab = new TabDeckEditorVisual(this);
+    if (deckToOpen)
+        tab->setDeck(new DeckLoader(*deckToOpen));
+    connect(tab, &TabDeckEditorVisual::deckEditorClosing, this, &TabSupervisor::visualDeckEditorClosed);
+    // connect(tab, &TabDeckEditorVisual::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
+    visualDeckEditorTabs.append(tab);
     setCurrentWidget(tab);
     return tab;
 }
@@ -832,6 +846,15 @@ void TabSupervisor::deckEditorClosed(AbstractTabDeckEditor *tab)
         emit setMenu();
 
     deckEditorTabs.removeOne(tab);
+    removeTab(indexOf(tab));
+}
+
+void TabSupervisor::visualDeckEditorClosed(TabDeckEditorVisual *tab)
+{
+    if (tab == currentWidget())
+        emit setMenu();
+
+    visualDeckEditorTabs.removeOne(tab);
     removeTab(indexOf(tab));
 }
 
