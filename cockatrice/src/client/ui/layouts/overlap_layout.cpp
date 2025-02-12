@@ -305,8 +305,6 @@ QSize OverlapLayout::calculatePreferredSize() const
     return QSize(totalWidth, totalHeight);
 }
 
-
-
 /**
  * @brief Returns the size hint for the layout, based on preferred size calculations.
  *
