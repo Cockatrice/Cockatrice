@@ -99,7 +99,7 @@ void StableReleaseChannel::releaseListFinished()
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "No reply received from the release update server.";
+        qCWarning(ReleaseChannelLog) << "No reply received from the release update server.";
         emit error(tr("No reply received from the release update server."));
         return;
     }
@@ -107,7 +107,7 @@ void StableReleaseChannel::releaseListFinished()
     QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("name") && resultMap.contains("html_url") && resultMap.contains("tag_name") &&
           resultMap.contains("published_at"))) {
-        qWarning() << "Invalid received from the release update server:" << resultMap;
+        qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
@@ -163,14 +163,14 @@ void StableReleaseChannel::tagListFinished()
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "No reply received from the tag update server.";
+        qCWarning(ReleaseChannelLog) << "No reply received from the tag update server.";
         emit error(tr("No reply received from the tag update server."));
         return;
     }
 
     QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("object") && resultMap["object"].toMap().contains("sha"))) {
-        qWarning() << "Invalid received from the tag update server.";
+        qCWarning(ReleaseChannelLog) << "Invalid received from the tag update server.";
         emit error(tr("Invalid reply received from the tag update server."));
         return;
     }
@@ -223,7 +223,7 @@ void BetaReleaseChannel::releaseListFinished()
     QVariantMap resultMap = array.at(0).toObject().toVariantMap();
 
     if (array.empty() || resultMap.empty()) {
-        qWarning() << "No reply received from the release update server:" << QString(jsonData);
+        qCWarning(ReleaseChannelLog) << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
     }
@@ -232,7 +232,7 @@ void BetaReleaseChannel::releaseListFinished()
     if (!resultMap.contains("assets") || !resultMap.contains("author") || !resultMap.contains("tag_name") ||
         !resultMap.contains("target_commitish") || !resultMap.contains("assets_url") ||
         !resultMap.contains("published_at")) {
-        qWarning() << "Invalid received from the release update server:" << resultMap;
+        qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
@@ -265,7 +265,7 @@ void BetaReleaseChannel::fileListFinished()
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "No reply received from the file update server.";
+        qCWarning(ReleaseChannelLog) << "No reply received from the file update server.";
         emit error(tr("No reply received from the file update server."));
         return;
     }
