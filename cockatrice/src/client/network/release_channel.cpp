@@ -121,23 +121,15 @@ void StableReleaseChannel::releaseListFinished()
 
     if (resultMap.contains("assets")) {
         auto rawAssets = resultMap["assets"].toList();
-        // [(name, url)]
-        QVector<std::pair<QString, QString>> assets;
-        std::transform(rawAssets.begin(), rawAssets.end(), std::back_inserter(assets), [](QVariant _asset) {
-            QVariantMap asset = _asset.toMap();
+        for (const auto &rawAsset : rawAssets) {
+            QVariantMap asset = rawAsset.toMap();
             QString name = asset["name"].toString();
             QString url = asset["browser_download_url"].toString();
-            return std::make_pair(name, url);
-        });
 
-        auto _releaseAsset = std::find_if(assets.begin(), assets.end(), [](std::pair<QString, QString> nameAndUrl) {
-            return downloadMatchesCurrentOS(nameAndUrl.first);
-        });
-
-        if (_releaseAsset != assets.end()) {
-            std::pair<QString, QString> releaseAsset = *_releaseAsset;
-            auto releaseUrl = releaseAsset.second;
-            lastRelease->setDownloadUrl(releaseUrl);
+            if (downloadMatchesCurrentOS(name)) {
+                lastRelease->setDownloadUrl(url);
+                break;
+            }
         }
     }
 
