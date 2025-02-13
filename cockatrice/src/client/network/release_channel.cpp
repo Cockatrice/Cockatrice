@@ -39,9 +39,9 @@ void ReleaseChannel::checkForUpdates()
 }
 
 // Different release channel checking functions for different operating systems
-#if defined(Q_OS_MACOS)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
+#if defined(Q_OS_MACOS)
     static QRegularExpression version_regex("macOS(\\d+)");
     auto match = version_regex.match(fileName);
     if (!match.hasMatch()) {
@@ -52,10 +52,8 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     int sys_maj = QSysInfo::productVersion().split(".")[0].toInt();
     int rel_maj = match.captured(1).toInt();
     return rel_maj == sys_maj;
-}
+
 #elif defined(Q_OS_WIN)
-bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
-{
 #if Q_PROCESSOR_WORDSIZE == 4
     return fileName.contains("32bit");
 #elif Q_PROCESSOR_WORDSIZE == 8
@@ -66,16 +64,15 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
         return fileName.contains("Win10");
     }
 #else
+    Q_UNUSED(fileName);
+    return false;
+#endif
+
+#else // If the OS doesn't fit one of the above #defines, then it will never match
+    Q_UNUSED(fileName);
     return false;
 #endif
 }
-#else
-bool ReleaseChannel::downloadMatchesCurrentOS(const QString &)
-{
-    // If the OS doesn't fit one of the above #defines, then it will never match
-    return false;
-}
-#endif
 
 QString StableReleaseChannel::getManualDownloadUrl() const
 {
