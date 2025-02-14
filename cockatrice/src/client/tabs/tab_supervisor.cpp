@@ -210,7 +210,7 @@ void TabSupervisor::retranslateUi()
     QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
     while (deckEditorIterator.hasNext())
         tabs.append(deckEditorIterator.next());
-    QListIterator<TabDeckEditorVisual *> visualDeckEditorIterator(visualDeckEditorTabs);
+    QListIterator<TabGenericDeckEditor *> visualDeckEditorIterator(visualDeckEditorTabs);
     while (visualDeckEditorIterator.hasNext())
         tabs.append(visualDeckEditorIterator.next());
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
@@ -257,7 +257,7 @@ bool TabSupervisor::closeRequest()
             return false;
     }
 
-    for (TabDeckEditorVisual *tab : visualDeckEditorTabs) {
+    for (TabGenericDeckEditor *tab : visualDeckEditorTabs) {
         if (!tab->confirmClose())
             return false;
     }
@@ -799,11 +799,11 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 
 TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *deckToOpen)
 {
-    TabDeckEditorVisual *tab = new TabDeckEditorVisual(this);
+    auto *tab = new TabDeckEditorVisual(this);
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
-    connect(tab, &TabDeckEditorVisual::deckEditorClosing, this, &TabSupervisor::visualDeckEditorClosed);
-    // connect(tab, &TabDeckEditorVisual::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    connect(tab, &TabGenericDeckEditor::deckEditorClosing, this, &TabSupervisor::visualDeckEditorClosed);
+    connect(tab, &TabGenericDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);
     visualDeckEditorTabs.append(tab);
     setCurrentWidget(tab);
@@ -831,7 +831,7 @@ void TabSupervisor::deckEditorClosed(AbstractTabDeckEditor *tab)
     removeTab(indexOf(tab));
 }
 
-void TabSupervisor::visualDeckEditorClosed(TabDeckEditorVisual *tab)
+void TabSupervisor::visualDeckEditorClosed(TabGenericDeckEditor *tab)
 {
     if (tab == currentWidget())
         emit setMenu();

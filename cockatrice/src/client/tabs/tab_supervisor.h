@@ -91,7 +91,7 @@ private:
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
     QList<AbstractTabDeckEditor *> deckEditorTabs;
-    QList<TabDeckEditorVisual *> visualDeckEditorTabs;
+    QList<AbstractTabDeckEditor *> visualDeckEditorTabs;
     bool isLocalGame;
 
     QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage,
@@ -154,7 +154,6 @@ public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     TabDeckEditorVisual *addVisualDeckEditorTab(const DeckLoader *deckToOpen);
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
-    TabDeckStorageVisual *addVisualDeckStorageTab();
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
