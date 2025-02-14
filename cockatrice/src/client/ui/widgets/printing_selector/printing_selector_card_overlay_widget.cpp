@@ -17,15 +17,15 @@
  * as a widget that displays the card amounts in different zones (mainboard, sideboard, etc.).
  *
  * @param parent The parent widget for this overlay.
- * @param deckEditor The TabDeckEditor instance for deck management.
- * @param deckModel The DeckListModel instance providing deck data.
- * @param deckView The QTreeView instance displaying the deck.
- * @param cardSizeSlider The slider controlling the size of the card.
- * @param rootCard The root card object that contains information about the card.
- * @param setInfoForCard The set-specific information for the card being displayed.
+ * @param _deckEditor The TabDeckEditor instance for deck management.
+ * @param _deckModel The DeckListModel instance providing deck data.
+ * @param _deckView The QTreeView instance displaying the deck.
+ * @param _cardSizeSlider The slider controlling the size of the card.
+ * @param _rootCard The root card object that contains information about the card.
+ * @param _setInfoForCard The set-specific information for the card being displayed.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                                                     TabDeckEditor *_deckEditor,
+                                                                     TabGenericDeckEditor *_deckEditor,
                                                                      DeckListModel *_deckModel,
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,

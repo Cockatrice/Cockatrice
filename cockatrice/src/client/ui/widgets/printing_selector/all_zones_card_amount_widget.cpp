@@ -19,7 +19,7 @@
  * @param setInfoForCard The set information for the card.
  */
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
-                                                   TabDeckEditor *deckEditor,
+                                                   TabGenericDeckEditor *deckEditor,
                                                    DeckListModel *deckModel,
                                                    QTreeView *deckView,
                                                    QSlider *cardSizeSlider,
