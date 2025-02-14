@@ -67,6 +67,7 @@ void VisualDeckStorageTagFilterWidget::refreshTags()
     QStringList allTags = gatherAllTags();
     removeTagsNotInList(gatherAllTags());
     addTagsIfNotPresent(gatherAllTags());
+    sortTags();
 }
 
 void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QStringList &tags)
@@ -109,6 +110,29 @@ void VisualDeckStorageTagFilterWidget::addTagIfNotPresent(const QString &tag)
                 &VisualDeckStorageTagFilterWidget::refreshTags);
         auto *flowWidget = findChild<FlowWidget *>();
         flowWidget->addWidget(newTagWidget);
+    }
+}
+
+void VisualDeckStorageTagFilterWidget::sortTags()
+{
+    auto *flowWidget = findChild<FlowWidget *>();
+    if (!flowWidget)
+        return;
+
+    // Get all tag widgets
+    QList<DeckPreviewTagDisplayWidget *> tagWidgets = findChildren<DeckPreviewTagDisplayWidget *>();
+
+    // Sort widgets by tag name
+    std::sort(tagWidgets.begin(), tagWidgets.end(), [](DeckPreviewTagDisplayWidget *a, DeckPreviewTagDisplayWidget *b) {
+        return a->getTagName().toLower() < b->getTagName().toLower();
+    });
+
+    // Clear and re-add widgets in sorted order
+    for (DeckPreviewTagDisplayWidget *tagWidget : tagWidgets) {
+        flowWidget->removeWidget(tagWidget);
+    }
+    for (DeckPreviewTagDisplayWidget *tagWidget : tagWidgets) {
+        flowWidget->addWidget(tagWidget);
     }
 }
 
