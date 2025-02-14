@@ -1,5 +1,6 @@
 #include "visual_deck_storage_widget.h"
 
+#include "../../../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 #include "../quick_settings/settings_button_widget.h"
@@ -12,6 +13,7 @@
 #include <QComboBox>
 #include <QDirIterator>
 #include <QMouseEvent>
+#include <QToolBar>
 #include <QVBoxLayout>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
@@ -23,6 +25,15 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->setSpacing(0);
     layout->setContentsMargins(9, 0, 9, 5);
     setLayout(layout);
+
+    auto toolBar = new QToolBar(this);
+
+    aLoadDeckFromClipboard = new QAction(this);
+    connect(aLoadDeckFromClipboard, &QAction::triggered, this, &VisualDeckStorageWidget::loadDeckFromClipboard);
+
+    toolBar->addAction(aLoadDeckFromClipboard);
+
+    layout->addWidget(toolBar);
 
     // search bar row
     searchAndSortContainer = new QWidget(this);
@@ -117,6 +128,41 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     } else {
         scrollArea->setWidget(databaseLoadIndicator);
     }
+}
+
+void VisualDeckStorageWidget::loadDeckFromClipboard()
+{
+    DlgLoadDeckFromClipboard dlg(this);
+    if (!dlg.exec())
+        return;
+
+    actSaveDeckAs(dlg.getDeckList());
+}
+
+bool VisualDeckStorageWidget::actSaveDeckAs(DeckLoader *deckModel)
+{
+    QFileDialog dialog(this, tr("Save deck"));
+    dialog.setDirectory(SettingsCache::instance().getDeckPath());
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix("cod");
+    dialog.setNameFilters(DeckLoader::fileNameFilters);
+    dialog.selectFile(deckModel->getName().trimmed() + ".cod");
+    if (!dialog.exec())
+        return false;
+
+    QString fileName = dialog.selectedFiles().at(0);
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+
+    if (!deckModel->saveToFile(fileName, fmt)) {
+        QMessageBox::critical(
+            this, tr("Error"),
+            tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
+        return false;
+    }
+
+    SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
+
+    return true;
 }
 
 void VisualDeckStorageWidget::refreshIfPossible()
