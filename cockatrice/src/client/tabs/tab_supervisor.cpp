@@ -706,8 +706,8 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     auto *tab = new TabDeckEditor(this);
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
-    connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
-    connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    connect(tab, &TabGenericDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
+    connect(tab, &TabGenericDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
     setCurrentWidget(tab);
@@ -726,7 +726,7 @@ TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCo
     return tab;
 }
 
-void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
+void TabSupervisor::deckEditorClosed(TabGenericDeckEditor *tab)
 {
     if (tab == currentWidget())
         emit setMenu();

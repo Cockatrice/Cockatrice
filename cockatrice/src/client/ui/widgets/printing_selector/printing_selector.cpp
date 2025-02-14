@@ -22,10 +22,10 @@
  * @param deckView The QTreeView instance used to display the deck and its contents.
  */
 PrintingSelector::PrintingSelector(QWidget *parent,
-                                   TabDeckEditor *deckEditor,
+                                   TabDeckEditor *_deckEditor,
                                    DeckListModel *deckModel,
                                    QTreeView *deckView)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView)
+    : QWidget(parent), deckEditor(_deckEditor), deckModel(deckModel), deckView(deckView)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout(this);

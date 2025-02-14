@@ -2,6 +2,7 @@
 
 #include "../../../../../dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../../../settings/cache_settings.h"
+#include "../../../../tabs/tab_generic_deck_editor.h"
 #include "deck_preview_tag_dialog.h"
 
 #include <QDirIterator>
@@ -110,16 +111,16 @@ void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
             }
         }
     } else if (tagsDisplayWidget->parentWidget()) {
-        // If we're the child of a TabDeckEditor, we are buried under a ton of childWidgets in the DeckInfoDock.
+        // If we're the child of a TabGenericDeckEditor, we are buried under a ton of childWidgets in the DeckInfoDock.
         QWidget *currentParent = tagsDisplayWidget->parentWidget();
         while (currentParent) {
-            if (qobject_cast<TabDeckEditor *>(currentParent)) {
+            if (qobject_cast<TabGenericDeckEditor *>(currentParent)) {
                 break;
             }
             currentParent = currentParent->parentWidget();
         }
-        if (qobject_cast<TabDeckEditor *>(currentParent)) {
-            auto *deckEditor = qobject_cast<TabDeckEditor *>(currentParent);
+        if (qobject_cast<TabGenericDeckEditor *>(currentParent)) {
+            auto *deckEditor = qobject_cast<TabGenericDeckEditor *>(currentParent);
             QStringList knownTags;
             QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath(), true);
             auto *loader = new DeckLoader();

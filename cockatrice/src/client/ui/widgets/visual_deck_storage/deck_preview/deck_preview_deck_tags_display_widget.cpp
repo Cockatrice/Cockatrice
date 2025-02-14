@@ -1,6 +1,5 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
-#include "../../../../tabs/tab_deck_editor.h"
 #include "../../general/layout_containers/flow_widget.h"
 #include "deck_preview_tag_addition_widget.h"
 #include "deck_preview_tag_display_widget.h"
