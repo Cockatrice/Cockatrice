@@ -37,10 +37,6 @@ public:
     explicit TabDeckEditor(TabSupervisor *_tabSupervisor);
     void retranslateUi() override;
     QString getTabText() const override;
-    void createDeckDock() override;
-    void createCardInfoDock() override;
-    void createFiltersDock() override;
-    void createPrintingSelectorDock() override;
     void createMenus() override;
     void createCentralFrame() override;
 

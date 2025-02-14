@@ -193,6 +193,10 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     ${VERSION_STRING_CPP}
 )
 

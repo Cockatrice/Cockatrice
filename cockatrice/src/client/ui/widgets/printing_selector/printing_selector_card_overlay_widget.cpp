@@ -25,7 +25,7 @@
  * @param _setInfoForCard The set-specific information for the card being displayed.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                                                     TabDeckEditor *_deckEditor,
+                                                                     TabGenericDeckEditor *_deckEditor,
                                                                      DeckListModel *_deckModel,
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
