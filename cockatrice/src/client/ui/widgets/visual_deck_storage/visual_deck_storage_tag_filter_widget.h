@@ -17,6 +17,7 @@ public:
     void removeTagsNotInList(const QStringList &tags);
     void addTagsIfNotPresent(const QStringList &tags);
     void addTagIfNotPresent(const QString &tag);
+    void sortTags();
     QStringList getAllKnownTags();
     VisualDeckStorageWidget *parent;
 
