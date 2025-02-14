@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QSize>
 #include <QTextOption>
+#include <qpropertyanimation.h>
 
 class CardInfoPictureWithTextOverlayWidget : public CardInfoPictureWidget
 {
@@ -33,6 +34,10 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     [[nodiscard]] QSize minimumSizeHint() const override;
+    void enterEvent(QEnterEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 
 private:
     void drawOutlinedText(QPainter &painter,
@@ -45,6 +50,9 @@ private:
     QColor outlineColor;
     int fontSize;
     Qt::Alignment textAlignment;
+    QPropertyAnimation *animation;
+    QPoint originalPos;         // Store the original position
+    const int hoverOffset = 10; // Adjust this for how much the widget moves up
 };
 
 #endif // CARD_PICTURE_WITH_TEXT_OVERLAY_H
