@@ -11,6 +11,7 @@
 DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent) : QDialog(parent), client(_client)
 {
     dirView = new RemoteDeckList_TreeWidget(client);
+    dirView->refreshTree();
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
