@@ -38,6 +38,9 @@ void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         lastMouseEvent = event;
         singleClickTimer->start(QApplication::doubleClickInterval());
+    } else {
+        emit imageClicked(event, this);
+        event->accept();
     }
 }
 
