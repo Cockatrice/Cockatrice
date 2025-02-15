@@ -39,9 +39,9 @@ void ReleaseChannel::checkForUpdates()
 }
 
 // Different release channel checking functions for different operating systems
-#if defined(Q_OS_MACOS)
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
+#if defined(Q_OS_MACOS)
     static QRegularExpression version_regex("macOS(\\d+)");
     auto match = version_regex.match(fileName);
     if (!match.hasMatch()) {
@@ -52,10 +52,8 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     int sys_maj = QSysInfo::productVersion().split(".")[0].toInt();
     int rel_maj = match.captured(1).toInt();
     return rel_maj == sys_maj;
-}
+
 #elif defined(Q_OS_WIN)
-bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
-{
 #if Q_PROCESSOR_WORDSIZE == 4
     return fileName.contains("32bit");
 #elif Q_PROCESSOR_WORDSIZE == 8
@@ -66,16 +64,15 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
         return fileName.contains("Win10");
     }
 #else
+    Q_UNUSED(fileName);
+    return false;
+#endif
+
+#else // If the OS doesn't fit one of the above #defines, then it will never match
+    Q_UNUSED(fileName);
     return false;
 #endif
 }
-#else
-bool ReleaseChannel::downloadMatchesCurrentOS(const QString &)
-{
-    // If the OS doesn't fit one of the above #defines, then it will never match
-    return false;
-}
-#endif
 
 QString StableReleaseChannel::getManualDownloadUrl() const
 {
@@ -99,7 +96,7 @@ void StableReleaseChannel::releaseListFinished()
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "No reply received from the release update server.";
+        qCWarning(ReleaseChannelLog) << "No reply received from the release update server.";
         emit error(tr("No reply received from the release update server."));
         return;
     }
@@ -107,7 +104,7 @@ void StableReleaseChannel::releaseListFinished()
     QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("name") && resultMap.contains("html_url") && resultMap.contains("tag_name") &&
           resultMap.contains("published_at"))) {
-        qWarning() << "Invalid received from the release update server:" << resultMap;
+        qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
@@ -121,23 +118,15 @@ void StableReleaseChannel::releaseListFinished()
 
     if (resultMap.contains("assets")) {
         auto rawAssets = resultMap["assets"].toList();
-        // [(name, url)]
-        QVector<std::pair<QString, QString>> assets;
-        std::transform(rawAssets.begin(), rawAssets.end(), std::back_inserter(assets), [](QVariant _asset) {
-            QVariantMap asset = _asset.toMap();
+        for (const auto &rawAsset : rawAssets) {
+            QVariantMap asset = rawAsset.toMap();
             QString name = asset["name"].toString();
             QString url = asset["browser_download_url"].toString();
-            return std::make_pair(name, url);
-        });
 
-        auto _releaseAsset = std::find_if(assets.begin(), assets.end(), [](std::pair<QString, QString> nameAndUrl) {
-            return downloadMatchesCurrentOS(nameAndUrl.first);
-        });
-
-        if (_releaseAsset != assets.end()) {
-            std::pair<QString, QString> releaseAsset = *_releaseAsset;
-            auto releaseUrl = releaseAsset.second;
-            lastRelease->setDownloadUrl(releaseUrl);
+            if (downloadMatchesCurrentOS(name)) {
+                lastRelease->setDownloadUrl(url);
+                break;
+            }
         }
     }
 
@@ -163,14 +152,14 @@ void StableReleaseChannel::tagListFinished()
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "No reply received from the tag update server.";
+        qCWarning(ReleaseChannelLog) << "No reply received from the tag update server.";
         emit error(tr("No reply received from the tag update server."));
         return;
     }
 
     QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("object") && resultMap["object"].toMap().contains("sha"))) {
-        qWarning() << "Invalid received from the tag update server.";
+        qCWarning(ReleaseChannelLog) << "Invalid received from the tag update server.";
         emit error(tr("Invalid reply received from the tag update server."));
         return;
     }
@@ -223,7 +212,7 @@ void BetaReleaseChannel::releaseListFinished()
     QVariantMap resultMap = array.at(0).toObject().toVariantMap();
 
     if (array.empty() || resultMap.empty()) {
-        qWarning() << "No reply received from the release update server:" << QString(jsonData);
+        qCWarning(ReleaseChannelLog) << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
     }
@@ -232,7 +221,7 @@ void BetaReleaseChannel::releaseListFinished()
     if (!resultMap.contains("assets") || !resultMap.contains("author") || !resultMap.contains("tag_name") ||
         !resultMap.contains("target_commitish") || !resultMap.contains("assets_url") ||
         !resultMap.contains("published_at")) {
-        qWarning() << "Invalid received from the release update server:" << resultMap;
+        qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
@@ -265,7 +254,7 @@ void BetaReleaseChannel::fileListFinished()
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "No reply received from the file update server.";
+        qCWarning(ReleaseChannelLog) << "No reply received from the file update server.";
         emit error(tr("No reply received from the file update server."));
         return;
     }
