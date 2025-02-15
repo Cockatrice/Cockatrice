@@ -4,6 +4,8 @@
 #include "../../deck/deck_loader.h"
 #include "../../server/user/user_list_proxy.h"
 #include "api/edhrec/tab_edhrec.h"
+#include "visual_deck_editor/tab_deck_editor_visual.h"
+#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
@@ -88,10 +90,11 @@ private:
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
     QList<TabDeckEditor *> deckEditorTabs;
+    QList<TabDeckEditorVisual *> visualDeckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
-        *aTabAdmin, *aTabLog;
+    QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage,
+        *aTabReplays, *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -148,6 +151,7 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabDeckEditorVisual *addVisualDeckEditorTab(const DeckLoader *deckToOpen);
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
@@ -175,6 +179,7 @@ private slots:
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(TabDeckEditor *tab);
+    void visualDeckEditorClosed(TabDeckEditorVisual *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);
