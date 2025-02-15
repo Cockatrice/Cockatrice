@@ -12,6 +12,7 @@
 
 class VisualDeckStorageWidget;
 class DeckPreviewDeckTagsDisplayWidget;
+
 class DeckPreviewWidget final : public QWidget
 {
     Q_OBJECT
@@ -37,8 +38,7 @@ public:
     bool checkVisibility() const;
 
 signals:
-    void deckPreviewClicked(QMouseEvent *event, DeckPreviewWidget *instance);
-    void deckPreviewDoubleClicked(QMouseEvent *event, DeckPreviewWidget *instance);
+    void deckLoadRequested(const QString &filePath);
     void visibilityUpdated();
 
 public slots:

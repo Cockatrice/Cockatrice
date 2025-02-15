@@ -172,17 +172,6 @@ void VisualDeckStorageWidget::retranslateUi()
     bannerCardComboBoxVisibilityCheckBox->setText(tr("Show Banner Card Selection Option"));
 }
 
-void VisualDeckStorageWidget::deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
-{
-    emit deckPreviewClicked(event, instance);
-}
-
-void VisualDeckStorageWidget::deckPreviewDoubleClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance)
-{
-    emit deckPreviewDoubleClicked(event, instance);
-    emit deckLoadRequested(instance->filePath);
-}
-
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,

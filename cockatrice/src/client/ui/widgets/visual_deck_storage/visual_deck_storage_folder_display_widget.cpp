@@ -87,10 +87,8 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
     for (const QString &file : getAllFiles(filePath, !showFolders)) {
         auto *display = new DeckPreviewWidget(flowWidget, visualDeckStorageWidget, file);
 
-        connect(display, &DeckPreviewWidget::deckPreviewClicked, visualDeckStorageWidget,
-                &VisualDeckStorageWidget::deckPreviewClickedEvent);
-        connect(display, &DeckPreviewWidget::deckPreviewDoubleClicked, visualDeckStorageWidget,
-                &VisualDeckStorageWidget::deckPreviewDoubleClickedEvent);
+        connect(display, &DeckPreviewWidget::deckLoadRequested, visualDeckStorageWidget,
+                &VisualDeckStorageWidget::deckLoadRequested);
         connect(visualDeckStorageWidget->cardSizeWidget->getSlider(), &QSlider::valueChanged,
                 display->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
         display->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->cardSizeWidget->getSlider()->value());

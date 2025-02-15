@@ -6,6 +6,7 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include <QFileInfo>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QSet>
 #include <QVBoxLayout>
@@ -258,12 +259,13 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
+    Q_UNUSED(event);
     Q_UNUSED(instance);
-    emit deckPreviewClicked(event, this);
 }
 
 void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
+    Q_UNUSED(event);
     Q_UNUSED(instance);
-    emit deckPreviewDoubleClicked(event, this);
+    emit deckLoadRequested(filePath);
 }
