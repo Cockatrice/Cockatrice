@@ -1981,7 +1981,7 @@ void Player::createCard(const CardItem *sourceCard,
         cmd.set_annotation("");
     }
     cmd.set_destroy_on_zone_change(!persistent);
-    cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
+    cmd.set_target_zone("table"); // we currently only support creating tokens on the table
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
