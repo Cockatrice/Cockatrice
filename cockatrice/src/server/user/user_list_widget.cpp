@@ -349,6 +349,7 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
     setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(18, QString::fromStdString(userInfo.country()))));
     setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
     setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
+    setData(3, Qt::InitialSortOrderRole, QString::fromStdString(userInfo.privlevel()));
 }
 
 void UserListTWI::setOnline(bool online)
@@ -357,15 +358,58 @@ void UserListTWI::setOnline(bool online)
     setData(2, Qt::ForegroundRole, online ? qApp->palette().brush(QPalette::WindowText) : QBrush(Qt::gray));
 }
 
+/**
+ * Sort Users in the following order
+ * 1) Online Users > Offline Users
+ * 2) Admins, judge/vip/donator status ignored
+ * 3) Moderators, judge/vip/donator status ignored
+ * 4) Judges
+ * 5) VIPs
+ * 6) Donators
+ * 7) Everyone else
+ * @param other RHS to compare to
+ * @return Left is less than the Right
+ */
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
     // Sort by online/offline
-    if (data(0, Qt::UserRole + 1) != other.data(0, Qt::UserRole + 1))
+    if (data(0, Qt::UserRole + 1) != other.data(0, Qt::UserRole + 1)) {
         return data(0, Qt::UserRole + 1).toBool();
+    }
 
-    // Sort by user level
-    if ((data(0, Qt::UserRole).toInt() & 15) != (other.data(0, Qt::UserRole).toInt() & 15))
-        return (data(0, Qt::UserRole).toInt() & 15) > (other.data(0, Qt::UserRole).toInt() & 15);
+    const auto &lhsUserLevelFlags = UserLevelFlags(data(0, Qt::UserRole).toInt());
+    const auto &rhsUserLevelFlags = UserLevelFlags(other.data(0, Qt::UserRole).toInt());
+
+    // Admins & Mods need no additional comparison checks, just to see if they're an admin or a moderator
+    static const QList<ServerInfo_User_UserLevelFlag> userLevelWithNoOtherPrefOrder = {
+        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsModerator};
+    for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
+        if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
+            lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
+            return QString::localeAwareCompare(data(2, Qt::UserRole).toString(),
+                                               other.data(2, Qt::UserRole).toString()) < 0;
+        } else if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
+            return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
+        }
+    }
+
+    // Judges can be sorted by their additional ranks
+    static const QList<ServerInfo_User_UserLevelFlag> userLevelOrder = {ServerInfo_User_UserLevelFlag_IsJudge,
+                                                                        ServerInfo_User_UserLevelFlag_IsRegistered,
+                                                                        ServerInfo_User_UserLevelFlag_IsUser};
+    for (const auto &userLevelEntry : userLevelOrder) {
+        if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
+            return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
+        }
+    }
+
+    // Sort by VIP > Donator > None
+    static const QMap<QString, int> privilegeOrder = {{"VIP", 3}, {"DONATOR", 2}, {"NONE", 1}, {"UNKNOWN", 0}};
+    const auto &lhsUserPrivLevel = privilegeOrder.value(data(3, Qt::InitialSortOrderRole).toString(), 0);
+    const auto &rhsUserPrivLevel = privilegeOrder.value(other.data(3, Qt::InitialSortOrderRole).toString(), 0);
+    if (lhsUserPrivLevel != rhsUserPrivLevel) {
+        return lhsUserPrivLevel > rhsUserPrivLevel;
+    }
 
     // Sort by name
     return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
