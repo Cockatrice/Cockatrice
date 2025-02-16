@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+class QMenu;
 class VisualDeckStorageWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 
@@ -53,6 +54,9 @@ public slots:
     void updateBannerCardComboBoxVisibility(bool visible);
     void updateTagsVisibility(bool visible);
     void resizeEvent(QResizeEvent *event) override;
+
+private:
+    QMenu *createRightClickMenu();
 };
 
 class NoScrollFilter : public QObject
