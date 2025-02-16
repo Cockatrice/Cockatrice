@@ -1358,6 +1358,9 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
             return Response::RespNameNotFound;
         }
     }
+
+    // prevent attaching from non-table zones
+    // (attaching from non-table zones is handled client-side by moving the card to table zone first)
     if (!startzone->hasCoords()) {
         return Response::RespContextError;
     }
