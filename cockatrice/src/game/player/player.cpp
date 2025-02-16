@@ -1930,7 +1930,15 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
             createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
         }
     } else {
-        createCard(sourceCard, dbName, cardRelation->getAttachType(), persistent);
+        auto attachType = cardRelation->getAttachType();
+
+        // move card onto table first if attaching from some other zone
+        // we only do this for AttachTo because cross-zone TransformInto is already handled server-side
+        if (attachType == CardRelation::AttachTo && sourceCard->getZone()->getName() != "table") {
+            playCardToTable(sourceCard, false);
+        }
+
+        createCard(sourceCard, dbName, attachType, persistent);
     }
     return true;
 }
@@ -1973,7 +1981,7 @@ void Player::createCard(const CardItem *sourceCard,
         cmd.set_annotation("");
     }
     cmd.set_destroy_on_zone_change(!persistent);
-    cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
+    cmd.set_target_zone("table"); // we currently only support creating tokens on the table
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
@@ -2754,7 +2762,7 @@ void Player::playCard(CardItem *card, bool faceDown)
  * Like {@link Player::playCard}, but forces the card to be played to the table zone.
  * Cards with tablerow 3 (the stack) will be played to tablerow 1 (the noncreatures row).
  */
-void Player::playCardToTable(CardItem *card, bool faceDown)
+void Player::playCardToTable(const CardItem *card, bool faceDown)
 {
     if (card == nullptr) {
         return;
