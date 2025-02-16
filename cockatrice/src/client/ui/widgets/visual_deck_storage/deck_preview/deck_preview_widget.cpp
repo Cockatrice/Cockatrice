@@ -257,16 +257,6 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
         itemData["name"].toString(), itemData["uuid"].toString()));
 }
 
-QMenu *DeckPreviewWidget::createRightClickMenu()
-{
-    auto *menu = new QMenu(this);
-
-    auto loadDeckAction = menu->addAction(tr("Load Deck"));
-    connect(loadDeckAction, &QAction::triggered, this, [this] { emit deckLoadRequested(filePath); });
-
-    return menu;
-}
-
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
     Q_UNUSED(instance);
@@ -281,4 +271,14 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
     Q_UNUSED(event);
     Q_UNUSED(instance);
     emit deckLoadRequested(filePath);
+}
+
+QMenu *DeckPreviewWidget::createRightClickMenu()
+{
+    auto *menu = new QMenu(this);
+
+    auto loadDeckAction = menu->addAction(tr("Load Deck"));
+    connect(loadDeckAction, &QAction::triggered, this, [this] { emit deckLoadRequested(filePath); });
+
+    return menu;
 }
