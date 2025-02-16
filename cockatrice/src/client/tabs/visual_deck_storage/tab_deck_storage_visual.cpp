@@ -12,7 +12,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
     : Tab(_tabSupervisor), visualDeckStorageWidget(new VisualDeckStorageWidget(this))
 {
     connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addDeckEditorTab);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckPreviewDoubleClicked, this,
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
             &TabDeckStorageVisual::actOpenLocalDeck);
 
     auto *widget = new QWidget(this);
@@ -22,10 +22,10 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
     layout->addWidget(visualDeckStorageWidget);
 }
 
-void TabDeckStorageVisual::actOpenLocalDeck(QMouseEvent * /*event*/, DeckPreviewWidget *instance)
+void TabDeckStorageVisual::actOpenLocalDeck(const QString &filePath)
 {
     DeckLoader deckLoader;
-    if (!deckLoader.loadFromFile(instance->filePath, DeckLoader::getFormatFromName(instance->filePath), true)) {
+    if (!deckLoader.loadFromFile(filePath, DeckLoader::getFormatFromName(filePath), true)) {
         return;
     }
 

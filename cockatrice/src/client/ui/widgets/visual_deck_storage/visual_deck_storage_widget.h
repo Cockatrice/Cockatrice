@@ -34,8 +34,6 @@ public:
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
 
 public slots:
-    void deckPreviewClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance);
-    void deckPreviewDoubleClickedEvent(QMouseEvent *event, DeckPreviewWidget *instance);
     void createRootFolderWidget(); // Refresh the display of cards based on the current sorting option
     void updateShowFolders(bool enabled);
     void updateTagFilter();
@@ -48,9 +46,7 @@ public slots:
 
 signals:
     void bannerCardsRefreshed();
-    void deckPreviewClicked(QMouseEvent *event, DeckPreviewWidget *instance);
-    void deckPreviewDoubleClicked(QMouseEvent *event, DeckPreviewWidget *instance);
-    void deckLoadRequested(QString &filePath);
+    void deckLoadRequested(const QString &filePath);
     void tagFilterUpdated();
     void colorFilterUpdated();
     void searchFilterUpdated();
