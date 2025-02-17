@@ -290,6 +290,9 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     auto loadDeckAction = menu->addAction(tr("Load Deck"));
     connect(loadDeckAction, &QAction::triggered, this, [this] { emit deckLoadRequested(filePath); });
 
+    connect(menu->addAction(tr("Edit Tags")), &QAction::triggered, deckTagsDisplayWidget,
+            &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
+
     menu->addSeparator();
 
     auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
