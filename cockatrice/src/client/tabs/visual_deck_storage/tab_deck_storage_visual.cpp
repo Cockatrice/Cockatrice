@@ -14,6 +14,8 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
     connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::addDeckEditorTab);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
             &TabDeckStorageVisual::actOpenLocalDeck);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::openDeckEditor, this,
+            &TabDeckStorageVisual::openDeckEditor);
 
     auto *widget = new QWidget(this);
     auto *layout = new QVBoxLayout(widget);
