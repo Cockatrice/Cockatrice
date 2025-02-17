@@ -40,7 +40,7 @@ signals:
     void buddyVisibilityChanged();
 private slots:
     void toggleBuddyVisibility() const;
-    void setExpandIconState(bool expanded) const;
+    void setDropdownIconState(bool expanded) const;
 };
 
 #endif // BANNER_WIDGET_H

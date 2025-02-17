@@ -106,7 +106,7 @@ public:
     }
 };
 
-class ExpandIconPixmapGenerator
+class DropdownIconPixmapGenerator
 {
 private:
     static QMap<QString, QPixmap> pmCache;

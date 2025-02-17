@@ -357,7 +357,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
 
 QMap<int, QPixmap> LockPixmapGenerator::pmCache;
 
-QPixmap ExpandIconPixmapGenerator::generatePixmap(int height, bool expanded)
+QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
 {
     QString key = QString::number(expanded) + ":" + QString::number(height);
     if (pmCache.contains(key))
@@ -370,7 +370,7 @@ QPixmap ExpandIconPixmapGenerator::generatePixmap(int height, bool expanded)
     return pixmap;
 }
 
-QMap<QString, QPixmap> ExpandIconPixmapGenerator::pmCache;
+QMap<QString, QPixmap> DropdownIconPixmapGenerator::pmCache;
 
 QPixmap loadColorAdjustedPixmap(const QString &name)
 {

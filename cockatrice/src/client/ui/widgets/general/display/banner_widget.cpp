@@ -46,23 +46,23 @@ void BannerWidget::setText(const QString &text) const
 void BannerWidget::setClickable(bool _clickable)
 {
     clickable = _clickable;
-    setExpandIconState(true);
+    setDropdownIconState(true);
 }
 
 void BannerWidget::toggleBuddyVisibility() const
 {
     if (buddy) {
         buddy->setVisible(!buddy->isVisible());
-        setExpandIconState(buddy->isVisible());
+        setDropdownIconState(buddy->isVisible());
     } else {
-        setExpandIconState(false);
+        setDropdownIconState(false);
     }
 }
 
-void BannerWidget::setExpandIconState(bool expanded) const
+void BannerWidget::setDropdownIconState(bool expanded) const
 {
     if (clickable) {
-        iconLabel->setPixmap(ExpandIconPixmapGenerator::generatePixmap(24, expanded));
+        iconLabel->setPixmap(DropdownIconPixmapGenerator::generatePixmap(24, expanded));
     } else {
         // we cannot directly hide the iconLabel, since it's needed to center the text; set an empty image instead
         iconLabel->setPixmap(QPixmap());
