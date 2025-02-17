@@ -9,6 +9,7 @@
 #include "deck_preview_tag_display_widget.h"
 #include "deck_preview_widget.h"
 
+#include <QDirIterator>
 #include <QHBoxLayout>
 #include <QLabel>
 
