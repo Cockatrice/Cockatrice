@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>resources/cardback.svg</file>
         <file>resources/cockatrice.svg</file>
         <file>resources/hand.svg</file>
@@ -17,6 +17,8 @@
         <file>resources/icons/conceded.svg</file>
         <file>resources/icons/decrement.svg</file>
         <file>resources/icons/delete.svg</file>
+        <file>resources/icons/dropdown_collapsed.svg</file>
+        <file>resources/icons/dropdown_expanded.svg</file>
         <file>resources/icons/forgot_password.svg</file>
         <file>resources/icons/increment.svg</file>
         <file>resources/icons/info.svg</file>
