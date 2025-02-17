@@ -16,6 +16,7 @@ public:
                           int transparency = 80);
     void mousePressEvent(QMouseEvent *event) override;
     void setText(const QString &text) const;
+    void setClickable(bool _clickable);
     void setBuddy(QWidget *_buddy)
     {
         buddy = _buddy;
@@ -23,10 +24,6 @@ public:
     QString getText() const
     {
         return bannerLabel->text();
-    }
-    void setClickable(bool _clickable)
-    {
-        clickable = _clickable;
     }
 
 protected:

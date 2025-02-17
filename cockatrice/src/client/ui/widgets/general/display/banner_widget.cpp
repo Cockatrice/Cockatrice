@@ -14,7 +14,6 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
 
     iconLabel = new QLabel(this);
     iconLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    setExpandIconState(true);
 
     // Create the banner label and set properties
     bannerLabel = new QLabel(text, this);
@@ -44,6 +43,12 @@ void BannerWidget::setText(const QString &text) const
     bannerLabel->setText(text);
 }
 
+void BannerWidget::setClickable(bool _clickable)
+{
+    clickable = _clickable;
+    setExpandIconState(true);
+}
+
 void BannerWidget::toggleBuddyVisibility() const
 {
     if (buddy) {
@@ -56,7 +61,12 @@ void BannerWidget::toggleBuddyVisibility() const
 
 void BannerWidget::setExpandIconState(bool expanded) const
 {
-    iconLabel->setPixmap(ExpandIconPixmapGenerator::generatePixmap(24, expanded));
+    if (clickable) {
+        iconLabel->setPixmap(ExpandIconPixmapGenerator::generatePixmap(24, expanded));
+    } else {
+        // we cannot directly hide the iconLabel, since it's needed to center the text; set an empty image instead
+        iconLabel->setPixmap(QPixmap());
+    }
 }
 
 void BannerWidget::paintEvent(QPaintEvent *event)
