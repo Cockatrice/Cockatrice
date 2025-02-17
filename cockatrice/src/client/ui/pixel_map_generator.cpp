@@ -364,7 +364,7 @@ QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
         return pmCache.value(key);
 
     QString name = expanded ? "dropdown_expanded" : "dropdown_collapsed";
-    QPixmap pixmap = tryLoadImage("theme:icons/" + name, QSize(height, height));
+    QPixmap pixmap = tryLoadImage("theme:icons/" + name, QSize(height, height), true);
 
     pmCache.insert(key, pixmap);
     return pixmap;
