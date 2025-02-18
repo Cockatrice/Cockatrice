@@ -1213,28 +1213,29 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     QString error;
     switch (err) {
         case QProcess::FailedToStart:
-            error = tr("failed to start.");
+            error = tr("Failed to start. The file might be missing, or permissions might be incorrect.");
             break;
-        case QProcess::Crashed:
-            error = tr("crashed.");
+            case QProcess::Crashed:
+            error = tr("Crashed. The process terminated unexpectedly.");
+            error += "\n\nError output:\n" + cardUpdateProcess->readAllStandardError();
             break;
         case QProcess::Timedout:
-            error = tr("timed out.");
-            break;
-        case QProcess::WriteError:
-            error = tr("write error.");
+                error = tr("Timed out. The process took too long to respond.");
+                break;
+            case QProcess::WriteError:
+            error = tr("Write error. The process couldn't receive input.");
             break;
         case QProcess::ReadError:
-            error = tr("read error.");
-            break;
-        case QProcess::UnknownError:
+                error = tr("Read error. The process couldn't send output.");
+                break;
+            case QProcess::UnknownError:
         default:
-            error = tr("unknown error.");
+            error = tr("Unknown error occurred.");
             break;
     }
 
     exitCardDatabaseUpdate();
-    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
+        QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
