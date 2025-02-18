@@ -1216,22 +1216,25 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             error = tr("Failed to start. The file might be missing, or permissions might be incorrect.");
             break;
             case QProcess::Crashed:
-            error = tr("Crashed. The process terminated unexpectedly.");
+            error = tr("The process crashed some time after starting successfully.");
             error += "\n\nError output:\n" + cardUpdateProcess->readAllStandardError();
             break;
-        case QProcess::Timedout:
-                error = tr("Timed out. The process took too long to respond.");
+            case QProcess::Timedout:
+                error =
+                    tr("Timed out. The process took too long to respond. The last waitFor...() function timed out.");
                 break;
             case QProcess::WriteError:
-            error = tr("Write error. The process couldn't receive input.");
-            break;
-        case QProcess::ReadError:
-                error = tr("Read error. The process couldn't send output.");
+                error = tr("An error occurred when attempting to write to the process. For example, the process may "
+                           "not be running, or it may have closed its input channel.");
+                break;
+            case QProcess::ReadError:
+                error = tr("An error occurred when attempting to read from the process. For example, the process may "
+                           "not be running.");
                 break;
             case QProcess::UnknownError:
-        default:
-            error = tr("Unknown error occurred.");
-            break;
+            default:
+                error = tr("Unknown error occurred.");
+                break;
     }
 
     exitCardDatabaseUpdate();
