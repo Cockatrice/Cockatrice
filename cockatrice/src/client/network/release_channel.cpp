@@ -11,6 +11,11 @@
 #include <QSysInfo>
 #include <QtGlobal>
 
+#if defined(Q_OS_MACOS)
+#include <sys/sysctl.h>
+#include <sys/types.h>
+#endif
+
 #define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
 #define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
 #define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
@@ -48,8 +53,23 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
         return false;
     }
 
+    auto getSystemVersion = [] {
+        // QSysInfo does not go through translation layers
+        // We need to use sysctl to reliably detect the underlying architecture
+        char arch[255];
+        size_t len = sizeof(arch);
+        if (sysctlbyname("machdep.cpu.brand_string", arch, &len, nullptr, 0) == 0) {
+            // Intel mac is only supported on macOS 13 versions
+            if (QString::fromUtf8(arch).contains("Intel")) {
+                return 13;
+            }
+        }
+
+        return QSysInfo::productVersion().split(".")[0].toInt();
+    };
+
     // older(smaller) releases are compatible with a newer or the same system version
-    int sys_maj = QSysInfo::productVersion().split(".")[0].toInt();
+    int sys_maj = getSystemVersion();
     int rel_maj = match.captured(1).toInt();
     return rel_maj == sys_maj;
 
