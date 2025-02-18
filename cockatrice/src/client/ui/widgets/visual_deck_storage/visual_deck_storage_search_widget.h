@@ -16,7 +16,7 @@ class VisualDeckStorageSearchWidget : public QWidget
 public:
     explicit VisualDeckStorageSearchWidget(VisualDeckStorageWidget *parent);
     QString getSearchText();
-    void filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText);
+    void filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText, bool includeFolderName);
 
 private:
     QHBoxLayout *layout;
