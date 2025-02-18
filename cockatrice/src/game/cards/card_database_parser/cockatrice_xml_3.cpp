@@ -173,7 +173,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     name = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                 } else if (xmlName == "text") {
                     text = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                } else if (xmlName == "color") {
+                } else if (xmlName == "color" || xmlName == "colors") {
                     colors.append(xml.readElementText(QXmlStreamReader::IncludeChildElements));
                 } else if (xmlName == "token") {
                     isToken = static_cast<bool>(xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt());
