@@ -60,8 +60,7 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
         size_t len = sizeof(arch);
         if (sysctlbyname("machdep.cpu.brand_string", arch, &len, nullptr, 0) == 0) {
             // Intel mac is only supported on macOS 13 versions
-            static QRegularExpression intel_regex("Intel");
-            if (intel_regex.match(QString::fromUtf8(arch)).hasMatch()) {
+            if (QString::fromUtf8(arch).contains("Intel")) {
                 return 13;
             }
         }
