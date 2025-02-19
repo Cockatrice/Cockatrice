@@ -1,5 +1,7 @@
 #include "visual_deck_storage_search_widget.h"
 
+#include "../../../../settings/cache_settings.h"
+
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
  *
@@ -38,7 +40,29 @@ QString VisualDeckStorageSearchWidget::getSearchText()
     return searchBar->text();
 }
 
-void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText)
+/**
+ * Gets the filename used for the search.
+ *
+ * if includeFolderName is true, then this returns the relative filepath starting from the deck folder.
+ * If the file isn't in the deck folder, or includeFolderName is false, then this will just return the filename.
+ *
+ * @param filePath The filePath to convert into a search name
+ */
+static QString getFileSearchName(const QString &filePath, bool includeFolderName)
+{
+    QString deckPath = SettingsCache::instance().getDeckPath();
+    if (includeFolderName && filePath.startsWith(deckPath)) {
+        return filePath.mid(deckPath.length()).toLower();
+    }
+
+    QFileInfo fileInfo(filePath);
+    QString fileName = fileInfo.fileName().toLower();
+    return fileName;
+}
+
+void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets,
+                                                  const QString &searchText,
+                                                  bool includeFolderName)
 {
     if (searchText.isEmpty() || searchText.isNull()) {
         for (auto widget : widgets) {
@@ -47,9 +71,7 @@ void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> wid
     }
 
     for (auto file : widgets) {
-        QFileInfo fileInfo(file->filePath);
-        QString fileName = fileInfo.fileName().toLower();
-
-        file->filteredBySearch = !fileName.contains(searchText.toLower());
+        QString fileSearchName = getFileSearchName(file->filePath, includeFolderName);
+        file->filteredBySearch = !fileSearchName.contains(searchText.toLower());
     }
 }
