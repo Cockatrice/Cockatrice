@@ -836,6 +836,7 @@ void TabGame::startGame(bool _resuming)
     while (i.hasNext()) {
         i.next();
         i.value()->setReadyStart(false);
+        i.value()->setVisualDeckStorageExists(false);
         i.value()->hide();
     }
 
