@@ -189,6 +189,7 @@ public slots:
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
     void deckEditorClosing(TabDeckEditor *tab);
+    void deckSaved(const QString &filePath);
 };
 
 #endif

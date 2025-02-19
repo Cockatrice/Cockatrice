@@ -31,6 +31,7 @@ set(cockatrice_SOURCES
     src/server/chat_view/chat_view.cpp
     src/game/board/counter_general.cpp
     src/deck/custom_line_edit.cpp
+    src/deck/deck_edit_event_bus.cpp
     src/deck/deck_loader.cpp
     src/deck/deck_list_model.cpp
     src/deck/deck_stats_interface.cpp
