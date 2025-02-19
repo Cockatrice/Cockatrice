@@ -1,5 +1,6 @@
 #include "visual_deck_storage_widget.h"
 
+#include "../../../../deck/deck_edit_event_bus.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 #include "../quick_settings/settings_button_widget.h"
@@ -110,6 +111,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     retranslateUi();
 
+    connect(DeckEditEventBus::instance(), &DeckEditEventBus::deckModified, this,
+            &VisualDeckStorageWidget::handleDeckModified);
+
     // Don't waste time processing the cards if they're going to get refreshed anyway once the db finishes loading
     if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
         createRootFolderWidget();
@@ -217,4 +221,19 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
     } else {
         tagFilterWidget->setHidden(true);
     }
+}
+
+/**
+ * Handles the scenario where a deck file has been modified. Updates the visual deck storage to reflect the change.
+ *
+ * @param filePath filepath to the changed deck
+ */
+void VisualDeckStorageWidget::handleDeckModified(const QString &filePath)
+{
+    // ignore if file isn't in deck folder
+    if (!filePath.startsWith(SettingsCache::instance().getDeckPath())) {
+        return;
+    }
+
+    refreshIfPossible();
 }

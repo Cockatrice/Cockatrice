@@ -3,6 +3,7 @@
 #include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
+#include "../../deck/deck_edit_event_bus.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
@@ -745,6 +746,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
+    connect(this, &TabDeckEditor::deckSaved, DeckEditEventBus::instance(), &DeckEditEventBus::deckModified);
+
     loadLayout();
 }
 
@@ -1136,6 +1139,8 @@ bool TabDeckEditor::actSaveDeck()
         return actSaveDeckAs();
     else if (deck->saveToFile(deck->getLastFileName(), deck->getLastFileFormat())) {
         setModified(false);
+
+        emit deckSaved(deck->getLastFileName());
         return true;
     }
     QMessageBox::critical(
@@ -1168,6 +1173,7 @@ bool TabDeckEditor::actSaveDeckAs()
 
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
 
+    emit deckSaved(fileName);
     return true;
 }
 
