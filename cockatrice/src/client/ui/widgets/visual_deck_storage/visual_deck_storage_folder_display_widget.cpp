@@ -89,6 +89,8 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
 
         connect(display, &DeckPreviewWidget::deckLoadRequested, visualDeckStorageWidget,
                 &VisualDeckStorageWidget::deckLoadRequested);
+        connect(display, &DeckPreviewWidget::openDeckEditor, visualDeckStorageWidget,
+                &VisualDeckStorageWidget::openDeckEditor);
         connect(visualDeckStorageWidget->cardSizeWidget->getSlider(), &QSlider::valueChanged,
                 display->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
         display->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->cardSizeWidget->getSlider()->value());
