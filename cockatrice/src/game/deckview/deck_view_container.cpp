@@ -212,11 +212,14 @@ void DeckViewContainer::refreshShortcuts()
 void DeckViewContainer::updateShowVisualDeckStorage(bool enabled)
 {
     if (enabled) {
-        tryCreateVisualDeckStorageWidget();
         // view mode state isn't stored in a field, so we determine state by checking the button
-        bool isDeckSelectView = loadLocalButton->isEnabled();
-        visualDeckStorageWidget->setHidden(!isDeckSelectView);
-        deckView->setHidden(isDeckSelectView);
+        if (loadLocalButton->isEnabled()) {
+            // We only need to handle the setting changing while in deck select state; tryCreate already gets called
+            // when switching from deck loaded to deck select state
+            tryCreateVisualDeckStorageWidget();
+            visualDeckStorageWidget->setHidden(false);
+            deckView->setHidden(true);
+        }
     } else {
         if (visualDeckStorageWidget) {
             visualDeckStorageWidget->deleteLater();
