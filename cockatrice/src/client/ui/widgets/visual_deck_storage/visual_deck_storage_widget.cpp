@@ -111,7 +111,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     retranslateUi();
 
-    connect(DeckEditEventBus::instance(), &DeckEditEventBus::deckModified, this,
+    connect(DeckEditEventBus::instance(), &DeckEditEventBus::deckFileModified, this,
             &VisualDeckStorageWidget::handleDeckModified);
 
     // Don't waste time processing the cards if they're going to get refreshed anyway once the db finishes loading

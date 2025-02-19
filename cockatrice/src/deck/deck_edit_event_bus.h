@@ -27,7 +27,7 @@ signals:
      * Should be emitted when a change has been written to a deck file.
      * @param filePath Absolute path to the deck file
      */
-    void deckModified(const QString &filePath);
+    void deckFileModified(const QString &filePath);
 };
 
 #endif // DECK_EDIT_EVENT_BUS_H

@@ -746,7 +746,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
-    connect(this, &TabDeckEditor::deckSaved, DeckEditEventBus::instance(), &DeckEditEventBus::deckModified);
+    connect(this, &TabDeckEditor::deckSaved, DeckEditEventBus::instance(), &DeckEditEventBus::deckFileModified);
 
     loadLayout();
 }
