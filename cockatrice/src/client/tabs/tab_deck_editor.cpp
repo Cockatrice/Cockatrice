@@ -102,6 +102,7 @@ void TabDeckEditor::createDeckDock()
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
+
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
@@ -112,6 +113,8 @@ void TabDeckEditor::createDeckDock()
     });
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &TabDeckEditor::setBannerCard);
+    connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this] { setModified(true); });
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
 
