@@ -357,6 +357,21 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
 
 QMap<int, QPixmap> LockPixmapGenerator::pmCache;
 
+QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
+{
+    QString key = QString::number(expanded) + ":" + QString::number(height);
+    if (pmCache.contains(key))
+        return pmCache.value(key);
+
+    QString name = expanded ? "dropdown_expanded" : "dropdown_collapsed";
+    QPixmap pixmap = tryLoadImage("theme:icons/" + name, QSize(height, height), true);
+
+    pmCache.insert(key, pixmap);
+    return pixmap;
+}
+
+QMap<QString, QPixmap> DropdownIconPixmapGenerator::pmCache;
+
 QPixmap loadColorAdjustedPixmap(const QString &name)
 {
     if (qApp->palette().windowText().color().lightness() > 200) {
