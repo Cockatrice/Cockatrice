@@ -69,7 +69,7 @@ void VisualDeckStorageSortWidget::updateSortOrder()
 std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> VisualDeckStorageSortWidget::getComparator() const
 {
     // Sort the widgets list based on the current sort order
-    return [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
+    return [sortOrder = sortOrder](const DeckPreviewWidget *widget1, const DeckPreviewWidget *widget2) {
         if (!widget1 || !widget2) {
             return false; // Handle null pointers gracefully
         }
