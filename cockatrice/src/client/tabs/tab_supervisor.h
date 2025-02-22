@@ -91,7 +91,7 @@ private:
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
     QList<TabGenericDeckEditor *> deckEditorTabs;
-    QList<TabDeckEditorVisual *> visualDeckEditorTabs;
+    QList<TabGenericDeckEditor *> visualDeckEditorTabs;
     bool isLocalGame;
 
     QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage,
