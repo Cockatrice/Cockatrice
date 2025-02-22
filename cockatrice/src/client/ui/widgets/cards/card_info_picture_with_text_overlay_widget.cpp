@@ -54,7 +54,11 @@ void CardInfoPictureWithTextOverlayWidget::moveEvent(QMoveEvent *event)
     CardInfoPictureWidget::moveEvent(event);
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void CardInfoPictureWithTextOverlayWidget::enterEvent(QEnterEvent *event)
+#else
+void CardInfoPictureWithTextOverlayWidget::enterEvent(QEvent *event)
+#endif
 {
     CardInfoPictureWidget::enterEvent(event);
     if (animation->state() == QAbstractAnimation::Running) {
