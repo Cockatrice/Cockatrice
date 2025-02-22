@@ -73,7 +73,7 @@ protected slots:
     void actDecrementCardFromSideboard(); // generic
     void copyDatabaseCellContents();      // generic
 
-    void saveDeckRemoteFinished(const Response &r);        // generic
+    void saveDeckRemoteFinished(const Response &r); // generic
 
     virtual void loadLayout() = 0;
     virtual void restartLayout() = 0; // somewhat generic
@@ -101,8 +101,8 @@ protected:
     QMessageBox *createSaveConfirmationWindow();
 
     bool isBlankNewDeck() const;
-    CardInfoPtr currentCardInfo() const;                         // generic
-    void decrementCardHelper(QString zoneName);                  // generic
+    CardInfoPtr currentCardInfo() const;        // generic
+    void decrementCardHelper(QString zoneName); // generic
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation) = 0;
 
     CardDatabaseModel *databaseModel;

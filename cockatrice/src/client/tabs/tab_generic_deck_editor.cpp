@@ -551,8 +551,6 @@ void TabGenericDeckEditor::copyDatabaseCellContents()
     QApplication::clipboard()->setText(_data.toString());
 }
 
-
-
 void TabGenericDeckEditor::saveDbHeaderState()
 {
     SettingsCache::instance().layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
