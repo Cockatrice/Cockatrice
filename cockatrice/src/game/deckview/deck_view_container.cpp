@@ -114,6 +114,7 @@ void DeckViewContainer::tryCreateVisualDeckStorageWidget()
     visualDeckStorageWidget = new VisualDeckStorageWidget(this);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
             &DeckViewContainer::loadDeckFromFile);
+    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::openDeckEditor, parentGame, &TabGame::openDeckEditor);
 
     deckViewLayout->addWidget(visualDeckStorageWidget);
 }
