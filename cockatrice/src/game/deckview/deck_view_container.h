@@ -66,7 +66,6 @@ private slots:
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
     void refreshShortcuts();
-    void updateShowVisualDeckStorage(bool enabled);
 signals:
     void newCardAdded(AbstractCardItem *card);
     void notIdle();
@@ -78,6 +77,7 @@ public:
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
     void setDeck(const DeckLoader &deck);
+    void setVisualDeckStorageExists(bool exists);
 
 public slots:
     void loadDeckFromFile(const QString &filePath);
