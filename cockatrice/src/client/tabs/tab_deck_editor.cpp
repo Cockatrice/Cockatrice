@@ -102,6 +102,7 @@ void TabDeckEditor::createDeckDock()
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
+
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
@@ -911,6 +912,7 @@ void TabDeckEditor::setBannerCard(int /* changedIndex */)
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
     deckModel->getDeckList()->setBannerCard(
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    setModified(true);
 }
 
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
