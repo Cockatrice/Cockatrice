@@ -87,7 +87,7 @@ private:
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
-    QList<TabDeckEditor *> deckEditorTabs;
+    QList<TabGenericDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
@@ -132,7 +132,7 @@ public:
     {
         return roomTabs;
     }
-    QList<TabDeckEditor *> getDeckEditorTabs() const
+    QList<TabGenericDeckEditor *> getDeckEditorTabs() const
     {
         return deckEditorTabs;
     }
