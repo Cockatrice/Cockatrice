@@ -38,7 +38,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     deckAnalytics->setObjectName("deckAnalytics");
     // deckAnalytics->analyzeManaCurve();
 
-    //printingSelector = new PrintingSelector(this, this->deckModel);
+    // printingSelector = new PrintingSelector(this, this->deckModel);
 
     this->addNewTab(visualDeckView, "Visual Deck View");
     this->addNewTab(visualDatabaseDisplay, "Visual Database Display");
