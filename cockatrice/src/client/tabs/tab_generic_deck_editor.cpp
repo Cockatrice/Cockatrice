@@ -201,20 +201,6 @@ void TabGenericDeckEditor::decklistCustomMenu(QPoint point)
     menu.exec(deckDockWidget->deckView->mapToGlobal(point));
 }
 
-void TabGenericDeckEditor::updateRecentlyOpened()
-{
-    loadRecentDeckMenu->clear();
-    for (const auto &deckPath : SettingsCache::instance().recents().getRecentlyOpenedDeckPaths()) {
-        QAction *aRecentlyOpenedDeck = new QAction(deckPath, this);
-        loadRecentDeckMenu->addAction(aRecentlyOpenedDeck);
-        connect(aRecentlyOpenedDeck, &QAction::triggered, this,
-                [=, this] { actOpenRecent(aRecentlyOpenedDeck->text()); });
-    }
-    loadRecentDeckMenu->addSeparator();
-    loadRecentDeckMenu->addAction(aClearRecents);
-    aClearRecents->setEnabled(SettingsCache::instance().recents().getRecentlyOpenedDeckPaths().length() > 0);
-}
-
 bool TabGenericDeckEditor::confirmClose()
 {
     if (modified) {
@@ -313,11 +299,6 @@ void TabGenericDeckEditor::actOpenRecent(const QString &fileName)
     openDeckFromFile(fileName, deckOpenLocation);
 }
 
-void TabGenericDeckEditor::actClearRecents()
-{
-    SettingsCache::instance().recents().clearRecentlyOpenedDeckPaths();
-}
-
 void TabGenericDeckEditor::saveDeckRemoteFinished(const Response &response)
 {
     if (response.response_code() != Response::RespOk)
@@ -404,7 +385,7 @@ void TabGenericDeckEditor::actLoadDeckFromClipboard()
         setModified(true);
     }
 
-    setSaveStatus(true);
+    deckMenu->setSaveStatus(true);
 }
 
 void TabGenericDeckEditor::actSaveDeckToClipboard()
@@ -527,13 +508,13 @@ void TabGenericDeckEditor::actAddCard()
         actAddCardToSideboard();
     else
         addCardHelper(currentCardInfo(), DECK_ZONE_MAIN);
-    setSaveStatus(true);
+    deckMenu->setSaveStatus(true);
 }
 
 void TabGenericDeckEditor::actAddCardToSideboard()
 {
     addCardHelper(currentCardInfo(), DECK_ZONE_SIDE);
-    setSaveStatus(true);
+    deckMenu->setSaveStatus(true);
 }
 
 void TabGenericDeckEditor::decrementCardHelper(QString zoneName)
@@ -575,19 +556,6 @@ void TabGenericDeckEditor::copyDatabaseCellContents()
 void TabGenericDeckEditor::saveDbHeaderState()
 {
     SettingsCache::instance().layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
-}
-
-void TabGenericDeckEditor::setSaveStatus(bool newStatus)
-{
-    aSaveDeck->setEnabled(newStatus);
-    aSaveDeckAs->setEnabled(newStatus);
-    aSaveDeckToClipboard->setEnabled(newStatus);
-    aSaveDeckToClipboardNoSetNameAndNumber->setEnabled(newStatus);
-    aSaveDeckToClipboardRaw->setEnabled(newStatus);
-    aSaveDeckToClipboardRawNoSetNameAndNumber->setEnabled(newStatus);
-    saveDeckToClipboardMenu->setEnabled(newStatus);
-    aPrintDeck->setEnabled(newStatus);
-    analyzeDeckMenu->setEnabled(newStatus);
 }
 
 void TabGenericDeckEditor::showSearchSyntaxHelp()

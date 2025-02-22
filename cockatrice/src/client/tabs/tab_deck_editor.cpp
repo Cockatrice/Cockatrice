@@ -11,6 +11,7 @@
 #include "../../game/filters/filter_tree_model.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
+#include "../menus/deck_editor/deck_editor_menu.h"
 #include "../ui/pixel_map_generator.h"
 #include "../ui/widgets/deck_editor/deck_editor_filter_dock_widget.h"
 #include "tab_supervisor.h"
@@ -152,87 +153,7 @@ void TabDeckEditor::createCentralFrame()
 
 void TabDeckEditor::createMenus()
 {
-    aNewDeck = new QAction(QString(), this);
-    connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
-
-    aLoadDeck = new QAction(QString(), this);
-    connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
-
-    loadRecentDeckMenu = new QMenu(this);
-    connect(&SettingsCache::instance().recents(), &RecentsSettings::recentlyOpenedDeckPathsChanged, this,
-            &TabDeckEditor::updateRecentlyOpened);
-
-    aClearRecents = new QAction(QString(), this);
-    connect(aClearRecents, &QAction::triggered, this, &TabDeckEditor::actClearRecents);
-
-    updateRecentlyOpened();
-
-    aSaveDeck = new QAction(QString(), this);
-    connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
-
-    aSaveDeckAs = new QAction(QString(), this);
-    connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
-
-    aLoadDeckFromClipboard = new QAction(QString(), this);
-    connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
-
-    aSaveDeckToClipboard = new QAction(QString(), this);
-    connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
-
-    aSaveDeckToClipboardNoSetNameAndNumber = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardNoSetNameAndNumber, SIGNAL(triggered()), this,
-            SLOT(actSaveDeckToClipboardNoSetNameAndNumber()));
-
-    aSaveDeckToClipboardRaw = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboardRaw()));
-
-    aSaveDeckToClipboardRawNoSetNameAndNumber = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardRawNoSetNameAndNumber, SIGNAL(triggered()), this,
-            SLOT(actSaveDeckToClipboardRawNoSetNameAndNumber()));
-
-    aPrintDeck = new QAction(QString(), this);
-    connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
-
-    aExportDeckDecklist = new QAction(QString(), this);
-    connect(aExportDeckDecklist, SIGNAL(triggered()), this, SLOT(actExportDeckDecklist()));
-
-    aAnalyzeDeckDeckstats = new QAction(QString(), this);
-    connect(aAnalyzeDeckDeckstats, SIGNAL(triggered()), this, SLOT(actAnalyzeDeckDeckstats()));
-
-    aAnalyzeDeckTappedout = new QAction(QString(), this);
-    connect(aAnalyzeDeckTappedout, SIGNAL(triggered()), this, SLOT(actAnalyzeDeckTappedout()));
-
-    analyzeDeckMenu = new QMenu(this);
-    analyzeDeckMenu->addAction(aExportDeckDecklist);
-    analyzeDeckMenu->addAction(aAnalyzeDeckDeckstats);
-    analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
-
-    aClose = new QAction(QString(), this);
-    connect(aClose, &QAction::triggered, this, [this] { closeRequest(); });
-
-    saveDeckToClipboardMenu = new QMenu(this);
-    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboard);
-    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardNoSetNameAndNumber);
-    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRaw);
-    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRawNoSetNameAndNumber);
-
-    deckMenu = new QMenu(this);
-    deckMenu->addAction(aNewDeck);
-    deckMenu->addAction(aLoadDeck);
-    deckMenu->addMenu(loadRecentDeckMenu);
-    deckMenu->addAction(aSaveDeck);
-    deckMenu->addAction(aSaveDeckAs);
-    deckMenu->addSeparator();
-    deckMenu->addAction(aLoadDeckFromClipboard);
-    deckMenu->addMenu(saveDeckToClipboardMenu);
-    deckMenu->addSeparator();
-    deckMenu->addAction(aPrintDeck);
-    deckMenu->addMenu(analyzeDeckMenu);
-    deckMenu->addSeparator();
-    deckMenu->addAction(filterDockWidget->aClearFilterOne);
-    deckMenu->addAction(filterDockWidget->aClearFilterAll);
-    deckMenu->addSeparator();
-    deckMenu->addAction(aClose);
+    deckMenu = new DeckEditorMenu(this, this);
     addTabMenu(deckMenu);
 
     viewMenu = new QMenu(this);
@@ -276,7 +197,7 @@ void TabDeckEditor::createMenus()
     connect(aResetLayout, SIGNAL(triggered()), this, SLOT(restartLayout()));
     viewMenu->addAction(aResetLayout);
 
-    setSaveStatus(false);
+    deckMenu->setSaveStatus(false);
 
     addTabMenu(viewMenu);
 }
@@ -304,7 +225,7 @@ void TabDeckEditor::actNewDeck()
 
     deckDockWidget->cleanDeck();
     setModified(false);
-    setSaveStatus(false);
+    deckMenu->setSaveStatus(false);
 }
 
 void TabDeckEditor::actLoadDeck()
@@ -344,47 +265,23 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
         } else {
-            setSaveStatus(false);
+            deckMenu->setSaveStatus(false);
             setDeck(l);
         }
     } else {
         delete l;
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
-    setSaveStatus(true);
+    deckMenu->setSaveStatus(true);
 }
 
 void TabDeckEditor::retranslateUi()
 {
+    deckMenu->retranslateUi();
     cardInfoDockWidget->cardInfo->retranslateUi();
-
-    aNewDeck->setText(tr("&New deck"));
-    aLoadDeck->setText(tr("&Load deck..."));
-    loadRecentDeckMenu->setTitle(tr("Load recent deck..."));
-    aClearRecents->setText(tr("Clear"));
-    aSaveDeck->setText(tr("&Save deck"));
-    aSaveDeckAs->setText(tr("Save deck &as..."));
-    aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
-
-    saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
-    aSaveDeckToClipboard->setText(tr("Annotated"));
-    aSaveDeckToClipboardNoSetNameAndNumber->setText(tr("Annotated (No set name or number)"));
-    aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
-    aSaveDeckToClipboardRawNoSetNameAndNumber->setText(tr("Not Annotated (No set name or number)"));
-
-    aPrintDeck->setText(tr("&Print deck..."));
-
-    analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
-    aExportDeckDecklist->setText(tr("Create decklist (decklist.org)"));
-    aAnalyzeDeckDeckstats->setText(tr("Analyze deck (deckstats.net)"));
-    aAnalyzeDeckTappedout->setText(tr("Analyze deck (tappedout.net)"));
-
-    aClose->setText(tr("&Close"));
 
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
-
-    deckMenu->setTitle(tr("&Deck Editor"));
 
     cardInfoDockWidget->setWindowTitle(tr("Card Info"));
     deckDockWidget->setWindowTitle(tr("Deck"));
@@ -415,21 +312,7 @@ void TabDeckEditor::retranslateUi()
 void TabDeckEditor::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-    aNewDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aNewDeck"));
-    aLoadDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeck"));
-    aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));
-    aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
-    aSaveDeckAs->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckAs"));
-    aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
-    aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
-    aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));
-    aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aResetLayout"));
-
-    aSaveDeckToClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
-    aSaveDeckToClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRaw"));
-
-    aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
 }
 
 void TabDeckEditor::showPrintingSelector()

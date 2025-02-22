@@ -3,6 +3,7 @@
 
 #include "../../deck/custom_line_edit.h"
 #include "../../game/cards/card_database.h"
+#include "../menus/deck_editor/deck_editor_menu.h"
 #include "../ui/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_deck_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_filter_dock_widget.h"
@@ -18,6 +19,8 @@ class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
 class QTreeView;
+
+class DeckEditorMenu;
 
 class CardInfoFrameWidget;
 class QTextEdit;
@@ -49,12 +52,9 @@ protected slots:
     void updateSearch(const QString &search);                                                     // generic
     void databaseCustomMenu(QPoint point);                                                        // generic
     void decklistCustomMenu(QPoint point);
-    void updateRecentlyOpened(); // generic
 
     virtual void actNewDeck() = 0;
     virtual void actLoadDeck() = 0;                     // NOT generic
-    void actOpenRecent(const QString &fileName);        // generic
-    void actClearRecents();                             // generic
     bool actSaveDeck();                                 // generic
     bool actSaveDeckAs();                               // generic
     void actLoadDeckFromClipboard();                    // generic
@@ -109,12 +109,7 @@ protected:
     QTreeView *databaseView;
     KeySignals searchKeySignals;
 
-    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu,
-        *analyzeDeckMenu, *saveDeckToClipboardMenu, *loadRecentDeckMenu;
-    QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
-        *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetNameAndNumber, *aSaveDeckToClipboardRaw,
-        *aSaveDeckToClipboardRawNoSetNameAndNumber, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats,
-        *aAnalyzeDeckTappedout, *aClose;
+    QMenu *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu;
     QAction *aAddCard, *aAddCardToSideboard;
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating, *aFilterDockVisible,
@@ -131,12 +126,12 @@ public:
     [[nodiscard]] virtual QString getTabText() const override = 0; // Subclasses MUST implement this
     void setDeck(DeckLoader *_deckLoader);                         // generic enough
     void setModified(bool _windowModified);                        // generic
-    void setSaveStatus(bool newStatus);                            // generic
     bool confirmClose();                                           // generic
     virtual void createMenus() = 0;
     virtual void createCentralFrame() = 0;
     void updateCardInfo(CardInfoPtr _card);
     void addCardHelper(CardInfoPtr info, QString zoneName); // reasonably generic
+    DeckEditorMenu *deckMenu;
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;
     DeckEditorDeckDockWidget *deckDockWidget;
     DeckEditorFilterDockWidget *filterDockWidget;
@@ -145,6 +140,7 @@ public:
     SearchLineEdit *searchEdit;
 
 public slots:
+    void actOpenRecent(const QString &fileName);     // generic
     void closeRequest(bool forced = false) override; // generic
     virtual void showPrintingSelector() = 0;
 signals:

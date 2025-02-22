@@ -170,14 +170,14 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
     deckEditor->setModified(true);
-    deckEditor->setSaveStatus(true);
+    deckEditor->deckMenu->setSaveStatus(true);
 }
 
 void DeckEditorDeckDockWidget::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
     deckEditor->setModified(true);
-    deckEditor->setSaveStatus(true);
+    deckEditor->deckMenu->setSaveStatus(true);
 }
 
 void DeckEditorDeckDockWidget::updateHash()
