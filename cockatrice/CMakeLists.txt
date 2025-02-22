@@ -184,6 +184,7 @@ set(cockatrice_SOURCES
     src/client/ui/window_main.cpp
     src/game/zones/view_zone_widget.cpp
     src/game/zones/view_zone.cpp
+    src/client/menus/deck_editor/deck_editor_menu.cpp
     src/client/ui/widgets/deck_analytics/mana_base_widget.cpp
     src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
     src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
