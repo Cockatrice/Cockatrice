@@ -113,8 +113,6 @@ void TabDeckEditor::createDeckDock()
     });
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &TabDeckEditor::setBannerCard);
-    connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            [this] { setModified(true); });
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
 
@@ -914,6 +912,7 @@ void TabDeckEditor::setBannerCard(int /* changedIndex */)
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
     deckModel->getDeckList()->setBannerCard(
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    setModified(true);
 }
 
 void TabDeckEditor::updateCardInfo(CardInfoPtr _card)
