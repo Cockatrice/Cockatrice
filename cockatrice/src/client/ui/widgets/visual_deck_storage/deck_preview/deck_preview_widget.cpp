@@ -286,9 +286,13 @@ static void saveDeckToClipboard(DeckLoader *deckLoader, bool addComments, bool a
 QMenu *DeckPreviewWidget::createRightClickMenu()
 {
     auto *menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
 
     auto loadDeckAction = menu->addAction(tr("Load Deck"));
     connect(loadDeckAction, &QAction::triggered, this, [this] { emit deckLoadRequested(filePath); });
+
+    connect(menu->addAction(tr("Edit Tags")), &QAction::triggered, deckTagsDisplayWidget,
+            &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
 
     menu->addSeparator();
 
