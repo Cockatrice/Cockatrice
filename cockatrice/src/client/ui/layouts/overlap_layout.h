@@ -3,7 +3,10 @@
 
 #include <QLayout>
 #include <QList>
+#include <QLoggingCategory>
 #include <QWidget>
+
+inline Q_LOGGING_CATEGORY(OverlapLayoutLog, "overlap_layout");
 
 class OverlapLayout : public QLayout
 {
