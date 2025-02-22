@@ -1,5 +1,7 @@
 #include "banner_widget.h"
 
+#include "../../../../../client/ui/pixel_map_generator.h"
+
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
@@ -8,14 +10,19 @@
 BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency, 100))
 {
+    auto layout = new QHBoxLayout(this);
+
+    iconLabel = new QLabel(this);
+    iconLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
     // Create the banner label and set properties
     bannerLabel = new QLabel(text, this);
     bannerLabel->setAlignment(Qt::AlignCenter);
     bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
 
-    // Layout to center the banner label
-    layout = new QVBoxLayout(this);
+    layout->addWidget(iconLabel);
     layout->addWidget(bannerLabel);
+    layout->addWidget(new QLabel(this)); // add dummy label to force text label to be centered
     setLayout(layout);
 
     // Set minimum height for the widget
@@ -36,10 +43,29 @@ void BannerWidget::setText(const QString &text) const
     bannerLabel->setText(text);
 }
 
+void BannerWidget::setClickable(bool _clickable)
+{
+    clickable = _clickable;
+    setDropdownIconState(true);
+}
+
 void BannerWidget::toggleBuddyVisibility() const
 {
     if (buddy) {
         buddy->setVisible(!buddy->isVisible());
+        setDropdownIconState(buddy->isVisible());
+    } else {
+        setDropdownIconState(false);
+    }
+}
+
+void BannerWidget::setDropdownIconState(bool expanded) const
+{
+    if (clickable) {
+        iconLabel->setPixmap(DropdownIconPixmapGenerator::generatePixmap(24, expanded));
+    } else {
+        // we cannot directly hide the iconLabel, since it's needed to center the text; set an empty image instead
+        iconLabel->setPixmap(QPixmap());
     }
 }
 
