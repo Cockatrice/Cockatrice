@@ -6,6 +6,7 @@
 #include "../tab_supervisor.h"
 #include "pb/command_deck_del.pb.h"
 
+#include <QMessageBox>
 #include <QMouseEvent>
 
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
@@ -26,6 +27,7 @@ void TabDeckStorageVisual::actOpenLocalDeck(const QString &filePath)
 {
     DeckLoader deckLoader;
     if (!deckLoader.loadFromFile(filePath, DeckLoader::getFormatFromName(filePath), true)) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(filePath));
         return;
     }
 
