@@ -12,6 +12,8 @@
 
 #include <QComboBox>
 #include <QDirIterator>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QToolBar>
 #include <QVBoxLayout>
