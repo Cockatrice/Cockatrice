@@ -36,6 +36,10 @@ public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
+    void actIncrement();  // generic
+    void actSwapCard();   // probably generic
+    void actDecrement();  // generic
+    void actRemoveCard(); // generic
 
 private:
     TabGenericDeckEditor *deckEditor;
@@ -63,11 +67,6 @@ private slots:
     void updateHash();                    // generic
     void refreshShortcuts();
     void retranslateUi();
-
-    void actIncrement();  // generic
-    void actSwapCard();   // probably generic
-    void actDecrement();  // generic
-    void actRemoveCard(); // generic
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H

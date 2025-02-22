@@ -180,7 +180,7 @@ private slots:
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(TabGenericDeckEditor *tab);
-    void visualDeckEditorClosed(TabDeckEditorVisual *tab);
+    void visualDeckEditorClosed(TabGenericDeckEditor *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);
