@@ -201,7 +201,7 @@ void TabSupervisor::retranslateUi()
     QListIterator<TabGame *> replayIterator(replayTabs);
     while (replayIterator.hasNext())
         tabs.append(replayIterator.next());
-    QListIterator<TabDeckEditor *> deckEditorIterator(deckEditorTabs);
+    QListIterator<TabGenericDeckEditor *> deckEditorIterator(deckEditorTabs);
     while (deckEditorIterator.hasNext())
         tabs.append(deckEditorIterator.next());
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
@@ -242,7 +242,7 @@ bool TabSupervisor::closeRequest()
         }
     }
 
-    for (TabDeckEditor *tab : deckEditorTabs) {
+    for (TabGenericDeckEditor *tab : deckEditorTabs) {
         if (!tab->confirmClose())
             return false;
     }
