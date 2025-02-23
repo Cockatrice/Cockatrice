@@ -1981,21 +1981,24 @@ void Player::createCard(const CardItem *sourceCard,
         cmd.set_annotation("");
     }
     cmd.set_destroy_on_zone_change(!persistent);
-    cmd.set_target_zone("table"); // we currently only support creating tokens on the table
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
     switch (attachType) {
         case CardRelation::DoesNotAttach:
+            cmd.set_target_zone("table");
             break;
 
         case CardRelation::AttachTo:
+            cmd.set_target_zone("table"); // We currently only support creating tokens on the table
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
             cmd.set_card_provider_id(sourceCard->getProviderId().toStdString());
             break;
 
         case CardRelation::TransformInto:
+            // Transform card zone changes are handled server-side
+            cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::TRANSFORM_INTO);
             cmd.set_card_provider_id(sourceCard->getProviderId().toStdString());
