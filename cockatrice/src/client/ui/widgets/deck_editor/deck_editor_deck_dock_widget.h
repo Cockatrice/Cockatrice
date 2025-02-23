@@ -1,0 +1,73 @@
+#ifndef DECK_EDITOR_DECK_DOCK_WIDGET_H
+#define DECK_EDITOR_DECK_DOCK_WIDGET_H
+
+#include "../../../../deck/custom_line_edit.h"
+#include "../../../../game/cards/card_database.h"
+#include "../../../game_logic/key_signals.h"
+#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+
+#include <QDockWidget>
+#include <QLabel>
+#include <QTextEdit>
+#include <QTreeView>
+
+class DeckListModel;
+class TabGenericDeckEditor;
+class DeckEditorDeckDockWidget : public QDockWidget
+{
+    Q_OBJECT
+public:
+    explicit DeckEditorDeckDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor);
+    DeckListModel *deckModel;
+    QTreeView *deckView;
+    QComboBox *bannerCardComboBox;
+    void createDeckDock();
+    QString getDeckName()
+    {
+        return nameEdit->text();
+    }
+    QString getSimpleDeckName()
+    {
+        return nameEdit->text().simplified();
+    }
+
+public slots:
+    void cleanDeck();
+    void updateBannerCardComboBox();
+    void setDeck(DeckLoader *_deck);
+
+private:
+    TabGenericDeckEditor *deckEditor;
+    KeySignals deckViewKeySignals;
+    QLabel *nameLabel;
+    LineEditUnfocusable *nameEdit;
+    QLabel *commentsLabel;
+    QTextEdit *commentsEdit;
+    QLabel *bannerCardLabel;
+    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
+    QLabel *hashLabel1;
+    LineEditUnfocusable *hashLabel;
+
+    QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
+
+    void recursiveExpand(const QModelIndex &index);              // generic
+    bool swapCard(const QModelIndex &idx);                       // probably generic
+    void offsetCountAtIndex(const QModelIndex &idx, int offset); // generic
+    QModelIndexList getSelectedCardNodes() const;
+
+private slots:
+    void updateName(const QString &name); // generic
+    void updateComments();                // generic
+    void setBannerCard(int);              // generic
+    void updateHash();                    // generic
+    void refreshShortcuts();
+    void retranslateUi();
+
+    void actIncrement();  // generic
+    void actSwapCard();   // probably generic
+    void actDecrement();  // generic
+    void actRemoveCard(); // generic
+};
+
+#endif // DECK_EDITOR_DECK_DOCK_WIDGET_H
