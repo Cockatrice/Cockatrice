@@ -160,7 +160,7 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
                                                             showFoldersCheckBox->isChecked());
 
-    scrollArea->setWidget(folderWidget);
+    scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
     updateSortOrder();
