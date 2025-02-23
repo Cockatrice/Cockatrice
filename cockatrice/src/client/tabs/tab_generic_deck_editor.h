@@ -5,6 +5,7 @@
 #include "../../game/cards/card_database.h"
 #include "../menus/deck_editor/deck_editor_menu.h"
 #include "../ui/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
+#include "../ui/widgets/deck_editor/deck_editor_database_display_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_deck_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_filter_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.h"
@@ -26,6 +27,7 @@ class CardInfoFrameWidget;
 class QTextEdit;
 class QLabel;
 class DeckLoader;
+class DeckEditorDatabaseDisplayWidget;
 class DeckEditorDeckDockWidget;
 class DeckEditorFilterDockWidget;
 class DeckEditorPrintingSelectorDockWidget;
@@ -49,43 +51,38 @@ protected slots:
     void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);            // generic
     void updatePrintingSelectorDatabase(const QModelIndex &current, const QModelIndex &previous); // possibly generic
     void updatePrintingSelectorDeckView(const QModelIndex &current, const QModelIndex &previous); // possibly generic
-    void updateSearch(const QString &search);                                                     // generic
-    void databaseCustomMenu(QPoint point);                                                        // generic
     void decklistCustomMenu(QPoint point);
 
     virtual void actNewDeck() = 0;
-    virtual void actLoadDeck() = 0;                     // NOT generic
-    bool actSaveDeck();                                 // generic
-    bool actSaveDeckAs();                               // generic
-    void actLoadDeckFromClipboard();                    // generic
-    void actSaveDeckToClipboard();                      // generic
-    void actSaveDeckToClipboardNoSetNameAndNumber();    // generic
-    void actSaveDeckToClipboardRaw();                   // generic
-    void actSaveDeckToClipboardRawNoSetNameAndNumber(); // generic
-    void actPrintDeck();                                // generic
-    void actExportDeckDecklist();                       // generic
-    void actAnalyzeDeckDeckstats();                     // generic
-    void actAnalyzeDeckTappedout();                     // generic
+    virtual void actLoadDeck() = 0;
+    bool actSaveDeck();
+    bool actSaveDeckAs();
+    void actLoadDeckFromClipboard();
+    void actSaveDeckToClipboard();
+    void actSaveDeckToClipboardNoSetNameAndNumber();
+    void actSaveDeckToClipboardRaw();
+    void actSaveDeckToClipboardRawNoSetNameAndNumber();
+    void actPrintDeck();
+    void actExportDeckDecklist();
+    void actAnalyzeDeckDeckstats();
+    void actAnalyzeDeckTappedout();
 
-    void actAddCard();                    // generic
-    void actAddCardToSideboard();         // generic
-    void actDecrementCard();              // generic
-    void actDecrementCardFromSideboard(); // generic
-    void copyDatabaseCellContents();      // generic
+    void actAddCard();
+    void actAddCardToSideboard();
+    void actDecrementCard();
+    void actDecrementCardFromSideboard();
 
-    void saveDeckRemoteFinished(const Response &r); // generic
+    void saveDeckRemoteFinished(const Response &r);
 
     virtual void loadLayout() = 0;
-    virtual void restartLayout() = 0; // somewhat generic
+    virtual void restartLayout() = 0;
     virtual void freeDocksSize() = 0;
     virtual void refreshShortcuts() = 0;
 
     bool eventFilter(QObject *o, QEvent *e) override;
-    virtual void dockVisibleTriggered() = 0;             // custom
-    virtual void dockFloatingTriggered() = 0;            // custom
-    virtual void dockTopLevelChanged(bool topLevel) = 0; // custom
-    void saveDbHeaderState();                            // generic
-    void showSearchSyntaxHelp();                         // generic
+    virtual void dockVisibleTriggered() = 0;
+    virtual void dockFloatingTriggered() = 0;
+    virtual void dockTopLevelChanged(bool topLevel) = 0;
 
 protected:
     /**
@@ -101,24 +98,17 @@ protected:
     QMessageBox *createSaveConfirmationWindow();
 
     bool isBlankNewDeck() const;
-    CardInfoPtr currentCardInfo() const;        // generic
+
     void decrementCardHelper(QString zoneName); // generic
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation) = 0;
 
-    CardDatabaseModel *databaseModel;
-    QTreeView *databaseView;
-    KeySignals searchKeySignals;
-
     QMenu *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu;
-    QAction *aAddCard, *aAddCardToSideboard;
+
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating, *aFilterDockVisible,
         *aFilterDockFloating, *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
 
     bool modified;
-    QVBoxLayout *centralFrame;
-    QHBoxLayout *searchLayout;
-    QWidget *centralWidget;
 
 public:
     explicit TabGenericDeckEditor(TabSupervisor *_tabSupervisor);
@@ -128,16 +118,14 @@ public:
     void setModified(bool _windowModified);                        // generic
     bool confirmClose();                                           // generic
     virtual void createMenus() = 0;
-    virtual void createCentralFrame() = 0;
     void updateCardInfo(CardInfoPtr _card);
     void addCardHelper(CardInfoPtr info, QString zoneName); // reasonably generic
     DeckEditorMenu *deckMenu;
+    DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;
     DeckEditorDeckDockWidget *deckDockWidget;
     DeckEditorFilterDockWidget *filterDockWidget;
     DeckEditorPrintingSelectorDockWidget *printingSelectorDockWidget;
-    CardDatabaseDisplayModel *databaseDisplayModel;
-    SearchLineEdit *searchEdit;
 
 public slots:
     void actOpenRecent(const QString &fileName);     // generic

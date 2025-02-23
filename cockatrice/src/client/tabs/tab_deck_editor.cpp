@@ -42,9 +42,9 @@
 TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEditor(_tabSupervisor)
 {
     setObjectName("TabDeckEditor");
+    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 
-    TabDeckEditor::createCentralFrame();
-
+    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this, this);
     deckDockWidget = new DeckEditorDeckDockWidget(this, this);
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
     filterDockWidget = new DeckEditorFilterDockWidget(this, this);
@@ -59,96 +59,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEdit
     TabDeckEditor::refreshShortcuts();
 
     TabDeckEditor::loadLayout();
-}
-
-void TabDeckEditor::createCentralFrame()
-{
-    searchEdit = new SearchLineEdit;
-    searchEdit->setObjectName("searchEdit");
-    searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
-    searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
-    searchEdit->installEventFilter(&searchKeySignals);
-
-    setFocusProxy(searchEdit);
-    setFocusPolicy(Qt::ClickFocus);
-
-    searchKeySignals.setObjectName("searchKeySignals");
-    connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
-    connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrementCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));
-    connect(help, &QAction::triggered, this, &TabDeckEditor::showSearchSyntaxHelp);
-
-    databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
-    databaseModel->setObjectName("databaseModel");
-    databaseDisplayModel = new CardDatabaseDisplayModel(this);
-    databaseDisplayModel->setSourceModel(databaseModel);
-    databaseDisplayModel->setFilterKeyColumn(0);
-
-    databaseView = new QTreeView();
-    databaseView->setObjectName("databaseView");
-    databaseView->setFocusProxy(searchEdit);
-    databaseView->setUniformRowHeights(true);
-    databaseView->setRootIsDecorated(false);
-    databaseView->setAlternatingRowColors(true);
-    databaseView->setSortingEnabled(true);
-    databaseView->sortByColumn(0, Qt::AscendingOrder);
-    databaseView->setModel(databaseDisplayModel);
-    databaseView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(databaseView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(databaseCustomMenu(QPoint)));
-    connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
-            SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
-    connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
-            SLOT(updatePrintingSelectorDatabase(const QModelIndex &, const QModelIndex &)));
-    connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
-
-    QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
-    if (dbHeaderState.isNull()) {
-        // first run
-        databaseView->setColumnWidth(0, 200);
-    } else {
-        databaseView->header()->restoreState(dbHeaderState);
-    }
-    connect(databaseView->header(), SIGNAL(geometriesChanged()), this, SLOT(saveDbHeaderState()));
-
-    searchEdit->setTreeView(databaseView);
-
-    aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(QPixmap("theme:icons/arrow_right_green"));
-    connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
-    auto *tbAddCard = new QToolButton(this);
-    tbAddCard->setDefaultAction(aAddCard);
-
-    aAddCardToSideboard = new QAction(QString(), this);
-    aAddCardToSideboard->setIcon(QPixmap("theme:icons/arrow_right_blue"));
-    connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-    auto *tbAddCardToSideboard = new QToolButton(this);
-    tbAddCardToSideboard->setDefaultAction(aAddCardToSideboard);
-
-    searchLayout = new QHBoxLayout;
-    searchLayout->setObjectName("searchLayout");
-    searchLayout->addWidget(searchEdit);
-    searchLayout->addWidget(tbAddCard);
-    searchLayout->addWidget(tbAddCardToSideboard);
-
-    centralFrame = new QVBoxLayout;
-    centralFrame->setObjectName("centralFrame");
-    centralFrame->addLayout(searchLayout);
-    centralFrame->addWidget(databaseView);
-
-    centralWidget = new QWidget(this);
-    centralWidget->setObjectName("centralWidget");
-    centralWidget->setLayout(centralFrame);
-    centralWidget->setMaximumSize(900, 5000);
-    setCentralWidget(centralWidget);
-    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
 void TabDeckEditor::createMenus()
@@ -280,9 +190,6 @@ void TabDeckEditor::retranslateUi()
     deckMenu->retranslateUi();
     cardInfoDockWidget->cardInfo->retranslateUi();
 
-    aAddCard->setText(tr("Add card to &maindeck"));
-    aAddCardToSideboard->setText(tr("Add card to &sideboard"));
-
     cardInfoDockWidget->setWindowTitle(tr("Card Info"));
     deckDockWidget->setWindowTitle(tr("Deck"));
     filterDockWidget->setWindowTitle(tr("Filters"));
@@ -326,6 +233,9 @@ void TabDeckEditor::showPrintingSelector()
 void TabDeckEditor::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
+
+    setCentralWidget(databaseDisplayDockWidget);
+
     auto &layoutState = layouts.getDeckEditorLayoutState();
     if (layoutState.isNull()) {
         restartLayout();
@@ -361,6 +271,9 @@ void TabDeckEditor::loadLayout()
     printingSelectorDockWidget->setMinimumSize(layouts.getDeckEditorPrintingSelectorSize());
     printingSelectorDockWidget->setMaximumSize(layouts.getDeckEditorPrintingSelectorSize());
 
+    databaseDisplayDockWidget->setMinimumSize(100, 100);
+    databaseDisplayDockWidget->setMaximumSize(1400, 5000);
+
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
@@ -386,6 +299,7 @@ void TabDeckEditor::restartLayout()
     aFilterDockFloating->setChecked(false);
     aPrintingSelectorDockFloating->setChecked(false);
 
+    setCentralWidget(databaseDisplayDockWidget);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), deckDockWidget);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), cardInfoDockWidget);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), filterDockWidget);
@@ -413,7 +327,8 @@ void TabDeckEditor::freeDocksSize()
     printingSelectorDockWidget->setMinimumSize(525, 100);
     printingSelectorDockWidget->setMaximumSize(5000, 5000);
 
-    centralWidget->setMaximumSize(900, 5000);
+    databaseDisplayDockWidget->setMinimumSize(100, 100);
+    databaseDisplayDockWidget->setMaximumSize(1400, 5000);
 }
 
 void TabDeckEditor::dockVisibleTriggered()

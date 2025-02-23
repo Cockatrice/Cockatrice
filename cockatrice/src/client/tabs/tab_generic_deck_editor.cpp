@@ -41,13 +41,6 @@
 #include <QTreeView>
 #include <QUrl>
 
-static bool canBeCommander(const CardInfoPtr &cardInfo)
-{
-    return ((cardInfo->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
-             cardInfo->getCardType().contains("Creature", Qt::CaseInsensitive))) ||
-           cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
-}
-
 TabGenericDeckEditor::TabGenericDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
 }
@@ -136,56 +129,6 @@ void TabGenericDeckEditor::updatePrintingSelectorDeckView(const QModelIndex &cur
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         printingSelectorDockWidget->printingSelector->setCard(
             CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderID), zoneName);
-    }
-}
-
-void TabGenericDeckEditor::updateSearch(const QString &search)
-{
-    databaseDisplayModel->setStringFilter(search);
-    QModelIndexList sel = databaseView->selectionModel()->selectedRows();
-    if (sel.isEmpty() && databaseDisplayModel->rowCount())
-        databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
-                                                        QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
-}
-
-void TabGenericDeckEditor::databaseCustomMenu(QPoint point)
-{
-    QMenu menu;
-    const CardInfoPtr info = currentCardInfo();
-
-    if (info) {
-        // add to deck and sideboard options
-        QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
-        addToDeck = menu.addAction(tr("Add to Deck"));
-        addToSideboard = menu.addAction(tr("Add to Sideboard"));
-        selectPrinting = menu.addAction(tr("Select Printing"));
-        if (canBeCommander(info)) {
-            edhRecCommander = menu.addAction(tr("Show on EDHREC (Commander)"));
-            connect(edhRecCommander, &QAction::triggered, this,
-                    [this, info] { this->tabSupervisor->addEdhrecTab(info, true); });
-        }
-        edhRecCard = menu.addAction(tr("Show on EDHREC (Card)"));
-
-        connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
-        connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-        connect(selectPrinting, &QAction::triggered, this, [this, info] { this->showPrintingSelector(); });
-        connect(edhRecCard, &QAction::triggered, this, [this, info] { this->tabSupervisor->addEdhrecTab(info); });
-
-        // filling out the related cards submenu
-        auto *relatedMenu = new QMenu(tr("Show Related cards"));
-        menu.addMenu(relatedMenu);
-        auto relatedCards = info->getAllRelatedCards();
-        if (relatedCards.isEmpty()) {
-            relatedMenu->setDisabled(true);
-        } else {
-            for (const CardRelation *rel : relatedCards) {
-                const QString &relatedCardName = rel->getName();
-                QAction *relatedCard = relatedMenu->addAction(relatedCardName);
-                connect(relatedCard, &QAction::triggered, cardInfoDockWidget->cardInfo,
-                        [this, relatedCardName] { cardInfoDockWidget->cardInfo->setCard(relatedCardName); });
-            }
-        }
-        menu.exec(databaseView->mapToGlobal(point));
     }
 }
 
@@ -463,28 +406,16 @@ void TabGenericDeckEditor::actExportDeckDecklist()
 
 void TabGenericDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*databaseModel->getDatabase(),
+    auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
                                              this); // it deletes itself when done
     interface->analyzeDeck(deckDockWidget->deckModel->getDeckList());
 }
 
 void TabGenericDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*databaseModel->getDatabase(),
+    auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
                                              this); // it deletes itself when done
     interface->analyzeDeck(deckDockWidget->deckModel->getDeckList());
-}
-
-CardInfoPtr TabGenericDeckEditor::currentCardInfo() const
-{
-    const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid()) {
-        return {};
-    }
-
-    const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
-
-    return CardDatabaseManager::getInstance()->getCard(cardName);
 }
 
 void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
@@ -499,7 +430,7 @@ void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneNam
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(newCardIndex);
     setModified(true);
-    searchEdit->setSelection(0, searchEdit->text().length());
+    databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
 void TabGenericDeckEditor::actAddCard()
@@ -507,19 +438,19 @@ void TabGenericDeckEditor::actAddCard()
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard();
     else
-        addCardHelper(currentCardInfo(), DECK_ZONE_MAIN);
+        addCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_MAIN);
     deckMenu->setSaveStatus(true);
 }
 
 void TabGenericDeckEditor::actAddCardToSideboard()
 {
-    addCardHelper(currentCardInfo(), DECK_ZONE_SIDE);
+    addCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_SIDE);
     deckMenu->setSaveStatus(true);
 }
 
 void TabGenericDeckEditor::decrementCardHelper(QString zoneName)
 {
-    const CardInfoPtr info = currentCardInfo();
+    const CardInfoPtr info = databaseDisplayDockWidget->currentCardInfo();
 
     if (!info)
         return;
@@ -543,53 +474,6 @@ void TabGenericDeckEditor::actDecrementCard()
 void TabGenericDeckEditor::actDecrementCardFromSideboard()
 {
     decrementCardHelper(DECK_ZONE_SIDE);
-}
-
-void TabGenericDeckEditor::copyDatabaseCellContents()
-{
-    auto _data = databaseView->selectionModel()->currentIndex().data();
-    QApplication::clipboard()->setText(_data.toString());
-}
-
-void TabGenericDeckEditor::saveDbHeaderState()
-{
-    SettingsCache::instance().layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
-}
-
-void TabGenericDeckEditor::showSearchSyntaxHelp()
-{
-
-    QFile file("theme:help/search.md");
-
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        return;
-    }
-
-    QTextStream in(&file);
-    QString text = in.readAll();
-    file.close();
-
-    // Poor Markdown Converter
-    auto opts = QRegularExpression::MultilineOption;
-    text = text.replace(QRegularExpression("^(###)(.*)", opts), "<h3>\\2</h3>")
-               .replace(QRegularExpression("^(##)(.*)", opts), "<h2>\\2</h2>")
-               .replace(QRegularExpression("^(#)(.*)", opts), "<h1>\\2</h1>")
-               .replace(QRegularExpression("^------*", opts), "<hr />")
-               .replace(QRegularExpression(R"(\[([^[]+)\]\(([^\)]+)\))", opts), R"(<a href='\2'>\1</a>)");
-
-    auto browser = new QTextBrowser;
-    browser->setParent(this, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint |
-                                 Qt::WindowCloseButtonHint | Qt::WindowFullscreenButtonHint);
-    browser->setWindowTitle("Search Help");
-    browser->setReadOnly(true);
-    browser->setMinimumSize({500, 600});
-
-    QString sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
-    browser->document()->setDefaultStyleSheet(sheet);
-
-    browser->setHtml(text);
-    connect(browser, &QTextBrowser::anchorClicked, [this](const QUrl &link) { searchEdit->setText(link.fragment()); });
-    browser->show();
 }
 
 void TabGenericDeckEditor::setDeck(DeckLoader *_deck)

@@ -23,8 +23,8 @@ void DeckEditorFilterDockWidget::createFiltersDock()
 {
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
-    deckEditor->databaseDisplayModel->setFilterTree(filterModel->filterTree());
-    deckEditor->databaseDisplayModel->setObjectName("databaseDisplayModel");
+    deckEditor->databaseDisplayDockWidget->databaseDisplayModel->setFilterTree(filterModel->filterTree());
+    deckEditor->databaseDisplayDockWidget->databaseDisplayModel->setObjectName("databaseDisplayModel");
     filterView = new QTreeView;
     filterView->setObjectName("filterView");
     filterView->setModel(filterModel);
@@ -115,8 +115,8 @@ void DeckEditorFilterDockWidget::filterRemove(QAction *action)
 
 void DeckEditorFilterDockWidget::actClearFilterAll()
 {
-    deckEditor->databaseDisplayModel->clearFilterAll();
-    deckEditor->searchEdit->setText("");
+    deckEditor->databaseDisplayDockWidget->databaseDisplayModel->clearFilterAll();
+    deckEditor->databaseDisplayDockWidget->searchEdit->setText("");
 }
 
 void DeckEditorFilterDockWidget::actClearFilterOne()

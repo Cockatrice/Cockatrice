@@ -38,7 +38,6 @@ public:
     void retranslateUi() override;
     QString getTabText() const override;
     void createMenus() override;
-    void createCentralFrame() override;
 
 public slots:
     void showPrintingSelector() override;
