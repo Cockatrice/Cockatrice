@@ -24,12 +24,12 @@ private:
     KeySignals filterViewKeySignals;
     QWidget *filterBox;
 
-    void filterViewCustomContextMenu(const QPoint &point); // generic
-    void filterRemove(QAction *action);                    // generic
+    void filterRemove(QAction *action);
 
 private slots:
-    void actClearFilterAll(); // generic
-    void actClearFilterOne(); // generic
+    void filterViewCustomContextMenu(const QPoint &point);
+    void actClearFilterAll();
+    void actClearFilterOne();
     void refreshShortcuts();
     void retranslateUi();
 };

@@ -39,12 +39,12 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->installEventFilter(&deckViewKeySignals);
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
+    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), deckEditor,
             SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
-    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
+    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), deckEditor,
             SLOT(updatePrintingSelectorDeckView(const QModelIndex &, const QModelIndex &)));
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
-    connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(decklistCustomMenu(QPoint)));
+    connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), deckEditor, SLOT(decklistCustomMenu(QPoint)));
     connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
