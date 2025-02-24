@@ -17,18 +17,18 @@ class DeckAnalyticsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeckAnalyticsWidget(QWidget *parent = nullptr, DeckListModel *deck_list_model = nullptr);
-    void setDeckList(const DeckList &new_deck_list_model);
+    explicit DeckAnalyticsWidget(QWidget *parent, DeckListModel *deckListModel);
+    void setDeckList(const DeckList &_deckListModel);
     std::map<int, int> analyzeManaCurve();
+    void refreshDisplays(DeckListModel *_deckListModel);
 
 private:
-    DeckListModel *deck_list_model;
-    QHBoxLayout *main_layout;
-    FlowWidget *flow_widget;
+    DeckListModel *deckListModel;
+    QVBoxLayout *mainLayout;
 
-    ManaCurveWidget *mana_curve_widget;
-    ManaDevotionWidget *mana_devotion_widget;
-    ManaBaseWidget *mana_base_widget;
+    ManaCurveWidget *manaCurveWidget;
+    ManaDevotionWidget *manaDevotionWidget;
+    ManaBaseWidget *manaBaseWidget;
 };
 
 #endif // DECK_ANALYTICS_WIDGET_H

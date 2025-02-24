@@ -42,13 +42,13 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
-    connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrementCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onEnter()), deckEditor, SLOT(actAddCard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), deckEditor, SLOT(actAddCard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), deckEditor, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), deckEditor, SLOT(actDecrementCard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), deckEditor, SLOT(actDecrementCardFromSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), deckEditor, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onCtrlEnter()), deckEditor, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));
     connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
 

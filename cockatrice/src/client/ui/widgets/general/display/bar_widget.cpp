@@ -1,9 +1,10 @@
 #include "bar_widget.h"
 
-#include <utility>
+#include <QFontMetrics>
+#include <QPainter>
 
-BarWidget::BarWidget(QString label, int value, int total, QWidget *parent)
-    : QWidget(parent), label(std::move(label)), value(value), total(total)
+BarWidget::BarWidget(QString label, int value, int total, QColor barColor, QWidget *parent)
+    : QWidget(parent), label(std::move(label)), value(value), total(total), barColor(barColor)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
@@ -14,10 +15,10 @@ QSize BarWidget::sizeHint() const
     int labelHeight = metrics.height();
     int valueHeight = metrics.height();
 
-    // Calculate the height based on total and value
-    int barHeight = total > 0 ? total * 2 : 20;                   // Adjust factor as necessary for visual size
-    int totalHeight = barHeight + labelHeight + valueHeight + 30; // Extra space for padding
-    return QSize(40, totalHeight);                                // Width is fixed, height is calculated
+    // Calculate the height dynamically based on the total
+    int barHeight = (total > 0) ? (value * 200 / total) : 20;     // Scale height proportionally
+    int totalHeight = barHeight + labelHeight + valueHeight + 30; // Extra space for text
+    return QSize(60, totalHeight);                                // Allow width to expand
 }
 
 void BarWidget::paintEvent(QPaintEvent *event)
@@ -25,25 +26,30 @@ void BarWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // Calculate the full bar width and value-specific bar width
-    int fullBarWidth = total; // Full bar (sum of all entries)
-    int valueBarWidth = (total > 0) ? (value * 100 / total) : 0;
+    int widgetWidth = width();
+    int widgetHeight = height();
 
-    // Draw the full bar background (gray)
-    painter.setBrush(QColor(200, 200, 200)); // Gray background for full bar
-    painter.drawRect(0, 10, 20, fullBarWidth);
+    // Calculate bar dimensions
+    int barWidth = widgetWidth * 0.8;      // Use 80% of the available width
+    int fullBarHeight = widgetHeight - 40; // Leave space for labels
+    int valueBarHeight = (total > 0) ? (value * fullBarHeight / total) : 0;
 
-    // Draw the value-specific bar (blue)
-    painter.setBrush(QColor(100, 150, 255)); // Blue for the value bar
-    painter.drawRect(0, fullBarWidth + 10, 20, -valueBarWidth);
+    // Draw full bar background (gray)
+    painter.setBrush(QColor(200, 200, 200));
+    painter.drawRect((widgetWidth - barWidth) / 2, 10, barWidth, fullBarHeight);
+
+    // Draw the value-specific bar using the assigned color
+    painter.setBrush(barColor);
+    painter.drawRect((widgetWidth - barWidth) / 2, 10 + fullBarHeight - valueBarHeight, barWidth, valueBarHeight);
 
     // Draw the CMC label
     painter.setPen(Qt::white);
-    QRect textRect(0, fullBarWidth + 10, 20, 30); // Define a rectangle for text
+    QRect textRect(0, widgetHeight - 30, widgetWidth, 20);
     painter.drawText(textRect, Qt::AlignCenter, label);
 
+    // Draw the value count
     painter.setPen(Qt::black);
-    QRect valueRect(0, 10, 20, fullBarWidth); // Define a rectangle for text
+    QRect valueRect(0, 10, widgetWidth, 20);
     painter.drawText(valueRect, Qt::AlignCenter, QString::number(value));
 
     (void)event; // Suppress unused parameter warning

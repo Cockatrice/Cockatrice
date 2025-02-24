@@ -16,7 +16,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    visualDeckView = new VisualDeckEditorWidget(this, this->deckModel);
+    visualDeckView = new VisualDeckEditorWidget(this, deckModel);
     visualDeckView->setObjectName("visualDeckView");
     visualDeckView->updateDisplay();
     connect(visualDeckView, SIGNAL(activeCardChanged(CardInfoPtr)), this, SLOT(onCardChanged(CardInfoPtr)));
@@ -25,8 +25,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     connect(visualDeckView, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onSideboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    visualDatabaseDisplay =
-        new VisualDatabaseDisplayWidget(this, this->cardDatabaseModel, this->cardDatabaseDisplayModel);
+    visualDatabaseDisplay = new VisualDatabaseDisplayWidget(this, cardDatabaseModel, cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this,
             SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
@@ -34,9 +33,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             SIGNAL(cardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onCardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    deckAnalytics = new DeckAnalyticsWidget(this, this->deckModel);
+    deckAnalytics = new DeckAnalyticsWidget(this, deckModel);
     deckAnalytics->setObjectName("deckAnalytics");
-    // deckAnalytics->analyzeManaCurve();
 
     // printingSelector = new PrintingSelector(this, this->deckModel);
 

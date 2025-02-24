@@ -113,13 +113,13 @@ protected:
 public:
     explicit TabGenericDeckEditor(TabSupervisor *_tabSupervisor);
     virtual void retranslateUi() override = 0;
-    [[nodiscard]] virtual QString getTabText() const override = 0; // Subclasses MUST implement this
-    void setDeck(DeckLoader *_deckLoader);                         // generic enough
-    void setModified(bool _windowModified);                        // generic
-    bool confirmClose();                                           // generic
+    [[nodiscard]] virtual QString getTabText() const override = 0;
+    virtual void setDeck(DeckLoader *_deckLoader);
+    void setModified(bool _windowModified);
+    bool confirmClose();
     virtual void createMenus() = 0;
     void updateCardInfo(CardInfoPtr _card);
-    void addCardHelper(CardInfoPtr info, QString zoneName); // reasonably generic
+    void addCardHelper(CardInfoPtr info, QString zoneName);
     DeckEditorMenu *deckMenu;
     DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;
