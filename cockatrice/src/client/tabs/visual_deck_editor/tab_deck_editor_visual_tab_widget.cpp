@@ -1,12 +1,14 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
 #include "../../ui/widgets/visual_database_display/visual_database_display_widget.h"
+#include "../tab_generic_deck_editor.h"
 
 TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
+                                                           TabGenericDeckEditor *_deckEditor,
                                                            DeckListModel *model,
                                                            CardDatabaseModel *card_database_model,
                                                            CardDatabaseDisplayModel *card_database_display_model)
-    : QTabWidget(parent), deckModel(model), cardDatabaseModel(card_database_model),
+    : QTabWidget(parent), deckEditor(_deckEditor), deckModel(model), cardDatabaseModel(card_database_model),
       cardDatabaseDisplayModel(card_database_display_model)
 {
     this->setTabsClosable(true); // Enable tab closing
@@ -16,7 +18,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    visualDeckView = new VisualDeckEditorWidget(this, this->deckModel);
+    visualDeckView = new VisualDeckEditorWidget(this, deckModel);
     visualDeckView->setObjectName("visualDeckView");
     visualDeckView->updateDisplay();
     connect(visualDeckView, SIGNAL(activeCardChanged(CardInfoPtr)), this, SLOT(onCardChanged(CardInfoPtr)));
@@ -25,8 +27,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     connect(visualDeckView, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onSideboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    visualDatabaseDisplay =
-        new VisualDatabaseDisplayWidget(this, this->cardDatabaseModel, this->cardDatabaseDisplayModel);
+    visualDatabaseDisplay = new VisualDatabaseDisplayWidget(this, cardDatabaseModel, cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this,
             SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
@@ -34,9 +35,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             SIGNAL(cardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onCardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    deckAnalytics = new DeckAnalyticsWidget(this, this->deckModel);
+    deckAnalytics = new DeckAnalyticsWidget(this, deckModel);
     deckAnalytics->setObjectName("deckAnalytics");
-    // deckAnalytics->analyzeManaCurve();
 
     // printingSelector = new PrintingSelector(this, this->deckModel);
 

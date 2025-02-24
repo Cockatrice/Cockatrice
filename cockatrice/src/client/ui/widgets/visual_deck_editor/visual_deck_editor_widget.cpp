@@ -16,8 +16,8 @@
 #include <QResizeEvent>
 #include <qscrollarea.h>
 
-VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *deck_list_model)
-    : QWidget(parent), deck_list_model(deck_list_model)
+VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deck_list_model)
+    : QWidget(parent), deck_list_model(_deck_list_model)
 {
     this->mainDeckCards = new QList<CardInfoPtr>;
     this->sideboardCards = new QList<CardInfoPtr>;
