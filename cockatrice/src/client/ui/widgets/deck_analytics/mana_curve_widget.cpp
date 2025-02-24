@@ -89,4 +89,3 @@ void ManaCurveWidget::updateDisplay()
 
     update(); // Update the widget display
 }
-

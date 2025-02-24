@@ -21,8 +21,8 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
 
-    signals:
-        void colorToggled(QChar color, bool active);
+signals:
+    void colorToggled(QChar color, bool active);
 
 private:
     QChar colorChar;
@@ -38,14 +38,14 @@ public:
     explicit VisualDatabaseDisplayColorFilterWidget(QWidget *parent, FilterTreeModel *filterModel);
     void retranslateUi();
 
-    signals:
-        void filterModeChanged(bool exactMatchMode);
+signals:
+    void filterModeChanged(bool exactMatchMode);
     void activeColorsChanged();
 
-    private slots:
-        void handleColorToggled(QChar color, bool active);
-        void updateColorFilter();
-        void updateFilterMode(bool checked);
+private slots:
+    void handleColorToggled(QChar color, bool active);
+    void updateColorFilter();
+    void updateFilterMode(bool checked);
 
 private:
     FilterTreeModel *filterModel;
@@ -55,4 +55,4 @@ private:
     bool exactMatchMode = false; // Default to "includes" mode
 };
 
-#endif //VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
+#endif // VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H

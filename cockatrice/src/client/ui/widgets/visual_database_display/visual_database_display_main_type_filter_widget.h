@@ -32,8 +32,8 @@ private:
     FlowWidget *flowWidget;
     QPushButton *toggleButton; // Mode switch button
 
-    QMap<QString, bool> activeMainTypes;   // Track active filters
-    QMap<QString, QPushButton*> typeButtons; // Store toggle buttons
+    QMap<QString, bool> activeMainTypes;      // Track active filters
+    QMap<QString, QPushButton *> typeButtons; // Store toggle buttons
 
     bool exactMatchMode = false; // Toggle between "Exact Match" and "Includes"
 };

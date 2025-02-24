@@ -34,8 +34,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     auto quickFilterWidget = new SettingsButtonWidget(this);
 
-
-
     auto searchLayout = new QHBoxLayout(this);
 
     searchEdit = new SearchLineEdit();
@@ -43,7 +41,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     // searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    //auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    // auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
@@ -63,7 +61,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
-
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     /*connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
@@ -74,7 +71,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));*/
-    //connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
+    // connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
 
     /*databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
     databaseModel->setObjectName("databaseModel");
@@ -119,9 +116,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     auto loadCardsTimer = new QTimer(this);
     loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
-    connect(loadCardsTimer, &QTimer::timeout, this, [this]() {
-        loadCurrentPage();
-    });
+    connect(loadCardsTimer, &QTimer::timeout, this, [this]() { loadCurrentPage(); });
     loadCardsTimer->start(5000);
 }
 

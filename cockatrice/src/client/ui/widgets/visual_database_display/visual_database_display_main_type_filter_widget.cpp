@@ -6,7 +6,8 @@
 #include <QPushButton>
 #include <QSpinBox>
 
-VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent, FilterTreeModel *_filterModel)
+VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent,
+                                                                                     FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel)
 {
     allMainCardTypesWithCount = CardDatabaseManager::getInstance()->getAllMainCardTypesWithCount();
@@ -20,10 +21,11 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     // Create the spinbox
     spinBox = new QSpinBox(this);
     spinBox->setMinimum(1);
-    spinBox->setMaximum(getMaxMainTypeCount());  // Set the max value dynamically
+    spinBox->setMaximum(getMaxMainTypeCount()); // Set the max value dynamically
     spinBox->setValue(150);
     layout->addWidget(spinBox);
-    connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility);
+    connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+            &VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     layout->addWidget(flowWidget);
@@ -44,25 +46,22 @@ void VisualDatabaseDisplayMainTypeFilterWidget::createMainTypeButtons()
     for (auto it = allMainCardTypesWithCount.begin(); it != allMainCardTypesWithCount.end(); ++it) {
         auto *button = new QPushButton(it.key(), flowWidget);
         button->setCheckable(true);
-        button->setStyleSheet(
-            "QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-            "QPushButton:checked { background-color: green; color: white; }"
-        );
+        button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
+                              "QPushButton:checked { background-color: green; color: white; }");
 
         flowWidget->addWidget(button);
         typeButtons[it.key()] = button;
 
         // Connect toggle signal
-        connect(button, &QPushButton::toggled, this, [this, mainType = it.key()](bool checked) {
-            handleMainTypeToggled(mainType, checked);
-        });
+        connect(button, &QPushButton::toggled, this,
+                [this, mainType = it.key()](bool checked) { handleMainTypeToggled(mainType, checked); });
     }
     updateMainTypeButtonsVisibility(); // Ensure visibility is updated initially
 }
 
 void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility()
 {
-    int threshold = spinBox->value();  // Get the current spinbox value
+    int threshold = spinBox->value(); // Get the current spinbox value
 
     // Iterate through buttons and hide/disable those below the threshold
     for (auto it = typeButtons.begin(); it != typeButtons.end(); ++it) {
@@ -110,14 +109,16 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
             // Require all selected types (TypeAnd)
             for (const auto &type : selectedTypes) {
                 QString typeString = type;
-                filterModel->addFilter(new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrType));
+                filterModel->addFilter(
+                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrType));
             }
 
             // Exclude any other types (TypeAndNot)
             for (const auto &type : typeButtons.keys()) {
                 if (!selectedTypes.contains(type)) {
                     QString typeString = type;
-                    filterModel->addFilter(new CardFilter(typeString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrType));
+                    filterModel->addFilter(
+                        new CardFilter(typeString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrType));
                 }
             }
         }
@@ -126,7 +127,8 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
         for (const auto &type : activeMainTypes.keys()) {
             if (activeMainTypes[type]) {
                 QString typeString = type;
-                filterModel->addFilter(new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrType));
+                filterModel->addFilter(
+                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrType));
             }
         }
     }
