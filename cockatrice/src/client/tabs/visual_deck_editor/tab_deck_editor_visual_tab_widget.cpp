@@ -4,11 +4,11 @@
 #include "../tab_generic_deck_editor.h"
 
 TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
-                                                            TabGenericDeckEditor *_deckEditor,
+                                                           TabGenericDeckEditor *_deckEditor,
                                                            DeckListModel *model,
                                                            CardDatabaseModel *card_database_model,
                                                            CardDatabaseDisplayModel *card_database_display_model)
-    : QTabWidget(parent), deckEditor(_deckEditor) ,deckModel(model), cardDatabaseModel(card_database_model),
+    : QTabWidget(parent), deckEditor(_deckEditor), deckModel(model), cardDatabaseModel(card_database_model),
       cardDatabaseDisplayModel(card_database_display_model)
 {
     this->setTabsClosable(true); // Enable tab closing

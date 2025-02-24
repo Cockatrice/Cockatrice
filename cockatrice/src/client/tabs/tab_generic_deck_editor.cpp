@@ -472,7 +472,8 @@ void TabGenericDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
 {
     QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
     QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
-    deckDockWidget->swapCard(deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
+    deckDockWidget->swapCard(
+        deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
 }
 
 void TabGenericDeckEditor::actDecrementCard(CardInfoPtr info)
