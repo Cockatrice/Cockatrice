@@ -38,6 +38,7 @@ protected:
 
 public:
     explicit TabDeckEditorVisual(TabSupervisor *_tabSupervisor);
+    void setDeck(DeckLoader *_deck) override;
     void retranslateUi() override;
     QString getTabText() const override;
     void changeModelIndexAndCardInfo(CardInfoPtr activeCard);
@@ -45,7 +46,7 @@ public:
     void createDeckAnalyticsDock();
     void createMenus() override;
     void createSearchAndDatabaseFrame();
-    void createCentralFrame() override;
+    void createCentralFrame();
 
 public slots:
     void showPrintingSelector() override;

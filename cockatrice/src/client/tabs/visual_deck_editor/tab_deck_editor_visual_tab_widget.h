@@ -5,6 +5,7 @@
 #include "../../ui/widgets/printing_selector/printing_selector.h"
 #include "../../ui/widgets/visual_database_display/visual_database_display_widget.h"
 #include "../../ui/widgets/visual_deck_editor/visual_deck_editor_widget.h"
+#include "../tab_generic_deck_editor.h"
 
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -16,6 +17,7 @@ class TabDeckEditorVisualTabWidget : public QTabWidget
 
 public:
     explicit TabDeckEditorVisualTabWidget(QWidget *parent = nullptr,
+                                          TabGenericDeckEditor *deckEditor = nullptr,
                                           DeckListModel *deckModel = nullptr,
                                           CardDatabaseModel *card_database_model = nullptr,
                                           CardDatabaseDisplayModel *card_database_display_model = nullptr);
@@ -48,6 +50,7 @@ signals:
 
 private:
     QVBoxLayout *layout; // Layout for the tab widget and other controls
+    TabGenericDeckEditor *deckEditor;
     DeckListModel *deckModel;
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
