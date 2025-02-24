@@ -85,7 +85,7 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this->deckDockWidget->deckModel,
+    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, this->deckDockWidget->deckModel,
                                                     this->databaseDisplayDockWidget->databaseModel,
                                                     this->databaseDisplayDockWidget->databaseDisplayModel);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
@@ -182,11 +182,10 @@ void TabDeckEditorVisual::changeModelIndexToCard(CardInfoPtr activeCard)
 
 void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
 {
-    (void)instance;
     if (event->button() == Qt::LeftButton) {
-        deckDockWidget->actSwapCard();
+        actSwapCard(instance->getInfo(), DECK_ZONE_MAIN);
     } else if (event->button() == Qt::RightButton) {
-        deckDockWidget->actDecrement();
+        actDecrementCard(instance->getInfo());
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
@@ -194,11 +193,10 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event, CardInfo
 
 void TabDeckEditorVisual::processSideboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
 {
-    (void)instance;
     if (event->button() == Qt::LeftButton) {
-        deckDockWidget->actSwapCard();
+        actSwapCard(instance->getInfo(), DECK_ZONE_SIDE);
     } else if (event->button() == Qt::RightButton) {
-        deckDockWidget->actDecrement();
+        actDecrementCardFromSideboard(instance->getInfo());
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
@@ -207,11 +205,10 @@ void TabDeckEditorVisual::processSideboardCardClick(QMouseEvent *event, CardInfo
 void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
                                                           CardInfoPictureWithTextOverlayWidget *instance)
 {
-    (void)instance;
     if (event->button() == Qt::LeftButton) {
-        // addCardInfo(instance->getInfo(), DECK_ZONE_MAIN);
+        actAddCard(instance->getInfo());
     } else if (event->button() == Qt::RightButton) {
-        deckDockWidget->actDecrement();
+        actDecrementCard(instance->getInfo());
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }

@@ -433,47 +433,56 @@ void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneNam
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
-void TabGenericDeckEditor::actAddCard()
+void TabGenericDeckEditor::actAddCard(CardInfoPtr info)
 {
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
-        actAddCardToSideboard();
+        actAddCardToSideboard(info);
     else
-        addCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_MAIN);
+        addCardHelper(info, DECK_ZONE_MAIN);
     deckMenu->setSaveStatus(true);
 }
 
-void TabGenericDeckEditor::actAddCardToSideboard()
+void TabGenericDeckEditor::actAddCardToSideboard(CardInfoPtr info)
 {
-    addCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_SIDE);
+    addCardHelper(info, DECK_ZONE_SIDE);
     deckMenu->setSaveStatus(true);
 }
 
-void TabGenericDeckEditor::decrementCardHelper(QString zoneName)
+void TabGenericDeckEditor::decrementCardHelper(CardInfoPtr info, QString zoneName)
 {
-    const CardInfoPtr info = databaseDisplayDockWidget->currentCardInfo();
-
     if (!info)
         return;
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QModelIndex idx = deckDockWidget->deckModel->findCard(info->getName(), zoneName);
+    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
+    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
+
+    QModelIndex idx = deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);
     if (!idx.isValid()) {
         return;
     }
+
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(idx);
-    // offsetCountAtIndex(idx, -1);
+    deckDockWidget->offsetCountAtIndex(idx, -1);
 }
 
-void TabGenericDeckEditor::actDecrementCard()
+void TabGenericDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
 {
-    decrementCardHelper(DECK_ZONE_MAIN);
+    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
+    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
+    deckDockWidget->swapCard(deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
 }
 
-void TabGenericDeckEditor::actDecrementCardFromSideboard()
+void TabGenericDeckEditor::actDecrementCard(CardInfoPtr info)
 {
-    decrementCardHelper(DECK_ZONE_SIDE);
+    decrementCardHelper(info, DECK_ZONE_MAIN);
+}
+
+void TabGenericDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
+{
+    decrementCardHelper(info, DECK_ZONE_SIDE);
 }
 
 void TabGenericDeckEditor::setDeck(DeckLoader *_deck)

@@ -67,10 +67,9 @@ protected slots:
     void actAnalyzeDeckDeckstats();
     void actAnalyzeDeckTappedout();
 
-    void actAddCard();
-    void actAddCardToSideboard();
-    void actDecrementCard();
-    void actDecrementCardFromSideboard();
+    void actAddCardToSideboard(CardInfoPtr info);
+    void actDecrementCard(CardInfoPtr info);
+    void actDecrementCardFromSideboard(CardInfoPtr info);
 
     void saveDeckRemoteFinished(const Response &r);
 
@@ -99,7 +98,8 @@ protected:
 
     bool isBlankNewDeck() const;
 
-    void decrementCardHelper(QString zoneName); // generic
+    void decrementCardHelper(CardInfoPtr info, QString zoneName); // generic
+    void actSwapCard(CardInfoPtr info, QString zoneName);
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation) = 0;
 
     QMenu *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu;
@@ -128,6 +128,7 @@ public:
     DeckEditorPrintingSelectorDockWidget *printingSelectorDockWidget;
 
 public slots:
+    void actAddCard(CardInfoPtr info);
     void actOpenRecent(const QString &fileName);     // generic
     void closeRequest(bool forced = false) override; // generic
     virtual void showPrintingSelector() = 0;

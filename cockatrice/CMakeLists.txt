@@ -189,7 +189,6 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
     src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
     src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
-    src/client/tabs/visual_deck_editor/tab_deck_editor_visual_database_search_tab.cpp
     src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp

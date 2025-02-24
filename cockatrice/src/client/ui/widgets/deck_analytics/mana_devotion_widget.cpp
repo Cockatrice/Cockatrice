@@ -38,7 +38,6 @@ void ManaDevotionWidget::setDeckModel(DeckListModel *deckModel)
 
 std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
 {
-    qDebug() << "Analyzing mana devotion";
     manaDevotionMap.clear();
     InnerDecklistNode *listRoot = deck_list_model->getDeckList()->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {

@@ -79,7 +79,6 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
     // Might use these at some point.
     (void)topLeft;
     (void)bottomRight;
-    qDebug() << "VDE Widget noticed a decklist data change";
     // Necessary to delay this in this manner else the updateDisplay will nuke widgets while their onClick event
     // hasn't returned yet. Interval of 0 means QT will schedule this after the current event loop has finished.
     QTimer::singleShot(0, this, [this] { updateDisplay(); });

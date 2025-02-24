@@ -37,9 +37,11 @@ public slots:
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
     void actIncrement();  // generic
+    bool swapCard(const QModelIndex &idx);
     void actSwapCard();   // probably generic
     void actDecrement();  // generic
     void actRemoveCard(); // generic
+    void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 private:
     TabGenericDeckEditor *deckEditor;
@@ -56,8 +58,6 @@ private:
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
     void recursiveExpand(const QModelIndex &index);              // generic
-    bool swapCard(const QModelIndex &idx);                       // probably generic
-    void offsetCountAtIndex(const QModelIndex &idx, int offset); // generic
     QModelIndexList getSelectedCardNodes() const;
 
 private slots:
