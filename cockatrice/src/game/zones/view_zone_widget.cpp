@@ -132,7 +132,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     setLayout(vbox);
 
-    connect(zone, &ZoneViewZone::optimumRectChanged, this, &ZoneViewWidget::resizeToZoneContents);
+    connect(zone, &ZoneViewZone::optimumRectChanged, this, [this] { resizeToZoneContents(); });
     connect(zone, &ZoneViewZone::closed, this, &ZoneViewWidget::zoneDeleted);
     zone->initializeCards(cardList);
 
