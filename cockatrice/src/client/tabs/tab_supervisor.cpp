@@ -101,7 +101,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
       tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), isLocalGame(false)
+      tabLog(nullptr), isLocalGame(false), isReopeningTabs(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -285,20 +285,25 @@ void TabSupervisor::initStartupTabs()
 {
     addDeckEditorTab(nullptr);
 
+    isReopeningTabs = true;
+
     checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
     checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
     checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
+
+    isReopeningTabs = false;
 }
 
 /**
  * Adds the tab to the TabSupervisor's tab bar.
  *
  * @param tab The Tab to add
+ * @param setCurrent Whether to set the current tab to that tab afterward.
  * @param manager The menu action that corresponds to this tab, if this is a single-instance managed tab. Pass in
  * nullptr if this is not a managed tab.
  * @return The index of the added tab in the tab widget's tab menu
  */
-int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
+int TabSupervisor::myAddTab(Tab *tab, bool setCurrent, QAction *manager)
 {
     connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
     connect(tab, &TabGame::tabTextChanged, this, &TabSupervisor::updateTabText);
@@ -308,6 +313,10 @@ int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
     setTabToolTip(idx, sanitizeHtml(tabText));
 
     addCloseButtonToTab(tab, idx, manager);
+
+    if (setCurrent) {
+        setCurrentWidget(tab);
+    }
 
     return idx;
 }
@@ -356,6 +365,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
     resetTabsMenu();
 
+    isReopeningTabs = true;
+
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabServer);
     tabsMenu->addAction(aTabAccount);
@@ -373,6 +384,8 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         checkAndTrigger(aTabAdmin, SettingsCache::instance().getTabAdminOpen());
         checkAndTrigger(aTabLog, SettingsCache::instance().getTabLogOpen());
     }
+
+    isReopeningTabs = false;
 
     retranslateUi();
 }
@@ -454,7 +467,7 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
     SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
         tabVisualDeckStorage = new TabDeckStorageVisual(this);
-        myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
+        myAddTab(tabVisualDeckStorage, !isReopeningTabs, aTabVisualDeckStorage);
         connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
             tabVisualDeckStorage = nullptr;
             aTabVisualDeckStorage->setChecked(false);
@@ -470,7 +483,7 @@ void TabSupervisor::actTabServer(bool checked)
     if (checked && !tabServer) {
         tabServer = new TabServer(this, client);
         connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
-        myAddTab(tabServer, aTabServer);
+        myAddTab(tabServer, !isReopeningTabs, aTabServer);
         connect(tabServer, &Tab::closed, this, [this] {
             tabServer = nullptr;
             aTabServer->setChecked(false);
@@ -488,7 +501,7 @@ void TabSupervisor::actTabAccount(bool checked)
         connect(tabAccount, &TabAccount::openMessageDialog, this, &TabSupervisor::addMessageTab);
         connect(tabAccount, &TabAccount::userJoined, this, &TabSupervisor::processUserJoined);
         connect(tabAccount, &TabAccount::userLeft, this, &TabSupervisor::processUserLeft);
-        myAddTab(tabAccount, aTabAccount);
+        myAddTab(tabAccount, !isReopeningTabs, aTabAccount);
         connect(tabAccount, &Tab::closed, this, [this] {
             tabAccount = nullptr;
             aTabAccount->setChecked(false);
@@ -504,7 +517,7 @@ void TabSupervisor::actTabDeckStorage(bool checked)
     if (checked && !tabDeckStorage) {
         tabDeckStorage = new TabDeckStorage(this, client, userInfo);
         connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-        myAddTab(tabDeckStorage, aTabDeckStorage);
+        myAddTab(tabDeckStorage, !isReopeningTabs, aTabDeckStorage);
         connect(tabDeckStorage, &Tab::closed, this, [this] {
             tabDeckStorage = nullptr;
             aTabDeckStorage->setChecked(false);
@@ -520,7 +533,7 @@ void TabSupervisor::actTabReplays(bool checked)
     if (checked && !tabReplays) {
         tabReplays = new TabReplays(this, client, userInfo);
         connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
-        myAddTab(tabReplays, aTabReplays);
+        myAddTab(tabReplays, !isReopeningTabs, aTabReplays);
         connect(tabReplays, &Tab::closed, this, [this] {
             tabReplays = nullptr;
             aTabReplays->setChecked(false);
@@ -536,7 +549,7 @@ void TabSupervisor::actTabAdmin(bool checked)
     if (checked && !tabAdmin) {
         tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
-        myAddTab(tabAdmin, aTabAdmin);
+        myAddTab(tabAdmin, !isReopeningTabs, aTabAdmin);
         connect(tabAdmin, &Tab::closed, this, [this] {
             tabAdmin = nullptr;
             aTabAdmin->setChecked(false);
@@ -551,7 +564,7 @@ void TabSupervisor::actTabLog(bool checked)
     SettingsCache::instance().setTabLogOpen(checked);
     if (checked && !tabLog) {
         tabLog = new TabLog(this, client);
-        myAddTab(tabLog, aTabLog);
+        myAddTab(tabLog, !isReopeningTabs, aTabLog);
         connect(tabLog, &Tab::closed, this, [this] {
             tabLog = nullptr;
             aTabAdmin->setChecked(false);
@@ -586,9 +599,8 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    myAddTab(tab);
+    myAddTab(tab, true);
     gameTabs.insert(event.game_info().game_id(), tab);
-    setCurrentWidget(tab);
 }
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
@@ -596,9 +608,8 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
     auto *tab = new TabGame(this, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    myAddTab(tab);
+    myAddTab(tab, true);
     gameTabs.insert(event.game_info().game_id(), tab);
-    setCurrentWidget(tab);
 
     for (int i = 1; i < localClients.size(); ++i) {
         Command_JoinGame cmd;
@@ -625,10 +636,8 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
-    myAddTab(tab);
+    myAddTab(tab, setCurrent);
     roomTabs.insert(info.room_id(), tab);
-    if (setCurrent)
-        setCurrentWidget(tab);
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)
@@ -644,9 +653,8 @@ void TabSupervisor::openReplay(GameReplay *replay)
 {
     auto *replayTab = new TabGame(this, replay);
     connect(replayTab, &TabGame::gameClosing, this, &TabSupervisor::replayLeft);
-    myAddTab(replayTab);
+    myAddTab(replayTab, true);
     replayTabs.append(replayTab);
-    setCurrentWidget(replayTab);
 }
 
 void TabSupervisor::replayLeft(TabGame *tab)
@@ -680,10 +688,8 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
-    myAddTab(tab);
+    myAddTab(tab, focus);
     messageTabs.insert(receiverName, tab);
-    if (focus)
-        setCurrentWidget(tab);
     return tab;
 }
 
@@ -708,9 +714,8 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
     connect(tab, &TabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &TabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-    myAddTab(tab);
+    myAddTab(tab, true);
     deckEditorTabs.append(tab);
-    setCurrentWidget(tab);
     return tab;
 }
 
@@ -721,8 +726,7 @@ TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCo
         tab->setCard(cardToQuery, isCommander);
     }
 
-    myAddTab(tab);
-    setCurrentWidget(tab);
+    myAddTab(tab, true);
     return tab;
 }
 

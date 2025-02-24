@@ -90,10 +90,15 @@ private:
     QList<TabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
+    /**
+     * Whether we're in the middle of reopening tabs that have their open state persisted in the settings.
+     */
+    bool isReopeningTabs;
+
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
         *aTabAdmin, *aTabLog;
 
-    int myAddTab(Tab *tab, QAction *manager = nullptr);
+    int myAddTab(Tab *tab, bool setCurrent, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
     static QString sanitizeTabName(QString dirty);
     static QString sanitizeHtml(QString dirty);
