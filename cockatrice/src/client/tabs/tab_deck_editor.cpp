@@ -1084,10 +1084,6 @@ void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation d
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt, true)) {
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
-        updateBannerCardComboBox();
-        if (!l->getBannerCard().first.isEmpty()) {
-            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText(l->getBannerCard().first));
-        }
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
         } else {
