@@ -30,7 +30,6 @@ void ManaCurveWidget::setDeckModel(DeckListModel *deckModel)
 
 std::unordered_map<int, int> ManaCurveWidget::analyzeManaCurve()
 {
-    qDebug() << "Analyzing mana curve";
     manaCurveMap.clear();
     InnerDecklistNode *listRoot = deck_list_model->getDeckList()->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {

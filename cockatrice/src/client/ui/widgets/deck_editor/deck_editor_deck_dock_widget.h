@@ -36,11 +36,11 @@ public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
-    void actIncrement();  // generic
+    void actIncrement();
     bool swapCard(const QModelIndex &idx);
-    void actSwapCard();   // probably generic
-    void actDecrement();  // generic
-    void actRemoveCard(); // generic
+    void actSwapCard();
+    void actDecrement();
+    void actRemoveCard();
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 private:
@@ -57,14 +57,14 @@ private:
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
-    void recursiveExpand(const QModelIndex &index);              // generic
+    void recursiveExpand(const QModelIndex &index);
     QModelIndexList getSelectedCardNodes() const;
 
 private slots:
-    void updateName(const QString &name); // generic
-    void updateComments();                // generic
-    void setBannerCard(int);              // generic
-    void updateHash();                    // generic
+    void updateName(const QString &name);
+    void updateComments();
+    void setBannerCard(int);
+    void updateHash();
     void refreshShortcuts();
     void retranslateUi();
 };
