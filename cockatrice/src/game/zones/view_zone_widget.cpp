@@ -350,12 +350,26 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 void ZoneViewWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->pos().y() <= 0) {
-        // expand window to full height and width if not currently at full height and width
-        // otherwise shrink window to initial max height
-        if (size().height() < maximumHeight() || size().width() < maximumWidth()) {
-            resize(maximumSize());
-        } else {
+        qreal maxInitialHeight = calcMaxInitialHeight();
+        qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().getCardViewExpandedRowsMax());
+        qreal height = rect().height() - extraHeight - 10;
+        qreal maxHeight = maximumHeight() - extraHeight - 10;
+
+        // reset window to initial max height if...
+        bool doResetSize =
+            // current height is less than that
+            (height < maxInitialHeight) ||
+            // current height is at expanded max height
+            (height == maxExpandedHeight) ||
+            // current height is at actual max height, and actual max height is less than expanded max height
+            (height == maxHeight && height > maxInitialHeight && height < maxExpandedHeight);
+
+        if (doResetSize) {
             resizeToZoneContents(true);
+        } else {
+            // expand/shrink window to expanded max height if current height is anywhere at or between initial max
+            // height and actual max height
+            resize(maximumSize().boundedTo({maximumWidth(), maxExpandedHeight + extraHeight + 10}));
         }
     }
 }
