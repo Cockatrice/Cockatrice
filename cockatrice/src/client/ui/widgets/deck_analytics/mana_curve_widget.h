@@ -1,25 +1,31 @@
 #ifndef MANA_CURVE_WIDGET_H
 #define MANA_CURVE_WIDGET_H
+
+#include "../../../../deck/deck_list_model.h"
+#include "../general/display/banner_widget.h"
+
 #include <QHBoxLayout>
 #include <QWidget>
-#include <utility>
+#include <unordered_map>
 
 class ManaCurveWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ManaCurveWidget(QWidget *parent = nullptr);
+    explicit ManaCurveWidget(QWidget *parent = nullptr, DeckListModel *deck_list_model = nullptr);
     void updateDisplay();
 
-    void setCurve(std::map<int, int> new_curve)
-    {
-        this->curve = std::move(new_curve);
-    }
+public slots:
+    void setDeckModel(DeckListModel *deckModel);
+    std::unordered_map<int, int> analyzeManaCurve();
 
 private:
-    std::map<int, int> curve;
-    QHBoxLayout *layout;
+    DeckListModel *deck_list_model = nullptr;
+    std::unordered_map<int, int> manaCurveMap;
+    QVBoxLayout *layout;
+    QHBoxLayout *barLayout;
+    BannerWidget *bannerWidget;
 };
 
 #endif // MANA_CURVE_WIDGET_H

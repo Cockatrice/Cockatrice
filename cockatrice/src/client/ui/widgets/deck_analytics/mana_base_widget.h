@@ -1,4 +1,5 @@
 #include "../../../../deck/deck_list_model.h"
+#include "../general/display/banner_widget.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
@@ -20,10 +21,15 @@ public:
     std::unordered_map<char, int> determineManaProduction(const QString &manaString);
     void mergeManaCounts(std::unordered_map<char, int> &manaCounts1, const std::unordered_map<char, int> &manaCounts2);
 
+public slots:
+    void setDeckModel(DeckListModel *deckModel);
+
 private:
     DeckListModel *deck_list_model;
+    BannerWidget *bannerWidget;
     std::unordered_map<char, int> manaBaseMap;
-    QHBoxLayout *layout;
+    QVBoxLayout *layout;
+    QHBoxLayout *barLayout;
 };
 
 #endif // MANA_BASE_WIDGET_H
