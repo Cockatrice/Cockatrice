@@ -262,7 +262,8 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     }
 
     emitRecursiveUpdates(index);
-    deckList->refreshDeckHash();
+
+    emit dataChanged(index, index);
     return true;
 }
 
@@ -292,7 +293,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
     } else {
         emitRecursiveUpdates(parent);
     }
-
+    emit dataChanged(parent, parent);
     return true;
 }
 
