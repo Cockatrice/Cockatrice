@@ -472,6 +472,19 @@ QStringList CardDatabase::getAllMainCardTypes() const
     return types.values();
 }
 
+QMap<QString, int> CardDatabase::getAllMainCardTypesWithCount() const
+{
+    QMap<QString, int> typeCounts;
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
+
+    while (cardIterator.hasNext()) {
+        QString type = cardIterator.next().value()->getMainCardType();
+        typeCounts[type]++;
+    }
+
+    return typeCounts;
+}
+
 void CardDatabase::checkUnknownSets()
 {
     auto _sets = getSetList();

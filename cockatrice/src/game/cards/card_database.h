@@ -98,6 +98,7 @@ public:
     LoadStatus loadFromFile(const QString &fileName);
     bool saveCustomTokensToFile();
     QStringList getAllMainCardTypes() const;
+    QMap<QString, int> getAllMainCardTypesWithCount() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;

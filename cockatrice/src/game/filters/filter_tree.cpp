@@ -504,6 +504,17 @@ bool FilterTree::acceptsCard(const CardInfoPtr info) const
     return true;
 }
 
+void FilterTree::removeFiltersByAttr(CardFilter::Attr filterType)
+{
+    for (int i = childNodes.size() - 1; i >= 0; --i) {
+        auto *child = dynamic_cast<LogicMap *>(childNodes.at(i));
+
+        if (child && child->attr == filterType) {
+            deleteAt(i);
+        }
+    }
+}
+
 void FilterTree::clear()
 {
     while (childCount() > 0) {

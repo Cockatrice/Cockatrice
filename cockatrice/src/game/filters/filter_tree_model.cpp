@@ -78,6 +78,16 @@ void FilterTreeModel::addFilter(const CardFilter *f)
     emit layoutChanged();
 }
 
+void FilterTreeModel::clearFiltersOfType(CardFilter::Attr filterType)
+{
+    emit layoutAboutToBeChanged();
+
+    // Recursively remove all nodes with the given filter type
+    fTree->removeFiltersByAttr(filterType);
+
+    emit layoutChanged();
+}
+
 int FilterTreeModel::rowCount(const QModelIndex &parent) const
 {
     const FilterTreeNode *node;

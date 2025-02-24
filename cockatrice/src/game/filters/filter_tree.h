@@ -97,6 +97,7 @@ protected:
 
 public:
     virtual ~FilterTreeBranch();
+    void removeFiltersByAttr(CardFilter::Attr filterType);
     FilterTreeNode *nodeAt(int i) const override;
     void deleteAt(int i) override;
     int childCount() const override
@@ -266,6 +267,7 @@ public:
     }
 
     bool acceptsCard(CardInfoPtr info) const;
+    void removeFiltersByAttr(CardFilter::Attr filterType);
     void clear();
 };
 

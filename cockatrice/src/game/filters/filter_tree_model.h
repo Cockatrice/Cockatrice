@@ -1,6 +1,8 @@
 #ifndef FILTERTREEMODEL_H
 #define FILTERTREEMODEL_H
 
+#include "filter_card.h"
+
 #include <QAbstractItemModel>
 
 class FilterTree;
@@ -15,6 +17,7 @@ private:
 
 public slots:
     void addFilter(const CardFilter *f);
+    void clearFiltersOfType(CardFilter::Attr filterType);
 
 private slots:
     void proxyBeginInsertRow(const FilterTreeNode *, int);

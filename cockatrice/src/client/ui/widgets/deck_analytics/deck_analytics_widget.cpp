@@ -1,26 +1,25 @@
 #include "deck_analytics_widget.h"
 
-DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListModel *deck_list_model)
-    : QWidget(parent), deck_list_model(deck_list_model)
+DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListModel *_deckListModel)
+    : QWidget(parent), deckListModel(_deckListModel)
 {
+    mainLayout = new QVBoxLayout();
+    setLayout(mainLayout);
 
-    this->setMinimumSize(0, 0);
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    this->setStyleSheet("border: 2px solid red;");
-    main_layout = new QHBoxLayout();
-    this->setLayout(main_layout);
+    manaCurveWidget = new ManaCurveWidget(this);
+    mainLayout->addWidget(manaCurveWidget);
 
-    flow_widget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
-    this->main_layout->addWidget(flow_widget);
+    manaDevotionWidget = new ManaDevotionWidget(this, deckListModel);
+    mainLayout->addWidget(manaDevotionWidget);
 
-    mana_curve_widget = new ManaCurveWidget(flow_widget);
-    mana_curve_widget->setStyleSheet("border: 2px solid yellow;");
+    manaBaseWidget = new ManaBaseWidget(this, deckListModel);
+    mainLayout->addWidget(manaBaseWidget);
+}
 
-    flow_widget->addWidget(mana_curve_widget);
-
-    mana_devotion_widget = new ManaDevotionWidget(flow_widget, this->deck_list_model);
-    flow_widget->addWidget(mana_devotion_widget);
-
-    mana_base_widget = new ManaBaseWidget(flow_widget, this->deck_list_model);
-    flow_widget->addWidget(mana_base_widget);
+void DeckAnalyticsWidget::refreshDisplays(DeckListModel *_deckModel)
+{
+    deckListModel = _deckModel;
+    manaCurveWidget->setDeckModel(_deckModel);
+    manaDevotionWidget->setDeckModel(_deckModel);
+    manaBaseWidget->setDeckModel(_deckModel);
 }
