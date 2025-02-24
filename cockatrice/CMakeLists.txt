@@ -12,6 +12,8 @@ set(cockatrice_SOURCES
     src/game/board/abstract_graphics_item.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
+    src/client/ui/widgets/general/display/bar_widget.cpp
+    src/client/ui/widgets/general/display/banner_widget.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
     src/game/cards/card_database_model.cpp
@@ -24,6 +26,8 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_info_picture_widget.cpp
     src/client/ui/widgets/cards/card_info_text_widget.cpp
     src/client/ui/widgets/cards/card_info_display_widget.cpp
+    src/client/ui/widgets/cards/deck_card_zone_display_widget.cpp
+    src/client/ui/widgets/cards/overlapped_card_group_display_widget.cpp
     src/client/ui/widgets/cards/card_size_widget.cpp
     src/game/cards/card_item.cpp
     src/game/cards/card_list.cpp
@@ -86,6 +90,8 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
     src/client/ui/widgets/general/display/shadow_background_label.cpp
+    src/client/ui/widgets/deck_analytics/deck_analytics_widget.cpp
+    src/utility/card_info_comparator.cpp
     src/main.cpp
     src/server/message_log_widget.cpp
     src/client/ui/layouts/overlap_layout.cpp
@@ -141,6 +147,7 @@ set(cockatrice_SOURCES
     src/client/tabs/tab.cpp
     src/client/tabs/tab_account.cpp
     src/client/tabs/tab_admin.cpp
+    src/client/tabs/tab_generic_deck_editor.cpp
     src/client/tabs/tab_deck_editor.cpp
     src/client/tabs/tab_deck_storage.cpp
     src/client/tabs/tab_game.cpp
@@ -177,6 +184,18 @@ set(cockatrice_SOURCES
     src/client/ui/window_main.cpp
     src/game/zones/view_zone_widget.cpp
     src/game/zones/view_zone.cpp
+    src/client/menus/deck_editor/deck_editor_menu.cpp
+    src/client/ui/widgets/deck_analytics/mana_base_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
+    src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
+    src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp
+    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
+    src/client/menus/deck_editor/deck_editor_menu.cpp
     src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_widget.cpp
@@ -192,6 +211,11 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
+    src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     ${VERSION_STRING_CPP}
 )
 

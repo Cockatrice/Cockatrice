@@ -41,6 +41,8 @@ public slots:
     void updateSortOrder();
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
+    void loadDeckFromClipboard();
+    bool actSaveDeckAs(DeckLoader *deckModel);
 
 signals:
     void bannerCardsRefreshed();
@@ -55,6 +57,7 @@ private:
     QHBoxLayout *searchAndSortLayout;
     DeckListModel *deckListModel;
     QLabel *databaseLoadIndicator;
+    QAction *aLoadDeckFromClipboard;
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;

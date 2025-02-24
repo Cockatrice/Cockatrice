@@ -7,6 +7,8 @@
 #include "deck_preview_color_identity_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
+#include <QComboBox>
+#include <QEvent>
 #include <QVBoxLayout>
 #include <QWidget>
 
