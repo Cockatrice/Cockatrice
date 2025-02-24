@@ -401,13 +401,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     cardViewInitialRowsMaxBox.setRange(1, 999);
     cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().getCardViewInitialRowsMax());
-    connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setCardViewInitialRowsMax);
+    connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &AppearanceSettingsPage::cardViewInitialRowsMaxChanged);
 
     cardViewExpandedRowsMaxBox.setRange(1, 999);
     cardViewExpandedRowsMaxBox.setValue(SettingsCache::instance().getCardViewExpandedRowsMax());
-    connect(&cardViewExpandedRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setCardViewExpandedRowsMax);
+    connect(&cardViewExpandedRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &AppearanceSettingsPage::cardViewExpandedRowsMaxChanged);
 
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
@@ -505,6 +505,32 @@ void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().setShowShortcuts(value);
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
+}
+
+/**
+ * Updates the settings for cardViewInitialRowsMax.
+ * Forces expanded rows max to always be >= initial rows max
+ * @param value The new value
+ */
+void AppearanceSettingsPage::cardViewInitialRowsMaxChanged(int value)
+{
+    SettingsCache::instance().setCardViewInitialRowsMax(value);
+    if (cardViewExpandedRowsMaxBox.value() < value) {
+        cardViewExpandedRowsMaxBox.setValue(value);
+    }
+}
+
+/**
+ * Updates the settings for cardViewExpandedRowsMax.
+ * Forces initial rows max to always be <= expanded rows max
+ * @param value The new value
+ */
+void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
+{
+    SettingsCache::instance().setCardViewExpandedRowsMax(value);
+    if (cardViewInitialRowsMaxBox.value() > value) {
+        cardViewInitialRowsMaxBox.setValue(value);
+    }
 }
 
 void AppearanceSettingsPage::retranslateUi()
