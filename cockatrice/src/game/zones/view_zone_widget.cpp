@@ -259,13 +259,24 @@ void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
 }
 
 /**
+ * Maps a height that is given as number of rows of cards to the actual height, given in pixels.
+ *
+ * @param rows Rows of cards
+ * @return The height in pixels
+ */
+static qreal rowsToHeight(int rows)
+{
+    const qreal cardsHeight = (rows + 1) * (CARD_HEIGHT / 3);
+    return cardsHeight + 5; // +5 padding to make the cutoff look nicer
+}
+
+/**
  * Calculates the max initial height from the settings.
  * The max initial height setting is given as number of rows, so we need to map it to a height.
  **/
 static qreal calcMaxInitialHeight()
 {
-    const qreal cardsHeight = (SettingsCache::instance().getCardViewInitialRowsMax() + 1) * (CARD_HEIGHT / 3);
-    return cardsHeight + 5; // +5 padding to make the cutoff look nicer
+    return rowsToHeight(SettingsCache::instance().getCardViewInitialRowsMax());
 }
 
 /**
