@@ -80,6 +80,7 @@ private:
     QLabel customCardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
     QLabel updateReleaseChannelLabel;
+    QLabel advertiseTranslationPageLabel;
     QCheckBox showTipsOnStartup;
 };
 
