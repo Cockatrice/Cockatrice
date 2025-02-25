@@ -68,6 +68,7 @@ private slots:
     void zoneDeleted();
     void moveEvent(QGraphicsSceneMoveEvent * /* event */) override;
     void resizeEvent(QGraphicsSceneResizeEvent * /* event */) override;
+    void expandWindow();
 
 public:
     ZoneViewWidget(Player *_player,
