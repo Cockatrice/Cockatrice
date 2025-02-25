@@ -499,6 +499,7 @@ public:
     bool saveCustomTokensToFile();
     QStringList getAllMainCardTypes() const;
     QMap<QString, int> getAllMainCardTypesWithCount() const;
+    QMap<QString, int> getAllSubCardTypesWithCount() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;
