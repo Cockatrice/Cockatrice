@@ -106,6 +106,9 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aOpenLocalDeck = new QAction(this);
     aOpenLocalDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenLocalDeck, SIGNAL(triggered()), this, SLOT(actOpenLocalDeck()));
+    aRenameLocal = new QAction(this);
+    aRenameLocal->setIcon(QPixmap("theme:icons/rename"));
+    connect(aRenameLocal, &QAction::triggered, this, &TabDeckStorage::actRenameLocal);
     aUpload = new QAction(this);
     aUpload->setIcon(QPixmap("theme:icons/arrow_right_green"));
     connect(aUpload, SIGNAL(triggered()), this, SLOT(actUpload()));
@@ -136,6 +139,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
+    leftToolBar->addAction(aRenameLocal);
     leftToolBar->addAction(aUpload);
     leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalDeck);
@@ -164,6 +168,7 @@ void TabDeckStorage::retranslateUi()
     rightGroupBox->setTitle(tr("Server deck storage"));
 
     aOpenLocalDeck->setText(tr("Open in deck editor"));
+    aRenameLocal->setText(tr("Rename deck or folder"));
     aUpload->setText(tr("Upload deck"));
     aOpenRemoteDeck->setText(tr("Open in deck editor"));
     aDownload->setText(tr("Download deck"));
@@ -244,6 +249,36 @@ void TabDeckStorage::actOpenLocalDeck()
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(filePath);
 
         emit openDeckEditor(&deckLoader);
+    }
+}
+
+void TabDeckStorage::actRenameLocal()
+{
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    for (const auto &curLeft : curLefts) {
+        const QFileInfo info = localDirModel->fileInfo(curLeft);
+
+        const QString oldName = info.baseName();
+        const QString title = info.isDir() ? tr("Rename local folder") : tr("Rename local file");
+
+        bool ok;
+        QString newName = QInputDialog::getText(this, title, tr("New name:"), QLineEdit::Normal, oldName, &ok);
+        if (!ok) { // terminate all remaining selections if user cancels
+            return;
+        }
+        if (newName.isEmpty() || oldName == newName) {
+            continue;
+        }
+
+        QString newFileName = newName;
+        if (!info.suffix().isEmpty()) {
+            newFileName += "." + info.suffix();
+        }
+        const QString newFilePath = QFileInfo(info.dir(), newFileName).filePath();
+
+        if (!QFile::rename(info.filePath(), newFilePath)) {
+            QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
+        }
     }
 }
 
