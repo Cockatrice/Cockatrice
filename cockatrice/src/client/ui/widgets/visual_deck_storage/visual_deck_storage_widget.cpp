@@ -204,7 +204,8 @@ void VisualDeckStorageWidget::updateColorFilter()
 void VisualDeckStorageWidget::updateSearchFilter()
 {
     if (folderWidget) {
-        searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText());
+        searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText(),
+                                    showFoldersCheckBox->isChecked());
     }
     emit searchFilterUpdated();
 }
