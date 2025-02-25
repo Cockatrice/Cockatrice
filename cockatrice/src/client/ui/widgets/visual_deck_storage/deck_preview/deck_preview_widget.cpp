@@ -288,8 +288,8 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 {
     auto *menu = new QMenu(this);
 
-    auto loadDeckAction = menu->addAction(tr("Load Deck"));
-    connect(loadDeckAction, &QAction::triggered, this, [this] { emit deckLoadRequested(filePath); });
+    connect(menu->addAction(tr("Open in deck editor")), &QAction::triggered, this,
+            [this] { emit openDeckEditor(deckLoader); });
 
     menu->addSeparator();
 
