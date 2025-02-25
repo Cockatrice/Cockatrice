@@ -26,14 +26,14 @@ FlowWidget::FlowWidget(QWidget *parent,
 {
     // Main Widget and Layout
     if (_flowDirection == Qt::Horizontal) {
-        this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        this->setMinimumWidth(0);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        setMinimumWidth(0);
     } else {
-        this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        this->setMinimumHeight(0);
+        setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+        setMinimumHeight(0);
     }
     mainLayout = new QHBoxLayout(this);
-    this->setLayout(mainLayout);
+    setLayout(mainLayout);
 
     if (horizontalPolicy != Qt::ScrollBarAlwaysOff || verticalPolicy != Qt::ScrollBarAlwaysOff) {
         // Scroll Area, which should expand as much as possible, since it should be the only direct child widget.

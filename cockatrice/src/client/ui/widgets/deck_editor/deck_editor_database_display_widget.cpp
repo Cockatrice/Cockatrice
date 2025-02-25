@@ -42,12 +42,13 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
-    connect(&searchKeySignals, SIGNAL(onEnter()), deckEditor, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), deckEditor, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), deckEditor, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), deckEditor, SLOT(actDecrementCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), deckEditor, SLOT(actDecrementCardFromSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), deckEditor, SLOT(actAddCardToSideboard()));
+    connect(&searchKeySignals, SIGNAL(onEnter()), deckEditor, SLOT(actAddCard(currentCardInfo())));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), deckEditor, SLOT(actAddCard(currentCardInfo())));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), deckEditor, SLOT(actAddCardToSideboard(currentCardInfo())));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), deckEditor, SLOT(actDecrementCard(currentCardInfo())));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), deckEditor,
+            SLOT(actDecrementCardFromSideboard(currentCardInfo())));
+    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), deckEditor, SLOT(actAddCardToSideboard(currentCardInfo())));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), deckEditor, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));
     connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
@@ -88,7 +89,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
 
     aAddCard = new QAction(QString(), this);
     aAddCard->setIcon(QPixmap("theme:icons/arrow_right_green"));
-    connect(aAddCard, SIGNAL(triggered()), deckEditor, SLOT(actAddCard()));
+    connect(aAddCard, SIGNAL(triggered()), deckEditor, SLOT(actAddCard(currentCardInfo())));
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);
 
