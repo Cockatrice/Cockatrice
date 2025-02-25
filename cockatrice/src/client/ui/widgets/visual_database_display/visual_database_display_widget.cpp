@@ -10,6 +10,7 @@
 #include "../quick_settings/settings_button_widget.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
+#include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
 #include "visual_database_display_sub_type_filter_widget.h"
 
@@ -51,6 +52,9 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
+
+    auto nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, filterModel);
+    quickFilterWidget->addSettingsWidget(nameFilterWidget);
 
     auto mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
     quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
