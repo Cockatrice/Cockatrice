@@ -38,11 +38,14 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     deckAnalytics = new DeckAnalyticsWidget(this, deckModel);
     deckAnalytics->setObjectName("deckAnalytics");
 
+    sampleHandWidget = new VisualDeckEditorSampleHandWidget(this, deckModel);
+
     // printingSelector = new PrintingSelector(this, this->deckModel);
 
     this->addNewTab(visualDeckView, "Visual Deck View");
     this->addNewTab(visualDatabaseDisplay, "Visual Database Display");
     this->addNewTab(deckAnalytics, "Deck Analytics");
+    this->addNewTab(sampleHandWidget, "Sample Hand");
 }
 
 void TabDeckEditorVisualTabWidget::onCardChanged(CardInfoPtr activeCard)
