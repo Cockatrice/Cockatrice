@@ -132,7 +132,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     setLayout(vbox);
 
-    connect(zone, &ZoneViewZone::optimumRectChanged, this, &ZoneViewWidget::resizeToZoneContents);
+    connect(zone, &ZoneViewZone::optimumRectChanged, this, [this] { resizeToZoneContents(); });
     connect(zone, &ZoneViewZone::closed, this, &ZoneViewWidget::zoneDeleted);
     zone->initializeCards(cardList);
 
@@ -259,13 +259,24 @@ void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
 }
 
 /**
+ * Maps a height that is given as number of rows of cards to the actual height, given in pixels.
+ *
+ * @param rows Rows of cards
+ * @return The height in pixels
+ */
+static qreal rowsToHeight(int rows)
+{
+    const qreal cardsHeight = (rows + 1) * (CARD_HEIGHT / 3);
+    return cardsHeight + 5; // +5 padding to make the cutoff look nicer
+}
+
+/**
  * Calculates the max initial height from the settings.
  * The max initial height setting is given as number of rows, so we need to map it to a height.
  **/
 static qreal calcMaxInitialHeight()
 {
-    const qreal cardsHeight = (SettingsCache::instance().getCardViewInitialRowsMax() + 1) * (CARD_HEIGHT / 3);
-    return cardsHeight + 5; // +5 padding to make the cutoff look nicer
+    return rowsToHeight(SettingsCache::instance().getCardViewInitialRowsMax());
 }
 
 /**
@@ -282,7 +293,7 @@ static qreal determineNewZoneHeight(qreal oldZoneHeight)
     return calcMaxInitialHeight();
 }
 
-void ZoneViewWidget::resizeToZoneContents()
+void ZoneViewWidget::resizeToZoneContents(bool forceInitialHeight)
 {
     QRectF zoneRect = zone->getOptimumRect();
     qreal totalZoneHeight = zoneRect.height();
@@ -293,7 +304,7 @@ void ZoneViewWidget::resizeToZoneContents()
     QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
 
     qreal currentZoneHeight = rect().height() - extraHeight - 10;
-    qreal newZoneHeight = determineNewZoneHeight(currentZoneHeight);
+    qreal newZoneHeight = forceInitialHeight ? calcMaxInitialHeight() : determineNewZoneHeight(currentZoneHeight);
 
     QSizeF initialSize(width, newZoneHeight + extraHeight + 10);
 
@@ -334,4 +345,40 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar)
         titleBar->icon = QPixmap("theme:cockatrice");
+}
+
+/**
+ * Expands/shrinks the window, depending on the current height as well as the configured initial and expanded max
+ * heights.
+ */
+void ZoneViewWidget::expandWindow()
+{
+    qreal maxInitialHeight = calcMaxInitialHeight();
+    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().getCardViewExpandedRowsMax());
+    qreal height = rect().height() - extraHeight - 10;
+    qreal maxHeight = maximumHeight() - extraHeight - 10;
+
+    // reset window to initial max height if...
+    bool doResetSize =
+        // current height is less than that
+        (height < maxInitialHeight) ||
+        // current height is at expanded max height
+        (height == maxExpandedHeight) ||
+        // current height is at actual max height, and actual max height is less than expanded max height
+        (height == maxHeight && height > maxInitialHeight && height < maxExpandedHeight);
+
+    if (doResetSize) {
+        resizeToZoneContents(true);
+    } else {
+        // expand/shrink window to expanded max height if current height is anywhere at or between initial max height
+        // and actual max height
+        resize(maximumSize().boundedTo({maximumWidth(), maxExpandedHeight + extraHeight + 10}));
+    }
+}
+
+void ZoneViewWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->pos().y() <= 0) {
+        expandWindow();
+    }
 }

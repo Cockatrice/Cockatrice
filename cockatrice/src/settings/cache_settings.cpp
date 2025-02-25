@@ -249,6 +249,7 @@ SettingsCache::SettingsCache()
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
+    cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
@@ -342,6 +343,12 @@ void SettingsCache::setCardViewInitialRowsMax(int _cardViewInitialRowsMax)
 {
     cardViewInitialRowsMax = _cardViewInitialRowsMax;
     settings->setValue("interface/cardViewInitialRowsMax", cardViewInitialRowsMax);
+}
+
+void SettingsCache::setCardViewExpandedRowsMax(int value)
+{
+    cardViewExpandedRowsMax = value;
+    settings->setValue("interface/cardViewExpandedRowsMax", cardViewExpandedRowsMax);
 }
 
 void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T value)

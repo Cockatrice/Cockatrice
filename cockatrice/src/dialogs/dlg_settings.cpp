@@ -401,8 +401,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     cardViewInitialRowsMaxBox.setRange(1, 999);
     cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().getCardViewInitialRowsMax());
-    connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setCardViewInitialRowsMax);
+    connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &AppearanceSettingsPage::cardViewInitialRowsMaxChanged);
+
+    cardViewExpandedRowsMaxBox.setRange(1, 999);
+    cardViewExpandedRowsMaxBox.setValue(SettingsCache::instance().getCardViewExpandedRowsMax());
+    connect(&cardViewExpandedRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &AppearanceSettingsPage::cardViewExpandedRowsMaxChanged);
 
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
@@ -414,6 +419,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGrid->addWidget(&verticalCardOverlapPercentBox, 5, 1, 1, 1);
     cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 6, 0);
     cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 6, 1);
+    cardsGrid->addWidget(&cardViewExpandedRowsMaxLabel, 7, 0);
+    cardsGrid->addWidget(&cardViewExpandedRowsMaxBox, 7, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -500,6 +507,32 @@ void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
 }
 
+/**
+ * Updates the settings for cardViewInitialRowsMax.
+ * Forces expanded rows max to always be >= initial rows max
+ * @param value The new value
+ */
+void AppearanceSettingsPage::cardViewInitialRowsMaxChanged(int value)
+{
+    SettingsCache::instance().setCardViewInitialRowsMax(value);
+    if (cardViewExpandedRowsMaxBox.value() < value) {
+        cardViewExpandedRowsMaxBox.setValue(value);
+    }
+}
+
+/**
+ * Updates the settings for cardViewExpandedRowsMax.
+ * Forces initial rows max to always be <= expanded rows max
+ * @param value The new value
+ */
+void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
+{
+    SettingsCache::instance().setCardViewExpandedRowsMax(value);
+    if (cardViewInitialRowsMaxBox.value() > value) {
+        cardViewInitialRowsMaxBox.setValue(value);
+    }
+}
+
 void AppearanceSettingsPage::retranslateUi()
 {
     themeGroupBox->setTitle(tr("Theme settings"));
@@ -526,6 +559,8 @@ void AppearanceSettingsPage::retranslateUi()
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
     cardViewInitialRowsMaxLabel.setText(tr("Maximum initial height for card view window:"));
     cardViewInitialRowsMaxBox.setSuffix(tr(" rows"));
+    cardViewExpandedRowsMaxLabel.setText(tr("Maximum expanded height for card view window:"));
+    cardViewExpandedRowsMaxBox.setSuffix(tr(" rows"));
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
