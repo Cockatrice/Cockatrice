@@ -26,6 +26,60 @@ CardInfoPictureWithTextOverlayWidget::CardInfoPictureWithTextOverlayWidget(QWidg
       fontSize(fontSize), textAlignment(alignment)
 {
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // Store the widget's original position
+    originalPos = this->pos();
+
+    // Create the animation
+    animation = new QPropertyAnimation(this, "pos");
+    animation->setDuration(200); // 200ms animation duration
+    animation->setEasingCurve(QEasingCurve::OutQuad);
+
+    animation->setStartValue(originalPos);
+    animation->setEndValue(originalPos - QPoint(0, hoverOffset));
+}
+
+void CardInfoPictureWithTextOverlayWidget::resizeEvent(QResizeEvent *event)
+{
+    originalPos = this->pos(); // Update the baseline position
+    CardInfoPictureWidget::resizeEvent(event);
+}
+
+void CardInfoPictureWithTextOverlayWidget::moveEvent(QMoveEvent *event)
+{
+    if (animation->state() == QAbstractAnimation::Running) {
+        return;
+    }
+    originalPos = this->pos(); // Update the baseline position
+    CardInfoPictureWidget::moveEvent(event);
+}
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void CardInfoPictureWithTextOverlayWidget::enterEvent(QEnterEvent *event)
+#else
+void CardInfoPictureWithTextOverlayWidget::enterEvent(QEvent *event)
+#endif
+{
+    CardInfoPictureWidget::enterEvent(event);
+    if (animation->state() == QAbstractAnimation::Running) {
+        animation->pause(); // Pause current animation
+    } else {
+        originalPos = this->pos(); // Update the baseline position
+        animation->setStartValue(originalPos);
+        animation->setEndValue(originalPos - QPoint(0, hoverOffset));
+    }
+    animation->setDirection(QAbstractAnimation::Forward);
+    animation->start();
+}
+
+void CardInfoPictureWithTextOverlayWidget::leaveEvent(QEvent *event)
+{
+    CardInfoPictureWidget::leaveEvent(event);
+    if (animation->state() == QAbstractAnimation::Running) {
+        animation->pause(); // Pause current animation
+    }
+    animation->setDirection(QAbstractAnimation::Backward);
+    animation->start();
 }
 
 /**
