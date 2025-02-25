@@ -485,6 +485,27 @@ QMap<QString, int> CardDatabase::getAllMainCardTypesWithCount() const
     return typeCounts;
 }
 
+QMap<QString, int> CardDatabase::getAllSubCardTypesWithCount() const
+{
+    QMap<QString, int> typeCounts;
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
+
+    while (cardIterator.hasNext()) {
+        QString type = cardIterator.next().value()->getCardType();
+
+        QStringList parts = type.split(" — ");
+
+        if (parts.size() > 1) { // Ensure there are subtypes
+            QStringList subtypes = parts[1].split(" ", Qt::SkipEmptyParts);
+            for (const QString &subtype : subtypes) {
+                typeCounts[subtype]++;
+            }
+        }
+    }
+
+    return typeCounts;
+}
+
 void CardDatabase::checkUnknownSets()
 {
     auto _sets = getSetList();

@@ -11,6 +11,7 @@
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
+#include "visual_database_display_sub_type_filter_widget.h"
 
 #include <QHeaderView>
 #include <QScrollBar>
@@ -53,6 +54,9 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     auto mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
     quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
+
+    auto subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
+    quickFilterWidget->addSettingsWidget(subTypeFilterWidget);
 
     auto setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
     quickFilterWidget->addSettingsWidget(setFilterWidget);
