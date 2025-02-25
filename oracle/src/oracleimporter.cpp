@@ -289,7 +289,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         QString numComponent;
         const QString numProperty = setInfo.getProperty("num");
-        const QChar lastChar = numProperty.at(numProperty.size() - 1);
+        const QChar lastChar = numProperty.isEmpty() ? QChar() : numProperty.back();
 
         // Un-Sets do some wonky stuff. Split up these cards as individual entries.
         if (setsWithCardsWithSameNameButDifferentText.contains(currentSet->getShortName()) &&
