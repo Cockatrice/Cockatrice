@@ -199,6 +199,7 @@ set(cockatrice_SOURCES
     src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp
     src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
