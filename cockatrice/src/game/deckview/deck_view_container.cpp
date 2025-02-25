@@ -97,7 +97,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     refreshShortcuts();
 
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageInGameChanged, this,
-            &DeckViewContainer::updateShowVisualDeckStorage);
+            &DeckViewContainer::setVisualDeckStorageExists);
 
     switchToDeckSelectView();
 }
@@ -207,16 +207,21 @@ void DeckViewContainer::refreshShortcuts()
 }
 
 /**
- * Update VDS existence when settings change
+ * Updates the existence of the embedded Visual Deck Storage, destroying or creating it if needed.
+ * Note that this change is temporary; the VDS may get recreated when the view transitions to the deck select state,
+ * depending on current settings.
  */
-void DeckViewContainer::updateShowVisualDeckStorage(bool enabled)
+void DeckViewContainer::setVisualDeckStorageExists(bool exists)
 {
-    if (enabled) {
-        tryCreateVisualDeckStorageWidget();
+    if (exists) {
         // view mode state isn't stored in a field, so we determine state by checking the button
-        bool isDeckSelectView = loadLocalButton->isEnabled();
-        visualDeckStorageWidget->setHidden(!isDeckSelectView);
-        deckView->setHidden(isDeckSelectView);
+        if (loadLocalButton->isEnabled()) {
+            // We only need to handle the setting changing while in deck select state; tryCreate already gets called
+            // when switching from deck loaded to deck select state
+            tryCreateVisualDeckStorageWidget();
+            visualDeckStorageWidget->setHidden(false);
+            deckView->setHidden(true);
+        }
     } else {
         if (visualDeckStorageWidget) {
             visualDeckStorageWidget->deleteLater();
