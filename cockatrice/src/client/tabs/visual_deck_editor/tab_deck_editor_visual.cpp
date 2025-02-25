@@ -393,12 +393,12 @@ void TabDeckEditorVisual::openDeckFromFile(const QString &fileName, DeckOpenLoca
     deckMenu->setSaveStatus(true);
     tabContainer->visualDeckView->updateDisplay();
     tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 
 void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
 {
     TabGenericDeckEditor::setDeck(_deck);
-    qDebug() << "set the deck";
 }
 
 void TabDeckEditorVisual::showPrintingSelector()
