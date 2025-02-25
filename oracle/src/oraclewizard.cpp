@@ -277,14 +277,14 @@ void LoadSetsPage::actLoadSetsFile()
     QFileDialog dialog(this, tr("Load sets file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
 
-    QString extensions = "*.json";
+    QString extensions = "*.json *.xml";
 #ifdef HAS_ZLIB
     extensions += " *.zip";
 #endif
 #ifdef HAS_LZMA
     extensions += " *.xz";
 #endif
-    dialog.setNameFilter(tr("Sets JSON file (%1)").arg(extensions));
+    dialog.setNameFilter(tr("Sets file (%1)").arg(extensions));
 
     if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text())) {
         dialog.selectFile(fileLineEdit->text());
