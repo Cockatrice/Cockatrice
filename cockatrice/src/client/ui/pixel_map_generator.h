@@ -106,6 +106,19 @@ public:
     }
 };
 
+class DropdownIconPixmapGenerator
+{
+private:
+    static QMap<QString, QPixmap> pmCache;
+
+public:
+    static QPixmap generatePixmap(int height, bool expanded);
+    static void clear()
+    {
+        pmCache.clear();
+    }
+};
+
 QPixmap loadColorAdjustedPixmap(const QString &name);
 
 #endif

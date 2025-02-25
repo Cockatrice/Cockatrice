@@ -16,6 +16,7 @@ public:
                           int transparency = 80);
     void mousePressEvent(QMouseEvent *event) override;
     void setText(const QString &text) const;
+    void setClickable(bool _clickable);
     void setBuddy(QWidget *_buddy)
     {
         buddy = _buddy;
@@ -24,16 +25,12 @@ public:
     {
         return bannerLabel->text();
     }
-    void setClickable(bool _clickable)
-    {
-        clickable = _clickable;
-    }
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    QVBoxLayout *layout;
+    QLabel *iconLabel;
     QLabel *bannerLabel;
     Qt::Orientation gradientOrientation;
     int transparency; // Transparency percentage for the gradient
@@ -43,6 +40,7 @@ signals:
     void buddyVisibilityChanged();
 private slots:
     void toggleBuddyVisibility() const;
+    void setDropdownIconState(bool expanded) const;
 };
 
 #endif // BANNER_WIDGET_H
