@@ -1,7 +1,7 @@
 #include "edhrec_commander_api_response_commander_details_display_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
-#include "../../../ui/widgets/cards/card_info_picture_widget.h"
+#include "../../../../../game/cards/card_database_manager.h"
+#include "../../../../ui/widgets/cards/card_info_picture_widget.h"
 
 #include <QLabel>
 

@@ -1,6 +1,6 @@
 #include "edhrec_commander_api_response_card_details_display_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
+#include "../../../../../game/cards/card_database_manager.h"
 
 EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCardDetailsDisplayWidget(
     QWidget *parent,
@@ -17,8 +17,11 @@ EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCa
     label->setText(toDisplay.name + "\n" + toDisplay.label);
     label->setAlignment(Qt::AlignHCenter);
 
+    int inclusionRate = 0;
     // Set label color based on inclusion rate
-    int inclusionRate = (toDisplay.numDecks * 100) / toDisplay.potentialDecks;
+    if (toDisplay.potentialDecks != 0) {
+        inclusionRate = (toDisplay.numDecks * 100) / toDisplay.potentialDecks;
+    }
 
     QColor labelColor;
     if (inclusionRate <= 30) {

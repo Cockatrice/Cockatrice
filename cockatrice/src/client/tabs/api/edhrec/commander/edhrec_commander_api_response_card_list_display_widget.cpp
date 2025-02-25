@@ -1,6 +1,6 @@
 #include "edhrec_commander_api_response_card_list_display_widget.h"
 
-#include "../../../ui/widgets/general/display/banner_widget.h"
+#include "../../../../ui/widgets/general/display/banner_widget.h"
 #include "edhrec_commander_api_response_card_details_display_widget.h"
 
 #include <QLabel>
