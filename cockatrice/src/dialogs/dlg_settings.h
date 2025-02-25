@@ -91,6 +91,9 @@ private slots:
     void openThemeLocation();
     void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
 
+    void cardViewInitialRowsMaxChanged(int value);
+    void cardViewExpandedRowsMaxChanged(int value);
+
 private:
     QLabel themeLabel;
     QComboBox themeBox;
@@ -110,6 +113,8 @@ private:
     QSpinBox verticalCardOverlapPercentBox;
     QLabel cardViewInitialRowsMaxLabel;
     QSpinBox cardViewInitialRowsMaxBox;
+    QLabel cardViewExpandedRowsMaxLabel;
+    QSpinBox cardViewExpandedRowsMaxBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;

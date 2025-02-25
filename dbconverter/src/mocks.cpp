@@ -58,6 +58,9 @@ void SettingsCache::setUseTearOffMenus(bool /* _useTearOffMenus */)
 void SettingsCache::setCardViewInitialRowsMax(int /* _cardViewInitialRowsMax */)
 {
 }
+void SettingsCache::setCardViewExpandedRowsMax(int /* value */)
+{
+}
 void SettingsCache::setCloseEmptyCardView(const QT_STATE_CHANGED_T /* value */)
 {
 }
