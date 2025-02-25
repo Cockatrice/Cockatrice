@@ -22,6 +22,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     setLayout(layout);
 
     deckLoader = new DeckLoader();
+    deckLoader->setParent(this);
     connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
     connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
             &VisualDeckStorageTagFilterWidget::refreshTags);
