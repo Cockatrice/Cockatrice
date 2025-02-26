@@ -93,7 +93,7 @@ private:
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
         *aTabAdmin, *aTabLog;
 
-    int myAddTab(Tab *tab, bool setCurrent, QAction *manager = nullptr);
+    int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
     static QString sanitizeTabName(QString dirty);
     static QString sanitizeHtml(QString dirty);
@@ -162,13 +162,13 @@ private slots:
     void actTabAdmin(bool checked);
     void actTabLog(bool checked);
 
-    void openTabVisualDeckStorage(bool setCurrent);
-    void openTabServer(bool setCurrent);
-    void openTabAccount(bool setCurrent);
-    void openTabDeckStorage(bool setCurrent);
-    void openTabReplays(bool setCurrent);
-    void openTabAdmin(bool setCurrent);
-    void openTabLog(bool setCurrent);
+    void openTabVisualDeckStorage();
+    void openTabServer();
+    void openTabAccount();
+    void openTabDeckStorage();
+    void openTabReplays();
+    void openTabAdmin();
+    void openTabLog();
 
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
