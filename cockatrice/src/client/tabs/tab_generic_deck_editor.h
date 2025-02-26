@@ -46,6 +46,7 @@ class TabGenericDeckEditor : public Tab
     Q_OBJECT
 protected slots:
     void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
+    void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
     void updatePrintingSelectorDatabase(const QModelIndex &current, const QModelIndex &previous);
     void updatePrintingSelectorDeckView(const QModelIndex &current, const QModelIndex &previous);
     void decklistCustomMenu(QPoint point);
