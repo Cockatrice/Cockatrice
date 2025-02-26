@@ -59,6 +59,8 @@ public:
         return a;
     }
 
+    QJsonObject toJson() const;
+    static CardFilter *fromJson(const QJsonObject &json);
     static const QString typeName(Type t);
     static const QString attrName(Attr a);
 };

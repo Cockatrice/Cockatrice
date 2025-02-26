@@ -1,10 +1,13 @@
 #include "visual_database_display_name_filter_widget.h"
 
+#include "../../../tabs/tab_generic_deck_editor.h"
+
 #include <QHBoxLayout>
 
 VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWidget *parent,
+                                                                             TabGenericDeckEditor *_deckEditor,
                                                                              FilterTreeModel *_filterModel)
-    : QWidget(parent), filterModel(_filterModel)
+    : QWidget(parent), deckEditor(_deckEditor), filterModel(_filterModel)
 {
     setMinimumWidth(300);
     setMaximumHeight(300);
@@ -22,12 +25,46 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
         if (!text.isEmpty() && !activeFilters.contains(text)) {
             createNameFilter(text);
             searchBox->clear();
+            updateFilterModel();
         }
     });
 
     // Create container for active filters
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
+
+    loadFromDeckButton = new QPushButton(this);
+    loadFromDeckButton->setText(tr("Load from Deck"));
+    layout->addWidget(loadFromDeckButton);
+
+    connect(loadFromDeckButton, &QPushButton::clicked, this, &VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck);
+}
+
+void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
+{
+    DeckListModel *deck_list_model = deckEditor->deckDockWidget->deckModel;
+
+    if (!deck_list_model)
+        return;
+    DeckList *decklist = deck_list_model->getDeckList();
+    if (!decklist)
+        return;
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        for (int j = 0; j < currentZone->size(); j++) {
+            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            if (!currentCard)
+                continue;
+            createNameFilter(currentCard->getName());
+        }
+    }
+    updateFilterModel();
 }
 
 void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name)
@@ -44,8 +81,6 @@ void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name
 
     flowWidget->addWidget(button);
     activeFilters[name] = button;
-
-    updateFilterModel();
 }
 
 void VisualDatabaseDisplayNameFilterWidget::removeNameFilter(const QString &name)
@@ -60,10 +95,20 @@ void VisualDatabaseDisplayNameFilterWidget::removeNameFilter(const QString &name
 void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
 {
     // Clear existing name filters
+    emit filterModel->layoutAboutToBeChanged();
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrName);
+
+    filterModel->blockSignals(true);
+    filterModel->filterTree()->blockSignals(true);
 
     for (const auto &name : activeFilters.keys()) {
         QString nameString = name;
         filterModel->addFilter(new CardFilter(nameString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrName));
     }
+
+    filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    filterModel->filterTree()->nodeAt(0)->nodeChanged();
+    emit filterModel->layoutChanged();
 }
