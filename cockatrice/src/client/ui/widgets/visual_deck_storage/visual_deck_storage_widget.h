@@ -68,6 +68,8 @@ private:
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
+
+    void reapplySortAndFilters();
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H
