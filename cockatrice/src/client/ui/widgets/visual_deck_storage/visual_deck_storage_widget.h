@@ -39,6 +39,7 @@ public slots:
     void updateSearchFilter();
     void updateTagsVisibility(bool visible);
     void updateSortOrder();
+    void handleDeckModified(const QString &filePath);
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
