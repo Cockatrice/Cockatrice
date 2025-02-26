@@ -285,9 +285,15 @@ void TabSupervisor::initStartupTabs()
 {
     addDeckEditorTab(nullptr);
 
-    checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
-    checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
-    checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
+    if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
+        openTabVisualDeckStorage(false);
+    }
+    if (SettingsCache::instance().getTabDeckStorageOpen()) {
+        openTabDeckStorage(false);
+    }
+    if (SettingsCache::instance().getTabReplaysOpen()) {
+        openTabReplays(false);
+    }
 }
 
 /**
@@ -365,8 +371,12 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     tabsMenu->addAction(aTabServer);
     tabsMenu->addAction(aTabAccount);
 
-    checkAndTrigger(aTabServer, SettingsCache::instance().getTabServerOpen());
-    checkAndTrigger(aTabAccount, SettingsCache::instance().getTabAccountOpen());
+    if (SettingsCache::instance().getTabServerOpen()) {
+        openTabServer(false);
+    }
+    if (SettingsCache::instance().getTabAccountOpen()) {
+        openTabAccount(false);
+    }
 
     updatePingTime(0, -1);
 
@@ -375,8 +385,12 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addAction(aTabAdmin);
         tabsMenu->addAction(aTabLog);
 
-        checkAndTrigger(aTabAdmin, SettingsCache::instance().getTabAdminOpen());
-        checkAndTrigger(aTabLog, SettingsCache::instance().getTabLogOpen());
+        if (SettingsCache::instance().getTabAdminOpen()) {
+            openTabAdmin(false);
+        }
+        if (SettingsCache::instance().getTabLogOpen()) {
+            openTabLog(false);
+        }
     }
 
     retranslateUi();
@@ -472,6 +486,7 @@ void TabSupervisor::openTabVisualDeckStorage(bool setCurrent)
         tabVisualDeckStorage = nullptr;
         aTabVisualDeckStorage->setChecked(false);
     });
+    aTabVisualDeckStorage->setChecked(true);
 }
 
 void TabSupervisor::actTabServer(bool checked)
@@ -493,6 +508,7 @@ void TabSupervisor::openTabServer(bool setCurrent)
         tabServer = nullptr;
         aTabServer->setChecked(false);
     });
+    aTabServer->setChecked(true);
 }
 
 void TabSupervisor::actTabAccount(bool checked)
@@ -516,6 +532,7 @@ void TabSupervisor::openTabAccount(bool setCurrent)
         tabAccount = nullptr;
         aTabAccount->setChecked(false);
     });
+    aTabAccount->setChecked(true);
 }
 
 void TabSupervisor::actTabDeckStorage(bool checked)
@@ -537,6 +554,7 @@ void TabSupervisor::openTabDeckStorage(bool setCurrent)
         tabDeckStorage = nullptr;
         aTabDeckStorage->setChecked(false);
     });
+    aTabDeckStorage->setChecked(true);
 }
 
 void TabSupervisor::actTabReplays(bool checked)
@@ -558,6 +576,7 @@ void TabSupervisor::openTabReplays(bool setCurrent)
         tabReplays = nullptr;
         aTabReplays->setChecked(false);
     });
+    aTabReplays->setChecked(true);
 }
 
 void TabSupervisor::actTabAdmin(bool checked)
@@ -579,6 +598,7 @@ void TabSupervisor::openTabAdmin(bool setCurrent)
         tabAdmin = nullptr;
         aTabAdmin->setChecked(false);
     });
+    aTabAdmin->setChecked(true);
 }
 
 void TabSupervisor::actTabLog(bool checked)
@@ -599,6 +619,7 @@ void TabSupervisor::openTabLog(bool setCurrent)
         tabLog = nullptr;
         aTabAdmin->setChecked(false);
     });
+    aTabAdmin->setChecked(true);
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
