@@ -99,7 +99,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
     connect(localDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenLocalReplay()));
     aRenameLocal = new QAction(this);
-    aRenameLocal->setIcon(QPixmap("theme:icons/pencil"));
+    aRenameLocal->setIcon(QPixmap("theme:icons/rename"));
     connect(aRenameLocal, &QAction::triggered, this, &TabReplays::actRenameLocal);
     aNewLocalFolder = new QAction(this);
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
