@@ -27,7 +27,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     connect(visualDeckView, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onSideboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
-    visualDatabaseDisplay = new VisualDatabaseDisplayWidget(this, cardDatabaseModel, cardDatabaseDisplayModel);
+    visualDatabaseDisplay =
+        new VisualDatabaseDisplayWidget(this, deckEditor, cardDatabaseModel, cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this,
             SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
