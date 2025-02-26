@@ -368,6 +368,14 @@ void TabDeckEditorVisual::actLoadDeck()
     deckDockWidget->updateBannerCardComboBox();
 }
 
+void TabDeckEditorVisual::actLoadDeckFromClipboard()
+{
+    TabGenericDeckEditor::actLoadDeckFromClipboard();
+    tabContainer->visualDeckView->updateDisplay();
+    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
+}
+
 void TabDeckEditorVisual::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
