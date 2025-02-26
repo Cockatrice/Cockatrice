@@ -167,6 +167,14 @@ private slots:
     void actTabAdmin(bool checked);
     void actTabLog(bool checked);
 
+    void openTabVisualDeckStorage(bool setCurrent);
+    void openTabServer(bool setCurrent);
+    void openTabAccount(bool setCurrent);
+    void openTabDeckStorage(bool setCurrent);
+    void openTabReplays(bool setCurrent);
+    void openTabAdmin(bool setCurrent);
+    void openTabLog(bool setCurrent);
+
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
     void gameJoined(const Event_GameJoined &event);

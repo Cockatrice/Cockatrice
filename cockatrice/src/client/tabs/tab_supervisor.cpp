@@ -466,112 +466,147 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
 {
     SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
-        tabVisualDeckStorage = new TabDeckStorageVisual(this);
-        myAddTab(tabVisualDeckStorage, !isReopeningTabs, aTabVisualDeckStorage);
-        connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
-            tabVisualDeckStorage = nullptr;
-            aTabVisualDeckStorage->setChecked(false);
-        });
+        openTabVisualDeckStorage(true);
     } else if (!checked && tabVisualDeckStorage) {
         tabVisualDeckStorage->closeRequest();
     }
+}
+
+void TabSupervisor::openTabVisualDeckStorage(bool setCurrent)
+{
+    tabVisualDeckStorage = new TabDeckStorageVisual(this);
+    myAddTab(tabVisualDeckStorage, setCurrent, aTabVisualDeckStorage);
+    connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
+        tabVisualDeckStorage = nullptr;
+        aTabVisualDeckStorage->setChecked(false);
+    });
 }
 
 void TabSupervisor::actTabServer(bool checked)
 {
     SettingsCache::instance().setTabServerOpen(checked);
     if (checked && !tabServer) {
-        tabServer = new TabServer(this, client);
-        connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
-        myAddTab(tabServer, !isReopeningTabs, aTabServer);
-        connect(tabServer, &Tab::closed, this, [this] {
-            tabServer = nullptr;
-            aTabServer->setChecked(false);
-        });
+        openTabServer(true);
     } else if (!checked && tabServer) {
         tabServer->closeRequest();
     }
+}
+
+void TabSupervisor::openTabServer(bool setCurrent)
+{
+    tabServer = new TabServer(this, client);
+    connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
+    myAddTab(tabServer, setCurrent, aTabServer);
+    connect(tabServer, &Tab::closed, this, [this] {
+        tabServer = nullptr;
+        aTabServer->setChecked(false);
+    });
 }
 
 void TabSupervisor::actTabAccount(bool checked)
 {
     SettingsCache::instance().setTabAccountOpen(checked);
     if (checked && !tabAccount) {
-        tabAccount = new TabAccount(this, client, *userInfo);
-        connect(tabAccount, &TabAccount::openMessageDialog, this, &TabSupervisor::addMessageTab);
-        connect(tabAccount, &TabAccount::userJoined, this, &TabSupervisor::processUserJoined);
-        connect(tabAccount, &TabAccount::userLeft, this, &TabSupervisor::processUserLeft);
-        myAddTab(tabAccount, !isReopeningTabs, aTabAccount);
-        connect(tabAccount, &Tab::closed, this, [this] {
-            tabAccount = nullptr;
-            aTabAccount->setChecked(false);
-        });
+        openTabAccount(true);
     } else if (!checked && tabAccount) {
         tabAccount->closeRequest();
     }
+}
+
+void TabSupervisor::openTabAccount(bool setCurrent)
+{
+    tabAccount = new TabAccount(this, client, *userInfo);
+    connect(tabAccount, &TabAccount::openMessageDialog, this, &TabSupervisor::addMessageTab);
+    connect(tabAccount, &TabAccount::userJoined, this, &TabSupervisor::processUserJoined);
+    connect(tabAccount, &TabAccount::userLeft, this, &TabSupervisor::processUserLeft);
+    myAddTab(tabAccount, setCurrent, aTabAccount);
+    connect(tabAccount, &Tab::closed, this, [this] {
+        tabAccount = nullptr;
+        aTabAccount->setChecked(false);
+    });
 }
 
 void TabSupervisor::actTabDeckStorage(bool checked)
 {
     SettingsCache::instance().setTabDeckStorageOpen(checked);
     if (checked && !tabDeckStorage) {
-        tabDeckStorage = new TabDeckStorage(this, client, userInfo);
-        connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
-        myAddTab(tabDeckStorage, !isReopeningTabs, aTabDeckStorage);
-        connect(tabDeckStorage, &Tab::closed, this, [this] {
-            tabDeckStorage = nullptr;
-            aTabDeckStorage->setChecked(false);
-        });
+        openTabDeckStorage(true);
     } else if (!checked && tabDeckStorage) {
         tabDeckStorage->closeRequest();
     }
+}
+
+void TabSupervisor::openTabDeckStorage(bool setCurrent)
+{
+    tabDeckStorage = new TabDeckStorage(this, client, userInfo);
+    connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    myAddTab(tabDeckStorage, setCurrent, aTabDeckStorage);
+    connect(tabDeckStorage, &Tab::closed, this, [this] {
+        tabDeckStorage = nullptr;
+        aTabDeckStorage->setChecked(false);
+    });
 }
 
 void TabSupervisor::actTabReplays(bool checked)
 {
     SettingsCache::instance().setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
-        tabReplays = new TabReplays(this, client, userInfo);
-        connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
-        myAddTab(tabReplays, !isReopeningTabs, aTabReplays);
-        connect(tabReplays, &Tab::closed, this, [this] {
-            tabReplays = nullptr;
-            aTabReplays->setChecked(false);
-        });
+        openTabReplays(true);
     } else if (!checked && tabReplays) {
         tabReplays->closeRequest();
     }
+}
+
+void TabSupervisor::openTabReplays(bool setCurrent)
+{
+    tabReplays = new TabReplays(this, client, userInfo);
+    connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
+    myAddTab(tabReplays, setCurrent, aTabReplays);
+    connect(tabReplays, &Tab::closed, this, [this] {
+        tabReplays = nullptr;
+        aTabReplays->setChecked(false);
+    });
 }
 
 void TabSupervisor::actTabAdmin(bool checked)
 {
     SettingsCache::instance().setTabAdminOpen(checked);
     if (checked && !tabAdmin) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
-        connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
-        myAddTab(tabAdmin, !isReopeningTabs, aTabAdmin);
-        connect(tabAdmin, &Tab::closed, this, [this] {
-            tabAdmin = nullptr;
-            aTabAdmin->setChecked(false);
-        });
+        openTabAdmin(true);
     } else if (!checked && tabAdmin) {
         tabAdmin->closeRequest();
     }
+}
+
+void TabSupervisor::openTabAdmin(bool setCurrent)
+{
+    tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+    connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
+    myAddTab(tabAdmin, setCurrent, aTabAdmin);
+    connect(tabAdmin, &Tab::closed, this, [this] {
+        tabAdmin = nullptr;
+        aTabAdmin->setChecked(false);
+    });
 }
 
 void TabSupervisor::actTabLog(bool checked)
 {
     SettingsCache::instance().setTabLogOpen(checked);
     if (checked && !tabLog) {
-        tabLog = new TabLog(this, client);
-        myAddTab(tabLog, !isReopeningTabs, aTabLog);
-        connect(tabLog, &Tab::closed, this, [this] {
-            tabLog = nullptr;
-            aTabAdmin->setChecked(false);
-        });
+        openTabLog(true);
     } else if (!checked && tabLog) {
         tabLog->closeRequest();
     }
+}
+
+void TabSupervisor::openTabLog(bool setCurrent)
+{
+    tabLog = new TabLog(this, client);
+    myAddTab(tabLog, setCurrent, aTabLog);
+    connect(tabLog, &Tab::closed, this, [this] {
+        tabLog = nullptr;
+        aTabAdmin->setChecked(false);
+    });
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
