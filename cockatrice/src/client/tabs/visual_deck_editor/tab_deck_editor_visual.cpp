@@ -399,14 +399,14 @@ void TabDeckEditorVisual::openDeckFromFile(const QString &fileName, DeckOpenLoca
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     deckMenu->setSaveStatus(true);
-    tabContainer->visualDeckView->updateDisplay();
-    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
-    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 
 void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
 {
     TabGenericDeckEditor::setDeck(_deck);
+    tabContainer->visualDeckView->updateDisplay();
+    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 
 void TabDeckEditorVisual::showPrintingSelector()
