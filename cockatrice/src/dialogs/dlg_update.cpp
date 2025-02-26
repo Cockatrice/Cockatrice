@@ -86,9 +86,9 @@ void DlgUpdate::gotoDownloadPage()
     QDesktopServices::openUrl(SettingsCache::instance().getUpdateReleaseChannel()->getManualDownloadUrl());
 }
 
-void DlgUpdate::downloadUpdate()
+void DlgUpdate::downloadUpdate(const QString &releaseName)
 {
-    setLabel(tr("Downloading update..."));
+    setLabel(tr("Downloading update") + QString(": %1").arg(releaseName));
     addStopDownloadAndRemoveOthers(true); // Will remove all other buttons
     uDownloader->beginDownload(updateUrl);
 }
@@ -157,7 +157,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
             QMessageBox::Yes | QMessageBox::No);
 
         if (reply == QMessageBox::Yes)
-            downloadUpdate();
+            downloadUpdate(release->getName());
     } else {
         QMessageBox::information(
             this, tr("Update Available"),

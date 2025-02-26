@@ -21,7 +21,7 @@ public:
 private slots:
     void finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release);
     void gotoDownloadPage();
-    void downloadUpdate();
+    void downloadUpdate(const QString &releaseName);
     void cancelDownload();
     void updateCheckError(const QString &errorString);
     void downloadSuccessful(const QUrl &filepath);
