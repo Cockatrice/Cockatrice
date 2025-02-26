@@ -70,6 +70,13 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(bannerCardComboBoxVisibilityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowBannerCardComboBox);
 
+    searchFolderNamesCheckBox = new QCheckBox(this);
+    searchFolderNamesCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageSearchFolderNames());
+    connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageWidget::updateSearchFilter);
+    connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageSearchFolderNames);
+
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
@@ -79,6 +86,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     quickSettingsWidget->addSettingsWidget(tagsOnWidgetsVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
     quickSettingsWidget->addSettingsWidget(bannerCardComboBoxVisibilityCheckBox);
+    quickSettingsWidget->addSettingsWidget(searchFolderNamesCheckBox);
     quickSettingsWidget->addSettingsWidget(cardSizeWidget);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
@@ -153,6 +161,7 @@ void VisualDeckStorageWidget::retranslateUi()
     tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw not contained Color Identities"));
     bannerCardComboBoxVisibilityCheckBox->setText(tr("Show Banner Card Selection Option"));
+    searchFolderNamesCheckBox->setText(tr("Include Folder Names in Search"));
 }
 
 void VisualDeckStorageWidget::createRootFolderWidget()
@@ -205,7 +214,7 @@ void VisualDeckStorageWidget::updateSearchFilter()
 {
     if (folderWidget) {
         searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText(),
-                                    showFoldersCheckBox->isChecked());
+                                    searchFolderNamesCheckBox->isChecked());
     }
     emit searchFilterUpdated();
 }
