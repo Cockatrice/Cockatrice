@@ -46,13 +46,13 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEdit
 
     databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this, this);
     deckDockWidget = new DeckEditorDeckDockWidget(this, this);
-    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
+    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this, this);
     filterDockWidget = new DeckEditorFilterDockWidget(this, this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
 
     TabDeckEditor::createMenus();
 
-    this->installEventFilter(this);
+    installEventFilter(this);
 
     TabDeckEditor::retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));

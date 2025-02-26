@@ -32,7 +32,7 @@ void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
     printingSelectorDockContents->setLayout(printingSelectorFrame);
     setWidget(printingSelectorDockContents);
 
-    installEventFilter(this);
+    installEventFilter(deckEditor);
     connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
 }
 

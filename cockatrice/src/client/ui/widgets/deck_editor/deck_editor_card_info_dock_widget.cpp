@@ -30,7 +30,7 @@ void DeckEditorCardInfoDockWidget::createCardInfoDock()
     cardInfoDockContents->setLayout(cardInfoFrame);
     setWidget(cardInfoDockContents);
 
-    installEventFilter(this);
+    installEventFilter(deckEditor);
     connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
 }
 

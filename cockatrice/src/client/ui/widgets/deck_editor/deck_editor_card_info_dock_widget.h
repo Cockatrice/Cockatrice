@@ -6,6 +6,7 @@
 
 #include <QDockWidget>
 
+class TabGenericDeckEditor;
 class DeckEditorCardInfoDockWidget : public QDockWidget
 {
     Q_OBJECT

@@ -19,7 +19,7 @@ DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(QWidget *parent, TabGenericDe
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-    installEventFilter(this);
+    installEventFilter(deckEditor);
     connect(this, SIGNAL(topLevelChanged(bool)), deckEditor, SLOT(dockTopLevelChanged(bool)));
     createDeckDock();
 }

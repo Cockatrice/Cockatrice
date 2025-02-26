@@ -24,6 +24,7 @@ class CardInfoFrameWidget;
 class QTextEdit;
 class QLabel;
 class DeckLoader;
+class DeckEditorCardInfoDockWidget;
 class DeckEditorDatabaseDisplayWidget;
 class DeckEditorDeckDockWidget;
 class DeckEditorFilterDockWidget;

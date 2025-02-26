@@ -81,7 +81,7 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     filterDockContents->setLayout(filterFrame);
     setWidget(filterDockContents);
 
-    installEventFilter(this);
+    installEventFilter(deckEditor);
     connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
 }
 
