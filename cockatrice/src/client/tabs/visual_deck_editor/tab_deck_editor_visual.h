@@ -12,6 +12,7 @@ class TabDeckEditorVisual : public TabGenericDeckEditor
 protected slots:
     void actNewDeck() override;
     void actLoadDeck() override;
+    void actLoadDeckFromClipboard() override;
 
     void loadLayout() override;
     void restartLayout() override;
