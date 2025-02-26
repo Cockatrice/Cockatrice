@@ -90,11 +90,6 @@ private:
     QList<TabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    /**
-     * Whether we're in the middle of reopening tabs that have their open state persisted in the settings.
-     */
-    bool isReopeningTabs;
-
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
         *aTabAdmin, *aTabLog;
 

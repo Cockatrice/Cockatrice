@@ -101,7 +101,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
       tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), isLocalGame(false), isReopeningTabs(false)
+      tabLog(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -285,13 +285,9 @@ void TabSupervisor::initStartupTabs()
 {
     addDeckEditorTab(nullptr);
 
-    isReopeningTabs = true;
-
     checkAndTrigger(aTabVisualDeckStorage, SettingsCache::instance().getTabVisualDeckStorageOpen());
     checkAndTrigger(aTabDeckStorage, SettingsCache::instance().getTabDeckStorageOpen());
     checkAndTrigger(aTabReplays, SettingsCache::instance().getTabReplaysOpen());
-
-    isReopeningTabs = false;
 }
 
 /**
@@ -365,8 +361,6 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
     resetTabsMenu();
 
-    isReopeningTabs = true;
-
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabServer);
     tabsMenu->addAction(aTabAccount);
@@ -384,8 +378,6 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         checkAndTrigger(aTabAdmin, SettingsCache::instance().getTabAdminOpen());
         checkAndTrigger(aTabLog, SettingsCache::instance().getTabLogOpen());
     }
-
-    isReopeningTabs = false;
 
     retranslateUi();
 }
