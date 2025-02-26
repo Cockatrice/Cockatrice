@@ -66,6 +66,7 @@ private:
     QCheckBox *bannerCardComboBoxVisibilityCheckBox;
     QCheckBox *tagFilterVisibilityCheckBox;
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
+    QCheckBox *searchFolderNamesCheckBox;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
 };
