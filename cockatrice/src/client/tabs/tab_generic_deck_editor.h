@@ -130,6 +130,9 @@ public slots:
     void actDecrementCardFromSideboard(CardInfoPtr info);
     void actDecrementCardFromSideboardFromDatabase();
     void actOpenRecent(const QString &fileName);
+
+    void filterTreeChanged(FilterTree *filterTree);
+
     void closeRequest(bool forced = false) override;
     virtual void showPrintingSelector() = 0;
     virtual void dockTopLevelChanged(bool topLevel) = 0;

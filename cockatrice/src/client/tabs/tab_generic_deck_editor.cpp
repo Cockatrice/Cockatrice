@@ -529,3 +529,8 @@ bool TabGenericDeckEditor::isBlankNewDeck() const
     DeckLoader *const deck = deckDockWidget->deckModel->getDeckList();
     return !modified && deck->getLastFileName().isEmpty() && deck->getLastRemoteDeckId() == -1;
 }
+
+void TabGenericDeckEditor::filterTreeChanged(FilterTree *filterTree)
+{
+    databaseDisplayDockWidget->setFilterTree(filterTree);
+}

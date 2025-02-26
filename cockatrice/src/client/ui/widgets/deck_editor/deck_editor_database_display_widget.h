@@ -23,6 +23,7 @@ public:
 
 public slots:
     CardInfoPtr currentCardInfo() const;
+    void setFilterTree(FilterTree *filterTree);
 
 private:
     KeySignals searchKeySignals;

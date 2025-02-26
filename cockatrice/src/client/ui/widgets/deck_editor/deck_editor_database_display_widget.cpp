@@ -60,6 +60,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
     databaseModel->setObjectName("databaseModel");
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
+    databaseDisplayModel->setObjectName("databaseDisplayModel");
     databaseDisplayModel->setSourceModel(databaseModel);
     databaseDisplayModel->setFilterKeyColumn(0);
 
@@ -226,6 +227,11 @@ void DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp()
     browser->setHtml(text);
     connect(browser, &QTextBrowser::anchorClicked, [this](const QUrl &link) { searchEdit->setText(link.fragment()); });
     browser->show();
+}
+
+void DeckEditorDatabaseDisplayWidget::setFilterTree(FilterTree *filterTree)
+{
+    databaseDisplayModel->setFilterTree(filterTree);
 }
 
 void DeckEditorDatabaseDisplayWidget::retranslateUi()

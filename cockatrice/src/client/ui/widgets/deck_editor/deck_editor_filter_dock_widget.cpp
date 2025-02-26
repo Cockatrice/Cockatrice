@@ -24,8 +24,7 @@ void DeckEditorFilterDockWidget::createFiltersDock()
 {
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
-    deckEditor->databaseDisplayDockWidget->databaseDisplayModel->setFilterTree(filterModel->filterTree());
-    deckEditor->databaseDisplayDockWidget->databaseDisplayModel->setObjectName("databaseDisplayModel");
+    deckEditor->filterTreeChanged(filterModel->filterTree());
     filterView = new QTreeView;
     filterView->setObjectName("filterView");
     filterView->setModel(filterModel);
