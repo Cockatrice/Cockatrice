@@ -9,6 +9,7 @@
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "visual_database_display_color_filter_widget.h"
+#include "visual_database_display_filter_save_load_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
@@ -19,9 +20,11 @@
 #include <qpropertyanimation.h>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
+                                                         TabGenericDeckEditor *_deckEditor,
                                                          CardDatabaseModel *database_model,
                                                          CardDatabaseDisplayModel *database_display_model)
-    : QWidget(parent), databaseModel(database_model), databaseDisplayModel(database_display_model)
+    : QWidget(parent), deckEditor(_deckEditor), databaseModel(database_model),
+      databaseDisplayModel(database_display_model)
 {
     cards = new QList<CardInfoPtr>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
@@ -53,7 +56,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     filterModel->setObjectName("filterModel");
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
 
-    auto nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, filterModel);
+    auto saveLoadWidget =
+        new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel, "/home/ascor/Cockatrice_presets/");
+    quickFilterWidget->addSettingsWidget(saveLoadWidget);
+
+    auto nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
     quickFilterWidget->addSettingsWidget(nameFilterWidget);
 
     auto mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);

@@ -3,6 +3,7 @@
 #include "../../../../game/filters/filter_card.h"
 #include "../../../../game/filters/filter_tree_model.h"
 
+#include <QJsonObject>
 #include <QMouseEvent>
 #include <QPainter>
 
