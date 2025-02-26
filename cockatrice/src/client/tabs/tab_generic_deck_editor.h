@@ -45,10 +45,9 @@ class TabGenericDeckEditor : public Tab
 {
     Q_OBJECT
 protected slots:
-    void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);             // generic
-    void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);            // generic
-    void updatePrintingSelectorDatabase(const QModelIndex &current, const QModelIndex &previous); // possibly generic
-    void updatePrintingSelectorDeckView(const QModelIndex &current, const QModelIndex &previous); // possibly generic
+    void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
+    void updatePrintingSelectorDatabase(const QModelIndex &current, const QModelIndex &previous);
+    void updatePrintingSelectorDeckView(const QModelIndex &current, const QModelIndex &previous);
     void decklistCustomMenu(QPoint point);
 
     virtual void actNewDeck() = 0;
@@ -91,7 +90,7 @@ protected:
 
     bool isBlankNewDeck() const;
 
-    void decrementCardHelper(CardInfoPtr info, QString zoneName); // generic
+    void decrementCardHelper(CardInfoPtr info, QString zoneName);
     void actSwapCard(CardInfoPtr info, QString zoneName);
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation) = 0;
 
@@ -129,8 +128,8 @@ public slots:
     void actDecrementCardFromDatabase();
     void actDecrementCardFromSideboard(CardInfoPtr info);
     void actDecrementCardFromSideboardFromDatabase();
-    void actOpenRecent(const QString &fileName);     // generic
-    void closeRequest(bool forced = false) override; // generic
+    void actOpenRecent(const QString &fileName);
+    void closeRequest(bool forced = false) override;
     virtual void showPrintingSelector() = 0;
     virtual void dockTopLevelChanged(bool topLevel) = 0;
 signals:
