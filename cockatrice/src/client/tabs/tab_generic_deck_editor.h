@@ -1,7 +1,6 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
-#include "../../deck/custom_line_edit.h"
 #include "../../game/cards/card_database.h"
 #include "../menus/deck_editor/deck_editor_menu.h"
 #include "../ui/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
@@ -9,11 +8,9 @@
 #include "../ui/widgets/deck_editor/deck_editor_deck_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_filter_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.h"
-#include "../ui/widgets/printing_selector/printing_selector.h"
 #include "../ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "tab.h"
 
-#include <QAbstractItemModel>
 #include <QDir>
 
 class CardDatabaseModel;
@@ -77,7 +74,6 @@ protected slots:
     bool eventFilter(QObject *o, QEvent *e) override;
     virtual void dockVisibleTriggered() = 0;
     virtual void dockFloatingTriggered() = 0;
-    virtual void dockTopLevelChanged(bool topLevel) = 0;
 
 protected:
     /**
@@ -135,6 +131,7 @@ public slots:
     void actOpenRecent(const QString &fileName);     // generic
     void closeRequest(bool forced = false) override; // generic
     virtual void showPrintingSelector() = 0;
+    virtual void dockTopLevelChanged(bool topLevel) = 0;
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
     void deckEditorClosing(TabGenericDeckEditor *tab);

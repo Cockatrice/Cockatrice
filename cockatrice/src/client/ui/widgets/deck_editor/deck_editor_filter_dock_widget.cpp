@@ -82,7 +82,7 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     setWidget(filterDockContents);
 
     installEventFilter(this);
-    // connect(this, SIGNAL(topLevelChanged(bool)), deckEditor, SLOT(dockTopLevelChanged(bool)));
+    connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
 }
 
 void DeckEditorFilterDockWidget::filterViewCustomContextMenu(const QPoint &point)

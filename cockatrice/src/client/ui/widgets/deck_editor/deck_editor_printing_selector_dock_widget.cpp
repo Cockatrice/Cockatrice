@@ -33,9 +33,7 @@ void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
     setWidget(printingSelectorDockContents);
 
     installEventFilter(this);
-    // connect(printingSelectorDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
-
-    // addDockWidget(Qt::RightDockWidgetArea, printingSelectorDock);
+    connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
 }
 
 void DeckEditorPrintingSelectorDockWidget::retranslateUi()

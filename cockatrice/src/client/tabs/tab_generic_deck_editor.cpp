@@ -20,11 +20,9 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
-#include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
-#include <QDockWidget>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QLineEdit>
@@ -35,8 +33,6 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSplitter>
-#include <QTextBrowser>
-#include <QTextEdit>
 #include <QTextStream>
 #include <QTreeView>
 #include <QUrl>
