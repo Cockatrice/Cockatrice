@@ -98,10 +98,11 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
 }
 
 /**
- * Updates the visibility of this folder and all its DeckPreviewWidgets, as well as all its subfolders and their
- * DeckPreviewWidgets.
+ * Updates the visibility of this folder and all its DeckPreviewWidgets
+ *
+ * @param recursive Also update the visibility of all subfolders and their DeckPreviewWidgets.
  */
-void VisualDeckStorageFolderDisplayWidget::updateVisibility()
+void VisualDeckStorageFolderDisplayWidget::updateVisibility(bool recursive)
 {
     bool atLeastOneWidgetVisible = checkVisibility();
     if (atLeastOneWidgetVisible) {
@@ -109,8 +110,10 @@ void VisualDeckStorageFolderDisplayWidget::updateVisibility()
         for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             display->updateVisibility();
         }
-        for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-            subFolder->updateVisibility();
+        if (recursive) {
+            for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+                subFolder->updateVisibility(false);
+            }
         }
     } else {
         setVisible(false);
