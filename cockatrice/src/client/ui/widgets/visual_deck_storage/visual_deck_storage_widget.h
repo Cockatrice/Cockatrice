@@ -46,9 +46,6 @@ signals:
     void bannerCardsRefreshed();
     void deckLoadRequested(const QString &filePath);
     void openDeckEditor(const DeckLoader *deck);
-    void tagFilterUpdated();
-    void colorFilterUpdated();
-    void searchFilterUpdated();
 
 private:
     QVBoxLayout *layout;
