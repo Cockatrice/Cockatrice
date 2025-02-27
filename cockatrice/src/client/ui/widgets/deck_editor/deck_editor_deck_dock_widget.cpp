@@ -11,7 +11,7 @@
 #include <QTextEdit>
 #include <trice_limits.h>
 
-DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor)
+DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
     : QDockWidget(parent), deckEditor(_deckEditor)
 {
     setObjectName("deckDock");
@@ -494,7 +494,7 @@ void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 
     QAction *selectPrinting = menu.addAction(tr("Select Printing"));
 
-    connect(selectPrinting, &QAction::triggered, deckEditor, &TabGenericDeckEditor::showPrintingSelector);
+    connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
 
     menu.exec(deckView->mapToGlobal(point));
 }

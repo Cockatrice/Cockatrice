@@ -4,19 +4,19 @@
 #include "../../../../deck/custom_line_edit.h"
 #include "../../../../game/cards/card_database_model.h"
 #include "../../../game_logic/key_signals.h"
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
 
-class TabGenericDeckEditor;
+class AbstractTabDeckEditor;
 class DeckEditorDatabaseDisplayWidget : public QWidget
 {
 
     Q_OBJECT
 public:
-    explicit DeckEditorDatabaseDisplayWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor);
-    TabGenericDeckEditor *deckEditor;
+    explicit DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
+    AbstractTabDeckEditor *deckEditor;
     SearchLineEdit *searchEdit;
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;

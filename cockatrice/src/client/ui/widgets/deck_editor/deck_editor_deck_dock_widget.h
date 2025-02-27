@@ -4,7 +4,7 @@
 #include "../../../../deck/custom_line_edit.h"
 #include "../../../../game/cards/card_database.h"
 #include "../../../game_logic/key_signals.h"
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 
 #include <QComboBox>
@@ -14,12 +14,12 @@
 #include <QTreeView>
 
 class DeckListModel;
-class TabGenericDeckEditor;
+class AbstractTabDeckEditor;
 class DeckEditorDeckDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorDeckDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor);
+    explicit DeckEditorDeckDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
     DeckListModel *deckModel;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
@@ -53,7 +53,7 @@ signals:
     void cardChanged(CardInfoPtr _card);
 
 private:
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     KeySignals deckViewKeySignals;
     QLabel *nameLabel;
     LineEditUnfocusable *nameEdit;

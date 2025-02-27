@@ -4,7 +4,7 @@
 #include "../../game/cards/card_database.h"
 #include "../game_logic/key_signals.h"
 #include "../ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
-#include "tab_generic_deck_editor.h"
+#include "abstract_tab_deck_editor.h"
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
@@ -13,7 +13,7 @@ class DeckListModel;
 class QLabel;
 class DeckLoader;
 
-class TabDeckEditor : public TabGenericDeckEditor
+class TabDeckEditor : public AbstractTabDeckEditor
 {
     Q_OBJECT
 

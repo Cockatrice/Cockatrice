@@ -39,37 +39,15 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
-TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEditor(_tabSupervisor)
+TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : AbstractTabDeckEditor(_tabSupervisor)
 {
     setObjectName("TabDeckEditor");
-    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
-
-    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this, this);
-    deckDockWidget = new DeckEditorDeckDockWidget(this, this);
-    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this, this);
-    filterDockWidget = new DeckEditorFilterDockWidget(this, this);
-    printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
-
-    connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &TabGenericDeckEditor::onDeckChanged);
-    connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &TabGenericDeckEditor::updateCard);
-    connect(this, &TabGenericDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
-            &TabGenericDeckEditor::updateCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
-            &TabGenericDeckEditor::actAddCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
-            &TabGenericDeckEditor::actAddCardToSideboard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromMainDeck, this,
-            &TabGenericDeckEditor::actDecrementCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, this,
-            &TabGenericDeckEditor::actDecrementCardFromSideboard);
 
     TabDeckEditor::createMenus();
 
     installEventFilter(this);
 
     TabDeckEditor::retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     TabDeckEditor::refreshShortcuts();
 
     TabDeckEditor::loadLayout();

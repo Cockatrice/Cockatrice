@@ -3,7 +3,7 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../game/cards/card_database.h"
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
@@ -16,7 +16,7 @@ class PrintingSelectorCardDisplayWidget : public QWidget
 
 public:
     PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                      TabGenericDeckEditor *_deckEditor,
+                                      AbstractTabDeckEditor *_deckEditor,
                                       DeckListModel *_deckModel,
                                       QTreeView *_deckView,
                                       QSlider *_cardSizeSlider,
@@ -33,7 +33,7 @@ signals:
 private:
     QVBoxLayout *layout;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;

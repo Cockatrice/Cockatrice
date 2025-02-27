@@ -1,18 +1,18 @@
 #ifndef DECK_EDITOR_MENU_H
 #define DECK_EDITOR_MENU_H
 
-#include "../../tabs/tab_generic_deck_editor.h"
+#include "../../tabs/abstract_tab_deck_editor.h"
 
 #include <QMenu>
 
-class TabGenericDeckEditor;
+class AbstractTabDeckEditor;
 class DeckEditorMenu : public QMenu
 {
     Q_OBJECT
 public:
-    explicit DeckEditorMenu(QWidget *parent, TabGenericDeckEditor *deckEditor);
+    explicit DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *deckEditor);
 
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
 
     QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
         *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetNameAndNumber, *aSaveDeckToClipboardRaw,

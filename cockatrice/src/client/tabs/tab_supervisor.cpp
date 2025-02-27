@@ -201,7 +201,7 @@ void TabSupervisor::retranslateUi()
     QListIterator<TabGame *> replayIterator(replayTabs);
     while (replayIterator.hasNext())
         tabs.append(replayIterator.next());
-    QListIterator<TabGenericDeckEditor *> deckEditorIterator(deckEditorTabs);
+    QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
     while (deckEditorIterator.hasNext())
         tabs.append(deckEditorIterator.next());
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
@@ -242,7 +242,7 @@ bool TabSupervisor::closeRequest()
         }
     }
 
-    for (TabGenericDeckEditor *tab : deckEditorTabs) {
+    for (AbstractTabDeckEditor *tab : deckEditorTabs) {
         if (!tab->confirmClose())
             return false;
     }
@@ -706,8 +706,8 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     auto *tab = new TabDeckEditor(this);
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
-    connect(tab, &TabGenericDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
-    connect(tab, &TabGenericDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
+    connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
     setCurrentWidget(tab);
@@ -726,7 +726,7 @@ TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCo
     return tab;
 }
 
-void TabSupervisor::deckEditorClosed(TabGenericDeckEditor *tab)
+void TabSupervisor::deckEditorClosed(AbstractTabDeckEditor *tab)
 {
     if (tab == currentWidget())
         emit setMenu();

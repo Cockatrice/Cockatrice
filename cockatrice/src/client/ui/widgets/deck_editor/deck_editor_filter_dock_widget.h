@@ -2,24 +2,24 @@
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 
 #include "../../../game_logic/key_signals.h"
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QDockWidget>
 #include <QTreeView>
 
 class FilterTreeModel;
-class TabGenericDeckEditor;
+class AbstractTabDeckEditor;
 class DeckEditorFilterDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorFilterDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor);
+    explicit DeckEditorFilterDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
     void createFiltersDock();
     void retranslateUi();
     QAction *aClearFilterAll, *aClearFilterOne;
 
 private:
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
     KeySignals filterViewKeySignals;

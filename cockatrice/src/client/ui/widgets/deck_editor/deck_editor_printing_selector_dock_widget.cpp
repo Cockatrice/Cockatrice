@@ -1,11 +1,11 @@
 #include "deck_editor_printing_selector_dock_widget.h"
 
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QVBoxLayout>
 
 DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(QWidget *parent,
-                                                                           TabGenericDeckEditor *_deckEditor)
+                                                                           AbstractTabDeckEditor *_deckEditor)
     : QDockWidget(parent), deckEditor(_deckEditor)
 {
     setObjectName("printingSelectorDock");
@@ -33,7 +33,7 @@ void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
     setWidget(printingSelectorDockContents);
 
     installEventFilter(deckEditor);
-    connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
+    connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
 }
 
 void DeckEditorPrintingSelectorDockWidget::retranslateUi()

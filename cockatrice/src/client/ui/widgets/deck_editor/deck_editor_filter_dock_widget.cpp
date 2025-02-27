@@ -9,7 +9,7 @@
 #include <QMenu>
 #include <QToolButton>
 
-DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor)
+DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
     : QDockWidget(parent), deckEditor(_deckEditor)
 {
     setObjectName("filterDock");
@@ -81,7 +81,7 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     setWidget(filterDockContents);
 
     installEventFilter(deckEditor);
-    connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
+    connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
 }
 
 void DeckEditorFilterDockWidget::filterViewCustomContextMenu(const QPoint &point)

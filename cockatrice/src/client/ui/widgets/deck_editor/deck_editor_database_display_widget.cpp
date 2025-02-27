@@ -2,7 +2,7 @@
 
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../../../tabs/tab_supervisor.h"
 
 #include <QClipboard>
@@ -20,7 +20,7 @@ static bool canBeCommander(const CardInfoPtr &cardInfo)
            cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
 }
 
-DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor)
+DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
     : QWidget(parent), deckEditor(_deckEditor)
 {
     setObjectName("centralWidget");

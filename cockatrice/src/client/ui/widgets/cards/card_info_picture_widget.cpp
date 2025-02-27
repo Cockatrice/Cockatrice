@@ -296,7 +296,7 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
     auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
 
     auto *mainWindow = qobject_cast<MainWindow *>(window());
-    QList<TabGenericDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
+    QList<AbstractTabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
     if (deckEditorTabs.isEmpty()) {
         addToOpenDeckMenu->setEnabled(false);

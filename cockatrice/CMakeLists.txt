@@ -142,7 +142,7 @@ set(cockatrice_SOURCES
     src/client/tabs/tab.cpp
     src/client/tabs/tab_account.cpp
     src/client/tabs/tab_admin.cpp
-    src/client/tabs/tab_generic_deck_editor.cpp
+    src/client/tabs/abstract_tab_deck_editor.cpp
     src/client/tabs/tab_deck_editor.cpp
     src/client/tabs/tab_deck_storage.cpp
     src/client/tabs/tab_game.cpp

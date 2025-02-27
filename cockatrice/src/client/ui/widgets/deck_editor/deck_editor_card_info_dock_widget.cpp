@@ -4,7 +4,7 @@
 
 #include <QVBoxLayout>
 
-DeckEditorCardInfoDockWidget::DeckEditorCardInfoDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor)
+DeckEditorCardInfoDockWidget::DeckEditorCardInfoDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
     : QDockWidget(parent), deckEditor(_deckEditor)
 {
     setObjectName("cardInfoDock");
@@ -31,7 +31,7 @@ void DeckEditorCardInfoDockWidget::createCardInfoDock()
     setWidget(cardInfoDockContents);
 
     installEventFilter(deckEditor);
-    connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
+    connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
 }
 
 void DeckEditorCardInfoDockWidget::updateCard(CardInfoPtr _card)

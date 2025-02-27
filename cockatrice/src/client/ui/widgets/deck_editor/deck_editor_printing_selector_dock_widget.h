@@ -1,7 +1,7 @@
 #ifndef DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 #define DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../printing_selector/printing_selector.h"
 
 #include <QDockWidget>
@@ -11,13 +11,13 @@ class DeckEditorPrintingSelectorDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorPrintingSelectorDockWidget(QWidget *parent, TabGenericDeckEditor *_deckEditor);
+    explicit DeckEditorPrintingSelectorDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
     void createPrintingSelectorDock();
     void retranslateUi();
     PrintingSelector *printingSelector;
 
 private:
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
 };
 
 #endif // DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H

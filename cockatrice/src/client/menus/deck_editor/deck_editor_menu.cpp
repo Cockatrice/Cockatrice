@@ -3,7 +3,7 @@
 #include "../../../settings/cache_settings.h"
 #include "../../../settings/shortcuts_settings.h"
 
-DeckEditorMenu::DeckEditorMenu(QWidget *parent, TabGenericDeckEditor *_deckEditor)
+DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
     : QMenu(parent), deckEditor(_deckEditor)
 {
     aNewDeck = new QAction(QString(), this);
@@ -62,7 +62,7 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, TabGenericDeckEditor *_deckEdito
     analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
     aClose = new QAction(QString(), this);
-    connect(aClose, &QAction::triggered, deckEditor, &TabGenericDeckEditor::closeRequest);
+    connect(aClose, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::closeRequest);
 
     saveDeckToClipboardMenu = new QMenu(this);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboard);

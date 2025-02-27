@@ -1,21 +1,21 @@
 #ifndef DECK_EDITOR_CARD_INFO_DOCK_WIDGET_H
 #define DECK_EDITOR_CARD_INFO_DOCK_WIDGET_H
 
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../cards/card_info_frame_widget.h"
 
 #include <QDockWidget>
 
-class TabGenericDeckEditor;
+class AbstractTabDeckEditor;
 class DeckEditorCardInfoDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorCardInfoDockWidget(QWidget *parent, TabGenericDeckEditor *deckEditor);
+    explicit DeckEditorCardInfoDockWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor);
     void createCardInfoDock();
     void retranslateUi();
 
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     CardInfoFrameWidget *cardInfo;
 
 public slots:

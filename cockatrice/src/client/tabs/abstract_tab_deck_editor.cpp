@@ -1,4 +1,4 @@
-#include "tab_generic_deck_editor.h"
+#include "abstract_tab_deck_editor.h"
 
 #include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
@@ -38,23 +38,46 @@
 #include <QTreeView>
 #include <QUrl>
 
-TabGenericDeckEditor::TabGenericDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
+AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
+    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
+
+    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this, this);
+    deckDockWidget = new DeckEditorDeckDockWidget(this, this);
+    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this, this);
+    filterDockWidget = new DeckEditorFilterDockWidget(this, this);
+    printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
+
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &AbstractTabDeckEditor::updateCard);
+    connect(this, &AbstractTabDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
+            &AbstractTabDeckEditor::updateCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
+            &AbstractTabDeckEditor::actAddCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
+            &AbstractTabDeckEditor::actAddCardToSideboard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromMainDeck, this,
+            &AbstractTabDeckEditor::actDecrementCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, this,
+            &AbstractTabDeckEditor::actDecrementCardFromSideboard);
+
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
 }
 
-void TabGenericDeckEditor::updateCard(CardInfoPtr _card)
+void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
 {
     cardInfoDockWidget->updateCard(_card);
     printingSelectorDockWidget->printingSelector->setCard(_card, DECK_ZONE_MAIN);
 }
 
-void TabGenericDeckEditor::onDeckChanged()
+void AbstractTabDeckEditor::onDeckChanged()
 {
     setModified(true);
     deckMenu->setSaveStatus(!getDeckList()->isEmpty());
 }
 
-void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
+void AbstractTabDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
 {
     if (!info)
         return;
@@ -69,7 +92,7 @@ void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneNam
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
-void TabGenericDeckEditor::actAddCard(CardInfoPtr info)
+void AbstractTabDeckEditor::actAddCard(CardInfoPtr info)
 {
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard(info);
@@ -78,23 +101,23 @@ void TabGenericDeckEditor::actAddCard(CardInfoPtr info)
     deckMenu->setSaveStatus(true);
 }
 
-void TabGenericDeckEditor::actAddCardToSideboard(CardInfoPtr info)
+void AbstractTabDeckEditor::actAddCardToSideboard(CardInfoPtr info)
 {
     addCardHelper(info, DECK_ZONE_SIDE);
     deckMenu->setSaveStatus(true);
 }
 
-void TabGenericDeckEditor::actDecrementCard(CardInfoPtr info)
+void AbstractTabDeckEditor::actDecrementCard(CardInfoPtr info)
 {
     emit decrementCard(info, DECK_ZONE_MAIN);
 }
 
-void TabGenericDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
+void AbstractTabDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
 {
     emit decrementCard(info, DECK_ZONE_SIDE);
 }
 
-void TabGenericDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
+void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
 {
     QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
     QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
@@ -102,7 +125,7 @@ void TabGenericDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
         deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
 }
 
-void TabGenericDeckEditor::setDeck(DeckLoader *_deck)
+void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
     PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(getDeckList()->getCardList()));
@@ -113,12 +136,12 @@ void TabGenericDeckEditor::setDeck(DeckLoader *_deck)
     deckDockWidget->setVisible(aDeckDockVisible->isChecked());
 }
 
-DeckLoader *TabGenericDeckEditor::getDeckList() const
+DeckLoader *AbstractTabDeckEditor::getDeckList() const
 {
     return deckDockWidget->getDeckList();
 }
 
-void TabGenericDeckEditor::setModified(bool _modified)
+void AbstractTabDeckEditor::setModified(bool _modified)
 {
     modified = _modified;
     emit tabTextChanged(this, getTabText());
@@ -127,13 +150,13 @@ void TabGenericDeckEditor::setModified(bool _modified)
 /**
  * @brief Returns true if this tab is a blank newly opened tab, as if it was just created with the `New Deck` action.
  */
-bool TabGenericDeckEditor::isBlankNewDeck() const
+bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
     DeckLoader *deck = getDeckList();
     return !modified && deck->hasNotBeenLoaded();
 }
 
-void TabGenericDeckEditor::actNewDeck()
+void AbstractTabDeckEditor::actNewDeck()
 {
     auto deckOpenLocation = confirmOpen(false);
 
@@ -149,7 +172,7 @@ void TabGenericDeckEditor::actNewDeck()
     cleanDeckAndResetModified();
 }
 
-void TabGenericDeckEditor::cleanDeckAndResetModified()
+void AbstractTabDeckEditor::cleanDeckAndResetModified()
 {
     deckMenu->setSaveStatus(false);
     deckDockWidget->cleanDeck();
@@ -165,7 +188,7 @@ void TabGenericDeckEditor::cleanDeckAndResetModified()
  *
  * @returns An enum that indicates if and where to load the deck
  */
-TabGenericDeckEditor::DeckOpenLocation TabGenericDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
+AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
     // handle `openDeckInNewTab` setting
     if (SettingsCache::instance().getOpenDeckInNewTab()) {
@@ -210,7 +233,7 @@ TabGenericDeckEditor::DeckOpenLocation TabGenericDeckEditor::confirmOpen(const b
  *
  * @returns A QMessageBox that can be further modified
  */
-QMessageBox *TabGenericDeckEditor::createSaveConfirmationWindow()
+QMessageBox *AbstractTabDeckEditor::createSaveConfirmationWindow()
 {
     QMessageBox *msgBox = new QMessageBox(this);
     msgBox->setIcon(QMessageBox::Warning);
@@ -220,7 +243,7 @@ QMessageBox *TabGenericDeckEditor::createSaveConfirmationWindow()
     return msgBox;
 }
 
-void TabGenericDeckEditor::actLoadDeck()
+void AbstractTabDeckEditor::actLoadDeck()
 {
     auto deckOpenLocation = confirmOpen();
 
@@ -237,7 +260,7 @@ void TabGenericDeckEditor::actLoadDeck()
     deckDockWidget->updateBannerCardComboBox();
 }
 
-void TabGenericDeckEditor::actOpenRecent(const QString &fileName)
+void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
 {
     auto deckOpenLocation = confirmOpen();
 
@@ -253,7 +276,7 @@ void TabGenericDeckEditor::actOpenRecent(const QString &fileName)
  * @param fileName The path of the deck to open
  * @param deckOpenLocation Which tab to open the deck
  */
-void TabGenericDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
+void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
@@ -273,7 +296,7 @@ void TabGenericDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLoc
     deckMenu->setSaveStatus(true);
 }
 
-bool TabGenericDeckEditor::actSaveDeck()
+bool AbstractTabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = getDeckList();
     if (deck->getLastRemoteDeckId() != -1) {
@@ -305,7 +328,7 @@ bool TabGenericDeckEditor::actSaveDeck()
     return false;
 }
 
-bool TabGenericDeckEditor::actSaveDeckAs()
+bool AbstractTabDeckEditor::actSaveDeckAs()
 {
     QFileDialog dialog(this, tr("Save deck"));
     dialog.setDirectory(SettingsCache::instance().getDeckPath());
@@ -332,7 +355,7 @@ bool TabGenericDeckEditor::actSaveDeckAs()
     return true;
 }
 
-void TabGenericDeckEditor::saveDeckRemoteFinished(const Response &response)
+void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
 {
     if (response.response_code() != Response::RespOk)
         QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved."));
@@ -340,7 +363,7 @@ void TabGenericDeckEditor::saveDeckRemoteFinished(const Response &response)
         setModified(false);
 }
 
-void TabGenericDeckEditor::actLoadDeckFromClipboard()
+void AbstractTabDeckEditor::actLoadDeckFromClipboard()
 {
     auto deckOpenLocation = confirmOpen();
 
@@ -362,7 +385,7 @@ void TabGenericDeckEditor::actLoadDeckFromClipboard()
     deckMenu->setSaveStatus(true);
 }
 
-void TabGenericDeckEditor::actSaveDeckToClipboard()
+void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -371,7 +394,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboard()
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
-void TabGenericDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
+void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -380,7 +403,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
-void TabGenericDeckEditor::actSaveDeckToClipboardRaw()
+void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -389,7 +412,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboardRaw()
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
-void TabGenericDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
+void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -398,7 +421,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
-void TabGenericDeckEditor::actPrintDeck()
+void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
     connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckDockWidget->deckModel, SLOT(printDeckList(QPrinter *)));
@@ -406,7 +429,7 @@ void TabGenericDeckEditor::actPrintDeck()
 }
 
 // Action called when export deck to decklist menu item is pressed.
-void TabGenericDeckEditor::actExportDeckDecklist()
+void AbstractTabDeckEditor::actExportDeckDecklist()
 {
     // Get the decklist class for the deck.
     DeckLoader *const deck = getDeckList();
@@ -435,27 +458,27 @@ void TabGenericDeckEditor::actExportDeckDecklist()
     }
 }
 
-void TabGenericDeckEditor::actAnalyzeDeckDeckstats()
+void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
                                              this); // it deletes itself when done
     interface->analyzeDeck(getDeckList());
 }
 
-void TabGenericDeckEditor::actAnalyzeDeckTappedout()
+void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
                                              this); // it deletes itself when done
     interface->analyzeDeck(getDeckList());
 }
 
-void TabGenericDeckEditor::filterTreeChanged(FilterTree *filterTree)
+void AbstractTabDeckEditor::filterTreeChanged(FilterTree *filterTree)
 {
     databaseDisplayDockWidget->setFilterTree(filterTree);
 }
 
 // Method uses to sync docks state with menu items state
-bool TabGenericDeckEditor::eventFilter(QObject *o, QEvent *e)
+bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
     if (e->type() == QEvent::Close) {
         if (o == cardInfoDockWidget) {
@@ -484,7 +507,7 @@ bool TabGenericDeckEditor::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
-bool TabGenericDeckEditor::confirmClose()
+bool AbstractTabDeckEditor::confirmClose()
 {
     if (modified) {
         tabSupervisor->setCurrentWidget(this);
@@ -497,7 +520,7 @@ bool TabGenericDeckEditor::confirmClose()
     return true;
 }
 
-void TabGenericDeckEditor::closeRequest(bool forced)
+void AbstractTabDeckEditor::closeRequest(bool forced)
 {
     if (!forced && !confirmClose()) {
         return;

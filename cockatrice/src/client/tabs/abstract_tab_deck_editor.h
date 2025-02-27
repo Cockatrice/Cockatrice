@@ -40,12 +40,12 @@ class QDockWidget;
 class QMenu;
 class QAction;
 
-class TabGenericDeckEditor : public Tab
+class AbstractTabDeckEditor : public Tab
 {
     Q_OBJECT
 
 public:
-    explicit TabGenericDeckEditor(TabSupervisor *_tabSupervisor);
+    explicit AbstractTabDeckEditor(TabSupervisor *_tabSupervisor);
 
     // UI and Navigation
     virtual void createMenus() = 0;
@@ -81,7 +81,7 @@ public slots:
 
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
-    void deckEditorClosing(TabGenericDeckEditor *tab);
+    void deckEditorClosing(AbstractTabDeckEditor *tab);
     void decrementCard(CardInfoPtr card, QString zoneName);
 
 protected slots:
