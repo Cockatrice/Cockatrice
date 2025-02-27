@@ -51,6 +51,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEdit
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
 
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &TabGenericDeckEditor::updateCard);
+    connect(this, &TabGenericDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
             &TabGenericDeckEditor::updateCard);
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,

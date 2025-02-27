@@ -46,9 +46,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
-    connect(&deckViewKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrement()));
+    connect(&deckViewKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrementSelection()));
     connect(&deckViewKeySignals, SIGNAL(onShiftRight()), this, SLOT(actIncrement()));
-    connect(&deckViewKeySignals, SIGNAL(onShiftLeft()), this, SLOT(actDecrement()));
+    connect(&deckViewKeySignals, SIGNAL(onShiftLeft()), this, SLOT(actDecrementSelection()));
     connect(&deckViewKeySignals, SIGNAL(onDelete()), this, SLOT(actRemoveCard()));
 
     nameLabel = new QLabel();
@@ -87,7 +87,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     aDecrement = new QAction(QString(), this);
     aDecrement->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
+    connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrementSelection()));
     auto *tbDecrement = new QToolButton(this);
     tbDecrement->setDefaultAction(aDecrement);
 
@@ -409,7 +409,27 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     return true;
 }
 
-void DeckEditorDeckDockWidget::actDecrement()
+void DeckEditorDeckDockWidget::actDecrementCard(CardInfoPtr info, QString zoneName)
+{
+    if (!info)
+        return;
+    if (info->getIsToken())
+        zoneName = DECK_ZONE_TOKENS;
+
+    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
+    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
+
+    QModelIndex idx = deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);
+    if (!idx.isValid()) {
+        return;
+    }
+
+    deckView->clearSelection();
+    deckView->setCurrentIndex(idx);
+    offsetCountAtIndex(idx, -1);
+}
+
+void DeckEditorDeckDockWidget::actDecrementSelection()
 {
     auto selectedRows = getSelectedCardNodes();
 

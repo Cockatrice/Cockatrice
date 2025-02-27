@@ -48,27 +48,83 @@ void TabGenericDeckEditor::updateCard(CardInfoPtr _card)
     printingSelectorDockWidget->printingSelector->setCard(_card, DECK_ZONE_MAIN);
 }
 
-bool TabGenericDeckEditor::confirmClose()
+void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
 {
-    if (modified) {
-        tabSupervisor->setCurrentWidget(this);
-        int ret = createSaveConfirmationWindow()->exec();
-        if (ret == QMessageBox::Save)
-            return actSaveDeck();
-        else if (ret == QMessageBox::Cancel)
-            return false;
-    }
-    return true;
+    if (!info)
+        return;
+    if (info->getIsToken())
+        zoneName = DECK_ZONE_TOKENS;
+
+    QModelIndex newCardIndex = deckDockWidget->deckModel->addPreferredPrintingCard(info->getName(), zoneName, false);
+    // recursiveExpand(newCardIndex);
+    deckDockWidget->deckView->clearSelection();
+    deckDockWidget->deckView->setCurrentIndex(newCardIndex);
+    setModified(true);
+    databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
-void TabGenericDeckEditor::closeRequest(bool forced)
+void TabGenericDeckEditor::actAddCard(CardInfoPtr info)
 {
-    if (!forced && !confirmClose()) {
-        return;
-    }
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+        actAddCardToSideboard(info);
+    else
+        addCardHelper(info, DECK_ZONE_MAIN);
+    deckMenu->setSaveStatus(true);
+}
 
-    emit deckEditorClosing(this);
-    close();
+void TabGenericDeckEditor::actAddCardToSideboard(CardInfoPtr info)
+{
+    addCardHelper(info, DECK_ZONE_SIDE);
+    deckMenu->setSaveStatus(true);
+}
+
+void TabGenericDeckEditor::actDecrementCard(CardInfoPtr info)
+{
+    emit decrementCard(info, DECK_ZONE_MAIN);
+}
+
+void TabGenericDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
+{
+    emit decrementCard(info, DECK_ZONE_SIDE);
+}
+
+void TabGenericDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
+{
+    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
+    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
+    deckDockWidget->swapCard(
+        deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
+}
+
+void TabGenericDeckEditor::setDeck(DeckLoader *_deck)
+{
+    deckDockWidget->setDeck(_deck);
+    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(getDeckList()->getCardList()));
+    setModified(false);
+
+    // If they load a deck, make the deck list appear
+    aDeckDockVisible->setChecked(true);
+    deckDockWidget->setVisible(aDeckDockVisible->isChecked());
+}
+
+DeckLoader *TabGenericDeckEditor::getDeckList() const
+{
+    return deckDockWidget->getDeckList();
+}
+
+void TabGenericDeckEditor::setModified(bool _modified)
+{
+    modified = _modified;
+    emit tabTextChanged(this, getTabText());
+}
+
+/**
+ * @brief Returns true if this tab is a blank newly opened tab, as if it was just created with the `New Deck` action.
+ */
+bool TabGenericDeckEditor::isBlankNewDeck() const
+{
+    DeckLoader *deck = getDeckList();
+    return !modified && deck->hasNotBeenLoaded();
 }
 
 void TabGenericDeckEditor::actNewDeck()
@@ -387,105 +443,6 @@ void TabGenericDeckEditor::actAnalyzeDeckTappedout()
     interface->analyzeDeck(getDeckList());
 }
 
-void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
-{
-    if (!info)
-        return;
-    if (info->getIsToken())
-        zoneName = DECK_ZONE_TOKENS;
-
-    QModelIndex newCardIndex = deckDockWidget->deckModel->addPreferredPrintingCard(info->getName(), zoneName, false);
-    // recursiveExpand(newCardIndex);
-    deckDockWidget->deckView->clearSelection();
-    deckDockWidget->deckView->setCurrentIndex(newCardIndex);
-    setModified(true);
-    databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
-}
-
-void TabGenericDeckEditor::actAddCard(CardInfoPtr info)
-{
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
-        actAddCardToSideboard(info);
-    else
-        addCardHelper(info, DECK_ZONE_MAIN);
-    deckMenu->setSaveStatus(true);
-}
-
-void TabGenericDeckEditor::actAddCardToSideboard(CardInfoPtr info)
-{
-    addCardHelper(info, DECK_ZONE_SIDE);
-    deckMenu->setSaveStatus(true);
-}
-
-void TabGenericDeckEditor::decrementCardHelper(CardInfoPtr info, QString zoneName)
-{
-    if (!info)
-        return;
-    if (info->getIsToken())
-        zoneName = DECK_ZONE_TOKENS;
-
-    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
-    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
-
-    QModelIndex idx = deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);
-    if (!idx.isValid()) {
-        return;
-    }
-
-    deckDockWidget->deckView->clearSelection();
-    deckDockWidget->deckView->setCurrentIndex(idx);
-    deckDockWidget->offsetCountAtIndex(idx, -1);
-}
-
-void TabGenericDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
-{
-    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
-    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
-    deckDockWidget->swapCard(
-        deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
-}
-
-void TabGenericDeckEditor::actDecrementCard(CardInfoPtr info)
-{
-    decrementCardHelper(info, DECK_ZONE_MAIN);
-}
-
-void TabGenericDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
-{
-    decrementCardHelper(info, DECK_ZONE_SIDE);
-}
-
-void TabGenericDeckEditor::setDeck(DeckLoader *_deck)
-{
-    deckDockWidget->setDeck(_deck);
-    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(getDeckList()->getCardList()));
-    setModified(false);
-
-    // If they load a deck, make the deck list appear
-    aDeckDockVisible->setChecked(true);
-    deckDockWidget->setVisible(aDeckDockVisible->isChecked());
-}
-
-DeckLoader *TabGenericDeckEditor::getDeckList() const
-{
-    return deckDockWidget->getDeckList();
-}
-
-void TabGenericDeckEditor::setModified(bool _modified)
-{
-    modified = _modified;
-    emit tabTextChanged(this, getTabText());
-}
-
-/**
- * @brief Returns true if this tab is a blank newly opened tab, as if it was just created with the `New Deck` action.
- */
-bool TabGenericDeckEditor::isBlankNewDeck() const
-{
-    DeckLoader *deck = getDeckList();
-    return !modified && deck->hasNotBeenLoaded();
-}
-
 void TabGenericDeckEditor::filterTreeChanged(FilterTree *filterTree)
 {
     databaseDisplayDockWidget->setFilterTree(filterTree);
@@ -519,4 +476,27 @@ bool TabGenericDeckEditor::eventFilter(QObject *o, QEvent *e)
         layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
     }
     return false;
+}
+
+bool TabGenericDeckEditor::confirmClose()
+{
+    if (modified) {
+        tabSupervisor->setCurrentWidget(this);
+        int ret = createSaveConfirmationWindow()->exec();
+        if (ret == QMessageBox::Save)
+            return actSaveDeck();
+        else if (ret == QMessageBox::Cancel)
+            return false;
+    }
+    return true;
+}
+
+void TabGenericDeckEditor::closeRequest(bool forced)
+{
+    if (!forced && !confirmClose()) {
+        return;
+    }
+
+    emit deckEditorClosing(this);
+    close();
 }

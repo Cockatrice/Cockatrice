@@ -42,8 +42,9 @@ public slots:
     DeckLoader *getDeckList();
     void actIncrement();
     bool swapCard(const QModelIndex &idx);
+    void actDecrementCard(CardInfoPtr info, QString zoneName);
+    void actDecrementSelection();
     void actSwapCard();
-    void actDecrement();
     void actRemoveCard();
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 

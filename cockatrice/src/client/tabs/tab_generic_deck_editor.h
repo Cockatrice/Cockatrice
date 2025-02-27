@@ -81,6 +81,7 @@ public slots:
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
     void deckEditorClosing(TabGenericDeckEditor *tab);
+    void decrementCard(CardInfoPtr card, QString zoneName);
 
 protected slots:
     // Deck Operations
@@ -129,7 +130,6 @@ protected:
 
     // Helper functions for card actions
     void addCardHelper(CardInfoPtr info, QString zoneName);
-    void decrementCardHelper(CardInfoPtr info, QString zoneName);
     void actSwapCard(CardInfoPtr info, QString zoneName);
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 
