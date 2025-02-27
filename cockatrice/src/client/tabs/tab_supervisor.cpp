@@ -210,7 +210,7 @@ void TabSupervisor::retranslateUi()
     QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
     while (deckEditorIterator.hasNext())
         tabs.append(deckEditorIterator.next());
-    QListIterator<TabGenericDeckEditor *> visualDeckEditorIterator(visualDeckEditorTabs);
+    QListIterator<AbstractTabDeckEditor *> visualDeckEditorIterator(visualDeckEditorTabs);
     while (visualDeckEditorIterator.hasNext())
         tabs.append(visualDeckEditorIterator.next());
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
@@ -257,7 +257,7 @@ bool TabSupervisor::closeRequest()
             return false;
     }
 
-    for (TabGenericDeckEditor *tab : visualDeckEditorTabs) {
+    for (AbstractTabDeckEditor *tab : visualDeckEditorTabs) {
         if (!tab->confirmClose())
             return false;
     }
@@ -802,8 +802,8 @@ TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *dec
     auto *tab = new TabDeckEditorVisual(this);
     if (deckToOpen)
         tab->setDeck(new DeckLoader(*deckToOpen));
-    connect(tab, &TabGenericDeckEditor::deckEditorClosing, this, &TabSupervisor::visualDeckEditorClosed);
-    connect(tab, &TabGenericDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
+    connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::visualDeckEditorClosed);
+    connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);
     visualDeckEditorTabs.append(tab);
     setCurrentWidget(tab);
@@ -831,7 +831,7 @@ void TabSupervisor::deckEditorClosed(AbstractTabDeckEditor *tab)
     removeTab(indexOf(tab));
 }
 
-void TabSupervisor::visualDeckEditorClosed(TabGenericDeckEditor *tab)
+void TabSupervisor::visualDeckEditorClosed(AbstractTabDeckEditor *tab)
 {
     if (tab == currentWidget())
         emit setMenu();
