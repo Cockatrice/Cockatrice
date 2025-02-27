@@ -48,18 +48,6 @@ void TabGenericDeckEditor::updateCard(CardInfoPtr _card)
     printingSelectorDockWidget->printingSelector->setCard(_card, DECK_ZONE_MAIN);
 }
 
-void TabGenericDeckEditor::decklistCustomMenu(QPoint point)
-{
-    QMenu menu;
-    const CardInfoPtr info = cardInfoDockWidget->cardInfo->getInfo();
-
-    QAction *selectPrinting = menu.addAction(tr("Select Printing"));
-
-    connect(selectPrinting, &QAction::triggered, this, &TabGenericDeckEditor::showPrintingSelector);
-
-    menu.exec(deckDockWidget->deckView->mapToGlobal(point));
-}
-
 bool TabGenericDeckEditor::confirmClose()
 {
     if (modified) {
@@ -225,7 +213,7 @@ void TabGenericDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLoc
 
 bool TabGenericDeckEditor::actSaveDeck()
 {
-    DeckLoader *const deck = deckDockWidget->deckModel->getDeckList();
+    DeckLoader *const deck = getDeckList();
     if (deck->getLastRemoteDeckId() != -1) {
         QString deckString = deck->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
@@ -262,14 +250,14 @@ bool TabGenericDeckEditor::actSaveDeckAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
-    dialog.selectFile(deckDockWidget->deckModel->getDeckList()->getName().trimmed() + ".cod");
+    dialog.selectFile(getDeckList()->getName().trimmed() + ".cod");
     if (!dialog.exec())
         return false;
 
     QString fileName = dialog.selectedFiles().at(0);
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    if (!deckDockWidget->deckModel->getDeckList()->saveToFile(fileName, fmt)) {
+    if (!getDeckList()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
@@ -316,7 +304,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboard()
 {
     QString buffer;
     QTextStream stream(&buffer);
-    deckDockWidget->deckModel->getDeckList()->saveToStream_Plain(stream);
+    getDeckList()->saveToStream_Plain(stream);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
@@ -325,7 +313,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
 {
     QString buffer;
     QTextStream stream(&buffer);
-    deckDockWidget->deckModel->getDeckList()->saveToStream_Plain(stream, true, false);
+    getDeckList()->saveToStream_Plain(stream, true, false);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
@@ -334,7 +322,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboardRaw()
 {
     QString buffer;
     QTextStream stream(&buffer);
-    deckDockWidget->deckModel->getDeckList()->saveToStream_Plain(stream, false);
+    getDeckList()->saveToStream_Plain(stream, false);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
@@ -343,7 +331,7 @@ void TabGenericDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
 {
     QString buffer;
     QTextStream stream(&buffer);
-    deckDockWidget->deckModel->getDeckList()->saveToStream_Plain(stream, false, false);
+    getDeckList()->saveToStream_Plain(stream, false, false);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
@@ -359,7 +347,7 @@ void TabGenericDeckEditor::actPrintDeck()
 void TabGenericDeckEditor::actExportDeckDecklist()
 {
     // Get the decklist class for the deck.
-    DeckLoader *const deck = deckDockWidget->deckModel->getDeckList();
+    DeckLoader *const deck = getDeckList();
     // create a string to load the decklist url into.
     QString decklistUrlString;
     // check if deck is not null
@@ -389,14 +377,14 @@ void TabGenericDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
                                              this); // it deletes itself when done
-    interface->analyzeDeck(deckDockWidget->deckModel->getDeckList());
+    interface->analyzeDeck(getDeckList());
 }
 
 void TabGenericDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
                                              this); // it deletes itself when done
-    interface->analyzeDeck(deckDockWidget->deckModel->getDeckList());
+    interface->analyzeDeck(getDeckList());
 }
 
 void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)

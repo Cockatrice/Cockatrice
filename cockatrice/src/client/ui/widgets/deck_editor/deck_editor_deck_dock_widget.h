@@ -24,6 +24,7 @@ public:
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
     void createDeckDock();
+    CardInfoPtr getCurrentCard();
     void retranslateUi();
     QString getDeckName()
     {
@@ -67,7 +68,8 @@ private:
     QModelIndexList getSelectedCardNodes() const;
 
 private slots:
-    void updateCard(const QModelIndex &current, const QModelIndex &previous);
+    void decklistCustomMenu(QPoint point);
+    void updateCard(QModelIndex, const QModelIndex &current);
     void updateName(const QString &name);
     void updateComments();
     void setBannerCard(int);

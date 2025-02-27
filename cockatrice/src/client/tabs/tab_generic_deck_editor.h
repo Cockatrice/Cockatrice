@@ -83,8 +83,6 @@ signals:
     void deckEditorClosing(TabGenericDeckEditor *tab);
 
 protected slots:
-    void decklistCustomMenu(QPoint point);
-
     // Deck Operations
     virtual void actNewDeck();
     void cleanDeckAndResetModified();

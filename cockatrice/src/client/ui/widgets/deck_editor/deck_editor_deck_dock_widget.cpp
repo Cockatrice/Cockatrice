@@ -42,7 +42,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDeckDockWidget::updateCard);
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
-    connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), deckEditor, SLOT(decklistCustomMenu(QPoint)));
+    connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(decklistCustomMenu(QPoint)));
     connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
@@ -164,16 +164,17 @@ void DeckEditorDeckDockWidget::createDeckDock()
     retranslateUi();
 }
 
-void DeckEditorDeckDockWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
+CardInfoPtr DeckEditorDeckDockWidget::getCurrentCard()
 {
+    QModelIndex current = deckView->selectionModel()->currentIndex();
     if (!current.isValid())
-        return;
+        return {};
     const QString cardName = current.sibling(current.row(), 1).data().toString();
     const QString cardProviderID = current.sibling(current.row(), 4).data().toString();
     const QModelIndex gparent = current.parent().parent();
 
     if (!gparent.isValid()) {
-        return;
+        return {};
     }
 
     const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
@@ -183,8 +184,16 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex &current, const QMod
         QString providerId = current.sibling(current.row(), 4).data().toString();
         if (CardInfoPtr selectedCard =
                 CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, providerId)) {
-            emit cardChanged(selectedCard);
+            return selectedCard;
         }
+    }
+    return {};
+}
+
+void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const QModelIndex & /*previous*/)
+{
+    if (CardInfoPtr card = getCurrentCard()) {
+        emit cardChanged(card);
     }
 }
 
@@ -462,6 +471,18 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
         deckModel->setData(numberIndex, new_count, Qt::EditRole);
     // TODO Hook up to deck editor
     // setModified(true);
+}
+
+void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
+{
+    QMenu menu;
+    const CardInfoPtr info = getCurrentCard();
+
+    QAction *selectPrinting = menu.addAction(tr("Select Printing"));
+
+    connect(selectPrinting, &QAction::triggered, deckEditor, &TabGenericDeckEditor::showPrintingSelector);
+
+    menu.exec(deckView->mapToGlobal(point));
 }
 
 void DeckEditorDeckDockWidget::refreshShortcuts()
