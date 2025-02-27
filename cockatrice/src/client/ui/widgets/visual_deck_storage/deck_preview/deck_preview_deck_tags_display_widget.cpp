@@ -143,10 +143,10 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             auto *deckEditor = qobject_cast<TabDeckEditor *>(currentParent);
             QStringList knownTags;
             QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
-            auto *loader = new DeckLoader();
+            DeckLoader loader;
             for (const QString &file : allFiles) {
-                loader->loadFromFile(file, DeckLoader::getFormatFromName(file), false);
-                QStringList tags = loader->getTags();
+                loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);
+                QStringList tags = loader.getTags();
                 knownTags.append(tags);
                 knownTags.removeDuplicates();
             }

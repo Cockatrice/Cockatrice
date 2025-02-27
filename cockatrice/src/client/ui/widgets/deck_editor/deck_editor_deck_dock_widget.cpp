@@ -289,6 +289,10 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
 }
 
+/**
+ * Sets the currently active deck for this tab
+ * @param _deck The deck. Takes ownership of the object
+ */
 void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 {
     deckModel->setDeckList(_deck);
