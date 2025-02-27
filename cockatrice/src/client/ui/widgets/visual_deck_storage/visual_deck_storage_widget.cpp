@@ -200,7 +200,6 @@ void VisualDeckStorageWidget::updateTagFilter()
         tagFilterWidget->filterDecksBySelectedTags(folderWidget->findChildren<DeckPreviewWidget *>());
         folderWidget->updateVisibility();
     }
-    emit tagFilterUpdated();
 }
 
 void VisualDeckStorageWidget::updateColorFilter()
@@ -209,7 +208,6 @@ void VisualDeckStorageWidget::updateColorFilter()
         deckPreviewColorIdentityFilterWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>());
         folderWidget->updateVisibility();
     }
-    emit colorFilterUpdated();
 }
 
 void VisualDeckStorageWidget::updateSearchFilter()
@@ -219,7 +217,6 @@ void VisualDeckStorageWidget::updateSearchFilter()
                                     searchFolderNamesCheckBox->isChecked());
         folderWidget->updateVisibility();
     }
-    emit searchFilterUpdated();
 }
 
 void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
