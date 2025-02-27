@@ -15,6 +15,10 @@ public:
     explicit EdhrecCommanderApiResponseCardDetailsDisplayWidget(
         QWidget *parent,
         const EdhrecCommanderApiResponseCardDetails &_toDisplay);
+public slots:
+    void actRequestPageNavigation();
+signals:
+    void requestUrl(QString url);
 
 private:
     EdhrecCommanderApiResponseCardDetails toDisplay;

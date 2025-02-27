@@ -33,6 +33,7 @@ public slots:
     void processTopCommandersResponse(QJsonObject reply);
     void prettyPrintJson(const QJsonValue &value, int indentLevel);
     void setCard(CardInfoPtr _cardToQuery, bool isCommander = false);
+    void actNavigatePage(QString url);
     void getTopCommanders();
     void getTopTags();
 

@@ -283,6 +283,8 @@ void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton) {
         createRightClickMenu()->popup(QCursor::pos());
     }
+
+    emit cardClicked();
 }
 
 QMenu *CardInfoPictureWidget::createRightClickMenu()

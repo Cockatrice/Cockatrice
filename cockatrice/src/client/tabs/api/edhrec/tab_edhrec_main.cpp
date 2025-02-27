@@ -154,6 +154,13 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
     networkManager->get(request);
 }
 
+void TabEdhRecMain::actNavigatePage(QString url)
+{
+    QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json")};
+
+    networkManager->get(request);
+}
+
 void TabEdhRecMain::getTopCommanders()
 {
     QNetworkRequest request{QUrl("https://json.edhrec.com/pages/commanders/year.json")};
@@ -196,6 +203,8 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/commanders/")) {
         processCommanderResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/cards/")) {
+        processCommanderResponse(jsonObj);
+    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/tags/")) {
         processCommanderResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/tags.json")) {
         processTopTagsResponse(jsonObj);
