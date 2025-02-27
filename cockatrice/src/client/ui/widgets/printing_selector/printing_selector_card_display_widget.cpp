@@ -19,16 +19,16 @@
  * display.
  *
  * @param parent The parent widget for this display.
- * @param deckEditor The TabDeckEditor instance for deck management.
- * @param deckModel The DeckListModel instance providing deck data.
- * @param deckView The QTreeView instance displaying the deck.
- * @param cardSizeSlider The slider controlling the size of the displayed card.
- * @param rootCard The root card object, representing the card to be displayed.
- * @param setInfoForCard The set-specific information for the card being displayed.
- * @param currentZone The current zone in which the card is located.
+ * @param _deckEditor The TabDeckEditor instance for deck management.
+ * @param _deckModel The DeckListModel instance providing deck data.
+ * @param _deckView The QTreeView instance displaying the deck.
+ * @param _cardSizeSlider The slider controlling the size of the displayed card.
+ * @param _rootCard The root card object, representing the card to be displayed.
+ * @param _setInfoForCard The set-specific information for the card being displayed.
+ * @param _currentZone The current zone in which the card is located.
  */
 PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                                                     TabDeckEditor *_deckEditor,
+                                                                     AbstractTabDeckEditor *_deckEditor,
                                                                      DeckListModel *_deckModel,
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,

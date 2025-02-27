@@ -45,6 +45,11 @@ public:
         return lastRemoteDeckId;
     }
 
+    bool hasNotBeenLoaded() const
+    {
+        return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
+    }
+
     void clearSetNamesAndNumbers();
     static FileFormat getFormatFromName(const QString &fileName);
 

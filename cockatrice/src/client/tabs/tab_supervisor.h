@@ -3,6 +3,7 @@
 
 #include "../../deck/deck_loader.h"
 #include "../../server/user/user_list_proxy.h"
+#include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
@@ -87,7 +88,7 @@ private:
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
-    QList<TabDeckEditor *> deckEditorTabs;
+    QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
     QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
@@ -132,7 +133,7 @@ public:
     {
         return roomTabs;
     }
-    QList<TabDeckEditor *> getDeckEditorTabs() const
+    QList<AbstractTabDeckEditor *> getDeckEditorTabs() const
     {
         return deckEditorTabs;
     }
@@ -174,7 +175,7 @@ private slots:
     void processUserLeft(const QString &userName);
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
-    void deckEditorClosed(TabDeckEditor *tab);
+    void deckEditorClosed(AbstractTabDeckEditor *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);

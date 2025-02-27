@@ -19,13 +19,13 @@ class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
 class PrintingSelectorViewOptionsWidget;
-class TabDeckEditor;
+class AbstractTabDeckEditor;
 class PrintingSelector : public QWidget
 {
     Q_OBJECT
 
 public:
-    PrintingSelector(QWidget *parent, TabDeckEditor *deckEditor, DeckListModel *deckModel, QTreeView *deckView);
+    PrintingSelector(QWidget *parent, AbstractTabDeckEditor *deckEditor);
 
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     void getAllSetsForCurrentCard();
@@ -51,7 +51,7 @@ private:
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
-    TabDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
     CardInfoPtr selectedCard;

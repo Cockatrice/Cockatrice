@@ -4,7 +4,7 @@
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_loader.h"
 #include "../../../../game/cards/card_database.h"
-#include "../../../tabs/tab_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 
 #include <QHBoxLayout>
@@ -18,7 +18,7 @@ class CardAmountWidget : public QWidget
     Q_OBJECT
 public:
     explicit CardAmountWidget(QWidget *parent,
-                              TabDeckEditor *deckEditor,
+                              AbstractTabDeckEditor *deckEditor,
                               DeckListModel *deckModel,
                               QTreeView *deckView,
                               QSlider *cardSizeSlider,
@@ -36,7 +36,7 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
-    TabDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;

@@ -16,7 +16,7 @@
  * @param zoneName The zone name (e.g., DECK_ZONE_MAIN or DECK_ZONE_SIDE).
  */
 CardAmountWidget::CardAmountWidget(QWidget *parent,
-                                   TabDeckEditor *deckEditor,
+                                   AbstractTabDeckEditor *deckEditor,
                                    DeckListModel *deckModel,
                                    QTreeView *deckView,
                                    QSlider *cardSizeSlider,

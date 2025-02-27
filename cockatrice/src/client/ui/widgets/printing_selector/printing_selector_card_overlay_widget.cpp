@@ -17,15 +17,15 @@
  * as a widget that displays the card amounts in different zones (mainboard, sideboard, etc.).
  *
  * @param parent The parent widget for this overlay.
- * @param deckEditor The TabDeckEditor instance for deck management.
- * @param deckModel The DeckListModel instance providing deck data.
- * @param deckView The QTreeView instance displaying the deck.
- * @param cardSizeSlider The slider controlling the size of the card.
- * @param rootCard The root card object that contains information about the card.
- * @param setInfoForCard The set-specific information for the card being displayed.
+ * @param _deckEditor The TabDeckEditor instance for deck management.
+ * @param _deckModel The DeckListModel instance providing deck data.
+ * @param _deckView The QTreeView instance displaying the deck.
+ * @param _cardSizeSlider The slider controlling the size of the card.
+ * @param _rootCard The root card object that contains information about the card.
+ * @param _setInfoForCard The set-specific information for the card being displayed.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                                                     TabDeckEditor *_deckEditor,
+                                                                     AbstractTabDeckEditor *_deckEditor,
                                                                      DeckListModel *_deckModel,
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
@@ -120,7 +120,7 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
 #endif
 {
     QWidget::enterEvent(event);
-    deckEditor->updateCardInfo(setCard);
+    deckEditor->updateCard(setCard);
 
     // Check if either mainboard or sideboard amount is greater than 0
     if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
@@ -199,7 +199,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
             const QString &relatedCardName = rel->getName();
             QAction *relatedCard = relatedMenu->addAction(relatedCardName);
             connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
-                deckEditor->updateCardInfo(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+                deckEditor->updateCard(CardDatabaseManager::getInstance()->getCard(relatedCardName));
                 deckEditor->showPrintingSelector();
             });
         }

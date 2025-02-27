@@ -21,11 +21,9 @@
  * @param deckModel The DeckListModel instance that provides data for the deck's contents.
  * @param deckView The QTreeView instance used to display the deck and its contents.
  */
-PrintingSelector::PrintingSelector(QWidget *parent,
-                                   TabDeckEditor *deckEditor,
-                                   DeckListModel *deckModel,
-                                   QTreeView *deckView)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView)
+PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
+    : QWidget(parent), deckEditor(_deckEditor), deckModel(deckEditor->deckDockWidget->deckModel),
+      deckView(deckEditor->deckDockWidget->deckView)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout(this);

@@ -12,7 +12,7 @@ class AllZonesCardAmountWidget : public QWidget
     Q_OBJECT
 public:
     explicit AllZonesCardAmountWidget(QWidget *parent,
-                                      TabDeckEditor *deckEditor,
+                                      AbstractTabDeckEditor *deckEditor,
                                       DeckListModel *deckModel,
                                       QTreeView *deckView,
                                       QSlider *cardSizeSlider,
@@ -31,7 +31,7 @@ public slots:
 
 private:
     QVBoxLayout *layout;
-    TabDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;

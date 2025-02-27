@@ -4,7 +4,7 @@
 #include "../../../../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../game/cards/card_database.h"
-#include "../../../tabs/tab_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "all_zones_card_amount_widget.h"
 #include "card_amount_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
@@ -15,7 +15,7 @@ class PrintingSelectorCardOverlayWidget : public QWidget
 
 public:
     explicit PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                               TabDeckEditor *_deckEditor,
+                                               AbstractTabDeckEditor *_deckEditor,
                                                DeckListModel *_deckModel,
                                                QTreeView *_deckView,
                                                QSlider *_cardSizeSlider,
@@ -39,7 +39,7 @@ signals:
 private:
     CardInfoPictureWidget *cardInfoPicture;
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
-    TabDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;
