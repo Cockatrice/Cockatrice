@@ -33,13 +33,6 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     containerLayout->addWidget(flowWidget);
 
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::tagFilterUpdated, this,
-            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::colorFilterUpdated, this,
-            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::searchFilterUpdated, this,
-            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-
     createWidgetsForFiles();
     createWidgetsForFolders();
 
@@ -104,6 +97,10 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
     }
 }
 
+/**
+ * Updates the visibility of this folder and all its DeckPreviewWidgets, as well as all its subfolders and their
+ * DeckPreviewWidgets.
+ */
 void VisualDeckStorageFolderDisplayWidget::updateVisibility()
 {
     bool atLeastOneWidgetVisible = checkVisibility();
