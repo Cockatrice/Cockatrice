@@ -371,9 +371,7 @@ void DeckEditorDeckDockWidget::actSwapCard()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (isModified) {
-        // TODO Hook up to deck editor
-        // setModified(true);
-        // setSaveStatus(true);
+        emit deckChanged();
     }
 
     update();
@@ -468,11 +466,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (isModified) {
-        DeckLoader *const deck = deckModel->getDeckList();
-        // TODO: Hook up to DeckEditor
-        Q_UNUSED(deck);
-        // setSaveStatus(!deck->isEmpty());
-        // setModified(true);
+        emit deckChanged();
     }
 }
 
@@ -489,8 +483,8 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
         deckModel->removeRow(idx.row(), idx.parent());
     else
         deckModel->setData(numberIndex, new_count, Qt::EditRole);
-    // TODO Hook up to deck editor
-    // setModified(true);
+
+    emit deckChanged();
 }
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)

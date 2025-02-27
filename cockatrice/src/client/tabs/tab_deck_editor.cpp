@@ -50,6 +50,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEdit
     filterDockWidget = new DeckEditorFilterDockWidget(this, this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
 
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &TabGenericDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &TabGenericDeckEditor::updateCard);
     connect(this, &TabGenericDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,

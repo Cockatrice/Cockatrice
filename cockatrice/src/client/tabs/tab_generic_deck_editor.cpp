@@ -48,6 +48,12 @@ void TabGenericDeckEditor::updateCard(CardInfoPtr _card)
     printingSelectorDockWidget->printingSelector->setCard(_card, DECK_ZONE_MAIN);
 }
 
+void TabGenericDeckEditor::onDeckChanged()
+{
+    setModified(true);
+    deckMenu->setSaveStatus(!getDeckList()->isEmpty());
+}
+
 void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
 {
     if (!info)
