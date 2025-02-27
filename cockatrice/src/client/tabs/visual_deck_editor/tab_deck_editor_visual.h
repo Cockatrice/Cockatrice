@@ -1,12 +1,10 @@
 #ifndef WINDOW_DECKEDITORVISUAL_H
 #define WINDOW_DECKEDITORVISUAL_H
 
-#include "../../game_logic/key_signals.h"
 #include "../tab.h"
-#include "../tab_deck_editor.h"
 #include "tab_deck_editor_visual_tab_widget.h"
 
-class TabDeckEditorVisual : public TabGenericDeckEditor
+class TabDeckEditorVisual : public AbstractTabDeckEditor
 {
     Q_OBJECT
 protected slots:
@@ -25,7 +23,7 @@ protected slots:
     void dockTopLevelChanged(bool topLevel) override;
 
 protected:
-    void openDeckFromFile(const QString &fileName, TabGenericDeckEditor::DeckOpenLocation deckOpenLocation) override;
+    void openDeckFromFile(const QString &fileName, AbstractTabDeckEditor::DeckOpenLocation deckOpenLocation) override;
     TabDeckEditorVisualTabWidget *tabContainer;
 
     QVBoxLayout *centralFrame;

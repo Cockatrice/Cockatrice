@@ -20,7 +20,7 @@
 #include <qpropertyanimation.h>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
-                                                         TabGenericDeckEditor *_deckEditor,
+                                                         AbstractTabDeckEditor *_deckEditor,
                                                          CardDatabaseModel *database_model,
                                                          CardDatabaseDisplayModel *database_display_model)
     : QWidget(parent), deckEditor(_deckEditor), databaseModel(database_model),
