@@ -21,8 +21,8 @@ static bool canBeCommander(const CardInfoPtr &cardInfo)
            cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
 }
 
-DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
-    : QWidget(parent), deckEditor(_deckEditor)
+DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeckEditor *parent)
+    : QWidget(parent), deckEditor(parent)
 {
     setObjectName("centralWidget");
 

@@ -11,7 +11,7 @@ class DeckEditorCardInfoDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorCardInfoDockWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor);
+    explicit DeckEditorCardInfoDockWidget(AbstractTabDeckEditor *parent);
     void createCardInfoDock();
     void retranslateUi();
 

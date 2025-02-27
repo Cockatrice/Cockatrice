@@ -13,7 +13,7 @@ class DeckEditorFilterDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorFilterDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
+    explicit DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent);
     void createFiltersDock();
     void retranslateUi();
     QAction *aClearFilterAll, *aClearFilterOne;

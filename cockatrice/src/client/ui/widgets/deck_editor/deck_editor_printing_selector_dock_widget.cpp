@@ -4,9 +4,8 @@
 
 #include <QVBoxLayout>
 
-DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(QWidget *parent,
-                                                                           AbstractTabDeckEditor *_deckEditor)
-    : QDockWidget(parent), deckEditor(_deckEditor)
+DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent)
+    : QDockWidget(parent), deckEditor(parent)
 {
     setObjectName("printingSelectorDock");
 

@@ -9,8 +9,8 @@
 #include <QMenu>
 #include <QToolButton>
 
-DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
-    : QDockWidget(parent), deckEditor(_deckEditor)
+DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)
+    : QDockWidget(parent), deckEditor(parent)
 {
     setObjectName("filterDock");
 

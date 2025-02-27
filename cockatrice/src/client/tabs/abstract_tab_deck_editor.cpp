@@ -42,11 +42,11 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 {
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 
-    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this, this);
-    deckDockWidget = new DeckEditorDeckDockWidget(this, this);
-    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this, this);
-    filterDockWidget = new DeckEditorFilterDockWidget(this, this);
-    printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
+    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this);
+    deckDockWidget = new DeckEditorDeckDockWidget(this);
+    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
+    filterDockWidget = new DeckEditorFilterDockWidget(this);
+    printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this);
 
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &AbstractTabDeckEditor::updateCard);

@@ -4,8 +4,8 @@
 
 #include <QVBoxLayout>
 
-DeckEditorCardInfoDockWidget::DeckEditorCardInfoDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
-    : QDockWidget(parent), deckEditor(_deckEditor)
+DeckEditorCardInfoDockWidget::DeckEditorCardInfoDockWidget(AbstractTabDeckEditor *parent)
+    : QDockWidget(parent), deckEditor(parent)
 {
     setObjectName("cardInfoDock");
 

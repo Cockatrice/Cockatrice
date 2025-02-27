@@ -11,8 +11,8 @@
 #include <QTextEdit>
 #include <trice_limits.h>
 
-DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
-    : QDockWidget(parent), deckEditor(_deckEditor)
+DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent)
+    : QDockWidget(parent), deckEditor(parent)
 {
     setObjectName("deckDock");
 

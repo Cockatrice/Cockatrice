@@ -11,7 +11,7 @@ class DeckEditorPrintingSelectorDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorPrintingSelectorDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
+    explicit DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent);
     void createPrintingSelectorDock();
     void retranslateUi();
     PrintingSelector *printingSelector;

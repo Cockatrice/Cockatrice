@@ -19,7 +19,7 @@ class DeckEditorDeckDockWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit DeckEditorDeckDockWidget(QWidget *parent, AbstractTabDeckEditor *_deckEditor);
+    explicit DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent);
     DeckListModel *deckModel;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
