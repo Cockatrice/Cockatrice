@@ -115,8 +115,7 @@ void DeckEditorFilterDockWidget::filterRemove(QAction *action)
 
 void DeckEditorFilterDockWidget::actClearFilterAll()
 {
-    deckEditor->databaseDisplayDockWidget->databaseDisplayModel->clearFilterAll();
-    deckEditor->databaseDisplayDockWidget->searchEdit->setText("");
+    emit clearAllDatabaseFilters();
 }
 
 void DeckEditorFilterDockWidget::actClearFilterOne()

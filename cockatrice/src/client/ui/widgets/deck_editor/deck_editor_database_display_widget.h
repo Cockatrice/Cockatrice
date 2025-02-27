@@ -24,6 +24,7 @@ public:
 public slots:
     CardInfoPtr currentCardInfo() const;
     void setFilterTree(FilterTree *filterTree);
+    void clearAllDatabaseFilters();
 
 signals:
     void addCardToMainDeck(CardInfoPtr card);

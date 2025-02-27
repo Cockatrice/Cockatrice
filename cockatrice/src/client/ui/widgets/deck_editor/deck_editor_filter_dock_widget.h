@@ -18,6 +18,9 @@ public:
     void retranslateUi();
     QAction *aClearFilterAll, *aClearFilterOne;
 
+signals:
+    void clearAllDatabaseFilters();
+
 private:
     AbstractTabDeckEditor *deckEditor;
     FilterTreeModel *filterModel;

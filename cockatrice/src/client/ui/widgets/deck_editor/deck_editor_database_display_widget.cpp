@@ -124,6 +124,12 @@ void DeckEditorDatabaseDisplayWidget::updateSearch(const QString &search)
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
 }
 
+void DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters()
+{
+    databaseDisplayModel->clearFilterAll();
+    searchEdit->setText("");
+}
+
 void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QString cardName = current.sibling(current.row(), 0).data().toString();
