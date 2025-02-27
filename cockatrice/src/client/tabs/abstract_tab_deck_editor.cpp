@@ -128,6 +128,10 @@ void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
         deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
 }
 
+/**
+ * Sets the currently active deck for this tab
+ * @param _deck The deck. Takes ownership of the object
+ */
 void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
