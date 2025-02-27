@@ -1,11 +1,11 @@
 #include "visual_database_display_name_filter_widget.h"
 
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QHBoxLayout>
 
 VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWidget *parent,
-                                                                             TabGenericDeckEditor *_deckEditor,
+                                                                             AbstractTabDeckEditor *_deckEditor,
                                                                              FilterTreeModel *_filterModel)
     : QWidget(parent), deckEditor(_deckEditor), filterModel(_filterModel)
 {

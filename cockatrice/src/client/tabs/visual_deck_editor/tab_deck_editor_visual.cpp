@@ -4,16 +4,10 @@
 #include "../../../deck/deck_stats_interface.h"
 #include "../../../dialogs/dlg_load_deck.h"
 #include "../../../dialogs/dlg_load_deck_from_clipboard.h"
-#include "../../../game/cards/card_database_manager.h"
 #include "../../../game/cards/card_database_model.h"
 #include "../../../game/filters/filter_builder.h"
-#include "../../../game/filters/filter_tree_model.h"
-#include "../../../main.h"
 #include "../../../server/pending_command.h"
 #include "../../../settings/cache_settings.h"
-#include "../../game_logic/abstract_client.h"
-#include "../../tapped_out_interface.h"
-#include "../../ui/picture_loader/picture_loader.h"
 #include "../../ui/pixel_map_generator.h"
 #include "../../ui/widgets/cards/card_info_frame_widget.h"
 #include "../../ui/widgets/deck_analytics/deck_analytics_widget.h"
@@ -21,54 +15,36 @@
 #include "../tab_deck_editor.h"
 #include "../tab_supervisor.h"
 #include "pb/command_deck_upload.pb.h"
-#include "pb/response.pb.h"
 #include "tab_deck_editor_visual_tab_widget.h"
 #include "trice_limits.h"
 
 #include <QAction>
 #include <QApplication>
-#include <QClipboard>
 #include <QCloseEvent>
-#include <QDesktopServices>
 #include <QDir>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QHeaderView>
-#include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
-#include <QMenuBar>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
 #include <QProcessEnvironment>
-#include <QPushButton>
-#include <QRegularExpression>
 #include <QSplitter>
-#include <QTextBrowser>
-#include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
-#include <QToolBar>
-#include <QToolButton>
 #include <QTreeView>
-#include <QUrl>
 #include <QVBoxLayout>
 
-TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : TabGenericDeckEditor(_tabSupervisor)
+TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : AbstractTabDeckEditor(_tabSupervisor)
 {
     setObjectName("TabDeckEditorVisual");
-
-    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this, this);
-    deckDockWidget = new DeckEditorDeckDockWidget(this, this);
-    cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
-    filterDockWidget = new DeckEditorFilterDockWidget(this, this);
-    printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
 
     createCentralFrame();
 
     TabDeckEditorVisual::createMenus();
 
-    this->installEventFilter(this);
+    installEventFilter(this);
 
     TabDeckEditorVisual::retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
@@ -91,7 +67,7 @@ void TabDeckEditorVisual::createCentralFrame()
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChangedDatabaseDisplay, this,
-            &TabGenericDeckEditor::updateCardInfo);
+            &AbstractTabDeckEditor::updateCard);
     connect(tabContainer, SIGNAL(mainboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(processMainboardCardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
     connect(tabContainer, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
@@ -166,7 +142,7 @@ QString TabDeckEditorVisual::getTabText() const
 
 void TabDeckEditorVisual::changeModelIndexAndCardInfo(CardInfoPtr activeCard)
 {
-    updateCardInfo(activeCard);
+    updateCard(activeCard);
     changeModelIndexToCard(activeCard);
 }
 
@@ -370,7 +346,7 @@ void TabDeckEditorVisual::actLoadDeck()
 
 void TabDeckEditorVisual::actLoadDeckFromClipboard()
 {
-    TabGenericDeckEditor::actLoadDeckFromClipboard();
+    AbstractTabDeckEditor::actLoadDeckFromClipboard();
     tabContainer->visualDeckView->updateDisplay();
     tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
     tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
@@ -403,7 +379,7 @@ void TabDeckEditorVisual::openDeckFromFile(const QString &fileName, DeckOpenLoca
 
 void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
 {
-    TabGenericDeckEditor::setDeck(_deck);
+    AbstractTabDeckEditor::setDeck(_deck);
     tabContainer->visualDeckView->updateDisplay();
     tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
     tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
