@@ -4,6 +4,7 @@
 #include "../../../../settings/cache_settings.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../../../tabs/tab_supervisor.h"
+#include "../../../ui/pixel_map_generator.h"
 
 #include <QClipboard>
 #include <QFile>
@@ -33,7 +34,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     searchEdit->setObjectName("searchEdit");
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
-    // searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     searchEdit->installEventFilter(&searchKeySignals);
 
