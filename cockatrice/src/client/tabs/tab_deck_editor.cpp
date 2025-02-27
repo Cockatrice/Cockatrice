@@ -50,6 +50,18 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : TabGenericDeckEdit
     filterDockWidget = new DeckEditorFilterDockWidget(this, this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this, this);
 
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &TabGenericDeckEditor::updateCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
+            &TabGenericDeckEditor::updateCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
+            &TabGenericDeckEditor::actAddCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
+            &TabGenericDeckEditor::actAddCardToSideboard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromMainDeck, this,
+            &TabGenericDeckEditor::actDecrementCard);
+    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, this,
+            &TabGenericDeckEditor::actDecrementCardFromSideboard);
+
     TabDeckEditor::createMenus();
 
     installEventFilter(this);
@@ -118,71 +130,6 @@ QString TabDeckEditor::getTabText() const
     if (modified)
         result.prepend("* ");
     return result;
-}
-
-void TabDeckEditor::actNewDeck()
-{
-    auto deckOpenLocation = confirmOpen(false);
-
-    if (deckOpenLocation == CANCELLED) {
-        return;
-    }
-
-    if (deckOpenLocation == NEW_TAB) {
-        emit openDeckEditor(nullptr);
-        return;
-    }
-
-    deckDockWidget->cleanDeck();
-    setModified(false);
-    deckMenu->setSaveStatus(false);
-}
-
-void TabDeckEditor::actLoadDeck()
-{
-    auto deckOpenLocation = confirmOpen();
-
-    if (deckOpenLocation == CANCELLED) {
-        return;
-    }
-
-    DlgLoadDeck dialog(this);
-    if (!dialog.exec())
-        return;
-
-    QString fileName = dialog.selectedFiles().at(0);
-    TabDeckEditor::openDeckFromFile(fileName, deckOpenLocation);
-    deckDockWidget->updateBannerCardComboBox();
-}
-
-void TabDeckEditor::actLoadDeckFromClipboard()
-{
-    TabGenericDeckEditor::actLoadDeckFromClipboard();
-}
-
-/**
- * Actually opens the deck from file
- * @param fileName The path of the deck to open
- * @param deckOpenLocation Which tab to open the deck
- */
-void TabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
-{
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
-
-    auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt, true)) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
-        if (deckOpenLocation == NEW_TAB) {
-            emit openDeckEditor(l);
-        } else {
-            deckMenu->setSaveStatus(false);
-            setDeck(l);
-        }
-    } else {
-        delete l;
-        QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
-    }
-    deckMenu->setSaveStatus(true);
 }
 
 void TabDeckEditor::retranslateUi()

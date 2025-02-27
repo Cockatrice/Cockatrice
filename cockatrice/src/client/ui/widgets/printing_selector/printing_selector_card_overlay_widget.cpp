@@ -120,7 +120,7 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
 #endif
 {
     QWidget::enterEvent(event);
-    deckEditor->updateCardInfo(setCard);
+    deckEditor->updateCard(setCard);
 
     // Check if either mainboard or sideboard amount is greater than 0
     if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
@@ -199,7 +199,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
             const QString &relatedCardName = rel->getName();
             QAction *relatedCard = relatedMenu->addAction(relatedCardName);
             connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
-                deckEditor->updateCardInfo(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+                deckEditor->updateCard(CardDatabaseManager::getInstance()->getCard(relatedCardName));
                 deckEditor->showPrintingSelector();
             });
         }

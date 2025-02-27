@@ -34,6 +34,11 @@ void DeckEditorCardInfoDockWidget::createCardInfoDock()
     connect(this, &QDockWidget::topLevelChanged, deckEditor, &TabGenericDeckEditor::dockTopLevelChanged);
 }
 
+void DeckEditorCardInfoDockWidget::updateCard(CardInfoPtr _card)
+{
+    cardInfo->setCard(_card);
+}
+
 void DeckEditorCardInfoDockWidget::retranslateUi()
 {
     setWindowTitle(tr("Card Info"));

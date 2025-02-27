@@ -38,12 +38,16 @@ public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
+    DeckLoader *getDeckList();
     void actIncrement();
     bool swapCard(const QModelIndex &idx);
     void actSwapCard();
     void actDecrement();
     void actRemoveCard();
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
+
+signals:
+    void cardChanged(CardInfoPtr _card);
 
 private:
     TabGenericDeckEditor *deckEditor;
@@ -63,6 +67,7 @@ private:
     QModelIndexList getSelectedCardNodes() const;
 
 private slots:
+    void updateCard(const QModelIndex &current, const QModelIndex &previous);
     void updateName(const QString &name);
     void updateComments();
     void setBannerCard(int);

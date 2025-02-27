@@ -4,6 +4,7 @@
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_stats_interface.h"
+#include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
@@ -41,91 +42,10 @@ TabGenericDeckEditor::TabGenericDeckEditor(TabSupervisor *_tabSupervisor) : Tab(
 {
 }
 
-// Method uses to sync docks state with menu items state
-bool TabGenericDeckEditor::eventFilter(QObject *o, QEvent *e)
+void TabGenericDeckEditor::updateCard(CardInfoPtr _card)
 {
-    if (e->type() == QEvent::Close) {
-        if (o == cardInfoDockWidget) {
-            aCardInfoDockVisible->setChecked(false);
-            aCardInfoDockFloating->setEnabled(false);
-        } else if (o == deckDockWidget) {
-            aDeckDockVisible->setChecked(false);
-            aDeckDockFloating->setEnabled(false);
-        } else if (o == filterDockWidget) {
-            aFilterDockVisible->setChecked(false);
-            aFilterDockFloating->setEnabled(false);
-        } else if (o == printingSelectorDockWidget) {
-            aPrintingSelectorDockVisible->setChecked(false);
-            aPrintingSelectorDockFloating->setEnabled(false);
-        }
-    }
-    if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance().layouts();
-        layouts.setDeckEditorLayoutState(saveState());
-        layouts.setDeckEditorGeometry(saveGeometry());
-        layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
-        layouts.setDeckEditorFilterSize(filterDockWidget->size());
-        layouts.setDeckEditorDeckSize(deckDockWidget->size());
-        layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
-    }
-    return false;
-}
-
-void TabGenericDeckEditor::updateCardInfo(CardInfoPtr _card)
-{
-    cardInfoDockWidget->cardInfo->setCard(_card);
-}
-
-void TabGenericDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex & /*previous*/)
-{
-    cardInfoDockWidget->cardInfo->setCard(current.sibling(current.row(), 0).data().toString());
-}
-
-void TabGenericDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModelIndex & /*previous*/)
-{
-    if (!current.isValid())
-        return;
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        cardInfoDockWidget->cardInfo->setCard(current.sibling(current.row(), 1).data().toString(),
-                                              current.sibling(current.row(), 4).data().toString());
-    }
-}
-
-void TabGenericDeckEditor::updatePrintingSelectorDatabase(const QModelIndex &current, const QModelIndex & /*previous*/)
-{
-    const QString cardName = current.sibling(current.row(), 0).data().toString();
-    const QString cardProviderID = CardDatabaseManager::getInstance()->getPreferredPrintingProviderIdForCard(cardName);
-
-    if (!current.isValid()) {
-        return;
-    }
-
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        printingSelectorDockWidget->printingSelector->setCard(
-            CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderID), DECK_ZONE_MAIN);
-    }
-}
-
-void TabGenericDeckEditor::updatePrintingSelectorDeckView(const QModelIndex &current, const QModelIndex & /*previous*/)
-{
-    const QString cardName = current.sibling(current.row(), 1).data().toString();
-    const QString cardProviderID = current.sibling(current.row(), 4).data().toString();
-    const QModelIndex gparent = current.parent().parent();
-
-    if (!gparent.isValid()) {
-        return;
-    }
-
-    const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
-
-    if (!current.isValid()) {
-        return;
-    }
-
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        printingSelectorDockWidget->printingSelector->setCard(
-            CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderID), zoneName);
-    }
+    cardInfoDockWidget->updateCard(_card);
+    printingSelectorDockWidget->printingSelector->setCard(_card, DECK_ZONE_MAIN);
 }
 
 void TabGenericDeckEditor::decklistCustomMenu(QPoint point)
@@ -161,6 +81,29 @@ void TabGenericDeckEditor::closeRequest(bool forced)
 
     emit deckEditorClosing(this);
     close();
+}
+
+void TabGenericDeckEditor::actNewDeck()
+{
+    auto deckOpenLocation = confirmOpen(false);
+
+    if (deckOpenLocation == CANCELLED) {
+        return;
+    }
+
+    if (deckOpenLocation == NEW_TAB) {
+        emit openDeckEditor(nullptr);
+        return;
+    }
+
+    cleanDeckAndResetModified();
+}
+
+void TabGenericDeckEditor::cleanDeckAndResetModified()
+{
+    deckMenu->setSaveStatus(false);
+    deckDockWidget->cleanDeck();
+    setModified(false);
 }
 
 /**
@@ -227,6 +170,23 @@ QMessageBox *TabGenericDeckEditor::createSaveConfirmationWindow()
     return msgBox;
 }
 
+void TabGenericDeckEditor::actLoadDeck()
+{
+    auto deckOpenLocation = confirmOpen();
+
+    if (deckOpenLocation == CANCELLED) {
+        return;
+    }
+
+    DlgLoadDeck dialog(this);
+    if (!dialog.exec())
+        return;
+
+    QString fileName = dialog.selectedFiles().at(0);
+    openDeckFromFile(fileName, deckOpenLocation);
+    deckDockWidget->updateBannerCardComboBox();
+}
+
 void TabGenericDeckEditor::actOpenRecent(const QString &fileName)
 {
     auto deckOpenLocation = confirmOpen();
@@ -238,12 +198,29 @@ void TabGenericDeckEditor::actOpenRecent(const QString &fileName)
     openDeckFromFile(fileName, deckOpenLocation);
 }
 
-void TabGenericDeckEditor::saveDeckRemoteFinished(const Response &response)
+/**
+ * Actually opens the deck from file
+ * @param fileName The path of the deck to open
+ * @param deckOpenLocation Which tab to open the deck
+ */
+void TabGenericDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
-    if (response.response_code() != Response::RespOk)
-        QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved."));
-    else
-        setModified(false);
+    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+
+    auto *l = new DeckLoader;
+    if (l->loadFromFile(fileName, fmt, true)) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
+        if (deckOpenLocation == NEW_TAB) {
+            emit openDeckEditor(l);
+        } else {
+            deckMenu->setSaveStatus(false);
+            setDeck(l);
+        }
+    } else {
+        delete l;
+        QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
+    }
+    deckMenu->setSaveStatus(true);
 }
 
 bool TabGenericDeckEditor::actSaveDeck()
@@ -303,6 +280,14 @@ bool TabGenericDeckEditor::actSaveDeckAs()
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
 
     return true;
+}
+
+void TabGenericDeckEditor::saveDeckRemoteFinished(const Response &response)
+{
+    if (response.response_code() != Response::RespOk)
+        QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved."));
+    else
+        setModified(false);
 }
 
 void TabGenericDeckEditor::actLoadDeckFromClipboard()
@@ -429,23 +414,12 @@ void TabGenericDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneNam
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
-void TabGenericDeckEditor::actAddCardFromDatabase()
-{
-    actAddCard(databaseDisplayDockWidget->currentCardInfo());
-}
-
 void TabGenericDeckEditor::actAddCard(CardInfoPtr info)
 {
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard(info);
     else
         addCardHelper(info, DECK_ZONE_MAIN);
-    deckMenu->setSaveStatus(true);
-}
-
-void TabGenericDeckEditor::actAddCardToSideboardFromDatabase()
-{
-    addCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_SIDE);
     deckMenu->setSaveStatus(true);
 }
 
@@ -488,31 +462,25 @@ void TabGenericDeckEditor::actDecrementCard(CardInfoPtr info)
     decrementCardHelper(info, DECK_ZONE_MAIN);
 }
 
-void TabGenericDeckEditor::actDecrementCardFromDatabase()
-{
-    decrementCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_MAIN);
-}
-
 void TabGenericDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
 {
     decrementCardHelper(info, DECK_ZONE_SIDE);
 }
 
-void TabGenericDeckEditor::actDecrementCardFromSideboardFromDatabase()
-{
-    decrementCardHelper(databaseDisplayDockWidget->currentCardInfo(), DECK_ZONE_SIDE);
-}
-
 void TabGenericDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
-    PictureLoader::cacheCardPixmaps(
-        CardDatabaseManager::getInstance()->getCards(deckDockWidget->deckModel->getDeckList()->getCardList()));
+    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(getDeckList()->getCardList()));
     setModified(false);
 
     // If they load a deck, make the deck list appear
     aDeckDockVisible->setChecked(true);
     deckDockWidget->setVisible(aDeckDockVisible->isChecked());
+}
+
+DeckLoader *TabGenericDeckEditor::getDeckList() const
+{
+    return deckDockWidget->getDeckList();
 }
 
 void TabGenericDeckEditor::setModified(bool _modified)
@@ -526,11 +494,41 @@ void TabGenericDeckEditor::setModified(bool _modified)
  */
 bool TabGenericDeckEditor::isBlankNewDeck() const
 {
-    DeckLoader *const deck = deckDockWidget->deckModel->getDeckList();
-    return !modified && deck->getLastFileName().isEmpty() && deck->getLastRemoteDeckId() == -1;
+    DeckLoader *deck = getDeckList();
+    return !modified && deck->hasNotBeenLoaded();
 }
 
 void TabGenericDeckEditor::filterTreeChanged(FilterTree *filterTree)
 {
     databaseDisplayDockWidget->setFilterTree(filterTree);
+}
+
+// Method uses to sync docks state with menu items state
+bool TabGenericDeckEditor::eventFilter(QObject *o, QEvent *e)
+{
+    if (e->type() == QEvent::Close) {
+        if (o == cardInfoDockWidget) {
+            aCardInfoDockVisible->setChecked(false);
+            aCardInfoDockFloating->setEnabled(false);
+        } else if (o == deckDockWidget) {
+            aDeckDockVisible->setChecked(false);
+            aDeckDockFloating->setEnabled(false);
+        } else if (o == filterDockWidget) {
+            aFilterDockVisible->setChecked(false);
+            aFilterDockFloating->setEnabled(false);
+        } else if (o == printingSelectorDockWidget) {
+            aPrintingSelectorDockVisible->setChecked(false);
+            aPrintingSelectorDockFloating->setEnabled(false);
+        }
+    }
+    if (o == this && e->type() == QEvent::Hide) {
+        LayoutsSettings &layouts = SettingsCache::instance().layouts();
+        layouts.setDeckEditorLayoutState(saveState());
+        layouts.setDeckEditorGeometry(saveGeometry());
+        layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
+        layouts.setDeckEditorFilterSize(filterDockWidget->size());
+        layouts.setDeckEditorDeckSize(deckDockWidget->size());
+        layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
+    }
+    return false;
 }

@@ -42,18 +42,18 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
-    connect(&searchKeySignals, &KeySignals::onEnter, deckEditor, &TabGenericDeckEditor::actAddCardFromDatabase);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, deckEditor, &TabGenericDeckEditor::actAddCardFromDatabase);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, deckEditor,
-            &TabGenericDeckEditor::actAddCardToSideboardFromDatabase);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, deckEditor,
-            &TabGenericDeckEditor::actDecrementCardFromDatabase);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, deckEditor,
-            &TabGenericDeckEditor::actDecrementCardFromSideboardFromDatabase);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, deckEditor,
-            &TabGenericDeckEditor::actAddCardToSideboardFromDatabase);
-    connect(&searchKeySignals, &KeySignals::onCtrlEnter, deckEditor,
-            &TabGenericDeckEditor::actAddCardToSideboardFromDatabase);
+    connect(&searchKeySignals, &KeySignals::onEnter, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, this,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, this,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, this,
+            &DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, this,
+            &DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, this,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlEnter, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     connect(&searchKeySignals, &KeySignals::onCtrlC, this, &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
 
@@ -75,11 +75,9 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     databaseView->setModel(databaseDisplayModel);
     databaseView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(databaseView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(databaseCustomMenu(QPoint)));
-    connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-            deckEditor, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
-    connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-            deckEditor, SLOT(updatePrintingSelectorDatabase(const QModelIndex &, const QModelIndex &)));
-    connect(databaseView, &QTreeView::doubleClicked, deckEditor, &TabGenericDeckEditor::actAddCardFromDatabase);
+    connect(databaseView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &DeckEditorDatabaseDisplayWidget::updateCard);
+    connect(databaseView, &QTreeView::doubleClicked, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
 
     QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     if (dbHeaderState.isNull()) {
@@ -94,14 +92,13 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
 
     aAddCard = new QAction(QString(), this);
     aAddCard->setIcon(QPixmap("theme:icons/arrow_right_green"));
-    connect(aAddCard, &QAction::triggered, deckEditor, &TabGenericDeckEditor::actAddCardFromDatabase);
+    connect(aAddCard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);
 
     aAddCardToSideboard = new QAction(QString(), this);
     aAddCardToSideboard->setIcon(QPixmap("theme:icons/arrow_right_blue"));
-    connect(aAddCardToSideboard, &QAction::triggered, deckEditor,
-            &TabGenericDeckEditor::actAddCardToSideboardFromDatabase);
+    connect(aAddCardToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     auto *tbAddCardToSideboard = new QToolButton(this);
     tbAddCardToSideboard->setDefaultAction(aAddCardToSideboard);
 
@@ -124,6 +121,41 @@ void DeckEditorDatabaseDisplayWidget::updateSearch(const QString &search)
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+}
+
+void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+    const QString cardName = current.sibling(current.row(), 0).data().toString();
+    const QString cardProviderID = CardDatabaseManager::getInstance()->getPreferredPrintingProviderIdForCard(cardName);
+
+    if (!current.isValid()) {
+        return;
+    }
+
+    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+        CardInfoPtr card = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderID);
+        emit cardChanged(card);
+    }
+}
+
+void DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck()
+{
+    emit addCardToMainDeck(currentCardInfo());
+}
+
+void DeckEditorDatabaseDisplayWidget::actAddCardToSideboard()
+{
+    emit addCardToSideboard(currentCardInfo());
+}
+
+void DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck()
+{
+    emit decrementCardFromMainDeck(currentCardInfo());
+}
+
+void DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard()
+{
+    emit decrementCardFromSideboard(currentCardInfo());
 }
 
 CardInfoPtr DeckEditorDatabaseDisplayWidget::currentCardInfo() const
@@ -156,9 +188,8 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         }
         edhRecCard = menu.addAction(tr("Show on EDHREC (Card)"));
 
-        connect(addToDeck, &QAction::triggered, deckEditor, &TabGenericDeckEditor::actAddCardFromDatabase);
-        connect(addToSideboard, &QAction::triggered, deckEditor,
-                &TabGenericDeckEditor::actAddCardToSideboardFromDatabase);
+        connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
+        connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
         connect(selectPrinting, &QAction::triggered, this, [this, info] { deckEditor->showPrintingSelector(); });
         connect(edhRecCard, &QAction::triggered, this,
                 [this, info] { deckEditor->getTabSupervisor()->addEdhrecTab(info); });

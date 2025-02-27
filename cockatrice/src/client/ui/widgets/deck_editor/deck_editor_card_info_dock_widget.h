@@ -17,6 +17,9 @@ public:
 
     TabGenericDeckEditor *deckEditor;
     CardInfoFrameWidget *cardInfo;
+
+public slots:
+    void updateCard(CardInfoPtr _card);
 };
 
 #endif // DECK_EDITOR_CARD_INFO_DOCK_WIDGET_H

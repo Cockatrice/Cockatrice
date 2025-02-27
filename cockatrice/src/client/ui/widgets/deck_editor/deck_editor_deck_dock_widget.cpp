@@ -39,10 +39,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->installEventFilter(&deckViewKeySignals);
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), deckEditor,
-            SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
-    connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), deckEditor,
-            SLOT(updatePrintingSelectorDeckView(const QModelIndex &, const QModelIndex &)));
+    connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &DeckEditorDeckDockWidget::updateCard);
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
     connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), deckEditor, SLOT(decklistCustomMenu(QPoint)));
     connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
@@ -166,6 +164,30 @@ void DeckEditorDeckDockWidget::createDeckDock()
     retranslateUi();
 }
 
+void DeckEditorDeckDockWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
+{
+    if (!current.isValid())
+        return;
+    const QString cardName = current.sibling(current.row(), 1).data().toString();
+    const QString cardProviderID = current.sibling(current.row(), 4).data().toString();
+    const QModelIndex gparent = current.parent().parent();
+
+    if (!gparent.isValid()) {
+        return;
+    }
+
+    const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
+
+    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+        QString cardName = current.sibling(current.row(), 1).data().toString();
+        QString providerId = current.sibling(current.row(), 4).data().toString();
+        if (CardInfoPtr selectedCard =
+                CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, providerId)) {
+            emit cardChanged(selectedCard);
+        }
+    }
+}
+
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
@@ -272,6 +294,11 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     deckView->expandAll();
 
     deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
+}
+
+DeckLoader *DeckEditorDeckDockWidget::getDeckList()
+{
+    return deckModel->getDeckList();
 }
 
 void DeckEditorDeckDockWidget::cleanDeck()

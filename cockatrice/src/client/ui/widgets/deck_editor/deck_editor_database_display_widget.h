@@ -25,6 +25,13 @@ public slots:
     CardInfoPtr currentCardInfo() const;
     void setFilterTree(FilterTree *filterTree);
 
+signals:
+    void addCardToMainDeck(CardInfoPtr card);
+    void addCardToSideboard(CardInfoPtr card);
+    void decrementCardFromMainDeck(CardInfoPtr card);
+    void decrementCardFromSideboard(CardInfoPtr card);
+    void cardChanged(CardInfoPtr _card);
+
 private:
     KeySignals searchKeySignals;
     QTreeView *databaseView;
@@ -37,6 +44,11 @@ private slots:
     void showSearchSyntaxHelp();
     void retranslateUi();
     void updateSearch(const QString &search);
+    void updateCard(const QModelIndex &current, const QModelIndex &);
+    void actAddCardToMainDeck();
+    void actAddCardToSideboard();
+    void actDecrementCardFromMainDeck();
+    void actDecrementCardFromSideboard();
     void databaseCustomMenu(QPoint point);
     void copyDatabaseCellContents();
     void saveDbHeaderState();

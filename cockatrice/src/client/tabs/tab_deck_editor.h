@@ -16,11 +16,8 @@ class DeckLoader;
 class TabDeckEditor : public TabGenericDeckEditor
 {
     Q_OBJECT
-protected slots:
-    void actNewDeck() override;
-    void actLoadDeck() override;
-    void actLoadDeckFromClipboard() override;
 
+protected slots:
     void loadLayout() override;
     void restartLayout() override;
     void freeDocksSize() override;
@@ -30,9 +27,6 @@ protected slots:
     void dockVisibleTriggered() override;
     void dockFloatingTriggered() override;
     void dockTopLevelChanged(bool topLevel) override;
-
-protected:
-    void openDeckFromFile(const QString &fileName, TabGenericDeckEditor::DeckOpenLocation deckOpenLocation) override;
 
 public:
     explicit TabDeckEditor(TabSupervisor *_tabSupervisor);
