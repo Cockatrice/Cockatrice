@@ -190,14 +190,6 @@ set(cockatrice_SOURCES
     src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
     src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
-    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
-    src/client/menus/deck_editor/deck_editor_menu.cpp
-    src/client/ui/widgets/deck_analytics/mana_base_widget.cpp
-    src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
-    src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
-    src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
-    src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
-    src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
