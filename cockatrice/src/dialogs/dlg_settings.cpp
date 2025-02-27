@@ -44,6 +44,7 @@
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
+#define WIKI_TRANSLATION_FAQ "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -69,6 +70,9 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
 
+    advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    advertiseTranslationPageLabel.setOpenExternalLinks(true);
+
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckUpdatesOnStartup);
@@ -80,12 +84,13 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
     personalGrid->addWidget(&languageBox, 0, 1);
-    personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
-    personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
-    personalGrid->addWidget(&startupUpdateCheckCheckBox, 3, 0, 1, 2);
-    personalGrid->addWidget(&updateNotificationCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 5, 0, 1, 2);
-    personalGrid->addWidget(&showTipsOnStartup, 6, 0, 1, 2);
+    personalGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
+    personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
+    personalGrid->addWidget(&startupUpdateCheckCheckBox, 4, 0, 1, 2);
+    personalGrid->addWidget(&updateNotificationCheckBox, 5, 0, 1, 2);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 6, 0, 1, 2);
+    personalGrid->addWidget(&showTipsOnStartup, 7, 0, 1, 2);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -298,7 +303,8 @@ void GeneralSettingsPage::retranslateUi()
     } else {
         pathsGroupBox->setTitle(tr("Paths"));
     }
-
+    advertiseTranslationPageLabel.setText(
+        QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
     picsPathLabel.setText(tr("Pictures directory:"));
