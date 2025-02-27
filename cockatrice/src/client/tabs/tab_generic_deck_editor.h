@@ -14,8 +14,6 @@
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
-
-
 class CardInfoFrameWidget;
 class DeckLoader;
 class DeckEditorMenu;
@@ -50,15 +48,15 @@ public:
     explicit TabGenericDeckEditor(TabSupervisor *_tabSupervisor);
 
     // UI and Navigation
-    virtual void retranslateUi() override = 0;
+    virtual void createMenus() = 0;
     [[nodiscard]] virtual QString getTabText() const override = 0;
+    bool confirmClose();
+    virtual void retranslateUi() override = 0;
 
     // Deck Management
     virtual void setDeck(DeckLoader *_deckLoader);
     DeckLoader *getDeckList() const;
     void setModified(bool _windowModified);
-    bool confirmClose();
-    virtual void createMenus() = 0;
 
     // UI Elements
     DeckEditorMenu *deckMenu;
