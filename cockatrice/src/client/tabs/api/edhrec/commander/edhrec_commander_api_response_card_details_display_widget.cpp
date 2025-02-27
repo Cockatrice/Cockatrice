@@ -11,7 +11,7 @@ EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCa
     setLayout(layout);
 
     cardPictureWidget = new CardInfoPictureWidget(this);
-    cardPictureWidget->setCard(CardDatabaseManager::getInstance()->getCard(toDisplay.name));
+    cardPictureWidget->setCard(CardDatabaseManager::getInstance()->guessCard(toDisplay.sanitized));
 
     label = new QLabel(this);
     label->setText(toDisplay.name + "\n" + toDisplay.label);
