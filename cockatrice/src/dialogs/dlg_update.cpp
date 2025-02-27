@@ -88,7 +88,7 @@ void DlgUpdate::gotoDownloadPage()
 
 void DlgUpdate::downloadUpdate(const QString &releaseName)
 {
-    setLabel(tr("Downloading update") + QString(": %1").arg(releaseName));
+    setLabel(tr("Downloading update: %1").arg(releaseName));
     addStopDownloadAndRemoveOthers(true); // Will remove all other buttons
     uDownloader->beginDownload(updateUrl);
 }
