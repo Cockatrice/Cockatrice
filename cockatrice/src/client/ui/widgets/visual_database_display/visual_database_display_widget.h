@@ -7,7 +7,7 @@
 #include "../../../../game/cards/card_database_model.h"
 #include "../../../../game/filters/filter_tree_model.h"
 #include "../../../game_logic/key_signals.h"
-#include "../../../tabs/tab_generic_deck_editor.h"
+#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
@@ -30,7 +30,7 @@ class VisualDatabaseDisplayWidget : public QWidget
 
 public:
     explicit VisualDatabaseDisplayWidget(QWidget *parent,
-                                         TabGenericDeckEditor *deckEditor,
+                                         AbstractTabDeckEditor *deckEditor,
                                          CardDatabaseModel *database_model,
                                          CardDatabaseDisplayModel *database_display_model);
 
@@ -63,7 +63,7 @@ protected slots:
 
 private:
     KeySignals searchKeySignals;
-    TabGenericDeckEditor *deckEditor;
+    AbstractTabDeckEditor *deckEditor;
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
     QTreeView *databaseView;
