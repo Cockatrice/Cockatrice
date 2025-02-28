@@ -70,12 +70,6 @@ void ManaCurveWidget::updateDisplay()
         }
     }
 
-    // Ensure layout exists
-    if (barLayout == nullptr) {
-        barLayout = new QHBoxLayout(this);
-        layout->addLayout(barLayout);
-    }
-
     int totalSum = 0;
     for (const auto &entry : manaCurveMap) {
         totalSum += entry.second;
