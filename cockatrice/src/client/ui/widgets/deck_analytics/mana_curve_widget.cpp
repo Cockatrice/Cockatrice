@@ -10,28 +10,33 @@
 #include <decklist.h>
 #include <unordered_map>
 
-ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deck_list_model)
-    : QWidget(parent), deck_list_model(_deck_list_model)
+ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)
+    : QWidget(parent), deckListModel(_deckListModel)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
+
     bannerWidget = new BannerWidget(this, "Mana Curve", Qt::Vertical, 100);
     bannerWidget->setMaximumHeight(100);
     layout->addWidget(bannerWidget);
-    connect(deck_list_model, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
+
+    barLayout = new QHBoxLayout(this);
+    layout->addLayout(barLayout);
+
+    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
 }
 
 void ManaCurveWidget::setDeckModel(DeckListModel *deckModel)
 {
-    deck_list_model = deckModel;
-    connect(deck_list_model, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
+    deckListModel = deckModel;
+    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
     analyzeManaCurve();
 }
 
 std::unordered_map<int, int> ManaCurveWidget::analyzeManaCurve()
 {
     manaCurveMap.clear();
-    InnerDecklistNode *listRoot = deck_list_model->getDeckList()->getRoot();
+    InnerDecklistNode *listRoot = deckListModel->getDeckList()->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         for (int j = 0; j < currentZone->size(); j++) {

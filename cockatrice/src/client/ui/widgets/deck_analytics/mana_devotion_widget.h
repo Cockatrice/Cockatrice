@@ -13,7 +13,7 @@ class ManaDevotionWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ManaDevotionWidget(QWidget *parent = nullptr, DeckListModel *deck_list_model = nullptr);
+    explicit ManaDevotionWidget(QWidget *parent, DeckListModel *deckListModel);
     void updateDisplay();
 
     std::unordered_map<char, int> countManaSymbols(const QString &manaString);
@@ -24,7 +24,7 @@ public slots:
     std::unordered_map<char, int> analyzeManaDevotion();
 
 private:
-    DeckListModel *deck_list_model;
+    DeckListModel *deckListModel;
     BannerWidget *bannerWidget;
     std::unordered_map<char, int> manaDevotionMap;
     QVBoxLayout *layout;
