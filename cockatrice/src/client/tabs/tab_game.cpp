@@ -929,8 +929,8 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                    PictureLoader::cacheCardPixmaps(
-                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
+                    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(
+                        newDeck.getCardListWithProviderId()));
                     deckViewContainer->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }

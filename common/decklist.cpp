@@ -825,11 +825,31 @@ void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result)
     }
 }
 
+void DeckList::getCardListWithProviderIdHelper(InnerDecklistNode *item, QMap<QString, QString> &result) const
+{
+    for (int i = 0; i < item->size(); ++i) {
+        auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
+
+        if (node) {
+            result.insert(node->getName(), node->getCardProviderId());
+        } else {
+            getCardListWithProviderIdHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
+        }
+    }
+}
+
 QStringList DeckList::getCardList() const
 {
     QSet<QString> result;
     getCardListHelper(root, result);
     return result.values();
+}
+
+QMap<QString, QString> DeckList::getCardListWithProviderId() const
+{
+    QMap<QString, QString> result;
+    getCardListWithProviderIdHelper(root, result);
+    return result;
 }
 
 int DeckList::getSideboardSize() const
