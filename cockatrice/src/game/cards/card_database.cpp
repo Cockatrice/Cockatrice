@@ -477,6 +477,18 @@ QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
     return cardInfos;
 }
 
+QList<CardInfoPtr> CardDatabase::getCardsByNameAndProviderId(const QMap<QString, QString> &cardNames) const
+{
+    QList<CardInfoPtr> cardInfos;
+    for (const QString &cardName : cardNames) {
+        CardInfoPtr ptr = getCardByNameAndProviderId(cardName, cardNames[cardName]);
+        if (ptr)
+            cardInfos.append(ptr);
+    }
+
+    return cardInfos;
+}
+
 CardInfoPtr CardDatabase::getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const
 {
     auto info = getCard(cardName);

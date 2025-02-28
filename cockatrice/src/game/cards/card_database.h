@@ -472,6 +472,7 @@ public:
     void removeCard(CardInfoPtr card);
     [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
+    QList<CardInfoPtr> getCardsByNameAndProviderId(const QMap<QString, QString> &cardNames) const;
     [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
     [[nodiscard]] CardInfoPerSet getPreferredSetForCard(const QString &cardName) const;
     [[nodiscard]] CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;

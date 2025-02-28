@@ -258,6 +258,7 @@ private:
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
+    void getCardListWithProviderIdHelper(InnerDecklistNode *item, QMap<QString, QString> &result) const;
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
 protected:
@@ -358,6 +359,7 @@ public:
         return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty();
     }
     QStringList getCardList() const;
+    QMap<QString, QString> getCardListWithProviderId() const;
 
     int getSideboardSize() const;
 
