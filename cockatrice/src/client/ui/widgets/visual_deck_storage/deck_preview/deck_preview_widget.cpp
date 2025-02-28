@@ -51,10 +51,13 @@ void DeckPreviewWidget::retranslateUi()
 void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    if (bannerCardDisplayWidget == nullptr || bannerCardComboBox == nullptr) {
+    if (bannerCardDisplayWidget == nullptr) {
         return;
     }
-    bannerCardComboBox->setMaximumWidth(bannerCardDisplayWidget->width());
+    QList<QWidget *> widgets = findChildren<QWidget *>();
+    for (QWidget *widget : widgets) {
+        widget->setMaximumWidth(bannerCardDisplayWidget->width());
+    }
 }
 
 void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
