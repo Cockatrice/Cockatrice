@@ -6,7 +6,7 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListModel *_deckLi
     mainLayout = new QVBoxLayout();
     setLayout(mainLayout);
 
-    manaCurveWidget = new ManaCurveWidget(this);
+    manaCurveWidget = new ManaCurveWidget(this, deckListModel);
     mainLayout->addWidget(manaCurveWidget);
 
     manaDevotionWidget = new ManaDevotionWidget(this, deckListModel);

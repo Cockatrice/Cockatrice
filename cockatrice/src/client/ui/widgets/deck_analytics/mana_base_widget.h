@@ -14,7 +14,7 @@ class ManaBaseWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ManaBaseWidget(QWidget *parent = nullptr, DeckListModel *deck_list_model = nullptr);
+    explicit ManaBaseWidget(QWidget *parent, DeckListModel *deckListModel);
     std::unordered_map<char, int> analyzeManaBase();
     void updateDisplay();
 
@@ -25,7 +25,7 @@ public slots:
     void setDeckModel(DeckListModel *deckModel);
 
 private:
-    DeckListModel *deck_list_model;
+    DeckListModel *deckListModel;
     BannerWidget *bannerWidget;
     std::unordered_map<char, int> manaBaseMap;
     QVBoxLayout *layout;
