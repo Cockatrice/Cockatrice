@@ -12,8 +12,8 @@
 #include <regex>
 #include <unordered_map>
 
-ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deck_list_model)
-    : QWidget(parent), deck_list_model(_deck_list_model)
+ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
+    : QWidget(parent), deckListModel(_deckListModel)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -25,20 +25,20 @@ ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deck_list_model)
     barLayout = new QHBoxLayout();
     layout->addLayout(barLayout);
 
-    connect(deck_list_model, &DeckListModel::dataChanged, this, &ManaBaseWidget::analyzeManaBase);
+    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaBaseWidget::analyzeManaBase);
 }
 
 void ManaBaseWidget::setDeckModel(DeckListModel *deckModel)
 {
-    deck_list_model = deckModel;
-    connect(deck_list_model, &DeckListModel::dataChanged, this, &ManaBaseWidget::analyzeManaBase);
+    deckListModel = deckModel;
+    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaBaseWidget::analyzeManaBase);
     analyzeManaBase();
 }
 
 std::unordered_map<char, int> ManaBaseWidget::analyzeManaBase()
 {
     manaBaseMap.clear();
-    InnerDecklistNode *listRoot = deck_list_model->getDeckList()->getRoot();
+    InnerDecklistNode *listRoot = deckListModel->getDeckList()->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         for (int j = 0; j < currentZone->size(); j++) {

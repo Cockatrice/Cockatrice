@@ -13,7 +13,7 @@ class ManaCurveWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ManaCurveWidget(QWidget *parent = nullptr, DeckListModel *deck_list_model = nullptr);
+    explicit ManaCurveWidget(QWidget *parent, DeckListModel *deckListModel);
     void updateDisplay();
 
 public slots:
@@ -21,7 +21,7 @@ public slots:
     std::unordered_map<int, int> analyzeManaCurve();
 
 private:
-    DeckListModel *deck_list_model = nullptr;
+    DeckListModel *deckListModel;
     std::unordered_map<int, int> manaCurveMap;
     QVBoxLayout *layout;
     QHBoxLayout *barLayout;
