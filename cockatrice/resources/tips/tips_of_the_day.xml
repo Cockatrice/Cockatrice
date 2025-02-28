@@ -211,4 +211,12 @@ Updating your card sources can often fix issues of cards not working or displayi
 		<image>updates.png</image>
 		<date>2025-02-10</date>
 	</tip>
+	<tip>
+		<title>Expand Card View Window</title>
+		<text>Double click on the title bar of the card view window to expand it! Double click again to shrink it back down.
+			You can configure the initial and expanded heights of the window in the settings, under "Appearance".
+		</text>
+		<image>expand_card_view.png</image>
+		<date>2025-02-27</date>
+	</tip>
 </tips>
