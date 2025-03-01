@@ -1,6 +1,7 @@
 #ifndef DECK_CARD_ZONE_DISPLAY_WIDGET_H
 #define DECK_CARD_ZONE_DISPLAY_WIDGET_H
 
+#include "../../../../deck/deck_list_model.h"
 #include "../../../../game/cards/card_database.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/overlap_widget.h"
@@ -15,10 +16,13 @@ class DeckCardZoneDisplayWidget : public QWidget
 
 public:
     DeckCardZoneDisplayWidget(QWidget *parent,
-                              QList<QPair<QString, QList<CardInfoPtr>>> cardLists,
-                              QString bannerText,
+                              DeckListModel *deckListModel,
+                              QString zoneName,
+                              QString activeSortCriteria,
                               int bannerOpacity,
                               int subBannerOpacity);
+    DeckListModel *deckListModel;
+    QString zoneName;
     void addCardsToOverlapWidget();
     void resizeEvent(QResizeEvent *event) override;
 
@@ -26,15 +30,21 @@ public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
     void displayCards();
+    void addCardGroupIfItDoesNotExist();
+    void deleteCardGroupIfItDoesNotExist();
+    void onActiveSortCriteriaChanged(QString activeSortCriteria);
+    QList<QString> getSortCriteriaValueList();
 
 signals:
-    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
+    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
     void cardHovered(CardInfoPtr card);
 
 private:
-    QList<QPair<QString, QList<CardInfoPtr>>> cardLists;
+    QString activeSortCriteria;
     QVBoxLayout *layout;
     BannerWidget *banner;
+    QWidget *cardGroupContainer;
+    QVBoxLayout *cardGroupLayout;
     int bannerOpacity = 20;
     int subBannerOpacity = 10;
     OverlapWidget *overlapWidget;

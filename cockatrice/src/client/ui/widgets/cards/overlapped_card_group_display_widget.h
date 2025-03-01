@@ -1,6 +1,7 @@
 #ifndef OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H
 #define OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H
 
+#include "../../../../deck/deck_list_model.h"
 #include "../../../../game/cards/card_database.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/overlap_widget.h"
@@ -15,20 +16,32 @@ class OverlappedCardGroupDisplayWidget : public QWidget
     Q_OBJECT
 
 public:
-    OverlappedCardGroupDisplayWidget(QWidget *parent, QList<CardInfoPtr> *cards, QString bannerText, int bannerOpacity);
-    void addCardsToOverlapWidget();
+    OverlappedCardGroupDisplayWidget(QWidget *parent,
+                                     DeckListModel *deckListModel,
+                                     QString zoneName,
+                                     QString cardGroupCategory,
+                                     QString activeSortCriteria,
+                                     int bannerOpacity);
+
+    QList<CardInfoPtr> getCardsMatchingGroup(QList<CardInfoPtr> *cardsToSort);
     void resizeEvent(QResizeEvent *event) override;
 
+    DeckListModel *deckListModel;
+    QString zoneName;
+    QString cardGroupCategory;
+    QString activeSortCriteria;
+
 public slots:
+    void sortCardList(QList<CardInfoPtr> *cardsToSort, QStringList properties, Qt::SortOrder order);
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
+    void updateCardDisplays();
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void cardHovered(CardInfoPtr card);
 
 private:
-    QList<CardInfoPtr> *cardsToDisplay;
     QVBoxLayout *layout;
     BannerWidget *banner;
     OverlapWidget *overlapWidget;

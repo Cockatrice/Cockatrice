@@ -39,15 +39,13 @@ public:
 public slots:
     void onCardChanged(CardInfoPtr activeCard);
     void onCardChangedDatabaseDisplay(CardInfoPtr activeCard);
-    void onMainboardCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void onSideboardCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void onCardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 signals:
     void cardChanged(CardInfoPtr activeCard);
     void cardChangedDatabaseDisplay(CardInfoPtr activeCard);
-    void mainboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void sideboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 private:

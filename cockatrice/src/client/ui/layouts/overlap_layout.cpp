@@ -231,8 +231,8 @@ QSize OverlapLayout::calculatePreferredSize() const
         return QSize(0, 0);
     }
 
-    int maxItemWidth = 0;
-    int maxItemHeight = 0;
+    int maxItemWidth = 1;
+    int maxItemHeight = 1;
 
     for (const auto &item : itemList) {
         if (item) {

@@ -20,13 +20,10 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
 
     visualDeckView = new VisualDeckEditorWidget(this, deckModel);
     visualDeckView->setObjectName("visualDeckView");
-    visualDeckView->updateDisplay();
     connect(visualDeckView, &VisualDeckEditorWidget::activeCardChanged, this,
             &TabDeckEditorVisualTabWidget::onCardChanged);
-    connect(visualDeckView, &VisualDeckEditorWidget::mainboardCardClicked, this,
-            &TabDeckEditorVisualTabWidget::onMainboardCardClickedDeckEditor);
-    connect(visualDeckView, &VisualDeckEditorWidget::sideboardCardClicked, this,
-            &TabDeckEditorVisualTabWidget::onSideboardCardClickedDeckEditor);
+    connect(visualDeckView, &VisualDeckEditorWidget::cardClicked, this,
+            &TabDeckEditorVisualTabWidget::onCardClickedDeckEditor);
 
     visualDatabaseDisplay =
         new VisualDatabaseDisplayWidget(this, deckEditor, cardDatabaseModel, cardDatabaseDisplayModel);
@@ -57,16 +54,11 @@ void TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay(CardInfoPtr acti
     emit cardChangedDatabaseDisplay(activeCard);
 }
 
-void TabDeckEditorVisualTabWidget::onMainboardCardClickedDeckEditor(QMouseEvent *event,
-                                                                    CardInfoPictureWithTextOverlayWidget *instance)
+void TabDeckEditorVisualTabWidget::onCardClickedDeckEditor(QMouseEvent *event,
+                                                           CardInfoPictureWithTextOverlayWidget *instance,
+                                                           QString zoneName)
 {
-    emit mainboardCardClicked(event, instance);
-}
-
-void TabDeckEditorVisualTabWidget::onSideboardCardClickedDeckEditor(QMouseEvent *event,
-                                                                    CardInfoPictureWithTextOverlayWidget *instance)
-{
-    emit sideboardCardClicked(event, instance);
+    emit cardClicked(event, instance, zoneName);
 }
 
 void TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay(QMouseEvent *event,
