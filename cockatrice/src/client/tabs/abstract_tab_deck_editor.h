@@ -67,7 +67,7 @@ public:
     DeckEditorPrintingSelectorDockWidget *printingSelectorDockWidget;
 
 public slots:
-    void onDeckChanged();
+    virtual void onDeckChanged();
     void updateCard(CardInfoPtr _card);
     void actAddCard(CardInfoPtr info);
     void actAddCardToSideboard(CardInfoPtr info);

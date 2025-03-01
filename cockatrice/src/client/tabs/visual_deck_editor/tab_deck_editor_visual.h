@@ -8,8 +8,6 @@ class TabDeckEditorVisual : public AbstractTabDeckEditor
 {
     Q_OBJECT
 protected slots:
-    void actLoadDeckFromClipboard() override;
-
     void loadLayout() override;
     void restartLayout() override;
     void freeDocksSize() override;
@@ -34,7 +32,6 @@ protected:
 
 public:
     explicit TabDeckEditorVisual(TabSupervisor *_tabSupervisor);
-    void setDeck(DeckLoader *_deck) override;
     void retranslateUi() override;
     QString getTabText() const override;
     void changeModelIndexAndCardInfo(CardInfoPtr activeCard);
@@ -45,6 +42,7 @@ public:
     void createCentralFrame();
 
 public slots:
+    void onDeckChanged() override;
     void showPrintingSelector() override;
     void processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
     void processSideboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
