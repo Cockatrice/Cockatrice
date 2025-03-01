@@ -10,7 +10,7 @@ class DeckEditorMenu : public QMenu
 {
     Q_OBJECT
 public:
-    explicit DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *deckEditor);
+    explicit DeckEditorMenu(AbstractTabDeckEditor *parent);
 
     AbstractTabDeckEditor *deckEditor;
 

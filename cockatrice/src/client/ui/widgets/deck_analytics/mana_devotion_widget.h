@@ -22,6 +22,7 @@ public:
 public slots:
     void setDeckModel(DeckListModel *deckModel);
     std::unordered_map<char, int> analyzeManaDevotion();
+    void retranslateUi();
 
 private:
     DeckListModel *deckListModel;

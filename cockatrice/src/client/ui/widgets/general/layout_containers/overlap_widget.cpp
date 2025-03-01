@@ -71,8 +71,8 @@ void OverlapWidget::clearLayout()
     if (overlapLayout != nullptr) {
         QLayoutItem *item;
         while ((item = overlapLayout->takeAt(0)) != nullptr) {
-            delete item->widget(); // Delete the widget
-            delete item;           // Delete the layout item
+            item->widget()->deleteLater();
+            delete item;
         }
     }
 
