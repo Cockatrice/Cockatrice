@@ -59,6 +59,11 @@ void OverlapWidget::addWidget(QWidget *widgetToAdd) const
     this->overlapLayout->addWidget(widgetToAdd);
 }
 
+void OverlapWidget::removeWidget(QWidget *widgetToRemove) const
+{
+    overlapLayout->removeWidget(widgetToRemove);
+}
+
 /**
  * @brief Clears all widgets from the layout and deletes them.
  *

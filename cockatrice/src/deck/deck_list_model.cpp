@@ -552,6 +552,26 @@ QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneNam
     return cards;
 }
 
+QList<QString> *DeckListModel::getZones() const
+{
+    QList<QString> *zones = new QList<QString>();
+    DeckList *decklist = getDeckList();
+    if (!decklist) {
+        return zones;
+    }
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return zones;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        zones->append(currentZone->getName());
+    }
+    return zones;
+}
+
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
     const int totalColumns = 2;
