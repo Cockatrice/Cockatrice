@@ -81,6 +81,14 @@ void TabDeckEditorVisual::createCentralFrame()
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
+void TabDeckEditorVisual::onDeckChanged()
+{
+    AbstractTabDeckEditor::onDeckChanged();
+    tabContainer->visualDeckView->updateDisplay();
+    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
+}
+
 void TabDeckEditorVisual::createMenus()
 {
     deckMenu = new DeckEditorMenu(this);
@@ -188,22 +196,6 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
-}
-
-void TabDeckEditorVisual::actLoadDeckFromClipboard()
-{
-    AbstractTabDeckEditor::actLoadDeckFromClipboard();
-    tabContainer->visualDeckView->updateDisplay();
-    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
-    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
-}
-
-void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
-{
-    AbstractTabDeckEditor::setDeck(_deck);
-    tabContainer->visualDeckView->updateDisplay();
-    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
-    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 
 void TabDeckEditorVisual::showPrintingSelector()
