@@ -190,6 +190,30 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
     }
 }
 
+void TabDeckEditorVisual::actLoadDeckFromClipboard()
+{
+    AbstractTabDeckEditor::actLoadDeckFromClipboard();
+    tabContainer->visualDeckView->updateDisplay();
+    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
+}
+
+void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
+{
+    AbstractTabDeckEditor::setDeck(_deck);
+    tabContainer->visualDeckView->updateDisplay();
+    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
+}
+
+void TabDeckEditorVisual::showPrintingSelector()
+{
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getInfo(), DECK_ZONE_MAIN);
+    printingSelectorDockWidget->printingSelector->updateDisplay();
+    aPrintingSelectorDockVisible->setChecked(true);
+    printingSelectorDockWidget->setVisible(true);
+}
+
 void TabDeckEditorVisual::restartLayout()
 {
     deckDockWidget->setVisible(true);
@@ -307,90 +331,6 @@ void TabDeckEditorVisual::retranslateUi()
     aFilterDockFloating->setText(tr("Floating"));
 
     aResetLayout->setText(tr("Reset layout"));
-}
-
-void TabDeckEditorVisual::actNewDeck()
-{
-    auto deckOpenLocation = confirmOpen(false);
-
-    if (deckOpenLocation == CANCELLED) {
-        return;
-    }
-
-    if (deckOpenLocation == NEW_TAB) {
-        emit openDeckEditor(nullptr);
-        return;
-    }
-
-    deckDockWidget->cleanDeck();
-    setModified(false);
-    deckMenu->setSaveStatus(false);
-}
-
-void TabDeckEditorVisual::actLoadDeck()
-{
-    auto deckOpenLocation = confirmOpen();
-
-    if (deckOpenLocation == CANCELLED) {
-        return;
-    }
-
-    DlgLoadDeck dialog(this);
-    if (!dialog.exec())
-        return;
-
-    QString fileName = dialog.selectedFiles().at(0);
-    TabDeckEditorVisual::openDeckFromFile(fileName, deckOpenLocation);
-    deckDockWidget->updateBannerCardComboBox();
-}
-
-void TabDeckEditorVisual::actLoadDeckFromClipboard()
-{
-    AbstractTabDeckEditor::actLoadDeckFromClipboard();
-    tabContainer->visualDeckView->updateDisplay();
-    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
-    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
-}
-
-void TabDeckEditorVisual::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
-{
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
-
-    auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt, true)) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
-        deckDockWidget->updateBannerCardComboBox();
-        if (!l->getBannerCard().first.isEmpty()) {
-            deckDockWidget->bannerCardComboBox->setCurrentIndex(
-                deckDockWidget->bannerCardComboBox->findText(l->getBannerCard().first));
-        }
-        if (deckOpenLocation == NEW_TAB) {
-            emit openDeckEditor(l);
-        } else {
-            deckMenu->setSaveStatus(false);
-            TabDeckEditorVisual::setDeck(l);
-        }
-    } else {
-        l->deleteLater();
-        QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
-    }
-    deckMenu->setSaveStatus(true);
-}
-
-void TabDeckEditorVisual::setDeck(DeckLoader *_deck)
-{
-    AbstractTabDeckEditor::setDeck(_deck);
-    tabContainer->visualDeckView->updateDisplay();
-    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
-    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
-}
-
-void TabDeckEditorVisual::showPrintingSelector()
-{
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getInfo(), DECK_ZONE_MAIN);
-    printingSelectorDockWidget->printingSelector->updateDisplay();
-    aPrintingSelectorDockVisible->setChecked(true);
-    printingSelectorDockWidget->setVisible(true);
 }
 
 // Method uses to sync docks state with menu items state
