@@ -7,10 +7,9 @@
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"
 
+#include <QHash>
 #include <QRegularExpression>
 #include <decklist.h>
-#include <regex>
-#include <unordered_map>
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)
@@ -53,24 +52,28 @@ void ManaBaseWidget::updateDisplay()
 
     int totalSum = 0;
     for (auto entry : manaBaseMap) {
-        totalSum += entry.second;
+        totalSum += entry;
     }
 
     // Define color mapping for mana types
-    std::unordered_map<QString, QColor> manaColors = {{"W", QColor(248, 231, 185)}, {"U", QColor(14, 104, 171)},
-                                                      {"B", QColor(21, 11, 0)},     {"R", QColor(211, 32, 42)},
-                                                      {"G", QColor(0, 115, 62)},    {"C", QColor(150, 150, 150)}};
+    QHash<QString, QColor> manaColors;
+    manaColors.insert("W", QColor(248, 231, 185));
+    manaColors.insert("U", QColor(14, 104, 171));
+    manaColors.insert("B", QColor(21, 11, 0));
+    manaColors.insert("R", QColor(211, 32, 42));
+    manaColors.insert("G", QColor(0, 115, 62));
+    manaColors.insert("C", QColor(150, 150, 150));
 
-    for (auto entry : manaBaseMap) {
-        QColor barColor = manaColors.count(entry.first) ? manaColors[entry.first] : Qt::gray;
-        BarWidget *barWidget = new BarWidget(QString(entry.first), entry.second, totalSum, barColor, this);
+    for (auto manaColor : manaBaseMap.keys()) {
+        QColor barColor = manaColors.contains(manaColor) ? manaColors[manaColor] : Qt::gray;
+        BarWidget *barWidget = new BarWidget(QString(manaColor), manaBaseMap[manaColor], totalSum, barColor, this);
         barLayout->addWidget(barWidget);
     }
 
     update();
 }
 
-std::unordered_map<QString, int> ManaBaseWidget::analyzeManaBase()
+QHash<QString, int> ManaBaseWidget::analyzeManaBase()
 {
     manaBaseMap.clear();
     InnerDecklistNode *listRoot = deckListModel->getDeckList()->getRoot();
@@ -95,10 +98,16 @@ std::unordered_map<QString, int> ManaBaseWidget::analyzeManaBase()
     return manaBaseMap;
 }
 
-std::unordered_map<QString, int> ManaBaseWidget::determineManaProduction(const QString &rulesText)
+QHash<QString, int> ManaBaseWidget::determineManaProduction(const QString &rulesText)
 {
     // Initialize mana counts
-    std::unordered_map<QString, int> manaCounts = {{"W", 0}, {"U", 0}, {"B", 0}, {"R", 0}, {"G", 0}, {"C", 0}};
+    QHash<QString, int> manaCounts;
+    manaCounts.insert("W", 0);
+    manaCounts.insert("U", 0);
+    manaCounts.insert("B", 0);
+    manaCounts.insert("R", 0);
+    manaCounts.insert("G", 0);
+    manaCounts.insert("C", 0);
 
     // Define regex patterns for different mana production rules
     QRegularExpression tapAddColorless(R"(\{T\}:\s*Add\s*\{C\}|Add\s*one\s*colorless\s*mana)");
@@ -131,10 +140,9 @@ std::unordered_map<QString, int> ManaBaseWidget::determineManaProduction(const Q
     return manaCounts;
 }
 
-void ManaBaseWidget::mergeManaCounts(std::unordered_map<QString, int> &manaCounts1,
-                                     const std::unordered_map<QString, int> &manaCounts2)
+void ManaBaseWidget::mergeManaCounts(QHash<QString, int> &manaCounts1, const QHash<QString, int> &manaCounts2)
 {
-    for (const auto &pair : manaCounts2) {
-        manaCounts1[pair.first] += pair.second; // Add values for matching keys
+    for (auto it = manaCounts2.constBegin(); it != manaCounts2.constEnd(); ++it) {
+        manaCounts1[it.key()] += it.value();
     }
 }
