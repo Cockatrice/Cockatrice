@@ -15,7 +15,7 @@ class VisualDeckEditorWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit VisualDeckEditorWidget(QWidget *parent = nullptr, DeckListModel *deck_list_model = nullptr);
+    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel);
     void resizeEvent(QResizeEvent *event) override;
     void updateDisplay();
     QWidget *displayCards(QList<QPair<QString, QList<CardInfoPtr>>> cardLists, int bannerOpacity);
@@ -41,7 +41,7 @@ protected slots:
     void activeSortCriteriaChanged();
 
 private:
-    DeckListModel *deck_list_model;
+    DeckListModel *deckListModel;
     QList<CardInfoPtr> *mainDeckCards;
     QList<CardInfoPtr> *sideboardCards;
     QVBoxLayout *mainLayout;
