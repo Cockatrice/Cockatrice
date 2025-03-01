@@ -50,9 +50,11 @@ void ManaBaseWidget::updateDisplay()
         delete item;
     }
 
-    int totalSum = 0;
+    int highestEntry = 0;
     for (auto entry : manaBaseMap) {
-        totalSum += entry;
+        if (entry > highestEntry) {
+            highestEntry = entry;
+        }
     }
 
     // Define color mapping for mana types
@@ -66,7 +68,7 @@ void ManaBaseWidget::updateDisplay()
 
     for (auto manaColor : manaBaseMap.keys()) {
         QColor barColor = manaColors.contains(manaColor) ? manaColors[manaColor] : Qt::gray;
-        BarWidget *barWidget = new BarWidget(QString(manaColor), manaBaseMap[manaColor], totalSum, barColor, this);
+        BarWidget *barWidget = new BarWidget(QString(manaColor), manaBaseMap[manaColor], highestEntry, barColor, this);
         barLayout->addWidget(barWidget);
     }
 
