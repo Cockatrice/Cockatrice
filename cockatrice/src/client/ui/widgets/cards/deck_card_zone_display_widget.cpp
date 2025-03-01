@@ -9,11 +9,12 @@
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,
                                                      QString _zoneName,
+                                                     QString _activeGroupCriteria,
                                                      QString _activeSortCriteria,
                                                      int bannerOpacity,
                                                      int subBannerOpacity)
-    : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), activeSortCriteria(_activeSortCriteria),
-      bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity)
+    : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
+      activeSortCriteria(_activeSortCriteria), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -61,7 +62,7 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
     QList<OverlappedCardGroupDisplayWidget *> cardGroupsDisplayWidgets =
         cardGroupContainer->findChildren<OverlappedCardGroupDisplayWidget *>();
 
-    QList<QString> cardGroups = getSortCriteriaValueList();
+    QList<QString> cardGroups = getGroupCriteriaValueList();
 
     for (QString cardGroup : cardGroups) {
         bool found = false;
@@ -72,11 +73,13 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
         }
 
         if (!found) {
-            OverlappedCardGroupDisplayWidget *display_widget = new OverlappedCardGroupDisplayWidget(
-                this, deckListModel, zoneName, cardGroup, activeSortCriteria, subBannerOpacity);
+            OverlappedCardGroupDisplayWidget *display_widget = new OverlappedCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName, cardGroup,
+                                                     activeGroupCriteria, activeSortCriteria, subBannerOpacity);
             connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                     SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
             connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+            connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                    &OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged);
             cardGroupLayout->addWidget(display_widget);
         }
     }
@@ -85,37 +88,59 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
 void DeckCardZoneDisplayWidget::deleteCardGroupIfItDoesNotExist()
 {
     QList<OverlappedCardGroupDisplayWidget *> cardGroupsDisplayWidgets =
-        cardGroupLayout->findChildren<OverlappedCardGroupDisplayWidget *>();
-    for (OverlappedCardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
-        bool found = false;
-        for (QString cardGroup : getSortCriteriaValueList()) {
-            if (cardGroupDisplayWidget->cardGroupCategory == cardGroup) {
-                found = true;
-            }
-        }
+        cardGroupContainer->findChildren<OverlappedCardGroupDisplayWidget *>();
 
-        if (!found) {
+    QList<QString> validGroups = getGroupCriteriaValueList();
+
+    qDebug() << "DeckCardZoneDisplayWidget: Checking for obsolete card groups.";
+    qDebug() << "Valid groups (should remain):" << validGroups;
+
+    for (OverlappedCardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
+        qDebug() << "Checking group:" << cardGroupDisplayWidget->cardGroupCategory;
+
+        if (!validGroups.contains(cardGroupDisplayWidget->cardGroupCategory)) {
+            qDebug() << "Deleting group:" << cardGroupDisplayWidget->cardGroupCategory;
             cardGroupLayout->removeWidget(cardGroupDisplayWidget);
+            cardGroupDisplayWidget->deleteLater(); // Properly delete the widget after the event loop cycles
+        } else {
+            qDebug() << "Keeping group:" << cardGroupDisplayWidget->cardGroupCategory;
         }
     }
+
+    qDebug() << "Finished checking for obsolete card groups.";
+}
+
+void DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged(QString _activeGroupCriteria)
+{
+    activeGroupCriteria = _activeGroupCriteria;
+    qDebug() << "DeckCardZoneDisplayWidget says: We group by " << activeGroupCriteria << " and display cards";
+    displayCards();
 }
 
 void DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged(QString _activeSortCriteria)
 {
     activeSortCriteria = _activeSortCriteria;
+    qDebug() << "DeckCardZoneDisplayWidget says: we sort by" << activeSortCriteria << " and emit a signal";
+    emit activeSortCriteriaChanged(activeSortCriteria);
 }
 
-QList<QString> DeckCardZoneDisplayWidget::getSortCriteriaValueList()
+QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
 {
-    QList<QString> sortCriteriaValues;
+    QList<QString> groupCriteriaValues;
 
     QList<CardInfoPtr> *cardsInZone = deckListModel->getCardsAsCardInfoPtrsForZone(zoneName);
 
     for (CardInfoPtr cardInZone : *cardsInZone) {
-        sortCriteriaValues.append(cardInZone->getProperty(activeSortCriteria));
+        groupCriteriaValues.append(cardInZone->getProperty(activeGroupCriteria));
     }
 
-    sortCriteriaValues.removeDuplicates();
-    sortCriteriaValues.sort();
-    return sortCriteriaValues;
+    groupCriteriaValues.removeDuplicates();
+    groupCriteriaValues.sort();
+
+    qDebug() << "These are the group by criteria values";
+    for (QString groupCriteria : groupCriteriaValues) {
+        qDebug() << groupCriteria;
+    }
+
+    return groupCriteriaValues;
 }
