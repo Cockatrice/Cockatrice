@@ -63,20 +63,20 @@ public:
     void resolveSetNameAndNumberToProviderID();
 
     // overload
-    bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true);
+    bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
     bool convertToCockatriceFormat(QString fileName);
 
 protected:
-    void saveToStream_DeckHeader(QTextStream &out);
+    void saveToStream_DeckHeader(QTextStream &out) const;
     void saveToStream_DeckZone(QTextStream &out,
                                const InnerDecklistNode *zoneNode,
                                bool addComments = true,
-                               bool addSetNameAndNumber = true);
+                               bool addSetNameAndNumber = true) const;
     void saveToStream_DeckZoneCards(QTextStream &out,
                                     const InnerDecklistNode *zoneNode,
                                     QList<DecklistCardNode *> cards,
                                     bool addComments = true,
-                                    bool addSetNameAndNumber = true);
+                                    bool addSetNameAndNumber = true) const;
     [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName) override;
     [[nodiscard]] QString getCompleteCardName(const QString &cardName) const override;
 };

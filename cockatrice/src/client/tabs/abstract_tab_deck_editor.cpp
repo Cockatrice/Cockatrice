@@ -389,7 +389,7 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
     deckMenu->setSaveStatus(true);
 }
 
-static void saveDeckToClipboard(DeckLoader *deckLoader, bool addComments, bool addSetNameAndNumber)
+static void saveDeckToClipboard(const DeckLoader *deckLoader, bool addComments, bool addSetNameAndNumber)
 {
     QString buffer;
     QTextStream stream(&buffer);

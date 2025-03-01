@@ -372,7 +372,7 @@ DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
     return PlainTextFormat;
 }
 
-bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool addSetNameAndNumber)
+bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool addSetNameAndNumber) const
 {
     if (addComments) {
         saveToStream_DeckHeader(out);
@@ -391,7 +391,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool add
     return true;
 }
 
-void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
+void DeckLoader::saveToStream_DeckHeader(QTextStream &out) const
 {
     if (!getName().isEmpty()) {
         out << "// " << getName() << "\n\n";
@@ -409,7 +409,7 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
 void DeckLoader::saveToStream_DeckZone(QTextStream &out,
                                        const InnerDecklistNode *zoneNode,
                                        bool addComments,
-                                       bool addSetNameAndNumber)
+                                       bool addSetNameAndNumber) const
 {
     // group cards by card type and count the subtotals
     QMultiMap<QString, DecklistCardNode *> cardsByType;
@@ -457,7 +457,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
                                             const InnerDecklistNode *zoneNode,
                                             QList<DecklistCardNode *> cards,
                                             bool addComments,
-                                            bool addSetNameAndNumber)
+                                            bool addSetNameAndNumber) const
 {
     // QMultiMap sorts values in reverse order
     for (int i = cards.size() - 1; i >= 0; --i) {
