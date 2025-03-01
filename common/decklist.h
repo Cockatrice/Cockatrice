@@ -366,8 +366,6 @@ public:
     }
     QStringList getCardList() const;
     QMap<QString, QString> getCardListWithProviderId() const;
-    QList<CardInfoPtr> *getCardsAsCardInfoPtrs() const;
-    QList<CardInfoPtr> *getCardsAsCardInfoPtrsForZone(QString zoneName) const;
 
     int getSideboardSize() const;
 

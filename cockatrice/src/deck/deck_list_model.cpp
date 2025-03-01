@@ -484,6 +484,74 @@ void DeckListModel::setDeckList(DeckLoader *_deck)
     rebuildTree();
 }
 
+QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrs() const
+{
+    QList<CardInfoPtr> *cards = new QList<CardInfoPtr>();
+    DeckList *decklist = getDeckList();
+    if (!decklist) {
+        return cards;
+    }
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return cards;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        for (int j = 0; j < currentZone->size(); j++) {
+            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            if (!currentCard)
+                continue;
+            for (int k = 0; k < currentCard->getNumber(); ++k) {
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                    currentCard->getName(), currentCard->getCardProviderId());
+                if (info) {
+                    cards->append(info);
+                } else {
+                    qDebug() << "Card not found in database!";
+                }
+            }
+        }
+    }
+    return cards;
+}
+
+QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName) const
+{
+    QList<CardInfoPtr> *cards = new QList<CardInfoPtr>();
+    DeckList *decklist = getDeckList();
+    if (!decklist) {
+        return cards;
+    }
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return cards;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        if (currentZone->getName() == zoneName) {
+            for (int j = 0; j < currentZone->size(); j++) {
+                DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+                if (!currentCard)
+                    continue;
+                for (int k = 0; k < currentCard->getNumber(); ++k) {
+                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                        currentCard->getName(), currentCard->getCardProviderId());
+                    if (info) {
+                        cards->append(info);
+                    } else {
+                        qDebug() << "Card not found in database!";
+                    }
+                }
+            }
+        }
+    }
+    return cards;
+}
+
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
     const int totalColumns = 2;
