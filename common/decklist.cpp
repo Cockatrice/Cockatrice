@@ -1,7 +1,5 @@
 #include "decklist.h"
 
-#include "../cockatrice/src/game/cards/card_database_manager.h"
-
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
@@ -850,66 +848,6 @@ QMap<QString, QString> DeckList::getCardListWithProviderId() const
     QMap<QString, QString> result;
     getCardListWithProviderIdHelper(root, result);
     return result;
-}
-
-QList<CardInfoPtr> *DeckList::getCardsAsCardInfoPtrs() const
-{
-    QList<CardInfoPtr> *cards = new QList<CardInfoPtr>();
-    InnerDecklistNode *listRoot = getRoot();
-    if (!listRoot)
-        return cards;
-
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
-                if (info) {
-                    cards->append(info);
-                } else {
-                    qDebug() << "Card not found in database!";
-                }
-            }
-        }
-    }
-    return cards;
-}
-
-QList<CardInfoPtr> *DeckList::getCardsAsCardInfoPtrsForZone(QString zoneName) const
-{
-    QList<CardInfoPtr> *cards = new QList<CardInfoPtr>();
-    InnerDecklistNode *listRoot = getRoot();
-    if (!listRoot)
-        return cards;
-
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        if (currentZone->getName() == zoneName) {
-            for (int j = 0; j < currentZone->size(); j++) {
-                DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-                if (!currentCard)
-                    continue;
-                for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                        currentCard->getName(), currentCard->getCardProviderId());
-                    if (info) {
-                        cards->append(info);
-                    } else {
-                        qDebug() << "Card not found in database!";
-                    }
-                }
-            }
-        }
-    }
-    return cards;
 }
 
 int DeckList::getSideboardSize() const
