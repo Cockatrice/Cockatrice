@@ -5,6 +5,8 @@
 #include "../main.h"
 #include "decklist.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -370,6 +372,15 @@ DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
         return CockatriceFormat;
     }
     return PlainTextFormat;
+}
+
+void DeckLoader::saveToClipboard(bool addComments, bool addSetNameAndNumber) const
+{
+    QString buffer;
+    QTextStream stream(&buffer);
+    saveToStream_Plain(stream, addComments, addSetNameAndNumber);
+    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
+    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
 bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool addSetNameAndNumber) const

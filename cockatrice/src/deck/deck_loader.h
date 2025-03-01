@@ -62,6 +62,8 @@ public:
 
     void resolveSetNameAndNumberToProviderID();
 
+    void saveToClipboard(bool addComments = true, bool addSetNameAndNumber = true) const;
+
     // overload
     bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
     bool convertToCockatriceFormat(QString fileName);
