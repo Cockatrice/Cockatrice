@@ -28,19 +28,23 @@ public slots:
 
 signals:
     void activeCardChanged(CardInfoPtr activeCard);
+    void activeGroupCriteriaChanged(QString activeGroupCriteria);
     void activeSortCriteriaChanged(QString activeSortCriteria);
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
 
 protected slots:
     void onHover(CardInfoPtr hoveredCard);
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void actChangeActiveGroupCriteria();
     void actChangeActiveSortCriteria();
 
 private:
     DeckListModel *deckListModel;
     QVBoxLayout *mainLayout;
+    QComboBox *groupByComboBox;
+    QString activeGroupCriteria = "maintype";
     QComboBox *sortByComboBox;
-    QString activeSortCriteria = "maintype";
+    QString activeSortCriteria = "name";
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;

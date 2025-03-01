@@ -27,12 +27,23 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     mainLayout = new QVBoxLayout();
     this->setLayout(mainLayout);
 
+    groupByComboBox = new QComboBox();
+    QStringList groupProperties;
+    groupProperties << "maintype"
+                    << "colors"
+                    << "cmc"
+                    << "name";
+    groupByComboBox->addItems(groupProperties);
+    connect(groupByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
+            &VisualDeckEditorWidget::actChangeActiveGroupCriteria);
+    actChangeActiveGroupCriteria();
+
     sortByComboBox = new QComboBox();
     QStringList sortProperties;
-    sortProperties << "maintype"
-                   << "colors"
+    sortProperties << "name"
                    << "cmc"
-                   << "name";
+                   << "colors"
+                   << "maintype";
     sortByComboBox->addItems(sortProperties);
     connect(sortByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
             &VisualDeckEditorWidget::actChangeActiveSortCriteria);
@@ -56,6 +67,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     overlapControlWidget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
 
+    mainLayout->addWidget(groupByComboBox);
     mainLayout->addWidget(sortByComboBox);
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(overlapControlWidget);
@@ -80,13 +92,15 @@ void VisualDeckEditorWidget::addZoneIfDoesNotExist()
         }
 
         if (!found) {
-            DeckCardZoneDisplayWidget *zoneDisplayWidget =
-                new DeckCardZoneDisplayWidget(zoneContainer, deckListModel, zone, activeSortCriteria, 20, 10);
+            DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
+                zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria, 20, 10);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this,
                     &VisualDeckEditorWidget::onCardClick);
             connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
                     &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
+            connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
+                    &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
             zoneContainerLayout->addWidget(zoneDisplayWidget);
         }
     }
@@ -117,9 +131,17 @@ void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
     zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
 }
 
+void VisualDeckEditorWidget::actChangeActiveGroupCriteria()
+{
+    activeGroupCriteria = groupByComboBox->currentText();
+    qDebug() << "VDE says we group by " << activeGroupCriteria;
+    emit activeGroupCriteriaChanged(activeGroupCriteria);
+}
+
 void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 {
     activeSortCriteria = sortByComboBox->currentText();
+    qDebug() << "VDE says we sort by " << activeSortCriteria;
     emit activeSortCriteriaChanged(activeSortCriteria);
 }
 
