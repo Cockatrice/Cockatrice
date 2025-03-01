@@ -307,6 +307,8 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     deckView->expandAll();
 
     deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
+
+    emit deckChanged();
 }
 
 DeckLoader *DeckEditorDeckDockWidget::getDeckList()
@@ -320,6 +322,7 @@ void DeckEditorDeckDockWidget::cleanDeck()
     nameEdit->setText(QString());
     commentsEdit->setText(QString());
     hashLabel->setText(QString());
+    emit deckChanged();
 }
 
 void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)

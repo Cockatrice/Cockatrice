@@ -205,35 +205,8 @@ void VisualDeckEditorWidget::populateCards()
     if (!deck_list_model)
         return;
     DeckList *decklist = deck_list_model->getDeckList();
-    if (!decklist)
-        return;
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return;
-
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
-                if (info) {
-                    if (currentZone->getName() == DECK_ZONE_MAIN) {
-                        mainDeckCards->append(info);
-                    } else if (currentZone->getName() == DECK_ZONE_SIDE) {
-                        sideboardCards->append(info);
-                    }
-                } else {
-                    qDebug() << "Card not found in database!";
-                }
-            }
-        }
-    }
+    mainDeckCards = decklist->getCardsAsCardInfoPtrsForZone(DECK_ZONE_MAIN);
+    sideboardCards = decklist->getCardsAsCardInfoPtrsForZone(DECK_ZONE_SIDE);
 }
 
 void VisualDeckEditorWidget::sortCardList(const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder)
