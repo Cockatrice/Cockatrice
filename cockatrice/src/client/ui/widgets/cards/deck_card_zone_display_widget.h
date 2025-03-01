@@ -18,6 +18,7 @@ public:
     DeckCardZoneDisplayWidget(QWidget *parent,
                               DeckListModel *deckListModel,
                               QString zoneName,
+                              QString activeGroupCriteria,
                               QString activeSortCriteria,
                               int bannerOpacity,
                               int subBannerOpacity);
@@ -32,14 +33,17 @@ public slots:
     void displayCards();
     void addCardGroupIfItDoesNotExist();
     void deleteCardGroupIfItDoesNotExist();
+    void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
     void onActiveSortCriteriaChanged(QString activeSortCriteria);
-    QList<QString> getSortCriteriaValueList();
+    QList<QString> getGroupCriteriaValueList();
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
     void cardHovered(CardInfoPtr card);
+    void activeSortCriteriaChanged(QString activeSortCriteria);
 
 private:
+    QString activeGroupCriteria;
     QString activeSortCriteria;
     QVBoxLayout *layout;
     BannerWidget *banner;
