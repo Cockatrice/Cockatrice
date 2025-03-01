@@ -204,9 +204,9 @@ void VisualDeckEditorWidget::populateCards()
 
     if (!deckListModel)
         return;
-    DeckList *decklist = deckListModel->getDeckList();
-    mainDeckCards = decklist->getCardsAsCardInfoPtrsForZone(DECK_ZONE_MAIN);
-    sideboardCards = decklist->getCardsAsCardInfoPtrsForZone(DECK_ZONE_SIDE);
+
+    mainDeckCards = deckListModel->getCardsAsCardInfoPtrsForZone(DECK_ZONE_MAIN);
+    sideboardCards = deckListModel->getCardsAsCardInfoPtrsForZone(DECK_ZONE_SIDE);
 }
 
 void VisualDeckEditorWidget::sortCardList(const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder)
