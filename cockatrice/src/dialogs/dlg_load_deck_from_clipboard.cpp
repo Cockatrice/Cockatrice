@@ -13,7 +13,10 @@
 #include <QTextStream>
 #include <QVBoxLayout>
 
-DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
+/**
+ * Creates the main layout and connects the signals that are common to all versions of this window
+ */
+void DlgLoadDeckFromClipboard::createMainLayout()
 {
     contentsEdit = new QPlainTextEdit;
 
@@ -38,12 +41,23 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(pa
 
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Load deck from clipboard"));
     resize(500, 500);
 
     actRefresh();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
+}
+
+/**
+ * Creates the dialog window for the "Load deck from clipboard" action
+ *
+ * @param parent The parent widget
+ */
+DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
+{
+    createMainLayout();
+
+    setWindowTitle(tr("Load deck from clipboard"));
 }
 
 /**
@@ -60,14 +74,18 @@ static QString deckListToString(const DeckLoader *deckList)
 }
 
 /**
- * Creates a dialogue window that already has the contents of the deck loaded into the textEdit
+ * Creates the dialog window for the "Edit deck in clipboard" action
  *
- * @param deck The deck to load
+ * @param deck The existing deck in the deck editor
  * @param parent The parent widget
  */
 DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(const DeckLoader &deck, QWidget *parent)
     : DlgLoadDeckFromClipboard(parent)
 {
+    createMainLayout();
+
+    setWindowTitle(tr("Edit deck in clipboard"));
+
     deckList = new DeckLoader(deck);
     deckList->setParent(this);
 

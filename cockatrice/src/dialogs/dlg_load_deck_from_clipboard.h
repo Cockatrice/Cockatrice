@@ -8,6 +8,9 @@ class DeckLoader;
 class QPlainTextEdit;
 class QPushButton;
 
+/**
+ * Dialog window for actions that involve loading decks from text input.
+ */
 class DlgLoadDeckFromClipboard : public QDialog
 {
     Q_OBJECT
@@ -17,10 +20,16 @@ private slots:
     void refreshShortcuts();
 
 private:
+    /**
+     * before actOK has been called, null deckList indicates "load deck from clipboard" action, and nonnull deckList
+     * indicates "edit deck in clipboard" action
+     */
     DeckLoader *deckList;
     QPlainTextEdit *contentsEdit;
     QPushButton *refreshButton;
     QCheckBox *loadSetNameAndNumberCheckBox;
+
+    void createMainLayout();
 
 public:
     explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
