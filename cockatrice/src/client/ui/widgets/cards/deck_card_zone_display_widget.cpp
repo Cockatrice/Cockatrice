@@ -73,7 +73,8 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
         }
 
         if (!found) {
-            OverlappedCardGroupDisplayWidget *display_widget = new OverlappedCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName, cardGroup,
+            OverlappedCardGroupDisplayWidget *display_widget =
+                new OverlappedCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName, cardGroup,
                                                      activeGroupCriteria, activeSortCriteria, subBannerOpacity);
             connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                     SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
