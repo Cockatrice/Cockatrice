@@ -65,10 +65,8 @@ void TabDeckEditorVisual::createCentralFrame()
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChangedDatabaseDisplay, this,
             &AbstractTabDeckEditor::updateCard);
-    connect(tabContainer, &TabDeckEditorVisualTabWidget::mainboardCardClicked, this,
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClicked, this,
             &TabDeckEditorVisual::processMainboardCardClick);
-    connect(tabContainer, &TabDeckEditorVisualTabWidget::sideboardCardClicked, this,
-            &TabDeckEditorVisual::processSideboardCardClick);
 
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClickedDatabaseDisplay, this,
             &TabDeckEditorVisual::processCardClickDatabaseDisplay);
@@ -161,23 +159,14 @@ void TabDeckEditorVisual::changeModelIndexToCard(const CardInfoPtr &activeCard)
     deckDockWidget->deckView->setCurrentIndex(index);
 }
 
-void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
+void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
+                                                    CardInfoPictureWithTextOverlayWidget *instance,
+                                                    QString zoneName)
 {
     if (event->button() == Qt::LeftButton) {
-        actSwapCard(instance->getInfo(), DECK_ZONE_MAIN);
+        actSwapCard(instance->getInfo(), zoneName);
     } else if (event->button() == Qt::RightButton) {
         actDecrementCard(instance->getInfo());
-    } else if (event->button() == Qt::MiddleButton) {
-        deckDockWidget->actRemoveCard();
-    }
-}
-
-void TabDeckEditorVisual::processSideboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
-{
-    if (event->button() == Qt::LeftButton) {
-        actSwapCard(instance->getInfo(), DECK_ZONE_SIDE);
-    } else if (event->button() == Qt::RightButton) {
-        actDecrementCardFromSideboard(instance->getInfo());
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
