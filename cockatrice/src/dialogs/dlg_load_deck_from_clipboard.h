@@ -24,6 +24,7 @@ private:
 
 public:
     explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
+    explicit DlgLoadDeckFromClipboard(const DeckLoader &deck, QWidget *parent = nullptr);
 
     /**
      * Gets the loaded deck. Only call this method after this dialog window has been successfully exec'd.
