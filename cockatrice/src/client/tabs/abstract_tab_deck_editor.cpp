@@ -389,40 +389,33 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
     deckMenu->setSaveStatus(true);
 }
 
-void AbstractTabDeckEditor::actSaveDeckToClipboard()
+static void saveDeckToClipboard(DeckLoader *deckLoader, bool addComments, bool addSetNameAndNumber)
 {
     QString buffer;
     QTextStream stream(&buffer);
-    getDeckList()->saveToStream_Plain(stream);
+    deckLoader->saveToStream_Plain(stream, addComments, addSetNameAndNumber);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+}
+
+void AbstractTabDeckEditor::actSaveDeckToClipboard()
+{
+    saveDeckToClipboard(getDeckList(), true, true);
 }
 
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
 {
-    QString buffer;
-    QTextStream stream(&buffer);
-    getDeckList()->saveToStream_Plain(stream, true, false);
-    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
-    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+    saveDeckToClipboard(getDeckList(), true, false);
 }
 
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    QString buffer;
-    QTextStream stream(&buffer);
-    getDeckList()->saveToStream_Plain(stream, false);
-    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
-    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+    saveDeckToClipboard(getDeckList(), false, true);
 }
 
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
 {
-    QString buffer;
-    QTextStream stream(&buffer);
-    getDeckList()->saveToStream_Plain(stream, false, false);
-    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
-    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+    saveDeckToClipboard(getDeckList(), false, false);
 }
 
 void AbstractTabDeckEditor::actPrintDeck()
